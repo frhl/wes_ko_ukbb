@@ -7,17 +7,21 @@
 
 #$ -cwd
 #$ -P lindgren.prjc
+#$ -
 
 CHR=${SGE_TASK_ID}
 
 # IN FILES
-RAW_ROOT=/well/lindgren/UKBIOBANK/DATA/IMPUTATION/
-RAW_FILE=ukb_imp_chr${CHR}_v3.bgen
-SAM_ROOT=/gpfs1/well/lindgren/UKBIOBANK/DATA/SAMPLE_FAM/
-SAM_FILE=ukb11867_imp_chr1_v3_s487395.sample
-FAM_FILE=/well/lindgren/UKBIOBANK/stefania/RelGroups/2020_03_10/QC.fam
-FAM_FILE_WB=/well/lindgren/UKBIOBANK/stefania/RelGroups/2020_03_10/QCWB.fam
-VEP_FILE=/well/lindgren/UKBIOBANK/flassen/projects/KO/IMPUTATION/derived/vep/ukbb_mfi_vep_all_HIGH_maf_info.txt
+readonly RAW_ROOT=/well/lindgren/UKBIOBANK/nbaya/resources/ukb_wes_200k_inliers_split_filtered/
+readonly RAW_FILE=ukb_wes_200k_inliers_split_filtered_hail_chr${CHR}.vcf.bgz
+
+#readonly SAM_ROOT=/gpfs1/well/lindgren/UKBIOBANK/DATA/SAMPLE_FAM/
+#readonly SAM_FILE=ukb11867_imp_chr1_v3_s487395.sample
+
+readonly FAM_FILE=/well/lindgren/UKBIOBANK/stefania/RelGroups/2020_03_10/QC.fam
+readonly FAM_FILE_WB=/well/lindgren/UKBIOBANK/stefania/RelGroups/2020_03_10/QCWB.fam
+
+readonly VEP_FILE=/well/lindgren/UKBIOBANK/flassen/projects/KO/IMPUTATION/derived/vep/ukbb_mfi_vep_all_HIGH_maf_info.txt
 
 # OUT FILES
 OUT_ROOT_BGEN=/well/lindgren/UKBIOBANK/flassen/projects/KO/IMPUTATION/derived/plink/bgen/
@@ -38,14 +42,14 @@ plink=/apps/well/plink/2.00a-20170724/plink2
 ## Open VEP variants.
 cat ${VEP_FILE} | cut -d" " -f3 > ${OUT_ROOT_BGEN}${TMP_FILE}
 
-## subset samples
-$qctool \
- -g ${RAW_ROOT}${RAW_FILE} \
- -s ${SAM_ROOT}${SAM_FILE} \
- -incl-snpids ${OUT_ROOT_BGEN}${TMP_FILE} \
- -ofiletype bgen \
- -og ${OUT_ROOT_BGEN}${OUT_BGEN_FILE} \
- -os ${OUT_ROOT_BGEN}${OUT_SAMPLE_FILE}
+## subset SNPs
+#$qctool \
+# -g ${RAW_ROOT}${RAW_FILE} \
+# -s ${SAM_ROOT}${SAM_FILE} \
+# -incl-snpids ${OUT_ROOT_BGEN}${TMP_FILE} \
+# -ofiletype bgen \
+# -og ${OUT_ROOT_BGEN}${OUT_BGEN_FILE} \
+# -os ${OUT_ROOT_BGEN}${OUT_SAMPLE_FILE}
 
 # remove tmp files
 rm ${OUT_ROOT_BGEN}${TMP_FILE}
@@ -129,10 +133,5 @@ $plink \
  --geno 0.05 \
  --hardy \
  --out ${OUT_ROOT_BED_WB}${OUT_BED_HWE_FILE}
-
-
-
-
-
 
 
