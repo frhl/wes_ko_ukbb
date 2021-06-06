@@ -1,0 +1,3 @@
+Possible precedence issue with control flow operator at /apps/eb/skylake/software/BioPerl/1.7.2-foss-2018b-Perl-5.28.0/lib/perl5/site_perl/5.28.0/Bio/DB/IndexedBase.pm line 845.
+WARNING: No input file format specified - detected vcf format
+mv: cannot stat '/well/lindgren/UKBIOBANK/flassen/projects/KO/WES200K/derived/vep/TMP_VEP10': No such file or directory
