@@ -3,12 +3,13 @@
 # Takes the resulting VEP files and create two files with AF < 2% 
 # that contains HIGH and MODERATE impact variants respectively.
 
-#$ -cwd
-# -o combine_vep.log
-# -e combine_vep.errors.log
-# -q short.qc
+#$ -n combine
+#$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
+#$ -o combine_vep.log
+#$ -e combine_vep.errors.log
+#$ -q short.qc
 #$ -P lindgren.prjc
-	# -pe shmem 1
+#$ -pe shmem 1
 
 # I/O
 IN_ROOT=/well/lindgren/UKBIOBANK/flassen/projects/KO/WES200K/derived/vep/output/

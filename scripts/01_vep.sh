@@ -11,13 +11,13 @@
 # -t 1-22
 
 # Set variables
-CHR=${SGE_TASK_ID}
-RAW_ROOT=/well/lindgren/UKBIOBANK/nbaya/resources/ukb_wes_200k_inliers_split_filtered/
-RAW_FILE=ukb_wes_200k_inliers_split_filtered_hail_chr${CHR}.vcf.bgz
-TMP_FILE=ukb_wes_200k_inliers_split_filtered_chr${CHR}.vcf
+readonly CHR=${SGE_TASK_ID}
+readonly RAW_ROOT=/well/lindgren/UKBIOBANK/nbaya/resources/ukb_wes_200k_inliers_split_filtered/
+readonly RAW_FILE=ukb_wes_200k_inliers_split_filtered_hail_chr${CHR}.vcf.bgz
+readonly TMP_FILE=ukb_wes_200k_inliers_split_filtered_chr${CHR}.vcf
 
-OUT_ROOT=/well/lindgren/UKBIOBANK/flassen/projects/KO/WES200K/derived/vep/output/
-OUT_FILE1=ukb_wes_200k_vep_chr${CHR}.vcf # direct output of VEP
+readonly OUT_ROOT=derived/vep/output/
+readonly OUT_FILE1=ukb_wes_200k_vep_chr${CHR}.vcf # direct output of VEP
 
 # extract variant information
 module load BCFtools/1.9-foss-2018b # for extracting variant information
