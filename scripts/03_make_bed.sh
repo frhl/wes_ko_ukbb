@@ -4,7 +4,7 @@
 #
 # Author: Frederik Lassen (2021-06-25)
 #
-#$ -N phase_common
+#$ -N make_bed
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/make_bed.log
 #$ -e logs/make_bed.errors.log
@@ -42,7 +42,7 @@ cat ${VEP_FILE} | cut -f3 > ${OUT_ROOT}${TMP_FILE}
 ## generate bed file with all variants
 $plink \
  --vcf ${RAW_ROOT}${RAW_FILE}  \
- --keep ${FAM_FILE_WB} \
+# --keep ${FAM_FILE_WB} \
  --extract ${OUT_ROOT}${TMP_FILE} \
  --max-maf 0.02 \
  --geno 0.05 \
@@ -50,34 +50,12 @@ $plink \
  --out ${OUT_ROOT}${OUT_FILE}
 
 ## calculate hwe stats
-$plink \
- --bfile ${RAW_ROOT}${RAW_FILE} \
- --keep ${FAM_FILE_WB} \
- --geno 0.05 \
- --hardy \
- --out ${OUT_ROOT}${OUT_FILE}
-
-rm ${OUT_ROOT}${TMP_FILE}
-
-## generate .bed files in which HWE P-values < 10e-7 are excluded
-#cat ${OUT_ROOT_BED_WB}${OUT_BED_FILE}.hardy | awk '$10 < 1e-7 {print $2}' > ${OUT_ROOT_BED_WB}${OUT_HWE_EXL_FILE}
-#cat ${OUT_ROOT_BED_WB}${OUT_BED_FILE}.hardy | awk '$10 > 1e-7 {print $2}' > ${OUT_ROOT_BED_WB}${OUT_HWE_ICL_FILE}
-
 #plink \
-# --bgen ${OUT_ROOT_BGEN}${OUT_BGEN_FILE} 'ref-first' \
-# --sample ${OUT_ROOT_BGEN}${OUT_SAMPLE_FILE} \
-# --exclude ${OUT_ROOT_BED_WB}${OUT_HWE_EXL_FILE} \
-# --keep ${FAM_FILE_WB} \
-# --geno 0.05 \
-# --make-bed \
-# --out ${OUT_ROOT_BED_WB}${OUT_BED_HWE_FILE}
-
-## calculate hwe stats
-#plink \
-# --bfile ${OUT_ROOT_BED_WB}${OUT_BED_HWE_FILE} \
+# --bfile ${RAW_ROOT}${RAW_FILE} \
 # --keep ${FAM_FILE_WB} \
 # --geno 0.05 \
 # --hardy \
-# --out ${OUT_ROOT_BED_WB}${OUT_BED_HWE_FILE}
+# --out ${OUT_ROOT}${OUT_FILE}
 
+rm ${OUT_ROOT}${TMP_FILE}
 
