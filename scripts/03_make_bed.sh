@@ -1,137 +1,83 @@
-#!/bin/bash
-
-# genereates .bgen and .bed files
-# filters by the following (include if):
-# 1) HWE P-value > 1e-7
-# 3) genotyping rate > 5%
-
-#$ -cwd
+#!/usr/bin/env bash
+#
+# This script will convert all phased vcf files into bed files and subset to high impact variants.
+#
+# Author: Frederik Lassen (2021-06-25)
+#
+#$ -N phase_common
+#$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
+#$ -o logs/make_bed.log
+#$ -e logs/make_bed.errors.log
 #$ -P lindgren.prjc
-#$ -
+#$ -pe shmem 1
+#$ -q short.qe
+#$ -t 22
+#$ -V
 
-CHR=${SGE_TASK_ID}
+set -o errexit
+set -o nounset
+module purge 
+chr=${SGE_TASK_ID}
 
 # IN FILES
-readonly RAW_ROOT=/well/lindgren/UKBIOBANK/nbaya/resources/ukb_wes_200k_inliers_split_filtered/
-readonly RAW_FILE=ukb_wes_200k_inliers_split_filtered_hail_chr${CHR}.vcf.bgz
+readonly RAW_ROOT="/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/data/phased"
+readonly RAW_FILE="/ukb_wes_200k_phased_chr${chr}.1of1.vcf.gz"
 
-#readonly SAM_ROOT=/gpfs1/well/lindgren/UKBIOBANK/DATA/SAMPLE_FAM/
-#readonly SAM_FILE=ukb11867_imp_chr1_v3_s487395.sample
+readonly FAM_FILE_WB="/well/lindgren/UKBIOBANK/stefania/RelGroups/2020_10_05/QCWB.txt"
+#readonly FAM_FILE_WB="/well/lindgren/UKBIOBANK/stefania/RelGroups/2020_03_10/QCWB.fam"
 
-readonly FAM_FILE=/well/lindgren/UKBIOBANK/stefania/RelGroups/2020_03_10/QC.fam
-readonly FAM_FILE_WB=/well/lindgren/UKBIOBANK/stefania/RelGroups/2020_03_10/QCWB.fam
-
-readonly VEP_FILE=/well/lindgren/UKBIOBANK/flassen/projects/KO/IMPUTATION/derived/vep/ukbb_mfi_vep_all_HIGH_maf_info.txt
+readonly VEP_FILE="/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/derived/vep/ukb_wes_200k_vep_HIGH.txt"
 
 # OUT FILES
-OUT_ROOT_BGEN=/well/lindgren/UKBIOBANK/flassen/projects/KO/IMPUTATION/derived/plink/bgen/
-OUT_ROOT_BED=/well/lindgren/UKBIOBANK/flassen/projects/KO/IMPUTATION/derived/plink/all/
-OUT_ROOT_BED_WB=/well/lindgren/UKBIOBANK/flassen/projects/KO/IMPUTATION/derived/plink/wb/
-OUT_SAMPLE_FILE=ukb_vep_chr${CHR}.sample
-OUT_BGEN_FILE=ukb_vep_chr${CHR}.bgen
-OUT_BED_FILE=ukb_vep_chr${CHR}
-OUT_BED_HWE_FILE=ukb_vep_hwe_chr${CHR}
-OUT_HWE_EXL_FILE=ukb_vep_hwe_chr_excluded_snps_chr${CHR}.txt
-OUT_HWE_ICL_FILE=ukb_vep_hwe_chr_included_snps_chr${CHR}.txt
-TMP_FILE=rsid_chr${CHR}.tmp
+readonly OUT_ROOT="/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/derived/bed/"
+readonly OUT_FILE="/ukb_wes_200k_phased_chr${chr}"
+readonly TMP_FILE="/ukb_wes_200k_${chr}.tmp"
 
 ## setup paths to sofware
-qctool=/apps/well/qctool/2.0.1/qctool
 plink=/apps/well/plink/2.00a-20170724/plink2
 
-## Open VEP variants.
-cat ${VEP_FILE} | cut -d" " -f3 > ${OUT_ROOT_BGEN}${TMP_FILE}
+# select VEP variants and keep in temp file
+cat ${VEP_FILE} | cut -f3 > ${OUT_ROOT}${TMP_FILE}
 
-## subset SNPs
-#$qctool \
-# -g ${RAW_ROOT}${RAW_FILE} \
-# -s ${SAM_ROOT}${SAM_FILE} \
-# -incl-snpids ${OUT_ROOT_BGEN}${TMP_FILE} \
-# -ofiletype bgen \
-# -og ${OUT_ROOT_BGEN}${OUT_BGEN_FILE} \
-# -os ${OUT_ROOT_BGEN}${OUT_SAMPLE_FILE}
-
-# remove tmp files
-rm ${OUT_ROOT_BGEN}${TMP_FILE}
-
-###############
-# All samples #
-###############
-
-## generate .bed files in which SNPs with a genotype rate of 95% (5 % missing) are included.
+## generate bed file with all variants
 $plink \
- --bgen ${OUT_ROOT_BGEN}${OUT_BGEN_FILE} 'ref-first' \
- --sample ${OUT_ROOT_BGEN}${OUT_SAMPLE_FILE} \
- --keep ${FAM_FILE} \
+ --vcf ${RAW_ROOT}${RAW_FILE}  \
+ --keep ${FAM_FILE_WB} \
+ --extract ${OUT_ROOT}${TMP_FILE} \
+ --max-maf 0.02 \
  --geno 0.05 \
  --make-bed \
- --out ${OUT_ROOT_BED}${OUT_BED_FILE}
+ --out ${OUT_ROOT}${OUT_FILE}
 
 ## calculate hwe stats
 $plink \
- --bfile ${OUT_ROOT_BED}${OUT_BED_FILE} \
+ --bfile ${RAW_ROOT}${RAW_FILE} \
+ --keep ${FAM_FILE_WB} \
  --geno 0.05 \
  --hardy \
- --out ${OUT_ROOT_BED}${OUT_BED_FILE}
+ --out ${OUT_ROOT}${OUT_FILE}
+
+rm ${OUT_ROOT}${TMP_FILE}
 
 ## generate .bed files in which HWE P-values < 10e-7 are excluded
-cat ${OUT_ROOT_BED}${OUT_BED_FILE}.hardy | awk '$10 < 1e-7 {print $2}' > ${OUT_ROOT_BED}${OUT_HWE_EXL_FILE}
-cat ${OUT_ROOT_BED}${OUT_BED_FILE}.hardy | awk '$10 > 1e-7 {print $2}' > ${OUT_ROOT_BED}${OUT_HWE_ICL_FILE}
+#cat ${OUT_ROOT_BED_WB}${OUT_BED_FILE}.hardy | awk '$10 < 1e-7 {print $2}' > ${OUT_ROOT_BED_WB}${OUT_HWE_EXL_FILE}
+#cat ${OUT_ROOT_BED_WB}${OUT_BED_FILE}.hardy | awk '$10 > 1e-7 {print $2}' > ${OUT_ROOT_BED_WB}${OUT_HWE_ICL_FILE}
 
-$plink \
- --bgen ${OUT_ROOT_BGEN}${OUT_BGEN_FILE} 'ref-first' \
- --sample ${OUT_ROOT_BGEN}${OUT_SAMPLE_FILE} \
- --exclude ${OUT_ROOT_BED}${OUT_HWE_EXL_FILE} \
- --keep ${FAM_FILE} \
- --geno 0.05 \
- --make-bed \
- --out ${OUT_ROOT_BED}${OUT_BED_HWE_FILE}
-
-$plink \
- --bfile ${OUT_ROOT_BED}${OUT_BED_HWE_FILE} \
- --geno 0.05 \
- --hardy \
- --out ${OUT_ROOT_BED}${OUT_BED_HWE_FILE}
-
-#################
-# White British #
-#################
-
-$plink \
- --bgen ${OUT_ROOT_BGEN}${OUT_BGEN_FILE} 'ref-first' \
- --sample ${OUT_ROOT_BGEN}${OUT_SAMPLE_FILE} \
- --keep ${FAM_FILE_WB} \
- --geno 0.05 \
- --make-bed \
- --out ${OUT_ROOT_BED_WB}${OUT_BED_FILE}
+#plink \
+# --bgen ${OUT_ROOT_BGEN}${OUT_BGEN_FILE} 'ref-first' \
+# --sample ${OUT_ROOT_BGEN}${OUT_SAMPLE_FILE} \
+# --exclude ${OUT_ROOT_BED_WB}${OUT_HWE_EXL_FILE} \
+# --keep ${FAM_FILE_WB} \
+# --geno 0.05 \
+# --make-bed \
+# --out ${OUT_ROOT_BED_WB}${OUT_BED_HWE_FILE}
 
 ## calculate hwe stats
-$plink \
- --bfile ${OUT_ROOT_BED_WB}${OUT_BED_FILE} \
- --keep ${FAM_FILE_WB} \
- --geno 0.05 \
- --hardy \
- --out ${OUT_ROOT_BED_WB}${OUT_BED_FILE}
-
-## generate .bed files in which HWE P-values < 10e-7 are excluded
-cat ${OUT_ROOT_BED_WB}${OUT_BED_FILE}.hardy | awk '$10 < 1e-7 {print $2}' > ${OUT_ROOT_BED_WB}${OUT_HWE_EXL_FILE}
-cat ${OUT_ROOT_BED_WB}${OUT_BED_FILE}.hardy | awk '$10 > 1e-7 {print $2}' > ${OUT_ROOT_BED_WB}${OUT_HWE_ICL_FILE}
-
-$plink \
- --bgen ${OUT_ROOT_BGEN}${OUT_BGEN_FILE} 'ref-first' \
- --sample ${OUT_ROOT_BGEN}${OUT_SAMPLE_FILE} \
- --exclude ${OUT_ROOT_BED_WB}${OUT_HWE_EXL_FILE} \
- --keep ${FAM_FILE_WB} \
- --geno 0.05 \
- --make-bed \
- --out ${OUT_ROOT_BED_WB}${OUT_BED_HWE_FILE}
-
-## calculate hwe stats
-$plink \
- --bfile ${OUT_ROOT_BED_WB}${OUT_BED_HWE_FILE} \
- --keep ${FAM_FILE_WB} \
- --geno 0.05 \
- --hardy \
- --out ${OUT_ROOT_BED_WB}${OUT_BED_HWE_FILE}
+#plink \
+# --bfile ${OUT_ROOT_BED_WB}${OUT_BED_HWE_FILE} \
+# --keep ${FAM_FILE_WB} \
+# --geno 0.05 \
+# --hardy \
+# --out ${OUT_ROOT_BED_WB}${OUT_BED_HWE_FILE}
 
 

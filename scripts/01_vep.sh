@@ -37,7 +37,7 @@ export PERL5LIB=$PERL5LIB:/well/lindgren/flassen/software/VEP/plugins_grch38/
 ###########
 
 ## run VEP 95 on temporary file
-vep --input_file "${OUT_ROOT}${TMP_FILE}" \
+vep --input_file "${RAW_ROOT}${TMP_FILE}" \
 --dir_cache /well/lindgren/flassen/software/VEP/vep95/GRCh38 \
 --assembly GRCh38 \
 --cache \
