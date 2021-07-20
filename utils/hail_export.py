@@ -3,13 +3,13 @@
 import hail as hl
 import os
 import argparse
+import re
 
 WD = '/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb'
 DATA_DIR = f'{WD}/data'
 
 def hail_init(chrom=None, log_prefix='get_vcf'):
-    r'''Initialize Hail
-    '''
+    r'''Initialize Hail '''
     n_slots = os.environ.get('NSLOTS', 1)
     chr_suffix = '' if chr is None else f'_chr{chrom}'
     WD = '/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb'
@@ -17,9 +17,8 @@ def hail_init(chrom=None, log_prefix='get_vcf'):
             default_reference='GRCh38',
             master=f'local[{n_slots}]')
 
-
-# mt = import_table('data/phased/ukb_wes_200k_phased_chr22.1of1.vcf.gz','vcf')
 def import_table(input_path, input_type, cache=False):
+    r'''Import mt/vcf/plink tables '''
     if input_type=='mt':
         mt = hl.read_matrix_table(input_path)
     elif input_type=='vcf':
@@ -48,18 +47,32 @@ def filter_maf(mt, maf=None, bounds = 'lower'):
 def filter_samples(mt, subset = 'WB'):
     r'''Filter samples to only include QCED individuals in reeference population '''
     if subset=='WB':
-        qt = hl.import_table('<INSERT TABLE NAME>').rename({'eid' : 's'})
-        qt = qt.key_by('s')
+        qt = hl.import_table('/well/lindgren/UKBIOBANK/stefania/RelGroups/2021_03_12/QCWB.txt')
+        qt = qt.rename({'eid' : 's'}).key_by('s')
         mt = mt.filter_cols(hl.is_defined(qt[mt['s']]))
         #post_filter_count = mt.count()
         return(mt)
     else:
         raise TypeError('Subset is not valid. Must be "WB"')
 
-def annotate_with_vep(mt, vep_path):
+def join_with_vep(mt, vep_path, keyword = None):
+    r'''Merge file with VEP info '''
+    vep = hl.import_vcf('derived/vep/output/ukb_wes_200k_vep_chr22.vcf', array_elements_required=False)
+    mt = mt.annotate_rows(info=mt.info.annotate(CSQ = vep.index_rows(mt.locus, mt.alleles).info.CSQ))
+    # select rows by specific keyword, e.g. HIGH / MODERATE
+    #mt = mt[]
+    return(mt)
 
+def rename_rsid():
+    # rename rsids
     return None
 
+def count_homozygous():
+    return None
+
+def export_table():
+    # export bed files that need to be analyzed
+    return None
 
 
 
@@ -76,8 +89,14 @@ def main(args):
     out_prefix = args.out_prefix
     out_type   = args.out_type
 
-
+    # filtering data
     hail_init(chrom)
+    mt = import_table('data/phased/ukb_wes_200k_phased_chr22.1of1.vcf.gz','vcf')
+    mt = filter_maf(mt, 0.02, 'lower')
+    mt = filter_samples(mt, 'WB')
+    mt = join_with_vep(mt)
+
+
 
     mt = read_input(input_path=input_path,
                     input_type=input_type)
