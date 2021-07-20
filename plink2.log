@@ -1,0 +1,16 @@
+PLINK v2.00aLM 64-bit Intel (24 Jul 2017)
+Options in effect:
+  --vcf /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/data/phased/ukb_wes_200k_phased_chr22.1of1.vcf.gz
+
+Hostname: compe026.hpc.in.bmrc.ox.ac.uk
+Working directory: /gpfs3/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
+Start time: Fri Jun 25 21:59:12 2021
+
+Random number seed: 1624654752
+385576 MB RAM detected; reserving 192788 MB for main workspace.
+Allocated 108443 MB successfully, after larger attempt(s) failed.
+Using up to 24 threads (change this with --threads).
+--vcf: 156977 variants scanned.
+--vcf: plink2.pgen + plink2.pvar + plink2.psam written.
+
+End time: Fri Jun 25 22:09:54 2021

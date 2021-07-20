@@ -44,7 +44,7 @@ $plink \
  --vcf ${RAW_ROOT}${RAW_FILE}  \
 # --keep ${FAM_FILE_WB} \
 # --extract ${OUT_ROOT}${TMP_FILE} \
- --max-maf 0.02 \
+# --max-maf 0.02 \
  --geno 0.05 \
  --make-bed \
  --out ${OUT_ROOT}${OUT_FILE}

@@ -1,28 +1,36 @@
-#!/bin/bash
-
-#$ -cwd
-# -N vep
-# -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/IMPUTATION/phase_ukb_wes 
-# -o logs/vep.log
-# -e logs/vep.errors.log
-# -q short.qc
+#!/usr/bin/env bash
+#
+# Annotate variants
+#
+# Author: Frederik Lassen (2021-06-25)
+#
+#$ -N vep
+#$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
+#$ -o logs/vep.log
+#$ -e logs/vep.log
 #$ -P lindgren.prjc
-# -pe shmem 8
-# -t 1-22
+#$ -pe shmem 8
+#$ -q short.qc
+#$ -t 22
+#$ -V
+
+set -o errexit
+set -o nounset
+module purge 
 
 # Set variables
-readonly CHR=${SGE_TASK_ID}
-readonly RAW_ROOT=/well/lindgren/UKBIOBANK/nbaya/resources/ukb_wes_200k_inliers_split_filtered/
-readonly RAW_FILE=ukb_wes_200k_inliers_split_filtered_hail_chr${CHR}.vcf.bgz
-readonly TMP_FILE=ukb_wes_200k_inliers_split_filtered_chr${CHR}.vcf
+readonly chr=${SGE_TASK_ID}
+readonly RAW_ROOT="/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/data/phased"
+readonly RAW_FILE="/ukb_wes_200k_phased_chr${chr}.1of1.vcf.gz"
+readonly TMP_FILE="/ukb_wes_200k_phased_tmp_chr${chr}.1of1.vcf.gz"
 
-readonly OUT_ROOT=derived/vep/output/
-readonly OUT_FILE1=ukb_wes_200k_vep_chr${CHR}.vcf # direct output of VEP
+readonly OUT_ROOT=derived/vep/output/test
+readonly OUT_FILE1=ukb_wes_200k_vep_chr${chr}.vcf # direct output of VEP
 
 # extract variant information
 module load BCFtools/1.9-foss-2018b # for extracting variant information
 
-bcftools query -f '%CHROM %POS %ID %REF %ALT %AC %AN %QUAL\n' ${RAW_ROOT}${RAW_FILE} -o "${OUT_ROOT}${TMP_FILE}"
+bcftools query -f '%CHROM %POS %ID %REF %ALT %AC %QUAL\n' ${RAW_ROOT}${RAW_FILE} -o "${OUT_ROOT}${TMP_FILE}"
 
 # Load modules (load order is important)
 module purge
@@ -31,10 +39,6 @@ module load VEP/95.0-foss-2018b-Perl-5.28.0 # required FOR VEP
 module load samtools/1.8-gcc5.4.0 # required for LOFTEE
 
 export PERL5LIB=$PERL5LIB:/well/lindgren/flassen/software/VEP/plugins_grch38/
-
-###########
-# Run VEP #
-###########
 
 ## run VEP 95 on temporary file
 vep --input_file "${RAW_ROOT}${TMP_FILE}" \
@@ -63,9 +67,5 @@ vep --input_file "${RAW_ROOT}${TMP_FILE}" \
 # change names
 mv "${OUT_ROOT}${OUT_FILE1}.tmp" "${OUT_ROOT}${OUT_FILE1}"
 rm "${OUT_ROOT}${OUT_FILE1}.tmp"
-
-# prohibit anyone from writing onto the file
 chmod -w "${OUT_ROOT}${OUT_FILE1}" 
-
-
 
