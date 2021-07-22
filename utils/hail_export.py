@@ -4,12 +4,14 @@ import hail as hl
 import os
 import argparse
 
+# authors Nik Baya & Frederik Heymann
+
 WD = '/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb'
 DATA_DIR = f'{WD}/data'
 
 def hail_init(chrom=None, log_prefix='get_vcf'):
     r'''Initialize Hail '''
-    assert chrom in range(1,23) # only autosomes
+    assert chrom in range(1,23) 'only autosomes allowed'
     n_slots = os.environ.get('NSLOTS', 1)
     chr_suffix = '' if chr is None else f'_chr{chrom}'
     WD = '/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb'
@@ -77,6 +79,18 @@ def annotate_gt(mt):
     # if vep.info.gene is present, annotate compound hetz
     return(mt)
 
+def write_sites(mt, out_prefix, keep_fields = []):
+    r'''Write sites-only tsv
+    `keep_fields` is a list of fields to keep in addition to chrom, pos, ref, alt
+    '''
+    ht = mt.rows().key_by()
+    ht = ht.select(chrom = ht.locus.contig,
+                   pos = ht.locus.position,
+                   ref = ht.alleles[0],
+                   alt = ht.alleles[1],
+                   *keep_fields)
+    ht.export(f'{out_prefix}.tsv')
+
 def get_fam(app_id=11867, wes_200k_only=False):
     # use files created by the command:
     #   /well/lindgren/UKBIOBANK/nbaya/wes_200k/phase_ukb_wes/utils/make_fam.py --make_fam
@@ -85,6 +99,25 @@ def get_fam(app_id=11867, wes_200k_only=False):
     fam_path = f'/well/lindgren/UKBIOBANK/nbaya/resources/ukb{app_id}_{"wes_200k_" if wes_200k_only else ""}pedigree.fam'
     fam = hl.import_table(paths=fam_path, key='IID',types={f:'str' for f in ['FID','IID','PAT','MAT','SEX','PHEN']})
     return fam
+
+def filter_to_related(mt, get_unrelated=False, maf=None):
+    r'''Filter to samples in duos/trios, as defined by fam file
+    '''
+    fam = get_fam()
+    fam = fam.filter(hl.is_defined(mt.cols()[fam.IID])) # need to filter to samples present in mt first before collecting FIDs
+    fam_ct = fam.count()
+    col_ct = mt.count_cols()
+    print(f'\n{col_ct-fam_ct}/{col_ct} samples have IIDs missing from fam file') # samples with missing IIDs cannot be included in the related sample set
+    iids = fam.IID.collect()
+    offspring_fids = fam.filter(hl.literal(iids).contains(fam.PAT)
+                                |hl.literal(iids).contains(fam.MAT)).FID.collect() # get the FIDs of offspring with at least one parent in the dataset
+    fam = fam.filter(hl.literal(offspring_fids).contains(fam.FID)) # subset to samples which share FIDs with offspring
+    if get_unrelated:
+        mt = mt.filter_cols(~hl.is_defined(fam[mt.s]))
+    else:
+        mt = mt.filter_cols(hl.is_defined(fam[mt.s]))
+    mt = recalc_info(mt=mt, maf=maf)
+    return mt
 
 def get_vcf_metadata(info_fields_to_drop=[], format_fields_to_drop=['RNC','PL']):
     r'''Merge file with VEP info '''
@@ -160,28 +193,40 @@ def main(args):
     vep_impact = args.vep_impact
     vep_variant= args.vep_variant
     vep_loftee = args.vep_loftee
+    vep_sites_write = args.vep_sites_write
     
     # run parser
     hail_init(chrom)
     mt = read_input(input_path=input_path, input_type=input_type)
 
-    if max_maf is not None:
+    if max_maf:
         mt = filter_max_maf(mt, max_maf)
 
-    if min_maf is not None:
+    if min_maf:
         mt = filter_min_maf(mt, min_maf)
 
-    if vep_path is not None:
+    if get_related:
+        mt = filter_to_related(mt, get_unrelated = False)
+
+    if get_urelated:
+        mt = filter_to_related(mt, get_unrelated = True)
+
+    if vep_path:
         mt = annotate_vep(mt, vep_path)
 
-    if vep_impact is not None:
+    if vep_impact:
         mt = filter_variants('impact', vep_impact)
 
-    if vep_variant is not None:
+    if vep_variant:
         mt = filter_variants('variant', vep_variant)
 
-    if vep_loftee is not None:
+    if vep_loftee:
         mt = filter_variants('loftee', vep_loftee)
+
+    if vep_sites_write:
+        write_sites(mt=mt,
+                    out_prefix=out_prefix,
+                    keep_fields='info')
 
     if out_prefix:
         write(mt=mt,
@@ -208,11 +253,14 @@ if __name__=='__main__':
     parser.add_argument('--chrom', default=None, help='Chromosome to be used')
     parser.add_argument('--maf_max', default=None, help='Select all variants with a maf less than the indicated value')
     parser.add_argument('--min_maf', default=None, help='Select all variants with a maf greater than the indicated values')
+    parser.add_argument('--get_related', default=None, help='Select all samples that are related')
+    parser.add_argument('--min_maf', default=None, help='Select all samples that are unrelated')
     # VEP
     parser.add_argument('--vep_path', default=None, help='path to a .vcf file containing annotated entries by locus and alleles')
     parser.add_argument('--vep_impact', default=None, help='subset by VEP impact')
     parser.add_argument('--vep_variant', default=None, help='subset by VEP variant type (e.g. "stop_gained")')
     parser.add_argument('--vep_loftee', default=None, help='subset by VEP loftee flag, only HC or LC.')
+    parser.add_argument('--vep_sites_write', default=None, help='Writes locus and allele information alongisde VEP annotations')
 
 
 
