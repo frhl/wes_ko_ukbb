@@ -63,8 +63,10 @@ def annotate_vep(mt, vep_path = 'derived/vep/output/ukb_wes_200k_vep_chr22.vcf')
     mt = mt.annotate_rows(info=mt.info.annotate(loftee_flag=ht.index_rows(mt.locus, mt.alleles).info.loftee_flag))
     return(mt)
 
-def select_field(mt, field = 'impact', condition = 'HIGH', check = True):
-    mt = mt.filter_rows(mt.info[field].contains(condition))
+def filter_variants(mt, field = 'impact', condition = 'HIGH', check = True):
+    r'''Filter rows by condition '''
+    for cond in condition:
+        mt = mt.filter_rows(mt.info[field].contains(cond))
     if check is True and min(mt.count()) < 1:
         print(f'\ninvalid condition: {condition}\n')
     return mt
@@ -173,13 +175,13 @@ def main(args):
         mt = annotate_vep(mt, vep_path)
 
     if vep_impact is not None:
-        mt = select_field('impact', vep_impact)
+        mt = filter_variants('impact', vep_impact)
 
     if vep_variant is not None:
-        mt = select_field('variant', vep_variant)
+        mt = filter_variants('variant', vep_variant)
 
     if vep_loftee is not None:
-        mt = select_field('loftee', vep_loftee)
+        mt = filter_variants('loftee', vep_loftee)
 
     if out_prefix:
         write(mt=mt,
