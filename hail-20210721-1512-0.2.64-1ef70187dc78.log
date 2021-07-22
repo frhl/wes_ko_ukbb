@@ -1,0 +1,663 @@
+2021-07-21 15:12:15 Hail: INFO: Running Hail version 0.2.64-1ef70187dc78
+2021-07-21 15:12:15 SparkContext: WARN: Using an existing SparkContext; some configuration may not take effect.
+2021-07-21 15:12:15 root: INFO: RegionPool: initialized for thread 25: Thread-5
+2021-07-21 15:12:15 MemoryStore: INFO: Block broadcast_0 stored as values in memory (estimated size 237.3 KB, free 10.5 GB)
+2021-07-21 15:12:16 MemoryStore: INFO: Block broadcast_0_piece0 stored as bytes in memory (estimated size 23.0 KB, free 10.5 GB)
+2021-07-21 15:12:16 BlockManagerInfo: INFO: Added broadcast_0_piece0 in memory on compe004.hpc.in.bmrc.ox.ac.uk:45533 (size: 23.0 KB, free: 10.5 GB)
+2021-07-21 15:12:16 SparkContext: INFO: Created broadcast 0 from broadcast at SparkBackend.scala:259
+2021-07-21 15:12:16 root: INFO: globbing path derived/vep/output/ukb_wes_200k_vep_chr22.vcf returned 1 files: ukb_wes_200k_vep_chr22.vcf
+2021-07-21 15:12:16 root: INFO: globbing path file:/gpfs3/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/derived/vep/output/ukb_wes_200k_vep_chr22.vcf returned 1 files: ukb_wes_200k_vep_chr22.vcf
+2021-07-21 15:12:16 MemoryStore: INFO: Block broadcast_1 stored as values in memory (estimated size 34.9 KB, free 10.5 GB)
+2021-07-21 15:12:16 MemoryStore: INFO: Block broadcast_1_piece0 stored as bytes in memory (estimated size 3.2 KB, free 10.5 GB)
+2021-07-21 15:12:16 BlockManagerInfo: INFO: Added broadcast_1_piece0 in memory on compe004.hpc.in.bmrc.ox.ac.uk:45533 (size: 3.2 KB, free: 10.5 GB)
+2021-07-21 15:12:16 SparkContext: INFO: Created broadcast 1 from broadcast at SparkBackend.scala:259
+2021-07-21 15:12:16 root: INFO: RegionPool: FREE: 64.0K allocated (64.0K blocks / 0 chunks), regions.size = 1, 0 current java objects, 0 max java objects, thread 25: Thread-5
+2021-07-21 15:12:16 root: INFO: timing SparkBackend.parse_matrix_ir total 660.332ms self 660.332ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: RegionPool: initialized for thread 25: Thread-5
+2021-07-21 15:12:26 root: INFO: RegionPool: FREE: 64.0K allocated (64.0K blocks / 0 chunks), regions.size = 1, 0 current java objects, 0 max java objects, thread 25: Thread-5
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.parse_value_ir total 6.127ms self 6.127ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: RegionPool: initialized for thread 25: Thread-5
+2021-07-21 15:12:26 root: INFO: starting execution of query hail_query_1 of initial size 3
+2021-07-21 15:12:26 root: INFO: optimize optimize: relationalLowerer, initial IR: before: IR size 3: 
+(TableCount
+  (MatrixColsTable
+    (MatrixRead None False False
+      "{\"files\":[\"derived/vep/output/ukb_wes_200k_vep_chr22.vcf\"],\"callFields\":[\"PGT\"],\"entryFloatTypeName\":\"Float64\",\"rg\":\"GRCh37\",\"contigRecoding\":{},\"arrayElementsRequired\":false,\"skipInvalidLoci\":false,\"gzAsBGZ\":false,\"forceGZ\":false,\"filterAndReplace\":{},\"partitionsJSON\":null,\"name\":\"MatrixVCFReader\"}")))
+2021-07-21 15:12:26 root: INFO: optimize optimize: relationalLowerer, initial IR: after: IR size 1:
+(I64 0)
+2021-07-21 15:12:26 root: INFO: optimize optimize: relationalLowerer, after LowerMatrixToTable: before: IR size 1: 
+(I64 0)
+2021-07-21 15:12:26 root: INFO: optimize optimize: relationalLowerer, after LowerMatrixToTable: after: IR size 1:
+(I64 0)
+2021-07-21 15:12:26 root: INFO: optimize optimize: relationalLowerer, after InterpretNonCompilable: before: IR size 1: 
+(I64 0)
+2021-07-21 15:12:26 root: INFO: optimize optimize: relationalLowerer, after InterpretNonCompilable: after: IR size 1:
+(I64 0)
+2021-07-21 15:12:26 root: INFO: optimize optimize: compileLowerer, initial IR: before: IR size 2: 
+(MakeTuple (0) (I64 0))
+2021-07-21 15:12:26 root: INFO: optimize optimize: compileLowerer, initial IR: after: IR size 1:
+(Literal Tuple[Int64] <literal value>)
+2021-07-21 15:12:26 root: INFO: optimize optimize: compileLowerer, after InlineApplyIR: before: IR size 1: 
+(Literal Tuple[Int64] <literal value>)
+2021-07-21 15:12:26 root: INFO: optimize optimize: compileLowerer, after InlineApplyIR: after: IR size 1:
+(Literal Tuple[Int64] <literal value>)
+2021-07-21 15:12:26 root: INFO: optimize optimize: compileLowerer, after LowerArrayAggsToRunAggs: before: IR size 1: 
+(Literal Tuple[Int64] <literal value>)
+2021-07-21 15:12:26 root: INFO: optimize optimize: compileLowerer, after LowerArrayAggsToRunAggs: after: IR size 1:
+(Literal Tuple[Int64] <literal value>)
+2021-07-21 15:12:26 root: INFO: encoder cache miss (0 hits, 1 misses, 0.000)
+2021-07-21 15:12:26 root: INFO: instruction count: 3: __C9etypeEncode.<init>
+2021-07-21 15:12:26 root: INFO: instruction count: 5: __C9etypeEncode.apply
+2021-07-21 15:12:26 root: INFO: instruction count: 9: __C9etypeEncode.__m10ENCODE_r_tuple_of_r_tuple_of_r_int64ENDEND_TO_r_struct_of_r_struct_of_r_int64ENDEND
+2021-07-21 15:12:26 root: INFO: instruction count: 13: __C9etypeEncode.__m11ENCODE_r_tuple_of_r_int64END_TO_r_struct_of_r_int64END
+2021-07-21 15:12:26 root: INFO: instruction count: 6: __C9etypeEncode.__m12ENCODE_r_int64_TO_r_int64
+2021-07-21 15:12:26 MemoryStore: INFO: Block broadcast_2 stored as values in memory (estimated size 80.0 B, free 10.5 GB)
+2021-07-21 15:12:26 MemoryStore: INFO: Block broadcast_2_piece0 stored as bytes in memory (estimated size 62.0 B, free 10.5 GB)
+2021-07-21 15:12:26 BlockManagerInfo: INFO: Added broadcast_2_piece0 in memory on compe004.hpc.in.bmrc.ox.ac.uk:45533 (size: 62.0 B, free: 10.5 GB)
+2021-07-21 15:12:26 SparkContext: INFO: Created broadcast 2 from broadcast at SparkBackend.scala:259
+2021-07-21 15:12:26 root: INFO: instruction count: 3: __C1Compiled.<init>
+2021-07-21 15:12:26 root: INFO: instruction count: 3: __C1Compiled.apply
+2021-07-21 15:12:26 root: INFO: instruction count: 9: __C1Compiled.setPartitionIndex
+2021-07-21 15:12:26 root: INFO: instruction count: 4: __C1Compiled.addPartitionRegion
+2021-07-21 15:12:26 root: INFO: instruction count: 4: __C1Compiled.setPool
+2021-07-21 15:12:26 root: INFO: instruction count: 32: __C1Compiled.addLiterals
+2021-07-21 15:12:26 root: INFO: instruction count: 23: __C1Compiled.__m6DECODE_r_struct_of_r_struct_of_r_int64ENDEND_TO_r_tuple_of_r_tuple_of_r_int64ENDEND
+2021-07-21 15:12:26 root: INFO: instruction count: 15: __C1Compiled.__m7INPLACE_DECODE_r_struct_of_r_int64END_TO_r_tuple_of_r_int64END
+2021-07-21 15:12:26 root: INFO: instruction count: 10: __C1Compiled.__m8INPLACE_DECODE_r_int64_TO_r_int64
+2021-07-21 15:12:26 root: INFO: finished execution of query hail_query_1
+2021-07-21 15:12:26 root: INFO: RegionPool: FREE: 128.0K allocated (128.0K blocks / 0 chunks), regions.size = 2, 0 current java objects, 0 max java objects, thread 25: Thread-5
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON total 477.585ms self 60.098ms children 417.487ms %children 87.42%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, initial IR total 78.523ms self 0.456ms children 78.067ms %children 99.42%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, initial IR/Verify total 0.280ms self 0.280ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, initial IR/LoweringTransformation total 77.763ms self 41.564ms children 36.199ms %children 46.55%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, initial IR/LoweringTransformation/Optimize total 36.199ms self 1.059ms children 35.140ms %children 97.07%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, initial IR/LoweringTransformation/Optimize/FoldConstants total 3.016ms self 3.016ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, initial IR/LoweringTransformation/Optimize/ExtractIntervalFilters total 3.854ms self 3.854ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, initial IR/LoweringTransformation/Optimize/Simplify total 11.665ms self 11.665ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, initial IR/LoweringTransformation/Optimize/ForwardLets total 5.474ms self 5.474ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, initial IR/LoweringTransformation/Optimize/ForwardRelationalLets total 1.318ms self 1.318ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, initial IR/LoweringTransformation/Optimize/PruneDeadFields total 9.537ms self 9.537ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, initial IR/LoweringTransformation/Optimize/FoldConstants total 0.079ms self 0.079ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, initial IR/LoweringTransformation/Optimize/ExtractIntervalFilters total 0.007ms self 0.007ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, initial IR/LoweringTransformation/Optimize/Simplify total 0.020ms self 0.020ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, initial IR/LoweringTransformation/Optimize/ForwardLets total 0.131ms self 0.131ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, initial IR/LoweringTransformation/Optimize/ForwardRelationalLets total 0.013ms self 0.013ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, initial IR/LoweringTransformation/Optimize/PruneDeadFields total 0.026ms self 0.026ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, initial IR/Verify total 0.024ms self 0.024ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/LowerMatrixToTable total 0.734ms self 0.012ms children 0.722ms %children 98.42%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/LowerMatrixToTable/Verify total 0.002ms self 0.002ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/LowerMatrixToTable/LoweringTransformation total 0.697ms self 0.697ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/LowerMatrixToTable/Verify total 0.022ms self 0.022ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, after LowerMatrixToTable total 0.606ms self 0.008ms children 0.598ms %children 98.70%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, after LowerMatrixToTable/Verify total 0.002ms self 0.002ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, after LowerMatrixToTable/LoweringTransformation total 0.593ms self 0.372ms children 0.221ms %children 37.23%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, after LowerMatrixToTable/LoweringTransformation/Optimize total 0.221ms self 0.017ms children 0.203ms %children 92.12%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, after LowerMatrixToTable/LoweringTransformation/Optimize/FoldConstants total 0.048ms self 0.048ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, after LowerMatrixToTable/LoweringTransformation/Optimize/ExtractIntervalFilters total 0.006ms self 0.006ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, after LowerMatrixToTable/LoweringTransformation/Optimize/Simplify total 0.016ms self 0.016ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, after LowerMatrixToTable/LoweringTransformation/Optimize/ForwardLets total 0.096ms self 0.096ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, after LowerMatrixToTable/LoweringTransformation/Optimize/ForwardRelationalLets total 0.012ms self 0.012ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, after LowerMatrixToTable/LoweringTransformation/Optimize/PruneDeadFields total 0.024ms self 0.024ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, after LowerMatrixToTable/Verify total 0.003ms self 0.003ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/InterpretNonCompilable total 1.115ms self 0.019ms children 1.096ms %children 98.33%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/InterpretNonCompilable/Verify total 0.004ms self 0.004ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/InterpretNonCompilable/LoweringTransformation total 0.942ms self 0.942ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/InterpretNonCompilable/Verify total 0.150ms self 0.150ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, after InterpretNonCompilable total 0.563ms self 0.008ms children 0.555ms %children 98.62%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, after InterpretNonCompilable/Verify total 0.002ms self 0.002ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, after InterpretNonCompilable/LoweringTransformation total 0.550ms self 0.362ms children 0.188ms %children 34.12%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, after InterpretNonCompilable/LoweringTransformation/Optimize total 0.188ms self 0.015ms children 0.173ms %children 92.11%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, after InterpretNonCompilable/LoweringTransformation/Optimize/FoldConstants total 0.037ms self 0.037ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, after InterpretNonCompilable/LoweringTransformation/Optimize/ExtractIntervalFilters total 0.006ms self 0.006ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, after InterpretNonCompilable/LoweringTransformation/Optimize/Simplify total 0.014ms self 0.014ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, after InterpretNonCompilable/LoweringTransformation/Optimize/ForwardLets total 0.082ms self 0.082ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, after InterpretNonCompilable/LoweringTransformation/Optimize/ForwardRelationalLets total 0.012ms self 0.012ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, after InterpretNonCompilable/LoweringTransformation/Optimize/PruneDeadFields total 0.023ms self 0.023ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/optimize: relationalLowerer, after InterpretNonCompilable/Verify total 0.003ms self 0.003ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile total 325.691ms self 297.816ms children 27.875ms %children 8.56%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, initial IR total 14.327ms self 0.013ms children 14.314ms %children 99.91%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, initial IR/Verify total 0.014ms self 0.014ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, initial IR/LoweringTransformation total 14.292ms self 6.613ms children 7.679ms %children 53.73%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, initial IR/LoweringTransformation/Optimize total 7.679ms self 0.070ms children 7.609ms %children 99.09%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, initial IR/LoweringTransformation/Optimize/FoldConstants total 7.210ms self 7.210ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, initial IR/LoweringTransformation/Optimize/ExtractIntervalFilters total 0.017ms self 0.017ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, initial IR/LoweringTransformation/Optimize/Simplify total 0.032ms self 0.032ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, initial IR/LoweringTransformation/Optimize/ForwardLets total 0.137ms self 0.137ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, initial IR/LoweringTransformation/Optimize/ForwardRelationalLets total 0.016ms self 0.016ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, initial IR/LoweringTransformation/Optimize/PruneDeadFields total 0.042ms self 0.042ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, initial IR/LoweringTransformation/Optimize/FoldConstants total 0.034ms self 0.034ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, initial IR/LoweringTransformation/Optimize/ExtractIntervalFilters total 0.005ms self 0.005ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, initial IR/LoweringTransformation/Optimize/Simplify total 0.013ms self 0.013ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, initial IR/LoweringTransformation/Optimize/ForwardLets total 0.072ms self 0.072ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, initial IR/LoweringTransformation/Optimize/ForwardRelationalLets total 0.010ms self 0.010ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, initial IR/LoweringTransformation/Optimize/PruneDeadFields total 0.022ms self 0.022ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, initial IR/Verify total 0.008ms self 0.008ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/InlineApplyIR total 0.267ms self 0.046ms children 0.221ms %children 82.81%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/InlineApplyIR/Verify total 0.010ms self 0.010ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/InlineApplyIR/LoweringTransformation total 0.191ms self 0.191ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/InlineApplyIR/Verify total 0.020ms self 0.020ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, after InlineApplyIR total 1.707ms self 0.008ms children 1.699ms %children 99.55%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, after InlineApplyIR/Verify total 0.002ms self 0.002ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, after InlineApplyIR/LoweringTransformation total 1.694ms self 1.439ms children 0.255ms %children 15.03%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, after InlineApplyIR/LoweringTransformation/Optimize total 0.255ms self 0.019ms children 0.236ms %children 92.68%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, after InlineApplyIR/LoweringTransformation/Optimize/FoldConstants total 0.049ms self 0.049ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, after InlineApplyIR/LoweringTransformation/Optimize/ExtractIntervalFilters total 0.008ms self 0.008ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, after InlineApplyIR/LoweringTransformation/Optimize/Simplify total 0.018ms self 0.018ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, after InlineApplyIR/LoweringTransformation/Optimize/ForwardLets total 0.116ms self 0.116ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, after InlineApplyIR/LoweringTransformation/Optimize/ForwardRelationalLets total 0.013ms self 0.013ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, after InlineApplyIR/LoweringTransformation/Optimize/PruneDeadFields total 0.031ms self 0.031ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, after InlineApplyIR/Verify total 0.003ms self 0.003ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/LowerArrayAggsToRunAggs total 10.911ms self 0.012ms children 10.899ms %children 99.89%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/LowerArrayAggsToRunAggs/Verify total 0.006ms self 0.006ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/LowerArrayAggsToRunAggs/LoweringTransformation total 10.724ms self 10.724ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/LowerArrayAggsToRunAggs/Verify total 0.169ms self 0.169ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, after LowerArrayAggsToRunAggs total 0.663ms self 0.008ms children 0.655ms %children 98.77%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, after LowerArrayAggsToRunAggs/Verify total 0.003ms self 0.003ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, after LowerArrayAggsToRunAggs/LoweringTransformation total 0.649ms self 0.408ms children 0.241ms %children 37.10%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, after LowerArrayAggsToRunAggs/LoweringTransformation/Optimize total 0.241ms self 0.019ms children 0.222ms %children 92.01%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, after LowerArrayAggsToRunAggs/LoweringTransformation/Optimize/FoldConstants total 0.044ms self 0.044ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, after LowerArrayAggsToRunAggs/LoweringTransformation/Optimize/ExtractIntervalFilters total 0.009ms self 0.009ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, after LowerArrayAggsToRunAggs/LoweringTransformation/Optimize/Simplify total 0.020ms self 0.020ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, after LowerArrayAggsToRunAggs/LoweringTransformation/Optimize/ForwardLets total 0.103ms self 0.103ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, after LowerArrayAggsToRunAggs/LoweringTransformation/Optimize/ForwardRelationalLets total 0.014ms self 0.014ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, after LowerArrayAggsToRunAggs/LoweringTransformation/Optimize/PruneDeadFields total 0.032ms self 0.032ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/Compile/optimize: compileLowerer, after LowerArrayAggsToRunAggs/Verify total 0.003ms self 0.003ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/InitializeCompiledFunction total 8.364ms self 8.364ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/RunCompiledFunction total 0.013ms self 0.013ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.executeJSON/convertRegionValueToAnnotation total 1.878ms self 1.878ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: RegionPool: initialized for thread 25: Thread-5
+2021-07-21 15:12:26 root: INFO: RegionPool: FREE: 64.0K allocated (64.0K blocks / 0 chunks), regions.size = 1, 0 current java objects, 0 max java objects, thread 25: Thread-5
+2021-07-21 15:12:26 root: INFO: timing SparkBackend.parse_value_ir total 17.056ms self 17.056ms children 0.000ms %children 0.00%
+2021-07-21 15:12:26 root: INFO: RegionPool: initialized for thread 25: Thread-5
+2021-07-21 15:12:26 root: INFO: starting execution of query hail_query_2 of initial size 28
+2021-07-21 15:12:26 root: INFO: optimize optimize: relationalLowerer, initial IR: before: IR size 28: 
+(ToArray
+  (StreamMap __uid_4
+    (ToStream False
+      (GetField rows
+        (TableCollect
+          (TableHead 0
+            (TableMapRows
+              (MatrixColsTable
+                (MatrixMapCols ()
+                  (MatrixMapGlobals
+                    (MatrixMapCols None
+                      (MatrixRead None False False
+                        "{\"files\":[\"derived/vep/output/ukb_wes_200k_vep_chr22.vcf\"],\"callFields\":[\"PGT\"],\"entryFloatTypeName\":\"Float64\",\"rg\":\"GRCh37\",\"contigRecoding\":{},\"arrayElementsRequired\":false,\"skipInvalidLoci\":false,\"gzAsBGZ\":false,\"forceGZ\":false,\"filterAndReplace\":{},\"partitionsJSON\":null,\"name\":\"MatrixVCFReader\"}")
+                      (InsertFields
+                        (SelectFields (s) (SelectFields (s) (Ref sa)))
+                        None))
+                    (InsertFields
+                      (SelectFields () (SelectFields () (Ref global)))
+                      None))
+                  (SelectFields (s) (Ref sa))))
+              (InsertFields
+                (SelectFields (s) (SelectFields (s) (Ref row)))
+                None))))))
+    (GetField s (Ref __uid_4))))
+2021-07-21 15:12:26 root: INFO: optimize optimize: relationalLowerer, initial IR: after: IR size 12:
+(ToArray
+  (StreamMap __iruid_2
+    (ToStream False
+      (GetField rows
+        (TableCollect
+          (MatrixColsTable
+            (MatrixMapCols ()
+              (MatrixColsHead 0
+                (MatrixRead
+                  Matrix{global:Struct{},col_key:[s],col:Struct{s:String},row_key:[[locus,alleles]],row:Struct{locus:Locus(GRCh37),alleles:Array[String]},entry:Struct{}}
+                  False False
+                  "{\"files\":[\"derived/vep/output/ukb_wes_200k_vep_chr22.vcf\"],\"callFields\":[\"PGT\"],\"entryFloatTypeName\":\"Float64\",\"rg\":\"GRCh37\",\"contigRecoding\":{},\"arrayElementsRequired\":false,\"skipInvalidLoci\":false,\"gzAsBGZ\":false,\"forceGZ\":false,\"filterAndReplace\":{},\"partitionsJSON\":null,\"name\":\"MatrixVCFReader\"}"))
+              (Ref sa))))))
+    (GetField s (Ref __iruid_2))))
+2021-07-21 15:12:27 root: INFO: optimize optimize: relationalLowerer, after LowerMatrixToTable: before: IR size 53: 
+(ToArray
+  (StreamMap __iruid_2
+    (ToStream False
+      (GetField rows
+        (TableCollect
+          (TableKeyBy () False
+            (TableParallelize None
+              (Let __cols_and_globals
+                (TableGetGlobals
+                  (TableMapGlobals
+                    (TableMapRows
+                      (TableMapGlobals
+                        (TableRead
+                          Table{global:Struct{__cols:Array[Struct{s:String}]},key:[locus,alleles],row:Struct{locus:Locus(GRCh37),alleles:Array[String],`the entries! [877f12a8827e18f61222c6c8c5fb04a8]`:Array[Struct{}]}}
+                          False
+                          "{\"files\":[\"derived/vep/output/ukb_wes_200k_vep_chr22.vcf\"],\"callFields\":[\"PGT\"],\"entryFloatTypeName\":\"Float64\",\"rg\":\"GRCh37\",\"contigRecoding\":{},\"arrayElementsRequired\":false,\"skipInvalidLoci\":false,\"gzAsBGZ\":false,\"forceGZ\":false,\"filterAndReplace\":{},\"partitionsJSON\":null,\"name\":\"MatrixVCFReader\"}")
+                        (InsertFields
+                          (Ref global)
+                          None
+                          (__cols
+                            (ApplyIR sliceLeft () Array[Struct{s:String}]
+                              (GetField __cols (Ref global))
+                              (I32 0)))))
+                      (InsertFields
+                        (Ref row)
+                        None
+                        (`the entries! [877f12a8827e18f61222c6c8c5fb04a8]`
+                          (ApplyIR sliceLeft () Array[Struct{}]
+                            (GetField
+                              `the entries! [877f12a8827e18f61222c6c8c5fb04a8]`
+                              (Ref row))
+                            (I32 0)))))
+                    (InsertFields
+                      (Ref global)
+                      None
+                      (__cols
+                        (ToArray
+                          (StreamMap __iruid_9
+                            (ToStream False
+                              (ToArray
+                                (StreamRange False
+                                  (I32 0)
+                                  (ArrayLen (GetField __cols (Ref global)))
+                                  (I32 1))))
+                            (Let __cols_array
+                              (GetField __cols (Ref global))
+                              (Let sa
+                                (ArrayRef
+                                  (Ref __cols_array)
+                                  (Ref __iruid_9)
+                                  (Str ""))
+                                (Ref sa)))))))))
+                (MakeStruct
+                  (rows (GetField __cols (Ref __cols_and_globals)))
+                  (global
+                    (SelectFields () (Ref __cols_and_globals))))))))))
+    (GetField s (Ref __iruid_2))))
+2021-07-21 15:12:27 root: INFO: Prune: MakeStruct: eliminating field 'global'
+2021-07-21 15:12:27 root: INFO: optimize optimize: relationalLowerer, after LowerMatrixToTable: after: IR size 24:
+(ToArray
+  (StreamMap __iruid_70
+    (ToStream False
+      (GetField rows
+        (Let __iruid_71
+          (ApplyIR sliceLeft () Array[Struct{s:String}]
+            (GetField __cols
+              (TableGetGlobals
+                (TableRead
+                  Table{global:Struct{__cols:Array[Struct{s:String}]},key:[locus,alleles],row:Struct{locus:Locus(GRCh37),alleles:Array[String]}}
+                  False
+                  "{\"files\":[\"derived/vep/output/ukb_wes_200k_vep_chr22.vcf\"],\"callFields\":[\"PGT\"],\"entryFloatTypeName\":\"Float64\",\"rg\":\"GRCh37\",\"contigRecoding\":{},\"arrayElementsRequired\":false,\"skipInvalidLoci\":false,\"gzAsBGZ\":false,\"forceGZ\":false,\"filterAndReplace\":{},\"partitionsJSON\":null,\"name\":\"MatrixVCFReader\"}")))
+            (I32 0))
+          (MakeStruct
+            (rows
+              (ToArray
+                (StreamMap __iruid_72
+                  (StreamRange False
+                    (I32 0)
+                    (ArrayLen (Ref __iruid_71))
+                    (I32 1))
+                  (ArrayRef
+                    (Ref __iruid_71)
+                    (Ref __iruid_72)
+                    (Str "")))))))))
+    (GetField s (Ref __iruid_70))))
+2021-07-21 15:12:27 root: INFO: interpreting non compilable node: TableGetGlobals
+2021-07-21 15:12:27 SparkContext: INFO: Starting job: runJob at ContextRDD.scala:238
+2021-07-21 15:12:27 DAGScheduler: INFO: Got job 0 (runJob at ContextRDD.scala:238) with 1 output partitions
+2021-07-21 15:12:27 DAGScheduler: INFO: Final stage: ResultStage 0 (runJob at ContextRDD.scala:238)
+2021-07-21 15:12:27 DAGScheduler: INFO: Parents of final stage: List()
+2021-07-21 15:12:27 DAGScheduler: INFO: Missing parents: List()
+2021-07-21 15:12:27 DAGScheduler: INFO: Submitting ResultStage 0 (GenericTableValueRDD[1] at RDD at GenericTableValue.scala:87), which has no missing parents
+2021-07-21 15:12:27 MemoryStore: INFO: Block broadcast_3 stored as values in memory (estimated size 14.3 KB, free 10.5 GB)
+2021-07-21 15:12:27 MemoryStore: INFO: Block broadcast_3_piece0 stored as bytes in memory (estimated size 7.2 KB, free 10.5 GB)
+2021-07-21 15:12:27 BlockManagerInfo: INFO: Added broadcast_3_piece0 in memory on compe004.hpc.in.bmrc.ox.ac.uk:45533 (size: 7.2 KB, free: 10.5 GB)
+2021-07-21 15:12:27 SparkContext: INFO: Created broadcast 3 from broadcast at DAGScheduler.scala:1161
+2021-07-21 15:12:27 DAGScheduler: INFO: Submitting 1 missing tasks from ResultStage 0 (GenericTableValueRDD[1] at RDD at GenericTableValue.scala:87) (first 15 tasks are for partitions Vector(0))
+2021-07-21 15:12:27 TaskSchedulerImpl: INFO: Adding task set 0.0 with 1 tasks
+2021-07-21 15:12:27 TaskSetManager: INFO: Starting task 0.0 in stage 0.0 (TID 0, localhost, executor driver, partition 0, PROCESS_LOCAL, 8040 bytes)
+2021-07-21 15:12:27 Executor: INFO: Running task 0.0 in stage 0.0 (TID 0)
+2021-07-21 15:12:27 root: INFO: RegionPool: initialized for thread 82: Executor task launch worker for task 0
+2021-07-21 15:12:27 root: INFO: RegionPool: FREE: 128.0K allocated (128.0K blocks / 0 chunks), regions.size = 2, 0 current java objects, 0 max java objects, thread 82: Executor task launch worker for task 0
+2021-07-21 15:12:27 Executor: ERROR: Exception in task 0.0 in stage 0.0 (TID 0)
+is.hail.utils.HailException: file:/gpfs3/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/derived/vep/output/ukb_wes_200k_vep_chr22.vcf:offset 5185: error while parsing line
+chr22	15528109	chr22_15528109_T_G	T	G	3	306082	26;CSQ=ENSG00000130538|ENST00000252835|Transcript|upstream_gene_variant|MODIFIER|OR11H1|HGNC|protein_coding|YES||||||||||||||||||||||
+
+	at is.hail.utils.ErrorHandling$class.fatal(ErrorHandling.scala:15)
+	at is.hail.utils.package$.fatal(package.scala:77)
+	at is.hail.io.vcf.MatrixVCFReader$$anonfun$21$$anonfun$apply$10$$anonfun$apply$11.apply(LoadVCF.scala:1751)
+	at is.hail.io.vcf.MatrixVCFReader$$anonfun$21$$anonfun$apply$10$$anonfun$apply$11.apply(LoadVCF.scala:1740)
+	at scala.collection.Iterator$$anon$13.hasNext(Iterator.scala:464)
+	at scala.collection.Iterator$$anon$11.hasNext(Iterator.scala:409)
+	at scala.collection.Iterator$$anon$12.hasNext(Iterator.scala:439)
+	at is.hail.rvd.RVD$$anonfun$34.apply(RVD.scala:1220)
+	at is.hail.rvd.RVD$$anonfun$34.apply(RVD.scala:1219)
+	at is.hail.sparkextras.ContextRDD$$anonfun$crunJobWithIndex$1.apply(ContextRDD.scala:242)
+	at is.hail.sparkextras.ContextRDD$$anonfun$crunJobWithIndex$1.apply(ContextRDD.scala:240)
+	at org.apache.spark.scheduler.ResultTask.runTask(ResultTask.scala:90)
+	at org.apache.spark.scheduler.Task.run(Task.scala:121)
+	at org.apache.spark.executor.Executor$TaskRunner$$anonfun$10.apply(Executor.scala:403)
+	at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:1360)
+	at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:409)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: is.hail.utils.HailException: Invalid locus 'chr22:15528109' found. Contig 'chr22' is not in the reference genome 'GRCh37'.
+	at is.hail.utils.ErrorHandling$class.fatal(ErrorHandling.scala:11)
+	at is.hail.utils.package$.fatal(package.scala:77)
+	at is.hail.variant.ReferenceGenome.checkLocus(ReferenceGenome.scala:206)
+	at is.hail.io.vcf.VCFLine$$anonfun$parseAddVariant$2.apply(LoadVCF.scala:358)
+	at is.hail.io.vcf.VCFLine$$anonfun$parseAddVariant$2.apply(LoadVCF.scala:358)
+	at scala.Option.foreach(Option.scala:257)
+	at is.hail.io.vcf.VCFLine.parseAddVariant(LoadVCF.scala:358)
+	at is.hail.io.vcf.LoadVCF$.parseLine(LoadVCF.scala:1306)
+	at is.hail.io.vcf.MatrixVCFReader$$anonfun$21$$anonfun$apply$10$$anonfun$apply$11.apply(LoadVCF.scala:1747)
+	... 16 more
+2021-07-21 15:12:27 TaskSetManager: WARN: Lost task 0.0 in stage 0.0 (TID 0, localhost, executor driver): is.hail.utils.HailException: file:/gpfs3/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/derived/vep/output/ukb_wes_200k_vep_chr22.vcf:offset 5185: error while parsing line
+chr22	15528109	chr22_15528109_T_G	T	G	3	306082	26;CSQ=ENSG00000130538|ENST00000252835|Transcript|upstream_gene_variant|MODIFIER|OR11H1|HGNC|protein_coding|YES||||||||||||||||||||||
+
+	at is.hail.utils.ErrorHandling$class.fatal(ErrorHandling.scala:15)
+	at is.hail.utils.package$.fatal(package.scala:77)
+	at is.hail.io.vcf.MatrixVCFReader$$anonfun$21$$anonfun$apply$10$$anonfun$apply$11.apply(LoadVCF.scala:1751)
+	at is.hail.io.vcf.MatrixVCFReader$$anonfun$21$$anonfun$apply$10$$anonfun$apply$11.apply(LoadVCF.scala:1740)
+	at scala.collection.Iterator$$anon$13.hasNext(Iterator.scala:464)
+	at scala.collection.Iterator$$anon$11.hasNext(Iterator.scala:409)
+	at scala.collection.Iterator$$anon$12.hasNext(Iterator.scala:439)
+	at is.hail.rvd.RVD$$anonfun$34.apply(RVD.scala:1220)
+	at is.hail.rvd.RVD$$anonfun$34.apply(RVD.scala:1219)
+	at is.hail.sparkextras.ContextRDD$$anonfun$crunJobWithIndex$1.apply(ContextRDD.scala:242)
+	at is.hail.sparkextras.ContextRDD$$anonfun$crunJobWithIndex$1.apply(ContextRDD.scala:240)
+	at org.apache.spark.scheduler.ResultTask.runTask(ResultTask.scala:90)
+	at org.apache.spark.scheduler.Task.run(Task.scala:121)
+	at org.apache.spark.executor.Executor$TaskRunner$$anonfun$10.apply(Executor.scala:403)
+	at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:1360)
+	at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:409)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: is.hail.utils.HailException: Invalid locus 'chr22:15528109' found. Contig 'chr22' is not in the reference genome 'GRCh37'.
+	at is.hail.utils.ErrorHandling$class.fatal(ErrorHandling.scala:11)
+	at is.hail.utils.package$.fatal(package.scala:77)
+	at is.hail.variant.ReferenceGenome.checkLocus(ReferenceGenome.scala:206)
+	at is.hail.io.vcf.VCFLine$$anonfun$parseAddVariant$2.apply(LoadVCF.scala:358)
+	at is.hail.io.vcf.VCFLine$$anonfun$parseAddVariant$2.apply(LoadVCF.scala:358)
+	at scala.Option.foreach(Option.scala:257)
+	at is.hail.io.vcf.VCFLine.parseAddVariant(LoadVCF.scala:358)
+	at is.hail.io.vcf.LoadVCF$.parseLine(LoadVCF.scala:1306)
+	at is.hail.io.vcf.MatrixVCFReader$$anonfun$21$$anonfun$apply$10$$anonfun$apply$11.apply(LoadVCF.scala:1747)
+	... 16 more
+
+2021-07-21 15:12:27 TaskSetManager: ERROR: Task 0 in stage 0.0 failed 1 times; aborting job
+2021-07-21 15:12:27 TaskSchedulerImpl: INFO: Removed TaskSet 0.0, whose tasks have all completed, from pool 
+2021-07-21 15:12:27 TaskSchedulerImpl: INFO: Cancelling stage 0
+2021-07-21 15:12:27 TaskSchedulerImpl: INFO: Killing all running tasks in stage 0: Stage cancelled
+2021-07-21 15:12:27 DAGScheduler: INFO: ResultStage 0 (runJob at ContextRDD.scala:238) failed in 0.206 s due to Job aborted due to stage failure: Task 0 in stage 0.0 failed 1 times, most recent failure: Lost task 0.0 in stage 0.0 (TID 0, localhost, executor driver): is.hail.utils.HailException: file:/gpfs3/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/derived/vep/output/ukb_wes_200k_vep_chr22.vcf:offset 5185: error while parsing line
+chr22	15528109	chr22_15528109_T_G	T	G	3	306082	26;CSQ=ENSG00000130538|ENST00000252835|Transcript|upstream_gene_variant|MODIFIER|OR11H1|HGNC|protein_coding|YES||||||||||||||||||||||
+
+	at is.hail.utils.ErrorHandling$class.fatal(ErrorHandling.scala:15)
+	at is.hail.utils.package$.fatal(package.scala:77)
+	at is.hail.io.vcf.MatrixVCFReader$$anonfun$21$$anonfun$apply$10$$anonfun$apply$11.apply(LoadVCF.scala:1751)
+	at is.hail.io.vcf.MatrixVCFReader$$anonfun$21$$anonfun$apply$10$$anonfun$apply$11.apply(LoadVCF.scala:1740)
+	at scala.collection.Iterator$$anon$13.hasNext(Iterator.scala:464)
+	at scala.collection.Iterator$$anon$11.hasNext(Iterator.scala:409)
+	at scala.collection.Iterator$$anon$12.hasNext(Iterator.scala:439)
+	at is.hail.rvd.RVD$$anonfun$34.apply(RVD.scala:1220)
+	at is.hail.rvd.RVD$$anonfun$34.apply(RVD.scala:1219)
+	at is.hail.sparkextras.ContextRDD$$anonfun$crunJobWithIndex$1.apply(ContextRDD.scala:242)
+	at is.hail.sparkextras.ContextRDD$$anonfun$crunJobWithIndex$1.apply(ContextRDD.scala:240)
+	at org.apache.spark.scheduler.ResultTask.runTask(ResultTask.scala:90)
+	at org.apache.spark.scheduler.Task.run(Task.scala:121)
+	at org.apache.spark.executor.Executor$TaskRunner$$anonfun$10.apply(Executor.scala:403)
+	at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:1360)
+	at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:409)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: is.hail.utils.HailException: Invalid locus 'chr22:15528109' found. Contig 'chr22' is not in the reference genome 'GRCh37'.
+	at is.hail.utils.ErrorHandling$class.fatal(ErrorHandling.scala:11)
+	at is.hail.utils.package$.fatal(package.scala:77)
+	at is.hail.variant.ReferenceGenome.checkLocus(ReferenceGenome.scala:206)
+	at is.hail.io.vcf.VCFLine$$anonfun$parseAddVariant$2.apply(LoadVCF.scala:358)
+	at is.hail.io.vcf.VCFLine$$anonfun$parseAddVariant$2.apply(LoadVCF.scala:358)
+	at scala.Option.foreach(Option.scala:257)
+	at is.hail.io.vcf.VCFLine.parseAddVariant(LoadVCF.scala:358)
+	at is.hail.io.vcf.LoadVCF$.parseLine(LoadVCF.scala:1306)
+	at is.hail.io.vcf.MatrixVCFReader$$anonfun$21$$anonfun$apply$10$$anonfun$apply$11.apply(LoadVCF.scala:1747)
+	... 16 more
+
+Driver stacktrace:
+2021-07-21 15:12:27 DAGScheduler: INFO: Job 0 failed: runJob at ContextRDD.scala:238, took 0.245197 s
+2021-07-21 15:12:27 root: ERROR: error while applying lowering 'InterpretNonCompilable'
+2021-07-21 15:12:27 root: INFO: RegionPool: FREE: 128.0K allocated (128.0K blocks / 0 chunks), regions.size = 2, 0 current java objects, 0 max java objects, thread 25: Thread-5
+2021-07-21 15:12:27 root: ERROR: HailException: Invalid locus 'chr22:15528109' found. Contig 'chr22' is not in the reference genome 'GRCh37'.
+From org.apache.spark.SparkException: Job aborted due to stage failure: Task 0 in stage 0.0 failed 1 times, most recent failure: Lost task 0.0 in stage 0.0 (TID 0, localhost, executor driver): is.hail.utils.HailException: file:/gpfs3/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/derived/vep/output/ukb_wes_200k_vep_chr22.vcf:offset 5185: error while parsing line
+chr22	15528109	chr22_15528109_T_G	T	G	3	306082	26;CSQ=ENSG00000130538|ENST00000252835|Transcript|upstream_gene_variant|MODIFIER|OR11H1|HGNC|protein_coding|YES||||||||||||||||||||||
+
+	at is.hail.utils.ErrorHandling$class.fatal(ErrorHandling.scala:15)
+	at is.hail.utils.package$.fatal(package.scala:77)
+	at is.hail.io.vcf.MatrixVCFReader$$anonfun$21$$anonfun$apply$10$$anonfun$apply$11.apply(LoadVCF.scala:1751)
+	at is.hail.io.vcf.MatrixVCFReader$$anonfun$21$$anonfun$apply$10$$anonfun$apply$11.apply(LoadVCF.scala:1740)
+	at scala.collection.Iterator$$anon$13.hasNext(Iterator.scala:464)
+	at scala.collection.Iterator$$anon$11.hasNext(Iterator.scala:409)
+	at scala.collection.Iterator$$anon$12.hasNext(Iterator.scala:439)
+	at is.hail.rvd.RVD$$anonfun$34.apply(RVD.scala:1220)
+	at is.hail.rvd.RVD$$anonfun$34.apply(RVD.scala:1219)
+	at is.hail.sparkextras.ContextRDD$$anonfun$crunJobWithIndex$1.apply(ContextRDD.scala:242)
+	at is.hail.sparkextras.ContextRDD$$anonfun$crunJobWithIndex$1.apply(ContextRDD.scala:240)
+	at org.apache.spark.scheduler.ResultTask.runTask(ResultTask.scala:90)
+	at org.apache.spark.scheduler.Task.run(Task.scala:121)
+	at org.apache.spark.executor.Executor$TaskRunner$$anonfun$10.apply(Executor.scala:403)
+	at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:1360)
+	at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:409)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: is.hail.utils.HailException: Invalid locus 'chr22:15528109' found. Contig 'chr22' is not in the reference genome 'GRCh37'.
+	at is.hail.utils.ErrorHandling$class.fatal(ErrorHandling.scala:11)
+	at is.hail.utils.package$.fatal(package.scala:77)
+	at is.hail.variant.ReferenceGenome.checkLocus(ReferenceGenome.scala:206)
+	at is.hail.io.vcf.VCFLine$$anonfun$parseAddVariant$2.apply(LoadVCF.scala:358)
+	at is.hail.io.vcf.VCFLine$$anonfun$parseAddVariant$2.apply(LoadVCF.scala:358)
+	at scala.Option.foreach(Option.scala:257)
+	at is.hail.io.vcf.VCFLine.parseAddVariant(LoadVCF.scala:358)
+	at is.hail.io.vcf.LoadVCF$.parseLine(LoadVCF.scala:1306)
+	at is.hail.io.vcf.MatrixVCFReader$$anonfun$21$$anonfun$apply$10$$anonfun$apply$11.apply(LoadVCF.scala:1747)
+	... 16 more
+
+Driver stacktrace:
+	at org.apache.spark.scheduler.DAGScheduler.org$apache$spark$scheduler$DAGScheduler$$failJobAndIndependentStages(DAGScheduler.scala:1889)
+	at org.apache.spark.scheduler.DAGScheduler$$anonfun$abortStage$1.apply(DAGScheduler.scala:1877)
+	at org.apache.spark.scheduler.DAGScheduler$$anonfun$abortStage$1.apply(DAGScheduler.scala:1876)
+	at scala.collection.mutable.ResizableArray$class.foreach(ResizableArray.scala:59)
+	at scala.collection.mutable.ArrayBuffer.foreach(ArrayBuffer.scala:48)
+	at org.apache.spark.scheduler.DAGScheduler.abortStage(DAGScheduler.scala:1876)
+	at org.apache.spark.scheduler.DAGScheduler$$anonfun$handleTaskSetFailed$1.apply(DAGScheduler.scala:926)
+	at org.apache.spark.scheduler.DAGScheduler$$anonfun$handleTaskSetFailed$1.apply(DAGScheduler.scala:926)
+	at scala.Option.foreach(Option.scala:257)
+	at org.apache.spark.scheduler.DAGScheduler.handleTaskSetFailed(DAGScheduler.scala:926)
+	at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.doOnReceive(DAGScheduler.scala:2110)
+	at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:2059)
+	at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:2048)
+	at org.apache.spark.util.EventLoop$$anon$1.run(EventLoop.scala:49)
+	at org.apache.spark.scheduler.DAGScheduler.runJob(DAGScheduler.scala:737)
+	at org.apache.spark.SparkContext.runJob(SparkContext.scala:2061)
+	at org.apache.spark.SparkContext.runJob(SparkContext.scala:2082)
+	at org.apache.spark.SparkContext.runJob(SparkContext.scala:2114)
+	at is.hail.sparkextras.ContextRDD.crunJobWithIndex(ContextRDD.scala:238)
+	at is.hail.rvd.RVD$.getKeyInfo(RVD.scala:1219)
+	at is.hail.rvd.RVD$.makeCoercer(RVD.scala:1294)
+	at is.hail.expr.ir.GenericTableValue.getRVDCoercer(GenericTableValue.scala:165)
+	at is.hail.expr.ir.GenericTableValue.toTableValue(GenericTableValue.scala:191)
+	at is.hail.io.vcf.MatrixVCFReader.apply(LoadVCF.scala:1779)
+	at is.hail.expr.ir.TableRead.execute(TableIR.scala:1141)
+	at is.hail.expr.ir.Interpret$.run(Interpret.scala:811)
+	at is.hail.expr.ir.Interpret$.alreadyLowered(Interpret.scala:53)
+	at is.hail.expr.ir.InterpretNonCompilable$.interpretAndCoerce$1(InterpretNonCompilable.scala:16)
+	at is.hail.expr.ir.InterpretNonCompilable$.is$hail$expr$ir$InterpretNonCompilable$$rewrite$1(InterpretNonCompilable.scala:53)
+	at is.hail.expr.ir.InterpretNonCompilable$$anonfun$1.apply(InterpretNonCompilable.scala:25)
+	at is.hail.expr.ir.InterpretNonCompilable$$anonfun$1.apply(InterpretNonCompilable.scala:25)
+	at scala.collection.TraversableLike$$anonfun$map$1.apply(TraversableLike.scala:234)
+	at scala.collection.TraversableLike$$anonfun$map$1.apply(TraversableLike.scala:234)
+	at scala.collection.IndexedSeqOptimized$class.foreach(IndexedSeqOptimized.scala:33)
+	at scala.collection.mutable.WrappedArray.foreach(WrappedArray.scala:35)
+	at scala.collection.TraversableLike$class.map(TraversableLike.scala:234)
+	at scala.collection.AbstractTraversable.map(Traversable.scala:104)
+	at is.hail.expr.ir.InterpretNonCompilable$.rewriteChildren$1(InterpretNonCompilable.scala:25)
+	at is.hail.expr.ir.InterpretNonCompilable$.is$hail$expr$ir$InterpretNonCompilable$$rewrite$1(InterpretNonCompilable.scala:54)
+	at is.hail.expr.ir.InterpretNonCompilable$$anonfun$1.apply(InterpretNonCompilable.scala:25)
+	at is.hail.expr.ir.InterpretNonCompilable$$anonfun$1.apply(InterpretNonCompilable.scala:25)
+	at scala.collection.TraversableLike$$anonfun$map$1.apply(TraversableLike.scala:234)
+	at scala.collection.TraversableLike$$anonfun$map$1.apply(TraversableLike.scala:234)
+	at scala.collection.mutable.ResizableArray$class.foreach(ResizableArray.scala:59)
+	at scala.collection.mutable.ArrayBuffer.foreach(ArrayBuffer.scala:48)
+	at scala.collection.TraversableLike$class.map(TraversableLike.scala:234)
+	at scala.collection.AbstractTraversable.map(Traversable.scala:104)
+	at is.hail.expr.ir.InterpretNonCompilable$.rewriteChildren$1(InterpretNonCompilable.scala:25)
+	at is.hail.expr.ir.InterpretNonCompilable$.is$hail$expr$ir$InterpretNonCompilable$$rewrite$1(InterpretNonCompilable.scala:54)
+	at is.hail.expr.ir.InterpretNonCompilable$$anonfun$1.apply(InterpretNonCompilable.scala:25)
+	at is.hail.expr.ir.InterpretNonCompilable$$anonfun$1.apply(InterpretNonCompilable.scala:25)
+	at scala.collection.TraversableLike$$anonfun$map$1.apply(TraversableLike.scala:234)
+	at scala.collection.TraversableLike$$anonfun$map$1.apply(TraversableLike.scala:234)
+	at scala.collection.IndexedSeqOptimized$class.foreach(IndexedSeqOptimized.scala:33)
+	at scala.collection.mutable.WrappedArray.foreach(WrappedArray.scala:35)
+	at scala.collection.TraversableLike$class.map(TraversableLike.scala:234)
+	at scala.collection.AbstractTraversable.map(Traversable.scala:104)
+	at is.hail.expr.ir.InterpretNonCompilable$.rewriteChildren$1(InterpretNonCompilable.scala:25)
+	at is.hail.expr.ir.InterpretNonCompilable$.is$hail$expr$ir$InterpretNonCompilable$$rewrite$1(InterpretNonCompilable.scala:54)
+	at is.hail.expr.ir.InterpretNonCompilable$$anonfun$1.apply(InterpretNonCompilable.scala:25)
+	at is.hail.expr.ir.InterpretNonCompilable$$anonfun$1.apply(InterpretNonCompilable.scala:25)
+	at scala.collection.TraversableLike$$anonfun$map$1.apply(TraversableLike.scala:234)
+	at scala.collection.TraversableLike$$anonfun$map$1.apply(TraversableLike.scala:234)
+	at scala.collection.IndexedSeqOptimized$class.foreach(IndexedSeqOptimized.scala:33)
+	at scala.collection.mutable.WrappedArray.foreach(WrappedArray.scala:35)
+	at scala.collection.TraversableLike$class.map(TraversableLike.scala:234)
+	at scala.collection.AbstractTraversable.map(Traversable.scala:104)
+	at is.hail.expr.ir.InterpretNonCompilable$.rewriteChildren$1(InterpretNonCompilable.scala:25)
+	at is.hail.expr.ir.InterpretNonCompilable$.is$hail$expr$ir$InterpretNonCompilable$$rewrite$1(InterpretNonCompilable.scala:54)
+	at is.hail.expr.ir.InterpretNonCompilable$$anonfun$1.apply(InterpretNonCompilable.scala:25)
+	at is.hail.expr.ir.InterpretNonCompilable$$anonfun$1.apply(InterpretNonCompilable.scala:25)
+	at scala.collection.TraversableLike$$anonfun$map$1.apply(TraversableLike.scala:234)
+	at scala.collection.TraversableLike$$anonfun$map$1.apply(TraversableLike.scala:234)
+	at scala.collection.IndexedSeqOptimized$class.foreach(IndexedSeqOptimized.scala:33)
+	at scala.collection.mutable.WrappedArray.foreach(WrappedArray.scala:35)
+	at scala.collection.TraversableLike$class.map(TraversableLike.scala:234)
+	at scala.collection.AbstractTraversable.map(Traversable.scala:104)
+	at is.hail.expr.ir.InterpretNonCompilable$.rewriteChildren$1(InterpretNonCompilable.scala:25)
+	at is.hail.expr.ir.InterpretNonCompilable$.is$hail$expr$ir$InterpretNonCompilable$$rewrite$1(InterpretNonCompilable.scala:54)
+	at is.hail.expr.ir.InterpretNonCompilable$$anonfun$1.apply(InterpretNonCompilable.scala:25)
+	at is.hail.expr.ir.InterpretNonCompilable$$anonfun$1.apply(InterpretNonCompilable.scala:25)
+	at scala.collection.TraversableLike$$anonfun$map$1.apply(TraversableLike.scala:234)
+	at scala.collection.TraversableLike$$anonfun$map$1.apply(TraversableLike.scala:234)
+	at scala.collection.IndexedSeqOptimized$class.foreach(IndexedSeqOptimized.scala:33)
+	at scala.collection.mutable.WrappedArray.foreach(WrappedArray.scala:35)
+	at scala.collection.TraversableLike$class.map(TraversableLike.scala:234)
+	at scala.collection.AbstractTraversable.map(Traversable.scala:104)
+	at is.hail.expr.ir.InterpretNonCompilable$.rewriteChildren$1(InterpretNonCompilable.scala:25)
+	at is.hail.expr.ir.InterpretNonCompilable$.is$hail$expr$ir$InterpretNonCompilable$$rewrite$1(InterpretNonCompilable.scala:54)
+	at is.hail.expr.ir.InterpretNonCompilable$$anonfun$1.apply(InterpretNonCompilable.scala:25)
+	at is.hail.expr.ir.InterpretNonCompilable$$anonfun$1.apply(InterpretNonCompilable.scala:25)
+	at scala.collection.TraversableLike$$anonfun$map$1.apply(TraversableLike.scala:234)
+	at scala.collection.TraversableLike$$anonfun$map$1.apply(TraversableLike.scala:234)
+	at scala.collection.IndexedSeqOptimized$class.foreach(IndexedSeqOptimized.scala:33)
+	at scala.collection.mutable.WrappedArray.foreach(WrappedArray.scala:35)
+	at scala.collection.TraversableLike$class.map(TraversableLike.scala:234)
+	at scala.collection.AbstractTraversable.map(Traversable.scala:104)
+	at is.hail.expr.ir.InterpretNonCompilable$.rewriteChildren$1(InterpretNonCompilable.scala:25)
+	at is.hail.expr.ir.InterpretNonCompilable$.is$hail$expr$ir$InterpretNonCompilable$$rewrite$1(InterpretNonCompilable.scala:54)
+	at is.hail.expr.ir.InterpretNonCompilable$.apply(InterpretNonCompilable.scala:58)
+	at is.hail.expr.ir.lowering.InterpretNonCompilablePass$.transform(LoweringPass.scala:67)
+	at is.hail.expr.ir.lowering.LoweringPass$$anonfun$apply$3$$anonfun$1.apply(LoweringPass.scala:15)
+	at is.hail.expr.ir.lowering.LoweringPass$$anonfun$apply$3$$anonfun$1.apply(LoweringPass.scala:15)
+	at is.hail.utils.ExecutionTimer.time(ExecutionTimer.scala:81)
+	at is.hail.expr.ir.lowering.LoweringPass$$anonfun$apply$3.apply(LoweringPass.scala:15)
+	at is.hail.expr.ir.lowering.LoweringPass$$anonfun$apply$3.apply(LoweringPass.scala:13)
+	at is.hail.utils.ExecutionTimer.time(ExecutionTimer.scala:81)
+	at is.hail.expr.ir.lowering.LoweringPass$class.apply(LoweringPass.scala:13)
+	at is.hail.expr.ir.lowering.InterpretNonCompilablePass$.apply(LoweringPass.scala:62)
+	at is.hail.expr.ir.lowering.LoweringPipeline$$anonfun$apply$1.apply(LoweringPipeline.scala:14)
+	at is.hail.expr.ir.lowering.LoweringPipeline$$anonfun$apply$1.apply(LoweringPipeline.scala:12)
+	at scala.collection.IndexedSeqOptimized$class.foreach(IndexedSeqOptimized.scala:33)
+	at scala.collection.mutable.WrappedArray.foreach(WrappedArray.scala:35)
+	at is.hail.expr.ir.lowering.LoweringPipeline.apply(LoweringPipeline.scala:12)
+	at is.hail.expr.ir.CompileAndEvaluate$._apply(CompileAndEvaluate.scala:28)
+	at is.hail.backend.spark.SparkBackend.is$hail$backend$spark$SparkBackend$$_execute(SparkBackend.scala:362)
+	at is.hail.backend.spark.SparkBackend$$anonfun$execute$1.apply(SparkBackend.scala:346)
+	at is.hail.backend.spark.SparkBackend$$anonfun$execute$1.apply(SparkBackend.scala:343)
+	at is.hail.expr.ir.ExecuteContext$$anonfun$scoped$1$$anonfun$apply$1.apply(ExecuteContext.scala:48)
+	at is.hail.expr.ir.ExecuteContext$$anonfun$scoped$1$$anonfun$apply$1.apply(ExecuteContext.scala:48)
+	at is.hail.utils.package$.using(package.scala:618)
+	at is.hail.expr.ir.ExecuteContext$$anonfun$scoped$1.apply(ExecuteContext.scala:48)
+	at is.hail.expr.ir.ExecuteContext$$anonfun$scoped$1.apply(ExecuteContext.scala:47)
+	at is.hail.utils.package$.using(package.scala:618)
+	at is.hail.annotations.RegionPool$.scoped(RegionPool.scala:13)
+	at is.hail.expr.ir.ExecuteContext$.scoped(ExecuteContext.scala:47)
+	at is.hail.backend.spark.SparkBackend.withExecuteContext(SparkBackend.scala:256)
+	at is.hail.backend.spark.SparkBackend.execute(SparkBackend.scala:343)
+	at is.hail.backend.spark.SparkBackend$$anonfun$7.apply(SparkBackend.scala:387)
+	at is.hail.backend.spark.SparkBackend$$anonfun$7.apply(SparkBackend.scala:385)
+	at is.hail.utils.ExecutionTimer$.time(ExecutionTimer.scala:52)
+	at is.hail.backend.spark.SparkBackend.executeJSON(SparkBackend.scala:385)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at py4j.reflection.MethodInvoker.invoke(MethodInvoker.java:244)
+	at py4j.reflection.ReflectionEngine.invoke(ReflectionEngine.java:357)
+	at py4j.Gateway.invoke(Gateway.java:282)
+	at py4j.commands.AbstractCommand.invokeMethod(AbstractCommand.java:132)
+	at py4j.commands.CallCommand.execute(CallCommand.java:79)
+	at py4j.GatewayConnection.run(GatewayConnection.java:238)
+	at java.lang.Thread.run(Thread.java:748)
+
+is.hail.utils.HailException: file:/gpfs3/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/derived/vep/output/ukb_wes_200k_vep_chr22.vcf:offset 5185: error while parsing line
+chr22	15528109	chr22_15528109_T_G	T	G	3	306082	26;CSQ=ENSG00000130538|ENST00000252835|Transcript|upstream_gene_variant|MODIFIER|OR11H1|HGNC|protein_coding|YES||||||||||||||||||||||
+
+	at is.hail.utils.ErrorHandling$class.fatal(ErrorHandling.scala:15)
+	at is.hail.utils.package$.fatal(package.scala:77)
+	at is.hail.io.vcf.MatrixVCFReader$$anonfun$21$$anonfun$apply$10$$anonfun$apply$11.apply(LoadVCF.scala:1751)
+	at is.hail.io.vcf.MatrixVCFReader$$anonfun$21$$anonfun$apply$10$$anonfun$apply$11.apply(LoadVCF.scala:1740)
+	at scala.collection.Iterator$$anon$13.hasNext(Iterator.scala:464)
+	at scala.collection.Iterator$$anon$11.hasNext(Iterator.scala:409)
+	at scala.collection.Iterator$$anon$12.hasNext(Iterator.scala:439)
+	at is.hail.rvd.RVD$$anonfun$34.apply(RVD.scala:1220)
+	at is.hail.rvd.RVD$$anonfun$34.apply(RVD.scala:1219)
+	at is.hail.sparkextras.ContextRDD$$anonfun$crunJobWithIndex$1.apply(ContextRDD.scala:242)
+	at is.hail.sparkextras.ContextRDD$$anonfun$crunJobWithIndex$1.apply(ContextRDD.scala:240)
+	at org.apache.spark.scheduler.ResultTask.runTask(ResultTask.scala:90)
+	at org.apache.spark.scheduler.Task.run(Task.scala:121)
+	at org.apache.spark.executor.Executor$TaskRunner$$anonfun$10.apply(Executor.scala:403)
+	at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:1360)
+	at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:409)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+
+is.hail.utils.HailException: Invalid locus 'chr22:15528109' found. Contig 'chr22' is not in the reference genome 'GRCh37'.
+	at is.hail.utils.ErrorHandling$class.fatal(ErrorHandling.scala:11)
+	at is.hail.utils.package$.fatal(package.scala:77)
+	at is.hail.variant.ReferenceGenome.checkLocus(ReferenceGenome.scala:206)
+	at is.hail.io.vcf.VCFLine$$anonfun$parseAddVariant$2.apply(LoadVCF.scala:358)
+	at is.hail.io.vcf.VCFLine$$anonfun$parseAddVariant$2.apply(LoadVCF.scala:358)
+	at scala.Option.foreach(Option.scala:257)
+	at is.hail.io.vcf.VCFLine.parseAddVariant(LoadVCF.scala:358)
+	at is.hail.io.vcf.LoadVCF$.parseLine(LoadVCF.scala:1306)
+	at is.hail.io.vcf.MatrixVCFReader$$anonfun$21$$anonfun$apply$10$$anonfun$apply$11.apply(LoadVCF.scala:1747)
+	at is.hail.io.vcf.MatrixVCFReader$$anonfun$21$$anonfun$apply$10$$anonfun$apply$11.apply(LoadVCF.scala:1740)
+	at scala.collection.Iterator$$anon$13.hasNext(Iterator.scala:464)
+	at scala.collection.Iterator$$anon$11.hasNext(Iterator.scala:409)
+	at scala.collection.Iterator$$anon$12.hasNext(Iterator.scala:439)
+	at is.hail.rvd.RVD$$anonfun$34.apply(RVD.scala:1220)
+	at is.hail.rvd.RVD$$anonfun$34.apply(RVD.scala:1219)
+	at is.hail.sparkextras.ContextRDD$$anonfun$crunJobWithIndex$1.apply(ContextRDD.scala:242)
+	at is.hail.sparkextras.ContextRDD$$anonfun$crunJobWithIndex$1.apply(ContextRDD.scala:240)
+	at org.apache.spark.scheduler.ResultTask.runTask(ResultTask.scala:90)
+	at org.apache.spark.scheduler.Task.run(Task.scala:121)
+	at org.apache.spark.executor.Executor$TaskRunner$$anonfun$10.apply(Executor.scala:403)
+	at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:1360)
+	at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:409)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+
+
+
+
+
+2021-07-21 15:12:35 SparkContext: INFO: Invoking stop() from shutdown hook
+2021-07-21 15:12:35 AbstractConnector: INFO: Stopped Spark@7b1060ce{HTTP/1.1,[http/1.1]}{0.0.0.0:4040}
+2021-07-21 15:12:35 SparkUI: INFO: Stopped Spark web UI at http://compe004.hpc.in.bmrc.ox.ac.uk:4040
+2021-07-21 15:12:35 MapOutputTrackerMasterEndpoint: INFO: MapOutputTrackerMasterEndpoint stopped!

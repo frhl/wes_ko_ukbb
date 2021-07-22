@@ -1,3 +1,6 @@
 derived/
 data/
-plink.*
+plink2.pgen
+plink2.psar
+plink2.pvar
+plink2.log
