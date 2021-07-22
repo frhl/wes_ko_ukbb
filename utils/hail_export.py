@@ -9,6 +9,7 @@ DATA_DIR = f'{WD}/data'
 
 def hail_init(chrom=None, log_prefix='get_vcf'):
     r'''Initialize Hail '''
+    assert chrom in range(1,23) # only autosomes
     n_slots = os.environ.get('NSLOTS', 1)
     chr_suffix = '' if chr is None else f'_chr{chrom}'
     WD = '/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb'
@@ -28,17 +29,17 @@ def import_table(input_path, input_type, cache=False):
         mt = mt.cache()
     return mt
 
-def filter_min_maf(mt, maf=None):
-    r'''Filter to variants with minor allele frequency '''
+def filter_max_maf(mt, maf=None):
+    r'''Filter to variants to have maf less than {maf}'''
     if maf is not None:
         if mt.info.AF.dtype==hl.dtype('array<float64>'):
-            mt = mt.filter_rows(hl.max(mt.info.AF)<maf)
+            mt = mt.filter_rows(hl.min(mt.info.AF)<maf)
         else:
             raise ValueError('MatrixTable does not have an info.AF field with dtype array<float64>')
     return mt
 
 def filter_min_maf(mt, maf=None):
-    r'''Filter to variants with minor allele frequency '''
+    r'''Filter to variants to have maf gt {maf}'''
     if maf is not None:
         if mt.info.AF.dtype==hl.dtype('array<float64>'):
             mt = mt.filter_rows(hl.min(mt.info.AF)>maf)
@@ -46,23 +47,10 @@ def filter_min_maf(mt, maf=None):
             raise ValueError('MatrixTable does not have an info.AF field with dtype array<float64>')
     return mt
 
-
-   #mt = mt.filter_rows(hl.agg.call_stats(mt.GT, mt.alleles).AF[1] > maf)
-#def filter_samples(mt, subset = 'WB'):
-#    r'''Filter samples to only include QCED individuals in reeference population '''
-#    if subset=='WB':
-#        qt = hl.import_table('/well/lindgren/UKBIOBANK/DATA/WES_200k/ukb23155_c1_b0_v1_s200632.fam')
-#        # still need to select the WB samples?
-#        qt = qt.rename({'eid' : 's'}).key_by('s')
-#        mt = mt.filter_cols(hl.is_defined(qt[mt['s']]))
-#        #post_filter_count = mt.count()
-#        return(mt)
-#    else:
-#        raise TypeError('Subset is not valid. Must be "WB"')
-
-def annotate_vep(mt):
+def annotate_vep(mt, vep_path = 'derived/vep/output/ukb_wes_200k_vep_chr22.vcf'):
     r'''Merge file with VEP info '''
-    ht = hl.import_vcf('derived/vep/output/ukb_wes_200k_vep_chr22.vcf')
+    print(f'\nAnnotating with VEP file: {vep_path}\n')
+    ht = hl.import_vcf(vep_path)
     ht = ht.annotate_rows(info=ht.info.annotate(ensgid=ht.info.CSQ.map(lambda x: x.split('\\|')[0])))
     ht = ht.annotate_rows(info=ht.info.annotate(enstid=ht.info.CSQ.map(lambda x: x.split('\\|')[1])))
     ht = ht.annotate_rows(info=ht.info.annotate(variant=ht.info.CSQ.map(lambda x: x.split('\\|')[3])))
@@ -75,8 +63,10 @@ def annotate_vep(mt):
     mt = mt.annotate_rows(info=mt.info.annotate(loftee_flag=ht.index_rows(mt.locus, mt.alleles).info.loftee_flag))
     return(mt)
 
-def select_field(mt, field = 'impact', condition = 'HIGH'):
+def select_field(mt, field = 'impact', condition = 'HIGH', check = True):
     mt = mt.filter_rows(mt.info[field].contains(condition))
+    if check is True and min(mt.count()) < 1:
+        print(f'\ninvalid condition: {condition}\n')
     return mt
 
 def annotate_gt(mt):
@@ -154,43 +144,54 @@ def export_table(mt, out_prefix, out_type, checkpoint=False, format_fields_to_dr
             raise ValueError(f'Cannot export to PLINK because at least one of {out_prefix}.{{bed,bim,fam}} already exists')
 
 
-
-    
-
-
-
-
 def main(args):
     
+    # parser
     input_path = args.input_path
     input_type = args.input_type
     out_prefix = args.out_prefix
     out_type   = args.out_type
+    vep_path   = args.vep_path
     chrom      = args.chrom
     max_maf    = args.max_maf
     min_maf    = args.min_maf 
+    vep_impact = args.vep_impact
+    vep_variant= args.vep_variant
+    vep_loftee = args.vep_loftee
     
-    # filtering data
-    chrom=22
+    # run parser
     hail_init(chrom)
+    mt = read_input(input_path=input_path, input_type=input_type)
+
+    if max_maf is not None:
+        mt = filter_max_maf(mt, max_maf)
+
+    if min_maf is not None:
+        mt = filter_min_maf(mt, min_maf)
+
+    if vep_path is not None:
+        mt = annotate_vep(mt, vep_path)
+
+    if vep_impact is not None:
+        mt = select_field('impact', vep_impact)
+
+    if vep_variant is not None:
+        mt = select_field('variant', vep_variant)
+
+    if vep_loftee is not None:
+        mt = select_field('loftee', vep_loftee)
+
+    if out_prefix:
+        write(mt=mt,
+              out_prefix=out_prefix,
+              out_type=out_type)
+
+    # test pipeline
+    chrom=22
     mt = import_table('data/phased/ukb_wes_200k_phased_chr22.1of1.vcf.gz','vcf')
-    mt = filter_maf(mt, 0.02, 'lower')
+    mt = filter_max_maf(mt, 0.02)
     mt = annotate_vep(mt)
     mt = select(mt, 'impact','HIGH')
-
-    export_table
-    # 
-    # find compound hetz? phased data?
-    # export plink file
-
-
-    mt.show(width = 80)
-
-
-
-    mt = read_input(input_path=input_path,
-                    input_type=input_type)
-
 
 
 
@@ -205,6 +206,13 @@ if __name__=='__main__':
     parser.add_argument('--chrom', default=None, help='Chromosome to be used')
     parser.add_argument('--maf_max', default=None, help='Select all variants with a maf less than the indicated value')
     parser.add_argument('--min_maf', default=None, help='Select all variants with a maf greater than the indicated values')
+    # VEP
+    parser.add_argument('--vep_path', default=None, help='path to a .vcf file containing annotated entries by locus and alleles')
+    parser.add_argument('--vep_impact', default=None, help='subset by VEP impact')
+    parser.add_argument('--vep_variant', default=None, help='subset by VEP variant type (e.g. "stop_gained")')
+    parser.add_argument('--vep_loftee', default=None, help='subset by VEP loftee flag, only HC or LC.')
+
+
 
     args = parser.parse_args()
 
