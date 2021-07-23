@@ -4,14 +4,13 @@ import hail as hl
 import os
 import argparse
 
-# authors Nik Baya & Frederik Heymann
 
 WD = '/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb'
 DATA_DIR = f'{WD}/data'
 
 def hail_init(chrom=None, log_prefix='get_vcf'):
     r'''Initialize Hail '''
-    assert chrom in range(1,23) 'only autosomes allowed'
+    assert chrom in range(1,23), 'only autosomes allowed'
     n_slots = os.environ.get('NSLOTS', 1)
     chr_suffix = '' if chr is None else f'_chr{chrom}'
     WD = '/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb'
@@ -67,8 +66,7 @@ def annotate_vep(mt, vep_path = 'derived/vep/output/ukb_wes_200k_vep_chr22.vcf')
 
 def filter_variants(mt, field = 'impact', condition = 'HIGH', check = True):
     r'''Filter rows by condition '''
-    for cond in condition:
-        mt = mt.filter_rows(mt.info[field].contains(cond))
+    mt = mt.filter_rows(mt.info[field].contains(condition))
     if check is True and min(mt.count()) < 1:
         print(f'\ninvalid condition: {condition}\n')
     return mt
@@ -91,7 +89,25 @@ def write_sites(mt, out_prefix, keep_fields = []):
                    *keep_fields)
     ht.export(f'{out_prefix}.tsv')
 
-def get_fam(app_id=11867, wes_200k_only=False):
+
+def translate_sample_ids(ht, from_app: int, to_app: int):
+    r'''Translate sample IDs from one UKB application to another
+    `from_app` and `to_app` are UKB application IDs. This function only supports
+    translation in either direction between applications 11867 (Lindgren) and 12788 (McVean)
+    '''
+    from_app, to_app = int(from_app), int(to_app)
+    valid_apps = {11867, 12788}
+    assert (from_app in valid_apps) & (to_app in valid_apps), f'from_app and to_app must be in {valid_apps}'
+    assert from_app!=to_app, 'from_app and to_app must be different'
+    print(f'Mapping IDs from UKB app {from_app} to {to_app}')
+    id_dict = hl.import_table('/well/lindgren/UKBIOBANK/nbaya/resources/ukb11867_to_ukb12788.sample_ids.txt',delimiter='\s+', key=f'eid_{from_app}')
+    ht = ht.key_cols_by(s = id_dict[ht.s][f'eid_{to_app}'])
+    undefined_ct = ht.aggregate_cols(hl.agg.sum(hl.is_missing(ht.s)))
+    assert undefined_ct==0, f'Not all sample IDs mapped perfectly ({undefined_ct}/{ht.count()} IDs are undefined)'
+    return ht
+
+
+def get_fam(app_id=12788, wes_200k_only=False):
     # use files created by the command:
     #   /well/lindgren/UKBIOBANK/nbaya/wes_200k/phase_ukb_wes/utils/make_fam.py --make_fam
     # github: https://github.com/nikbaya/phase_ukb_wes/blob/a5a97de8604d4ea1c7e7cfeecd9a1f57c2af2357/utils/make_fam.py
@@ -99,6 +115,28 @@ def get_fam(app_id=11867, wes_200k_only=False):
     fam_path = f'/well/lindgren/UKBIOBANK/nbaya/resources/ukb{app_id}_{"wes_200k_" if wes_200k_only else ""}pedigree.fam'
     fam = hl.import_table(paths=fam_path, key='IID',types={f:'str' for f in ['FID','IID','PAT','MAT','SEX','PHEN']})
     return fam
+
+def recalc_info(mt, maf=None, info_field='info', gt_field='GT'):
+    r'''Recalculate INFO fields AF, AC, AN and keep sites with minor allele
+    frequency > `maf The fields AF and AC are made into integers instead of 
+    an array, only showing the AF and AC for the alt allele
+    '''
+    if info_field in mt.row:
+        mt = mt.annotate_rows(
+            info = mt[info_field].annotate(**hl.agg.call_stats(mt[gt_field],
+                                                               mt.alleles)
+                                               ).drop('homozygote_count')
+            ) # recalculate AF, AC, AN, drop homozygote_count
+    else:
+        mt = mt.annotate_rows(**{info_field: hl.agg.call_stats(mt[gt_field], mt.alleles)})
+    mt = mt.annotate_rows(
+        **{info_field: mt[info_field].annotate(
+            **{field:mt[info_field][field][1] for field in ['AF','AC']}
+            )}
+        ) # keep only the 2nd entries in AF and AC, which correspond to the alt alleles
+    if maf is not None:
+        mt = mt.filter_rows((mt[info_field].AF>maf) & (mt[info_field].AF<(1-maf)))
+    return mt
 
 def filter_to_related(mt, get_unrelated=False, maf=None):
     r'''Filter to samples in duos/trios, as defined by fam file
@@ -187,9 +225,13 @@ def main(args):
     out_prefix = args.out_prefix
     out_type   = args.out_type
     vep_path   = args.vep_path
+    
     chrom      = args.chrom
     max_maf    = args.max_maf
     min_maf    = args.min_maf 
+    get_related = args.get_related
+    get_unrelated = args.get_unrelated
+    
     vep_impact = args.vep_impact
     vep_variant= args.vep_variant
     vep_loftee = args.vep_loftee
@@ -197,7 +239,7 @@ def main(args):
     
     # run parser
     hail_init(chrom)
-    mt = read_input(input_path=input_path, input_type=input_type)
+    mt = import_table(input_path=input_path, input_type=input_type)
 
     if max_maf:
         mt = filter_max_maf(mt, max_maf)
@@ -205,10 +247,10 @@ def main(args):
     if min_maf:
         mt = filter_min_maf(mt, min_maf)
 
-    if get_related:
+    if get_related and not get_unrelated:
         mt = filter_to_related(mt, get_unrelated = False)
 
-    if get_urelated:
+    if get_unrelated and not get_related:
         mt = filter_to_related(mt, get_unrelated = True)
 
     if vep_path:
@@ -237,9 +279,12 @@ def main(args):
     chrom=22
     mt = import_table('data/phased/ukb_wes_200k_phased_chr22.1of1.vcf.gz','vcf')
     mt = filter_max_maf(mt, 0.02)
-    mt = annotate_vep(mt)
     mt = select(mt, 'impact','HIGH')
-
+    mt = filter_to_related(mt, get_unrelated = True)
+    counts = mt.count()
+    mt = annotate_vep(mt)
+    translate_sample_ids(mt, 12788, 11867, 's')
+    
 
 
 if __name__=='__main__':
@@ -254,6 +299,7 @@ if __name__=='__main__':
     parser.add_argument('--maf_max', default=None, help='Select all variants with a maf less than the indicated value')
     parser.add_argument('--min_maf', default=None, help='Select all variants with a maf greater than the indicated values')
     parser.add_argument('--get_related', default=None, help='Select all samples that are related')
+    parser.add_argument('--get_unrelated', default=None, help='Select all samples that are unrelated')
     parser.add_argument('--min_maf', default=None, help='Select all samples that are unrelated')
     # VEP
     parser.add_argument('--vep_path', default=None, help='path to a .vcf file containing annotated entries by locus and alleles')
