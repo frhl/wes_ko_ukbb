@@ -265,6 +265,9 @@ def main(args):
     if vep_loftee:
         mt = filter_variants('loftee', vep_loftee)
 
+    if map_samples:
+        mt = translate_sample_ids(mt, 12788, 11867)
+
     if vep_sites_write:
         write_sites(mt=mt,
                     out_prefix=out_prefix,
@@ -300,7 +303,7 @@ if __name__=='__main__':
     parser.add_argument('--min_maf', default=None, help='Select all variants with a maf greater than the indicated values')
     parser.add_argument('--get_related', default=None, help='Select all samples that are related')
     parser.add_argument('--get_unrelated', default=None, help='Select all samples that are unrelated')
-    parser.add_argument('--min_maf', default=None, help='Select all samples that are unrelated')
+    parser.add_argument('--map_samples', default=False, help='Map samples to lindgren UKBB app ID (11867)?')
     # VEP
     parser.add_argument('--vep_path', default=None, help='path to a .vcf file containing annotated entries by locus and alleles')
     parser.add_argument('--vep_impact', default=None, help='subset by VEP impact')
