@@ -18,7 +18,7 @@ def hail_init(chrom=None, log_prefix='get_vcf'):
             default_reference='GRCh38',
             master=f'local[{n_slots}]')
 
-def import_table(input_path, input_type, cache=False):
+def get_table(input_path, input_type, cache=False):
     r'''Import mt/vcf/plink tables '''
     if input_type=='mt':
         mt = hl.read_matrix_table(input_path)
@@ -103,9 +103,26 @@ def translate_sample_ids(ht, from_app: int, to_app: int):
     id_dict = hl.import_table('/well/lindgren/UKBIOBANK/nbaya/resources/ukb11867_to_ukb12788.sample_ids.txt',delimiter='\s+', key=f'eid_{from_app}')
     ht = ht.key_cols_by(s = id_dict[ht.s][f'eid_{to_app}'])
     undefined_ct = ht.aggregate_cols(hl.agg.sum(hl.is_missing(ht.s)))
-    assert undefined_ct==0, f'Not all sample IDs mapped perfectly ({undefined_ct}/{ht.count()} IDs are undefined)'
+    undefined_ct==0, f'[translate_sample_ids]: Not all sample IDs mapped perfectly ({undefined_ct}/{ht.count()} IDs are undefined)'
     return ht
 
+def get_genetically_european(mt):
+    r''' Get white british (app 11867) /well/lindgren/UKBIOBANK/DATA/QC/ukb_sqc_v2.txt
+    and genetically european from /well/lindgren/UKBIOBANK/laura/k_means_clustering_pcs/ukbb_genetically_european_k4_4PCs_self_rep_Nov2020.txt
+    ''' 
+    ht = hl.import_table('/well/lindgren/UKBIOBANK/laura/k_means_clustering_pcs/ukbb_genetically_european_k4_4PCs_self_rep_Nov2020.txt',
+        types={'eid': hl.tstr, 'genetically_european': hl.tint32}).key_by('eid')
+    mt = mt.annotate_cols(eur = ht[mt.s].genetically_european)
+    undefined_eur = mt.aggregate_cols(hl.agg.sum(hl.is_missing(mt.eur)))
+    pre_filter_count = mt.count()
+    if undefined_eur == pre_filter_count[1]:
+        raise ValueError('[get_genetically_european]: IDs for genetically europeans does not match keys in MatrixTable!')
+    if undefined_eur > 0:
+        print(f'[get_genetically_european]: Not all samples IDs mapped perfectly ({undefined_eur}/{pre_filter_count[1]} IDs are undefined)')
+    mt = mt.filter_cols(mt.s[mt.eur].contains(1))
+    post_filter_count = mt.count()
+    print(f'[get_genetically_european]:{post_filter_count[1]}/{pre_filter_count[1]} IDs were included as genetically european.')
+    return mt
 
 def get_fam(app_id=12788, wes_200k_only=False):
     # use files created by the command:
@@ -231,6 +248,8 @@ def main(args):
     min_maf    = args.min_maf 
     get_related = args.get_related
     get_unrelated = args.get_unrelated
+    map_samples = args.map_samples
+    get_europeans = args.get_europeans
     
     vep_impact = args.vep_impact
     vep_variant= args.vep_variant
@@ -239,7 +258,7 @@ def main(args):
     
     # run parser
     hail_init(chrom)
-    mt = import_table(input_path=input_path, input_type=input_type)
+    mt = get_table(input_path=input_path, input_type=input_type)
 
     if max_maf:
         mt = filter_max_maf(mt, max_maf)
@@ -268,6 +287,12 @@ def main(args):
     if map_samples:
         mt = translate_sample_ids(mt, 12788, 11867)
 
+    if get_europeans:
+        if map_samples is True:
+            mt = get_genetically_european(mt)
+        else:
+            raise ValueError('EIDs are invalid. Did you map them using --map_samples?')
+
     if vep_sites_write:
         write_sites(mt=mt,
                     out_prefix=out_prefix,
@@ -280,13 +305,14 @@ def main(args):
 
     # test pipeline
     chrom=22
-    mt = import_table('data/phased/ukb_wes_200k_phased_chr22.1of1.vcf.gz','vcf')
+    mt = get_table('data/phased/ukb_wes_200k_phased_chr22.1of1.vcf.gz','vcf')
     mt = filter_max_maf(mt, 0.02)
     mt = select(mt, 'impact','HIGH')
     mt = filter_to_related(mt, get_unrelated = True)
     counts = mt.count()
     mt = annotate_vep(mt)
-    translate_sample_ids(mt, 12788, 11867, 's')
+
+    mt = translate_sample_ids(mt, 12788, 11867, 's')
     
 
 
@@ -297,13 +323,15 @@ if __name__=='__main__':
     parser.add_argument('--input_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Type of output dataset (options: mt, vcf, plink)')
-    # filtering
+    # filtering variants
     parser.add_argument('--chrom', default=None, help='Chromosome to be used')
     parser.add_argument('--maf_max', default=None, help='Select all variants with a maf less than the indicated value')
     parser.add_argument('--min_maf', default=None, help='Select all variants with a maf greater than the indicated values')
+    # filtering samples
     parser.add_argument('--get_related', default=None, help='Select all samples that are related')
     parser.add_argument('--get_unrelated', default=None, help='Select all samples that are unrelated')
-    parser.add_argument('--map_samples', default=False, help='Map samples to lindgren UKBB app ID (11867)?')
+    parser.add_argument('--map_samples', default=None, help='Map samples to lindgren UKBB app ID (11867)?')
+    parser.add_argument('--get_europeans', default=None, help='Filter to genetically confimed europeans?')
     # VEP
     parser.add_argument('--vep_path', default=None, help='path to a .vcf file containing annotated entries by locus and alleles')
     parser.add_argument('--vep_impact', default=None, help='subset by VEP impact')
