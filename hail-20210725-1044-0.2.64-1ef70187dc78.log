@@ -1,0 +1,4 @@
+2021-07-25 10:44:48 Hail: INFO: Running Hail version 0.2.64-1ef70187dc78
+2021-07-25 10:44:48 SparkContext: WARN: Using an existing SparkContext; some configuration may not take effect.
+2021-07-25 10:44:54 Hail: INFO: downloading MovieLens-100k data ...
+  Source: http://files.grouplens.org/datasets/movielens/ml-100k.zip
