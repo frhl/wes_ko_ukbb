@@ -86,17 +86,18 @@ def write_sites(mt, out_prefix, keep_fields = []):
 
 def annotate_phased_entries(mt):
     r'''Annotates alleles that have the alternate allele on either first or second strand.'''
-    assert mt.GT.is_phased()
+    assert all(mt.GT.is_phased())
     mt = mt.annotate_entries(a0_alt = mt.GT ==  hl.parse_call('1|0'))
     mt = mt.annotate_entries(a1_alt = mt.GT ==  hl.parse_call('0|1'))
     mt = mt.annotate_entries(a_homo = mt.GT ==  hl.parse_call('1|1'))
     return mt
 
 def construct_phased_ko_mt(mt, gene_field = 'ensgid'):
-    r'''Returns a matrix table keyed by gene and samples, that contain 
-    information whether an individual is a KO (Both homozygous or compound heterozyogus).
-    Note, that this function returns a one ONLY if the individual is a knockout.
+    r''' Returns matrix table that contains gene KO details:
+    0: two reference alleles or 1 alternate allele in either strand.
+    1: two alernate alleles on either strand (either as homozygous or compound heterozygous)
     '''
+
     mt = annotate_phased_entries(mt)
     burden_mt = (
         mt 
@@ -106,13 +107,17 @@ def construct_phased_ko_mt(mt, gene_field = 'ensgid'):
     return burden_mt
 
 def construct_phased_dosage_mt(mt, gene_field = 'ensgid'):
-    r''' 
+    r''' Returns matrix table that contains dosage information from phased geneotypes.
+    0: two refererence alleles in locus,
+    1: one alternate allele on either strand in a locus, 
+    2: two alternate allele on either strand in a locus (either as homozygous or compound heterozygous)
     '''
     mt = annotate_phased_entries(mt)
     burden_mt = (
         mt 
         .group_rows_by(mt.info[gene_field])
-        .aggregate(ko = hl.agg.count_where( (mt.a0_alt & mt.a1_alt) | mt.a_homo ))
+        .aggregate(dosage = hl.ifelse( (mt.a0_alt & mt.a1_alt) | mt.a_homo , 2, 
+                            hl.ifelse( (mt.a0_alt | mt.a1_alt), 1, 0 )))
     )
     return burden_mt
 
