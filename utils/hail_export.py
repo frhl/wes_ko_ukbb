@@ -5,8 +5,28 @@ import os
 import argparse
 
 
-WD = '/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb'
-DATA_DIR = f'{WD}/data'
+#WD = '/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb'
+#DATA_DIR = f'{WD}/data'
+
+def is_het_phased(x, strand):
+    '''Returns true if the 
+    :rtype: bool
+    '''
+    #assert all(self.phased == 1)
+    n = x.ploidy
+    #phased = self.phased()
+    assert strand in (1,2)
+    assert n == 2 #and phased
+    a0 = x._alleles[0]
+    a1 = x._alleles[1]
+    # if a0==a1 -> homo
+    # if a0!=a1 -> hetz
+    if strand == 1:
+        return True if a0 == 1 else False
+    elif strand == 2:
+        return True if a1 == 1 else False
+
+
 
 def hail_init(chrom=None, log_prefix='get_vcf'):
     r'''Initialize Hail '''
@@ -71,11 +91,6 @@ def filter_variants(mt, field = 'impact', condition = 'HIGH', check = True):
         print(f'\ninvalid condition: {condition}\n')
     return mt
 
-def annotate_gt(mt):
-    mt = mt.annotate_rows(info=mt.info.annotate(hl.agg.count_where(mt.GT.is_het())))
-    mt = mt.annotate_rows(info=mt.info.annotate(hl.agg.count_where(mt.GT.is_homo())))
-    # if vep.info.gene is present, annotate compound hetz
-    return(mt)
 
 def write_sites(mt, out_prefix, keep_fields = []):
     r'''Write sites-only tsv
@@ -103,13 +118,12 @@ def translate_sample_ids(ht, from_app: int, to_app: int):
     id_dict = hl.import_table('/well/lindgren/UKBIOBANK/nbaya/resources/ukb11867_to_ukb12788.sample_ids.txt',delimiter='\s+', key=f'eid_{from_app}')
     ht = ht.key_cols_by(s = id_dict[ht.s][f'eid_{to_app}'])
     undefined_ct = ht.aggregate_cols(hl.agg.sum(hl.is_missing(ht.s)))
-    undefined_ct==0, f'[translate_sample_ids]: Not all sample IDs mapped perfectly ({undefined_ct}/{ht.count()} IDs are undefined)'
+    assert undefined_ct==0, f'[translate_sample_ids]: Not all sample IDs mapped perfectly ({undefined_ct}/{ht.count()} IDs are undefined)'
     return ht
 
-def get_genetically_european(mt):
-    r''' Get white british (app 11867) /well/lindgren/UKBIOBANK/DATA/QC/ukb_sqc_v2.txt
-    and genetically european from /well/lindgren/UKBIOBANK/laura/k_means_clustering_pcs/ukbb_genetically_european_k4_4PCs_self_rep_Nov2020.txt
-    ''' 
+def filter_to_european(mt):
+    r'''Get white british (app 11867) /well/lindgren/UKBIOBANK/DATA/QC/ukb_sqc_v2.txt
+    and genetically european from /well/lindgren/UKBIOBANK/laura/k_means_clustering_pcs/ukbb_genetically_european_k4_4PCs_self_rep_Nov2020.txt''' 
     ht = hl.import_table('/well/lindgren/UKBIOBANK/laura/k_means_clustering_pcs/ukbb_genetically_european_k4_4PCs_self_rep_Nov2020.txt',
         types={'eid': hl.tstr, 'genetically_european': hl.tint32}).key_by('eid')
     mt = mt.annotate_cols(eur = ht[mt.s].genetically_european)
@@ -119,7 +133,8 @@ def get_genetically_european(mt):
         raise ValueError('[get_genetically_european]: IDs for genetically europeans does not match keys in MatrixTable!')
     if undefined_eur > 0:
         print(f'[get_genetically_european]: Not all samples IDs mapped perfectly ({undefined_eur}/{pre_filter_count[1]} IDs are undefined)')
-    mt = mt.filter_cols(mt.s[mt.eur].contains(1))
+    #mt = mt.filter_cols(mt.s[mt.eur])
+    mt = mt.filter_cols(mt.eur == 1)
     post_filter_count = mt.count()
     print(f'[get_genetically_european]:{post_filter_count[1]}/{pre_filter_count[1]} IDs were included as genetically european.')
     return mt
@@ -155,7 +170,7 @@ def recalc_info(mt, maf=None, info_field='info', gt_field='GT'):
         mt = mt.filter_rows((mt[info_field].AF>maf) & (mt[info_field].AF<(1-maf)))
     return mt
 
-def filter_to_related(mt, get_unrelated=False, maf=None):
+def filter_to_unrelated(mt, get_related=False, maf=None):
     r'''Filter to samples in duos/trios, as defined by fam file
     '''
     fam = get_fam()
@@ -167,10 +182,10 @@ def filter_to_related(mt, get_unrelated=False, maf=None):
     offspring_fids = fam.filter(hl.literal(iids).contains(fam.PAT)
                                 |hl.literal(iids).contains(fam.MAT)).FID.collect() # get the FIDs of offspring with at least one parent in the dataset
     fam = fam.filter(hl.literal(offspring_fids).contains(fam.FID)) # subset to samples which share FIDs with offspring
-    if get_unrelated:
-        mt = mt.filter_cols(~hl.is_defined(fam[mt.s]))
+    if get_related:
+        mt = mt.filter_cols(hl.is_defined(fam[mt.s])) # related
     else:
-        mt = mt.filter_cols(hl.is_defined(fam[mt.s]))
+        mt = mt.filter_cols(~hl.is_defined(fam[mt.s])) # unrelated
     mt = recalc_info(mt=mt, maf=maf)
     return mt
 
@@ -267,10 +282,10 @@ def main(args):
         mt = filter_min_maf(mt, min_maf)
 
     if get_related and not get_unrelated:
-        mt = filter_to_related(mt, get_unrelated = False)
+        mt = filter_to_unrelated(mt, get_related = True)
 
     if get_unrelated and not get_related:
-        mt = filter_to_related(mt, get_unrelated = True)
+        mt = filter_to_unrelated(mt, get_related = False)
 
     if vep_path:
         mt = annotate_vep(mt, vep_path)
@@ -307,12 +322,13 @@ def main(args):
     chrom=22
     mt = get_table('data/phased/ukb_wes_200k_phased_chr22.1of1.vcf.gz','vcf')
     mt = filter_max_maf(mt, 0.02)
-    mt = select(mt, 'impact','HIGH')
-    mt = filter_to_related(mt, get_unrelated = True)
-    counts = mt.count()
     mt = annotate_vep(mt)
-
-    mt = translate_sample_ids(mt, 12788, 11867, 's')
+    mt = select(mt, 'impact','HIGH')
+    
+    # sample filtering
+    mt = filter_to_unrelated(mt, get_related = False)
+    mt = translate_sample_ids(mt, 12788, 11867)
+    mt = filter_to_european(mt)
     
 
 
