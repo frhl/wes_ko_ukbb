@@ -8,25 +8,6 @@ import argparse
 #WD = '/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb'
 #DATA_DIR = f'{WD}/data'
 
-def is_het_phased(x, strand):
-    '''Returns true if the 
-    :rtype: bool
-    '''
-    #assert all(self.phased == 1)
-    n = x.ploidy
-    #phased = self.phased()
-    assert strand in (1,2)
-    assert n == 2 #and phased
-    a0 = x._alleles[0]
-    a1 = x._alleles[1]
-    # if a0==a1 -> homo
-    # if a0!=a1 -> hetz
-    if strand == 1:
-        return True if a0 == 1 else False
-    elif strand == 2:
-        return True if a1 == 1 else False
-
-
 
 def hail_init(chrom=None, log_prefix='get_vcf'):
     r'''Initialize Hail '''
@@ -84,13 +65,12 @@ def annotate_vep(mt, vep_path = 'derived/vep/output/ukb_wes_200k_vep_chr22.vcf')
     mt = mt.annotate_rows(info=mt.info.annotate(loftee_flag=ht.index_rows(mt.locus, mt.alleles).info.loftee_flag))
     return(mt)
 
-def filter_variants(mt, field = 'impact', condition = 'HIGH', check = True):
+def filter_vep(mt, field = 'impact', condition = 'HIGH', check = False):
     r'''Filter rows by condition '''
     mt = mt.filter_rows(mt.info[field].contains(condition))
     if check is True and min(mt.count()) < 1:
         print(f'\ninvalid condition: {condition}\n')
     return mt
-
 
 def write_sites(mt, out_prefix, keep_fields = []):
     r'''Write sites-only tsv
@@ -104,6 +84,37 @@ def write_sites(mt, out_prefix, keep_fields = []):
                    *keep_fields)
     ht.export(f'{out_prefix}.tsv')
 
+def annotate_phased_entries(mt):
+    r'''Annotates alleles that have the alternate allele on either first or second strand.'''
+    assert mt.GT.is_phased()
+    mt = mt.annotate_entries(a0_alt = mt.GT ==  hl.parse_call('1|0'))
+    mt = mt.annotate_entries(a1_alt = mt.GT ==  hl.parse_call('0|1'))
+    mt = mt.annotate_entries(a_homo = mt.GT ==  hl.parse_call('1|1'))
+    return mt
+
+def construct_phased_ko_mt(mt, gene_field = 'ensgid'):
+    r'''Returns a matrix table keyed by gene and samples, that contain 
+    information whether an individual is a KO (Both homozygous or compound heterozyogus).
+    Note, that this function returns a one ONLY if the individual is a knockout.
+    '''
+    mt = annotate_phased_entries(mt)
+    burden_mt = (
+        mt 
+        .group_rows_by(mt.info[gene_field])
+        .aggregate(ko = hl.agg.count_where( (mt.a0_alt & mt.a1_alt) | mt.a_homo ))
+    )
+    return burden_mt
+
+def construct_phased_dosage_mt(mt, gene_field = 'ensgid'):
+    r''' 
+    '''
+    mt = annotate_phased_entries(mt)
+    burden_mt = (
+        mt 
+        .group_rows_by(mt.info[gene_field])
+        .aggregate(ko = hl.agg.count_where( (mt.a0_alt & mt.a1_alt) | mt.a_homo ))
+    )
+    return burden_mt
 
 def translate_sample_ids(ht, from_app: int, to_app: int):
     r'''Translate sample IDs from one UKB application to another
@@ -291,7 +302,7 @@ def main(args):
         mt = annotate_vep(mt, vep_path)
 
     if vep_impact:
-        mt = filter_variants('impact', vep_impact)
+        mt = filter_vep('impact', vep_impact)
 
     if vep_variant:
         mt = filter_variants('variant', vep_variant)
