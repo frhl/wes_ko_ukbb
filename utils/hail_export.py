@@ -86,7 +86,7 @@ def write_sites(mt, out_prefix, keep_fields = []):
 
 def annotate_phased_entries(mt):
     r'''Annotates alleles that have the alternate allele on either first or second strand.'''
-    assert all(mt.GT.is_phased())
+    #assert all(mt.GT.phased())
     mt = mt.annotate_entries(a0_alt = mt.GT ==  hl.parse_call('1|0'))
     mt = mt.annotate_entries(a1_alt = mt.GT ==  hl.parse_call('0|1'))
     mt = mt.annotate_entries(a_homo = mt.GT ==  hl.parse_call('1|1'))
@@ -116,8 +116,8 @@ def construct_phased_dosage_mt(mt, gene_field = 'ensgid'):
     burden_mt = (
         mt 
         .group_rows_by(mt.info[gene_field])
-        .aggregate(dosage = hl.ifelse( (mt.a0_alt & mt.a1_alt) | mt.a_homo , 2, 
-                            hl.ifelse( (mt.a0_alt | mt.a1_alt), 1, 0 )))
+        .aggregate(dosage = hl.if_else( hl.agg.any((mt.a0_alt & mt.a1_alt) | mt.a_homo) , 2, 
+                            hl.if_else( hl.agg.any((mt.a0_alt | mt.a1_alt)), 1, 0 )))
     )
     return burden_mt
 
@@ -337,9 +337,9 @@ def main(args):
     # test pipeline
     chrom=22
     mt = get_table('data/phased/ukb_wes_200k_phased_chr22.1of1.vcf.gz','vcf')
-    mt = filter_max_maf(mt, 0.02)
+    #mt = filter_max_maf(mt, 0.02)
     mt = annotate_vep(mt)
-    mt = select(mt, 'impact','HIGH')
+    mt = filter_vep(mt, 'impact','HIGH')
     
     # sample filtering
     mt = filter_to_unrelated(mt, get_related = False)
