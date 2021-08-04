@@ -1,114 +1,17 @@
-/var/spool/default/compd013/job_scripts/51131039: line 33:  5803 Illegal instruction     bcftools query -f '%CHROM %POS %ID %REF %ALT %AC %QUAL\n' ${RAW_ROOT}${RAW_FILE} -o "${OUT_ROOT}${TMP_FILE}"
 foss/2018b(23):ERROR:150: Module 'foss/2018b' conflicts with the currently loaded module(s) 'foss/2019a'
 foss/2018b(23):ERROR:102: Tcl command execution failed: conflict foss
 
 Perl/5.28.0-GCCcore-7.3.0(116):ERROR:150: Module 'Perl/5.28.0-GCCcore-7.3.0' conflicts with the currently loaded module(s) 'Perl/5.28.1-GCCcore-8.2.0'
 Perl/5.28.0-GCCcore-7.3.0(116):ERROR:102: Tcl command execution failed: conflict Perl
 
-DBD-mysql/4.048-foss-2018b-Perl-5.28.0(21):ERROR:150: Module 'DBD-mysql/4.048-foss-2018b-Perl-5.28.0' conflicts with the currently loaded module(s) 'DBD-mysql/4.050-foss-2019a-Perl-5.28.1'
-DBD-mysql/4.048-foss-2018b-Perl-5.28.0(21):ERROR:102: Tcl command execution failed: conflict DBD-mysql
+DBD-mysql/4.048-foss-2018b-Perl-5.28.0(22):ERROR:150: Module 'DBD-mysql/4.048-foss-2018b-Perl-5.28.0' conflicts with the currently loaded module(s) 'DBD-mysql/4.050-foss-2019a-Perl-5.28.1'
+DBD-mysql/4.048-foss-2018b-Perl-5.28.0(22):ERROR:102: Tcl command execution failed: conflict DBD-mysql
 
-BioPerl/1.7.2-foss-2018b-Perl-5.28.0(23):ERROR:150: Module 'BioPerl/1.7.2-foss-2018b-Perl-5.28.0' conflicts with the currently loaded module(s) 'BioPerl/1.7.2-GCCcore-8.2.0-Perl-5.28.1'
-BioPerl/1.7.2-foss-2018b-Perl-5.28.0(23):ERROR:102: Tcl command execution failed: conflict BioPerl
+BioPerl/1.7.2-foss-2018b-Perl-5.28.0(24):ERROR:150: Module 'BioPerl/1.7.2-foss-2018b-Perl-5.28.0' conflicts with the currently loaded module(s) 'BioPerl/1.7.2-GCCcore-8.2.0-Perl-5.28.1'
+BioPerl/1.7.2-foss-2018b-Perl-5.28.0(24):ERROR:102: Tcl command execution failed: conflict BioPerl
 
-Bio-DB-HTS/2.11-foss-2018b-Perl-5.28.0(21):ERROR:150: Module 'Bio-DB-HTS/2.11-foss-2018b-Perl-5.28.0' conflicts with the currently loaded module(s) 'Bio-DB-HTS/3.01-GCC-8.2.0-2.31.1-Perl-5.28.1'
-Bio-DB-HTS/2.11-foss-2018b-Perl-5.28.0(21):ERROR:102: Tcl command execution failed: conflict Bio-DB-HTS
-
-Smartmatch is experimental at /well/lindgren/flassen/software/VEP/plugins_grch38/de_novo_donor.pl line 175.
-Smartmatch is experimental at /well/lindgren/flassen/software/VEP/plugins_grch38/de_novo_donor.pl line 214.
-Smartmatch is experimental at /well/lindgren/flassen/software/VEP/plugins_grch38/splice_site_scan.pl line 191.
-Smartmatch is experimental at /well/lindgren/flassen/software/VEP/plugins_grch38/splice_site_scan.pl line 194.
-Smartmatch is experimental at /well/lindgren/flassen/software/VEP/plugins_grch38/splice_site_scan.pl line 238.
-Smartmatch is experimental at /well/lindgren/flassen/software/VEP/plugins_grch38/splice_site_scan.pl line 241.
-
--------------------- EXCEPTION --------------------
-MSG: ERROR: File "/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/data/phased/ukb_wes_200k_phased_tmp_chr13.1of1.vcf.gz" does not exist
-
-STACK Bio::EnsEMBL::VEP::Parser::file /gpfs3/apps/eb/skylake/software/VEP/95.0-foss-2018b-Perl-5.28.0/modules/Bio/EnsEMBL/VEP/Parser.pm:230
-STACK Bio::EnsEMBL::VEP::Parser::new /gpfs3/apps/eb/skylake/software/VEP/95.0-foss-2018b-Perl-5.28.0/modules/Bio/EnsEMBL/VEP/Parser.pm:123
-STACK Bio::EnsEMBL::VEP::Runner::get_Parser /gpfs3/apps/eb/skylake/software/VEP/95.0-foss-2018b-Perl-5.28.0/modules/Bio/EnsEMBL/VEP/Runner.pm:789
-STACK Bio::EnsEMBL::VEP::Runner::get_InputBuffer /gpfs3/apps/eb/skylake/software/VEP/95.0-foss-2018b-Perl-5.28.0/modules/Bio/EnsEMBL/VEP/Runner.pm:816
-STACK Bio::EnsEMBL::VEP::Runner::init /gpfs3/apps/eb/skylake/software/VEP/95.0-foss-2018b-Perl-5.28.0/modules/Bio/EnsEMBL/VEP/Runner.pm:131
-STACK Bio::EnsEMBL::VEP::Runner::run /gpfs3/apps/eb/skylake/software/VEP/95.0-foss-2018b-Perl-5.28.0/modules/Bio/EnsEMBL/VEP/Runner.pm:194
-STACK toplevel /apps/eb/skylake/software/VEP/95.0-foss-2018b-Perl-5.28.0/vep:225
-Date (localtime)    = Fri Jun 25 21:45:03 2021
-Ensembl API version = 95
----------------------------------------------------
-/var/spool/default/compd011/job_scripts/51137463: line 24: chr: unbound variable
-/var/spool/default/compe056/job_scripts/51140694: line 28: CHR: unbound variable
-/var/spool/default/compd019/job_scripts/51141152: line 33: 18451 Illegal instruction     bcftools query -f '%CHROM %POS %ID %REF %ALT %AC %QUAL\n' ${RAW_ROOT}${RAW_FILE} -o "${OUT_ROOT}${TMP_FILE}"
-foss/2018b(23):ERROR:150: Module 'foss/2018b' conflicts with the currently loaded module(s) 'foss/2019a'
-foss/2018b(23):ERROR:102: Tcl command execution failed: conflict foss
-
-Perl/5.28.0-GCCcore-7.3.0(116):ERROR:150: Module 'Perl/5.28.0-GCCcore-7.3.0' conflicts with the currently loaded module(s) 'Perl/5.28.1-GCCcore-8.2.0'
-Perl/5.28.0-GCCcore-7.3.0(116):ERROR:102: Tcl command execution failed: conflict Perl
-
-DBD-mysql/4.048-foss-2018b-Perl-5.28.0(21):ERROR:150: Module 'DBD-mysql/4.048-foss-2018b-Perl-5.28.0' conflicts with the currently loaded module(s) 'DBD-mysql/4.050-foss-2019a-Perl-5.28.1'
-DBD-mysql/4.048-foss-2018b-Perl-5.28.0(21):ERROR:102: Tcl command execution failed: conflict DBD-mysql
-
-BioPerl/1.7.2-foss-2018b-Perl-5.28.0(23):ERROR:150: Module 'BioPerl/1.7.2-foss-2018b-Perl-5.28.0' conflicts with the currently loaded module(s) 'BioPerl/1.7.2-GCCcore-8.2.0-Perl-5.28.1'
-BioPerl/1.7.2-foss-2018b-Perl-5.28.0(23):ERROR:102: Tcl command execution failed: conflict BioPerl
-
-Bio-DB-HTS/2.11-foss-2018b-Perl-5.28.0(21):ERROR:150: Module 'Bio-DB-HTS/2.11-foss-2018b-Perl-5.28.0' conflicts with the currently loaded module(s) 'Bio-DB-HTS/3.01-GCC-8.2.0-2.31.1-Perl-5.28.1'
-Bio-DB-HTS/2.11-foss-2018b-Perl-5.28.0(21):ERROR:102: Tcl command execution failed: conflict Bio-DB-HTS
-
-Smartmatch is experimental at /well/lindgren/flassen/software/VEP/plugins_grch38/de_novo_donor.pl line 175.
-Smartmatch is experimental at /well/lindgren/flassen/software/VEP/plugins_grch38/de_novo_donor.pl line 214.
-Smartmatch is experimental at /well/lindgren/flassen/software/VEP/plugins_grch38/splice_site_scan.pl line 191.
-Smartmatch is experimental at /well/lindgren/flassen/software/VEP/plugins_grch38/splice_site_scan.pl line 194.
-Smartmatch is experimental at /well/lindgren/flassen/software/VEP/plugins_grch38/splice_site_scan.pl line 238.
-Smartmatch is experimental at /well/lindgren/flassen/software/VEP/plugins_grch38/splice_site_scan.pl line 241.
-
--------------------- EXCEPTION --------------------
-MSG: ERROR: File "/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/data/phased/ukb_wes_200k_phased_tmp_chr22.1of1.vcf.gz" does not exist
-
-STACK Bio::EnsEMBL::VEP::Parser::file /gpfs3/apps/eb/skylake/software/VEP/95.0-foss-2018b-Perl-5.28.0/modules/Bio/EnsEMBL/VEP/Parser.pm:230
-STACK Bio::EnsEMBL::VEP::Parser::new /gpfs3/apps/eb/skylake/software/VEP/95.0-foss-2018b-Perl-5.28.0/modules/Bio/EnsEMBL/VEP/Parser.pm:123
-STACK Bio::EnsEMBL::VEP::Runner::get_Parser /gpfs3/apps/eb/skylake/software/VEP/95.0-foss-2018b-Perl-5.28.0/modules/Bio/EnsEMBL/VEP/Runner.pm:789
-STACK Bio::EnsEMBL::VEP::Runner::get_InputBuffer /gpfs3/apps/eb/skylake/software/VEP/95.0-foss-2018b-Perl-5.28.0/modules/Bio/EnsEMBL/VEP/Runner.pm:816
-STACK Bio::EnsEMBL::VEP::Runner::init /gpfs3/apps/eb/skylake/software/VEP/95.0-foss-2018b-Perl-5.28.0/modules/Bio/EnsEMBL/VEP/Runner.pm:131
-STACK Bio::EnsEMBL::VEP::Runner::run /gpfs3/apps/eb/skylake/software/VEP/95.0-foss-2018b-Perl-5.28.0/modules/Bio/EnsEMBL/VEP/Runner.pm:194
-STACK toplevel /apps/eb/skylake/software/VEP/95.0-foss-2018b-Perl-5.28.0/vep:225
-Date (localtime)    = Thu Jul 22 16:07:51 2021
-Ensembl API version = 95
----------------------------------------------------
-foss/2018b(23):ERROR:150: Module 'foss/2018b' conflicts with the currently loaded module(s) 'foss/2019a'
-foss/2018b(23):ERROR:102: Tcl command execution failed: conflict foss
-
-Perl/5.28.0-GCCcore-7.3.0(116):ERROR:150: Module 'Perl/5.28.0-GCCcore-7.3.0' conflicts with the currently loaded module(s) 'Perl/5.28.1-GCCcore-8.2.0'
-Perl/5.28.0-GCCcore-7.3.0(116):ERROR:102: Tcl command execution failed: conflict Perl
-
-DBD-mysql/4.048-foss-2018b-Perl-5.28.0(21):ERROR:150: Module 'DBD-mysql/4.048-foss-2018b-Perl-5.28.0' conflicts with the currently loaded module(s) 'DBD-mysql/4.050-foss-2019a-Perl-5.28.1'
-DBD-mysql/4.048-foss-2018b-Perl-5.28.0(21):ERROR:102: Tcl command execution failed: conflict DBD-mysql
-
-BioPerl/1.7.2-foss-2018b-Perl-5.28.0(23):ERROR:150: Module 'BioPerl/1.7.2-foss-2018b-Perl-5.28.0' conflicts with the currently loaded module(s) 'BioPerl/1.7.2-GCCcore-8.2.0-Perl-5.28.1'
-BioPerl/1.7.2-foss-2018b-Perl-5.28.0(23):ERROR:102: Tcl command execution failed: conflict BioPerl
-
-Bio-DB-HTS/2.11-foss-2018b-Perl-5.28.0(21):ERROR:150: Module 'Bio-DB-HTS/2.11-foss-2018b-Perl-5.28.0' conflicts with the currently loaded module(s) 'Bio-DB-HTS/3.01-GCC-8.2.0-2.31.1-Perl-5.28.1'
-Bio-DB-HTS/2.11-foss-2018b-Perl-5.28.0(21):ERROR:102: Tcl command execution failed: conflict Bio-DB-HTS
-
-Smartmatch is experimental at /well/lindgren/flassen/software/VEP/plugins_grch38/de_novo_donor.pl line 175.
-Smartmatch is experimental at /well/lindgren/flassen/software/VEP/plugins_grch38/de_novo_donor.pl line 214.
-Smartmatch is experimental at /well/lindgren/flassen/software/VEP/plugins_grch38/splice_site_scan.pl line 191.
-Smartmatch is experimental at /well/lindgren/flassen/software/VEP/plugins_grch38/splice_site_scan.pl line 194.
-Smartmatch is experimental at /well/lindgren/flassen/software/VEP/plugins_grch38/splice_site_scan.pl line 238.
-Smartmatch is experimental at /well/lindgren/flassen/software/VEP/plugins_grch38/splice_site_scan.pl line 241.
-WARNING: No input file format specified - detected vcf format
-rm: cannot remove 'derived/vep/output/testukb_wes_200k_vep_chr22.vcf.tmp': No such file or directory
-foss/2018b(23):ERROR:150: Module 'foss/2018b' conflicts with the currently loaded module(s) 'foss/2019a'
-foss/2018b(23):ERROR:102: Tcl command execution failed: conflict foss
-
-Perl/5.28.0-GCCcore-7.3.0(116):ERROR:150: Module 'Perl/5.28.0-GCCcore-7.3.0' conflicts with the currently loaded module(s) 'Perl/5.28.1-GCCcore-8.2.0'
-Perl/5.28.0-GCCcore-7.3.0(116):ERROR:102: Tcl command execution failed: conflict Perl
-
-DBD-mysql/4.048-foss-2018b-Perl-5.28.0(21):ERROR:150: Module 'DBD-mysql/4.048-foss-2018b-Perl-5.28.0' conflicts with the currently loaded module(s) 'DBD-mysql/4.050-foss-2019a-Perl-5.28.1'
-DBD-mysql/4.048-foss-2018b-Perl-5.28.0(21):ERROR:102: Tcl command execution failed: conflict DBD-mysql
-
-BioPerl/1.7.2-foss-2018b-Perl-5.28.0(23):ERROR:150: Module 'BioPerl/1.7.2-foss-2018b-Perl-5.28.0' conflicts with the currently loaded module(s) 'BioPerl/1.7.2-GCCcore-8.2.0-Perl-5.28.1'
-BioPerl/1.7.2-foss-2018b-Perl-5.28.0(23):ERROR:102: Tcl command execution failed: conflict BioPerl
-
-Bio-DB-HTS/2.11-foss-2018b-Perl-5.28.0(21):ERROR:150: Module 'Bio-DB-HTS/2.11-foss-2018b-Perl-5.28.0' conflicts with the currently loaded module(s) 'Bio-DB-HTS/3.01-GCC-8.2.0-2.31.1-Perl-5.28.1'
-Bio-DB-HTS/2.11-foss-2018b-Perl-5.28.0(21):ERROR:102: Tcl command execution failed: conflict Bio-DB-HTS
+Bio-DB-HTS/2.11-foss-2018b-Perl-5.28.0(22):ERROR:150: Module 'Bio-DB-HTS/2.11-foss-2018b-Perl-5.28.0' conflicts with the currently loaded module(s) 'Bio-DB-HTS/3.01-GCC-8.2.0-2.31.1-Perl-5.28.1'
+Bio-DB-HTS/2.11-foss-2018b-Perl-5.28.0(22):ERROR:102: Tcl command execution failed: conflict Bio-DB-HTS
 
 Smartmatch is experimental at /well/lindgren/flassen/software/VEP/plugins_grch38/de_novo_donor.pl line 175.
 Smartmatch is experimental at /well/lindgren/flassen/software/VEP/plugins_grch38/de_novo_donor.pl line 214.

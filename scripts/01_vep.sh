@@ -11,7 +11,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 8
 #$ -q short.qc
-#$ -t 22
+#$ -t 21
 #$ -V
 
 set -o errexit
@@ -24,18 +24,17 @@ readonly RAW_ROOT="/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/data
 readonly RAW_FILE="/ukb_wes_200k_phased_chr${chr}.1of1.vcf.gz"
 readonly TMP_FILE="/ukb_wes_200k_phased_tmp_chr${chr}.1of1.vcf.gz"
 
-readonly OUT_ROOT="derived/vep/output/test"
+readonly OUT_ROOT="data/vep/output"
 readonly OUT_FILE1="/ukb_wes_200k_vep_chr${chr}.vcf" # direct output of VEP
 
-# extract variant information
-module load BCFtools/1.9-foss-2018b # for extracting variant information
-
+# extract variants in format that can be read by VEP
+module load BCFtools/1.9-foss-2018b
 bcftools query -f '%CHROM %POS %ID %REF %ALT %AC %QUAL\n' "${RAW_ROOT}${RAW_FILE}" -o "${OUT_ROOT}${TMP_FILE}"
 
-# Load modules (load order is important)
+# Load modules (NOTE: load order is important)
 module purge
 module load EnsEMBLCoreAPI/96.0-r20190601-foss-2019a-Perl-5.28.1 # required for LOFTEE
-module load VEP/95.0-foss-2018b-Perl-5.28.0 # required FOR VEP
+module load VEP/95.0-foss-2018b-Perl-5.28.0 # required FOR VEP (NOTE: this steps throws some errors since the above module is already loaded. It works nonetheless.)
 module load samtools/1.8-gcc5.4.0 # required for LOFTEE
 
 export PERL5LIB=$PERL5LIB:/well/lindgren/flassen/software/VEP/plugins_grch38/
@@ -66,5 +65,7 @@ vep --input_file "${OUT_ROOT}${TMP_FILE}" \
 
 # change names
 mv "${OUT_ROOT}${OUT_FILE1}.tmp" "${OUT_ROOT}${OUT_FILE1}"
+mv "${OUT_ROOT}${OUT_FILE1}.tmp_warnings.txt" "${OUT_ROOT}/warnings.ukb_wes_200k_vep${chr}.vcf" 
+
 chmod -w "${OUT_ROOT}${OUT_FILE1}" 
 
