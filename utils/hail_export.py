@@ -132,6 +132,10 @@ def write_sites(mt, out_prefix, keep_fields = []):
 
 def annotate_phased_entries(mt):
     r'''Annotates alleles that have the alternate allele on either first or second strand.'''
+<<<<<<< HEAD
+=======
+    #assert all(mt.GT.phased())
+>>>>>>> f01a67341ff57eb781cd25a850fc622d21cb05ce
     mt = mt.annotate_entries(a0_alt = mt.GT ==  hl.parse_call('1|0'))
     mt = mt.annotate_entries(a1_alt = mt.GT ==  hl.parse_call('0|1'))
     mt = mt.annotate_entries(a_homo = mt.GT ==  hl.parse_call('1|1'))
@@ -163,6 +167,7 @@ def construct_summary_mt(mt, gene_field = 'Gene'):
     mt = annotate_phased_entries(mt)
     ht = (
         mt 
+<<<<<<< HEAD
         .group_rows_by(mt.vep[gene_field])
         .aggregate(dosage = hl.if_else( hl.agg.any((mt.a0_alt & mt.a1_alt) & (mt.a_homo == hl.literal(False))) , 4,  # compound hetz but not homo
                             hl.if_else( hl.agg.any((mt.a0_alt & mt.a1_alt) & (mt.a_homo == hl.literal(True))) , 3, # homozygous but not compoundd hetz
@@ -173,6 +178,13 @@ def construct_summary_mt(mt, gene_field = 'Gene'):
     aggr = ht.aggregate_entries(hl.agg.counter(ht.dosage))
     print(aggr)
     return ht
+=======
+        .group_rows_by(mt.info[gene_field])
+        .aggregate(dosage = hl.if_else( hl.agg.any((mt.a0_alt & mt.a1_alt) | mt.a_homo) , 2, 
+                            hl.if_else( hl.agg.any((mt.a0_alt | mt.a1_alt)), 1, 0 )))
+    )
+    return burden_mt
+>>>>>>> f01a67341ff57eb781cd25a850fc622d21cb05ce
 
 def translate_sample_ids(ht, from_app: int, to_app: int):
     r'''Translate sample IDs from one UKB application to another
@@ -391,11 +403,16 @@ def main(args):
     chrom=22
     mt = get_table('data/phased/ukb_wes_200k_phased_chr22.1of1.vcf.gz','vcf')
     #mt = filter_max_maf(mt, 0.02)
+<<<<<<< HEAD
     mt = annotate_vep(mt, 'data/vep/output/ukb_wes_200k_vep_chr22.vcf')
     mt = filter_vep(mt, 'IMPACT', ['HIGH'])
     ht = construct_summary_mt(mt)
 
     #mt_burden = construct_phased_dosage_mt(mt)
+=======
+    mt = annotate_vep(mt)
+    mt = filter_vep(mt, 'impact','HIGH')
+>>>>>>> f01a67341ff57eb781cd25a850fc622d21cb05ce
     
     # sample filtering
     mt = filter_to_unrelated(mt, get_related = False)
