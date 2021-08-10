@@ -9,9 +9,9 @@
 #$ -o logs/vep.log
 #$ -e logs/vep.log
 #$ -P lindgren.prjc
-#$ -pe shmem 8
-#$ -q short.qc
-#$ -t 1-22
+#$ -pe shmem 4
+#$ -q short.qe
+#$ -t 22
 #$ -V
 
 set -o errexit
@@ -24,7 +24,7 @@ readonly RAW_ROOT="/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/data
 readonly RAW_FILE="/ukb_wes_200k_phased_chr${chr}.1of1.vcf.gz"
 readonly TMP_FILE="/ukb_wes_200k_phased_tmp_chr${chr}.1of1.vcf.gz"
 
-readonly OUT_ROOT="data/vep/output"
+readonly OUT_ROOT="data/vep/test" #output"
 readonly OUT_FILE1="/ukb_wes_200k_vep_chr${chr}.vcf" 
 
 # Check if outfile already exists
@@ -47,11 +47,11 @@ if [ ! -f "${OUT_ROOT}${OUT_FILE1}" ]; then
 	--assembly GRCh38 \
 	--cache \
 	--species "homo_sapiens" \
-	--symbol \
 	--biotype \
 	--canonical \
 	--vcf \
 	--pick \
+	--most_severe \
 	--total_length \
 	--sift b \
 	--polyphen b \
@@ -73,7 +73,4 @@ if [ ! -f "${OUT_ROOT}${OUT_FILE1}" ]; then
 else
 	echo "${OUT_ROOT}${OUT_FILE1} already exists. Skipping... "
 fi  
-
-
-
 
