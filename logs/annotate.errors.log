@@ -1,0 +1,3 @@
+Could not find conda environment: hail
+You can list all discoverable environments with `conda info --envs`.
+

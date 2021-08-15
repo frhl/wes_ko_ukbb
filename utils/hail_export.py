@@ -19,7 +19,7 @@ import pandas
 import os
 
 
-def hail_init(chrom=None, log_prefix='get_vcf'):
+def hail_init(chrom=None, log_prefix='wes_analysis'):
     r'''Initialize Hail '''
     assert chrom in range(1,23), 'only autosomes allowed'
     n_slots = os.environ.get('NSLOTS', 1)
@@ -34,7 +34,7 @@ def get_table(input_path, input_type, cache=False):
     if input_type=='mt':
         mt = hl.read_matrix_table(input_path)
     elif input_type=='vcf':
-        mt = hl.import_vcf(input_path, force_bgz=True, array_elements_required=False, min_partitions=50)
+        mt = hl.import_vcf(input_path, force_bgz=True, array_elements_required=False, min_partitions=100)
     elif input_type=='plink':
         mt = hl.import_plink(*[f'{input_path}.{x}' for x in ['bed','bim','fam']])
     if input_type!='mt' and cache:
@@ -224,6 +224,9 @@ def annotate_vep(mt, vep_path):
                 ).rename({'col':f'{fields[i]}'})
         )
     
+    # Most severe variant consequence
+    ht = ht.annotate_rows(vep = ht.vep.annotate(most_severe_consequence = ht.vep.Consequence.split('&')[0]))
+    
     # Extract various categories annotations and change type
     ht = ht.annotate_rows(vep = ht.vep.annotate(sift_pred = ht.vep.SIFT_pred.split('&')[0]))
     ht = ht.annotate_rows(vep = ht.vep.annotate(polyphen2_hdiv_pred = ht.vep.Polyphen2_HDIV_pred.split('&')[0]))
@@ -253,16 +256,16 @@ def annotate_vep(mt, vep_path):
     
     # Create categories for downstream analysis
     ht = ht.annotate_rows(vep = ht.vep.annotate(consequence_category = 
-        hl.case().when(ptv.contains(ht.vep.Consequence), "ptv")
-             .when(missense.contains(ht.vep.Consequence) & 
+        hl.case().when(ptv.contains(ht.vep.most_severe_consequence), "ptv")
+             .when(missense.contains(ht.vep.most_severe_consequence) & 
                    (~hl.is_defined(ht.vep.cadd_phred_score) | 
                     ~hl.is_defined(ht.vep.revel_score)), "other_missense")                                   
-             .when(missense.contains(ht.vep.Consequence) & 
+             .when(missense.contains(ht.vep.most_severe_consequence) & 
                    (ht.vep.cadd_phred_score >= 20) & 
                    (ht.vep.revel_score >= 0.6), "damaging_missense") 
-             .when(missense.contains(ht.vep.Consequence), "other_missense")
-             .when(synonymous.contains(ht.vep.Consequence), "synonymous")
-             .when(non_coding.contains(ht.vep.Consequence), "non_coding")
+             .when(missense.contains(ht.vep.most_severe_consequence), "other_missense")
+             .when(synonymous.contains(ht.vep.most_severe_consequence), "synonymous")
+             .when(non_coding.contains(ht.vep.most_severe_consequence), "non_coding")
              .default("NA")
     ))
                                                 
@@ -421,17 +424,16 @@ def main(args):
     out_type   = args.out_type
     vep_path   = args.vep_path
     
-    chrom      = args.chrom
-    max_maf    = args.max_maf
-    min_maf    = args.min_maf 
-    hwe        = args.hwe
+    chrom      = int(args.chrom)
+    maf_max    = (args.maf_max)
+    maf_min    = (args.maf_min)
+    hwe        = (args.hwe)
+    
     get_related = args.get_related
     get_unrelated = args.get_unrelated
-    map_samples = args.map_samples
     get_europeans = args.get_europeans
-
-    vep_ko_matrix = args.vep_ko_matrix
-    vep_ko_samples = args.vep_ko_samples
+    ko_matrix = args.ko_matrix
+    ko_samples = args.ko_samples
 
     # run parser
     hail_init(chrom)
@@ -447,24 +449,24 @@ def main(args):
 
     if get_europeans:
         mt = translate_sample_ids(mt, 12788, 11867)
-        mt = get_genetically_european(mt)
+        mt = filter_to_european(mt)
 
     ### Variant filtering/annotations
 
-    if max_maf:
-        mt = filter_max_maf(mt, max_maf)
+    if maf_max:
+        mt = filter_max_maf(mt, float(maf_max))
 
-    if min_maf:
-        mt = filter_min_maf(mt, min_maf)
+    if maf_min:
+        mt = filter_min_maf(mt, float(maf_min))
 
     if hwe:
-        mt = filter_hwe(mt, hwe)
+        mt = filter_hwe(mt, float(hwe))
 
     if vep_path:
         mt = annotate_vep(mt, vep_path)
 
     #### get stats
-    mt = mt.repartition(500)
+    mt = mt.repartition(100)
 
     if vep_variants:
         summary_ptv = summarize_variants(mt, 'ptv')
@@ -474,11 +476,11 @@ def main(args):
             index = ['ptv','missense'])
         df.to_csv(out_prefix + 'plof_variants.csv', index=True)
 
-    if vep_ko_samples:
+    if ko_samples:
         mt_ko_samples = extract_knockout_samples(mt)
         mt_ko_sample.export(prefix + 'ko_samples.tsv.bgz')
 
-    if vep_ko_matrix:
+    if ko_matrix:
         mt_ko_matrix = construct_phased_dosage_mt(mt)
         mt_ko_matrix.export('ko_matrx.tsv.bgz')
 
@@ -496,17 +498,17 @@ if __name__=='__main__':
     # filtering variants
     parser.add_argument('--chrom', default=None, help='Chromosome to be used')
     parser.add_argument('--maf_max', default=None, help='Select all variants with a maf less than the indicated value')
-    parser.add_argument('--min_maf', default=None, help='Select all variants with a maf greater than the indicated values')
+    parser.add_argument('--maf_min', default=None, help='Select all variants with a maf greater than the indicated values')
     parser.add_argument('--hwe', default=None, help='Filter variants by HWE threshold')
     # filtering samples
-    parser.add_argument('--get_related', default=None, help='Select all samples that are related')
-    parser.add_argument('--get_unrelated', default=None, help='Select all samples that are unrelated')
-    parser.add_argument('--get_europeans', default=None, help='Filter to genetically confimed europeans?')
+    parser.add_argument('--get_related', action='store_true', help='Select all samples that are related')
+    parser.add_argument('--get_unrelated', action='store_true', help='Select all samples that are unrelated')
+    parser.add_argument('--get_europeans', action='store_true', help='Filter to genetically confimed europeans?')
     # out
     parser.add_argument('--vep_path', default=None, help='path to a .vcf file containing annotated entries by locus and alleles')
-    parser.add_argument('--vep_variants', default=False, help='Generate a summary of filter variants')
-    parser.add_argument('--vep_ko_samples', default=False, help='Get the genes/individuals that are KO and the SNPs involved')
-    parser.add_argument('--vep_ko_matrix', default=False, help='Generate a gene x sample matrix with KO status')
+    parser.add_argument('--vep_variants', action='store_true', help='Generate a summary of filter variants')
+    parser.add_argument('--ko_samples', action='store_true', help='Get the genes/individuals that are KO and the SNPs involved')
+    parser.add_argument('--ko_matrix', action='store_true', help='Generate a gene x sample matrix with KO status')
     
     args = parser.parse_args()
 
@@ -515,5 +517,41 @@ if __name__=='__main__':
 
 
 
+
+
+
+
+
+
+
+
+    # test pipeline
+    #chrom=22
+    #mt = get_table('data/phased/ukb_wes_200k_phased_chr22.1of1.vcf.gz','vcf')
+    #mt = filter_max_maf(mt, 0.02)
+    #mt = annotate_vep(mt, 'data/vep/output/ukb_wes_200k_vep_chr22.vcf')
+    #mt = filter_vep(mt, 'IMPACT', ['HIGH'])
+    #ht = construct_summary_mt(mt)
+
+    #mt_burden = construct_phased_dosage_mt(mt)
+    
+    # sample filtering
+    #mt = filter_to_unrelated(mt, get_related = False)
+    #mt = translate_sample_ids(mt, 12788, 11867)
+    #mt = filter_to_european(mt)
+
+    # generate LONG format described here: https://discuss.hail.is/t/how-to-write-a-matrixtable-to-a-file-as-a-tab-separated-table-in-wide-format/1338
+
+    # How many individuals are compound hetz?
+    
+    #hail_init(22)
+    #mt = hl.import_vcf('data/tmp/ukb_wes_200k_phased_tmp_chr22.1of1.vcf.gz', force_bgz=True, array_elements_required=False, min_partitions=1)
+    #mt = annotate_vep(mt, vep_path = 'data/vep/output/ukb_wes_200k_vep_chr22.vcf')
+    #test = hl.vep(mt, 'data/vep/vep_env.json')
+
+    #mt = hl.import_vcf('data/phased/ukb_wes_200k_phased_chr22.1of1.vcf.gz', force_bgz=True, array_elements_required=False, min_partitions=50)
+    #test = hl.vep(mt, 'data/vep/vep_newest.json')
+    #mt = mt.filter_rows(hl.literal('chr22_16964821_G_A;chr22_16964821_G_C').contains(mt.rsid))
+    #mt = mt.repartition(5)
 
 

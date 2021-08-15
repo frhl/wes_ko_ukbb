@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 #
 #
-#$ -N annotate
+#$ -N hail_shell
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/annotate.log
-#$ -e logs/annotate.errors.log
+#$ -o logs/hail_shell.log
+#$ -e logs/hail_shell.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 4
+#$ -pe shmem 2
 #$ -q short.qe
 #$ -t 22
 
@@ -33,7 +33,7 @@ readonly in="${in_dir}/ukb_wes_200k_phased_chr${chr}.1of1.vcf.gz"
 readonly vep="${vep_dir}/ukb_wes_200k_vep_chr${chr}.vcf"
 
 # output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_phased_chr${chr}"
+readonly out_prefix="${out_dir}/qqqqukb_wes_200k_phased_chr${chr}"
 readonly out="${out_prefix}.mt"
 
 # setup hail
@@ -47,14 +47,18 @@ SECONDS=0
 mkdir -p ${out_dir}
 python3 ${hail_script} \
     --chrom ${chr} \
-    --input_path ${out_prefix} \
-    --input_type "mt" \
+    --input_path ${in} \
+    --input_type "vcf" \
     --vep_path ${vep} \
-    --get_european \
+    --get_europeans \
     --out_prefix ${out_prefix} \
     --vep_variants \
     --ko_matrix \
     --ko_samples 
 
 print_update "Finished running HAIL for chr${chr}" "${SECONDS}"
+
+
+
+
 

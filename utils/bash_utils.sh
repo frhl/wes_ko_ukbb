@@ -89,7 +89,7 @@ set_up_hail() {
   module load Anaconda3/2020.07
   module load java/1.8.0_latest
   set_up_conda
-  conda activate hail # Requires conda environment with Hail installed
+  conda activate jupyter-hail # Requires conda environment with Hail installed
   local _mem=$( get_hail_memory ) 
   if [ ! -z ${_mem} ]; then
     export PYSPARK_SUBMIT_ARGS="--conf spark.local.dir=${spark_dir} --conf spark.executor.heartbeatInterval=1000000 --conf spark.network.timeout=1000000  --driver-memory ${_mem}g --executor-memory ${_mem}g pyspark-shell"
