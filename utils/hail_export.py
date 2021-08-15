@@ -2,20 +2,22 @@
 
 #' @description Compound heterozygos HAIL pipeline
 #' @todo Integrate SAIGE-GENE+
-#' @todo Convert MatrixTable (sample, variant)-pairs to 'long' format
-#' @todo Long format table should also contain variants found and their strand.
+#' @DONE @todo Convert MatrixTable (sample, variant)-pairs to 'long' format
+#' @DONE @todo Long format table should also contain variants found and their strand.
 #' @DONE @todo Test burden_dosage function
 #' @DONE @todo Create function that subsets variants of MODERATE impact
-#' @todo hardy eq test for each variant
-#' @todo add mt.repartition to different commands
-#' @todo check worst consequence
+#' @DONE @todo hardy eq test for each variant
+#' @DONE @todo add mt.repartition to different commands
+#' @DONE @todo check worst consequence
+#' @DONE @todo export ultra rare variants
+#' @todo check which allele is included in VEP? What about MAF thresholds?
+
 
 import hail as hl
-import os
 import argparse
+import pandas
+import os
 
-#WD = '/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb'
-#DATA_DIR = f'{WD}/data'
 
 def hail_init(chrom=None, log_prefix='get_vcf'):
     r'''Initialize Hail '''
@@ -37,8 +39,44 @@ def get_table(input_path, input_type, cache=False):
         mt = hl.import_plink(*[f'{input_path}.{x}' for x in ['bed','bim','fam']])
     if input_type!='mt' and cache:
         mt = mt.cache()
+    mt = recalc_info(mt)
     return mt
 
+def export_table(mt, out_prefix, out_type, checkpoint=False, format_fields_to_drop=[]):
+    r'''Merge file with VEP info '''
+    assert out_type in {'mt', 'vcf', 'plink'}
+    mt = mt.drop(*[f for f in format_fields_to_drop if f in mt.entry])
+    if checkpoint:
+        mt = mt.checkpoint(out_prefix+'.mt')
+    if out_type=='mt':
+        print(f'\nWriting to MT: {out_prefix}.mt\n')
+        mt.write(out_prefix+'.mt')
+    elif out_type=='vcf':
+        out_vcf_path = out_prefix+'.vcf.bgz'
+        print(f'\nExporting to VCF: {out_vcf_path}\n')
+        if not hl.hadoop_is_file(out_vcf_path):
+            metadata = get_vcf_metadata(format_fields_to_drop=format_fields_to_drop)
+            hl.export_vcf(dataset=mt,
+                          output=out_vcf_path,
+                          parallel=None,
+                          metadata = metadata)
+        else:
+            raise ValueError(f'Cannot export VCF because {out_vcf_path} already exists')
+    elif out_type=='plink':
+        print(f'\nExporting to PLINK: {out_prefix}.{{bed,bim,fam}}\n')
+        mt = annotate_with_fam_fields(mt)
+        if not any(hl.hadoop_is_file(out_prefix+s) for s in ['bed','bim','fam']): # don't overwrite if any files exist
+            hl.export_plink(dataset=mt,
+                            output=out_prefix,
+                            fam_id=mt.fam_id,
+                            pat_id=mt.pat_id,
+                            mat_id=mt.mat_id,
+                            is_female=mt.is_female,
+                            varid=mt.rsid)
+        else:
+            raise ValueError(f'Cannot export to PLINK because at least one of {out_prefix}.{{bed,bim,fam}} already exists')
+
+## QC PIPELINE
 def filter_max_maf(mt, maf=None):
     r'''Filter to variants to have maf less than {maf}'''
     mt = mt.filter_rows(hl.min(mt.info.AF)<maf)
@@ -48,131 +86,6 @@ def filter_min_maf(mt, maf=None):
     r'''Filter to variants to have maf gt {maf}'''
     mt = mt.filter_rows(hl.min(mt.info.AF)>maf)
     return mt
-
-
-def annotate_vep(mt, vep_path):
-    r'''Annotate matrix table with VEP consequence from external file.'''
-    print(f'Annotating with VEP file: {vep_path}')
-    with open('data/vep/vep_fields.txt', 'r') as file:
-        fields = file.read().strip().split(',')
-    ht = hl.import_vcf(vep_path).rename({'info':'vep'}) 
-    #ht = hl.annotate_rows(vep = hl.annoate(CSQ=ht.info.CSQ[0]))
-    for i in range(len(fields)):
-        ht = ht.annotate_rows(
-            vep=ht.vep.annotate(
-                col=ht.vep.CSQ.map(lambda x: (x.split('\\|')[i]))[0]
-                ).rename({'col':f'{fields[i]}'})
-        )
-    # Extract various categories used downstream
-    ht = ht.annotate_rows(vep = ht.vep.annotate(sift_pred = ht.vep.SIFT_pred.split('&')[0]))
-    ht = ht.annotate_rows(vep = ht.vep.annotate(polyphen2_hdiv_pred = ht.vep.Polyphen2_HDIV_pred.split('&')[0]))
-    ht = ht.annotate_rows(vep = ht.vep.annotate(polyphen2_hvar_pred = ht.vep.Polyphen2_HVAR_pred.split('&')[0]))
-
-    #ht = ht.annotate_rows(vep = hl.struct(pred = ht.vep.SIFT_pred.split('&')[0]))
-    #ht = ht.annotate(polyphen2 = hl.vep.struct(hdiv_pred = ht.vep.Polyphen2_HDIV_pred.split('&')[0]))
-    #ht = ht.vep.annotate(polyphen2 = hl.vep.struct(hvar_pred = ht.vep.Polyphen2_HVAR_pred..split('&')[0]))
-    # Categories for variants
-    ptv = hl.set(["transcript_ablation", "splice_acceptor_variant",
-              "splice_donor_variant", "stop_gained", "frameshift_variant"])
-    missense = hl.set(["stop_lost", "start_lost", "transcript_amplification",
-                   "inframe_insertion", "inframe_deletion", "missense_variant",
-                   "protein_altering_variant", "splice_region_variant"])
-    synonymous = hl.set(["incomplete_terminal_codon_variant", "stop_retained_variant", "synonymous_variant"])
-    non_coding = hl.set(["coding_sequence_variant", "mature_miRNA_variant", "5_prime_UTR_variant",
-              "3_prime_UTR_variant", "non_coding_transcript_exon_variant", "intron_variant",
-              "NMD_transcript_variant", "non_coding_transcript_variant", "upstream_gene_variant",
-              "downstream_gene_variant", "TFBS_ablation", "TFBS_amplification", "TF_binding_site_variant",
-              "regulatory_region_ablation", "regulatory_region_amplification", "feature_elongation",
-              "regulatory_region_variant", "feature_truncation", "intergenic_variant"])
-    # create cases
-    ht = ht.annotate_rows(consequence_category = 
-        hl.case().when(ptv.contains(ht.vep.Consequence), "ptv")
-             .when(missense.contains(ht.vep.Consequence) & 
-                   (ht.vep.polyphen2_hdiv_pred == "") & 
-                   (ht.vep.sift_pred == ""), "other_missense")
-             .when(missense.contains(ht.vep.Consequence) & 
-                   (ht.vep.polyphen2_hdiv_pred == "D") & 
-                   (ht.vep.sift_pred == "D"), "damaging_missense")
-             .when(missense.contains(ht.vep.Consequence), "other_missense")
-             .when(synonymous.contains(ht.vep.Consequence), "synonymous")
-             .when(non_coding.contains(ht.vep.Consequence), "non_coding")
-             .default("NA")
-    )
-
-    #ht.filter_rows(hl.literal('chr22_16964821_G_A;chr22_16964821_G_C').contains(ht.rsid))
-
-    
-    # combine with matrix table
-    mt = mt.annotate_rows(
-        vep = ht.index_rows(mt.locus, mt.alleles).vep.drop('CSQ')
-        )
-    return(mt)
-
-
-
-def filter_vep(mt, field, conditions):
-    r'''Filter VEP field by condition(s) '''
-    assert isinstance(conditions, list):
-    assert field in list(mt.vep):
-    conds = [[cond] for cond in conditions]
-    mt = mt.filter_rows(hl.literal(conds).contains(mt.vep[field]))
-    return mt
-
-def write_sites(mt, out_prefix, keep_fields = []):
-    r'''Write sites-only tsv
-    `keep_fields` is a list of fields to keep in addition to chrom, pos, ref, alt
-    '''
-    ht = mt.rows().key_by()
-    ht = ht.select(chrom = ht.locus.contig,
-                   pos = ht.locus.position,
-                   ref = ht.alleles[0],
-                   alt = ht.alleles[1],
-                   *keep_fields)
-    ht.export(f'{out_prefix}.tsv')
-
-def annotate_phased_entries(mt):
-    r'''Annotates alleles that have the alternate allele on either first or second strand.'''
-    mt = mt.annotate_entries(a0_alt = mt.GT ==  hl.parse_call('1|0'))
-    mt = mt.annotate_entries(a1_alt = mt.GT ==  hl.parse_call('0|1'))
-    mt = mt.annotate_entries(a_homo = mt.GT ==  hl.parse_call('1|1'))
-    return mt
-
-
-def construct_phased_dosage_mt(mt, gene_field = 'Gene'):
-    r''' Returns matrix table that contains dosage information from phased geneotypes.
-    0: two refererence alleles in locus,
-    1: one alternate allele on either strand in a locus, 
-    2: two alternate allele on either strand in a locus (either as homozygous or compound heterozygous)
-    '''
-    mt = annotate_phased_entries(mt)
-    burden_mt = (
-        mt 
-        .group_rows_by(mt.vep[gene_field])
-        .aggregate(dosage = hl.if_else( hl.agg.any((mt.a0_alt & mt.a1_alt) | mt.a_homo) , 2, 
-                            hl.if_else( hl.agg.any((mt.a0_alt | mt.a1_alt)), 1, 0 )))
-        #.burden_mt.filter_entries(burden_mt.entries != 0)
-    )
-    return burden_mt
-
-def construct_summary_mt(mt, gene_field = 'Gene'):
-    r''' Returns matrix table that contains dosage information from phased geneotypes.
-    0: two refererence alleles in locus,
-    1: one alternate allele on either strand in a locus, 
-    2: two alternate allele on either strand in a locus (either as homozygous or compound heterozygous)
-    '''
-    mt = annotate_phased_entries(mt)
-    ht = (
-        mt 
-        .group_rows_by(mt.vep[gene_field])
-        .aggregate(dosage = hl.if_else( hl.agg.any((mt.a0_alt & mt.a1_alt) & (mt.a_homo == hl.literal(False))) , 4,  # compound hetz but not homo
-                            hl.if_else( hl.agg.any((mt.a0_alt & mt.a1_alt) & (mt.a_homo == hl.literal(True))) , 3, # homozygous but not compoundd hetz
-                            hl.if_else( hl.agg.any((mt.a0_alt | mt.a1_alt)) , 1, # heterozygous for either a1 or a2
-                            hl.if_else( hl.agg.any((mt.a_homo == hl.literal(True))) , 2, 0))))) # homozygous
-        .filter_entries(burden_mt.entries != 0)
-    )    
-    aggr = ht.aggregate_entries(hl.agg.counter(ht.dosage))
-    print(aggr)
-    return ht
 
 def translate_sample_ids(ht, from_app: int, to_app: int):
     r'''Translate sample IDs from one UKB application to another
@@ -240,8 +153,7 @@ def recalc_info(mt, maf=None, info_field='info', gt_field='GT'):
     return mt
 
 def filter_to_unrelated(mt, get_related=False, maf=None):
-    r'''Filter to samples in duos/trios, as defined by fam file
-    '''
+    r'''Filter to samples in duos/trios, as defined by fam file'''
     fam = get_fam()
     fam = fam.filter(hl.is_defined(mt.cols()[fam.IID])) # need to filter to samples present in mt first before collecting FIDs
     fam_ct = fam.count()
@@ -256,6 +168,12 @@ def filter_to_unrelated(mt, get_related=False, maf=None):
     else:
         mt = mt.filter_cols(~hl.is_defined(fam[mt.s])) # unrelated
     mt = recalc_info(mt=mt, maf=maf)
+    return mt
+
+def filter_hwe(mt, cut_off = 1e-12):
+    mt =  mt.annotate_rows(hwe = hl.agg.hardy_weinberg_test(mt.GT))
+    rows = mt.hwe.p_values >= cut_off
+    mt = mt.filter_rows(rows)
     return mt
 
 def get_vcf_metadata(info_fields_to_drop=[], format_fields_to_drop=['RNC','PL']):
@@ -281,41 +199,217 @@ def annotate_with_fam_fields(mt):
                                                             hl.null(hl.tbool))))
     return mt
 
-def export_table(mt, out_prefix, out_type, checkpoint=False, format_fields_to_drop=[]):
-    r'''Merge file with VEP info '''
-    assert out_type in {'mt', 'vcf', 'plink'}
-    mt = mt.drop(*[f for f in format_fields_to_drop if f in mt.entry])
 
-    if checkpoint:
-        mt = mt.checkpoint(out_prefix+'.mt')
 
-    if out_type=='mt':
-        print(f'\nWriting to MT: {out_prefix}.mt\n')
-        mt.write(out_prefix+'.mt')
-    elif out_type=='vcf':
-        out_vcf_path = out_prefix+'.vcf.bgz'
-        print(f'\nExporting to VCF: {out_vcf_path}\n')
-        if not hl.hadoop_is_file(out_vcf_path):
-            metadata = get_vcf_metadata(format_fields_to_drop=format_fields_to_drop)
-            hl.export_vcf(dataset=mt,
-                          output=out_vcf_path,
-                          parallel=None,
-                          metadata = metadata)
-        else:
-            raise ValueError(f'Cannot export VCF because {out_vcf_path} already exists')
-    elif out_type=='plink':
-        print(f'\nExporting to PLINK: {out_prefix}.{{bed,bim,fam}}\n')
-        mt = annotate_with_fam_fields(mt)
-        if not any(hl.hadoop_is_file(out_prefix+s) for s in ['bed','bim','fam']): # don't overwrite if any files exist
-            hl.export_plink(dataset=mt,
-                            output=out_prefix,
-                            fam_id=mt.fam_id,
-                            pat_id=mt.pat_id,
-                            mat_id=mt.mat_id,
-                            is_female=mt.is_female,
-                            varid=mt.rsid)
-        else:
-            raise ValueError(f'Cannot export to PLINK because at least one of {out_prefix}.{{bed,bim,fam}} already exists')
+def remake_rsid(mt, delim = '_'):
+    r'''Re-create rsids based on current locus and alleles'''
+    ids = hl.delimit([mt.locus.contig, hl.str(mt.locus.position), mt.alleles[0], mt.alleles[1]], delim)
+    mt = mt.annotate_rows(rsid = ids)
+    return mt
+
+def annotate_vep(mt, vep_path):
+    r'''Annotate matrix table with VEP consequence from external file.'''
+    print(f'Annotating with VEP file: {vep_path}')
+    
+    # Open file containing VEP fields
+    with open('data/vep/vep_fields.txt', 'r') as file:
+        fields = file.read().strip().split(',')
+    ht = hl.import_vcf(vep_path).rename({'info':'vep'}) 
+    
+    # Add VEP fields by iteration
+    for i in range(len(fields)):
+        ht = ht.annotate_rows(
+            vep=ht.vep.annotate(
+                col=ht.vep.CSQ.map(lambda x: (x.split('\\|')[i]))[0]
+                ).rename({'col':f'{fields[i]}'})
+        )
+    
+    # Extract various categories annotations and change type
+    ht = ht.annotate_rows(vep = ht.vep.annotate(sift_pred = ht.vep.SIFT_pred.split('&')[0]))
+    ht = ht.annotate_rows(vep = ht.vep.annotate(polyphen2_hdiv_pred = ht.vep.Polyphen2_HDIV_pred.split('&')[0]))
+    ht = ht.annotate_rows(vep = ht.vep.annotate(polyphen2_hvar_pred = ht.vep.Polyphen2_HVAR_pred.split('&')[0]))
+    ht = ht.annotate_rows(vep = ht.vep.annotate(cadd_phred_score = hl.parse_float(ht.vep.CADD_phred)))
+    ht = ht.annotate_rows(vep = ht.vep.annotate(revel_score = hl.parse_float(ht.vep.REVEL_score)))
+    
+    # Define protein truncating variants
+    ptv = hl.set(["transcript_ablation", "splice_acceptor_variant",
+              "splice_donor_variant", "stop_gained", "frameshift_variant"])
+    
+    # Define missense variation
+    missense = hl.set(["stop_lost", "start_lost", "transcript_amplification",
+                   "inframe_insertion", "inframe_deletion", "missense_variant",
+                   "protein_altering_variant", "splice_region_variant"])
+    
+    # Define synonymous
+    synonymous = hl.set(["incomplete_terminal_codon_variant", "stop_retained_variant", "synonymous_variant"])
+    
+    # Define non coding variation
+    non_coding = hl.set(["coding_sequence_variant", "mature_miRNA_variant", "5_prime_UTR_variant",
+              "3_prime_UTR_variant", "non_coding_transcript_exon_variant", "intron_variant",
+              "NMD_transcript_variant", "non_coding_transcript_variant", "upstream_gene_variant",
+              "downstream_gene_variant", "TFBS_ablation", "TFBS_amplification", "TF_binding_site_variant",
+              "regulatory_region_ablation", "regulatory_region_amplification", "feature_elongation",
+              "regulatory_region_variant", "feature_truncation", "intergenic_variant"])
+    
+    # Create categories for downstream analysis
+    ht = ht.annotate_rows(vep = ht.vep.annotate(consequence_category = 
+        hl.case().when(ptv.contains(ht.vep.Consequence), "ptv")
+             .when(missense.contains(ht.vep.Consequence) & 
+                   (~hl.is_defined(ht.vep.cadd_phred_score) | 
+                    ~hl.is_defined(ht.vep.revel_score)), "other_missense")                                   
+             .when(missense.contains(ht.vep.Consequence) & 
+                   (ht.vep.cadd_phred_score >= 20) & 
+                   (ht.vep.revel_score >= 0.6), "damaging_missense") 
+             .when(missense.contains(ht.vep.Consequence), "other_missense")
+             .when(synonymous.contains(ht.vep.Consequence), "synonymous")
+             .when(non_coding.contains(ht.vep.Consequence), "non_coding")
+             .default("NA")
+    ))
+                                                
+    # combine with matrix table
+    mt = mt.annotate_rows(vep = ht.index_rows(mt.locus, mt.alleles).vep.drop('CSQ'))
+    return(mt)
+
+
+
+def filter_vep(mt, field, conditions):
+    r'''Filter VEP field by condition(s) '''
+    assert isinstance(conditions, list)
+    assert field in list(mt.vep)
+    #conds = [[cond] for cond in conditions]
+    mt = mt.filter_rows(hl.literal(set(conds)).contains(mt.vep[field]))
+    return mt
+
+
+def annotate_phased_entries(mt):
+    r'''Annotates alleles that have the alternate allele on either first or second strand.'''
+    mt = mt.annotate_entries(a0_alt = mt.GT ==  hl.parse_call('1|0'))
+    mt = mt.annotate_entries(a1_alt = mt.GT ==  hl.parse_call('0|1'))
+    mt = mt.annotate_entries(a_homo = mt.GT ==  hl.parse_call('1|1'))
+    return mt
+
+
+def construct_phased_dosage_mt(mt, gene_field = 'Gene'):
+    r''' Returns matrix table that contains dosage information from phased geneotypes.
+    0: two refererence alleles in locus,
+    1: one alternate allele on either strand in a locus, 
+    2: two alternate allele on either strand in a locus (either as homozygous or compound heterozygous)
+    '''
+    mt = annotate_phased_entries(mt)
+    knockout =  (mt.a0_alt & mt.a1_alt) | mt.a_homo # ((mt.a0_alt & mt.a1_alt) | mt.a_homo ) & (mt.vep.consequence_category == hl.literal("ptv"))
+    heterozygous = (mt.a0_alt | mt.a1_alt)
+    burden_mt = (
+        mt 
+        .group_rows_by(mt.vep[gene_field])
+        .aggregate(dosage = hl.if_else( hl.agg.any(knockout), 2, 
+                            hl.if_else( hl.agg.any(heterozygous), 1, 0 )))
+        #.burden_mt.filter_entries(burden_mt.entries != 0)
+    )
+    return burden_mt
+
+def construct_summary_mt(mt, gene_field = 'Gene'):
+    r''' Returns matrix table that contains dosage information from phased geneotypes.
+    0: two refererence alleles in locus,
+    1: one alternate allele on either strand in a locus, 
+    2: two alternate allele on either strand in a locus (either as homozygous or compound heterozygous)
+    '''
+    
+    # setup booleans
+    mt = annotate_phased_entries(mt)
+    homozygous = mt.a_homo
+    compound_heterozygous = mt.a0_alt & mt.a1_alt
+    heterozygous = mt.a0_alt | mt.a1_alt
+
+    # aggregate onto gene level
+    ht = (
+        mt 
+        .group_rows_by(mt.vep[gene_field])
+        .aggregate(ko = hl.if_else( hl.agg.any(compound_heterozygous & ~homozygous) , 'CH', 
+                        hl.if_else( hl.agg.any(homozygous & ~compound_heterozygous) , 'HO',
+                        hl.if_else( hl.agg.any(compound_heterozygous & homozygous) , 'CH+HO',
+                        hl.if_else( hl.agg.any(heterozygous) , 'HE', '')))))
+        .filter_entries(mt.entries != '')
+    )
+    
+    return ht
+
+def extract_gene_ko_rows(burden_mt):
+    assert ko in list(burden_mt)
+    entries = burden_mt.entries()
+    entries = entries.filter(~hl.literal('').contains(entries.ko))
+    return entries
+
+def extract_knockout_samples(mt, gene_field ='Gene', keep = ['HO','CH+HO']):
+    r''' Collapses variants into genes for each individual, and returns
+    a with three columns containing:
+    1: The gene that was used for collapsing
+    2: The current individual 
+    4: Either CH (Compound heterozygous), HO (Homozygous) or CH+HO or H (Heterozygous).
+       To avoid too long matrices, this is specified by the keep column.
+    3: The variant and corresponding genotype for the variant in the sample,
+      e.g. "chr22_50604850_G_A=1|1,chr22_50606762_C_T=1|1".
+    '''
+    
+    # Parameters for KO/CH
+    mt = annotate_phased_entries(mt)
+    homozygous = mt.a_homo
+    compound_heterozygous = mt.a0_alt & mt.a1_alt
+    heterozygous = mt.a0_alt | mt.a1_alt
+
+    # aggregate the gene-level
+    ht1 = (mt 
+          .group_rows_by(mt.vep[gene_field])
+          .aggregate(ko = hl.if_else( hl.agg.any(compound_heterozygous & ~homozygous) , 'CH', 
+                          hl.if_else( hl.agg.any(homozygous & ~compound_heterozygous) , 'HO',
+                          hl.if_else( hl.agg.any(compound_heterozygous & homozygous) , 'CH+HO',
+                          hl.if_else( hl.agg.any(heterozygous) , 'HE', '')))))
+          .filter_entries(mt.entries != ''))
+
+    # generate rsid to gt entries
+    mt = mt.annotate_entries(rsid_entry = mt.rsid)
+    mt = mt.annotate_entries(rsid_gt = hl.delimit([mt.rsid_entry, hl.str(mt.GT)], '='))
+
+    # annotate only ko entries
+    ht2 = (
+            mt 
+            .group_rows_by(mt.vep[gene_field])
+            .aggregate(rsid = hl.agg.filter(mt.a_homo | (mt.a0_alt & mt.a1_alt), hl.agg.collect(mt.rsid_gt)))
+    )
+
+    # combine entries
+    ent1 = ht1.entries()
+    ent2 = ht2.entries()
+    combined = ent1.annotate(genotypes = ent2[ent1[gene_field], ent1.s])
+    combined = combined.filter(hl.set(keep).contains(combined.ko))
+    line_merge = hl.delimit(combined.genotypes.rsid, ',')
+    combined = combined.annotate(genotypes = combined.genotypes.annotate(rsid = line_merge))
+    return combined
+
+
+def count_alleles(mt):
+    r'''Count up alleles in a vector (singleton AC, not singletons AC, total AC)'''
+    mt = mt.filter_rows(mt.info.AC > 0)
+    d = mt.aggregate_rows(hl.agg.counter(mt.info.AC))
+    if 1 in d.keys():
+        n_singletons_ac = d[1]
+    else:
+        n_singletons_ac = 0
+    n_not_singletons_ac = sum([value*key for key, value in d.items() if key != 1])
+    return [n_singletons_ac, n_not_singletons_ac, n_singletons_ac + n_not_singletons_ac]
+
+def count_genes(mt):
+    r'''Collapse variants into genes and count affected genes'''
+    d = mt.aggregate_entries(hl.agg.group_by(mt.vep.Gene, hl.agg.count_where(mt.GT.is_non_ref())))
+    n_genes = len([(key, value) for key, value in d.items() if value != 0])
+    return n_genes
+
+def summarize_variants(mt, what = 'ptv', vep_field = 'consequence_category'):
+    r'''Count up singletons, non singletons, total and genes affected by variants'''
+    ht = mt.filter_rows(hl.literal(set([what])).contains(mt.vep[vep_field]))
+    ht_alleles = count_alleles(ht)
+    ht_genes = count_genes(ht)
+    out = ht_alleles + [ht_genes]
+    return out
 
 
 def main(args):
@@ -330,25 +424,20 @@ def main(args):
     chrom      = args.chrom
     max_maf    = args.max_maf
     min_maf    = args.min_maf 
+    hwe        = args.hwe
     get_related = args.get_related
     get_unrelated = args.get_unrelated
     map_samples = args.map_samples
     get_europeans = args.get_europeans
-    
-    vep_impact = args.vep_impact
-    vep_variant= args.vep_variant
-    vep_loftee = args.vep_loftee
-    vep_sites_write = args.vep_sites_write
-    
+
+    vep_ko_matrix = args.vep_ko_matrix
+    vep_ko_samples = args.vep_ko_samples
+
     # run parser
     hail_init(chrom)
     mt = get_table(input_path=input_path, input_type=input_type)
 
-    if max_maf:
-        mt = filter_max_maf(mt, max_maf)
-
-    if min_maf:
-        mt = filter_min_maf(mt, min_maf)
+    ### Sample filtering
 
     if get_related and not get_unrelated:
         mt = filter_to_unrelated(mt, get_related = True)
@@ -356,68 +445,50 @@ def main(args):
     if get_unrelated and not get_related:
         mt = filter_to_unrelated(mt, get_related = False)
 
+    if get_europeans:
+        mt = translate_sample_ids(mt, 12788, 11867)
+        mt = get_genetically_european(mt)
+
+    ### Variant filtering/annotations
+
+    if max_maf:
+        mt = filter_max_maf(mt, max_maf)
+
+    if min_maf:
+        mt = filter_min_maf(mt, min_maf)
+
+    if hwe:
+        mt = filter_hwe(mt, hwe)
+
     if vep_path:
         mt = annotate_vep(mt, vep_path)
 
-    if vep_impact:
-        mt = filter_vep('impact', vep_impact)
+    #### get stats
+    mt = mt.repartition(500)
 
-    if vep_variant:
-        mt = filter_variants('variant', vep_variant)
+    if vep_variants:
+        summary_ptv = summarize_variants(mt, 'ptv')
+        summary_missense = summarize_variants(mt, 'damaging_missense')
+        df = pd.DataFrame([summary_ptv, summary_missense], \
+            columns=['Singletons','non-singletons','total AC', 'Genes'],\
+            index = ['ptv','missense'])
+        df.to_csv(out_prefix + 'plof_variants.csv', index=True)
 
-    if vep_loftee:
-        mt = filter_variants('loftee', vep_loftee)
+    if vep_ko_samples:
+        mt_ko_samples = extract_knockout_samples(mt)
+        mt_ko_sample.export(prefix + 'ko_samples.tsv.bgz')
 
-    if map_samples:
-        mt = translate_sample_ids(mt, 12788, 11867)
+    if vep_ko_matrix:
+        mt_ko_matrix = construct_phased_dosage_mt(mt)
+        mt_ko_matrix.export('ko_matrx.tsv.bgz')
 
-    if get_europeans:
-        if map_samples is True:
-            mt = get_genetically_european(mt)
-        else:
-            raise ValueError('EIDs are invalid. Did you map them using --map_samples?')
 
-    if vep_sites_write:
-        write_sites(mt=mt,
-                    out_prefix=out_prefix,
-                    keep_fields='info')
 
-    if out_prefix:
-        write(mt=mt,
-              out_prefix=out_prefix,
-              out_type=out_type)
-
-    # test pipeline
-    chrom=22
-    mt = get_table('data/phased/ukb_wes_200k_phased_chr22.1of1.vcf.gz','vcf')
-    #mt = filter_max_maf(mt, 0.02)
-    mt = annotate_vep(mt, 'data/vep/output/ukb_wes_200k_vep_chr22.vcf')
-    mt = filter_vep(mt, 'IMPACT', ['HIGH'])
-    ht = construct_summary_mt(mt)
-
-    #mt_burden = construct_phased_dosage_mt(mt)
-    
-    # sample filtering
-    mt = filter_to_unrelated(mt, get_related = False)
-    mt = translate_sample_ids(mt, 12788, 11867)
-    mt = filter_to_european(mt)
-
-    # generate LONG format described here: https://discuss.hail.is/t/how-to-write-a-matrixtable-to-a-file-as-a-tab-separated-table-in-wide-format/1338
-
-    # How many individuals are compound hetz?
-    
-    mt = hl.import_vcf('data/tmp/ukb_wes_200k_phased_tmp_chr22.1of1.vcf.gz', force_bgz=True, array_elements_required=False, min_partitions=1)
-    test = hl.vep(mt, 'data/vep/vep_env.json')
-
-    mt = hl.import_vcf('data/phased/ukb_wes_200k_phased_chr22.1of1.vcf.gz', force_bgz=True, array_elements_required=False, min_partitions=50)
-    test = hl.vep(mt, 'data/vep/vep_newest.json')
-    mt = mt.filter_rows(hl.literal('chr22_16964821_G_A;chr22_16964821_G_C').contains(mt.rsid))
-    mt = mt.repartition(5)
 
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
-    # I/O
+    # initial params
     parser.add_argument('--input_path', default=None, help='Path to input')
     parser.add_argument('--input_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
@@ -426,21 +497,20 @@ if __name__=='__main__':
     parser.add_argument('--chrom', default=None, help='Chromosome to be used')
     parser.add_argument('--maf_max', default=None, help='Select all variants with a maf less than the indicated value')
     parser.add_argument('--min_maf', default=None, help='Select all variants with a maf greater than the indicated values')
+    parser.add_argument('--hwe', default=None, help='Filter variants by HWE threshold')
     # filtering samples
     parser.add_argument('--get_related', default=None, help='Select all samples that are related')
     parser.add_argument('--get_unrelated', default=None, help='Select all samples that are unrelated')
     parser.add_argument('--map_samples', default=None, help='Map samples to lindgren UKBB app ID (11867)?')
     parser.add_argument('--get_europeans', default=None, help='Filter to genetically confimed europeans?')
-    # VEP
+    # out
     parser.add_argument('--vep_path', default=None, help='path to a .vcf file containing annotated entries by locus and alleles')
-    parser.add_argument('--vep_impact', default=None, help='subset by VEP impact')
-    parser.add_argument('--vep_variant', default=None, help='subset by VEP variant type (e.g. "stop_gained")')
-    parser.add_argument('--vep_loftee', default=None, help='subset by VEP loftee flag, only HC or LC.')
-    parser.add_argument('--vep_sites_write', default=None, help='Writes locus and allele information alongisde VEP annotations')
-
-
-
+    parser.add_argument('--vep_variants', default=False, help='Generate a summary of filter variants')
+    parser.add_argument('--vep_ko_samples', default=False, help='Get the genes/individuals that are KO and the SNPs involved')
+    parser.add_argument('--vep_ko_matrix', default=False, help='Generate a gene x sample matrix with KO status')
+    
     args = parser.parse_args()
 
     main(args)
+
 
