@@ -501,7 +501,6 @@ if __name__=='__main__':
     # filtering samples
     parser.add_argument('--get_related', default=None, help='Select all samples that are related')
     parser.add_argument('--get_unrelated', default=None, help='Select all samples that are unrelated')
-    parser.add_argument('--map_samples', default=None, help='Map samples to lindgren UKBB app ID (11867)?')
     parser.add_argument('--get_europeans', default=None, help='Filter to genetically confimed europeans?')
     # out
     parser.add_argument('--vep_path', default=None, help='path to a .vcf file containing annotated entries by locus and alleles')
@@ -512,5 +511,9 @@ if __name__=='__main__':
     args = parser.parse_args()
 
     main(args)
+
+
+
+
 
 
