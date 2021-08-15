@@ -432,6 +432,7 @@ def main(args):
     get_related = args.get_related
     get_unrelated = args.get_unrelated
     get_europeans = args.get_europeans
+    vep_variants = args.vep_variants
     ko_matrix = args.ko_matrix
     ko_samples = args.ko_samples
 
@@ -474,17 +475,15 @@ def main(args):
         df = pd.DataFrame([summary_ptv, summary_missense], \
             columns=['Singletons','non-singletons','total AC', 'Genes'],\
             index = ['ptv','missense'])
-        df.to_csv(out_prefix + 'plof_variants.csv', index=True)
+        df.to_csv(out_prefix + '_plof_variants.csv', index=True)
 
     if ko_samples:
         mt_ko_samples = extract_knockout_samples(mt)
-        mt_ko_sample.export(prefix + 'ko_samples.tsv.bgz')
+        mt_ko_sample.export(prefix + '_ko_samples.tsv.bgz')
 
     if ko_matrix:
         mt_ko_matrix = construct_phased_dosage_mt(mt)
-        mt_ko_matrix.export('ko_matrx.tsv.bgz')
-
-
+        mt_ko_matrix.export(prefix + '_ko_matrx.tsv.bgz')
 
 
 
@@ -518,40 +517,5 @@ if __name__=='__main__':
 
 
 
-
-
-
-
-
-
-
-    # test pipeline
-    #chrom=22
-    #mt = get_table('data/phased/ukb_wes_200k_phased_chr22.1of1.vcf.gz','vcf')
-    #mt = filter_max_maf(mt, 0.02)
-    #mt = annotate_vep(mt, 'data/vep/output/ukb_wes_200k_vep_chr22.vcf')
-    #mt = filter_vep(mt, 'IMPACT', ['HIGH'])
-    #ht = construct_summary_mt(mt)
-
-    #mt_burden = construct_phased_dosage_mt(mt)
-    
-    # sample filtering
-    #mt = filter_to_unrelated(mt, get_related = False)
-    #mt = translate_sample_ids(mt, 12788, 11867)
-    #mt = filter_to_european(mt)
-
-    # generate LONG format described here: https://discuss.hail.is/t/how-to-write-a-matrixtable-to-a-file-as-a-tab-separated-table-in-wide-format/1338
-
-    # How many individuals are compound hetz?
-    
-    #hail_init(22)
-    #mt = hl.import_vcf('data/tmp/ukb_wes_200k_phased_tmp_chr22.1of1.vcf.gz', force_bgz=True, array_elements_required=False, min_partitions=1)
-    #mt = annotate_vep(mt, vep_path = 'data/vep/output/ukb_wes_200k_vep_chr22.vcf')
-    #test = hl.vep(mt, 'data/vep/vep_env.json')
-
-    #mt = hl.import_vcf('data/phased/ukb_wes_200k_phased_chr22.1of1.vcf.gz', force_bgz=True, array_elements_required=False, min_partitions=50)
-    #test = hl.vep(mt, 'data/vep/vep_newest.json')
-    #mt = mt.filter_rows(hl.literal('chr22_16964821_G_A;chr22_16964821_G_C').contains(mt.rsid))
-    #mt = mt.repartition(5)
 
 
