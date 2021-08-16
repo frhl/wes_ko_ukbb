@@ -15,7 +15,7 @@
 
 import hail as hl
 import argparse
-import pandas
+import pandas as pd
 import os
 
 
