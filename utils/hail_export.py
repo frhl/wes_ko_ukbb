@@ -15,7 +15,7 @@
 
 import hail as hl
 import argparse
-import pandas as pd
+import pandas
 import os
 
 
@@ -478,7 +478,7 @@ def main(args):
         df.to_csv(out_prefix + '_plof_variants.csv', index=True)
 
     if ko_samples:
-        mt_ko_samples = extract_knockout_samples(mt)
+        mt_ko_sample = extract_knockout_samples(mt)
         mt_ko_sample.export(prefix + '_ko_samples.tsv.bgz')
 
     if ko_matrix:
