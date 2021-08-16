@@ -4990,3 +4990,653 @@
 2021-08-16 13:14:44 Executor: INFO: Running task 41.0 in stage 7.0 (TID 276)
 2021-08-16 13:14:44 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 41.0 in stage 7.0 (TID 276)
 2021-08-16 13:14:44 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 41.0 in stage 7.0 (TID 276)
+2021-08-16 13:14:44 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 41.0 in stage 7.0 (TID 276)
+2021-08-16 13:14:44 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 41.0 in stage 7.0 (TID 276)
+2021-08-16 13:14:44 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 31267856 }, alleles: [2; C, A] }, { locus: { contig: chr22, position: 31267856 }, alleles: [2; C, G] }
+2021-08-16 13:14:45 root: INFO: TaskReport: stage=7, partition=40, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:14:45 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 40.0 in stage 7.0 (TID 275)
+2021-08-16 13:14:45 Executor: INFO: Finished task 40.0 in stage 7.0 (TID 275). 1829 bytes result sent to driver
+2021-08-16 13:14:45 TaskSetManager: INFO: Starting task 42.0 in stage 7.0 (TID 277) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 42, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:14:45 Executor: INFO: Running task 42.0 in stage 7.0 (TID 277)
+2021-08-16 13:14:45 TaskSetManager: INFO: Finished task 40.0 in stage 7.0 (TID 275) in 3329 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (41/100)
+2021-08-16 13:14:45 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 42.0 in stage 7.0 (TID 277)
+2021-08-16 13:14:45 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 42.0 in stage 7.0 (TID 277)
+2021-08-16 13:14:45 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 42.0 in stage 7.0 (TID 277)
+2021-08-16 13:14:45 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 42.0 in stage 7.0 (TID 277)
+2021-08-16 13:14:48 root: INFO: TaskReport: stage=7, partition=41, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:14:48 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 41.0 in stage 7.0 (TID 276)
+2021-08-16 13:14:48 Executor: INFO: Finished task 41.0 in stage 7.0 (TID 276). 1677 bytes result sent to driver
+2021-08-16 13:14:48 TaskSetManager: INFO: Starting task 43.0 in stage 7.0 (TID 278) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 43, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:14:48 TaskSetManager: INFO: Finished task 41.0 in stage 7.0 (TID 276) in 3775 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (42/100)
+2021-08-16 13:14:48 Executor: INFO: Running task 43.0 in stage 7.0 (TID 278)
+2021-08-16 13:14:48 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 43.0 in stage 7.0 (TID 278)
+2021-08-16 13:14:48 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 43.0 in stage 7.0 (TID 278)
+2021-08-16 13:14:48 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 43.0 in stage 7.0 (TID 278)
+2021-08-16 13:14:48 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 43.0 in stage 7.0 (TID 278)
+2021-08-16 13:14:50 root: INFO: TaskReport: stage=7, partition=42, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:14:50 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 42.0 in stage 7.0 (TID 277)
+2021-08-16 13:14:50 Executor: INFO: Finished task 42.0 in stage 7.0 (TID 277). 1677 bytes result sent to driver
+2021-08-16 13:14:50 TaskSetManager: INFO: Starting task 44.0 in stage 7.0 (TID 279) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 44, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:14:50 Executor: INFO: Running task 44.0 in stage 7.0 (TID 279)
+2021-08-16 13:14:50 TaskSetManager: INFO: Finished task 42.0 in stage 7.0 (TID 277) in 4066 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (43/100)
+2021-08-16 13:14:50 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 44.0 in stage 7.0 (TID 279)
+2021-08-16 13:14:50 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 44.0 in stage 7.0 (TID 279)
+2021-08-16 13:14:50 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 44.0 in stage 7.0 (TID 279)
+2021-08-16 13:14:50 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 44.0 in stage 7.0 (TID 279)
+2021-08-16 13:14:50 root: INFO: TaskReport: stage=7, partition=43, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:14:50 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 43.0 in stage 7.0 (TID 278)
+2021-08-16 13:14:50 Executor: INFO: Finished task 43.0 in stage 7.0 (TID 278). 1634 bytes result sent to driver
+2021-08-16 13:14:50 TaskSetManager: INFO: Starting task 45.0 in stage 7.0 (TID 280) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 45, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:14:50 TaskSetManager: INFO: Finished task 43.0 in stage 7.0 (TID 278) in 2690 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (44/100)
+2021-08-16 13:14:50 Executor: INFO: Running task 45.0 in stage 7.0 (TID 280)
+2021-08-16 13:14:50 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 45.0 in stage 7.0 (TID 280)
+2021-08-16 13:14:50 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 45.0 in stage 7.0 (TID 280)
+2021-08-16 13:14:50 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 45.0 in stage 7.0 (TID 280)
+2021-08-16 13:14:50 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 45.0 in stage 7.0 (TID 280)
+2021-08-16 13:14:52 root: INFO: TaskReport: stage=7, partition=44, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:14:52 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 44.0 in stage 7.0 (TID 279)
+2021-08-16 13:14:52 Executor: INFO: Finished task 44.0 in stage 7.0 (TID 279). 1677 bytes result sent to driver
+2021-08-16 13:14:52 TaskSetManager: INFO: Starting task 46.0 in stage 7.0 (TID 281) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 46, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:14:52 Executor: INFO: Running task 46.0 in stage 7.0 (TID 281)
+2021-08-16 13:14:52 TaskSetManager: INFO: Finished task 44.0 in stage 7.0 (TID 279) in 2813 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (45/100)
+2021-08-16 13:14:52 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 46.0 in stage 7.0 (TID 281)
+2021-08-16 13:14:52 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 46.0 in stage 7.0 (TID 281)
+2021-08-16 13:14:52 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 46.0 in stage 7.0 (TID 281)
+2021-08-16 13:14:52 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 46.0 in stage 7.0 (TID 281)
+2021-08-16 13:14:53 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 35347131 }, alleles: [2; G, A] }, { locus: { contig: chr22, position: 35347131 }, alleles: [2; G, C] }
+2021-08-16 13:14:53 root: INFO: TaskReport: stage=7, partition=45, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:14:53 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 45.0 in stage 7.0 (TID 280)
+2021-08-16 13:14:53 Executor: INFO: Finished task 45.0 in stage 7.0 (TID 280). 1677 bytes result sent to driver
+2021-08-16 13:14:53 TaskSetManager: INFO: Starting task 47.0 in stage 7.0 (TID 282) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 47, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:14:53 TaskSetManager: INFO: Finished task 45.0 in stage 7.0 (TID 280) in 3108 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (46/100)
+2021-08-16 13:14:53 Executor: INFO: Running task 47.0 in stage 7.0 (TID 282)
+2021-08-16 13:14:53 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 47.0 in stage 7.0 (TID 282)
+2021-08-16 13:14:53 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 47.0 in stage 7.0 (TID 282)
+2021-08-16 13:14:53 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 47.0 in stage 7.0 (TID 282)
+2021-08-16 13:14:53 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 47.0 in stage 7.0 (TID 282)
+2021-08-16 13:14:55 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 36201835 }, alleles: [2; G, A] }, { locus: { contig: chr22, position: 36201835 }, alleles: [2; G, T] }
+2021-08-16 13:14:56 root: INFO: TaskReport: stage=7, partition=47, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:14:56 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 47.0 in stage 7.0 (TID 282)
+2021-08-16 13:14:56 Executor: INFO: Finished task 47.0 in stage 7.0 (TID 282). 1829 bytes result sent to driver
+2021-08-16 13:14:56 TaskSetManager: INFO: Starting task 48.0 in stage 7.0 (TID 283) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 48, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:14:56 Executor: INFO: Running task 48.0 in stage 7.0 (TID 283)
+2021-08-16 13:14:56 TaskSetManager: INFO: Finished task 47.0 in stage 7.0 (TID 282) in 2365 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (47/100)
+2021-08-16 13:14:56 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 48.0 in stage 7.0 (TID 283)
+2021-08-16 13:14:56 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 48.0 in stage 7.0 (TID 283)
+2021-08-16 13:14:56 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 48.0 in stage 7.0 (TID 283)
+2021-08-16 13:14:56 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 48.0 in stage 7.0 (TID 283)
+2021-08-16 13:14:56 root: INFO: TaskReport: stage=7, partition=46, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:14:56 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 46.0 in stage 7.0 (TID 281)
+2021-08-16 13:14:56 Executor: INFO: Finished task 46.0 in stage 7.0 (TID 281). 1829 bytes result sent to driver
+2021-08-16 13:14:56 TaskSetManager: INFO: Starting task 49.0 in stage 7.0 (TID 284) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 49, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:14:56 Executor: INFO: Running task 49.0 in stage 7.0 (TID 284)
+2021-08-16 13:14:56 TaskSetManager: INFO: Finished task 46.0 in stage 7.0 (TID 281) in 3474 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (48/100)
+2021-08-16 13:14:56 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 49.0 in stage 7.0 (TID 284)
+2021-08-16 13:14:56 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 49.0 in stage 7.0 (TID 284)
+2021-08-16 13:14:56 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 49.0 in stage 7.0 (TID 284)
+2021-08-16 13:14:56 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 49.0 in stage 7.0 (TID 284)
+2021-08-16 13:14:56 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 36253920 }, alleles: [2; C, A] }, { locus: { contig: chr22, position: 36253920 }, alleles: [2; C, T] }
+2021-08-16 13:14:59 root: INFO: TaskReport: stage=7, partition=48, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:14:59 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 48.0 in stage 7.0 (TID 283)
+2021-08-16 13:14:59 Executor: INFO: Finished task 48.0 in stage 7.0 (TID 283). 1786 bytes result sent to driver
+2021-08-16 13:14:59 TaskSetManager: INFO: Starting task 50.0 in stage 7.0 (TID 285) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 50, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:14:59 Executor: INFO: Running task 50.0 in stage 7.0 (TID 285)
+2021-08-16 13:14:59 TaskSetManager: INFO: Finished task 48.0 in stage 7.0 (TID 283) in 2780 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (49/100)
+2021-08-16 13:14:59 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 50.0 in stage 7.0 (TID 285)
+2021-08-16 13:14:59 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 50.0 in stage 7.0 (TID 285)
+2021-08-16 13:14:59 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 50.0 in stage 7.0 (TID 285)
+2021-08-16 13:14:59 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 50.0 in stage 7.0 (TID 285)
+2021-08-16 13:14:59 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 36932926 }, alleles: [2; G, A] }, { locus: { contig: chr22, position: 36932926 }, alleles: [2; G, C] }
+2021-08-16 13:14:59 root: INFO: TaskReport: stage=7, partition=49, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:14:59 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 49.0 in stage 7.0 (TID 284)
+2021-08-16 13:14:59 Executor: INFO: Finished task 49.0 in stage 7.0 (TID 284). 1634 bytes result sent to driver
+2021-08-16 13:14:59 TaskSetManager: INFO: Starting task 51.0 in stage 7.0 (TID 286) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 51, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:14:59 Executor: INFO: Running task 51.0 in stage 7.0 (TID 286)
+2021-08-16 13:14:59 TaskSetManager: INFO: Finished task 49.0 in stage 7.0 (TID 284) in 3434 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (50/100)
+2021-08-16 13:14:59 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 51.0 in stage 7.0 (TID 286)
+2021-08-16 13:14:59 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 51.0 in stage 7.0 (TID 286)
+2021-08-16 13:14:59 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 51.0 in stage 7.0 (TID 286)
+2021-08-16 13:14:59 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 51.0 in stage 7.0 (TID 286)
+2021-08-16 13:15:02 root: INFO: TaskReport: stage=7, partition=51, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:02 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 51.0 in stage 7.0 (TID 286)
+2021-08-16 13:15:02 Executor: INFO: Finished task 51.0 in stage 7.0 (TID 286). 1677 bytes result sent to driver
+2021-08-16 13:15:02 TaskSetManager: INFO: Starting task 52.0 in stage 7.0 (TID 287) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 52, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:02 Executor: INFO: Running task 52.0 in stage 7.0 (TID 287)
+2021-08-16 13:15:02 TaskSetManager: INFO: Finished task 51.0 in stage 7.0 (TID 286) in 2300 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (51/100)
+2021-08-16 13:15:02 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 52.0 in stage 7.0 (TID 287)
+2021-08-16 13:15:02 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 52.0 in stage 7.0 (TID 287)
+2021-08-16 13:15:02 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 52.0 in stage 7.0 (TID 287)
+2021-08-16 13:15:02 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 52.0 in stage 7.0 (TID 287)
+2021-08-16 13:15:02 root: INFO: TaskReport: stage=7, partition=50, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:02 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 50.0 in stage 7.0 (TID 285)
+2021-08-16 13:15:02 Executor: INFO: Finished task 50.0 in stage 7.0 (TID 285). 1829 bytes result sent to driver
+2021-08-16 13:15:02 TaskSetManager: INFO: Starting task 53.0 in stage 7.0 (TID 288) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 53, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:02 Executor: INFO: Running task 53.0 in stage 7.0 (TID 288)
+2021-08-16 13:15:02 TaskSetManager: INFO: Finished task 50.0 in stage 7.0 (TID 285) in 3149 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (52/100)
+2021-08-16 13:15:02 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 53.0 in stage 7.0 (TID 288)
+2021-08-16 13:15:02 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 53.0 in stage 7.0 (TID 288)
+2021-08-16 13:15:02 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 53.0 in stage 7.0 (TID 288)
+2021-08-16 13:15:02 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 53.0 in stage 7.0 (TID 288)
+2021-08-16 13:15:02 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 37226848 }, alleles: [2; G, C] }, { locus: { contig: chr22, position: 37226848 }, alleles: [2; G, T] }
+2021-08-16 13:15:05 root: INFO: TaskReport: stage=7, partition=52, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:05 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 52.0 in stage 7.0 (TID 287)
+2021-08-16 13:15:05 Executor: INFO: Finished task 52.0 in stage 7.0 (TID 287). 1829 bytes result sent to driver
+2021-08-16 13:15:05 TaskSetManager: INFO: Starting task 54.0 in stage 7.0 (TID 289) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 54, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:05 Executor: INFO: Running task 54.0 in stage 7.0 (TID 289)
+2021-08-16 13:15:05 TaskSetManager: INFO: Finished task 52.0 in stage 7.0 (TID 287) in 2991 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (53/100)
+2021-08-16 13:15:05 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 54.0 in stage 7.0 (TID 289)
+2021-08-16 13:15:05 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 54.0 in stage 7.0 (TID 289)
+2021-08-16 13:15:05 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 54.0 in stage 7.0 (TID 289)
+2021-08-16 13:15:05 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 54.0 in stage 7.0 (TID 289)
+2021-08-16 13:15:05 root: INFO: TaskReport: stage=7, partition=53, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:05 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 53.0 in stage 7.0 (TID 288)
+2021-08-16 13:15:05 Executor: INFO: Finished task 53.0 in stage 7.0 (TID 288). 1677 bytes result sent to driver
+2021-08-16 13:15:05 TaskSetManager: INFO: Starting task 55.0 in stage 7.0 (TID 290) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 55, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:05 TaskSetManager: INFO: Finished task 53.0 in stage 7.0 (TID 288) in 3774 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (54/100)
+2021-08-16 13:15:05 Executor: INFO: Running task 55.0 in stage 7.0 (TID 290)
+2021-08-16 13:15:05 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 55.0 in stage 7.0 (TID 290)
+2021-08-16 13:15:05 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 55.0 in stage 7.0 (TID 290)
+2021-08-16 13:15:05 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 55.0 in stage 7.0 (TID 290)
+2021-08-16 13:15:05 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 55.0 in stage 7.0 (TID 290)
+2021-08-16 13:15:05 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 37734452 }, alleles: [2; G, A] }, { locus: { contig: chr22, position: 37734452 }, alleles: [2; G, T] }
+2021-08-16 13:15:08 root: INFO: TaskReport: stage=7, partition=54, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:08 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 54.0 in stage 7.0 (TID 289)
+2021-08-16 13:15:08 Executor: INFO: Finished task 54.0 in stage 7.0 (TID 289). 1634 bytes result sent to driver
+2021-08-16 13:15:08 TaskSetManager: INFO: Starting task 56.0 in stage 7.0 (TID 291) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 56, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:08 Executor: INFO: Running task 56.0 in stage 7.0 (TID 291)
+2021-08-16 13:15:08 TaskSetManager: INFO: Finished task 54.0 in stage 7.0 (TID 289) in 3255 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (55/100)
+2021-08-16 13:15:08 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 56.0 in stage 7.0 (TID 291)
+2021-08-16 13:15:08 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 56.0 in stage 7.0 (TID 291)
+2021-08-16 13:15:08 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 56.0 in stage 7.0 (TID 291)
+2021-08-16 13:15:08 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 56.0 in stage 7.0 (TID 291)
+2021-08-16 13:15:09 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 37927500 }, alleles: [2; G, A] }, { locus: { contig: chr22, position: 37927500 }, alleles: [2; G, T] }
+2021-08-16 13:15:09 root: INFO: TaskReport: stage=7, partition=55, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:09 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 55.0 in stage 7.0 (TID 290)
+2021-08-16 13:15:09 Executor: INFO: Finished task 55.0 in stage 7.0 (TID 290). 1829 bytes result sent to driver
+2021-08-16 13:15:09 TaskSetManager: INFO: Starting task 57.0 in stage 7.0 (TID 292) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 57, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:09 TaskSetManager: INFO: Finished task 55.0 in stage 7.0 (TID 290) in 3522 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (56/100)
+2021-08-16 13:15:09 Executor: INFO: Running task 57.0 in stage 7.0 (TID 292)
+2021-08-16 13:15:09 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 57.0 in stage 7.0 (TID 292)
+2021-08-16 13:15:09 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 57.0 in stage 7.0 (TID 292)
+2021-08-16 13:15:09 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 57.0 in stage 7.0 (TID 292)
+2021-08-16 13:15:09 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 57.0 in stage 7.0 (TID 292)
+2021-08-16 13:15:10 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 38108365 }, alleles: [2; T, A] }, { locus: { contig: chr22, position: 38108365 }, alleles: [2; T, C] }
+2021-08-16 13:15:11 root: INFO: TaskReport: stage=7, partition=56, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:11 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 56.0 in stage 7.0 (TID 291)
+2021-08-16 13:15:11 Executor: INFO: Finished task 56.0 in stage 7.0 (TID 291). 1829 bytes result sent to driver
+2021-08-16 13:15:11 TaskSetManager: INFO: Starting task 58.0 in stage 7.0 (TID 293) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 58, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:11 Executor: INFO: Running task 58.0 in stage 7.0 (TID 293)
+2021-08-16 13:15:11 TaskSetManager: INFO: Finished task 56.0 in stage 7.0 (TID 291) in 3445 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (57/100)
+2021-08-16 13:15:11 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 58.0 in stage 7.0 (TID 293)
+2021-08-16 13:15:11 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 58.0 in stage 7.0 (TID 293)
+2021-08-16 13:15:11 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 58.0 in stage 7.0 (TID 293)
+2021-08-16 13:15:11 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 58.0 in stage 7.0 (TID 293)
+2021-08-16 13:15:12 root: INFO: TaskReport: stage=7, partition=57, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:12 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 57.0 in stage 7.0 (TID 292)
+2021-08-16 13:15:12 Executor: INFO: Finished task 57.0 in stage 7.0 (TID 292). 1786 bytes result sent to driver
+2021-08-16 13:15:12 TaskSetManager: INFO: Starting task 59.0 in stage 7.0 (TID 294) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 59, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:12 TaskSetManager: INFO: Finished task 57.0 in stage 7.0 (TID 292) in 3229 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (58/100)
+2021-08-16 13:15:12 Executor: INFO: Running task 59.0 in stage 7.0 (TID 294)
+2021-08-16 13:15:12 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 59.0 in stage 7.0 (TID 294)
+2021-08-16 13:15:12 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 59.0 in stage 7.0 (TID 294)
+2021-08-16 13:15:12 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 59.0 in stage 7.0 (TID 294)
+2021-08-16 13:15:12 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 59.0 in stage 7.0 (TID 294)
+2021-08-16 13:15:15 root: INFO: TaskReport: stage=7, partition=58, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:15 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 58.0 in stage 7.0 (TID 293)
+2021-08-16 13:15:15 Executor: INFO: Finished task 58.0 in stage 7.0 (TID 293). 1677 bytes result sent to driver
+2021-08-16 13:15:15 TaskSetManager: INFO: Starting task 60.0 in stage 7.0 (TID 295) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 60, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:15 Executor: INFO: Running task 60.0 in stage 7.0 (TID 295)
+2021-08-16 13:15:15 TaskSetManager: INFO: Finished task 58.0 in stage 7.0 (TID 293) in 4180 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (59/100)
+2021-08-16 13:15:15 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 60.0 in stage 7.0 (TID 295)
+2021-08-16 13:15:15 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 60.0 in stage 7.0 (TID 295)
+2021-08-16 13:15:15 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 60.0 in stage 7.0 (TID 295)
+2021-08-16 13:15:15 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 60.0 in stage 7.0 (TID 295)
+2021-08-16 13:15:16 root: INFO: TaskReport: stage=7, partition=59, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:16 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 59.0 in stage 7.0 (TID 294)
+2021-08-16 13:15:16 Executor: INFO: Finished task 59.0 in stage 7.0 (TID 294). 1677 bytes result sent to driver
+2021-08-16 13:15:16 TaskSetManager: INFO: Starting task 61.0 in stage 7.0 (TID 296) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 61, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:16 Executor: INFO: Running task 61.0 in stage 7.0 (TID 296)
+2021-08-16 13:15:16 TaskSetManager: INFO: Finished task 59.0 in stage 7.0 (TID 294) in 3906 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (60/100)
+2021-08-16 13:15:16 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 61.0 in stage 7.0 (TID 296)
+2021-08-16 13:15:16 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 61.0 in stage 7.0 (TID 296)
+2021-08-16 13:15:16 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 61.0 in stage 7.0 (TID 296)
+2021-08-16 13:15:16 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 61.0 in stage 7.0 (TID 296)
+2021-08-16 13:15:17 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 39100331 }, alleles: [2; G, A] }, { locus: { contig: chr22, position: 39100331 }, alleles: [2; G, T] }
+2021-08-16 13:15:19 root: INFO: TaskReport: stage=7, partition=60, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:19 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 60.0 in stage 7.0 (TID 295)
+2021-08-16 13:15:19 Executor: INFO: Finished task 60.0 in stage 7.0 (TID 295). 1677 bytes result sent to driver
+2021-08-16 13:15:19 TaskSetManager: INFO: Starting task 62.0 in stage 7.0 (TID 297) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 62, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:19 Executor: INFO: Running task 62.0 in stage 7.0 (TID 297)
+2021-08-16 13:15:19 TaskSetManager: INFO: Finished task 60.0 in stage 7.0 (TID 295) in 3464 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (61/100)
+2021-08-16 13:15:19 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 62.0 in stage 7.0 (TID 297)
+2021-08-16 13:15:19 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 62.0 in stage 7.0 (TID 297)
+2021-08-16 13:15:19 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 62.0 in stage 7.0 (TID 297)
+2021-08-16 13:15:19 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 62.0 in stage 7.0 (TID 297)
+2021-08-16 13:15:19 root: INFO: TaskReport: stage=7, partition=61, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:19 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 61.0 in stage 7.0 (TID 296)
+2021-08-16 13:15:19 Executor: INFO: Finished task 61.0 in stage 7.0 (TID 296). 1829 bytes result sent to driver
+2021-08-16 13:15:19 TaskSetManager: INFO: Starting task 63.0 in stage 7.0 (TID 298) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 63, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:19 Executor: INFO: Running task 63.0 in stage 7.0 (TID 298)
+2021-08-16 13:15:19 TaskSetManager: INFO: Finished task 61.0 in stage 7.0 (TID 296) in 2874 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (62/100)
+2021-08-16 13:15:19 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 63.0 in stage 7.0 (TID 298)
+2021-08-16 13:15:19 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 63.0 in stage 7.0 (TID 298)
+2021-08-16 13:15:19 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 63.0 in stage 7.0 (TID 298)
+2021-08-16 13:15:19 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 63.0 in stage 7.0 (TID 298)
+2021-08-16 13:15:23 root: INFO: TaskReport: stage=7, partition=63, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:23 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 63.0 in stage 7.0 (TID 298)
+2021-08-16 13:15:23 Executor: INFO: Finished task 63.0 in stage 7.0 (TID 298). 1677 bytes result sent to driver
+2021-08-16 13:15:23 TaskSetManager: INFO: Starting task 64.0 in stage 7.0 (TID 299) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 64, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:23 Executor: INFO: Running task 64.0 in stage 7.0 (TID 299)
+2021-08-16 13:15:23 TaskSetManager: INFO: Finished task 63.0 in stage 7.0 (TID 298) in 3642 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (63/100)
+2021-08-16 13:15:23 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 64.0 in stage 7.0 (TID 299)
+2021-08-16 13:15:23 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 64.0 in stage 7.0 (TID 299)
+2021-08-16 13:15:23 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 64.0 in stage 7.0 (TID 299)
+2021-08-16 13:15:23 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 64.0 in stage 7.0 (TID 299)
+2021-08-16 13:15:23 root: INFO: TaskReport: stage=7, partition=62, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:23 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 62.0 in stage 7.0 (TID 297)
+2021-08-16 13:15:23 Executor: INFO: Finished task 62.0 in stage 7.0 (TID 297). 1677 bytes result sent to driver
+2021-08-16 13:15:23 TaskSetManager: INFO: Starting task 65.0 in stage 7.0 (TID 300) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 65, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:23 Executor: INFO: Running task 65.0 in stage 7.0 (TID 300)
+2021-08-16 13:15:23 TaskSetManager: INFO: Finished task 62.0 in stage 7.0 (TID 297) in 3842 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (64/100)
+2021-08-16 13:15:23 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 65.0 in stage 7.0 (TID 300)
+2021-08-16 13:15:23 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 65.0 in stage 7.0 (TID 300)
+2021-08-16 13:15:23 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 65.0 in stage 7.0 (TID 300)
+2021-08-16 13:15:23 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 65.0 in stage 7.0 (TID 300)
+2021-08-16 13:15:24 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 40418590 }, alleles: [2; C, A] }, { locus: { contig: chr22, position: 40418590 }, alleles: [2; C, T] }
+2021-08-16 13:15:25 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 40404540 }, alleles: [2; C, A] }, { locus: { contig: chr22, position: 40404540 }, alleles: [2; C, T] }
+2021-08-16 13:15:26 root: INFO: TaskReport: stage=7, partition=64, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:26 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 64.0 in stage 7.0 (TID 299)
+2021-08-16 13:15:26 Executor: INFO: Finished task 64.0 in stage 7.0 (TID 299). 1830 bytes result sent to driver
+2021-08-16 13:15:26 TaskSetManager: INFO: Starting task 66.0 in stage 7.0 (TID 301) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 66, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:26 Executor: INFO: Running task 66.0 in stage 7.0 (TID 301)
+2021-08-16 13:15:26 TaskSetManager: INFO: Finished task 64.0 in stage 7.0 (TID 299) in 3399 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (65/100)
+2021-08-16 13:15:26 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 66.0 in stage 7.0 (TID 301)
+2021-08-16 13:15:26 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 66.0 in stage 7.0 (TID 301)
+2021-08-16 13:15:26 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 66.0 in stage 7.0 (TID 301)
+2021-08-16 13:15:26 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 66.0 in stage 7.0 (TID 301)
+2021-08-16 13:15:26 root: INFO: TaskReport: stage=7, partition=65, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:26 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 65.0 in stage 7.0 (TID 300)
+2021-08-16 13:15:26 Executor: INFO: Finished task 65.0 in stage 7.0 (TID 300). 1830 bytes result sent to driver
+2021-08-16 13:15:26 TaskSetManager: INFO: Starting task 67.0 in stage 7.0 (TID 302) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 67, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:26 Executor: INFO: Running task 67.0 in stage 7.0 (TID 302)
+2021-08-16 13:15:26 TaskSetManager: INFO: Finished task 65.0 in stage 7.0 (TID 300) in 3648 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (66/100)
+2021-08-16 13:15:26 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 67.0 in stage 7.0 (TID 302)
+2021-08-16 13:15:26 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 67.0 in stage 7.0 (TID 302)
+2021-08-16 13:15:26 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 67.0 in stage 7.0 (TID 302)
+2021-08-16 13:15:26 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 67.0 in stage 7.0 (TID 302)
+2021-08-16 13:15:28 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 41254695 }, alleles: [2; C, A] }, { locus: { contig: chr22, position: 41254695 }, alleles: [2; C, G] }
+2021-08-16 13:15:30 root: INFO: TaskReport: stage=7, partition=66, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:30 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 66.0 in stage 7.0 (TID 301)
+2021-08-16 13:15:30 Executor: INFO: Finished task 66.0 in stage 7.0 (TID 301). 1635 bytes result sent to driver
+2021-08-16 13:15:30 TaskSetManager: INFO: Starting task 68.0 in stage 7.0 (TID 303) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 68, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:30 Executor: INFO: Running task 68.0 in stage 7.0 (TID 303)
+2021-08-16 13:15:30 TaskSetManager: INFO: Finished task 66.0 in stage 7.0 (TID 301) in 3508 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (67/100)
+2021-08-16 13:15:30 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 68.0 in stage 7.0 (TID 303)
+2021-08-16 13:15:30 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 68.0 in stage 7.0 (TID 303)
+2021-08-16 13:15:30 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 68.0 in stage 7.0 (TID 303)
+2021-08-16 13:15:30 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 68.0 in stage 7.0 (TID 303)
+2021-08-16 13:15:30 root: INFO: TaskReport: stage=7, partition=67, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:30 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 67.0 in stage 7.0 (TID 302)
+2021-08-16 13:15:30 Executor: INFO: Finished task 67.0 in stage 7.0 (TID 302). 1787 bytes result sent to driver
+2021-08-16 13:15:30 TaskSetManager: INFO: Starting task 69.0 in stage 7.0 (TID 304) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 69, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:30 Executor: INFO: Running task 69.0 in stage 7.0 (TID 304)
+2021-08-16 13:15:30 TaskSetManager: INFO: Finished task 67.0 in stage 7.0 (TID 302) in 3369 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (68/100)
+2021-08-16 13:15:30 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 69.0 in stage 7.0 (TID 304)
+2021-08-16 13:15:30 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 69.0 in stage 7.0 (TID 304)
+2021-08-16 13:15:30 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 69.0 in stage 7.0 (TID 304)
+2021-08-16 13:15:30 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 69.0 in stage 7.0 (TID 304)
+2021-08-16 13:15:30 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 41663764 }, alleles: [2; G, A] }, { locus: { contig: chr22, position: 41663764 }, alleles: [2; G, T] }
+2021-08-16 13:15:33 root: INFO: TaskReport: stage=7, partition=69, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:33 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 69.0 in stage 7.0 (TID 304)
+2021-08-16 13:15:33 Executor: INFO: Finished task 69.0 in stage 7.0 (TID 304). 1830 bytes result sent to driver
+2021-08-16 13:15:33 TaskSetManager: INFO: Starting task 70.0 in stage 7.0 (TID 305) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 70, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:33 TaskSetManager: INFO: Finished task 69.0 in stage 7.0 (TID 304) in 3595 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (69/100)
+2021-08-16 13:15:33 Executor: INFO: Running task 70.0 in stage 7.0 (TID 305)
+2021-08-16 13:15:33 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 70.0 in stage 7.0 (TID 305)
+2021-08-16 13:15:33 root: INFO: TaskReport: stage=7, partition=68, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:33 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 68.0 in stage 7.0 (TID 303)
+2021-08-16 13:15:33 Executor: INFO: Finished task 68.0 in stage 7.0 (TID 303). 1678 bytes result sent to driver
+2021-08-16 13:15:33 TaskSetManager: INFO: Starting task 71.0 in stage 7.0 (TID 306) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 71, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:33 Executor: INFO: Running task 71.0 in stage 7.0 (TID 306)
+2021-08-16 13:15:33 TaskSetManager: INFO: Finished task 68.0 in stage 7.0 (TID 303) in 3803 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (70/100)
+2021-08-16 13:15:33 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 70.0 in stage 7.0 (TID 305)
+2021-08-16 13:15:33 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 70.0 in stage 7.0 (TID 305)
+2021-08-16 13:15:33 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 71.0 in stage 7.0 (TID 306)
+2021-08-16 13:15:33 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 71.0 in stage 7.0 (TID 306)
+2021-08-16 13:15:33 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 71.0 in stage 7.0 (TID 306)
+2021-08-16 13:15:33 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 70.0 in stage 7.0 (TID 305)
+2021-08-16 13:15:33 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 71.0 in stage 7.0 (TID 306)
+2021-08-16 13:15:37 root: INFO: TaskReport: stage=7, partition=70, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:37 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 70.0 in stage 7.0 (TID 305)
+2021-08-16 13:15:37 Executor: INFO: Finished task 70.0 in stage 7.0 (TID 305). 1678 bytes result sent to driver
+2021-08-16 13:15:37 TaskSetManager: INFO: Starting task 72.0 in stage 7.0 (TID 307) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 72, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:37 Executor: INFO: Running task 72.0 in stage 7.0 (TID 307)
+2021-08-16 13:15:37 TaskSetManager: INFO: Finished task 70.0 in stage 7.0 (TID 305) in 3203 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (71/100)
+2021-08-16 13:15:37 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 72.0 in stage 7.0 (TID 307)
+2021-08-16 13:15:37 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 72.0 in stage 7.0 (TID 307)
+2021-08-16 13:15:37 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 72.0 in stage 7.0 (TID 307)
+2021-08-16 13:15:37 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 72.0 in stage 7.0 (TID 307)
+2021-08-16 13:15:37 root: INFO: TaskReport: stage=7, partition=71, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:37 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 71.0 in stage 7.0 (TID 306)
+2021-08-16 13:15:37 Executor: INFO: Finished task 71.0 in stage 7.0 (TID 306). 1678 bytes result sent to driver
+2021-08-16 13:15:37 TaskSetManager: INFO: Starting task 73.0 in stage 7.0 (TID 308) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 73, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:37 Executor: INFO: Running task 73.0 in stage 7.0 (TID 308)
+2021-08-16 13:15:37 TaskSetManager: INFO: Finished task 71.0 in stage 7.0 (TID 306) in 3521 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (72/100)
+2021-08-16 13:15:37 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 73.0 in stage 7.0 (TID 308)
+2021-08-16 13:15:37 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 73.0 in stage 7.0 (TID 308)
+2021-08-16 13:15:37 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 73.0 in stage 7.0 (TID 308)
+2021-08-16 13:15:37 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 73.0 in stage 7.0 (TID 308)
+2021-08-16 13:15:37 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 42516100 }, alleles: [2; C, G] }, { locus: { contig: chr22, position: 42516100 }, alleles: [2; C, T] }
+2021-08-16 13:15:39 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 43133308 }, alleles: [2; G, A] }, { locus: { contig: chr22, position: 43133308 }, alleles: [2; G, C] }
+2021-08-16 13:15:40 root: INFO: TaskReport: stage=7, partition=73, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:40 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 73.0 in stage 7.0 (TID 308)
+2021-08-16 13:15:40 Executor: INFO: Finished task 73.0 in stage 7.0 (TID 308). 1830 bytes result sent to driver
+2021-08-16 13:15:40 TaskSetManager: INFO: Starting task 74.0 in stage 7.0 (TID 309) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 74, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:40 TaskSetManager: INFO: Finished task 73.0 in stage 7.0 (TID 308) in 2687 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (73/100)
+2021-08-16 13:15:40 Executor: INFO: Running task 74.0 in stage 7.0 (TID 309)
+2021-08-16 13:15:40 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 74.0 in stage 7.0 (TID 309)
+2021-08-16 13:15:40 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 74.0 in stage 7.0 (TID 309)
+2021-08-16 13:15:40 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 74.0 in stage 7.0 (TID 309)
+2021-08-16 13:15:40 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 74.0 in stage 7.0 (TID 309)
+2021-08-16 13:15:40 root: INFO: TaskReport: stage=7, partition=72, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:40 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 72.0 in stage 7.0 (TID 307)
+2021-08-16 13:15:40 Executor: INFO: Finished task 72.0 in stage 7.0 (TID 307). 1830 bytes result sent to driver
+2021-08-16 13:15:40 TaskSetManager: INFO: Starting task 75.0 in stage 7.0 (TID 310) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 75, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:40 Executor: INFO: Running task 75.0 in stage 7.0 (TID 310)
+2021-08-16 13:15:40 TaskSetManager: INFO: Finished task 72.0 in stage 7.0 (TID 307) in 3296 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (74/100)
+2021-08-16 13:15:40 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 75.0 in stage 7.0 (TID 310)
+2021-08-16 13:15:40 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 75.0 in stage 7.0 (TID 310)
+2021-08-16 13:15:40 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 75.0 in stage 7.0 (TID 310)
+2021-08-16 13:15:40 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 75.0 in stage 7.0 (TID 310)
+2021-08-16 13:15:41 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 43176348 }, alleles: [2; C, G] }, { locus: { contig: chr22, position: 43176348 }, alleles: [2; C, T] }
+2021-08-16 13:15:42 root: INFO: TaskReport: stage=7, partition=74, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:42 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 74.0 in stage 7.0 (TID 309)
+2021-08-16 13:15:42 Executor: INFO: Finished task 74.0 in stage 7.0 (TID 309). 1787 bytes result sent to driver
+2021-08-16 13:15:42 TaskSetManager: INFO: Starting task 76.0 in stage 7.0 (TID 311) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 76, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:42 Executor: INFO: Running task 76.0 in stage 7.0 (TID 311)
+2021-08-16 13:15:42 TaskSetManager: INFO: Finished task 74.0 in stage 7.0 (TID 309) in 2713 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (75/100)
+2021-08-16 13:15:42 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 76.0 in stage 7.0 (TID 311)
+2021-08-16 13:15:42 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 76.0 in stage 7.0 (TID 311)
+2021-08-16 13:15:42 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 76.0 in stage 7.0 (TID 311)
+2021-08-16 13:15:42 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 76.0 in stage 7.0 (TID 311)
+2021-08-16 13:15:43 root: INFO: TaskReport: stage=7, partition=75, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:43 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 75.0 in stage 7.0 (TID 310)
+2021-08-16 13:15:43 Executor: INFO: Finished task 75.0 in stage 7.0 (TID 310). 1678 bytes result sent to driver
+2021-08-16 13:15:43 TaskSetManager: INFO: Starting task 77.0 in stage 7.0 (TID 312) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 77, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:43 TaskSetManager: INFO: Finished task 75.0 in stage 7.0 (TID 310) in 3074 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (76/100)
+2021-08-16 13:15:43 Executor: INFO: Running task 77.0 in stage 7.0 (TID 312)
+2021-08-16 13:15:43 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 77.0 in stage 7.0 (TID 312)
+2021-08-16 13:15:43 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 77.0 in stage 7.0 (TID 312)
+2021-08-16 13:15:43 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 77.0 in stage 7.0 (TID 312)
+2021-08-16 13:15:43 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 77.0 in stage 7.0 (TID 312)
+2021-08-16 13:15:43 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 43833612 }, alleles: [2; G, A] }, { locus: { contig: chr22, position: 43833612 }, alleles: [2; G, C] }
+2021-08-16 13:15:44 root: INFO: TaskReport: stage=7, partition=76, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:44 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 76.0 in stage 7.0 (TID 311)
+2021-08-16 13:15:44 Executor: INFO: Finished task 76.0 in stage 7.0 (TID 311). 1830 bytes result sent to driver
+2021-08-16 13:15:44 TaskSetManager: INFO: Starting task 78.0 in stage 7.0 (TID 313) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 78, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:44 TaskSetManager: INFO: Finished task 76.0 in stage 7.0 (TID 311) in 2151 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (77/100)
+2021-08-16 13:15:44 Executor: INFO: Running task 78.0 in stage 7.0 (TID 313)
+2021-08-16 13:15:44 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 78.0 in stage 7.0 (TID 313)
+2021-08-16 13:15:44 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 78.0 in stage 7.0 (TID 313)
+2021-08-16 13:15:44 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 78.0 in stage 7.0 (TID 313)
+2021-08-16 13:15:44 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 78.0 in stage 7.0 (TID 313)
+2021-08-16 13:15:45 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 44702227 }, alleles: [2; T, A] }, { locus: { contig: chr22, position: 44702227 }, alleles: [2; T, G] }
+2021-08-16 13:15:45 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 44198704 }, alleles: [2; C, A] }, { locus: { contig: chr22, position: 44198704 }, alleles: [2; C, G] }
+2021-08-16 13:15:46 root: INFO: TaskReport: stage=7, partition=77, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:46 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 77.0 in stage 7.0 (TID 312)
+2021-08-16 13:15:46 Executor: INFO: Finished task 77.0 in stage 7.0 (TID 312). 1787 bytes result sent to driver
+2021-08-16 13:15:46 TaskSetManager: INFO: Starting task 79.0 in stage 7.0 (TID 314) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 79, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:46 TaskSetManager: INFO: Finished task 77.0 in stage 7.0 (TID 312) in 2799 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (78/100)
+2021-08-16 13:15:46 Executor: INFO: Running task 79.0 in stage 7.0 (TID 314)
+2021-08-16 13:15:46 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 79.0 in stage 7.0 (TID 314)
+2021-08-16 13:15:46 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 79.0 in stage 7.0 (TID 314)
+2021-08-16 13:15:46 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 79.0 in stage 7.0 (TID 314)
+2021-08-16 13:15:46 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 79.0 in stage 7.0 (TID 314)
+2021-08-16 13:15:46 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 44862453 }, alleles: [2; C, A] }, { locus: { contig: chr22, position: 44862453 }, alleles: [2; C, G] }
+2021-08-16 13:15:47 root: INFO: TaskReport: stage=7, partition=78, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:47 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 78.0 in stage 7.0 (TID 313)
+2021-08-16 13:15:47 Executor: INFO: Finished task 78.0 in stage 7.0 (TID 313). 1830 bytes result sent to driver
+2021-08-16 13:15:47 TaskSetManager: INFO: Starting task 80.0 in stage 7.0 (TID 315) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 80, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:47 TaskSetManager: INFO: Finished task 78.0 in stage 7.0 (TID 313) in 3013 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (79/100)
+2021-08-16 13:15:47 Executor: INFO: Running task 80.0 in stage 7.0 (TID 315)
+2021-08-16 13:15:47 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 80.0 in stage 7.0 (TID 315)
+2021-08-16 13:15:47 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 80.0 in stage 7.0 (TID 315)
+2021-08-16 13:15:47 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 80.0 in stage 7.0 (TID 315)
+2021-08-16 13:15:47 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 80.0 in stage 7.0 (TID 315)
+2021-08-16 13:15:49 root: INFO: TaskReport: stage=7, partition=79, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:49 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 79.0 in stage 7.0 (TID 314)
+2021-08-16 13:15:49 Executor: INFO: Finished task 79.0 in stage 7.0 (TID 314). 1830 bytes result sent to driver
+2021-08-16 13:15:49 TaskSetManager: INFO: Starting task 81.0 in stage 7.0 (TID 316) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 81, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:49 Executor: INFO: Running task 81.0 in stage 7.0 (TID 316)
+2021-08-16 13:15:49 TaskSetManager: INFO: Finished task 79.0 in stage 7.0 (TID 314) in 3005 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (80/100)
+2021-08-16 13:15:49 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 81.0 in stage 7.0 (TID 316)
+2021-08-16 13:15:49 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 81.0 in stage 7.0 (TID 316)
+2021-08-16 13:15:49 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 81.0 in stage 7.0 (TID 316)
+2021-08-16 13:15:49 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 81.0 in stage 7.0 (TID 316)
+2021-08-16 13:15:49 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 45393863 }, alleles: [2; T, A] }, { locus: { contig: chr22, position: 45393863 }, alleles: [2; T, G] }
+2021-08-16 13:15:49 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 45533734 }, alleles: [2; C, A] }, { locus: { contig: chr22, position: 45533734 }, alleles: [2; C, T] }
+2021-08-16 13:15:49 root: INFO: TaskReport: stage=7, partition=80, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:49 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 80.0 in stage 7.0 (TID 315)
+2021-08-16 13:15:49 Executor: INFO: Finished task 80.0 in stage 7.0 (TID 315). 1787 bytes result sent to driver
+2021-08-16 13:15:49 TaskSetManager: INFO: Starting task 82.0 in stage 7.0 (TID 317) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 82, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:49 TaskSetManager: INFO: Finished task 80.0 in stage 7.0 (TID 315) in 1997 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (81/100)
+2021-08-16 13:15:49 Executor: INFO: Running task 82.0 in stage 7.0 (TID 317)
+2021-08-16 13:15:49 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 82.0 in stage 7.0 (TID 317)
+2021-08-16 13:15:49 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 82.0 in stage 7.0 (TID 317)
+2021-08-16 13:15:49 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 82.0 in stage 7.0 (TID 317)
+2021-08-16 13:15:49 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 82.0 in stage 7.0 (TID 317)
+2021-08-16 13:15:52 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 46260349 }, alleles: [2; T, A] }, { locus: { contig: chr22, position: 46260349 }, alleles: [2; T, G] }
+2021-08-16 13:15:52 root: INFO: TaskReport: stage=7, partition=81, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:52 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 81.0 in stage 7.0 (TID 316)
+2021-08-16 13:15:52 Executor: INFO: Finished task 81.0 in stage 7.0 (TID 316). 1830 bytes result sent to driver
+2021-08-16 13:15:52 TaskSetManager: INFO: Starting task 83.0 in stage 7.0 (TID 318) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 83, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:52 Executor: INFO: Running task 83.0 in stage 7.0 (TID 318)
+2021-08-16 13:15:52 TaskSetManager: INFO: Finished task 81.0 in stage 7.0 (TID 316) in 3179 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (82/100)
+2021-08-16 13:15:52 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 83.0 in stage 7.0 (TID 318)
+2021-08-16 13:15:52 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 83.0 in stage 7.0 (TID 318)
+2021-08-16 13:15:52 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 83.0 in stage 7.0 (TID 318)
+2021-08-16 13:15:52 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 83.0 in stage 7.0 (TID 318)
+2021-08-16 13:15:52 root: INFO: TaskReport: stage=7, partition=82, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:52 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 82.0 in stage 7.0 (TID 317)
+2021-08-16 13:15:52 Executor: INFO: Finished task 82.0 in stage 7.0 (TID 317). 1830 bytes result sent to driver
+2021-08-16 13:15:52 TaskSetManager: INFO: Starting task 84.0 in stage 7.0 (TID 319) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 84, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:52 Executor: INFO: Running task 84.0 in stage 7.0 (TID 319)
+2021-08-16 13:15:52 TaskSetManager: INFO: Finished task 82.0 in stage 7.0 (TID 317) in 2956 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (83/100)
+2021-08-16 13:15:52 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 84.0 in stage 7.0 (TID 319)
+2021-08-16 13:15:52 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 84.0 in stage 7.0 (TID 319)
+2021-08-16 13:15:52 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 84.0 in stage 7.0 (TID 319)
+2021-08-16 13:15:52 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 84.0 in stage 7.0 (TID 319)
+2021-08-16 13:15:54 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 46384724 }, alleles: [2; G, A] }, { locus: { contig: chr22, position: 46384724 }, alleles: [2; G, C] }
+2021-08-16 13:15:54 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 46335874 }, alleles: [2; G, A] }, { locus: { contig: chr22, position: 46335874 }, alleles: [2; G, C] }
+2021-08-16 13:15:55 root: INFO: TaskReport: stage=7, partition=83, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:55 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 83.0 in stage 7.0 (TID 318)
+2021-08-16 13:15:55 Executor: INFO: Finished task 83.0 in stage 7.0 (TID 318). 1787 bytes result sent to driver
+2021-08-16 13:15:55 TaskSetManager: INFO: Starting task 85.0 in stage 7.0 (TID 320) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 85, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:55 Executor: INFO: Running task 85.0 in stage 7.0 (TID 320)
+2021-08-16 13:15:55 TaskSetManager: INFO: Finished task 83.0 in stage 7.0 (TID 318) in 3128 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (84/100)
+2021-08-16 13:15:55 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 85.0 in stage 7.0 (TID 320)
+2021-08-16 13:15:55 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 85.0 in stage 7.0 (TID 320)
+2021-08-16 13:15:55 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 85.0 in stage 7.0 (TID 320)
+2021-08-16 13:15:55 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 85.0 in stage 7.0 (TID 320)
+2021-08-16 13:15:56 root: INFO: TaskReport: stage=7, partition=84, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:56 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 84.0 in stage 7.0 (TID 319)
+2021-08-16 13:15:56 Executor: INFO: Finished task 84.0 in stage 7.0 (TID 319). 1787 bytes result sent to driver
+2021-08-16 13:15:56 TaskSetManager: INFO: Starting task 86.0 in stage 7.0 (TID 321) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 86, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:56 Executor: INFO: Running task 86.0 in stage 7.0 (TID 321)
+2021-08-16 13:15:56 TaskSetManager: INFO: Finished task 84.0 in stage 7.0 (TID 319) in 3300 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (85/100)
+2021-08-16 13:15:56 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 86.0 in stage 7.0 (TID 321)
+2021-08-16 13:15:56 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 86.0 in stage 7.0 (TID 321)
+2021-08-16 13:15:56 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 86.0 in stage 7.0 (TID 321)
+2021-08-16 13:15:56 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 86.0 in stage 7.0 (TID 321)
+2021-08-16 13:15:57 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 46673038 }, alleles: [2; G, A] }, { locus: { contig: chr22, position: 46673038 }, alleles: [2; G, T] }
+2021-08-16 13:15:58 root: INFO: TaskReport: stage=7, partition=85, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:58 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 85.0 in stage 7.0 (TID 320)
+2021-08-16 13:15:58 Executor: INFO: Finished task 85.0 in stage 7.0 (TID 320). 1830 bytes result sent to driver
+2021-08-16 13:15:58 TaskSetManager: INFO: Starting task 87.0 in stage 7.0 (TID 322) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 87, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:58 Executor: INFO: Running task 87.0 in stage 7.0 (TID 322)
+2021-08-16 13:15:58 TaskSetManager: INFO: Finished task 85.0 in stage 7.0 (TID 320) in 3009 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (86/100)
+2021-08-16 13:15:58 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 87.0 in stage 7.0 (TID 322)
+2021-08-16 13:15:58 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 87.0 in stage 7.0 (TID 322)
+2021-08-16 13:15:58 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 87.0 in stage 7.0 (TID 322)
+2021-08-16 13:15:58 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 87.0 in stage 7.0 (TID 322)
+2021-08-16 13:15:59 root: INFO: TaskReport: stage=7, partition=86, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:15:59 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 86.0 in stage 7.0 (TID 321)
+2021-08-16 13:15:59 Executor: INFO: Finished task 86.0 in stage 7.0 (TID 321). 1678 bytes result sent to driver
+2021-08-16 13:15:59 TaskSetManager: INFO: Starting task 88.0 in stage 7.0 (TID 323) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 88, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:15:59 TaskSetManager: INFO: Finished task 86.0 in stage 7.0 (TID 321) in 3218 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (87/100)
+2021-08-16 13:15:59 Executor: INFO: Running task 88.0 in stage 7.0 (TID 323)
+2021-08-16 13:15:59 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 88.0 in stage 7.0 (TID 323)
+2021-08-16 13:15:59 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 88.0 in stage 7.0 (TID 323)
+2021-08-16 13:15:59 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 88.0 in stage 7.0 (TID 323)
+2021-08-16 13:15:59 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 88.0 in stage 7.0 (TID 323)
+2021-08-16 13:15:59 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 49925703 }, alleles: [2; T, A] }, { locus: { contig: chr22, position: 49925703 }, alleles: [2; T, C] }
+2021-08-16 13:16:01 root: INFO: TaskReport: stage=7, partition=87, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:16:01 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 87.0 in stage 7.0 (TID 322)
+2021-08-16 13:16:01 Executor: INFO: Finished task 87.0 in stage 7.0 (TID 322). 1678 bytes result sent to driver
+2021-08-16 13:16:01 TaskSetManager: INFO: Starting task 89.0 in stage 7.0 (TID 324) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 89, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:16:01 Executor: INFO: Running task 89.0 in stage 7.0 (TID 324)
+2021-08-16 13:16:01 TaskSetManager: INFO: Finished task 87.0 in stage 7.0 (TID 322) in 3275 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (88/100)
+2021-08-16 13:16:01 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 89.0 in stage 7.0 (TID 324)
+2021-08-16 13:16:01 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 89.0 in stage 7.0 (TID 324)
+2021-08-16 13:16:01 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 89.0 in stage 7.0 (TID 324)
+2021-08-16 13:16:01 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 89.0 in stage 7.0 (TID 324)
+2021-08-16 13:16:02 root: INFO: TaskReport: stage=7, partition=88, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:16:02 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 88.0 in stage 7.0 (TID 323)
+2021-08-16 13:16:02 Executor: INFO: Finished task 88.0 in stage 7.0 (TID 323). 1830 bytes result sent to driver
+2021-08-16 13:16:02 TaskSetManager: INFO: Starting task 90.0 in stage 7.0 (TID 325) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 90, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:16:02 TaskSetManager: INFO: Finished task 88.0 in stage 7.0 (TID 323) in 2704 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (89/100)
+2021-08-16 13:16:02 Executor: INFO: Running task 90.0 in stage 7.0 (TID 325)
+2021-08-16 13:16:02 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 90.0 in stage 7.0 (TID 325)
+2021-08-16 13:16:02 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 90.0 in stage 7.0 (TID 325)
+2021-08-16 13:16:02 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 90.0 in stage 7.0 (TID 325)
+2021-08-16 13:16:02 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 90.0 in stage 7.0 (TID 325)
+2021-08-16 13:16:02 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 50064097 }, alleles: [2; A, C] }, { locus: { contig: chr22, position: 50064097 }, alleles: [2; A, G] }
+2021-08-16 13:16:04 root: INFO: TaskReport: stage=7, partition=89, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:16:04 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 89.0 in stage 7.0 (TID 324)
+2021-08-16 13:16:04 Executor: INFO: Finished task 89.0 in stage 7.0 (TID 324). 1787 bytes result sent to driver
+2021-08-16 13:16:04 TaskSetManager: INFO: Starting task 91.0 in stage 7.0 (TID 326) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 91, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:16:04 Executor: INFO: Running task 91.0 in stage 7.0 (TID 326)
+2021-08-16 13:16:04 TaskSetManager: INFO: Finished task 89.0 in stage 7.0 (TID 324) in 2411 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (90/100)
+2021-08-16 13:16:04 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 91.0 in stage 7.0 (TID 326)
+2021-08-16 13:16:04 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 91.0 in stage 7.0 (TID 326)
+2021-08-16 13:16:04 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 91.0 in stage 7.0 (TID 326)
+2021-08-16 13:16:04 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 91.0 in stage 7.0 (TID 326)
+2021-08-16 13:16:04 root: INFO: TaskReport: stage=7, partition=90, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:16:04 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 90.0 in stage 7.0 (TID 325)
+2021-08-16 13:16:04 Executor: INFO: Finished task 90.0 in stage 7.0 (TID 325). 1635 bytes result sent to driver
+2021-08-16 13:16:04 TaskSetManager: INFO: Starting task 92.0 in stage 7.0 (TID 327) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 92, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:16:04 Executor: INFO: Running task 92.0 in stage 7.0 (TID 327)
+2021-08-16 13:16:04 TaskSetManager: INFO: Finished task 90.0 in stage 7.0 (TID 325) in 2672 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (91/100)
+2021-08-16 13:16:04 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 92.0 in stage 7.0 (TID 327)
+2021-08-16 13:16:04 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 92.0 in stage 7.0 (TID 327)
+2021-08-16 13:16:04 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 92.0 in stage 7.0 (TID 327)
+2021-08-16 13:16:04 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 92.0 in stage 7.0 (TID 327)
+2021-08-16 13:16:07 root: INFO: TaskReport: stage=7, partition=91, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:16:07 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 91.0 in stage 7.0 (TID 326)
+2021-08-16 13:16:07 Executor: INFO: Finished task 91.0 in stage 7.0 (TID 326). 1678 bytes result sent to driver
+2021-08-16 13:16:07 TaskSetManager: INFO: Starting task 93.0 in stage 7.0 (TID 328) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 93, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:16:07 Executor: INFO: Running task 93.0 in stage 7.0 (TID 328)
+2021-08-16 13:16:07 TaskSetManager: INFO: Finished task 91.0 in stage 7.0 (TID 326) in 3524 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (92/100)
+2021-08-16 13:16:07 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 93.0 in stage 7.0 (TID 328)
+2021-08-16 13:16:07 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 93.0 in stage 7.0 (TID 328)
+2021-08-16 13:16:07 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 93.0 in stage 7.0 (TID 328)
+2021-08-16 13:16:07 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 93.0 in stage 7.0 (TID 328)
+2021-08-16 13:16:07 root: INFO: TaskReport: stage=7, partition=92, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:16:07 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 92.0 in stage 7.0 (TID 327)
+2021-08-16 13:16:07 Executor: INFO: Finished task 92.0 in stage 7.0 (TID 327). 1678 bytes result sent to driver
+2021-08-16 13:16:07 TaskSetManager: INFO: Starting task 94.0 in stage 7.0 (TID 329) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 94, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:16:07 Executor: INFO: Running task 94.0 in stage 7.0 (TID 329)
+2021-08-16 13:16:07 TaskSetManager: INFO: Finished task 92.0 in stage 7.0 (TID 327) in 3054 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (93/100)
+2021-08-16 13:16:07 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 94.0 in stage 7.0 (TID 329)
+2021-08-16 13:16:07 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 94.0 in stage 7.0 (TID 329)
+2021-08-16 13:16:07 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 94.0 in stage 7.0 (TID 329)
+2021-08-16 13:16:07 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 94.0 in stage 7.0 (TID 329)
+2021-08-16 13:16:10 root: INFO: TaskReport: stage=7, partition=94, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:16:10 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 94.0 in stage 7.0 (TID 329)
+2021-08-16 13:16:10 Executor: INFO: Finished task 94.0 in stage 7.0 (TID 329). 1678 bytes result sent to driver
+2021-08-16 13:16:10 TaskSetManager: INFO: Starting task 95.0 in stage 7.0 (TID 330) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 95, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:16:10 Executor: INFO: Running task 95.0 in stage 7.0 (TID 330)
+2021-08-16 13:16:10 TaskSetManager: INFO: Finished task 94.0 in stage 7.0 (TID 329) in 2793 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (94/100)
+2021-08-16 13:16:10 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 95.0 in stage 7.0 (TID 330)
+2021-08-16 13:16:10 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 95.0 in stage 7.0 (TID 330)
+2021-08-16 13:16:10 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 95.0 in stage 7.0 (TID 330)
+2021-08-16 13:16:10 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 95.0 in stage 7.0 (TID 330)
+2021-08-16 13:16:10 root: INFO: TaskReport: stage=7, partition=93, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:16:10 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 93.0 in stage 7.0 (TID 328)
+2021-08-16 13:16:10 Executor: INFO: Finished task 93.0 in stage 7.0 (TID 328). 1678 bytes result sent to driver
+2021-08-16 13:16:10 TaskSetManager: INFO: Starting task 96.0 in stage 7.0 (TID 331) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 96, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:16:10 Executor: INFO: Running task 96.0 in stage 7.0 (TID 331)
+2021-08-16 13:16:10 TaskSetManager: INFO: Finished task 93.0 in stage 7.0 (TID 328) in 3128 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (95/100)
+2021-08-16 13:16:10 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 96.0 in stage 7.0 (TID 331)
+2021-08-16 13:16:10 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 96.0 in stage 7.0 (TID 331)
+2021-08-16 13:16:10 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 96.0 in stage 7.0 (TID 331)
+2021-08-16 13:16:10 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 96.0 in stage 7.0 (TID 331)
+2021-08-16 13:16:13 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 50462830 }, alleles: [2; G, A] }, { locus: { contig: chr22, position: 50462830 }, alleles: [2; G, T] }
+2021-08-16 13:16:13 root: INFO: TaskReport: stage=7, partition=95, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:16:13 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 95.0 in stage 7.0 (TID 330)
+2021-08-16 13:16:13 Executor: INFO: Finished task 95.0 in stage 7.0 (TID 330). 1830 bytes result sent to driver
+2021-08-16 13:16:13 TaskSetManager: INFO: Starting task 97.0 in stage 7.0 (TID 332) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 97, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:16:13 Executor: INFO: Running task 97.0 in stage 7.0 (TID 332)
+2021-08-16 13:16:13 TaskSetManager: INFO: Finished task 95.0 in stage 7.0 (TID 330) in 3319 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (96/100)
+2021-08-16 13:16:13 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 97.0 in stage 7.0 (TID 332)
+2021-08-16 13:16:13 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 97.0 in stage 7.0 (TID 332)
+2021-08-16 13:16:13 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 97.0 in stage 7.0 (TID 332)
+2021-08-16 13:16:13 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 71: Executor task launch worker for task 97.0 in stage 7.0 (TID 332)
+2021-08-16 13:16:14 root: INFO: TaskReport: stage=7, partition=96, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:16:14 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 96.0 in stage 7.0 (TID 331)
+2021-08-16 13:16:14 Executor: INFO: Finished task 96.0 in stage 7.0 (TID 331). 1678 bytes result sent to driver
+2021-08-16 13:16:14 TaskSetManager: INFO: Starting task 98.0 in stage 7.0 (TID 333) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 98, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:16:14 Executor: INFO: Running task 98.0 in stage 7.0 (TID 333)
+2021-08-16 13:16:14 TaskSetManager: INFO: Finished task 96.0 in stage 7.0 (TID 331) in 3292 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (97/100)
+2021-08-16 13:16:14 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 98.0 in stage 7.0 (TID 333)
+2021-08-16 13:16:14 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 98.0 in stage 7.0 (TID 333)
+2021-08-16 13:16:14 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 98.0 in stage 7.0 (TID 333)
+2021-08-16 13:16:14 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 98.0 in stage 7.0 (TID 333)
+2021-08-16 13:16:15 root: INFO: partition-key-sorted: { locus: { contig: chr22, position: 50524353 }, alleles: [2; C, A] }, { locus: { contig: chr22, position: 50524353 }, alleles: [2; C, G] }
+2021-08-16 13:16:17 root: INFO: TaskReport: stage=7, partition=98, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:16:17 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 98.0 in stage 7.0 (TID 333)
+2021-08-16 13:16:17 Executor: INFO: Finished task 98.0 in stage 7.0 (TID 333). 1635 bytes result sent to driver
+2021-08-16 13:16:17 TaskSetManager: INFO: Starting task 99.0 in stage 7.0 (TID 334) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 99, PROCESS_LOCAL, 4658 bytes) taskResourceAssignments Map()
+2021-08-16 13:16:17 Executor: INFO: Running task 99.0 in stage 7.0 (TID 334)
+2021-08-16 13:16:17 TaskSetManager: INFO: Finished task 98.0 in stage 7.0 (TID 333) in 2948 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (98/100)
+2021-08-16 13:16:17 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 99.0 in stage 7.0 (TID 334)
+2021-08-16 13:16:17 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 99.0 in stage 7.0 (TID 334)
+2021-08-16 13:16:17 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 99.0 in stage 7.0 (TID 334)
+2021-08-16 13:16:17 root: INFO: RegionPool: REPORT_THRESHOLD: 1.0M allocated (1.0M blocks / 0 chunks), regions.size = 15, 0 current java objects, thread 70: Executor task launch worker for task 99.0 in stage 7.0 (TID 334)
+2021-08-16 13:16:17 root: INFO: TaskReport: stage=7, partition=97, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:16:17 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 71: Executor task launch worker for task 97.0 in stage 7.0 (TID 332)
+2021-08-16 13:16:17 Executor: INFO: Finished task 97.0 in stage 7.0 (TID 332). 1787 bytes result sent to driver
+2021-08-16 13:16:17 TaskSetManager: INFO: Finished task 97.0 in stage 7.0 (TID 332) in 3255 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (99/100)
+2021-08-16 13:16:20 root: INFO: TaskReport: stage=7, partition=99, attempt=0, peakBytes=1769472, peakBytesReadable=1.69 MiB, chunks requested=0, cache hits=0
+2021-08-16 13:16:20 root: INFO: RegionPool: FREE: 1.7M allocated (1.7M blocks / 0 chunks), regions.size = 27, 0 current java objects, thread 70: Executor task launch worker for task 99.0 in stage 7.0 (TID 334)
+2021-08-16 13:16:20 Executor: INFO: Finished task 99.0 in stage 7.0 (TID 334). 1678 bytes result sent to driver
+2021-08-16 13:16:20 TaskSetManager: INFO: Finished task 99.0 in stage 7.0 (TID 334) in 3554 ms on compe032.hpc.in.bmrc.ox.ac.uk (executor driver) (100/100)
+2021-08-16 13:16:20 TaskSchedulerImpl: INFO: Removed TaskSet 7.0, whose tasks have all completed, from pool 
+2021-08-16 13:16:20 DAGScheduler: INFO: ResultStage 7 (runJob at ContextRDD.scala:238) finished in 161.917 s
+2021-08-16 13:16:20 DAGScheduler: INFO: Job 7 is finished. Cancelling potential speculative or zombie tasks for this job
+2021-08-16 13:16:20 TaskSchedulerImpl: INFO: Killing all running tasks in stage 7: Stage finished
+2021-08-16 13:16:20 DAGScheduler: INFO: Job 7 finished: runJob at ContextRDD.scala:238, took 161.922834 s
+2021-08-16 13:16:20 Hail: INFO: Coerced almost-sorted dataset
+2021-08-16 13:16:20 root: INFO: Unsorted keys: CURRENT={ locus: { contig: chr22, position: 17108319 }, alleles: [2; C, A] }, PREV={ locus: { contig: chr22, position: 17108319 }, alleles: [2; C, T] }
+2021-08-16 13:16:20 SparkContext: INFO: Starting job: fold at RVD.scala:736
+2021-08-16 13:16:20 DAGScheduler: INFO: Got job 8 (fold at RVD.scala:736) with 100 output partitions
+2021-08-16 13:16:20 DAGScheduler: INFO: Final stage: ResultStage 8 (fold at RVD.scala:736)
+2021-08-16 13:16:20 DAGScheduler: INFO: Parents of final stage: List()
+2021-08-16 13:16:20 DAGScheduler: INFO: Missing parents: List()
+2021-08-16 13:16:20 DAGScheduler: INFO: Submitting ResultStage 8 (MapPartitionsRDD[50] at mapPartitions at ContextRDD.scala:168), which has no missing parents
+2021-08-16 13:16:20 MemoryStore: INFO: Block broadcast_16 stored as values in memory (estimated size 137.1 KiB, free 10.4 GiB)
+2021-08-16 13:16:20 MemoryStore: INFO: Block broadcast_16_piece0 stored as bytes in memory (estimated size 45.2 KiB, free 10.4 GiB)
+2021-08-16 13:16:20 BlockManagerInfo: INFO: Added broadcast_16_piece0 in memory on compe032.hpc.in.bmrc.ox.ac.uk:44511 (size: 45.2 KiB, free: 10.5 GiB)
+2021-08-16 13:16:20 SparkContext: INFO: Created broadcast 16 from broadcast at DAGScheduler.scala:1388
+2021-08-16 13:16:20 DAGScheduler: INFO: Submitting 100 missing tasks from ResultStage 8 (MapPartitionsRDD[50] at mapPartitions at ContextRDD.scala:168) (first 15 tasks are for partitions Vector(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14))
+2021-08-16 13:16:20 TaskSchedulerImpl: INFO: Adding task set 8.0 with 100 tasks resource profile 0
+2021-08-16 13:16:20 TaskSetManager: INFO: Starting task 0.0 in stage 8.0 (TID 335) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 0, PROCESS_LOCAL, 5167 bytes) taskResourceAssignments Map()
+2021-08-16 13:16:20 TaskSetManager: INFO: Starting task 1.0 in stage 8.0 (TID 336) (compe032.hpc.in.bmrc.ox.ac.uk, executor driver, partition 1, PROCESS_LOCAL, 5167 bytes) taskResourceAssignments Map()
+2021-08-16 13:16:20 Executor: INFO: Running task 0.0 in stage 8.0 (TID 335)
+2021-08-16 13:16:20 Executor: INFO: Running task 1.0 in stage 8.0 (TID 336)
+2021-08-16 13:16:20 root: INFO: RegionPool: initialized for thread 71: Executor task launch worker for task 1.0 in stage 8.0 (TID 336)
+2021-08-16 13:16:20 root: INFO: RegionPool: initialized for thread 70: Executor task launch worker for task 0.0 in stage 8.0 (TID 335)
+2021-08-16 13:16:20 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 71: Executor task launch worker for task 1.0 in stage 8.0 (TID 336)
+2021-08-16 13:16:20 root: INFO: RegionPool: REPORT_THRESHOLD: 256.0K allocated (256.0K blocks / 0 chunks), regions.size = 3, 0 current java objects, thread 70: Executor task launch worker for task 0.0 in stage 8.0 (TID 335)
+2021-08-16 13:16:20 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 71: Executor task launch worker for task 1.0 in stage 8.0 (TID 336)
+2021-08-16 13:16:20 root: INFO: RegionPool: REPORT_THRESHOLD: 512.0K allocated (512.0K blocks / 0 chunks), regions.size = 7, 0 current java objects, thread 70: Executor task launch worker for task 0.0 in stage 8.0 (TID 335)
