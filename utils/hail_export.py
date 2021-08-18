@@ -424,6 +424,7 @@ def main(args):
     out_type   = args.out_type
     vep_path   = args.vep_path
     
+    
     chrom      = int(args.chrom)
     maf_max    = (args.maf_max)
     maf_min    = (args.maf_min)
@@ -485,6 +486,9 @@ def main(args):
         mt_ko_matrix = construct_phased_dosage_mt(mt)
         mt_ko_matrix.export(prefix + '_ko_matrx.tsv.bgz')
 
+    if out_prefix & out_type:
+        export_table(mt, out_prefix, out_type)
+
 
 
 if __name__=='__main__':
@@ -512,10 +516,4 @@ if __name__=='__main__':
     args = parser.parse_args()
 
     main(args)
-
-
-
-
-
-
 
