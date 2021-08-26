@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 #
-# Annotate variants
-# Note this link when using pick order: https://www.biostars.org/p/120055/
-# Author: Frederik Lassen (2021-06-25)
-#
 #$ -N vep
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/vep.log
@@ -11,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 4
 #$ -q short.qe
-#$ -t 22
+#$ -t 1-22
 #$ -V
 
 set -o errexit
@@ -19,12 +15,12 @@ set -o nounset
 
 # Set variables
 readonly chr=${SGE_TASK_ID}
-readonly RAW_ROOT="/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/data/phased"
-readonly RAW_FILE="/ukb_wes_200k_phased_chr${chr}.1of1.vcf.gz"
-readonly TMP_FILE="/ukb_wes_200k_phased_tmp_chr${chr}.1of1.vcf.gz"
+readonly RAW_ROOT="/well/lindgren/UKBIOBANK/nbaya/wes_200k/phase_ukb_wes/data/tmp/singletons"
+readonly RAW_FILE="/ukb_wes_200k_singletons_chr${chr}.vcf.bgz"
+readonly TMP_FILE="/ukb_wes_200k_singletons_tmp_chr${chr}.vcf.gz"
 
-readonly OUT_ROOT="data/vep/test" #output"
-readonly OUT_FILE1="/ukb_wes_200k_vep_chr${chr}.vcf" 
+readonly OUT_ROOT="data/vep/singletons" #output"
+readonly OUT_FILE1="/ukb_wes_200k_singletons_chr${chr}.vcf" 
 
 # Check if outfile already exists
 if [ ! -f "${OUT_ROOT}${OUT_FILE1}" ]; then
@@ -51,7 +47,7 @@ if [ ! -f "${OUT_ROOT}${OUT_FILE1}" ]; then
 	--biotype \
 	--canonical \
 	--vcf \
-        --pick \
+	--pick \
 	--total_length \
 	--sift b \
 	--polyphen b \
@@ -73,5 +69,4 @@ if [ ! -f "${OUT_ROOT}${OUT_FILE1}" ]; then
 else
 	echo "${OUT_ROOT}${OUT_FILE1} already exists. Skipping... "
 fi  
-
 
