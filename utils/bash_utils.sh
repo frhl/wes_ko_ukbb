@@ -96,5 +96,12 @@ set_up_hail() {
   fi
 }
 
+set_up_vep() {
+  module load EnsEMBLCoreAPI/96.0-r20190601-foss-2019a-Perl-5.28.1 # required for LOFTEE
+  module load VEP/95.0-foss-2018b-Perl-5.28.0 # required FOR VEP (NOTE: this steps throws some errors since the above module is already loaded. It works nonetheless.)
+  module load samtools/1.8-gcc5.4.0 # required for LOFTEE 
+  export PERL5LIB=$PERL5LIB:/well/lindgren/flassen/software/VEP/plugins_grch38/
+}
+
 
 

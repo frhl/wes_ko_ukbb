@@ -19,12 +19,12 @@ set -o nounset
 
 # Set variables
 readonly chr=${SGE_TASK_ID}
-readonly RAW_ROOT="/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/data/phased"
-readonly RAW_FILE="/ukb_wes_200k_phased_chr${chr}.1of1.vcf.gz"
-readonly TMP_FILE="/ukb_wes_200k_phased_tmp_chr${chr}.1of1.vcf.gz"
+readonly RAW_ROOT="/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/data/unphased/unfiltered"
+readonly RAW_FILE="/ukb_wes_200k_filtered_chr${chr}.vcf.bgz"
+readonly TMP_FILE="/ukb_wes_200k_filtered_tmp_chr${chr}.vcf.gz"
 
-readonly OUT_ROOT="data/vep/test" #output"
-readonly OUT_FILE1="/ukb_wes_200k_vep_chr${chr}.vcf" 
+readonly OUT_ROOT="data/vep/full" #output"
+readonly OUT_FILE1="/ukb_wes_200k_full_vep_chr${chr}.vcf" 
 
 # Check if outfile already exists
 if [ ! -f "${OUT_ROOT}${OUT_FILE1}" ]; then
