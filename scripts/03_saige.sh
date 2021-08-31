@@ -10,8 +10,8 @@
 #$ -q short.qe
 #$ -t 22
 
-set -o errexit
-set -o nounset
+#set -o errexit
+#set -o nounset
 
 module purge
 source utils/bash_utils.sh
@@ -45,11 +45,12 @@ readonly createSparseGRM="/well/lindgren/flassen/software/dev/SAIGE/extdata/crea
 #readonly step2_SPAtests="/well/lindgren/flassen/software/dev/SAIGE/extdata/step2_SPAtests.R"
 
 # setup hail
-#set_up_hail
+set_up_conda
 
 SECONDS=0
-#mkdir -p ${out_dir}
-#python3 ${hail_script} \
+set_up_hail
+# mkdir -p ${out_dir}
+# python3 "${hail_script}" \
 #    --chrom ${chr} \
 #    --input_path ${in_unphased} \
 #    --input_type "mt" \
@@ -58,12 +59,12 @@ SECONDS=0
 #    --out_prefix ${out_prefix} \
 #    --out_type "plink"
 
-#conda deactivate
+conda deactivate
 conda activate RSAIGE
 
 print_update "Generating GRM from plink files.. "
-Rscript ${createSparseGRM}	\
-	--plinkFile=${out_prefix} \
+Rscript "${createSparseGRM}" \
+	--plinkFile=${wd}${out_prefix} \
 	--nThreads= ${threads} \
 	--outputPrefix=${out_prefix}	\
 	--numRandomMarkerforSparseKin=1000	\

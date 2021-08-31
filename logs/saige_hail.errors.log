@@ -1,2 +1,7 @@
 /var/spool/default/compe090/job_scripts/54107767: line 63: Rscript: command not found
 /var/spool/default/compe054/job_scripts/54107778: line 62: conda: command not found
+/var/spool/default/compe077/job_scripts/54107785: line 61: conda: command not found
+/var/spool/default/compe073/job_scripts/54107788: line 62: conda: command not found
+/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/etc/conda/activate.d/activate-binutils_linux-64.sh: line 67: HOST: unbound variable
+/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/etc/conda/activate.d/activate-binutils_linux-64.sh: line 67: HOST: unbound variable
+/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/etc/conda/activate.d/activate-binutils_linux-64.sh: line 67: HOST: unbound variable
