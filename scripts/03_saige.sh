@@ -29,7 +29,7 @@ readonly out_dir="data/saige/input"
 readonly hail_script="utils/hail_plink_export.py"
 
 # input path
-readonly chr=$( get_chr ${SGE_TASK_ID} )
+readonly chr=${SGE_TASK_ID}
 readonly in_phased="${in_dir_phased}/ukb_wes_200k_phased_chr${chr}.1of1.vcf.gz"
 readonly in_unphased="${in_dir_unphased}/ukb_wes_200k_filtered_chr${chr}.mt"
 readonly vep="${vep_dir}/ukb_wes_200k_full_vep_chr${chr}.vcf"
@@ -38,8 +38,14 @@ readonly vep="${vep_dir}/ukb_wes_200k_full_vep_chr${chr}.vcf"
 readonly out_prefix="${out_dir}/ukb_wes_200k_chr${chr}"
 readonly out="${out_prefix}.plink"
 
+# SAIGE step paths
+readonly threads=$(( ${NSLOTS}-1 ))
+readonly createSparseGRM="/well/lindgren/flassen/software/dev/SAIGE/extdata/createSparseGRM.R"
+#readonly step1_fitNULLGLMM="/well/lindgren/flassen/software/dev/SAIGE/step1_fitNULLGLMM.R"
+#readonly step2_SPAtests="/well/lindgren/flassen/software/dev/SAIGE/extdata/step2_SPAtests.R"
+
 # setup hail
-set_up_hail
+#set_up_hail
 
 SECONDS=0
 #mkdir -p ${out_dir}
@@ -52,11 +58,14 @@ SECONDS=0
 #    --out_prefix ${out_prefix} \
 #    --out_type "plink"
 
+#conda deactivate
+conda activate RSAIGE
 
-Rscript createSparseGRM.R	\
-	--plinkFile=./input/nfam_100_nindep_0_step1_includeMoreRareVariants_poly \
-	--nThreads=4  \
-	--outputPrefix=./output/sparseGRM	\
+print_update "Generating GRM from plink files.. "
+Rscript ${createSparseGRM}	\
+	--plinkFile=${out_prefix} \
+	--nThreads= ${threads} \
+	--outputPrefix=${out_prefix}	\
 	--numRandomMarkerforSparseKin=1000	\
 	--relatednessCutoff=0.125
 

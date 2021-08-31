@@ -454,3 +454,5 @@ Traceback (most recent call last):
   File "utils/hail_export.py", line 482, in main
     mt_ko_sample.export(prefix + '_ko_samples.tsv.bgz')
 NameError: name 'mt_ko_sample' is not defined
+/var/spool/default/compe081/job_scripts/54107252: line 43: createSparseGRM: readonly variable
+/var/spool/default/compe053/job_scripts/54107257: line 43: createSparseGRM: readonly variable
