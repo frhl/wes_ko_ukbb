@@ -5,3 +5,11 @@
 /well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/etc/conda/activate.d/activate-binutils_linux-64.sh: line 67: HOST: unbound variable
 /well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/etc/conda/activate.d/activate-binutils_linux-64.sh: line 67: HOST: unbound variable
 /well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/etc/conda/activate.d/activate-binutils_linux-64.sh: line 67: HOST: unbound variable
+/var/spool/default/compe090/job_scripts/54107799: line 29: conda: command not found
+/var/spool/default/compe090/job_scripts/54107799: line 32: wd: unbound variable
+/var/spool/default/compe003/job_scripts/54107800: line 29: conda: command not found
+/var/spool/default/compe003/job_scripts/54107800: line 32: Rscript: command not found
+/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/etc/conda/activate.d/activate-binutils_linux-64.sh: line 67: HOST: unbound variable
+/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/etc/conda/activate.d/activate-binutils_linux-64.sh: line 67: ADDR2LINE: unbound variable
+/var/spool/default/compe090/job_scripts/54108316: line 28: conda: command not found
+/var/spool/default/compe090/job_scripts/54108316: line 32: Rscript: command not found
