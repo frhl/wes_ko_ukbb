@@ -6,7 +6,7 @@
 #$ -o logs/saige_hail.log
 #$ -e logs/saige_hail.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 2
+#$ -pe shmem 5
 #$ -q short.qe
 #$ -t 22
 
@@ -62,8 +62,8 @@ readonly createSparseGRM="/well/lindgren/flassen/software/dev/SAIGE/extdata/crea
 set_up_RSAIGE
 print_update "Generating GRM from plink files.. "
 Rscript "${createSparseGRM}" \
-	--plinkFile=${wd}${out_prefix} \
-	--nThreads=1 \
+	--plinkFile=${out_prefix} \
+	--nThreads=4 \
 	--outputPrefix=${out_prefix}	\
 	--numRandomMarkerforSparseKin=1000	\
 	--relatednessCutoff=0.125

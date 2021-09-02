@@ -87,6 +87,25 @@ def filter_min_maf(mt, maf=None):
     mt = mt.filter_rows(hl.min(mt.info.AF)>maf)
     return mt
 
+def filter_max_mac(mt, mac=None):
+    r'''Filter to variants to have maf less than {maf}'''
+    if mac is not None:
+        mt = mt.filter_rows(hl.min(mt.info.AC)<=mac)
+    return mt
+
+def filter_min_mac(mt, mac=None):
+    r'''Filter to variants to have mac gt {mac}'''
+    if mac is not None:
+        mt = mt.filter_rows(hl.min(mt.info.AC)>mac)
+    return mt
+
+def filter_min_missing(mt, value = 0.05):
+    r'''Filter variants to have less than {value} in genotype missigness"'''
+    assert value >= 0 and value < 1
+    missing = hl.agg.mean(hl.is_missing(mt.GT)) <= value
+    mt = mt.filter_rows(missing)
+    return mt
+
 def translate_sample_ids(ht, from_app: int, to_app: int):
     r'''Translate sample IDs from one UKB application to another
     `from_app` and `to_app` are UKB application IDs. This function only supports
@@ -414,21 +433,59 @@ def summarize_variants(mt, what = 'ptv', vep_field = 'consequence_category'):
     out = ht_alleles + [ht_genes]
     return out
 
+def gene_burden_annotations_per_sample(mt, gene_field = 'Gene'):
+    r''' calculate gene burden by counting variants in gene'''
+    mt = mt.group_rows_by(
+        Gene = mt.vep.Gene#,
+        #consequence_category = mt.vep.consequence_category
+        ).aggregate(n = hl.agg.count_where(mt.GT.is_non_ref()))
+    return mt
+
+def gene_burden_category_annotations_per_sample(mt, gene_field = 'Gene'):
+    r''' calculate gene burden by counting variants in gene stratified by variant category'''
+    mt = mt.group_rows_by(
+        Gene = mt.vep.Gene,
+        consequence_category = mt.vep.consequence_category
+        ).aggregate(n = hl.agg.count_where(mt.GT.is_non_ref()))
+    return mt
+
+def calc_ko_prob(mt):
+    '''
+    Calculate the probability of a gene being a KO in an invidual given the 
+    amount of phased hetz in a gene (construct_phased_dosage_mt) and the singletons 
+    in the gene (gene_burden_annotations_per_sample). 
+    '''
+    #z = x.annotate_entries(k = y[(x.Gene, x.s)].n)
+    ko_mt = mt.annotate_entries(
+        pKO = hl.if_else(
+            mt.dosage == 2, 1, # knockout
+            hl.if_else(
+                mt.dosage == 1, 
+                hl.if_else(mt.singletons >= 1, 1 - (1/2)**mt.singletons, 0), # one phased hetz
+                hl.if_else(mt.singletons >= 2, 1 - 2*(1/2)**mt.singletons, 0), # zero phased hetz
+            )
+        )
+    )
+    return ko_mt
+
+
 
 def main(args):
     
     # parser
-    input_path = args.input_path
-    input_type = args.input_type
+    input_phased_path = args.input_phased_path
+    input_phased_type = args.input_phased_type
+    input_unphased_path = args.input_unphased_path
+    input_unphased_type = args.input_unphased_type
     out_prefix = args.out_prefix
     out_type   = args.out_type
     vep_path   = args.vep_path
-    
     
     chrom      = int(args.chrom)
     maf_max    = (args.maf_max)
     maf_min    = (args.maf_min)
     hwe        = (args.hwe)
+    missing    = args.missing
     
     get_related = args.get_related
     get_unrelated = args.get_unrelated
@@ -436,66 +493,96 @@ def main(args):
     vep_variants = args.vep_variants
     ko_matrix = args.ko_matrix
     ko_samples = args.ko_samples
+    export_burden = args.export_burden
 
     # run parser
     hail_init(chrom)
-    mt = get_table(input_path=input_path, input_type=input_type)
+    mt1 = get_table(input_path=input_phased_path, input_type=input_phased_type) # 12788
+    mt2 = get_table(input_path=input_unphased_path, input_type=input_unphased_type) # 11867 (for singletons)
 
     ### Sample filtering
 
     if get_related and not get_unrelated:
-        mt = filter_to_unrelated(mt, get_related = True)
+        mt1 = filter_to_unrelated(mt1, get_related = True)
+        mt2 = filter_to_unrelated(mt2, get_related = True)
 
     if get_unrelated and not get_related:
-        mt = filter_to_unrelated(mt, get_related = False)
+        mt1 = filter_to_unrelated(mt1, get_related = False)
+        mt2 = filter_to_unrelated(mt2, get_related = False)
 
     if get_europeans:
-        mt = translate_sample_ids(mt, 12788, 11867)
-        mt = filter_to_european(mt)
+        mt1 = translate_sample_ids(mt1, 12788, 11867)
+        mt1 = filter_to_european(mt1)
+        mt2 = filter_to_european(mt2)
 
     ### Variant filtering/annotations
+    # Using mt2 as a singleton refereence, so remove those with AC > 1
+    mt2 = filter_max_mac(mt2, 1)
+
+    if missing:
+        mt1 = filter_min_missing(mt1, 0.05)
+        mt2 = filter_min_missing(mt2, 0.05)
 
     if maf_max:
-        mt = filter_max_maf(mt, float(maf_max))
+        mt1 = filter_max_maf(mt1, float(maf_max))
 
     if maf_min:
-        mt = filter_min_maf(mt, float(maf_min))
+        mt1 = filter_min_maf(mt1, float(maf_min))
 
     if hwe:
-        mt = filter_hwe(mt, float(hwe))
+        mt1 = filter_hwe(mt1, float(hwe))
 
     if vep_path:
-        mt = annotate_vep(mt, vep_path)
+        mt1 = annotate_vep(mt1, vep_path)
+        mt2 = annotate_vep(mt2, vep_path)
 
     #### get stats
-    mt = mt.repartition(100)
 
-    if vep_variants:
-        summary_ptv = summarize_variants(mt, 'ptv')
-        summary_missense = summarize_variants(mt, 'damaging_missense')
-        df = pd.DataFrame([summary_ptv, summary_missense], \
-            columns=['Singletons','non-singletons','total AC', 'Genes'],\
-            index = ['ptv','missense'])
-        df.to_csv(out_prefix + '_plof_variants.csv', index=True)
+    if export_burden:
 
-    if ko_samples:
-        mt_ko_sample = extract_knockout_samples(mt)
-        mt_ko_sample.export(prefix + '_ko_samples.tsv.bgz')
+        # Count burden per gene per individual
+        mt1_cat = gene_burden_category_annotations_per_sample(mt1)
+        mt2_cat = gene_burden_category_annotations_per_sample(mt2)
 
-    if ko_matrix:
-        mt_ko_matrix = construct_phased_dosage_mt(mt)
-        mt_ko_matrix.export(prefix + '_ko_matrx.tsv.bgz')
+        # combine singleton table and full table
+        res = mt1_cat.annotate_entries(singletons = mt2_cat[(mt1_cat.Gene, mt1_cat.consequence_category), mt1_cat.s].n)
+        res = res.annotate_entries(singletons = hl.if_else(hl.is_missing(res.singletons),0,res.singletons))
+        res = res.annotate_entries(total = res.n + hl.if_else(hl.is_missing(res.singletons),0,res.singletons))
+        res = res.entries()
+        res = res.filter_rows(res.total > 0)
 
-    if out_prefix & out_type:
-        export_table(mt, out_prefix, out_type)
+        # export data
+        res.export(out_prefix + '_burden.tsv.bgz')
+
+    
+    #if vep_variants:
+    #    summary_ptv = summarize_variants(mt, 'ptv')
+    #    summary_missense = summarize_variants(mt, 'damaging_missense')
+    #    df = pd.DataFrame([summary_ptv, summary_missense], \
+    #        columns=['Singletons','non-singletons','total AC', 'Genes'],\
+    #        index = ['ptv','missense'])
+    #    df.to_csv(out_prefix + '_plof_variants.csv', index=True)
+
+    #if ko_samples:
+    #    mt_ko_sample = extract_knockout_samples(mt)
+    #    mt_ko_sample.export(prefix + '_ko_samples.tsv.bgz')
+
+    #if ko_matrix:
+    #    mt_ko_matrix = construct_phased_dosage_mt(mt)
+    #    mt_ko_matrix.export(prefix + '_ko_matrx.tsv.bgz')
+
+    #if out_prefix & out_type:
+    #    export_table(mt, out_prefix, out_type)
 
 
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
     # initial params
-    parser.add_argument('--input_path', default=None, help='Path to input')
-    parser.add_argument('--input_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
+    parser.add_argument('--input_phased_path', default=None, help='Path to input')
+    parser.add_argument('--input_phased_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
+    parser.add_argument('--input_unphased_path', default=None, help='Path to input that contains singletons')
+    parser.add_argument('--input_unphased_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Type of output dataset (options: mt, vcf, plink)')
     # filtering variants
@@ -503,11 +590,13 @@ if __name__=='__main__':
     parser.add_argument('--maf_max', default=None, help='Select all variants with a maf less than the indicated value')
     parser.add_argument('--maf_min', default=None, help='Select all variants with a maf greater than the indicated values')
     parser.add_argument('--hwe', default=None, help='Filter variants by HWE threshold')
+    parser.add_argument('--missing', default=0.05, help='Filter variants by missingness threshold')
     # filtering samples
     parser.add_argument('--get_related', action='store_true', help='Select all samples that are related')
     parser.add_argument('--get_unrelated', action='store_true', help='Select all samples that are unrelated')
     parser.add_argument('--get_europeans', action='store_true', help='Filter to genetically confimed europeans?')
     # out
+    parser.add_argument('--export_burden', action='store_true', help='Export burden variant count by gene and and individuals.')
     parser.add_argument('--vep_path', default=None, help='path to a .vcf file containing annotated entries by locus and alleles')
     parser.add_argument('--vep_variants', action='store_true', help='Generate a summary of filter variants')
     parser.add_argument('--ko_samples', action='store_true', help='Get the genes/individuals that are KO and the SNPs involved')
@@ -516,4 +605,6 @@ if __name__=='__main__':
     args = parser.parse_args()
 
     main(args)
+
+
 
