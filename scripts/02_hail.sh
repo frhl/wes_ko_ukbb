@@ -8,7 +8,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qe
-#$ -t 22
+#$ -t 21
 
 set -o errexit
 set -o nounset
@@ -16,10 +16,9 @@ set -o nounset
 module purge
 source utils/bash_utils.sh
 
-SGE_TASK_ID=22
-
 # directories
-readonly in_dir="data/phased"
+readonly in_dir_phased="data/phased"
+readonly in_dir_unphased="data/unphased/unfiltered"
 readonly vep_dir="data/vep/output"
 readonly spark_dir="data/tmp/spark"
 readonly out_dir="derived/hail"
@@ -28,29 +27,29 @@ readonly out_dir="derived/hail"
 readonly hail_script="utils/hail_export.py"
 
 # input path
-readonly chr=$( get_chr ${SGE_TASK_ID} )
-readonly in="${in_dir}/ukb_wes_200k_phased_chr${chr}.1of1.vcf.gz"
-readonly vep="${vep_dir}/ukb_wes_200k_vep_chr${chr}.vcf"
+readonly chr=${SGE_TASK_ID}
+readonly in_phased="${in_dir_phased}/ukb_wes_200k_phased_chr${chr}.1of1.vcf.gz"
+readonly in_unphased="${in_dir_unphased}/ukb_wes_200k_filtered_chr${chr}.mt"
+readonly vep="${vep_dir}/ukb_wes_200k_full_vep_chr${chr}.vcf"
 
 # output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_phased_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_wes_200k_phased_eur_maf002_chr${chr}"
 readonly out="${out_prefix}.mt"
 
-# setup hail
 set_up_hail
-
-SECONDS=0
 mkdir -p ${out_dir}
-python3 ${hail_script} \
+python3 "${hail_script}" \
     --chrom ${chr} \
-    --input_path ${in} \
-    --input_type "vcf" \
-    --vep_path ${vep} \
+    --input_phased_path ${in_phased}\
+    --input_unphased_path ${in_unphased} \
+    --input_phased_type "vcf" \
+    --input_unphased_type "mt" \
     --get_europeans \
+    --maf_max 0.02 \
+    --missing 0.05 \
     --out_prefix ${out_prefix} \
-    --vep_variants \
-    --ko_matrix \
-    --ko_samples 
+    --export_burden
+
 
 print_update "Finished running HAIL for chr${chr}" "${SECONDS}"
 

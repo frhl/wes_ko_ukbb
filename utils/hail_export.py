@@ -554,22 +554,13 @@ def main(args):
         # export data
         res.export(out_prefix + '_burden.tsv.bgz')
 
-    
-    #if vep_variants:
-    #    summary_ptv = summarize_variants(mt, 'ptv')
-    #    summary_missense = summarize_variants(mt, 'damaging_missense')
-    #    df = pd.DataFrame([summary_ptv, summary_missense], \
-    #        columns=['Singletons','non-singletons','total AC', 'Genes'],\
-    #        index = ['ptv','missense'])
-    #    df.to_csv(out_prefix + '_plof_variants.csv', index=True)
+    if ko_samples:
+        mt_ko_sample = extract_knockout_samples(mt)
+        mt_ko_sample.export(prefix + '_ko_samples.tsv.bgz')
 
-    #if ko_samples:
-    #    mt_ko_sample = extract_knockout_samples(mt)
-    #    mt_ko_sample.export(prefix + '_ko_samples.tsv.bgz')
-
-    #if ko_matrix:
-    #    mt_ko_matrix = construct_phased_dosage_mt(mt)
-    #    mt_ko_matrix.export(prefix + '_ko_matrx.tsv.bgz')
+    if ko_matrix:
+        mt_ko_matrix = construct_phased_dosage_mt(mt)
+        mt_ko_matrix.export(prefix + '_ko_matrx.tsv.bgz')
 
     #if out_prefix & out_type:
     #    export_table(mt, out_prefix, out_type)
