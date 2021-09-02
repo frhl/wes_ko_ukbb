@@ -560,7 +560,7 @@ def main(args):
 
     if ko_matrix:
         mt_ko_matrix = construct_phased_dosage_mt(mt)
-        mt_ko_matrix.export(prefix + '_ko_matrx.tsv.bgz')
+        mt_ko_matrix.export(prefix + '_ko_matrix.tsv.bgz')
 
     #if out_prefix & out_type:
     #    export_table(mt, out_prefix, out_type)

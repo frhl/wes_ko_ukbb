@@ -44,6 +44,7 @@ python3 "${hail_script}" \
     --input_unphased_path ${in_unphased} \
     --input_phased_type "vcf" \
     --input_unphased_type "mt" \
+    --vep_path ${vep} \
     --get_europeans \
     --maf_max 0.02 \
     --missing 0.05 \
