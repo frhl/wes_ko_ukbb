@@ -494,6 +494,7 @@ def main(args):
     ko_matrix = args.ko_matrix
     ko_samples = args.ko_samples
     export_burden = args.export_burden
+    export_ko_probability = args.export_ko_probability
 
     # run parser
     hail_init(chrom)
@@ -553,6 +554,24 @@ def main(args):
 
         # export data
         res.export(out_prefix + '_burden.tsv.bgz')
+	
+    if export_ko_probability:
+
+    	# Determine probability of being KO given singletons and phased hetz
+		mt1_burden = construct_phased_dosage_mt(mt1)
+		mt2_burden = gene_burden_annotations_per_sample(mt2)
+		mt_ko = mt1_burden.annotate_entries(singletons = mt2_burden[(mt1_burden.Gene, mt1_burden.s)].n)
+		mt_ko = calc_ko_prob(mt_ko)
+
+		# drop not needed rows
+		mt_ko = mt_ko.drop('dosage')
+		mt_ko = mt_ko.drop('singletons')
+		mt_ko_entries = mt_ko.entries()
+		mt_ko_entries = mt_ko_entries.filter(~hl.is_missing(mt_ko_entries.pKO))
+
+        # export data
+        res.export(out_prefix + '_ko_prob.tsv.bgz')
+
 
     if ko_samples:
         mt_ko_sample = extract_knockout_samples(mt)
@@ -587,6 +606,7 @@ if __name__=='__main__':
     parser.add_argument('--get_unrelated', action='store_true', help='Select all samples that are unrelated')
     parser.add_argument('--get_europeans', action='store_true', help='Filter to genetically confimed europeans?')
     # out
+    parser.add_argument('--export_ko_probability', action='store_true', help='Exports the KO probability.')
     parser.add_argument('--export_burden', action='store_true', help='Export burden variant count by gene and and individuals.')
     parser.add_argument('--vep_path', default=None, help='path to a .vcf file containing annotated entries by locus and alleles')
     parser.add_argument('--vep_variants', action='store_true', help='Generate a summary of filter variants')
