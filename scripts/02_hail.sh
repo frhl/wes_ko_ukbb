@@ -6,7 +6,7 @@
 #$ -o logs/hail_shell.log
 #$ -e logs/hail_shell.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 2
+#$ -pe shmem 4
 #$ -q short.qe
 #$ -t 21
 
@@ -19,7 +19,7 @@ source utils/bash_utils.sh
 # directories
 readonly in_dir_phased="data/phased"
 readonly in_dir_unphased="data/unphased/unfiltered"
-readonly vep_dir="data/vep/output"
+readonly vep_dir="data/vep/full/"
 readonly spark_dir="data/tmp/spark"
 readonly out_dir="derived/hail"
 
@@ -49,7 +49,8 @@ python3 "${hail_script}" \
     --maf_max 0.02 \
     --missing 0.05 \
     --out_prefix ${out_prefix} \
-    --export_burden
+    --export_burden \
+    --export_ko_probability
 
 
 print_update "Finished running HAIL for chr${chr}" "${SECONDS}"

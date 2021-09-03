@@ -449,13 +449,11 @@ def gene_burden_category_annotations_per_sample(mt, gene_field = 'Gene'):
         ).aggregate(n = hl.agg.count_where(mt.GT.is_non_ref()))
     return mt
 
-def calc_ko_prob(mt):
+def calc_p_ko(mt):
     '''
-    Calculate the probability of a gene being a KO in an invidual given the 
-    amount of phased hetz in a gene (construct_phased_dosage_mt) and the singletons 
-    in the gene (gene_burden_annotations_per_sample). 
+    Annotates entries with P(Knockout). Requires, that fields are
+    already annotated with "singletons" count, and "dosage". 
     '''
-    #z = x.annotate_entries(k = y[(x.Gene, x.s)].n)
     ko_mt = mt.annotate_entries(
         pKO = hl.if_else(
             mt.dosage == 2, 1, # knockout
@@ -467,6 +465,33 @@ def calc_ko_prob(mt):
         )
     )
     return ko_mt
+
+def get_prob_ko_matrix(mt_phased, mt_unphased, fields_drop = ['dosage','sigletons']):
+    
+    '''
+    Annotates entries with P(Knockout). Requires a phased matrix and an unphased
+    matrix that only contains singletons.
+    '''
+    
+    # setup variables
+    mt1 = mt_phased # contains phased non-singletons
+    mt2 = mt_unphased # contains unphased singletons
+    
+    # add check to ensure that mt1 is phased
+    # add check to ensure that mt2 only contains singletons
+    
+    # Determine probability of being KO given singletons and phased hetz
+    mt1_burden = construct_phased_dosage_mt(mt1)
+    mt2_burden = gene_burden_annotations_per_sample(mt2)
+    mt_ko = mt1_burden.annotate_entries(singletons = mt2_burden[(mt1_burden.Gene, mt1_burden.s)].n)
+    mt_ko = mt_ko.annotate_entries(singletons = hl.if_else(~hl.is_missing(mt_ko.singletons), mt_ko.singletons, 0 ))
+    mt_ko = calc_p_ko(mt_ko)
+
+    # drop not needed rows
+    mt_ko = mt_ko.drop(*[f for f in fields_drop if f in mt_ko.entry])
+    #mt_ko_entries = mt_ko.entries()
+    #mt_ko_entries = mt_ko_entries.filter(~hl.is_missing(mt_ko_entries.pKO))
+    return mt_ko
 
 
 
@@ -495,6 +520,10 @@ def main(args):
     ko_samples = args.ko_samples
     export_burden = args.export_burden
     export_ko_probability = args.export_ko_probability
+
+    # check that files exists
+
+
 
     # run parser
     hail_init(chrom)
@@ -550,28 +579,30 @@ def main(args):
         res = res.annotate_entries(singletons = hl.if_else(hl.is_missing(res.singletons),0,res.singletons))
         res = res.annotate_entries(total = res.n + hl.if_else(hl.is_missing(res.singletons),0,res.singletons))
         res = res.entries()
-        res = res.filter_rows(res.total > 0)
+        res = res.filter(res.total > 0)
 
         # export data
         res.export(out_prefix + '_burden.tsv.bgz')
-	
+
     if export_ko_probability:
 
-    	# Determine probability of being KO given singletons and phased hetz
-		mt1_burden = construct_phased_dosage_mt(mt1)
-		mt2_burden = gene_burden_annotations_per_sample(mt2)
-		mt_ko = mt1_burden.annotate_entries(singletons = mt2_burden[(mt1_burden.Gene, mt1_burden.s)].n)
-		mt_ko = calc_ko_prob(mt_ko)
+        # Determine probability of being KO given singletons and phased hetz
+        #mt1_burden = construct_phased_dosage_mt(mt1)
+        #mt2_burden = gene_burden_annotations_per_sample(mt2)
+        #mt_ko = mt1_burden.annotate_entries(singletons = mt2_burden[(mt1_burden.Gene, mt1_burden.s)].n)
+        #mt_ko = calc_ko_prob(mt_ko)
 
-		# drop not needed rows
-		mt_ko = mt_ko.drop('dosage')
-		mt_ko = mt_ko.drop('singletons')
-		mt_ko_entries = mt_ko.entries()
-		mt_ko_entries = mt_ko_entries.filter(~hl.is_missing(mt_ko_entries.pKO))
+        # drop not needed rows
+        #mt_ko = mt_ko.drop('dosage')
+        #mt_ko = mt_ko.drop('singletons')
+        #mt_ko_entries = mt_ko.entries()
+        #mt_ko_entries = mt_ko_entries.filter(~hl.is_missing(mt_ko_entries.pKO))
+        mt_ko = get_prob_ko_matrix(mt1, mt2, 'dosage')
+        mt_ko_entries = mt_ko.entries()
+        mt_ko_entries = mt_ko_entries.filter(mt_ko_entries.pKO>0)
 
         # export data
         res.export(out_prefix + '_ko_prob.tsv.bgz')
-
 
     if ko_samples:
         mt_ko_sample = extract_knockout_samples(mt)
@@ -616,6 +647,4 @@ if __name__=='__main__':
     args = parser.parse_args()
 
     main(args)
-
-
 
