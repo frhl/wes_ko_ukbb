@@ -43,7 +43,7 @@ python3 "${hail_script}" \
     --input_phased_path ${in_phased}\
     --input_unphased_path ${in_unphased} \
     --input_phased_type "vcf" \
-    --input_unphased_type "vcf" \
+    --input_unphased_type "mt" \
     --vep_path ${vep} \
     --get_europeans \
     --maf_max 0.02 \
