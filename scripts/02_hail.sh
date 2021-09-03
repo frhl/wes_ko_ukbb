@@ -3,8 +3,8 @@
 #
 #$ -N hail_shell
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/hail_shell.log
-#$ -e logs/hail_shell.errors.log
+#$ -o logs/hail.log
+#$ -e logs/hail.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 4
 #$ -q short.qe
@@ -43,14 +43,12 @@ python3 "${hail_script}" \
     --input_phased_path ${in_phased}\
     --input_unphased_path ${in_unphased} \
     --input_phased_type "vcf" \
-    --input_unphased_type "mt" \
+    --input_unphased_type "vcf" \
     --vep_path ${vep} \
     --get_europeans \
     --maf_max 0.02 \
     --missing 0.05 \
     --out_prefix ${out_prefix} \
-    #--export_burden \
-    #--export_ko_probability \
     --export_fake_vcf
 
 

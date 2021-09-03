@@ -493,11 +493,14 @@ def get_prob_ko_matrix(mt_phased, mt_unphased, fields_drop = ['dosage','sigleton
     #mt_ko_entries = mt_ko_entries.filter(~hl.is_missing(mt_ko_entries.pKO))
     return mt_ko
 
-def get_dummy_by_dp(mt_phased, mt_unphased, chrom):
+def get_dummy_by_dp(mt1, mt2, chrom):
+
+    # mt1 is phased
+    # mt2 is unphased
 
     # get probability matrix
     pmt = get_prob_ko_matrix(mt1, mt2, ["dosage","singletons"])
-    pmt = pmt.annotate_entries(DP = pmt.pKO)
+    pmt = pmt.annotate_entries(DP = pmt.pKO*2) # multiply probability by 2 (dosage encoded [0:2])
     pmt = pmt.drop('pKO')
 
     # create fake loci
@@ -506,7 +509,6 @@ def get_dummy_by_dp(mt_phased, mt_unphased, chrom):
     pmt = pmt.annotate_rows(rsid = pmt.Gene)
     pmt = pmt.key_rows_by(pmt.locus, pmt.alleles)
     pmt = pmt.drop('Gene')
-
     return pmt
 
 
@@ -619,8 +621,6 @@ def main(args):
         mt_ko_matrix = construct_phased_dosage_mt(mt)
         mt_ko_matrix.export(prefix + '_ko_matrix.tsv.bgz')
 
-    #if out_prefix & out_type:
-    #    export_table(mt, out_prefix, out_type)
     if export_fake_vcf:
         out = get_dummy_by_dp(mt1, mt2, chrom)
         export_table(out, out_prefix = prefix + "_dummy", out_type = 'vcf')
