@@ -493,6 +493,22 @@ def get_prob_ko_matrix(mt_phased, mt_unphased, fields_drop = ['dosage','sigleton
     #mt_ko_entries = mt_ko_entries.filter(~hl.is_missing(mt_ko_entries.pKO))
     return mt_ko
 
+def get_dummy_by_dp(mt_phased, mt_unphased, chrom):
+
+    # get probability matrix
+    pmt = get_prob_ko_matrix(mt1, mt2, ["dosage","singletons"])
+    pmt = pmt.annotate_entries(DP = pmt.pKO)
+    pmt = pmt.drop('pKO')
+
+    # create fake loci
+    pmt = pmt.annotate_rows(locus = hl.parse_locus('chr' + str(chrom) + ':1'))
+    pmt = pmt.annotate_rows(alleles = hl.literal(['X','Y']))
+    pmt = pmt.annotate_rows(rsid = pmt.Gene)
+    pmt = pmt.key_rows_by(pmt.locus, pmt.alleles)
+    pmt = pmt.drop('Gene')
+
+    return pmt
+
 
 
 def main(args):
@@ -520,6 +536,7 @@ def main(args):
     ko_samples = args.ko_samples
     export_burden = args.export_burden
     export_ko_probability = args.export_ko_probability
+    export_fake_vcf = args.export_fake_vcf
 
     # check that files exists
 
@@ -586,17 +603,7 @@ def main(args):
 
     if export_ko_probability:
 
-        # Determine probability of being KO given singletons and phased hetz
-        #mt1_burden = construct_phased_dosage_mt(mt1)
-        #mt2_burden = gene_burden_annotations_per_sample(mt2)
-        #mt_ko = mt1_burden.annotate_entries(singletons = mt2_burden[(mt1_burden.Gene, mt1_burden.s)].n)
-        #mt_ko = calc_ko_prob(mt_ko)
-
-        # drop not needed rows
-        #mt_ko = mt_ko.drop('dosage')
-        #mt_ko = mt_ko.drop('singletons')
-        #mt_ko_entries = mt_ko.entries()
-        #mt_ko_entries = mt_ko_entries.filter(~hl.is_missing(mt_ko_entries.pKO))
+        # determine probability of being a ko
         mt_ko = get_prob_ko_matrix(mt1, mt2, 'dosage')
         mt_ko_entries = mt_ko.entries()
         mt_ko_entries = mt_ko_entries.filter(mt_ko_entries.pKO>0)
@@ -614,6 +621,9 @@ def main(args):
 
     #if out_prefix & out_type:
     #    export_table(mt, out_prefix, out_type)
+    if export_fake_vcf:
+        out = get_dummy_by_dp(mt1, mt2, chrom)
+        export_table(out, out_prefix = prefix + "_dummy", out_type = 'vcf')
 
 
 
@@ -639,6 +649,7 @@ if __name__=='__main__':
     # out
     parser.add_argument('--export_ko_probability', action='store_true', help='Exports the KO probability.')
     parser.add_argument('--export_burden', action='store_true', help='Export burden variant count by gene and and individuals.')
+    parser.add_argument('--export_fake_vcf', action='store_true', help='Export a "fake" VCF file that contains KO probabilities as DP field..')
     parser.add_argument('--vep_path', default=None, help='path to a .vcf file containing annotated entries by locus and alleles')
     parser.add_argument('--vep_variants', action='store_true', help='Generate a summary of filter variants')
     parser.add_argument('--ko_samples', action='store_true', help='Get the genes/individuals that are KO and the SNPs involved')

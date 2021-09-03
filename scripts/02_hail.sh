@@ -21,7 +21,7 @@ readonly in_dir_phased="data/phased"
 readonly in_dir_unphased="data/unphased/unfiltered"
 readonly vep_dir="data/vep/full/"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/hail"
+readonly out_dir="derived/knockouts"
 
 # hail script
 readonly hail_script="utils/hail_export.py"
@@ -50,7 +50,8 @@ python3 "${hail_script}" \
     --missing 0.05 \
     --out_prefix ${out_prefix} \
     --export_burden \
-    --export_ko_probability
+    --export_ko_probability \
+    --export_fake_vcf
 
 
 print_update "Finished running HAIL for chr${chr}" "${SECONDS}"
