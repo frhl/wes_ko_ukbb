@@ -8,7 +8,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 4
 #$ -q short.qe
-#$ -t 21
+#$ -t 22
 
 set -o errexit
 set -o nounset
@@ -49,8 +49,8 @@ python3 "${hail_script}" \
     --maf_max 0.02 \
     --missing 0.05 \
     --out_prefix ${out_prefix} \
-    --export_burden \
-    --export_ko_probability \
+    #--export_burden \
+    #--export_ko_probability \
     --export_fake_vcf
 
 
