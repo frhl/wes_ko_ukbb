@@ -49,7 +49,8 @@ python3 "${hail_script}" \
     --maf_max 0.02 \
     --missing 0.05 \
     --out_prefix ${out_prefix} \
-    --export_fake_vcf
+    --export_fake_vcf \
+    --export_burden 
 
 
 print_update "Finished running HAIL for chr${chr}" "${SECONDS}"

@@ -615,15 +615,15 @@ def main(args):
 
     if ko_samples:
         mt_ko_sample = extract_knockout_samples(mt)
-        mt_ko_sample.export(prefix + '_ko_samples.tsv.bgz')
+        mt_ko_sample.export(out_prefix + '_ko_samples.tsv.bgz')
 
     if ko_matrix:
         mt_ko_matrix = construct_phased_dosage_mt(mt)
-        mt_ko_matrix.export(prefix + '_ko_matrix.tsv.bgz')
+        mt_ko_matrix.export(out_prefix + '_ko_matrix.tsv.bgz')
 
     if export_fake_vcf:
         out = get_dummy_by_dp(mt1, mt2, chrom)
-        export_table(out, out_prefix = prefix + "_dummy", out_type = 'vcf')
+        export_table(out, out_prefix = out_prefix + "_ko", out_type = 'vcf')
 
 
 
