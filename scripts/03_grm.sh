@@ -32,23 +32,26 @@ set_up_hail
 set_up_pythonpath
 mkdir -p ${out_dir}
 python "${hail_script}" \
-    --chroms ${chroms}  \
-    --out_prefix ${out_prefix} \
-    --subset_markers_by_kinship
+	--chroms ${chroms}  \
+	--out_prefix ${out_prefix} \
+	--subset_markers_by_kinship
 
 print_update "Successfully combined .bgen files for GRM input." "${SECONDS}"
 
-# compute GRM
-#conda deacticate
-#set_up_RSAIGE
-#print_update "Generating GRM from plink files.. "
-#Rscript "${createSparseGRM}" \
-#	--plinkFile=${out_prefix} \
-#	--nThreads=4 \
-#	--outputPrefix=${out_prefix}	\
-#	--numRandomMarkerforSparseKin=1000	\
-#	--relatednessCutoff=0.125
 
-
+# compute GRM with SAIGE
+if [ $( ls -1 *.mtx 2> /dev/null | wc -l ) != 0 ]; then
+	conda deactivate
+	set_up_RSAIGE
+	print_update "Generating GRM from plink files.. "
+	Rscript "${createSparseGRM}" \
+		--plinkFile=${out_prefix} \
+		--nThreads=4 \
+		--outputPrefix=${out_prefix}	\
+		--numRandomMarkerforSparseKin=1000	\
+		--relatednessCutoff=0.125
+else 
+	print_update "${out_prefix} (GRM) already exists! skipping."
+fi
 
 print_update "Successfully generated GRM" "${SECONDS}"
