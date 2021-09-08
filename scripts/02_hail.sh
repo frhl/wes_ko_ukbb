@@ -8,7 +8,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 4
 #$ -q short.qe
-#$ -t 1-22
+#$ -t 2-22
 
 set -o errexit
 set -o nounset
@@ -21,7 +21,7 @@ readonly in_dir_phased="data/phased"
 readonly in_dir_unphased="data/unphased/unfiltered"
 readonly vep_dir="data/vep/full/"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/knockouts"
+readonly out_dir="derived/tmp"
 
 # hail script
 readonly hail_script="utils/hail_export.py"

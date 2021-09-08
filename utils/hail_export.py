@@ -534,15 +534,11 @@ def main(args):
     get_unrelated = args.get_unrelated
     get_europeans = args.get_europeans
     vep_variants = args.vep_variants
-    ko_matrix = args.ko_matrix
-    ko_samples = args.ko_samples
+    export_ko_dosage_matrix = args.export_ko_dosage_matrix
+    export_ko_samples = args.export_ko_samples
     export_burden = args.export_burden
     export_ko_probability = args.export_ko_probability
     export_fake_vcf = args.export_fake_vcf
-
-    # check that files exists
-
-
 
     # run parser
     hail_init(chrom)
@@ -601,7 +597,7 @@ def main(args):
         res = res.filter(res.total > 0)
 
         # export data
-        res.export(out_prefix + '_burden.tsv.bgz')
+        res.export(out_prefix + '_burden.tsv.gz')
 
     if export_ko_probability:
 
@@ -611,21 +607,21 @@ def main(args):
         mt_ko_entries = mt_ko_entries.filter(mt_ko_entries.pKO>0)
 
         # export data
-        res.export(out_prefix + '_ko_prob.tsv.bgz')
+        mt_ko_entries.export(out_prefix + '_ko_prob.tsv.gz')
 
-    if ko_samples:
-        mt_ko_sample = extract_knockout_samples(mt)
-        mt_ko_sample.export(out_prefix + '_ko_samples.tsv.bgz')
+    if export_ko_samples:
+        # ignores singletons
+        mt_ko_sample = extract_knockout_samples(mt1)
+        mt_ko_sample.export(out_prefix + '_ko_samples_no_singletons.tsv.gz')
 
-    if ko_matrix:
-        mt_ko_matrix = construct_phased_dosage_mt(mt)
-        mt_ko_matrix.export(out_prefix + '_ko_matrix.tsv.bgz')
+    if export_ko_dosage_matrix:
+        # ignores singletons
+        mt_ko_matrix = construct_phased_dosage_mt(mt1)
+        mt_ko_matrix.export(out_prefix + '_ko_matrix_no_singletons.tsv.gz')
 
     if export_fake_vcf:
         out = get_dummy_by_dp(mt1, mt2, chrom)
         export_table(out, out_prefix = out_prefix + "_ko", out_type = 'vcf')
-
-
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
@@ -652,10 +648,11 @@ if __name__=='__main__':
     parser.add_argument('--export_fake_vcf', action='store_true', help='Export a "fake" VCF file that contains KO probabilities as DP field..')
     parser.add_argument('--vep_path', default=None, help='path to a .vcf file containing annotated entries by locus and alleles')
     parser.add_argument('--vep_variants', action='store_true', help='Generate a summary of filter variants')
-    parser.add_argument('--ko_samples', action='store_true', help='Get the genes/individuals that are KO and the SNPs involved')
-    parser.add_argument('--ko_matrix', action='store_true', help='Generate a gene x sample matrix with KO status')
+    parser.add_argument('--export_ko_samples', action='store_true', help='Get the genes/individuals that are KO and the SNPs involved')
+    parser.add_argument('--export_ko_dosage_matrix', action='store_true', help='Generate a gene x sample matrix with KO status')
     
     args = parser.parse_args()
 
     main(args)
+
 
