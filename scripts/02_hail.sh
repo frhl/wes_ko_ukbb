@@ -15,6 +15,8 @@ set -o nounset
 
 module purge
 source utils/bash_utils.sh
+source /well/lindgren/flassen/ressources/ukb/ukb_utils/bash/hail_utils.sh 
+set_up_pythonpath
 
 # directories
 readonly in_dir_phased="data/phased"
