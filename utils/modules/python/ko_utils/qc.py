@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+import hail as hl
+import os
+
 def hail_init(chrom=None, log_prefix='wes_analysis'):
     r'''Initialize Hail '''
     assert chrom in range(1,23), 'only autosomes allowed'

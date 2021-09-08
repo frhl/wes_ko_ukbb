@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import hail as hl
+
 def annotate_vep(mt, vep_path):
     r'''Annotate matrix table with VEP consequence from external file.'''
     print(f'Annotating with VEP file: {vep_path}')

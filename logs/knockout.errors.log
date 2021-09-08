@@ -1,0 +1,43 @@
+/var/spool/default/compe073/job_scripts/54206541: line 15: utils/bash_utils.sh: No such file or directory
+Traceback (most recent call last):
+  File "utils/hail_export.py", line 166, in <module>
+    main(args)
+  File "utils/hail_export.py", line 54, in main
+    hail_init(chrom)
+TypeError: 'module' object is not callable
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Running on Apache Spark version 3.1.2
+SparkUI available at http://compe003.hpc.in.bmrc.ox.ac.uk:4040
+Welcome to
+     __  __     <>__
+    / /_/ /__  __/ /
+   / __  / _ `/ / /
+  /_/ /_/\_,_/_/_/   version 0.2.74-0c3a74d12093
+LOGGING: writing to logs/hail/hail_export.log
+Traceback (most recent call last):
+  File "utils/hail_export.py", line 166, in <module>
+    main(args)
+  File "utils/hail_export.py", line 55, in main
+    mt1 = qc.get_table(input_path=input_phased_path, input_type=input_phased_type) # 12788
+  File "/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/utils/modules/python/ko_utils/qc.py", line 18, in get_table
+    mt = hl.import_vcf(input_path, force_bgz=True, array_elements_required=False, min_partitions=100)
+NameError: name 'hl' is not defined
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Running on Apache Spark version 3.1.2
+SparkUI available at http://compe009.hpc.in.bmrc.ox.ac.uk:4040
+Welcome to
+     __  __     <>__
+    / /_/ /__  __/ /
+   / __  / _ `/ / /
+  /_/ /_/\_,_/_/_/   version 0.2.74-0c3a74d12093
+LOGGING: writing to logs/hail/hail_export.log
+Traceback (most recent call last):
+  File "utils/hail_export.py", line 166, in <module>
+    main(args)
+  File "utils/hail_export.py", line 55, in main
+    mt1 = qc.get_table(input_path=input_phased_path, input_type=input_phased_type) # 12788
+  File "/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/utils/modules/python/ko_utils/qc.py", line 18, in get_table
+    mt = hl.import_vcf(input_path, force_bgz=True, array_elements_required=False, min_partitions=100)
+NameError: name 'hl' is not defined

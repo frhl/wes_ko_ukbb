@@ -1,28 +1,26 @@
 #!/usr/bin/env bash
 #
-#
-#$ -N hail_shell
+#$ -N knockout
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/hail.log
-#$ -e logs/hail.errors.log
+#$ -o logs/knockout.log
+#$ -e logs/knockout.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 4
+#$ -pe shmem 2
 #$ -q short.qe
-#$ -t 2-22
+#$ -t 22
 
 set -o errexit
 set -o nounset
 
-module purge
-source utils/bash_utils.sh
-set_up_pythonpath
+source utils/qsub_utils.sh
+source utils/hail_utils.sh
 
 # directories
 readonly in_dir_phased="data/phased"
 readonly in_dir_unphased="data/unphased/unfiltered"
 readonly vep_dir="data/vep/full/"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/tmp"
+readonly out_dir="derived/tmptmp"
 
 # hail script
 readonly hail_script="utils/hail_export.py"
@@ -37,7 +35,9 @@ readonly vep="${vep_dir}/ukb_wes_200k_full_vep_chr${chr}.vcf"
 readonly out_prefix="${out_dir}/ukb_wes_200k_phased_eur_maf002_chr${chr}"
 readonly out="${out_prefix}.mt"
 
+# run hail
 set_up_hail
+set_up_pythonpath
 mkdir -p ${out_dir}
 python3 "${hail_script}" \
     --chrom ${chr} \
