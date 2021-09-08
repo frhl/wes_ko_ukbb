@@ -6,31 +6,37 @@
 #$ -o logs/create_grm.log
 #$ -e logs/create_grm.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 5
+#$ -pe shmem 2
 #$ -q short.qe
 
-#set -o errexit
-#set -o nounset
+set -o errexit
+set -o nounset
 
 module purge
-source utils/bash_utils.sh
+source utils/qsub_utils.sh
+source utils/hail_utils.sh
 
 # paths for hail script
 readonly out_dir="data/saige/grm/input"
-readonly out_prefix="${out_dor}/ukb_imp_sparse_markers"
+readonly out_prefix="${out_dir}/ukb_imp_sparse_markers"
 readonly hail_script="utils/create_grm_input.py"
+readonly spark_dir="data/tmp/spark"
 readonly threads=$(( ${NSLOTS}-1 ))
 readonly createSparseGRM="/well/lindgren/flassen/software/dev/SAIGE/extdata/createSparseGRM.R"
 
 # Generate a sequence of chromosomes to be included
 chroms=$( seq 21 22 | tr '\n' ' ' )
 
+# combine markers from UKBB imputed data
+set_up_hail
+set_up_pythonpath
 mkdir -p ${out_dir}
-python3 "${hail_script}" \
+python "${hail_script}" \
     --chroms ${chroms}  \
     --out_prefix ${out_prefix} \
     --subset_markers_by_kinship
 
+print_update "Successfully combined .bgen files for GRM input." "${SECONDS}"
 
 # compute GRM
 #conda deacticate
@@ -44,5 +50,5 @@ python3 "${hail_script}" \
 #	--relatednessCutoff=0.125
 
 
-print_update "Finished running HAIL for chr${chr}" "${SECONDS}"
 
+print_update "Successfully generated GRM" "${SECONDS}"

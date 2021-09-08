@@ -1,0 +1,9 @@
+/var/spool/default/compe050/job_scripts/54206368: line 30: python3: command not found
+/var/spool/default/compe028/job_scripts/54206385: line 30: conda: command not found
+/var/spool/default/compe028/job_scripts/54206385: line 31: set_up_pythonpaths: command not found
+/var/spool/default/compe028/job_scripts/54206385: line 33: python3: command not found
+/var/spool/default/compe046/job_scripts/54206414: line 21: out_dor: unbound variable
+/var/spool/default/compe046/job_scripts/54206418: line 30: conda: command not found
+utils/hail_utils.sh: line 43: spark_dir: unbound variable
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).

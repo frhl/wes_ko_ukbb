@@ -1,0 +1,6 @@
+Finished running HAIL for chr. Elapsed time: 0 hrs (job id: 54206368.undefined Wed Sep  8 16:03:46 BST 2021)
+Finished running HAIL for chr. Elapsed time: 0 hrs (job id: 54206385.undefined Wed Sep  8 16:05:45 BST 2021)
+2021-09-08 16:13:13 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-08 16:13:14 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-08 16:13:14 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
