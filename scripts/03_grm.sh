@@ -28,20 +28,20 @@ readonly createSparseGRM="/well/lindgren/flassen/software/dev/SAIGE/extdata/crea
 chroms=$( seq 1 22 | tr '\n' ' ' )
 
 # combine markers from UKBB imputed data
-set_up_hail
-set_up_pythonpath
-mkdir -p ${out_dir}
-python "${hail_script}" \
-	--chroms ${chroms}  \
-	--out_prefix ${out_prefix} \
-	--subset_markers_by_kinship
-
-print_update "Successfully combined .bgen files for GRM input." "${SECONDS}"
+#set_up_hail
+#set_up_pythonpath
+#mkdir -p ${out_dir}
+#python "${hail_script}" \
+#	--chroms ${chroms}  \
+#	--out_prefix ${out_prefix} \
+#	--subset_markers_by_kinship
+#
+#print_update "Successfully combined .bgen files for GRM input." "${SECONDS}"
 
 
 # compute GRM with SAIGE
 if [ $( ls -1 *.mtx 2> /dev/null | wc -l ) == 0 ]; then
-	conda deactivate
+	#conda deactivate
 	set_up_RSAIGE
 	print_update "Generating GRM from plink files.. "
 	Rscript "${createSparseGRM}" \
