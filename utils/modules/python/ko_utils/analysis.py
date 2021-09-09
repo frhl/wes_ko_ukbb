@@ -70,10 +70,10 @@ def annotate_vep(mt, vep_path):
 
 
 
-def filter_vep(mt, field, conditions):
+def filter_vep(mt, field, conds):
     r'''Filter VEP field by condition(s) '''
-    assert isinstance(conditions, list)
-    assert field in list(mt.vep)
+    #assert isinstance(conds, list)
+    #assert field in list(mt.vep)
     #conds = [[cond] for cond in conditions]
     mt = mt.filter_rows(hl.literal(set(conds)).contains(mt.vep[field]))
     return mt

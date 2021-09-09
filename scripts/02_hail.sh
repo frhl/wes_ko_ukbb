@@ -5,9 +5,9 @@
 #$ -o logs/knockout.log
 #$ -e logs/knockout.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 2
+#$ -pe shmem 4
 #$ -q short.qe
-#$ -t 22
+#$ -t 1-22
 
 set -o errexit
 set -o nounset
@@ -32,7 +32,7 @@ readonly in_unphased="${in_dir_unphased}/ukb_wes_200k_filtered_chr${chr}.mt"
 readonly vep="${vep_dir}/ukb_wes_200k_full_vep_chr${chr}.vcf"
 
 # output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_phased_eur_maf002_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_wes_200k_phased_all_maf002_chr${chr}"
 readonly out="${out_prefix}.mt"
 
 # run hail
@@ -46,7 +46,7 @@ python3 "${hail_script}" \
     --input_phased_type "vcf" \
     --input_unphased_type "mt" \
     --vep_path ${vep} \
-    --get_europeans \
+    --vep_filter "damaging_missense" "ptv" \
     --maf_max 0.02 \
     --missing 0.05 \
     --out_prefix ${out_prefix} \

@@ -43,7 +43,7 @@ def main(args):
     get_related = args.get_related
     get_unrelated = args.get_unrelated
     get_europeans = args.get_europeans
-    vep_variants = args.vep_variants
+    vep_filter = args.vep_filter
     export_ko_dosage_matrix = args.export_ko_dosage_matrix
     export_ko_samples = args.export_ko_samples
     export_burden = args.export_burden
@@ -90,6 +90,11 @@ def main(args):
     if vep_path:
         mt1 = analysis.annotate_vep(mt1, vep_path)
         mt2 = analysis.annotate_vep(mt2, vep_path)
+    
+        # filter VEP
+        if len(vep_filter) > 0:
+            mt1 = analysis.filter_vep(mt1, 'consequence_category', vep_filter)
+            mt2 = analysis.filter_vep(mt2, 'consequence_category', vep_filter) 
 
     #### get stats
 
@@ -157,12 +162,11 @@ if __name__=='__main__':
     parser.add_argument('--export_burden', action='store_true', help='Export burden variant count by gene and and individuals.')
     parser.add_argument('--export_fake_vcf', action='store_true', help='Export a "fake" VCF file that contains KO probabilities as DP field..')
     parser.add_argument('--vep_path', default=None, help='path to a .vcf file containing annotated entries by locus and alleles')
-    parser.add_argument('--vep_variants', action='store_true', help='Generate a summary of filter variants')
+    parser.add_argument('--vep_filter', nargs='+', help='Filter consequence_category by mutations e.g., "damaging_missense" or "ptv"')
     parser.add_argument('--export_ko_samples', action='store_true', help='Get the genes/individuals that are KO and the SNPs involved')
     parser.add_argument('--export_ko_dosage_matrix', action='store_true', help='Generate a gene x sample matrix with KO status')
     
     args = parser.parse_args()
 
     main(args)
-
 
