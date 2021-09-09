@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 #
-#
-#$ -N hail_shell
+#$ -N knockout
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/hail.log
-#$ -e logs/hail.errors.log
+#$ -o logs/knockout.log
+#$ -e logs/knockout.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 4
 #$ -q short.qe
@@ -13,15 +12,15 @@
 set -o errexit
 set -o nounset
 
-module purge
-source utils/bash_utils.sh
+source utils/qsub_utils.sh
+source utils/hail_utils.sh
 
 # directories
 readonly in_dir_phased="data/phased"
 readonly in_dir_unphased="data/unphased/unfiltered"
 readonly vep_dir="data/vep/full/"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/knockouts"
+readonly out_dir="derived/tmptmp"
 
 # hail script
 readonly hail_script="utils/hail_export.py"
@@ -33,10 +32,12 @@ readonly in_unphased="${in_dir_unphased}/ukb_wes_200k_filtered_chr${chr}.mt"
 readonly vep="${vep_dir}/ukb_wes_200k_full_vep_chr${chr}.vcf"
 
 # output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_phased_eur_maf002_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_wes_200k_phased_all_maf002_chr${chr}"
 readonly out="${out_prefix}.mt"
 
+# run hail
 set_up_hail
+set_up_pythonpath
 mkdir -p ${out_dir}
 python3 "${hail_script}" \
     --chrom ${chr} \
@@ -45,7 +46,7 @@ python3 "${hail_script}" \
     --input_phased_type "vcf" \
     --input_unphased_type "mt" \
     --vep_path ${vep} \
-    --get_europeans \
+    --vep_filter "damaging_missense" "ptv" \
     --maf_max 0.02 \
     --missing 0.05 \
     --out_prefix ${out_prefix} \
