@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 #
 #
-#$ -N grmtest
+#$ -N make_grm
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/grmtest.log
-#$ -e logs/grmtest.errors.log
+#$ -o logs/make_grm.log
+#$ -e logs/make_grm.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 5
+#$ -pe shmem 20
 #$ -q short.qe
 
 #set -o errexit
@@ -34,7 +34,8 @@ readonly out_dir="data/saige/grm/input"
 #readonly vep="${vep_dir}/ukb_wes_200k_full_vep_chr${chr}.vcf"
 
 # output path
-readonly out_prefix="${out_dir}/ukb_imp_chr1_22_sparse_markers"
+# path ukb_imp_eur_chr1_22_sparse_markers"
+readonly out_prefix="${out_dir}/ukb_imp_eur_chr1_22_sparse_markers"
 #readonly out="${out_prefix}.plink"
 
 # SAIGE step paths
@@ -62,7 +63,7 @@ set_up_RSAIGE
 print_update "Generating GRM from plink files.. "
 Rscript "${createSparseGRM}" \
 	--plinkFile=${out_prefix} \
-	--nThreads=4 \
+	--nThreads=19 \
 	--outputPrefix=${out_prefix}	\
 	--numRandomMarkerforSparseKin=1000	\
 	--relatednessCutoff=0.125

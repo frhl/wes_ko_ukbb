@@ -136,7 +136,7 @@ def main(args):
 
     if export_fake_vcf:
         out = analysis.get_dummy_by_dp(mt1, mt2, chrom)
-        export_table(out, out_prefix = out_prefix + "_ko", out_type = 'vcf')
+        qc.export_table(out, out_prefix = out_prefix + "_ko", out_type = 'vcf')
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()

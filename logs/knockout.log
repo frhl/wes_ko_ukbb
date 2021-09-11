@@ -97,3 +97,261 @@ Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr18.vcf
 Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr18.vcf
 Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr13.vcf
 Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr13.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr22.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr22.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr20.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr20.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr14.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr14.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr15.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr15.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr8.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr8.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr4.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr4.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr10.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr10.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr5.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr5.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr9.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr9.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr7.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr7.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr6.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr6.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr16.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr16.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr12.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr12.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr2.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr2.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr3.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr3.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr19.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr19.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr17.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr17.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr11.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr11.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr1.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr1.vcf
+2021-09-10 11:18:59 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-10 11:19:00 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-10 11:19:00 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-10 11:19:22 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-10 11:19:22 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-10 11:19:22 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-10 11:19:22 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-10 11:19:22 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-10 11:19:22 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-10 11:19:22 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-10 11:19:22 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-10 11:19:22 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-10 11:19:22 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-10 11:19:22 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-10 11:19:22 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-10 11:19:22 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-10 11:19:22 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-10 11:19:22 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-10 11:19:22 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-10 11:19:22 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-10 11:19:22 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-10 11:19:22 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-10 11:19:22 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-10 11:19:22 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-10 11:19:22 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-10 11:19:22 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-10 11:19:22 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-10 11:19:22 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-10 11:19:22 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-10 11:19:22 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-10 11:19:22 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-10 11:19:22 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-10 11:19:22 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-10 11:19:22 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-10 11:19:22 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-10 11:19:22 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-10 11:19:22 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-10 11:19:22 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-10 11:19:22 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-10 11:19:22 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-10 11:19:23 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-10 11:19:23 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-10 11:19:23 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-10 11:19:23 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-10 11:19:23 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-10 11:19:23 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-10 11:19:23 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-10 11:19:23 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-10 11:19:23 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-10 11:19:23 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-10 11:19:23 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-10 11:19:23 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-10 11:19:23 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-10 11:19:23 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-10 11:19:23 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-10 11:19:23 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-10 11:19:23 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-10 11:19:23 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-10 11:19:23 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-10 11:19:23 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-10 11:19:23 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-10 11:19:23 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-10 11:19:23 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-10 11:19:23 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-10 11:19:23 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-10 11:19:23 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr21.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr21.vcf
+
+Exporting to VCF: derived/tmptmp/ukb_wes_200k_phased_all_maf002_chr21_ko.vcf.bgz
+
+Finished running HAIL for chr21. Elapsed time: .71 hrs (job id: 54218328.21 Fri Sep 10 12:01:59 BST 2021)
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr18.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr18.vcf
+
+Exporting to VCF: derived/tmptmp/ukb_wes_200k_phased_all_maf002_chr18_ko.vcf.bgz
+
+Finished running HAIL for chr18. Elapsed time: 1.10 hrs (job id: 54218328.18 Fri Sep 10 12:25:17 BST 2021)
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr13.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr13.vcf
+
+Exporting to VCF: derived/tmptmp/ukb_wes_200k_phased_all_maf002_chr13_ko.vcf.bgz
+
+Finished running HAIL for chr13. Elapsed time: 1.28 hrs (job id: 54218328.13 Fri Sep 10 12:36:00 BST 2021)
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr22.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr22.vcf
+
+Exporting to VCF: derived/tmptmp/ukb_wes_200k_phased_all_maf002_chr22_ko.vcf.bgz
+
+Finished running HAIL for chr22. Elapsed time: 1.91 hrs (job id: 54218328.22 Fri Sep 10 13:14:01 BST 2021)
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr20.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr20.vcf
+
+Exporting to VCF: derived/tmptmp/ukb_wes_200k_phased_all_maf002_chr20_ko.vcf.bgz
+
+Finished running HAIL for chr20. Elapsed time: 2.17 hrs (job id: 54218328.20 Fri Sep 10 13:29:44 BST 2021)
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr14.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr14.vcf
+
+Exporting to VCF: derived/tmptmp/ukb_wes_200k_phased_all_maf002_chr14_ko.vcf.bgz
+
+Finished running HAIL for chr14. Elapsed time: 2.70 hrs (job id: 54218328.14 Fri Sep 10 14:01:29 BST 2021)
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr15.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr15.vcf
+
+Exporting to VCF: derived/tmptmp/ukb_wes_200k_phased_all_maf002_chr15_ko.vcf.bgz
+
+Finished running HAIL for chr15. Elapsed time: 2.97 hrs (job id: 54218328.15 Fri Sep 10 14:17:43 BST 2021)
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr8.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr8.vcf
+
+Exporting to VCF: derived/tmptmp/ukb_wes_200k_phased_all_maf002_chr8_ko.vcf.bgz
+
+Finished running HAIL for chr8. Elapsed time: 3.29 hrs (job id: 54218328.8 Fri Sep 10 14:37:01 BST 2021)
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr4.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr4.vcf
+
+Exporting to VCF: derived/tmptmp/ukb_wes_200k_phased_all_maf002_chr4_ko.vcf.bgz
+
+Finished running HAIL for chr4. Elapsed time: 3.57 hrs (job id: 54218328.4 Fri Sep 10 14:53:46 BST 2021)
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr10.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr10.vcf
+
+Exporting to VCF: derived/tmptmp/ukb_wes_200k_phased_all_maf002_chr10_ko.vcf.bgz
+
+Finished running HAIL for chr10. Elapsed time: 3.67 hrs (job id: 54218328.10 Fri Sep 10 14:59:26 BST 2021)
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr5.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr5.vcf
+
+Exporting to VCF: derived/tmptmp/ukb_wes_200k_phased_all_maf002_chr5_ko.vcf.bgz
+
+Finished running HAIL for chr5. Elapsed time: 4.17 hrs (job id: 54218328.5 Fri Sep 10 15:29:37 BST 2021)
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr9.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr9.vcf
+
+Exporting to VCF: derived/tmptmp/ukb_wes_200k_phased_all_maf002_chr9_ko.vcf.bgz
+
+Finished running HAIL for chr9. Elapsed time: 4.26 hrs (job id: 54218328.9 Fri Sep 10 15:34:59 BST 2021)
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr7.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr7.vcf
+
+Exporting to VCF: derived/tmptmp/ukb_wes_200k_phased_all_maf002_chr7_ko.vcf.bgz
+
+Finished running HAIL for chr7. Elapsed time: 5.00 hrs (job id: 54218328.7 Fri Sep 10 16:19:37 BST 2021)
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr6.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr6.vcf
+
+Exporting to VCF: derived/tmptmp/ukb_wes_200k_phased_all_maf002_chr6_ko.vcf.bgz
+
+Finished running HAIL for chr6. Elapsed time: 5.23 hrs (job id: 54218328.6 Fri Sep 10 16:32:56 BST 2021)
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr16.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr16.vcf
+
+Exporting to VCF: derived/tmptmp/ukb_wes_200k_phased_all_maf002_chr16_ko.vcf.bgz
+
+Finished running HAIL for chr16. Elapsed time: 5.43 hrs (job id: 54218328.16 Fri Sep 10 16:45:07 BST 2021)
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr12.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr12.vcf
+
+Exporting to VCF: derived/tmptmp/ukb_wes_200k_phased_all_maf002_chr12_ko.vcf.bgz
+
+Finished running HAIL for chr12. Elapsed time: 5.60 hrs (job id: 54218328.12 Fri Sep 10 16:55:03 BST 2021)
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr3.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr3.vcf
+
+Exporting to VCF: derived/tmptmp/ukb_wes_200k_phased_all_maf002_chr3_ko.vcf.bgz
+
+Finished running HAIL for chr3. Elapsed time: 6.46 hrs (job id: 54218328.3 Fri Sep 10 17:46:43 BST 2021)
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr2.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr2.vcf
+
+Exporting to VCF: derived/tmptmp/ukb_wes_200k_phased_all_maf002_chr2_ko.vcf.bgz
+
+Finished running HAIL for chr2. Elapsed time: 6.66 hrs (job id: 54218328.2 Fri Sep 10 17:58:40 BST 2021)
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr19.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr19.vcf
+
+Exporting to VCF: derived/tmptmp/ukb_wes_200k_phased_all_maf002_chr19_ko.vcf.bgz
+
+Finished running HAIL for chr19. Elapsed time: 6.89 hrs (job id: 54218328.19 Fri Sep 10 18:12:48 BST 2021)
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr17.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr17.vcf
+
+Exporting to VCF: derived/tmptmp/ukb_wes_200k_phased_all_maf002_chr17_ko.vcf.bgz
+
+Finished running HAIL for chr17. Elapsed time: 7.00 hrs (job id: 54218328.17 Fri Sep 10 18:19:05 BST 2021)
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr11.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr11.vcf
+
+Exporting to VCF: derived/tmptmp/ukb_wes_200k_phased_all_maf002_chr11_ko.vcf.bgz
+
+Finished running HAIL for chr11. Elapsed time: 7.11 hrs (job id: 54218328.11 Fri Sep 10 18:26:12 BST 2021)
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr1.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr1.vcf
+
+Exporting to VCF: derived/tmptmp/ukb_wes_200k_phased_all_maf002_chr1_ko.vcf.bgz
+
+Finished running HAIL for chr1. Elapsed time: 10.35 hrs (job id: 54218328.1 Fri Sep 10 21:40:12 BST 2021)

@@ -19,3 +19,7 @@ Successfully combined .bgen files for GRM input.. Elapsed time: 9.38 hrs (job id
 2021-09-09 12:11:35 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
   Compatibility is not guaranteed.
 2021-09-09 12:11:35 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+[get_genetically_european]: Not all samples IDs mapped perfectly (125/487409 IDs are undefined)
+[get_genetically_european]:458841/487409 IDs were included as genetically european.
+Successfully combined .bgen files for GRM input.. Elapsed time: 10.69 hrs (job id: 54212818.undefined Thu Sep  9 22:52:41 BST 2021)
+Successfully generated GRM. Elapsed time: 10.69 hrs (job id: 54212818.undefined Thu Sep  9 22:52:41 BST 2021)

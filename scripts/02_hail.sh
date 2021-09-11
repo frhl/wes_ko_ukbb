@@ -5,7 +5,7 @@
 #$ -o logs/knockout.log
 #$ -e logs/knockout.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 4
+#$ -pe shmem 2
 #$ -q short.qe
 #$ -t 1-22
 
@@ -51,8 +51,8 @@ python3 "${hail_script}" \
     --missing 0.05 \
     --out_prefix ${out_prefix} \
     --export_fake_vcf \
-    --export_burden \
-    --export_ko_probability 
+    #--export_burden \
+    #--export_ko_probability 
 
 
 print_update "Finished running HAIL for chr${chr}" "${SECONDS}"
