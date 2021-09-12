@@ -355,3 +355,9 @@ Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr1.vcf
 Exporting to VCF: derived/tmptmp/ukb_wes_200k_phased_all_maf002_chr1_ko.vcf.bgz
 
 Finished running HAIL for chr1. Elapsed time: 10.35 hrs (job id: 54218328.1 Fri Sep 10 21:40:12 BST 2021)
+2021-09-12 13:12:28 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-12 13:12:28 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-12 13:12:28 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr22.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr22.vcf

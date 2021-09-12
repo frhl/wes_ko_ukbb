@@ -92,7 +92,7 @@ def main(args):
         mt2 = analysis.annotate_vep(mt2, vep_path)
     
         # filter VEP
-        if len(vep_filter) > 0:
+        if vep_filter:
             mt1 = analysis.filter_vep(mt1, 'consequence_category', vep_filter)
             mt2 = analysis.filter_vep(mt2, 'consequence_category', vep_filter) 
 
