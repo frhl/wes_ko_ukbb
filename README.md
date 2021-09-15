@@ -1,6 +1,6 @@
 # wes_ko_ukbb
 
-updated 9-sep-2021
+updated 15-sep-2021
 
 ## todo
 * use UKBB kinship markers to generate a sparse matrix of all chromosomes

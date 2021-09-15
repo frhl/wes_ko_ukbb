@@ -18,6 +18,16 @@ def main(args):
     # annotate with VEP
     hail_init.hail_bmrc_init('/logs/hail/hail_vep_export.log', 'GRCh38')
     dataset = qc.get_table(input_path, input_type)
+    
+    # clean up snpID and rsID
+    dataset = qc.annotate_snpid(dataset)
+    dataset = qc.annotate_rsid(dataset)
+    dataset = qc.default_to_snpid_when_missing_rsid(dataset)
+
+    # Translate to lindgren IDs
+    dataset = qc.translate_sample_ids(dataset, 12788, 11867)    
+
+    # get VEP
     result = hl.vep(dataset, "utils/configs/vep_env.json") 
     result = process_consequences(result)
     qc.export_table(result, out_prefix = out_prefix, out_type = out_type)

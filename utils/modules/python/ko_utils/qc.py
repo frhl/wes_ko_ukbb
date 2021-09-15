@@ -202,14 +202,29 @@ def annotate_with_fam_fields(mt):
     return mt
 
 
-
-def remake_rsid(mt, delim = '_'):
-    r'''Re-create rsids based on current locus and alleles'''
+def annotate_snpid(mt, delim = '_'):
+    r'''Annotate field snpid based on current locus and alleles'''
     ids = hl.delimit([mt.locus.contig, hl.str(mt.locus.position), mt.alleles[0], mt.alleles[1]], delim)
-    mt = mt.annotate_rows(rsid = ids)
+    mt = mt.annotate_rows(snpid = ids)
+    return mt
+
+def annotate_rsid(mt, dbsnp_path = '/well/lindgren/flassen/ressources/dbsnp/GRCh38/GCF_000001405.39.gz', build = 'GRCh38'):
+    r'''Use dbSNP to annotate all rsIDs in the a matrix table.'''
+    recode = {f"NC_0000{i}.{j}":f"chr{i}" for i in (list(range(1, 23)) + ['X', 'Y']) for j in ('09','10','11','12','13','14')}
+    dbsnp = hl.import_vcf(dbsnp_path, 
+                       reference_genome=build, 
+                       contig_recoding=recode, 
+                       skip_invalid_loci=True,
+                       force_bgz=True)
+    
+    rsids = dbsnp.index_rows(mt.locus, mt.alleles).rsid
+    mt = mt.annotate_rows(rsid = rsids)
     return mt
 
 
+def default_to_snpid_when_missing_rsid(mt):
+    r'''rsid is converted to snpid when it is missing'''
+    return mt.annotate_rows(rsid = hl.if_else(hl.is_missing(mt.rsid), mt.snpid, mt.rsid))
 
 
 

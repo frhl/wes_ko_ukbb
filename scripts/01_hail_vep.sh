@@ -9,7 +9,7 @@
 #$ -o logs/hail_vep.log
 #$ -e logs/hail_vep.log
 #$ -P lindgren.prjc
-#$ -pe shmem 2
+#$ -pe shmem 5
 #$ -q short.qe
 #$ -t 22
 #$ -V
@@ -25,7 +25,7 @@ readonly chr=${SGE_TASK_ID}
 readonly in_dir="/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/data/unphased/unfiltered"
 readonly in="${in_dir}/ukb_wes_200k_filtered_chr${chr}.vcf.bgz"
 readonly out_dir="data/mt" 
-readonly out="${out_dir}/ukb_wes_vep_200" 
+readonly out="${out_dir}/ukb_wes_vep_200_chr${chr}" 
 readonly spark_dir="data/tmp/spark"
 readonly hail_script='utils/hail_vep_export.sh'
 

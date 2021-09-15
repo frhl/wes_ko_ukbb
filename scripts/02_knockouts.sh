@@ -32,7 +32,7 @@ readonly in_unphased="${in_dir_unphased}/ukb_wes_200k_filtered_chr${chr}.mt"
 readonly vep="${vep_dir}/ukb_wes_200k_full_vep_chr${chr}.vcf"
 
 # output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_phased_all_maf002_nofilter_test_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_wes_200k_phased_all_maf002_no_missing_filter_test_chr${chr}"
 readonly out="${out_prefix}.mt"
 
 # run hail
@@ -47,7 +47,6 @@ python3 "${hail_script}" \
     --input_unphased_type "mt" \
     --vep_path ${vep} \
     --maf_max 0.02 \
-    --missing 0.05 \
     --out_prefix ${out_prefix} \
     --export_burden \
     --export_ko_probability 
