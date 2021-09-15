@@ -26,6 +26,9 @@ def main(args):
 
     # Translate to lindgren IDs
     dataset = qc.translate_sample_ids(dataset, 12788, 11867)    
+    
+    # recalc info
+    dataset = qc.recalc_info(dataset)
 
     # get VEP
     result = hl.vep(dataset, "utils/configs/vep_env.json") 
