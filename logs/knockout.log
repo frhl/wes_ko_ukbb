@@ -392,3 +392,11 @@ Finished running HAIL for chr22. Elapsed time: 3.77 hrs (job id: 54275613.22 Wed
 Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr22.vcf
 Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr22.vcf
 Finished running HAIL for chr22. Elapsed time: 3.14 hrs (job id: 54285448.22 Wed Sep 15 21:05:39 BST 2021)
+2021-09-16 21:29:37 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-16 21:29:38 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-16 21:29:38 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-16 22:55:04 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-16 22:55:05 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-16 22:55:05 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).

@@ -20,7 +20,7 @@ readonly in_dir_phased="data/phased"
 readonly in_dir_unphased="data/unphased/unfiltered"
 readonly vep_dir="data/vep/full/"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/tmp"
+readonly out_dir="derived/ko_tmp"
 
 # hail script
 readonly hail_script="utils/hail_export.py"
@@ -46,10 +46,13 @@ python3 "${hail_script}" \
     --input_phased_type "vcf" \
     --input_unphased_type "mt" \
     --vep_path ${vep} \
+    --vep_filter "damaging_missense" "ptv" \
     --maf_max 0.02 \
     --out_prefix ${out_prefix} \
     --export_burden \
-    --export_ko_probability 
+    --export_ko_probability \
+    --export_fake_vcf \
+    --export_ko_samples  
 
 
 print_update "Finished running HAIL for chr${chr}" "${SECONDS}"

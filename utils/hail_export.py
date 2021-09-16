@@ -65,8 +65,9 @@ def main(args):
         mt1 = qc.filter_to_unrelated(mt1, get_related = False)
         mt2 = qc.filter_to_unrelated(mt2, get_related = False)
 
+	# note: need to translate ids to combine later!
+    mt1 = qc.translate_sample_ids(mt1, 12788, 11867)
     if get_europeans:
-        mt1 = qc.translate_sample_ids(mt1, 12788, 11867)
         mt1 = qc.filter_to_european(mt1)
         mt2 = qc.filter_to_european(mt2)
 
@@ -92,7 +93,9 @@ def main(args):
         mt2 = analysis.annotate_vep(mt2, vep_path)
     
         # filter VEP
-        if vep_filter:
+        if vep_filter: 
+            #mt1 = mt1.filter_rows(mt1.vep.consequence_category == 'ptv')
+            #mt2 = mt2.filter_rows(mt2.vep.consequence_category == 'ptv')
             mt1 = analysis.filter_vep(mt1, 'consequence_category', vep_filter)
             mt2 = analysis.filter_vep(mt2, 'consequence_category', vep_filter) 
 
@@ -107,7 +110,7 @@ def main(args):
         # combine singleton table and full table
         res = mt1_cat.annotate_entries(singletons = mt2_cat[(mt1_cat.Gene, mt1_cat.consequence_category), mt1_cat.s].n)
         res = res.annotate_entries(singletons = hl.if_else(hl.is_missing(res.singletons),0,res.singletons))
-        res = res.annotate_entries(total = res.n + hl.if_else(hl.is_missing(res.singletons),0,res.singletons))
+        res = res.annotate_entries(total = res.n + res.singletons)
         res = res.entries()
         res = res.filter(res.total > 0)
 
