@@ -5,9 +5,9 @@
 #$ -o logs/knockout.log
 #$ -e logs/knockout.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 2
+#$ -pe shmem 4
 #$ -q short.qe
-#$ -t 22
+#$ -t 1-21
 
 set -o errexit
 set -o nounset
