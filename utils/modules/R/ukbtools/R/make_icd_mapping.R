@@ -10,7 +10,7 @@
 #' f(c('124','Z851'))
 #' }
 
-make_icd_mapping <- function(from, to, icd_path = "/well/lindgren/UKBIOBANK/ferreira/phenotype_extraction/phenotype_lists/ICD10_codes_converted_ICD9_v2v3_codes.txt"){
+make_icd_mapping <- function(from, to, icd_path = "/well/lindgren/UKBIOBANK/ferreira/convert_disease_codes/icd9_icd10_lkps.txt"){
 
   # Read icd code
   icd <- fread(icd_path)
@@ -38,7 +38,6 @@ make_icd_mapping <- function(from, to, icd_path = "/well/lindgren/UKBIOBANK/ferr
 
   return(mapper)
 }
-
 
 
 
