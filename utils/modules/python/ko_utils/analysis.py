@@ -72,9 +72,6 @@ def annotate_vep(mt, vep_path):
 
 def filter_vep(mt, field, conds):
     r'''Filter VEP field by condition(s) '''
-    #assert isinstance(conds, list)
-    #assert field in list(mt.vep)
-    #conds = [[cond] for cond in conditions]
     mt = mt.filter_rows(hl.literal(set(conds)).contains(mt.vep[field]))
     return mt
 
@@ -86,102 +83,63 @@ def annotate_phased_entries(mt):
     mt = mt.annotate_entries(a_homo = mt.GT ==  hl.parse_call('1|1'))
     return mt
 
-
-def construct_phased_dosage_mt(mt, gene_field = 'Gene'):
-    r''' Returns matrix table that contains dosage information from phased geneotypes.
-    0: two refererence alleles in locus,
-    1: one alternate allele on either strand in a locus, 
-    2: two alternate allele on either strand in a locus (either as homozygous or compound heterozygous)
+def gene_csqs_case_builder(in_mt):
+    r''' Returns matrix table that contains gene consequence information from phased geneotypes.
+    "": no alternate alleles,
+    "HE": one alternate allele on either strand in a locus, 
+    "HO": homozygous for alternate alleles
+    "CH": two alternate allele on either strand in a locus (compound heterozygous)
+    "CH+HO": two alternate allele on either strand in a locus (either as homozygous or compound heterozygous)
     '''
-    mt = annotate_phased_entries(mt)
-    knockout =  (mt.a0_alt & mt.a1_alt) | mt.a_homo # ((mt.a0_alt & mt.a1_alt) | mt.a_homo ) & (mt.vep.consequence_category == hl.literal("ptv"))
-    heterozygous = (mt.a0_alt | mt.a1_alt)
-    burden_mt = (
-        mt 
-        .group_rows_by(mt.vep[gene_field])
-        .aggregate(dosage = hl.if_else( hl.agg.any(knockout), 2, 
-                            hl.if_else( hl.agg.any(heterozygous), 1, 0 )))
-        #.burden_mt.filter_entries(burden_mt.entries != 0)
-    )
-    return burden_mt
-
-def construct_summary_mt(mt, gene_field = 'Gene'):
-    r''' Returns matrix table that contains dosage information from phased geneotypes.
-    0: two refererence alleles in locus,
-    1: one alternate allele on either strand in a locus, 
-    2: two alternate allele on either strand in a locus (either as homozygous or compound heterozygous)
-    '''
-    
-    # setup booleans
-    mt = annotate_phased_entries(mt)
-    homozygous = mt.a_homo
-    compound_heterozygous = mt.a0_alt & mt.a1_alt
-    heterozygous = mt.a0_alt | mt.a1_alt
-
-    # aggregate onto gene level
-    ht = (
-        mt 
-        .group_rows_by(mt.vep[gene_field])
-        .aggregate(ko = hl.if_else( hl.agg.any(compound_heterozygous & ~homozygous) , 'CH', 
-                        hl.if_else( hl.agg.any(homozygous & ~compound_heterozygous) , 'HO',
-                        hl.if_else( hl.agg.any(compound_heterozygous & homozygous) , 'CH+HO',
-                        hl.if_else( hl.agg.any(heterozygous) , 'HE', '')))))
-        .filter_entries(mt.entries != '')
-    )
-    
+    # get all snps that are not homozygous
+    mt = in_mt
+    mt = analysis.annotate_phased_entries(mt)
+    mt = mt.filter_entries(~mt.GT.is_hom_var())
+    # create table for each strand and combine to gene
+    ht0 = (mt.group_rows_by(mt.vep.Gene).aggregate(s0 = hl.agg.any(mt.a0_alt)))
+    ht1 = (mt.group_rows_by(mt.vep.Gene).aggregate(s1 = hl.agg.any(mt.a1_alt)))
+    ht2 = (in_mt.group_rows_by(in_mt.vep.Gene).aggregate(hom_var = hl.agg.any(in_mt.GT.is_hom_var())))
+    # combine entries
+    ht = ht0.annotate_entries(s1 = ht1[ht0.Gene, ht0.s].s1)
+    ht = ht.annotate_entries(hom_var = ht2[ht.Gene, ht.s].hom_var)
+    expr = (hl.case()
+           .when( (ht.s0) & (ht.s1) & (ht.hom_var), 'CH+HO')
+           .when( (ht.s0) & (ht.s1), "CH")
+           .when( (ht.hom_var), 'HO')
+           .when( (ht.s0) & (ht.s1 == False), 'HE')
+           .when( (ht.s1) & (ht.s0 == False), 'HE')
+           .default(''))
+    ht = ht.annotate_entries(csqs = expr)
+    ht = ht.drop('s0').drop('s1').drop('hom_var')    
     return ht
 
-def extract_gene_ko_rows(burden_mt):
-    assert ko in list(burden_mt)
-    entries = burden_mt.entries()
-    entries = entries.filter(~hl.literal('').contains(entries.ko))
-    return entries
-
-def extract_knockout_samples(mt, gene_field ='Gene', keep = ['HO','CH+HO']):
-    r''' Collapses variants into genes for each individual, and returns
-    a with three columns containing:
-    1: The gene that was used for collapsing
-    2: The current individual 
-    4: Either CH (Compound heterozygous), HO (Homozygous) or CH+HO or H (Heterozygous).
-       To avoid too long matrices, this is specified by the keep column.
-    3: The variant and corresponding genotype for the variant in the sample,
-      e.g. "chr22_50604850_G_A=1|1,chr22_50606762_C_T=1|1".
+def gene_csqs_dosage_builder(in_mt):
+    r''' Returns matrix table that contains dosage information from phased geneotypes.
+    0: two refererence alleles in locus,
+    1: one alternate allele on either strand in a locus, 
+    2: two alternate allele on either strand in a locus (either as homozygous or compound heterozygous)
     '''
-    
-    # Parameters for KO/CH
-    mt = annotate_phased_entries(mt)
-    homozygous = mt.a_homo
-    compound_heterozygous = mt.a0_alt & mt.a1_alt
-    heterozygous = mt.a0_alt | mt.a1_alt
-
-    # aggregate the gene-level
-    ht1 = (mt 
-          .group_rows_by(mt.vep[gene_field])
-          .aggregate(ko = hl.if_else( hl.agg.any(compound_heterozygous & ~homozygous) , 'CH', 
-                          hl.if_else( hl.agg.any(homozygous & ~compound_heterozygous) , 'HO',
-                          hl.if_else( hl.agg.any(compound_heterozygous & homozygous) , 'CH+HO',
-                          hl.if_else( hl.agg.any(heterozygous) , 'HE', '')))))
-          .filter_entries(mt.entries != ''))
-
-    # generate rsid to gt entries
-    mt = mt.annotate_entries(rsid_entry = mt.rsid)
-    mt = mt.annotate_entries(rsid_gt = hl.delimit([mt.rsid_entry, hl.str(mt.GT)], '='))
-
-    # annotate only ko entries
-    ht2 = (
-            mt 
-            .group_rows_by(mt.vep[gene_field])
-            .aggregate(rsid = hl.agg.filter(mt.a_homo | (mt.a0_alt & mt.a1_alt), hl.agg.collect(mt.rsid_gt)))
-    )
-
+    # get all snps that are not homozygous
+    mt = in_mt
+    mt = analysis.annotate_phased_entries(mt)
+    mt = mt.filter_entries(~mt.GT.is_hom_var())
+    # create table for each strand and combine to gene
+    ht0 = (mt.group_rows_by(mt.vep.Gene).aggregate(s0 = hl.agg.any(mt.a0_alt)))
+    ht1 = (mt.group_rows_by(mt.vep.Gene).aggregate(s1 = hl.agg.any(mt.a1_alt)))
+    ht2 = (in_mt.group_rows_by(in_mt.vep.Gene).aggregate(hom_var = hl.agg.any(in_mt.GT.is_hom_var())))
     # combine entries
-    ent1 = ht1.entries()
-    ent2 = ht2.entries()
-    combined = ent1.annotate(genotypes = ent2[ent1[gene_field], ent1.s])
-    combined = combined.filter(hl.set(keep).contains(combined.ko))
-    line_merge = hl.delimit(combined.genotypes.rsid, ',')
-    combined = combined.annotate(genotypes = combined.genotypes.annotate(rsid = line_merge))
-    return combined
+    ht = ht0.annotate_entries(s1 = ht1[ht0.Gene, ht0.s].s1)
+    ht = ht.annotate_entries(hom_var = ht2[ht.Gene, ht.s].hom_var)
+    expr = (hl.case()
+           .when( (ht.s0) & (ht.s1) & (ht.hom_var), 2)
+           .when( (ht.s0) & (ht.s1), 2)
+           .when( (ht.hom_var), 2)
+           .when( (ht.s0) & (ht.s1 == False), 1)
+           .when( (ht.s1) & (ht.s0 == False), 1)
+           .default(0))
+    ht = ht.annotate_entries(DT = expr)
+    ht = ht.drop('s0').drop('s1').drop('hom_var')    
+    return ht
 
 
 def count_alleles(mt):
@@ -226,15 +184,13 @@ def gene_burden_category_annotations_per_sample(mt, gene_field = 'Gene'):
     return mt
 
 def calc_p_ko(mt):
-    '''
-    Annotates entries with P(Knockout). Requires, that fields are
-    already annotated with "singletons" count, and "dosage". 
-    '''
+    '''Annotates entries with P(Knockout). Requires, that fields are
+       already annotated with "singletons" count, and "DT". '''
     ko_mt = mt.annotate_entries(
         pKO = hl.if_else(
-            mt.dosage == 2, 1, # knockout
+            mt.DT == 2, 1, # knockout
             hl.if_else(
-                mt.dosage == 1, 
+                mt.DT == 1, 
                 hl.if_else(mt.singletons >= 1, 1 - (1/2)**mt.singletons, 0), # one phased hetz
                 hl.if_else(mt.singletons >= 2, 1 - 2*(1/2)**mt.singletons, 0), # zero phased hetz
             )
@@ -242,22 +198,16 @@ def calc_p_ko(mt):
     )
     return ko_mt
 
-def get_prob_ko_matrix(mt_phased, mt_unphased, fields_drop = ['dosage','sigletons']):
+def gene_csqs_calc_pKO(mt_phased, mt_unphased, fields_drop = ['dosage','sigletons']):
     
-    '''
-    Annotates entries with P(Knockout). Requires a phased matrix and an unphased
-    matrix that only contains singletons.
-    '''
+    '''Annotates entries with P(Knockout). Requires a phased matrix and an unphased matrix that only contains singletons.'''
     
     # setup variables
     mt1 = mt_phased # contains phased non-singletons
     mt2 = mt_unphased # contains unphased singletons
     
-    # add check to ensure that mt1 is phased
-    # add check to ensure that mt2 only contains singletons
-    
     # Determine probability of being KO given singletons and phased hetz
-    mt1_burden = construct_phased_dosage_mt(mt1)
+    mt1_burden = gene_csqs_dosage_builder(mt1)
     mt2_burden = gene_burden_annotations_per_sample(mt2)
     mt_ko = mt1_burden.annotate_entries(singletons = mt2_burden[(mt1_burden.Gene, mt1_burden.s)].n)
     mt_ko = mt_ko.annotate_entries(singletons = hl.if_else(~hl.is_missing(mt_ko.singletons), mt_ko.singletons, 0 ))
@@ -265,18 +215,18 @@ def get_prob_ko_matrix(mt_phased, mt_unphased, fields_drop = ['dosage','sigleton
 
     # drop not needed rows
     mt_ko = mt_ko.drop(*[f for f in fields_drop if f in mt_ko.entry])
-    #mt_ko_entries = mt_ko.entries()
-    #mt_ko_entries = mt_ko_entries.filter(~hl.is_missing(mt_ko_entries.pKO))
     return mt_ko
 
-def get_dummy_by_dp(mt1, mt2, chrom):
-
+def gene_csqs_calc_pKO_pseudoSNP(mt1, mt2, chrom):
+    '''Calculate probability of being a knockout incoporating phased 
+       data (mt1) and unphased singletons (mt2). Create a file with 
+       fake markers, that can be inputted into SAIGE'''
     # mt1 is phased
     # mt2 is unphased
 
     # get probability matrix
-    pmt = get_prob_ko_matrix(mt1, mt2, ["dosage","singletons"])
-    pmt = pmt.annotate_entries(DP = pmt.pKO*2) # multiply probability by 2 (dosage encoded [0:2])
+    pmt = get_prob_ko_matrix(mt1, mt2, ["DT","singletons"])
+    pmt = pmt.annotate_entries(DT = pmt.pKO*2) # multiply probability by 2 (dosage encoded [0:2])
     pmt = pmt.drop('pKO')
 
     # create fake loci
@@ -286,3 +236,25 @@ def get_dummy_by_dp(mt1, mt2, chrom):
     pmt = pmt.key_rows_by(pmt.locus, pmt.alleles)
     pmt = pmt.drop('Gene')
     return pmt
+
+def maf_category_case_builder(mt):
+    return (hl.case()
+            .when(call_stats_expr.AF <= 0.00001, 0.00001)
+            .when(call_stats_expr.AF <= 0.0001, 0.0001)
+            .when(call_stats_expr.AF <= 0.001, 0.001)
+            .when(call_stats_expr.AF <= 0.01, 0.01)
+            .when(call_stats_expr.AF <= 0.1, 0.1)
+            .default(0.99))
+
+def mac_category_case_builder(call_stats_expr):
+    return (hl.case()
+            .when(call_stats_expr.AC <= 5, call_stats_expr.AC)
+            .when(call_stats_expr.AC <= 10, 10)
+            .when(call_stats_expr.AC <= 25, 25)
+            .when(call_stats_expr.AC <= 100, 100)
+            .when(call_stats_expr.AC <= 1000, 1000)
+            .when(call_stats_expr.AC <= 10000, 10000)
+            .when(call_stats_expr.AC <= 100000, 100000)
+            .when(call_stats_expr.AC <= 1000000, 1000000)
+            .default(0))
+

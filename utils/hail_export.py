@@ -45,7 +45,7 @@ def main(args):
     get_europeans = args.get_europeans
     vep_filter = args.vep_filter
     export_ko_dosage_matrix = args.export_ko_dosage_matrix
-    export_ko_samples = args.export_ko_samples
+    #export_ko_samples = args.export_ko_samples
     export_burden = args.export_burden
     export_ko_probability = args.export_ko_probability
     export_fake_vcf = args.export_fake_vcf
@@ -56,7 +56,6 @@ def main(args):
     mt2 = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type) # 11867 (for singletons)
 
     ### Sample filtering
-
     if get_related and not get_unrelated:
         mt1 = qc.filter_to_unrelated(mt1, get_related = True)
         mt2 = qc.filter_to_unrelated(mt2, get_related = True)
@@ -76,8 +75,8 @@ def main(args):
     mt2 = qc.filter_max_mac(mt2, 1)
 
     if missing:
-        mt1 = qc.filter_min_missing(mt1, 0.05)
-        mt2 = qc.filter_min_missing(mt2, 0.05)
+        mt1 = qc.filter_min_missing(mt1, float(missing))
+        mt2 = qc.filter_min_missing(mt2, float(missing))
 
     if maf_max:
         mt1 = qc.filter_max_maf(mt1, float(maf_max))
@@ -91,11 +90,7 @@ def main(args):
     if vep_path:
         mt1 = analysis.annotate_vep(mt1, vep_path)
         mt2 = analysis.annotate_vep(mt2, vep_path)
-    
-        # filter VEP
         if vep_filter: 
-            #mt1 = mt1.filter_rows(mt1.vep.consequence_category == 'ptv')
-            #mt2 = mt2.filter_rows(mt2.vep.consequence_category == 'ptv')
             mt1 = analysis.filter_vep(mt1, 'consequence_category', vep_filter)
             mt2 = analysis.filter_vep(mt2, 'consequence_category', vep_filter) 
 
@@ -120,25 +115,20 @@ def main(args):
     if export_ko_probability:
 
         # determine probability of being a ko
-        mt_ko = analysis.get_prob_ko_matrix(mt1, mt2, 'dosage')
+        mt_ko = analysis.gene_csqs_calc_pKO(mt1, mt2, 'dosage')
         mt_ko_entries = mt_ko.entries()
         mt_ko_entries = mt_ko_entries.filter(mt_ko_entries.pKO>0)
 
         # export data
         mt_ko_entries.export(out_prefix + '_ko_prob.tsv.gz')
 
-    if export_ko_samples:
-        # ignores singletons
-        mt_ko_sample = analysis.extract_knockout_samples(mt1)
-        mt_ko_sample.export(out_prefix + '_ko_samples_no_singletons.tsv.gz')
-
     if export_ko_dosage_matrix:
-        # ignores singletons
-        mt_ko_matrix = analysis.construct_phased_dosage_mt(mt1)
+        # ignores singletons (but gives an overview)
+        mt_ko_matrix = analysis.gene_csqs_case_builder(mt1)
         mt_ko_matrix.export(out_prefix + '_ko_matrix_no_singletons.tsv.gz')
 
     if export_fake_vcf:
-        out = analysis.get_dummy_by_dp(mt1, mt2, chrom)
+        out = analysis.gene_csqs_calc_pKO_pseudoSNP(mt1, mt2, chrom)
         qc.export_table(out, out_prefix = out_prefix + "_ko", out_type = 'vcf')
 
 if __name__=='__main__':
@@ -166,7 +156,6 @@ if __name__=='__main__':
     parser.add_argument('--export_fake_vcf', action='store_true', help='Export a "fake" VCF file that contains KO probabilities as DP field..')
     parser.add_argument('--vep_path', default=None, help='path to a .vcf file containing annotated entries by locus and alleles')
     parser.add_argument('--vep_filter', nargs='+', help='Filter consequence_category by mutations e.g., "damaging_missense" or "ptv"')
-    parser.add_argument('--export_ko_samples', action='store_true', help='Get the genes/individuals that are KO and the SNPs involved')
     parser.add_argument('--export_ko_dosage_matrix', action='store_true', help='Generate a gene x sample matrix with KO status')
     
     args = parser.parse_args()

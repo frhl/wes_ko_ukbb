@@ -226,5 +226,14 @@ def default_to_snpid_when_missing_rsid(mt):
     r'''rsid is converted to snpid when it is missing'''
     return mt.annotate_rows(rsid = hl.if_else(hl.is_missing(mt.rsid), mt.snpid, mt.rsid))
 
+def is_phased(mt):
+    ''' Check if the input contains phased data. Returns Bool'''
+    mt = mt.annotate_entries(phased = 
+                        (mt.GT ==  hl.parse_call('0|0')) |
+                        (mt.GT ==  hl.parse_call('1|0')) |
+                        (mt.GT ==  hl.parse_call('0|1')) |
+                        (mt.GT ==  hl.parse_call('1|1'))
+                       )
+    return mt.aggregate_entries(hl.agg.any(mt.phased))
 
 

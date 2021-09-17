@@ -5,9 +5,9 @@
 #$ -o logs/knockout.log
 #$ -e logs/knockout.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 4
+#$ -pe shmem 5
 #$ -q short.qe
-#$ -t 1-21
+#$ -t 21
 
 set -o errexit
 set -o nounset
@@ -20,7 +20,7 @@ readonly in_dir_phased="data/phased"
 readonly in_dir_unphased="data/unphased/unfiltered"
 readonly vep_dir="data/vep/full/"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/ko_tmp"
+readonly out_dir="derived/tmp"
 
 # hail script
 readonly hail_script="utils/hail_export.py"
@@ -48,11 +48,11 @@ python3 "${hail_script}" \
     --vep_path ${vep} \
     --vep_filter "damaging_missense" "ptv" \
     --maf_max 0.02 \
+    --missing 0.05 \
     --out_prefix ${out_prefix} \
     --export_burden \
     --export_ko_probability \
-    --export_fake_vcf \
-    --export_ko_samples  
+    --export_fake_vcf
 
 
 print_update "Finished running HAIL for chr${chr}" "${SECONDS}"
