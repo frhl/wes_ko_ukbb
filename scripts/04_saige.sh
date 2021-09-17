@@ -41,8 +41,8 @@ readonly out="${out_prefix}.plink"
 # SAIGE step paths
 readonly threads=$(( ${NSLOTS}-1 ))
 readonly createSparseGRM="/well/lindgren/flassen/software/dev/SAIGE/extdata/createSparseGRM.R"
-#readonly step1_fitNULLGLMM="/well/lindgren/flassen/software/dev/SAIGE/step1_fitNULLGLMM.R"
-#readonly step2_SPAtests="/well/lindgren/flassen/software/dev/SAIGE/extdata/step2_SPAtests.R"
+readonly step1_fitNULLGLMM="/well/lindgren/flassen/software/dev/SAIGE/step1_fitNULLGLMM.R"
+readonly step2_SPAtests="/well/lindgren/flassen/software/dev/SAIGE/extdata/step2_SPAtests.R"
 
 # setup hail
 
@@ -69,5 +69,55 @@ Rscript "${createSparseGRM}" \
 	--relatednessCutoff=0.125
 
 
-print_update "Finished running HAIL for chr${chr}" "${SECONDS}"
+Rscript "${step1_fitNULLGLMM.R}"     \
+	--plinkFile=./input/nfam_100_nindep_0_step1_includeMoreRareVariants_poly \
+    --phenoFile=./input/pheno_1000samples.txt_withdosages_withBothTraitTypes.txt \
+    --phenoCol=y_quantitative \
+    --covarColList=x1,x2 \
+    --sampleIDColinphenoFile=IID \
+    --traitType=quantitative       \
+    --invNormalize=TRUE     \
+    --outputPrefix=./output/example_quantitative \
+	--outputPrefix_varRatio=./output/example_quantitative_cate	\
+	--sparseGRMFile=./output/example_binary_cate.varianceRatio.txt.sparseGRM.mtx    \
+    --sparseGRMSampleIDFile=./output/example_binary.varianceRatio.txt.sparseGRM.mtx.sample  \
+    --nThreads=4 \
+    --LOCO=FALSE	\
+	--skipModelFitting=FALSE \
+    --IsSparseKin=TRUE      \
+    --isCateVarianceRatio=TRUE	
+
+Rscript "${step1_fitNULLGLMM.R}"     \
+    --plinkFile=./input/nfam_100_nindep_0_step1_includeMoreRareVariants_poly \
+    --phenoFile=./input/pheno_1000samples.txt_withdosages_withBothTraitTypes.txt \
+    --phenoCol=y_binary \
+    --covarColList=x1,x2 \
+    --sampleIDColinphenoFile=IID \
+    --traitType=binary       \
+    --invNormalize=TRUE     \
+    --outputPrefix=./output/example_binary \
+    --outputPrefix_varRatio=./output/example_binary_cate      \
+    --sparseGRMFile=./output/example_binary_cate.varianceRatio.txt.sparseGRM.mtx    \
+    --sparseGRMSampleIDFile=./output/example_binary.varianceRatio.txt.sparseGRM.mtx.sample  \
+    --nThreads=4 \
+    --LOCO=FALSE    \
+    --skipModelFitting=FALSE \
+    --IsSparseKin=TRUE      \
+    --isCateVarianceRatio=TRUE
+
+Rscript step2_SPAtests.R	\
+	--vcfFile=./input/dosage_10markers.vcf.gz \
+	--vcfFileIndex=./input/dosage_10markers.vcf.gz.tbi \
+	--vcfField=DS \
+        --chrom=1 \
+        --minMAF=0.0001 \
+        --minMAC=1 \
+        --GMMATmodelFile=./output/example_binary_includenonAutoforvarRatio.rda \
+        --varianceRatioFile=./output/example_binary.varianceRatio.txt \
+        --SAIGEOutputFile=./output/example_binary.SAIGE.vcf.genotype.txt_new \
+        --numLinesOutput=2 \
+        --IsOutputAFinCaseCtrl=TRUE	\
+	--IsOutputNinCaseCtrl=TRUE	\
+	--IsOutputHetHomCountsinCaseCtrl=TRUE	
+
 

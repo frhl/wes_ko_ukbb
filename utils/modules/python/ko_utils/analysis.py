@@ -93,7 +93,7 @@ def gene_csqs_case_builder(in_mt):
     '''
     # get all snps that are not homozygous
     mt = in_mt
-    mt = analysis.annotate_phased_entries(mt)
+    mt = annotate_phased_entries(mt)
     mt = mt.filter_entries(~mt.GT.is_hom_var())
     # create table for each strand and combine to gene
     ht0 = (mt.group_rows_by(mt.vep.Gene).aggregate(s0 = hl.agg.any(mt.a0_alt)))
@@ -121,7 +121,7 @@ def gene_csqs_dosage_builder(in_mt):
     '''
     # get all snps that are not homozygous
     mt = in_mt
-    mt = analysis.annotate_phased_entries(mt)
+    mt = annotate_phased_entries(mt)
     mt = mt.filter_entries(~mt.GT.is_hom_var())
     # create table for each strand and combine to gene
     ht0 = (mt.group_rows_by(mt.vep.Gene).aggregate(s0 = hl.agg.any(mt.a0_alt)))
