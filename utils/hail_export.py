@@ -130,6 +130,7 @@ def main(args):
     if export_fake_vcf:
         out = analysis.gene_csqs_calc_pKO_pseudoSNP(mt1, mt2, chrom)
         qc.export_table(out, out_prefix = out_prefix + "_ko", out_type = 'vcf')
+        qc.export_table(out, out_prefix = out_prefix + "_ko", out_type = 'plink')
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
