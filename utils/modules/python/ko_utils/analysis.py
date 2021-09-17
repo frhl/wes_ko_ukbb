@@ -198,7 +198,7 @@ def calc_p_ko(mt):
     )
     return ko_mt
 
-def gene_csqs_calc_pKO(mt_phased, mt_unphased, fields_drop = ['dosage','sigletons']):
+def gene_csqs_calc_pKO(mt_phased, mt_unphased, fields_drop = ['DT','sigletons']):
     
     '''Annotates entries with P(Knockout). Requires a phased matrix and an unphased matrix that only contains singletons.'''
     
@@ -225,7 +225,7 @@ def gene_csqs_calc_pKO_pseudoSNP(mt1, mt2, chrom):
     # mt2 is unphased
 
     # get probability matrix
-    pmt = get_prob_ko_matrix(mt1, mt2, ["DT","singletons"])
+    pmt = gene_csqs_calc_pKO(mt1, mt2, ["DT","singletons"])
     pmt = pmt.annotate_entries(DT = pmt.pKO*2) # multiply probability by 2 (dosage encoded [0:2])
     pmt = pmt.drop('pKO')
 
@@ -257,4 +257,32 @@ def mac_category_case_builder(call_stats_expr):
             .when(call_stats_expr.AC <= 100000, 100000)
             .when(call_stats_expr.AC <= 1000000, 1000000)
             .default(0))
+
+def gene_csqs_variant_builder(in_mt):
+    r'''Makes a matrix table that contains variants for each (phased) strand'''
+    # annotate with rsid
+    in_mt = in_mt.annotate_entries(rsid_entry = in_mt.rsid)
+    in_mt = in_mt.annotate_entries(rsid_gt = hl.delimit([in_mt.rsid_entry, hl.str(in_mt.GT)], '='))
+    # get all snps that are not homozygous
+    mt = in_mt
+    mt = annotate_phased_entries(mt)
+    mt = mt.filter_entries(~mt.GT.is_hom_var())
+    # create table for each strand and combine to gene
+    ht0 = (mt.group_rows_by(mt.vep.Gene).aggregate(s0 = hl.agg.filter(mt.a0_alt, hl.agg.collect(mt.rsid_gt))))
+    ht1 = (mt.group_rows_by(mt.vep.Gene).aggregate(s1 = hl.agg.filter(mt.a1_alt, hl.agg.collect(mt.rsid_gt))))
+    ht2 = (in_mt.group_rows_by(in_mt.vep.Gene).aggregate(hom_var = hl.agg.filter(in_mt.GT.is_hom_var(), hl.agg.collect(in_mt.rsid_gt))))
+    # combine entries
+    ht = ht0.annotate_entries(s1 = ht1[ht0.Gene, ht0.s].s1)
+    ht = ht.annotate_entries(hom_var = ht2[ht.Gene, ht.s].hom_var)
+    return ht
+    
+def gene_csqs_rsid_builder(in_mt, keep = ['CH','HO','CH+HO']):
+    r'''Makes a matrix that cotanins knockout type and the variant (rsID) involved in the KO'''
+    # build gene x variants/ko status
+    mt_rs = gene_csqs_variant_builder(in_mt)
+    mt_dt = gene_csqs_case_builder(in_mt)
+    # combine the two annotations in a single table 
+    combined = mt_rs.annotate_entries(csqs = mt_dt[mt_rs.Gene, mt_rs.s].csqs)
+    combined = combined.filter_entries(hl.literal(keep).contains(combined.csqs))
+    return combined
 

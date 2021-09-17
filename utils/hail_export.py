@@ -49,6 +49,7 @@ def main(args):
     export_burden = args.export_burden
     export_ko_probability = args.export_ko_probability
     export_fake_vcf = args.export_fake_vcf
+    export_ko_rsid = args.export_ko_rsid
 
     # run parser
     hail_init.hail_bmrc_init('logs/hail/hail_export.log', 'GRCh38')
@@ -127,6 +128,10 @@ def main(args):
         mt_ko_matrix = analysis.gene_csqs_case_builder(mt1)
         mt_ko_matrix.export(out_prefix + '_ko_matrix_no_singletons.tsv.gz')
 
+    if export_ko_rsid:
+        mt_ko_rsid = analysis.gene_csqs_rsid_builder(mt1).entries()
+        mt_ko_rsid.export(out_prefix + '_ko_rsid.tsv.gz')
+
     if export_fake_vcf:
         out = analysis.gene_csqs_calc_pKO_pseudoSNP(mt1, mt2, chrom)
         qc.export_table(out, out_prefix = out_prefix + "_ko", out_type = 'vcf')
@@ -151,7 +156,8 @@ if __name__=='__main__':
     parser.add_argument('--get_related', action='store_true', help='Select all samples that are related')
     parser.add_argument('--get_unrelated', action='store_true', help='Select all samples that are unrelated')
     parser.add_argument('--get_europeans', action='store_true', help='Filter to genetically confimed europeans?')
-    # out
+    # out 
+    parser.add_argument('--export_ko_rsid', action='store_true', help='Exports the table with rsIDs involved in KOs.')
     parser.add_argument('--export_ko_probability', action='store_true', help='Exports the KO probability.')
     parser.add_argument('--export_burden', action='store_true', help='Export burden variant count by gene and and individuals.')
     parser.add_argument('--export_fake_vcf', action='store_true', help='Export a "fake" VCF file that contains KO probabilities as DP field..')
