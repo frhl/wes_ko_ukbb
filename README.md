@@ -11,7 +11,8 @@ updated 17-sep-2021
 * Setup SAIGE pipeline (fit null)
 * setup SAIGE pipeline (SPA test)
 * get phenotypes (Teresa)
-* extract allels that are compound hetz. Validate with known compound hetz analysis.
+* (DONE) extract allels that are compound hetz. Validate with known compound hetz analysis.
+* extract allele consequence for compound hetz/homozygous individuals. 
 * run saige with with sparse matrix and fake VCF files that represent knockouts. (Notice, that we treat these files as single markers and not genesets!). Note: when running SAIGE, you can use the full file with non white british. These will be removed since GRM is created on only WB.
 
 ## Current pipeline:
