@@ -1,0 +1,728 @@
+Fatal error: cannot open file '/well/lindgren/flassen/software/dev/SAIGE/step1_fitNULLGLMM.R': No such file or directory
+R version 3.6.1 (2019-07-05)
+Platform: x86_64-conda_cos6-linux-gnu (64-bit)
+Running under: CentOS Linux 7 (Core)
+
+Matrix products: default
+BLAS/LAPACK: /gpfs3/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/lib/R/lib/libRblas.so
+
+locale:
+[1] C
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] optparse_1.6.4 SAIGE_0.44.6.4
+
+loaded via a namespace (and not attached):
+[1] compiler_3.6.1     Matrix_1.2-17      Rcpp_1.0.1         getopt_1.20.3     
+[5] grid_3.6.1         RcppParallel_5.1.4 lattice_0.20-44   
+$plinkFile
+[1] "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers"
+
+$phenoFile
+[1] "data/saige/grm/input/UKBB_WES200k_binary_phenotypes.tsv"
+
+$phenoCol
+[1] "Crohns_disease"
+
+$traitType
+[1] "binary"
+
+$invNormalize
+[1] TRUE
+
+$covarColList
+[1] "data/saige/COVAR_FILE_HERE"
+
+$sampleIDColinphenoFile
+[1] "ID"
+
+$tol
+[1] 0.02
+
+$maxiter
+[1] 20
+
+$tolPCG
+[1] 1e-05
+
+$maxiterPCG
+[1] 500
+
+$nThreads
+[1] 1
+
+$SPAcutoff
+[1] 2
+
+$numRandomMarkerforVarianceRatio
+[1] 30
+
+$skipModelFitting
+[1] FALSE
+
+$memoryChunk
+[1] 2
+
+$tauInit
+[1] "0,0"
+
+$LOCO
+[1] FALSE
+
+$traceCVcutoff
+[1] 0.0025
+
+$ratioCVcutoff
+[1] 0.001
+
+$outputPrefix
+[1] "derived/saige/binary/ukb_wes_200k_test_crohns22"
+
+$outputPrefix_varRatio
+[1] "derived/saige/binary/ukb_wes_200k_test_crohns_cate"
+
+$IsOverwriteVarianceRatioFile
+[1] FALSE
+
+$IsSparseKin
+[1] TRUE
+
+$sparseGRMFile
+[1] "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+
+$sparseGRMSampleIDFile
+[1] "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt"
+
+$numRandomMarkerforSparseKin
+[1] 2000
+
+$isCateVarianceRatio
+[1] TRUE
+
+$relatednessCutoff
+[1] 0.125
+
+$cateVarRatioMinMACVecExclude
+[1] "0.5,1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+$cateVarRatioMaxMACVecInclude
+[1] "1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+$isCovariateTransform
+[1] TRUE
+
+$isDiagofKinSetAsOne
+[1] FALSE
+
+$useSparseSigmaConditionerforPCG
+[1] FALSE
+
+$useSparseSigmaforInitTau
+[1] FALSE
+
+$useSparseGRMtoFitNULL
+[1] FALSE
+
+$minMAFforGRM
+[1] 0.01
+
+$minCovariateCount
+[1] -1
+
+$includeNonautoMarkersforVarRatio
+[1] FALSE
+
+$FemaleOnly
+[1] FALSE
+
+$MaleOnly
+[1] FALSE
+
+$sexCol
+[1] ""
+
+$FemaleCode
+[1] "1"
+
+$MaleCode
+[1] "0"
+
+$noEstFixedEff
+[1] FALSE
+
+$help
+[1] FALSE
+
+tauInit  is  0 0 
+cateVarRatioMinMACVecExclude  is  0.5 1.5 2.5 3.5 4.5 5.5 10.5 20.5 
+cateVarRatioMaxMACVecInclude  is  1.5 2.5 3.5 4.5 5.5 10.5 20.5 
+Markers in the Plink file with MAF >=  0.01  will be used to construct GRM
+458841  samples have genotypes
+R version 3.6.1 (2019-07-05)
+Platform: x86_64-conda_cos6-linux-gnu (64-bit)
+Running under: CentOS Linux 7 (Core)
+
+Matrix products: default
+BLAS/LAPACK: /gpfs3/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/lib/R/lib/libRblas.so
+
+locale:
+[1] C
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] optparse_1.6.4 SAIGE_0.44.6.4
+
+loaded via a namespace (and not attached):
+[1] compiler_3.6.1     Matrix_1.2-17      Rcpp_1.0.1         getopt_1.20.3     
+[5] grid_3.6.1         RcppParallel_5.1.4 lattice_0.20-44   
+$plinkFile
+[1] "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers"
+
+$phenoFile
+[1] "/well/lindgren/UKBIOBANK/dpalmer/ukb_wes_phenotypes/200k/UKBB_WES200k_binary_phenotypes.tsv"
+
+$phenoCol
+[1] "Crohns_disease"
+
+$traitType
+[1] "binary"
+
+$invNormalize
+[1] TRUE
+
+$covarColList
+[1] "data/saige/COVAR_FILE_HERE"
+
+$sampleIDColinphenoFile
+[1] "ID"
+
+$tol
+[1] 0.02
+
+$maxiter
+[1] 20
+
+$tolPCG
+[1] 1e-05
+
+$maxiterPCG
+[1] 500
+
+$nThreads
+[1] 1
+
+$SPAcutoff
+[1] 2
+
+$numRandomMarkerforVarianceRatio
+[1] 30
+
+$skipModelFitting
+[1] FALSE
+
+$memoryChunk
+[1] 2
+
+$tauInit
+[1] "0,0"
+
+$LOCO
+[1] FALSE
+
+$traceCVcutoff
+[1] 0.0025
+
+$ratioCVcutoff
+[1] 0.001
+
+$outputPrefix
+[1] "derived/saige/binary/ukb_wes_200k_test_crohns22"
+
+$outputPrefix_varRatio
+[1] "derived/saige/binary/ukb_wes_200k_test_crohns_cate"
+
+$IsOverwriteVarianceRatioFile
+[1] FALSE
+
+$IsSparseKin
+[1] TRUE
+
+$sparseGRMFile
+[1] "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+
+$sparseGRMSampleIDFile
+[1] "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt"
+
+$numRandomMarkerforSparseKin
+[1] 2000
+
+$isCateVarianceRatio
+[1] TRUE
+
+$relatednessCutoff
+[1] 0.125
+
+$cateVarRatioMinMACVecExclude
+[1] "0.5,1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+$cateVarRatioMaxMACVecInclude
+[1] "1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+$isCovariateTransform
+[1] TRUE
+
+$isDiagofKinSetAsOne
+[1] FALSE
+
+$useSparseSigmaConditionerforPCG
+[1] FALSE
+
+$useSparseSigmaforInitTau
+[1] FALSE
+
+$useSparseGRMtoFitNULL
+[1] FALSE
+
+$minMAFforGRM
+[1] 0.01
+
+$minCovariateCount
+[1] -1
+
+$includeNonautoMarkersforVarRatio
+[1] FALSE
+
+$FemaleOnly
+[1] FALSE
+
+$MaleOnly
+[1] FALSE
+
+$sexCol
+[1] ""
+
+$FemaleCode
+[1] "1"
+
+$MaleCode
+[1] "0"
+
+$noEstFixedEff
+[1] FALSE
+
+$help
+[1] FALSE
+
+tauInit  is  0 0 
+cateVarRatioMinMACVecExclude  is  0.5 1.5 2.5 3.5 4.5 5.5 10.5 20.5 
+cateVarRatioMaxMACVecInclude  is  1.5 2.5 3.5 4.5 5.5 10.5 20.5 
+Markers in the Plink file with MAF >=  0.01  will be used to construct GRM
+R version 3.6.1 (2019-07-05)
+Platform: x86_64-conda_cos6-linux-gnu (64-bit)
+Running under: CentOS Linux 7 (Core)
+
+Matrix products: default
+BLAS/LAPACK: /gpfs3/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/lib/R/lib/libRblas.so
+
+locale:
+[1] C
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] optparse_1.6.4 SAIGE_0.44.6.4
+
+loaded via a namespace (and not attached):
+[1] compiler_3.6.1     Matrix_1.2-17      Rcpp_1.0.1         getopt_1.20.3     
+[5] grid_3.6.1         RcppParallel_5.1.4 lattice_0.20-44   
+$plinkFile
+[1] "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers"
+
+$phenoFile
+[1] "/well/lindgren/UKBIOBANK/dpalmer/ukb_wes_phenotypes/200k/UKBB_WES200k_binary_phenotypes.tsv"
+
+$phenoCol
+[1] "Crohns_disease"
+
+$traitType
+[1] "binary"
+
+$invNormalize
+[1] TRUE
+
+$covarColList
+[1] "data/saige/COVAR_FILE_HERE"
+
+$sampleIDColinphenoFile
+[1] "ID"
+
+$tol
+[1] 0.02
+
+$maxiter
+[1] 20
+
+$tolPCG
+[1] 1e-05
+
+$maxiterPCG
+[1] 500
+
+$nThreads
+[1] 1
+
+$SPAcutoff
+[1] 2
+
+$numRandomMarkerforVarianceRatio
+[1] 30
+
+$skipModelFitting
+[1] FALSE
+
+$memoryChunk
+[1] 2
+
+$tauInit
+[1] "0,0"
+
+$LOCO
+[1] FALSE
+
+$traceCVcutoff
+[1] 0.0025
+
+$ratioCVcutoff
+[1] 0.001
+
+$outputPrefix
+[1] "derived/saige/binary/ukb_wes_200k_test_crohns22"
+
+$outputPrefix_varRatio
+[1] "derived/saige/binary/ukb_wes_200k_test_crohns22"
+
+$IsOverwriteVarianceRatioFile
+[1] FALSE
+
+$IsSparseKin
+[1] TRUE
+
+$sparseGRMFile
+[1] "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+
+$sparseGRMSampleIDFile
+[1] "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt"
+
+$numRandomMarkerforSparseKin
+[1] 2000
+
+$isCateVarianceRatio
+[1] TRUE
+
+$relatednessCutoff
+[1] 0.125
+
+$cateVarRatioMinMACVecExclude
+[1] "0.5,1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+$cateVarRatioMaxMACVecInclude
+[1] "1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+$isCovariateTransform
+[1] TRUE
+
+$isDiagofKinSetAsOne
+[1] FALSE
+
+$useSparseSigmaConditionerforPCG
+[1] FALSE
+
+$useSparseSigmaforInitTau
+[1] FALSE
+
+$useSparseGRMtoFitNULL
+[1] FALSE
+
+$minMAFforGRM
+[1] 0.01
+
+$minCovariateCount
+[1] -1
+
+$includeNonautoMarkersforVarRatio
+[1] FALSE
+
+$FemaleOnly
+[1] FALSE
+
+$MaleOnly
+[1] FALSE
+
+$sexCol
+[1] ""
+
+$FemaleCode
+[1] "1"
+
+$MaleCode
+[1] "0"
+
+$noEstFixedEff
+[1] FALSE
+
+$help
+[1] FALSE
+
+tauInit  is  0 0 
+cateVarRatioMinMACVecExclude  is  0.5 1.5 2.5 3.5 4.5 5.5 10.5 20.5 
+cateVarRatioMaxMACVecInclude  is  1.5 2.5 3.5 4.5 5.5 10.5 20.5 
+Markers in the Plink file with MAF >=  0.01  will be used to construct GRM
+458841  samples have genotypes
+R version 3.6.1 (2019-07-05)
+Platform: x86_64-conda_cos6-linux-gnu (64-bit)
+Running under: CentOS Linux 7 (Core)
+
+Matrix products: default
+BLAS/LAPACK: /gpfs3/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/lib/R/lib/libRblas.so
+
+locale:
+[1] C
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] optparse_1.6.4 SAIGE_0.44.6.4
+
+loaded via a namespace (and not attached):
+[1] compiler_3.6.1     Matrix_1.2-17      Rcpp_1.0.1         getopt_1.20.3     
+[5] grid_3.6.1         RcppParallel_5.1.4 lattice_0.20-44   
+$plinkFile
+[1] "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers"
+
+$phenoFile
+[1] "/well/lindgren/UKBIOBANK/dpalmer/ukb_wes_phenotypes/200k/UKBB_WES200k_binary_phenotypes.tsv"
+
+$phenoCol
+[1] "Crohns_disease"
+
+$traitType
+[1] "binary"
+
+$invNormalize
+[1] TRUE
+
+$covarColList
+[1] "age,sex2,genotyping.array2,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10"
+
+$sampleIDColinphenoFile
+[1] "ID"
+
+$tol
+[1] 0.02
+
+$maxiter
+[1] 20
+
+$tolPCG
+[1] 1e-05
+
+$maxiterPCG
+[1] 500
+
+$nThreads
+[1] 1
+
+$SPAcutoff
+[1] 2
+
+$numRandomMarkerforVarianceRatio
+[1] 30
+
+$skipModelFitting
+[1] FALSE
+
+$memoryChunk
+[1] 2
+
+$tauInit
+[1] "0,0"
+
+$LOCO
+[1] FALSE
+
+$traceCVcutoff
+[1] 0.0025
+
+$ratioCVcutoff
+[1] 0.001
+
+$outputPrefix
+[1] "derived/saige/binary/ukb_wes_200k_test_crohns22"
+
+$outputPrefix_varRatio
+[1] "derived/saige/binary/ukb_wes_200k_test_crohns22"
+
+$IsOverwriteVarianceRatioFile
+[1] TRUE
+
+$IsSparseKin
+[1] TRUE
+
+$sparseGRMFile
+[1] "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+
+$sparseGRMSampleIDFile
+[1] "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt"
+
+$numRandomMarkerforSparseKin
+[1] 2000
+
+$isCateVarianceRatio
+[1] TRUE
+
+$relatednessCutoff
+[1] 0.125
+
+$cateVarRatioMinMACVecExclude
+[1] "0.5,1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+$cateVarRatioMaxMACVecInclude
+[1] "1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+$isCovariateTransform
+[1] TRUE
+
+$isDiagofKinSetAsOne
+[1] FALSE
+
+$useSparseSigmaConditionerforPCG
+[1] FALSE
+
+$useSparseSigmaforInitTau
+[1] FALSE
+
+$useSparseGRMtoFitNULL
+[1] FALSE
+
+$minMAFforGRM
+[1] 0.01
+
+$minCovariateCount
+[1] -1
+
+$includeNonautoMarkersforVarRatio
+[1] FALSE
+
+$FemaleOnly
+[1] FALSE
+
+$MaleOnly
+[1] FALSE
+
+$sexCol
+[1] ""
+
+$FemaleCode
+[1] "1"
+
+$MaleCode
+[1] "0"
+
+$noEstFixedEff
+[1] FALSE
+
+$help
+[1] FALSE
+
+tauInit  is  0 0 
+cateVarRatioMinMACVecExclude  is  0.5 1.5 2.5 3.5 4.5 5.5 10.5 20.5 
+cateVarRatioMaxMACVecInclude  is  1.5 2.5 3.5 4.5 5.5 10.5 20.5 
+Markers in the Plink file with MAF >=  0.01  will be used to construct GRM
+The variance ratio file  derived/saige/binary/ukb_wes_200k_test_crohns22.varianceRatio.txt  already exists. IsOverwriteVarianceRatioFile=TRUE so the file will be overwritten
+458841  samples have genotypes
+formula is  Crohns_disease~age+sex2+genotyping.array2+PC1+PC2+PC3+PC4+PC5+PC6+PC7+PC8+PC9+PC10 
+111562  samples have non-missing phenotypes
+347279  samples in geno file do not have phenotypes
+111562  samples will be used for analysis
+qr transformation has been performed on covariates
+colnames(data.new) is  Y minus1 age sex2 genotyping.array2 PC1 PC2 PC3 PC4 PC5 PC6 PC7 PC8 PC9 PC10 
+out.transform$Param.transform$qrr:  14 14 
+extract sparse GRM
+[1] 568941
+set elements in the sparse GRN <=  0.125  to zero
+[1] 568941
+111562  samples have been used to fit the glmm null model
+[1] "print m4"
+[1] 111562 111562
+2 locationMat.n_rows 
+118204 locationMat.n_cols 
+118204 valueVec.n_elem 
+1.08047
+0
+0
+0.994459
+1
+1
+0.997576
+2
+2
+1.01329
+3
+3
+0.994539
+4
+4
+1.0122
+5
+5
+0.997576
+6
+6
+1.0061
+7
+7
+0.999909
+8
+8
+1.00852
+9
+9
+Crohns_disease  is a binary trait
+glm:
+
+Call:  glm(formula = formula.new, family = binomial, data = data.new)
+
+Coefficients:
+           minus1                age               sex2  genotyping.array2  
+         4.943320           0.058832           0.101806           0.111495  
+              PC1                PC2                PC3                PC4  
+         0.027240           0.001563          -0.016810          -0.054652  
+              PC5                PC6                PC7                PC8  
+         0.058452           0.012825           0.028545          -0.002693  
+              PC9               PC10  
+         0.057067           0.056495  
+
+Degrees of Freedom: 111562 Total (i.e. Null);  111548 Residual
+Null Deviance:	    154700 
+Residual Deviance: 9526 	AIC: 9554
+Start fitting the NULL GLMM
+   user  system elapsed 
+  7.447   1.247   8.374 
+   user  system elapsed 
+  7.686   1.247   8.612 
+[1] "Start reading genotype plink file here"
+nbyte: 114711
+nbyte: 27891
+reserve: 2599153408
+
+M: 93183, N: 458841
+size of genoVecofPointers: 6
+setgeno mark1
+setgeno mark2
