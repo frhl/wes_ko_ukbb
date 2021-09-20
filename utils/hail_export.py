@@ -18,6 +18,7 @@ import argparse
 import pandas
 import os
 
+from gnomad.utils.vep import process_consequences
 from ukb_utils import hail_init
 from ukb_utils import genotypes
 from ko_utils import qc
@@ -39,13 +40,13 @@ def main(args):
     maf_min    = (args.maf_min)
     hwe        = (args.hwe)
     missing    = args.missing
-    
+    annotate_rsid = args.annotate_rsid   
+ 
     get_related = args.get_related
     get_unrelated = args.get_unrelated
     get_europeans = args.get_europeans
     vep_filter = args.vep_filter
     export_ko_dosage_matrix = args.export_ko_dosage_matrix
-    #export_ko_samples = args.export_ko_samples
     export_burden = args.export_burden
     export_ko_probability = args.export_ko_probability
     export_fake_vcf = args.export_fake_vcf
@@ -89,11 +90,39 @@ def main(args):
         mt1 = qc.filter_hwe(mt1, float(hwe))
 
     if vep_path:
-        mt1 = analysis.annotate_vep(mt1, vep_path)
-        mt2 = analysis.annotate_vep(mt2, vep_path)
+        
+        # Run VEP + gnomAD variant annotations
+        mt1 = process_consequences(hl.vep(mt1, "utils/configs/vep_env.json"))
+        mt2 = process_consequences(hl.vep(mt2, "utils/configs/vep_env.json"))
+        
+        # Annotate with REVEL+CADD scores
+        mt1 = analysis.annotate_dbnsfp(mt1, vep_path)
+        mt2 = analysis.annotate_dbnsfp(mt2, vep_path)
+        
+        # annotate consequnece categories 
+        mt1 = analysis.variant_csqs_category_builder(mt1)
+        mt2 = analysis.variant_csqs_category_builder(mt2)
+        
+        # annotate Gene (In the future just use vep.worst_csq_by_gene_canonical downstream..) 
+        mt1 = mt1.annotate_rows(vep = mt1.vep.annotate(Gene = mt1.vep.worst_csq_by_gene_canonical))
+        mt2 = mt2.annotate_rows(vep = mt2.vep.annotate(Gene = mt2.vep.worst_csq_by_gene_canonical))
+        
+        # only keep selected consequences
         if vep_filter: 
             mt1 = analysis.filter_vep(mt1, 'consequence_category', vep_filter)
             mt2 = analysis.filter_vep(mt2, 'consequence_category', vep_filter) 
+
+    if annotate_rsid:
+
+        # annotate mt1 with dbSNP
+        mt1 = qc.annotate_snpid(mt1)
+        mt1 = qc.annotate_rsid(mt1)
+        mt1 = qc.default_to_snpid_when_missing_rsid(mt1)
+
+        # annotate mt2 with dbSNP
+        mt2 = qc.annotate_snpid(mt2)
+        mt2 = qc.annotate_rsid(mt2)
+        mt2 = qc.default_to_snpid_when_missing_rsid(mt2)
 
     #### get stats
 
@@ -135,7 +164,6 @@ def main(args):
     if export_fake_vcf:
         out = analysis.gene_csqs_calc_pKO_pseudoSNP(mt1, mt2, chrom)
         qc.export_table(out, out_prefix = out_prefix + "_ko", out_type = 'vcf')
-        qc.export_table(out, out_prefix = out_prefix + "_ko", out_type = 'plink')
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
@@ -147,6 +175,7 @@ if __name__=='__main__':
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Type of output dataset (options: mt, vcf, plink)')
     # filtering variants
+    parser.add_argument('--annotate_rsid', action = 'store_true', help = 'use dbSNP to annotate rsids in data')
     parser.add_argument('--chrom', default=None, help='Chromosome to be used')
     parser.add_argument('--maf_max', default=None, help='Select all variants with a maf less than the indicated value')
     parser.add_argument('--maf_min', default=None, help='Select all variants with a maf greater than the indicated values')

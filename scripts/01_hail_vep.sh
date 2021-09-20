@@ -11,7 +11,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 5
 #$ -q short.qe
-#$ -t 21
+#$ -t 20
 #$ -V
 
 set -o errexit
@@ -28,6 +28,8 @@ readonly out_dir="data/mt"
 readonly out="${out_dir}/ukb_wes_vep_200_chr${chr}" 
 readonly spark_dir="data/tmp/spark"
 readonly hail_script='utils/hail_vep_export.sh'
+readonly vep_dir="data/vep/full/"
+readonly vep="${vep_dir}/ukb_wes_200k_full_vep_chr${chr}.vcf"
 
 # generate VEP annotations as matrix table
 set_up_hail
@@ -37,6 +39,7 @@ mkdir -p ${out_dir}
 python3 "${hail_script}" \
 	--input_path ${in} \
     --input_type "vcf" \
+    --vep_path "${vep}" \
     --out_prefix ${out} \
     --out_type "mt"
 

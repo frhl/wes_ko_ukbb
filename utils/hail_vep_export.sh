@@ -6,10 +6,12 @@ import os
 from gnomad.utils.vep import process_consequences
 from ukb_utils import hail_init
 from ko_utils import qc
+from ko_utils import analysis
 
 def main(args):
     
     # input path
+    vep_path = args.vep_path
     input_path = args.input_path
     input_type = args.input_type
     out_prefix = args.out_prefix
@@ -35,11 +37,15 @@ def main(args):
     # get VEP
     result = hl.vep(dataset, "utils/configs/vep_env.json") 
     result = process_consequences(result)
+    result = analysis.annotate_dbnsfp(result, vep_path)
+    result = analysis.variant_csqs_category_builder(result)
+
     qc.export_table(result, out_prefix = out_prefix, out_type = out_type)
     
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
-    # initial params
+    # initial params 
+    parser.add_argument('--vep_path', default=None, help='Path to VEP file with dbNSFP annotations')
     parser.add_argument('--input_path', default=None, help='Path to input')
     parser.add_argument('--input_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
     parser.add_argument('--translate_iid', action='store_true', help='Translate iid to lindgren data (Only required for phased data)')

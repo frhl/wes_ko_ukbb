@@ -5,9 +5,9 @@
 #$ -o logs/knockout.log
 #$ -e logs/knockout.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 8
+#$ -pe shmem 5
 #$ -q short.qe
-#$ -t 1-21
+#$ -t 22
 
 set -o errexit
 set -o nounset
@@ -20,7 +20,7 @@ readonly in_dir_phased="data/phased"
 readonly in_dir_unphased="data/unphased/unfiltered"
 readonly vep_dir="data/vep/full/"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/knockouts/all/ptv"
+readonly out_dir="derived/tmp"
 
 # hail script
 readonly hail_script="utils/hail_export.py"
@@ -37,6 +37,7 @@ readonly out="${out_prefix}.mt"
 
 # run hail
 set_up_hail
+set_up_vep
 set_up_pythonpath
 mkdir -p ${out_dir}
 python3 "${hail_script}" \
@@ -46,7 +47,7 @@ python3 "${hail_script}" \
     --input_phased_type "vcf" \
     --input_unphased_type "mt" \
     --vep_path ${vep} \
-    --vep_filter "ptv" \
+    --vep_filter "damaging_missense" "ptv" \
     --maf_max 0.02 \
     --missing 0.05 \
     --out_prefix ${out_prefix} \

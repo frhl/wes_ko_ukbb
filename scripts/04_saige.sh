@@ -19,20 +19,23 @@ source utils/bash_utils.sh
 SGE_TASK_ID=22
 
 # directories
-readonly in_dir_phased="data/phased"
-readonly in_dir_unphased="data/unphased/unfiltered"
-readonly vep_dir="data/vep/full"
-readonly spark_dir="data/tmp/spark"
-readonly out_dir="data/saige/input"
+#readonly in_dir_phased="data/phased"
+#readonly in_dir_unphased="data/unphased/unfiltered"
+#readonly vep_dir="data/vep/full"
+#readonly spark_dir="data/tmp/spark"
+readonly pheno_dir=''
+readonly plink_dir='data/saige/grm/input'
+readonly out_dir="data/saige"
 
 # hail script
 readonly hail_script="utils/hail_plink_export.py"
 
 # input path
 readonly chr=${SGE_TASK_ID}
-readonly in_phased="${in_dir_phased}/ukb_wes_200k_phased_chr${chr}.1of1.vcf.gz"
-readonly in_unphased="${in_dir_unphased}/ukb_wes_200k_filtered_chr${chr}.mt"
-readonly vep="${vep_dir}/ukb_wes_200k_full_vep_chr${chr}.vcf"
+readonly plink_file="${plink_dir}/ukb_imp_eur_chr1_22_sparse_markers"
+#readonly in_phased="${in_dir_phased}/ukb_wes_200k_phased_chr${chr}.1of1.vcf.gz"
+#readonly in_unphased="${in_dir_unphased}/ukb_wes_200k_filtered_chr${chr}.mt"
+#readonly vep="${vep_dir}/ukb_wes_200k_full_vep_chr${chr}.vcf"
 
 # output path
 readonly out_prefix="${out_dir}/ukb_wes_200k_chr${chr}"
@@ -70,7 +73,7 @@ Rscript "${createSparseGRM}" \
 
 
 Rscript "${step1_fitNULLGLMM.R}"     \
-	--plinkFile=./input/nfam_100_nindep_0_step1_includeMoreRareVariants_poly \
+	--plinkFile=${plink_file} \  #./input/nfam_100_nindep_0_step1_includeMoreRareVariants_poly \
     --phenoFile=./input/pheno_1000samples.txt_withdosages_withBothTraitTypes.txt \
     --phenoCol=y_quantitative \
     --covarColList=x1,x2 \

@@ -706,3 +706,100 @@ Finished running HAIL for chr15. Elapsed time: 1.70 hrs (job id: 54342866.15 Sat
   Compatibility is not guaranteed.
 2021-09-20 09:41:53 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
 2021-09-20 09:41:53 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+Mapping IDs from UKB app 12788 to 11867
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr21.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr21.vcf
+
+Exporting to VCF: derived/knockouts/all/ptv/ukb_wes_200k_phased_all_maf002_no_missing_filter_test_chr21_ko.vcf.bgz
+
+
+Exporting to PLINK: derived/knockouts/all/ptv/ukb_wes_200k_phased_all_maf002_no_missing_filter_test_chr21_ko.{bed,bim,fam}
+
+Finished running HAIL for chr21. Elapsed time: 1.71 hrs (job id: 54348101.21 Mon Sep 20 11:24:22 BST 2021)
+Mapping IDs from UKB app 12788 to 11867
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr18.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr18.vcf
+
+Exporting to VCF: derived/knockouts/all/ptv/ukb_wes_200k_phased_all_maf002_no_missing_filter_test_chr18_ko.vcf.bgz
+
+
+Exporting to PLINK: derived/knockouts/all/ptv/ukb_wes_200k_phased_all_maf002_no_missing_filter_test_chr18_ko.{bed,bim,fam}
+
+Finished running HAIL for chr18. Elapsed time: 2.23 hrs (job id: 54348101.18 Mon Sep 20 11:55:42 BST 2021)
+Mapping IDs from UKB app 12788 to 11867
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr13.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr13.vcf
+
+Exporting to VCF: derived/knockouts/all/ptv/ukb_wes_200k_phased_all_maf002_no_missing_filter_test_chr13_ko.vcf.bgz
+
+
+Exporting to PLINK: derived/knockouts/all/ptv/ukb_wes_200k_phased_all_maf002_no_missing_filter_test_chr13_ko.{bed,bim,fam}
+
+Finished running HAIL for chr13. Elapsed time: 2.59 hrs (job id: 54348101.13 Mon Sep 20 12:17:11 BST 2021)
+[thread 47827131668224 also had an error]
+[thread 47827084384000 also had an error]
+[thread 47827130615552 also had an error]
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGBUS (0x7) at pc=0x00002b6959827f00, pid=123689, tid=0x00002b7f9ee14700
+#
+# JRE version: Java(TM) SE Runtime Environment (8.0_172-b11) (build 1.8.0_172-b11)
+# Java VM: Java HotSpot(TM) 64-Bit Server VM (25.172-b11 mixed mode linux-amd64 )
+# Problematic frame:
+# V  [libjvm.so+0x926f00]Mapping IDs from UKB app 12788 to 11867
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr20.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr20.vcf
+
+Exporting to VCF: derived/knockouts/all/ptv/ukb_wes_200k_phased_all_maf002_no_missing_filter_test_chr20_ko.vcf.bgz
+
+
+Exporting to PLINK: derived/knockouts/all/ptv/ukb_wes_200k_phased_all_maf002_no_missing_filter_test_chr20_ko.{bed,bim,fam}
+
+Finished running HAIL for chr20. Elapsed time: 3.83 hrs (job id: 54348101.20 Mon Sep 20 13:31:44 BST 2021)
+Mapping IDs from UKB app 12788 to 11867
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr5.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr5.vcf
+Mapping IDs from UKB app 12788 to 11867
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr22.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr22.vcf
+
+Exporting to VCF: derived/knockouts/all/ptv/ukb_wes_200k_phased_all_maf002_no_missing_filter_test_chr22_ko.vcf.bgz
+
+
+Exporting to PLINK: derived/knockouts/all/ptv/ukb_wes_200k_phased_all_maf002_no_missing_filter_test_chr22_ko.{bed,bim,fam}
+
+Finished running HAIL for chr22. Elapsed time: 4.35 hrs (job id: 54348082.22 Mon Sep 20 13:52:32 BST 2021)
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGBUS (0x7) at pc=0x00002ae7848bab00, pid=65659, tid=0x00002afd48401700
+#
+# JRE version: Java(TM) SE Runtime Environment (8.0_172-b11) (build 1.8.0_172-b11)
+# Java VM: Java HotSpot(TM) 64-Bit Server VM (25.172-b11 mixed mode linux-amd64 )
+# Problematic frame:
+# V  [libjvm.so+0x928b00]2021-09-20 14:41:28 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-20 14:41:29 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-20 14:41:29 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+Mapping IDs from UKB app 12788 to 11867
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr22.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr22.vcf
+2021-09-20 14:45:57 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-20 14:45:58 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-20 14:45:58 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+Mapping IDs from UKB app 12788 to 11867
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr22.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr22.vcf
+2021-09-20 15:02:54 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-20 15:02:55 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-20 15:02:55 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+Mapping IDs from UKB app 12788 to 11867
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr22.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr22.vcf
+2021-09-20 15:11:49 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-20 15:11:50 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-20 15:11:50 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).

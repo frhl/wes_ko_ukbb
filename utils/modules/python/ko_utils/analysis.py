@@ -2,6 +2,37 @@
 
 import hail as hl
 
+PLOF_CSQS = ["transcript_ablation", "splice_acceptor_variant",
+             "splice_donor_variant", "stop_gained", "frameshift_variant"]
+
+MISSENSE_CSQS = ["stop_lost", "start_lost", "transcript_amplification",
+                 "inframe_insertion", "inframe_deletion", "missense_variant"]
+
+SYNONYMOUS_CSQS = ["stop_retained_variant", "synonymous_variant"]
+
+OTHER_CSQS = ["mature_miRNA_variant", "5_prime_UTR_variant",
+              "3_prime_UTR_variant", "non_coding_transcript_exon_variant", "intron_variant",
+              "NMD_transcript_variant", "non_coding_transcript_variant", "upstream_gene_variant",
+              "downstream_gene_variant", "TFBS_ablation", "TFBS_amplification", "TF_binding_site_variant",
+              "regulatory_region_ablation", "regulatory_region_amplification", "feature_elongation",
+              "regulatory_region_variant", "feature_truncation", "intergenic_variant"]
+
+def variant_csqs_category_builder(mt):
+    r'''Create categories for downstream analysis'''
+    return mt.annotate_rows(vep = mt.vep.annotate(consequence_category = 
+        hl.case().when(hl.literal(set(PLOF_CSQS)).contains(mt.vep.most_severe_consequence), "ptv")
+             .when(hl.literal(set(MISSENSE_CSQS)).contains(mt.vep.most_severe_consequence) & 
+                   (~hl.is_defined(mt.dbnsfp.cadd_phred_score) | 
+                    ~hl.is_defined(mt.dbnsfp.revel_score)), "other_missense")                                   
+             .when(hl.literal(set(MISSENSE_CSQS)).contains(mt.vep.most_severe_consequence) & 
+                   (mt.dbnsfp.cadd_phred_score >= 20) & 
+                   (mt.dbnsfp.revel_score >= 0.6), "damaging_missense") 
+             .when(hl.literal(set(MISSENSE_CSQS)).contains(mt.vep.most_severe_consequence), "other_missense")
+             .when(hl.literal(set(SYNONYMOUS_CSQS)).contains(mt.vep.most_severe_consequence), "synonymous")
+             .when(hl.literal(set(OTHER_CSQS)).contains(mt.vep.most_severe_consequence), "non_coding")
+             .default("NA")))
+
+
 def annotate_vep(mt, vep_path):
     r'''Annotate matrix table with VEP consequence from external file.'''
     print(f'Annotating with VEP file: {vep_path}')
@@ -66,6 +97,39 @@ def annotate_vep(mt, vep_path):
                                                 
     # combine with matrix table
     mt = mt.annotate_rows(vep = ht.index_rows(mt.locus, mt.alleles).vep.drop('CSQ'))
+    return(mt)
+
+def annotate_dbnsfp(mt, vep_path):
+    r'''Annotate matrix table with dbNSFP consequence from external VEP file.'''
+    print(f'Annotating with VEP file: {vep_path}')
+    
+    # Open file containing VEP fields
+    with open('data/vep/vep_fields.txt', 'r') as file:
+        fields = file.read().strip().split(',')
+    ht = hl.import_vcf(vep_path).rename({'info':'vep'}) 
+    
+    # Add VEP fields by iteration
+    for i in range(len(fields)):
+        ht = ht.annotate_rows(
+            vep=ht.vep.annotate(
+                col=ht.vep.CSQ.map(lambda x: (x.split('\\|')[i]))[0]
+                ).rename({'col':f'{fields[i]}'})
+        )
+    
+    # Extract various categories annotations and change type
+    ht = ht.annotate_rows(vep = ht.vep.annotate(sift_pred = ht.vep.SIFT_pred.split('&')[0]))
+    ht = ht.annotate_rows(vep = ht.vep.annotate(polyphen2_hdiv_pred = ht.vep.Polyphen2_HDIV_pred.split('&')[0]))
+    ht = ht.annotate_rows(vep = ht.vep.annotate(polyphen2_hvar_pred = ht.vep.Polyphen2_HVAR_pred.split('&')[0]))
+    ht = ht.annotate_rows(vep = ht.vep.annotate(cadd_phred_score = hl.parse_float(ht.vep.CADD_phred)))
+    ht = ht.annotate_rows(vep = ht.vep.annotate(revel_score = hl.parse_float(ht.vep.REVEL_score)))
+    
+    # annotate main table
+    mt = mt.annotate_rows(dbnsfp = hl.struct())
+    mt = mt.annotate_rows(dbnsfp = mt.dbnsfp.annotate(revel_score = ht.index_rows(mt.locus, mt.alleles).vep.revel_score))
+    mt = mt.annotate_rows(dbnsfp = mt.dbnsfp.annotate(cadd_phred_score = ht.index_rows(mt.locus, mt.alleles).vep.cadd_phred_score))
+    mt = mt.annotate_rows(dbnsfp = mt.dbnsfp.annotate(polyphen2_hdiv_pred = ht.index_rows(mt.locus, mt.alleles).vep.polyphen2_hdiv_pred))
+    mt = mt.annotate_rows(dbnsfp = mt.dbnsfp.annotate(polyphen2_hvar_pred = ht.index_rows(mt.locus, mt.alleles).vep.polyphen2_hvar_pred))
+
     return(mt)
 
 
@@ -260,6 +324,7 @@ def mac_category_case_builder(call_stats_expr):
 
 def gene_csqs_variant_builder(in_mt):
     r'''Makes a matrix table that contains variants for each (phased) strand'''
+    # NOTE: This function is currently utilized downstream. See 'gene_csqs_vep_builder'.
     # annotate with rsid
     in_mt = in_mt.annotate_entries(rsid_entry = in_mt.rsid)
     in_mt = in_mt.annotate_entries(rsid_gt = hl.delimit([in_mt.rsid_entry, hl.str(in_mt.GT)], '='))
@@ -275,11 +340,37 @@ def gene_csqs_variant_builder(in_mt):
     ht = ht0.annotate_entries(s1 = ht1[ht0.Gene, ht0.s].s1)
     ht = ht.annotate_entries(hom_var = ht2[ht.Gene, ht.s].hom_var)
     return ht
-    
+  
+def gene_csqs_vep_builder(in_mt):
+    r'''Makes a matrix table that contains variants for each (phased) strand. Uses VEP information.'''
+    # annotate with rsid
+    in_mt = in_mt.annotate_entries(rsid_entry = in_mt.rsid)
+    in_mt = in_mt.annotate_entries(rsid_gt = hl.delimit([in_mt.rsid_entry,
+                                                         hl.str(in_mt.GT),
+                                                         in_mt.vep.consequence_category,
+                                                         in_mt.vep.most_severe_consequence,
+                                                         in_mt.vep.LoF,
+                                                         in_mt.vep.LoF_flags,
+                                                         hl.str(in_mt.vep.revel_score),
+                                                         hl.str(in_mt.vep.cadd_phred_score)], ';'))
+    #in_mt = in_mt.annotate_entries(rsid_gt = hl.delimit([in_mt.rsid_entry, in_mt.vep.consequence]))
+    # get all snps that are not homozygous
+    mt = in_mt
+    mt = analysis.annotate_phased_entries(mt)
+    mt = mt.filter_entries(~mt.GT.is_hom_var())
+    # create table for each strand and combine to gene
+    ht0 = (mt.group_rows_by(mt.vep.Gene).aggregate(s0 = hl.agg.filter(mt.a0_alt, hl.agg.collect(mt.rsid_gt))))
+    ht1 = (mt.group_rows_by(mt.vep.Gene).aggregate(s1 = hl.agg.filter(mt.a1_alt, hl.agg.collect(mt.rsid_gt))))
+    ht2 = (in_mt.group_rows_by(in_mt.vep.Gene).aggregate(hom_var = hl.agg.filter(in_mt.GT.is_hom_var(), hl.agg.collect(in_mt.rsid_gt))))
+    # combine entries
+    ht = ht0.annotate_entries(s1 = ht1[ht0.Gene, ht0.s].s1)
+    ht = ht.annotate_entries(hom_var = ht2[ht.Gene, ht.s].hom_var)
+    return ht
+ 
 def gene_csqs_rsid_builder(in_mt, keep = ['CH','HO','CH+HO']):
     r'''Makes a matrix that cotanins knockout type and the variant (rsID) involved in the KO'''
     # build gene x variants/ko status
-    mt_rs = gene_csqs_variant_builder(in_mt)
+    mt_rs = gene_csqs_vep_builder(in_mt)
     mt_dt = gene_csqs_case_builder(in_mt)
     # combine the two annotations in a single table 
     combined = mt_rs.annotate_entries(csqs = mt_dt[mt_rs.Gene, mt_rs.s].csqs)
