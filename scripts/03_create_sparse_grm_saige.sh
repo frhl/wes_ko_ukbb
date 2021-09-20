@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
 #
-#$ -N mk_sparse_grm
+#$ -N step0_saige
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/create_sparse_grm.log
-#$ -e logs/create_sparse_grm.errors.log
+#$ -o logs/step0_saige.log
+#$ -e logs/step0_saige.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 20
 #$ -q short.qe

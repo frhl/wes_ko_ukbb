@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
 #
-#$ -N saige_step1
+#$ -N step1_saige
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/saige_step1.log
-#$ -e logs/saige_step1.errors.log
+#$ -o logs/step1_saige.log
+#$ -e logs/step1_saige.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qe
