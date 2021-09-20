@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
 #
-#$ -N create_grm
+#$ -N mk_sparse_grm
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/create_grm.log
-#$ -e logs/create_grm.errors.log
+#$ -o logs/create_sparse_grm.log
+#$ -e logs/create_sparse_grm.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 20
 #$ -q short.qe
@@ -40,19 +40,3 @@ python "${hail_script}" \
 print_update "Successfully combined .bgen files for GRM input." "${SECONDS}"
 
 
-# compute GRM with SAIGE
-#if [ $( ls -1 *.mtx 2> /dev/null | wc -l ) == 0 ]; then
-#	#conda deactivate
-#	set_up_RSAIGE
-#	print_update "Generating GRM from plink files.. "
-#	Rscript "${createSparseGRM}" \
-#		--plinkFile=${out_prefix} \
-#		--nThreads=4 \
-#		--outputPrefix=${out_prefix}	\
-#		--numRandomMarkerforSparseKin=1000	\
-#		--relatednessCutoff=0.125
-#else 
-#	print_update "${out_prefix} (GRM) already exists! skipping."
-#fi
-
-print_update "Successfully generated GRM" "${SECONDS}"

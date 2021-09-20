@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
 #
-#$ -N saige_hail
+#$ -N saige_step1
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/saige_hail.log
-#$ -e logs/saige_hail.errors.log
+#$ -o logs/saige_step1.log
+#$ -e logs/saige_step1.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 5
 #$ -q short.qe
@@ -19,108 +19,61 @@ source utils/bash_utils.sh
 SGE_TASK_ID=22
 
 # directories
-#readonly in_dir_phased="data/phased"
-#readonly in_dir_unphased="data/unphased/unfiltered"
-#readonly vep_dir="data/vep/full"
-#readonly spark_dir="data/tmp/spark"
-readonly pheno_dir=''
-readonly plink_dir='data/saige/grm/input'
-readonly out_dir="data/saige"
-
-# hail script
-readonly hail_script="utils/hail_plink_export.py"
+readonly grm_dir="data/saige/grm/input"
+readonly covar_dir="data/saige"
+readonly pheno_dir="/well/lindgren/UKBIOBANK/dpalmer/ukb_wes_phenotypes/200k"
+readonly plink_dir="data/saige/grm/input"
+readonly out_dir="derived/saige/binary"
 
 # input path
 readonly chr=${SGE_TASK_ID}
+readonly grm_mtx="${grm_dir}/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+readonly grm_sam="${grm_dir}/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt"
 readonly plink_file="${plink_dir}/ukb_imp_eur_chr1_22_sparse_markers"
-#readonly in_phased="${in_dir_phased}/ukb_wes_200k_phased_chr${chr}.1of1.vcf.gz"
-#readonly in_unphased="${in_dir_unphased}/ukb_wes_200k_filtered_chr${chr}.mt"
-#readonly vep="${vep_dir}/ukb_wes_200k_full_vep_chr${chr}.vcf"
+readonly pheno_file="${plink_dir}/UKBB_WES200k_binary_phenotypes.tsv"
+readonly covar_file="${covar_dir}/COVAR_FILE_HERE"
 
 # output path
 readonly out_prefix="${out_dir}/ukb_wes_200k_chr${chr}"
-readonly out="${out_prefix}.plink"
 
-# SAIGE step paths
+# SAIGE paths
 readonly threads=$(( ${NSLOTS}-1 ))
 readonly createSparseGRM="/well/lindgren/flassen/software/dev/SAIGE/extdata/createSparseGRM.R"
 readonly step1_fitNULLGLMM="/well/lindgren/flassen/software/dev/SAIGE/step1_fitNULLGLMM.R"
 readonly step2_SPAtests="/well/lindgren/flassen/software/dev/SAIGE/extdata/step2_SPAtests.R"
 
-# setup hail
 
-# SECONDS=0
-# set_up_hail
-# mkdir -p ${out_dir}
-# python3 "${hail_script}" \
-#    --chrom ${chr} \
-#    --input_path ${in_unphased} \
-#    --input_type "mt" \
-#    --get_europeans \
-#    --missing 0.05 \
-#    --out_prefix ${out_prefix} \
-#    --out_type "plink"
-
-
-set_up_RSAIGE
-print_update "Generating GRM from plink files.. "
-Rscript "${createSparseGRM}" \
-	--plinkFile=${out_prefix} \
-	--nThreads=4 \
-	--outputPrefix=${out_prefix}	\
-	--numRandomMarkerforSparseKin=1000	\
-	--relatednessCutoff=0.125
-
-
-Rscript "${step1_fitNULLGLMM.R}"     \
-	--plinkFile=${plink_file} \  #./input/nfam_100_nindep_0_step1_includeMoreRareVariants_poly \
-    --phenoFile=./input/pheno_1000samples.txt_withdosages_withBothTraitTypes.txt \
-    --phenoCol=y_quantitative \
-    --covarColList=x1,x2 \
-    --sampleIDColinphenoFile=IID \
-    --traitType=quantitative       \
-    --invNormalize=TRUE     \
+Rscript "${step1_fitNULLGLMM.R}" \
+	--plinkFile="${plink_file}" \
+    --phenoFile="${pheno_file}" \
+    --phenoCol="Phenotype_here?" \
+    --covarColList=${covar_file} \
+    --sampleIDColinphenoFile="ID" \
+    --traitType="binary" \
+    --invNormalize=TRUE \
     --outputPrefix=./output/example_quantitative \
 	--outputPrefix_varRatio=./output/example_quantitative_cate	\
-	--sparseGRMFile=./output/example_binary_cate.varianceRatio.txt.sparseGRM.mtx    \
-    --sparseGRMSampleIDFile=./output/example_binary.varianceRatio.txt.sparseGRM.mtx.sample  \
+	--sparseGRMFile=${grm_mtx} \
+    --sparseGRMSampleIDFile=${grm_sam}  \
     --nThreads=4 \
-    --LOCO=FALSE	\
+    --LOCO=FALSE\
 	--skipModelFitting=FALSE \
     --IsSparseKin=TRUE      \
     --isCateVarianceRatio=TRUE	
 
-Rscript "${step1_fitNULLGLMM.R}"     \
-    --plinkFile=./input/nfam_100_nindep_0_step1_includeMoreRareVariants_poly \
-    --phenoFile=./input/pheno_1000samples.txt_withdosages_withBothTraitTypes.txt \
-    --phenoCol=y_binary \
-    --covarColList=x1,x2 \
-    --sampleIDColinphenoFile=IID \
-    --traitType=binary       \
-    --invNormalize=TRUE     \
-    --outputPrefix=./output/example_binary \
-    --outputPrefix_varRatio=./output/example_binary_cate      \
-    --sparseGRMFile=./output/example_binary_cate.varianceRatio.txt.sparseGRM.mtx    \
-    --sparseGRMSampleIDFile=./output/example_binary.varianceRatio.txt.sparseGRM.mtx.sample  \
-    --nThreads=4 \
-    --LOCO=FALSE    \
-    --skipModelFitting=FALSE \
-    --IsSparseKin=TRUE      \
-    --isCateVarianceRatio=TRUE
-
-Rscript step2_SPAtests.R	\
-	--vcfFile=./input/dosage_10markers.vcf.gz \
-	--vcfFileIndex=./input/dosage_10markers.vcf.gz.tbi \
-	--vcfField=DS \
-        --chrom=1 \
-        --minMAF=0.0001 \
-        --minMAC=1 \
-        --GMMATmodelFile=./output/example_binary_includenonAutoforvarRatio.rda \
-        --varianceRatioFile=./output/example_binary.varianceRatio.txt \
-        --SAIGEOutputFile=./output/example_binary.SAIGE.vcf.genotype.txt_new \
-        --numLinesOutput=2 \
-        --IsOutputAFinCaseCtrl=TRUE	\
-	--IsOutputNinCaseCtrl=TRUE	\
-	--IsOutputHetHomCountsinCaseCtrl=TRUE	
+#Rscript step2_SPAtests.R	\
+#	--vcfFile=./input/dosage_10markers.vcf.gz \
+#	--vcfFileIndex=./input/dosage_10markers.vcf.gz.tbi \
+#	--vcfField=DS \
+#        --chrom=1 \
+#        --minMAF=0.0001 \
+#        --minMAC=1 \
+#        --GMMATmodelFile=./output/example_binary_includenonAutoforvarRatio.rda \
+#        --varianceRatioFile=./output/example_binary.varianceRatio.txt \
+#        --SAIGEOutputFile=./output/example_binary.SAIGE.vcf.genotype.txt_new \
+#        --numLinesOutput=2 \
+#        --IsOutputAFinCaseCtrl=TRUE	\
+#	--IsOutputNinCaseCtrl=TRUE	\
+#	--IsOutputHetHomCountsinCaseCtrl=TRUE	
 
 
