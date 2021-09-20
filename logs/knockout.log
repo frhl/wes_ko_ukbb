@@ -566,3 +566,143 @@ Finished running HAIL for chr1. Elapsed time: 5.07 hrs (job id: 54339065.1 Sat S
 2021-09-18 09:03:22 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
 2021-09-18 09:03:22 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
 2021-09-18 09:03:22 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+Mapping IDs from UKB app 12788 to 11867
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr12.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr12.vcf
+Mapping IDs from UKB app 12788 to 11867
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr6.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr6.vcf
+Mapping IDs from UKB app 12788 to 11867
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr2.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr2.vcf
+Mapping IDs from UKB app 12788 to 11867
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr17.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr17.vcf
+[thread 47538199615232 also had an error][thread 47538201720576 also had an error][thread 47538200667904 also had an error]Mapping IDs from UKB app 12788 to 11867
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr19.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr19.vcf
+Mapping IDs from UKB app 12788 to 11867
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr7.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr7.vcf
+Mapping IDs from UKB app 12788 to 11867
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr21.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr21.vcf
+Finished running HAIL for chr21. Elapsed time: .73 hrs (job id: 54342866.21 Sat Sep 18 09:47:20 BST 2021)
+Mapping IDs from UKB app 12788 to 11867
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr5.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr5.vcf
+Mapping IDs from UKB app 12788 to 11867
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr18.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr18.vcf
+Finished running HAIL for chr18. Elapsed time: .98 hrs (job id: 54342866.18 Sat Sep 18 10:02:01 BST 2021)
+Mapping IDs from UKB app 12788 to 11867
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr13.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr13.vcf
+Finished running HAIL for chr13. Elapsed time: 1.03 hrs (job id: 54342866.13 Sat Sep 18 10:05:00 BST 2021)
+#
+Mapping IDs from UKB app 12788 to 11867
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr16.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr16.vcf
+Mapping IDs from UKB app 12788 to 11867
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr10.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr10.vcf
+Mapping IDs from UKB app 12788 to 11867
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr20.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr20.vcf
+Finished running HAIL for chr20. Elapsed time: 1.51 hrs (job id: 54342866.20 Sat Sep 18 10:34:05 BST 2021)
+Mapping IDs from UKB app 12788 to 11867
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr14.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr14.vcf
+Finished running HAIL for chr14. Elapsed time: 1.69 hrs (job id: 54342866.14 Sat Sep 18 10:44:28 BST 2021)
+Mapping IDs from UKB app 12788 to 11867
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr15.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr15.vcf
+Finished running HAIL for chr15. Elapsed time: 1.70 hrs (job id: 54342866.15 Sat Sep 18 10:45:09 BST 2021)
+2021-09-20 09:31:38 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-20 09:31:39 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-20 09:31:39 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-20 09:41:52 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-20 09:41:52 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-20 09:41:52 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-20 09:41:52 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-20 09:41:52 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-20 09:41:52 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-20 09:41:52 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-20 09:41:52 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-20 09:41:52 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-20 09:41:52 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-20 09:41:52 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-20 09:41:52 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-20 09:41:52 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-20 09:41:52 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-20 09:41:52 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-20 09:41:52 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-20 09:41:52 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-20 09:41:52 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-20 09:41:52 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-20 09:41:52 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-20 09:41:52 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-20 09:41:53 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-20 09:41:53 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-20 09:41:53 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-20 09:41:53 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-20 09:41:53 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-20 09:41:53 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-20 09:41:53 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-20 09:41:53 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-20 09:41:53 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-20 09:41:53 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-20 09:41:53 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-20 09:41:53 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-20 09:41:53 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-20 09:41:53 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-20 09:41:53 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-20 09:41:53 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-20 09:41:53 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-20 09:41:53 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-20 09:41:53 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-20 09:41:53 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-20 09:41:53 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-20 09:41:53 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-20 09:41:53 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-20 09:41:53 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-20 09:41:53 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-20 09:41:53 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-20 09:41:53 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-20 09:41:53 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-20 09:41:53 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-20 09:41:53 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-20 09:41:53 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-20 09:41:53 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-20 09:41:53 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-20 09:41:53 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-20 09:41:53 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-20 09:41:53 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-20 09:41:53 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-20 09:41:53 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-20 09:41:53 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-20 09:41:53 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-20 09:41:53 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-20 09:41:53 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
