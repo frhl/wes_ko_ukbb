@@ -34,8 +34,9 @@ readonly pheno_file="${pheno_dir}/UKBB_WES200k_binary_phenotypes.tsv"
 readonly covar_file="${covar_dir}/COVARS1.csv"
 
 # output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_test_crohns${chr}"
+readonly out_prefix="${out_dir}/ukb_wes_200k_test_crohns"
 readonly out_prefix_ratio="${out_dir}/ukb_wes_200k_test_crohns_cate"
+readonly tmp="${out_prefix}.tmp"
 
 # SAIGE paths
 readonly threads=$(( ${NSLOTS}-1 ))
@@ -43,7 +44,17 @@ readonly createSparseGRM="/well/lindgren/flassen/software/dev/SAIGE/extdata/crea
 readonly step1_fitNULLGLMM="/well/lindgren/flassen/software/dev/SAIGE/extdata/step1_fitNULLGLMM.R"
 readonly step2_SPAtests="/well/lindgren/flassen/software/dev/SAIGE/extdata/step2_SPAtests.R"
 
+# setup phenotype and covars
 covars=$( cat ${covar_file} )
+
+python3 extract_phenos_from_header.py 
+    --input ${pheno_file}
+    --index ${SGE_TASK_ID} 
+
+
+pheno=$( cut -d, -f${SGE_TASK_ID} test.txt )
+
+
 set_up_RSAIGE
 Rscript "${step1_fitNULLGLMM}" \
 	--plinkFile="${plink_file}" \

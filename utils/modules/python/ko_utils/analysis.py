@@ -267,8 +267,8 @@ def gene_csqs_vep_builder(in_mt):
                                                          in_mt.vep.most_severe_consequence,
                                                          in_mt.vep.worst_csq_by_gene_canonical.lof,
                                                          in_mt.vep.worst_csq_by_gene_canonical.lof_flags,
-                                                         hl.str(in_mt.vep.revel_score),
-                                                         hl.str(in_mt.vep.cadd_phred_score)], ';'))
+                                                         hl.str(in_mt.dbnsfp.revel_score),
+                                                         hl.str(in_mt.dbnsfp.cadd_phred_score)], ';'))
     #in_mt = in_mt.annotate_entries(rsid_gt = hl.delimit([in_mt.rsid_entry, in_mt.vep.consequence]))
     # get all snps that are not homozygous
     mt = in_mt

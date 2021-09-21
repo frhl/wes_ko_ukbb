@@ -819,3 +819,20 @@ Mapping IDs from UKB app 12788 to 11867
 2021-09-21 09:57:27 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
   Compatibility is not guaranteed.
 2021-09-21 09:57:27 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+Mapping IDs from UKB app 12788 to 11867
+[get_genetically_european]: Not all samples IDs mapped perfectly (522/199795 IDs are undefined)
+[get_genetically_european]: Not all samples IDs mapped perfectly (522/199795 IDs are undefined)
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr21.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr21.vcf
+Mapping IDs from UKB app 12788 to 11867
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr22.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr22.vcf
+2021-09-21 10:45:02 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-21 10:45:02 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-21 10:45:02 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+Mapping IDs from UKB app 12788 to 11867
+[get_genetically_european]: Not all samples IDs mapped perfectly (522/199795 IDs are undefined)
+[get_genetically_european]: Not all samples IDs mapped perfectly (522/199795 IDs are undefined)
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr21.vcf
+Annotating with VEP file: data/vep/full//ukb_wes_200k_full_vep_chr21.vcf
