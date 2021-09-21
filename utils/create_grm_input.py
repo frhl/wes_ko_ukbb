@@ -15,6 +15,7 @@ def main(args):
     subset_markers_by_kinship = args.subset_markers_by_kinship
     out_prefix = args.out_prefix
     subset_samples_by_eur = args.subset_samples_by_eur
+    subset_samples_by_ukbb_eur = args.subset_samples_by_ukbb_eur
     subset_samples_by_wes200k = args.subset_samples_by_wes200k   
      
     # combine multiple matrix tables
@@ -33,18 +34,23 @@ def main(args):
         ids = qc.get_table(path, 'mt').s.collect()
         mt = mt.filter_cols(hl.literal(ids).contains(mt.s))
     
-    # get white british ancestry
-    if subset_samples_by_eur:
-        mt = qc.filter_to_european(mt)
+    # get white british ancestry (k-means)
+    if subset_samples_by_eur or subset_samples_by_ukbb_eur:
+        mt = qc.filter_to_european(mt, genetically_european = subset_samples_by_ukbb_eur)
     
+    # get white british ancestry (ukbb)
+    if subset_samples_by_ukbb_eur:
+        mt = mt    
+
     hl.export_plink(mt, out_prefix, ind_id = mt.s)
     
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--chroms', nargs='+', default=None, help='chroms to be included')
     parser.add_argument('--subset_markers_by_kinship', action='store_true', help='Only use markers that have been used in UKBB as kinship markers')
-    parser.add_argument('--subset_samples_by_eur', action='store_true', help='Subset samples to those that are genetically european.') 
     parser.add_argument('--subset_samples_by_wes200k', action='store_true', help='Subset samples to those that are presennt in the post QC WES.')
+    parser.add_argument('--subset_samples_by_eur', action='store_true', help='Subset samples to those that are genetically european.') 
+    parser.add_argument('--subset_samples_by_ukbb_eur', action='store_true', default = False, help='Subset samples to those that are european designated by UKBB.') 
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset (plink format)')
     args = parser.parse_args()
 

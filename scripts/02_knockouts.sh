@@ -2,12 +2,12 @@
 #
 #$ -N knockout
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/knockout.log
-#$ -e logs/knockout.errors.log
+#$ -o logs/knockout19.log
+#$ -e logs/knockout19.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 10
 #$ -q short.qe
-#$ -t 22
+#$ -t 19
 
 set -o errexit
 set -o nounset
@@ -53,8 +53,8 @@ python3 "${hail_script}" \
     --missing 0.05 \
     --out_prefix ${out_prefix} \
     --export_ko_rsid \
-    --export_ko_probability
-    #--export_burden \
+    --export_ko_probability \
+    --export_burden \
     --export_fake_vcf
 
 
