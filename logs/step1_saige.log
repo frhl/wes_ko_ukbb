@@ -1778,3 +1778,398 @@ Fixed-effect coefficients:
 t_end_null - t_begin, fitting the NULL model without LOCO took
      user    system   elapsed 
 17268.521    12.334  2621.873 
+pcg did not converge. You may increase maxiter number.
+iter from getPCG1ofSigmaAndVector 500
+t1_Rinv_1 is  7.021606e+19 
+Nglmm  4.493444e+18 
+     user    system   elapsed 
+33852.116    18.774  4307.298 
+t_end - t_begin, fitting the NULL model took
+     user    system   elapsed 
+33844.480    17.700  4298.718 
+Start estimating variance ratios
+
+Family: binomial 
+Link function: logit 
+
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+pcg did not converge. You may increase maxiter number.
+iter from getPCG1ofSigmaAndVector 500
+t1_Rinv_1 is  8.812076e+19 
+Nglmm  3.22096e+18 
+     user    system   elapsed 
+25670.994    15.234  3867.813 
+t_end - t_begin, fitting the NULL model took
+     user    system   elapsed 
+25662.281    13.860  3857.826 
+Start estimating variance ratios
+
+Family: binomial 
+Link function: logit 
+
+iter from getPCG1ofSigmaAndVector 1
+iter from getPCG1ofSigmaAndVector 1
+iter from getPCG1ofSigmaAndVector 1
+iter from getPCG1ofSigmaAndVector 1
+iter from getPCG1ofSigmaAndVector 1
+iter from getPCG1ofSigmaAndVector 1
+iter from getPCG1ofSigmaAndVector 1
+iter from getPCG1ofSigmaAndVector 1
+iter from getPCG1ofSigmaAndVector 1
+iter from getPCG1ofSigmaAndVector 1
+iter from getPCG1ofSigmaAndVector 1
+iter from getPCG1ofSigmaAndVector 1
+iter from getPCG1ofSigmaAndVector 1
+iter from getPCG1ofSigmaAndVector 1
+sparse GRM will be used
+sparse GRM has been specified
+read in sparse GRM from  data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx 
+length(sparseGRMSampleID$IndexGRM):  458841 
+nrow(sparseGRMSampleID):  458841 
+111786  samples have been used to fit the glmm null model
+iter from getPCG1ofSigmaAndVector 3
+[1] 111786      3
+          IID IndexInModel IndexGRM
+63213 3836967            1        6
+66616 3989903            2       20
+4220  1187038            3       22
+99663 5483168            4       33
+47545 3133758            5       67
+48577 3179667            6       91
+write sparse Sigma to  derived/saige/binary/ukb_wes_200k_Trachea_bronchus_lung_cancer.varianceRatio.txt_relatednessCutoff_0.125_2000_randomMarkersUsed.sparseSigma.mtx 
+Only one variance ratio will be estimated using randomly selected markers with MAC >= 20
+iter from getPCG1ofSigmaAndVector 1
+iter from getPCG1ofSigmaAndVector 1
+iter from getPCG1ofSigmaAndVector 1
+iter from getPCG1ofSigmaAndVector 1
+iter from getPCG1ofSigmaAndVector 1
+iter from getPCG1ofSigmaAndVector 1
+iter from getPCG1ofSigmaAndVector 1
+iter from getPCG1ofSigmaAndVector 1
+iter from getPCG1ofSigmaAndVector 1
+iter from getPCG1ofSigmaAndVector 1
+iter from getPCG1ofSigmaAndVector 1
+iter from getPCG1ofSigmaAndVector 1
+iter from getPCG1ofSigmaAndVector 1
+iter from getPCG1ofSigmaAndVector 1
+58867 th marker
+G0 0 1 1 1 2 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.026   0.013   0.020 
+87214 th marker
+G0 1 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.010   0.003   0.007 
+32878 th marker
+G0 0 0 0 0 0 1 1 0 0 0 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.008   0.003   0.006 
+16699 th marker
+G0 0 1 0 0 0 0 0 1 0 0 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.010   0.002   0.006 
+17466 th marker
+G0 0 0 0 0 1 0 1 0 0 0 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.009   0.002   0.005 
+34487 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.010   0.003   0.006 
+13202 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.013   0.006   0.010 
+92595 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.010   0.008   0.009 
+18680 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.010   0.002   0.006 
+89199 th marker
+G0 0 0 0 0 0 0 0 1 0 0 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.010   0.002   0.007 
+[1] "OK"
+[1] "OK1"
+87552 th marker
+G0 0 0 1 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.008   0.004   0.006 
+24081 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.009   0.004   0.007 
+66033 th marker
+G0 0 0 0 0 0 0 0 0 1 0 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.007   0.004   0.006 
+16338 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.008   0.004   0.007 
+47482 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.007   0.005   0.006 
+5796 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.008   0.003   0.005 
+3185 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.009   0.002   0.005 
+19413 th marker
+G0 2 2 2 2 1 2 2 2 1 2 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.007   0.004   0.006 
+41775 th marker
+G0 0 1 1 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.009   0.003   0.006 
+27332 th marker
+G0 1 0 1 0 0 0 0 0 0 1 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.010   0.001   0.006 
+[1] "OK"
+[1] "OK1"
+32971 th marker
+G0 2 2 2 2 2 2 1 2 2 2 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.016   0.007   0.011 
+30882 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.007   0.008   0.008 
+39871 th marker
+G0 1 1 2 1 0 2 2 1 2 1 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.009   0.002   0.006 
+32497 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.008   0.008   0.008 
+59446 th marker
+G0 0 0 0 0 0 1 1 0 0 1 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.008   0.003   0.005 
+30333 th marker
+G0 0 0 1 0 0 0 1 0 0 0 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.009   0.002   0.005 
+83974 th marker
+G0 0 1 0 1 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.009   0.002   0.005 
+73427 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.008   0.004   0.007 
+35843 th marker
+G0 0 0 0 0 0 1 0 1 0 0 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.008   0.005   0.006 
+4550 th marker
+G0 0 0 0 0 0 1 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 1
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.009   0.002   0.005 
+[1] "OK"
+[1] "OK1"
+[1] "OK2"
+CV for variance ratio estimate using  30  markers is  1.35391e-09  <  0.001 
+varRatio 1 
+[1] 1
+     [,1]
+[1,]    1
+     [,1]
+[1,]    1
+[1] "derived/saige/binary/ukb_wes_200k_Trachea_bronchus_lung_cancer.varianceRatio.txt"
+  V1
+1  1
+closed the plinkFile!
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+sparse GRM will be used
+sparse GRM has been specified
+read in sparse GRM from  data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx 
+length(sparseGRMSampleID$IndexGRM):  458841 
+nrow(sparseGRMSampleID):  458841 
+112586  samples have been used to fit the glmm null model
+[1] 112586      3
+           IID IndexInModel IndexGRM
+63653  3836967            1        6
+67089  3989903            2       20
+4233   1187038            3       22
+100371 5483168            4       33
+47920  3133758            5       67
+48958  3179667            6       91
+write sparse Sigma to  derived/saige/binary/ukb_wes_200k_colorectal_cancer.varianceRatio.txt_relatednessCutoff_0.125_2000_randomMarkersUsed.sparseSigma.mtx 
+Only one variance ratio will be estimated using randomly selected markers with MAC >= 20
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
