@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 10
 #$ -q short.qe
-#$ -t 21
+#$ -t 22
 
 set -o errexit
 set -o nounset
@@ -20,7 +20,7 @@ readonly in_dir_phased="data/phased"
 readonly in_dir_unphased="data/unphased/unfiltered"
 readonly vep_dir="data/vep/full/"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/ptvs_test"
+readonly out_dir="derived/ptvs_test2"
 
 # hail script
 readonly hail_script="utils/hail_export.py"
@@ -55,7 +55,7 @@ python3 "${hail_script}" \
     --export_ko_rsid \
     --export_ko_probability
     #--export_burden \
-    #--export_fake_vcf
+    --export_fake_vcf
 
 
 print_update "Finished running HAIL for chr${chr}" "${SECONDS}"

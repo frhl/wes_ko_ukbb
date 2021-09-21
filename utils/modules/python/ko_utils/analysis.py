@@ -260,9 +260,12 @@ def gene_csqs_vep_builder(in_mt):
     # annotate with rsid
     in_mt = in_mt.annotate_entries(rsid_entry = in_mt.rsid)
     in_mt = in_mt.annotate_entries(snpid_entry = in_mt.snpid)
+    in_mt = in_mt.annotate_entries(af_entry = in_mt.info.AF)
+    in_mt = in_mt.annotate_entries(ac_entry = in_mt.info.AC)
     in_mt = in_mt.annotate_entries(rsid_gt = hl.delimit([in_mt.snpid_entry,
                                                          in_mt.rsid_entry,
-                                                         hl.str(in_mt.GT),
+                                                         hl.str(in_mt.af_entry),
+                                                         hl.str(in_mt.ac_entry),
                                                          in_mt.vep.consequence_category,
                                                          in_mt.vep.most_severe_consequence,
                                                          in_mt.vep.worst_csq_by_gene_canonical.lof[0],

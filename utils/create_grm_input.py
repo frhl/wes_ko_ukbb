@@ -29,7 +29,8 @@ def main(args):
 
     # subset population by WES data samples
     if subset_samples_by_wes200k:
-        ids = genotypes.get_ukb_wes_200k_post_qc_path(chrom=22).s.collect()
+        path = genotypes.get_ukb_wes_200k_post_qc_path(chrom=22)
+        ids = qc.get_table(path, 'mt').s.collect()
         mt = mt.filter_cols(hl.literal(ids).contains(mt.s))
     
     # get white british ancestry
@@ -43,7 +44,7 @@ if __name__=='__main__':
     parser.add_argument('--chroms', nargs='+', default=None, help='chroms to be included')
     parser.add_argument('--subset_markers_by_kinship', action='store_true', help='Only use markers that have been used in UKBB as kinship markers')
     parser.add_argument('--subset_samples_by_eur', action='store_true', help='Subset samples to those that are genetically european.') 
-    parser.add_argument('--subset_samples_by_wes200k', default=None, help='Subset samples to those that are presennt in the post QC WES.')
+    parser.add_argument('--subset_samples_by_wes200k', action='store_true', help='Subset samples to those that are presennt in the post QC WES.')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset (plink format)')
     args = parser.parse_args()
 
