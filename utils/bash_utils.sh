@@ -111,5 +111,3 @@ set_up_vep() {
   export PERL5LIB=$PERL5LIB:/well/lindgren/flassen/software/VEP/plugins_grch38/
 }
 
-
-
