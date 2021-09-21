@@ -1,18 +1,5 @@
 #!/usr/bin/env python3
 
-#' @description Compound heterozygos HAIL pipeline
-#' @todo Integrate SAIGE-GENE+
-#' @DONE @todo Convert MatrixTable (sample, variant)-pairs to 'long' format
-#' @DONE @todo Long format table should also contain variants found and their strand.
-#' @DONE @todo Test burden_dosage function
-#' @DONE @todo Create function that subsets variants of MODERATE impact
-#' @DONE @todo hardy eq test for each variant
-#' @DONE @todo add mt.repartition to different commands
-#' @DONE @todo check worst consequence
-#' @DONE @todo export ultra rare variants
-#' @todo check which allele is included in VEP? What about MAF thresholds?
-
-
 import hail as hl
 import argparse
 import pandas
@@ -33,7 +20,6 @@ def main(args):
     input_unphased_type = args.input_unphased_type
     out_prefix = args.out_prefix
     out_type   = args.out_type
-    vep_path   = args.vep_path
     
     # variant filters
     chrom      = int(args.chrom)
@@ -74,9 +60,20 @@ def main(args):
 
 	# note: need to translate ids to combine later!
     mt1 = qc.translate_sample_ids(mt1, 12788, 11867)
-    if get_europeans or annotate_europeans:
-        mt1 = qc.filter_to_european(mt1, only_annotate = annotate_europeans)
-        mt2 = qc.filter_to_european(mt2, only_annotate = annotate_europeans)
+    if annotate_europeans:
+
+        mt1 = qc.filter_to_european(mt1, only_annotate = True)
+        mt2 = qc.filter_to_european(mt2, only_annotate = True)
+
+    if get_europeans: 
+        
+        if 'eur' not in mt1.row or 'eur' not in mt2.row:
+            mt1 = qc.filter_to_european(mt1, only_annotate = True)
+            mt2 = qc.filter_to_european(mt2, only_annotate = True)
+        else:
+            print('Filtering on field "eur".')
+            mt1 = mt1.filter_cols(mt1.eur == 1)
+            mt2 = mt2.filter_cols(mt2.eur == 1)
 
     ### Variant filtering/annotations
     # Using mt2 as a singleton refereence, so remove those with AC > 1
@@ -95,43 +92,9 @@ def main(args):
     if hwe:
         mt1 = qc.filter_hwe(mt1, float(hwe))
 
-    if vep_path:
-        
-        # Run VEP + gnomAD variant annotations
-        mt1 = process_consequences(hl.vep(mt1, "utils/configs/vep_env.json"))
-        mt2 = process_consequences(hl.vep(mt2, "utils/configs/vep_env.json"))
-        
-        # Annotate with REVEL+CADD scores
-        mt1 = analysis.annotate_dbnsfp(mt1, vep_path)
-        mt2 = analysis.annotate_dbnsfp(mt2, vep_path)
-        
-        # annotate consequnece categories 
-        mt1 = analysis.variant_csqs_category_builder(mt1)
-        mt2 = analysis.variant_csqs_category_builder(mt2)
-        
-        # annotate Gene (In the future just use vep.worst_csq_by_gene_canonical downstream..) 
-        mt1 = mt1.annotate_rows(vep = mt1.vep.annotate(Gene = mt1.vep.worst_csq_by_gene_canonical))
-        mt2 = mt2.annotate_rows(vep = mt2.vep.annotate(Gene = mt2.vep.worst_csq_by_gene_canonical))
-        
-        # only keep selected consequences
-        if vep_filter: 
-            mt1 = analysis.filter_vep(mt1, 'consequence_category', vep_filter)
-            mt2 = analysis.filter_vep(mt2, 'consequence_category', vep_filter) 
-
-    if annotate_snpid:
-
-        mt1 = qc.annotate_snpid(mt1)
-        mt2 = qc.annotate_snpid(mt2)
-
-    if annotate_rsid:
-
-        # annotate mt1 with dbSNP
-        mt1 = qc.annotate_rsid(mt1)
-        mt1 = qc.default_to_snpid_when_missing_rsid(mt1)
-
-        # annotate mt2 with dbSNP
-        mt2 = qc.annotate_rsid(mt2)
-        mt2 = qc.default_to_snpid_when_missing_rsid(mt2)
+    if vep_filter: 
+        mt1 = analysis.filter_vep(mt1, 'consequence_category', vep_filter)
+        mt2 = analysis.filter_vep(mt2, 'consequence_category', vep_filter) 
 
     #### get stats
 
@@ -201,11 +164,12 @@ if __name__=='__main__':
     parser.add_argument('--export_ko_probability', action='store_true', help='Exports the KO probability.')
     parser.add_argument('--export_burden', action='store_true', help='Export burden variant count by gene and and individuals.')
     parser.add_argument('--export_fake_vcf', action='store_true', help='Export a "fake" VCF file that contains KO probabilities as DP field..')
-    parser.add_argument('--vep_path', default=None, help='path to a .vcf file containing annotated entries by locus and alleles')
     parser.add_argument('--vep_filter', nargs='+', help='Filter consequence_category by mutations e.g., "damaging_missense" or "ptv"')
     parser.add_argument('--export_ko_dosage_matrix', action='store_true', help='Generate a gene x sample matrix with KO status')
     
     args = parser.parse_args()
 
     main(args)
+
+
 
