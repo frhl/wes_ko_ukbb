@@ -5,9 +5,9 @@
 #$ -o logs/hail_vep.log
 #$ -e logs/hail_vep.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 5
+#$ -pe shmem 15
 #$ -q short.qe
-#$ -t 22
+#$ -t 1-22
 
 set -o errexit
 set -o nounset
