@@ -42,6 +42,7 @@ def main(args):
     hwe        = (args.hwe)
     missing    = args.missing
     annotate_rsid = args.annotate_rsid   
+    annotate_snpid = args.annotate_snpid
  
     # sample filtering options
     get_related = args.get_related
@@ -79,7 +80,7 @@ def main(args):
 
     ### Variant filtering/annotations
     # Using mt2 as a singleton refereence, so remove those with AC > 1
-    mt2 = qc.filter_max_mac(mt2, 1)
+    # mt2 = qc.filter_max_mac(mt2, 1)
 
     if missing:
         mt1 = qc.filter_min_missing(mt1, float(missing))
@@ -117,9 +118,10 @@ def main(args):
             mt1 = analysis.filter_vep(mt1, 'consequence_category', vep_filter)
             mt2 = analysis.filter_vep(mt2, 'consequence_category', vep_filter) 
 
-    # By default add snpid id annotation
-    mt1 = qc.annotate_snpid(mt1)
-    mt2 = qc.annotate_snpid(mt2)
+    if annotate_snpid:
+
+        mt1 = qc.annotate_snpid(mt1)
+        mt2 = qc.annotate_snpid(mt2)
 
     if annotate_rsid:
 
@@ -182,6 +184,7 @@ if __name__=='__main__':
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Type of output dataset (options: mt, vcf, plink)')
     # filtering variants
+    parser.add_argument('--annotate_snpid', action = 'store_true', help = 'use chr:pos:a1:a2 to annotate snpids in data')
     parser.add_argument('--annotate_rsid', action = 'store_true', help = 'use dbSNP to annotate rsids in data')
     parser.add_argument('--chrom', default=None, help='Chromosome to be used')
     parser.add_argument('--maf_max', default=None, help='Select all variants with a maf less than the indicated value')
