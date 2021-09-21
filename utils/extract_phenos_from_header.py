@@ -8,7 +8,7 @@ def main(args):
     
     out = phenos.extract_from_header(args.input, delim = args.input_delim)
     if args.index is not None:
-        out = out[int(args.index)]
+        out = out[int(args.index)-1]
         sys.stdout.write(out)
     else:
         sys.stdout.write("\t".join(out))

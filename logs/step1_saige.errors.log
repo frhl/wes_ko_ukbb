@@ -1,1 +1,6 @@
 Loading required package: optparse
+/var/spool/default/compe084/job_scripts/54366897: line 46: python3: command not found
+/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/etc/conda/activate.d/activate-binutils_linux-64.sh: line 67: HOST: unbound variable
+/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/etc/conda/activate.d/activate-binutils_linux-64.sh: line 67: HOST: unbound variable
+Loading required package: optparse
+Loading required package: optparse
