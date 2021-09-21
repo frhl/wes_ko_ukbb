@@ -265,8 +265,8 @@ def gene_csqs_vep_builder(in_mt):
                                                          hl.str(in_mt.GT),
                                                          in_mt.vep.consequence_category,
                                                          in_mt.vep.most_severe_consequence,
-                                                         in_mt.vep.worst_csq_by_gene_canonical.lof,
-                                                         in_mt.vep.worst_csq_by_gene_canonical.lof_flags,
+                                                         in_mt.vep.worst_csq_by_gene_canonical.lof[0],
+                                                         in_mt.vep.worst_csq_by_gene_canonical.lof_flags[0],
                                                          hl.str(in_mt.dbnsfp.revel_score),
                                                          hl.str(in_mt.dbnsfp.cadd_phred_score)], ';'))
     #in_mt = in_mt.annotate_entries(rsid_gt = hl.delimit([in_mt.rsid_entry, in_mt.vep.consequence]))

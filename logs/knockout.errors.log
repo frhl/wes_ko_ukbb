@@ -1,0 +1,16 @@
+foss/2018b(23):ERROR:150: Module 'foss/2018b' conflicts with the currently loaded module(s) 'foss/2019a'
+foss/2018b(23):ERROR:102: Tcl command execution failed: conflict foss
+
+Perl/5.28.0-GCCcore-7.3.0(116):ERROR:150: Module 'Perl/5.28.0-GCCcore-7.3.0' conflicts with the currently loaded module(s) 'Perl/5.28.1-GCCcore-8.2.0'
+Perl/5.28.0-GCCcore-7.3.0(116):ERROR:102: Tcl command execution failed: conflict Perl
+
+DBD-mysql/4.048-foss-2018b-Perl-5.28.0(21):ERROR:150: Module 'DBD-mysql/4.048-foss-2018b-Perl-5.28.0' conflicts with the currently loaded module(s) 'DBD-mysql/4.050-foss-2019a-Perl-5.28.1'
+DBD-mysql/4.048-foss-2018b-Perl-5.28.0(21):ERROR:102: Tcl command execution failed: conflict DBD-mysql
+
+BioPerl/1.7.2-foss-2018b-Perl-5.28.0(23):ERROR:150: Module 'BioPerl/1.7.2-foss-2018b-Perl-5.28.0' conflicts with the currently loaded module(s) 'BioPerl/1.7.2-GCCcore-8.2.0-Perl-5.28.1'
+BioPerl/1.7.2-foss-2018b-Perl-5.28.0(23):ERROR:102: Tcl command execution failed: conflict BioPerl
+
+Bio-DB-HTS/2.11-foss-2018b-Perl-5.28.0(21):ERROR:150: Module 'Bio-DB-HTS/2.11-foss-2018b-Perl-5.28.0' conflicts with the currently loaded module(s) 'Bio-DB-HTS/3.01-GCC-8.2.0-2.31.1-Perl-5.28.1'
+Bio-DB-HTS/2.11-foss-2018b-Perl-5.28.0(21):ERROR:102: Tcl command execution failed: conflict Bio-DB-HTS
+
+utils/hail_utils.sh: line 4: PYTHONPATH: unbound variable
