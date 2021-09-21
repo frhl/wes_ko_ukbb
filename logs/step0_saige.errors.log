@@ -1,0 +1,14 @@
+usage: create_grm_input.py [-h] [--chroms CHROMS [CHROMS ...]]
+                           [--subset_markers_by_kinship]
+                           [--subset_samples_by_eur]
+                           [--subset_samples_to_wes200k SUBSET_SAMPLES_TO_WES200K]
+                           [--out_prefix OUT_PREFIX]
+create_grm_input.py: error: unrecognized arguments: --subset_samples_by_wes200k
+/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/etc/conda/activate.d/activate-binutils_linux-64.sh: line 67: HOST: unbound variable
+usage: create_grm_input.py [-h] [--chroms CHROMS [CHROMS ...]]
+                           [--subset_markers_by_kinship]
+                           [--subset_samples_by_eur]
+                           [--subset_samples_by_wes200k SUBSET_SAMPLES_BY_WES200K]
+                           [--out_prefix OUT_PREFIX]
+create_grm_input.py: error: argument --subset_samples_by_wes200k: expected one argument
+/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/etc/conda/activate.d/activate-binutils_linux-64.sh: line 67: HOST: unbound variable

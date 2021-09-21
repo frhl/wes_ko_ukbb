@@ -6,11 +6,8 @@
 #$ -o logs/step0_saige.log
 #$ -e logs/step0_saige.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 20
+#$ -pe shmem 5
 #$ -q short.qe
-
-set -o errexit
-set -o nounset
 
 module purge
 source utils/qsub_utils.sh
@@ -18,7 +15,7 @@ source utils/hail_utils.sh
 
 # paths for hail script
 readonly out_dir="data/saige/grm/input"
-readonly out_prefix="${out_dir}/ukb_imp_eur_chr1_22_sparse_markers"
+readonly out_prefix="${out_dir}/ukb_imp_eur_wes_chr1_22_sparse_markers"
 readonly hail_script="utils/create_grm_input.py"
 readonly spark_dir="data/tmp/spark"
 readonly threads=$(( ${NSLOTS}-1 ))
@@ -35,6 +32,7 @@ python "${hail_script}" \
 	--chroms ${chroms}  \
 	--out_prefix ${out_prefix} \
 	--subset_markers_by_kinship \
+    --subset_samples_by_wes200k \
     --subset_samples_by_eur
 
 print_update "Successfully combined .bgen files for GRM input." "${SECONDS}"

@@ -2173,3 +2173,300 @@ iter from getPCG1ofSigmaAndVector 3
 iter from getPCG1ofSigmaAndVector 3
 iter from getPCG1ofSigmaAndVector 3
 iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+79344 th marker
+G0 0 1 0 0 0 0 0 1 1 0 
+iter from getPCG1ofSigmaAndVector 3
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.028   0.014   0.021 
+4838 th marker
+G0 0 1 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.009   0.004   0.006 
+87199 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.007   0.006   0.006 
+85931 th marker
+G0 1 0 1 1 1 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 3
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.014   0.017   0.016 
+78530 th marker
+G0 0 0 0 0 1 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.012   0.005   0.008 
+23152 th marker
+G0 0 0 1 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.006   0.005   0.006 
+23067 th marker
+G0 0 0 1 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.012   0.001   0.006 
+92741 th marker
+G0 0 0 0 0 0 1 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.009   0.005   0.007 
+54290 th marker
+G0 1 2 2 2 0 1 1 1 2 0 
+iter from getPCG1ofSigmaAndVector 3
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.010   0.003   0.006 
+20716 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.009   0.003   0.006 
+[1] "OK"
+[1] "OK1"
+85342 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.011   0.011   0.011 
+74239 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.081   0.061   0.071 
+30060 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 3
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.007   0.007   0.008 
+47734 th marker
+G0 0 0 0 0 0 1 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.009   0.008   0.008 
+17304 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.009   0.002   0.005 
+75459 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.005   0.006   0.005 
+38924 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.005   0.005   0.005 
+53804 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.009   0.002   0.006 
+22819 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 3
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.008   0.007   0.008 
+73883 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.009   0.003   0.006 
+[1] "OK"
+[1] "OK1"
+19246 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.011   0.006   0.009 
+31658 th marker
+G0 0 0 0 0 0 0 1 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.010   0.002   0.006 
+37283 th marker
+G0 0 0 0 1 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.010   0.001   0.005 
+8016 th marker
+G0 0 1 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.009   0.005   0.008 
+56518 th marker
+G0 0 0 0 1 0 1 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.006   0.006   0.006 
+62503 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.012   0.004   0.008 
+59190 th marker
+G0 0 0 1 2 1 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 3
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.009   0.004   0.006 
+61568 th marker
+G0 0 0 0 1 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.010   0.001   0.006 
+51114 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.010   0.002   0.005 
+49796 th marker
+G0 0 0 0 1 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.009   0.002   0.005 
+[1] "OK"
+[1] "OK1"
+[1] "OK2"
+CV for variance ratio estimate using  30  markers is  1.189204e-05  <  0.001 
+varRatio 0.9957023 
+[1] 0.9957023
+          [,1]
+[1,] 0.9957023
+          [,1]
+[1,] 0.9957023
+[1] "derived/saige/binary/ukb_wes_200k_colorectal_cancer.varianceRatio.txt"
+         V1
+1 0.9957023
+closed the plinkFile!

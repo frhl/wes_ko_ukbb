@@ -43,7 +43,8 @@ def export_table(mt, out_prefix, out_type, checkpoint=False, format_fields_to_dr
             hl.export_vcf(dataset=mt,
                           output=out_vcf_path,
                           parallel=None,
-                          metadata = metadata)
+                          metadata = metadata,
+                          tabix = True)
         else:
             raise ValueError(f'Cannot export VCF because {out_vcf_path} already exists')
     elif out_type=='plink':
