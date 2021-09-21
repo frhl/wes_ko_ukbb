@@ -19,18 +19,10 @@ source utils/bash_utils.sh
 SGE_TASK_ID=22
 
 # directories
-readonly grm_dir="data/saige/grm/input"
-readonly covar_dir="data/saige/input"
-readonly pheno_dir="/well/lindgren/UKBIOBANK/dpalmer/ukb_wes_phenotypes/200k"
-readonly plink_dir="data/saige/grm/input"
-readonly out_dir="derived/saige/binary"
+readonly out_dir="derived/saige/binary/step2"
 
 # input path
 readonly chr=${SGE_TASK_ID}
-readonly grm_mtx="${grm_dir}/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
-readonly grm_sam="${grm_dir}/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt"
-readonly plink_file="${plink_dir}/ukb_imp_eur_chr1_22_sparse_markers"
-readonly pheno_file="${pheno_dir}/UKBB_WES200k_binary_phenotypes.tsv"
 readonly covar_file="${covar_dir}/COVARS1.csv"
 
 # output path
@@ -43,19 +35,19 @@ readonly createSparseGRM="/well/lindgren/flassen/software/dev/SAIGE/extdata/crea
 readonly step1_fitNULLGLMM="/well/lindgren/flassen/software/dev/SAIGE/extdata/step1_fitNULLGLMM.R"
 readonly step2_SPAtests="/well/lindgren/flassen/software/dev/SAIGE/extdata/step2_SPAtests.R"
 
-#Rscript step2_SPAtests.R	\
-#	--vcfFile=./input/dosage_10markers.vcf.gz \
-#	--vcfFileIndex=./input/dosage_10markers.vcf.gz.tbi \
-#	--vcfField=DS \
-#        --chrom=1 \
-#        --minMAF=0.0001 \
-#        --minMAC=1 \
-#        --GMMATmodelFile=./output/example_binary_includenonAutoforvarRatio.rda \
-#        --varianceRatioFile=./output/example_binary.varianceRatio.txt \
-#        --SAIGEOutputFile=./output/example_binary.SAIGE.vcf.genotype.txt_new \
-#        --numLinesOutput=2 \
-#        --IsOutputAFinCaseCtrl=TRUE	\
-#	--IsOutputNinCaseCtrl=TRUE	\
-#	--IsOutputHetHomCountsinCaseCtrl=TRUE	
+Rscript "${step1_SPAtests}"	\
+	--vcfFile=./input/dosage_10markers.vcf.gz \
+	--vcfFileIndex=./input/dosage_10markers.vcf.gz.tbi \
+	--vcfField="DS" \
+    --chrom=${chr} \
+    --minMAF=0.0001 \
+    --minMAC=1 \
+    --GMMATmodelFile=./output/example_binary_includenonAutoforvarRatio.rda \
+    --varianceRatioFile=./output/example_binary.varianceRatio.txt \
+    --SAIGEOutputFile=./output/example_binary.SAIGE.vcf.genotype.txt_new \
+    --numLinesOutput=2 \
+    --IsOutputAFinCaseCtrl=TRUE	\
+	--IsOutputNinCaseCtrl=TRUE	\
+	--IsOutputHetHomCountsinCaseCtrl=TRUE	
 
 

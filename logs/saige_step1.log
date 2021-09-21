@@ -988,3 +988,48 @@ Fixed-effect coefficients:
 t_end_null - t_begin, fitting the NULL model without LOCO took
      user    system   elapsed 
 16106.586    14.992   916.087 
+pcg did not converge. You may increase maxiter number.
+iter from getPCG1ofSigmaAndVector 500
+t1_Rinv_1 is  2.159336e+19 
+Nglmm  6.202753e+17 
+     user    system   elapsed 
+32503.007    23.024  1614.369 
+t_end - t_begin, fitting the NULL model took
+     user    system   elapsed 
+32495.560    21.777  1605.995 
+Start estimating variance ratios
+
+Family: binomial 
+Link function: logit 
+
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+sparse GRM will be used
+sparse GRM has been specified
+read in sparse GRM from  data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx 
+length(sparseGRMSampleID$IndexGRM):  458841 
+nrow(sparseGRMSampleID):  458841 
+111562  samples have been used to fit the glmm null model
+[1] 111562      3
+          IID IndexInModel IndexGRM
+63057 3836967            1        6
+66455 3989903            2       20
+4205  1187038            3       22
+99457 5483168            4       33
+47464 3133758            5       67
+48482 3179667            6       91
+write sparse Sigma to  derived/saige/binary/ukb_wes_200k_test_crohns22.varianceRatio.txt_relatednessCutoff_0.125_2000_randomMarkersUsed.sparseSigma.mtx 
+Categorical variance ratios will be estimated
+0.5 < MAC <=  1.5 

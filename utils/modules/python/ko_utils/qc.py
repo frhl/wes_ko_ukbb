@@ -105,7 +105,7 @@ def translate_sample_ids(ht, from_app: int, to_app: int):
     assert undefined_ct==0, f'[translate_sample_ids]: Not all sample IDs mapped perfectly ({undefined_ct}/{ht.count()} IDs are undefined)'
     return ht
 
-def filter_to_european(mt):
+def filter_to_european(mt, only_annotate = False):
     r'''Get white british (app 11867) /well/lindgren/UKBIOBANK/DATA/QC/ukb_sqc_v2.txt
     and genetically european from /well/lindgren/UKBIOBANK/laura/k_means_clustering_pcs/ukbb_genetically_european_k4_4PCs_self_rep_Nov2020.txt''' 
     ht = hl.import_table('/well/lindgren/UKBIOBANK/laura/k_means_clustering_pcs/ukbb_genetically_european_k4_4PCs_self_rep_Nov2020.txt',
@@ -117,10 +117,10 @@ def filter_to_european(mt):
         raise ValueError('[get_genetically_european]: IDs for genetically europeans does not match keys in MatrixTable!')
     if undefined_eur > 0:
         print(f'[get_genetically_european]: Not all samples IDs mapped perfectly ({undefined_eur}/{pre_filter_count[1]} IDs are undefined)')
-    #mt = mt.filter_cols(mt.s[mt.eur])
-    mt = mt.filter_cols(mt.eur == 1)
-    post_filter_count = mt.count()
-    print(f'[get_genetically_european]:{post_filter_count[1]}/{pre_filter_count[1]} IDs were included as genetically european.')
+    if only_annotate == False:
+        mt = mt.filter_cols(mt.eur == 1)
+        post_filter_count = mt.count()
+        print(f'[get_genetically_european]:{post_filter_count[1]}/{pre_filter_count[1]} IDs were included as genetically european.')
     return mt
 
 def get_fam(app_id=12788, wes_200k_only=False):

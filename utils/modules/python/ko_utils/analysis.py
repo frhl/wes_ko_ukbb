@@ -255,35 +255,18 @@ def mac_category_case_builder(call_stats_expr):
             .when(call_stats_expr.AC <= 1000000, 1000000)
             .default(0))
 
-def gene_csqs_variant_builder(in_mt):
-    r'''Makes a matrix table that contains variants for each (phased) strand'''
-    # NOTE: This function is currently utilized downstream. See 'gene_csqs_vep_builder'.
-    # annotate with rsid
-    in_mt = in_mt.annotate_entries(rsid_entry = in_mt.rsid)
-    in_mt = in_mt.annotate_entries(rsid_gt = hl.delimit([in_mt.rsid_entry, hl.str(in_mt.GT)], '='))
-    # get all snps that are not homozygous
-    mt = in_mt
-    mt = annotate_phased_entries(mt)
-    mt = mt.filter_entries(~mt.GT.is_hom_var())
-    # create table for each strand and combine to gene
-    ht0 = (mt.group_rows_by(mt.vep.Gene).aggregate(s0 = hl.agg.filter(mt.a0_alt, hl.agg.collect(mt.rsid_gt))))
-    ht1 = (mt.group_rows_by(mt.vep.Gene).aggregate(s1 = hl.agg.filter(mt.a1_alt, hl.agg.collect(mt.rsid_gt))))
-    ht2 = (in_mt.group_rows_by(in_mt.vep.Gene).aggregate(hom_var = hl.agg.filter(in_mt.GT.is_hom_var(), hl.agg.collect(in_mt.rsid_gt))))
-    # combine entries
-    ht = ht0.annotate_entries(s1 = ht1[ht0.Gene, ht0.s].s1)
-    ht = ht.annotate_entries(hom_var = ht2[ht.Gene, ht.s].hom_var)
-    return ht
-  
 def gene_csqs_vep_builder(in_mt):
     r'''Makes a matrix table that contains variants for each (phased) strand. Uses VEP information.'''
     # annotate with rsid
     in_mt = in_mt.annotate_entries(rsid_entry = in_mt.rsid)
-    in_mt = in_mt.annotate_entries(rsid_gt = hl.delimit([in_mt.rsid_entry,
+    in_mt = in_mt.annotate_entries(snpid_entry = in_mt.snpid)
+    in_mt = in_mt.annotate_entries(rsid_gt = hl.delimit([in_mt.snpid_entry,
+                                                         in_mt.rsid_entry,
                                                          hl.str(in_mt.GT),
                                                          in_mt.vep.consequence_category,
                                                          in_mt.vep.most_severe_consequence,
-                                                         in_mt.vep.LoF,
-                                                         in_mt.vep.LoF_flags,
+                                                         in_mt.vep.worst_csq_by_gene_canonical.lof,
+                                                         in_mt.vep.worst_csq_by_gene_canonical.lof_flags,
                                                          hl.str(in_mt.vep.revel_score),
                                                          hl.str(in_mt.vep.cadd_phred_score)], ';'))
     #in_mt = in_mt.annotate_entries(rsid_gt = hl.delimit([in_mt.rsid_entry, in_mt.vep.consequence]))
@@ -309,4 +292,70 @@ def gene_csqs_rsid_builder(in_mt, keep = ['CH','HO','CH+HO']):
     combined = mt_rs.annotate_entries(csqs = mt_dt[mt_rs.Gene, mt_rs.s].csqs)
     combined = combined.filter_entries(hl.literal(keep).contains(combined.csqs))
     return combined
+
+def annotate_vep(mt, vep_path):
+    r'''Annotate matrix table with VEP consequence from external file.'''
+    print(f'Annotating with VEP file: {vep_path}')
+    
+    # Open file containing VEP fields
+    with open('data/vep/vep_fields.txt', 'r') as file:
+        fields = file.read().strip().split(',')
+    ht = hl.import_vcf(vep_path).rename({'info':'vep'}) 
+    
+    # Add VEP fields by iteration
+    for i in range(len(fields)):
+        ht = ht.annotate_rows(
+            vep=ht.vep.annotate(
+                col=ht.vep.CSQ.map(lambda x: (x.split('\\|')[i]))[0]
+                ).rename({'col':f'{fields[i]}'})
+        )
+    
+    # Most severe variant consequence
+    ht = ht.annotate_rows(vep = ht.vep.annotate(most_severe_consequence = ht.vep.Consequence.split('&')[0]))
+    
+    # Extract various categories annotations and change type
+    ht = ht.annotate_rows(vep = ht.vep.annotate(sift_pred = ht.vep.SIFT_pred.split('&')[0]))
+    ht = ht.annotate_rows(vep = ht.vep.annotate(polyphen2_hdiv_pred = ht.vep.Polyphen2_HDIV_pred.split('&')[0]))
+    ht = ht.annotate_rows(vep = ht.vep.annotate(polyphen2_hvar_pred = ht.vep.Polyphen2_HVAR_pred.split('&')[0]))
+    ht = ht.annotate_rows(vep = ht.vep.annotate(cadd_phred_score = hl.parse_float(ht.vep.CADD_phred)))
+    ht = ht.annotate_rows(vep = ht.vep.annotate(revel_score = hl.parse_float(ht.vep.REVEL_score)))
+    
+    # Define protein truncating variants
+    ptv = hl.set(["transcript_ablation", "splice_acceptor_variant",
+              "splice_donor_variant", "stop_gained", "frameshift_variant"])
+    
+    # Define missense variation
+    missense = hl.set(["stop_lost", "start_lost", "transcript_amplification",
+                   "inframe_insertion", "inframe_deletion", "missense_variant",
+                   "protein_altering_variant", "splice_region_variant"])
+    
+    # Define synonymous
+    synonymous = hl.set(["incomplete_terminal_codon_variant", "stop_retained_variant", "synonymous_variant"])
+    
+    # Define non coding variation
+    non_coding = hl.set(["coding_sequence_variant", "mature_miRNA_variant", "5_prime_UTR_variant",
+              "3_prime_UTR_variant", "non_coding_transcript_exon_variant", "intron_variant",
+              "NMD_transcript_variant", "non_coding_transcript_variant", "upstream_gene_variant",
+              "downstream_gene_variant", "TFBS_ablation", "TFBS_amplification", "TF_binding_site_variant",
+              "regulatory_region_ablation", "regulatory_region_amplification", "feature_elongation",
+              "regulatory_region_variant", "feature_truncation", "intergenic_variant"])
+    
+    # Create categories for downstream analysis
+    ht = ht.annotate_rows(vep = ht.vep.annotate(consequence_category = 
+        hl.case().when(ptv.contains(ht.vep.most_severe_consequence), "ptv")
+             .when(missense.contains(ht.vep.most_severe_consequence) & 
+                   (~hl.is_defined(ht.vep.cadd_phred_score) | 
+                    ~hl.is_defined(ht.vep.revel_score)), "other_missense")                                   
+             .when(missense.contains(ht.vep.most_severe_consequence) & 
+                   (ht.vep.cadd_phred_score >= 20) & 
+                   (ht.vep.revel_score >= 0.6), "damaging_missense") 
+             .when(missense.contains(ht.vep.most_severe_consequence), "other_missense")
+             .when(synonymous.contains(ht.vep.most_severe_consequence), "synonymous")
+             .when(non_coding.contains(ht.vep.most_severe_consequence), "non_coding")
+             .default("NA")
+    ))
+                                                
+    # combine with matrix table
+    mt = mt.annotate_rows(vep = ht.index_rows(mt.locus, mt.alleles).vep.drop('CSQ'))
+    return(mt)
 

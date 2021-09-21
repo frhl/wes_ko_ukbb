@@ -15,3 +15,8 @@ Error in fitNULLGLMM(plinkFile = opt$plinkFile, phenoFile = opt$phenoFile,  :
   ERROR! column for data/saige/COVAR_FILE_HERE does not exist in the phenoFile 
 Execution halted
 Loading required package: optparse
+Error in scoreTest_SPAGMMAT_forVarianceRatio_binaryTrait(obj.glmm.null = modglmm,  : 
+  ERROR! number of genetic variants in 0.5< MAC <= 1.5 is lower than 30
+Please include more markers in this MAC category in the plink file
+Calls: fitNULLGLMM -> scoreTest_SPAGMMAT_forVarianceRatio_binaryTrait
+Execution halted

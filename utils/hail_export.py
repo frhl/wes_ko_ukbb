@@ -35,6 +35,7 @@ def main(args):
     out_type   = args.out_type
     vep_path   = args.vep_path
     
+    # variant filters
     chrom      = int(args.chrom)
     maf_max    = (args.maf_max)
     maf_min    = (args.maf_min)
@@ -42,9 +43,13 @@ def main(args):
     missing    = args.missing
     annotate_rsid = args.annotate_rsid   
  
+    # sample filtering options
     get_related = args.get_related
     get_unrelated = args.get_unrelated
     get_europeans = args.get_europeans
+    annotate_europeans = args.annotate_europeans
+
+    # output options
     vep_filter = args.vep_filter
     export_ko_dosage_matrix = args.export_ko_dosage_matrix
     export_burden = args.export_burden
@@ -68,9 +73,9 @@ def main(args):
 
 	# note: need to translate ids to combine later!
     mt1 = qc.translate_sample_ids(mt1, 12788, 11867)
-    if get_europeans:
-        mt1 = qc.filter_to_european(mt1)
-        mt2 = qc.filter_to_european(mt2)
+    if get_europeans or annotate_europeans:
+        mt1 = qc.filter_to_european(mt1, only_annotate = annotate_europeans)
+        mt2 = qc.filter_to_european(mt2, only_annotate = annotate_europeans)
 
     ### Variant filtering/annotations
     # Using mt2 as a singleton refereence, so remove those with AC > 1
@@ -112,15 +117,17 @@ def main(args):
             mt1 = analysis.filter_vep(mt1, 'consequence_category', vep_filter)
             mt2 = analysis.filter_vep(mt2, 'consequence_category', vep_filter) 
 
+    # By default add snpid id annotation
+    mt1 = qc.annotate_snpid(mt1)
+    mt2 = qc.annotate_snpid(mt2)
+
     if annotate_rsid:
 
         # annotate mt1 with dbSNP
-        mt1 = qc.annotate_snpid(mt1)
         mt1 = qc.annotate_rsid(mt1)
         mt1 = qc.default_to_snpid_when_missing_rsid(mt1)
 
         # annotate mt2 with dbSNP
-        mt2 = qc.annotate_snpid(mt2)
         mt2 = qc.annotate_rsid(mt2)
         mt2 = qc.default_to_snpid_when_missing_rsid(mt2)
 
@@ -183,8 +190,9 @@ if __name__=='__main__':
     parser.add_argument('--missing', default=0.05, help='Filter variants by missingness threshold')
     # filtering samples
     parser.add_argument('--get_related', action='store_true', help='Select all samples that are related')
-    parser.add_argument('--get_unrelated', action='store_true', help='Select all samples that are unrelated')
-    parser.add_argument('--get_europeans', action='store_true', help='Filter to genetically confimed europeans?')
+    parser.add_argument('--get_unrelated', action='store_true', help='Select all samples that are unrelated') 
+    parser.add_argument('--get_europeans', action='store_true', help='Filter to genetically confimed europeans.')
+    parser.add_argument('--annotate_europeans', default=False, action='store_true', help='Annotate genetically confirmed europeans in output.')
     # out 
     parser.add_argument('--export_ko_rsid', action='store_true', help='Exports the table with rsIDs involved in KOs.')
     parser.add_argument('--export_ko_probability', action='store_true', help='Exports the KO probability.')

@@ -62,7 +62,7 @@ Rscript "${step1_fitNULLGLMM}" \
     --LOCO=FALSE\
 	--skipModelFitting=FALSE \
     --IsSparseKin=TRUE      \
-    --isCateVarianceRatio=TRUE	
+    --isCateVarianceRatio=FALSE # Only needed for SAIGE-GENE+ (geneset)	
 
 #Rscript step2_SPAtests.R	\
 #	--vcfFile=./input/dosage_10markers.vcf.gz \
