@@ -1,6 +1,6 @@
 # wes_ko_ukbb
 
-Counts can be found here https://docs.google.com/spreadsheets/d/1p3wvZx7BNcMDg2BBT1wNSpVjC9gEwOloDEqeKMrcRAM/edit#gid=0
+* Counts can be found here https://docs.google.com/spreadsheets/d/1p3wvZx7BNcMDg2BBT1wNSpVjC9gEwOloDEqeKMrcRAM/edit#gid=0
 
 updated 17-sep-2021
 
