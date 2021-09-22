@@ -14,7 +14,7 @@ source utils/qsub_utils.sh
 source utils/hail_utils.sh
 
 # paths for hail script
-readonly out_dir="data/saige/grm/input"
+readonly out_dir="data/saige/grm/input/eur_ukbb"
 readonly out_prefix="${out_dir}/ukb_imp_eur_wes_chr1_22_sparse_markers"
 readonly hail_script="utils/create_grm_input.py"
 readonly spark_dir="data/tmp/spark"
@@ -33,7 +33,7 @@ python "${hail_script}" \
 	--out_prefix ${out_prefix} \
 	--subset_markers_by_kinship \
     --subset_samples_by_wes200k \
-    --subset_samples_by_eur
+    --subset_samples_by_ukbb_eur
 
 print_update "Successfully combined .bgen files for GRM input." "${SECONDS}"
 

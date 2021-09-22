@@ -88,17 +88,19 @@ def gene_csqs_case_builder(in_mt):
     "CH": two alternate allele on either strand in a locus (compound heterozygous)
     "CH+HO": two alternate allele on either strand in a locus (either as homozygous or compound heterozygous)
     '''
+    # create one gene_id for each item in gene_id array
+    in_mt = in_mt.explode_rows(in_mt.vep.worst_csq_by_gene_canonical)
     # get all snps that are not homozygous
     mt = in_mt
     mt = annotate_phased_entries(mt)
     mt = mt.filter_entries(~mt.GT.is_hom_var())
     # create table for each strand and combine to gene
-    ht0 = (mt.group_rows_by(mt.vep.Gene).aggregate(s0 = hl.agg.any(mt.a0_alt)))
-    ht1 = (mt.group_rows_by(mt.vep.Gene).aggregate(s1 = hl.agg.any(mt.a1_alt)))
-    ht2 = (in_mt.group_rows_by(in_mt.vep.Gene).aggregate(hom_var = hl.agg.any(in_mt.GT.is_hom_var())))
+    ht0 = (mt.group_rows_by(mt.vep.worst_csq_by_gene_canonical.gene_id).aggregate(s0 = hl.agg.any(mt.a0_alt)))
+    ht1 = (mt.group_rows_by(mt.vep.worst_csq_by_gene_canonical.gene_id).aggregate(s1 = hl.agg.any(mt.a1_alt)))
+    ht2 = (in_mt.group_rows_by(in_mt.vep.worst_csq_by_gene_canonical.gene_id).aggregate(hom_var = hl.agg.any(in_mt.GT.is_hom_var())))
     # combine entries
-    ht = ht0.annotate_entries(s1 = ht1[ht0.Gene, ht0.s].s1)
-    ht = ht.annotate_entries(hom_var = ht2[ht.Gene, ht.s].hom_var)
+    ht = ht0.annotate_entries(s1 = ht1[ht0.gene_id, ht0.s].s1)
+    ht = ht.annotate_entries(hom_var = ht2[ht.gene_id, ht.s].hom_var)
     expr = (hl.case()
            .when( (ht.s0) & (ht.s1) & (ht.hom_var), 'CH+HO')
            .when( (ht.s0) & (ht.s1), "CH")
@@ -110,23 +112,26 @@ def gene_csqs_case_builder(in_mt):
     ht = ht.drop('s0').drop('s1').drop('hom_var')    
     return ht
 
+
 def gene_csqs_dosage_builder(in_mt):
     r''' Returns matrix table that contains dosage information from phased geneotypes.
     0: two refererence alleles in locus,
     1: one alternate allele on either strand in a locus, 
     2: two alternate allele on either strand in a locus (either as homozygous or compound heterozygous)
     '''
+    # create one gene_id for each item in gene_id array
+    in_mt = in_mt.explode_rows(in_mt.vep.worst_csq_by_gene_canonical)
     # get all snps that are not homozygous
     mt = in_mt
     mt = annotate_phased_entries(mt)
     mt = mt.filter_entries(~mt.GT.is_hom_var())
     # create table for each strand and combine to gene
-    ht0 = (mt.group_rows_by(mt.vep.Gene).aggregate(s0 = hl.agg.any(mt.a0_alt)))
-    ht1 = (mt.group_rows_by(mt.vep.Gene).aggregate(s1 = hl.agg.any(mt.a1_alt)))
-    ht2 = (in_mt.group_rows_by(in_mt.vep.Gene).aggregate(hom_var = hl.agg.any(in_mt.GT.is_hom_var())))
+    ht0 = (mt.group_rows_by(mt.vep.worst_csq_by_gene_canonical.gene_id).aggregate(s0 = hl.agg.any(mt.a0_alt)))
+    ht1 = (mt.group_rows_by(mt.vep.worst_csq_by_gene_canonical.gene_id).aggregate(s1 = hl.agg.any(mt.a1_alt)))
+    ht2 = (in_mt.group_rows_by(in_mt.vep.worst_csq_by_gene_canonical.gene_id).aggregate(hom_var = hl.agg.any(in_mt.GT.is_hom_var())))
     # combine entries
-    ht = ht0.annotate_entries(s1 = ht1[ht0.Gene, ht0.s].s1)
-    ht = ht.annotate_entries(hom_var = ht2[ht.Gene, ht.s].hom_var)
+    ht = ht0.annotate_entries(s1 = ht1[ht0.gene_id, ht0.s].s1)
+    ht = ht.annotate_entries(hom_var = ht2[ht.gene_id, ht.s].hom_var)
     expr = (hl.case()
            .when( (ht.s0) & (ht.s1) & (ht.hom_var), 2)
            .when( (ht.s0) & (ht.s1), 2)
@@ -138,9 +143,9 @@ def gene_csqs_dosage_builder(in_mt):
     ht = ht.drop('s0').drop('s1').drop('hom_var')    
     return ht
 
-
 def count_alleles(mt):
     r'''Count up alleles in a vector (singleton AC, not singletons AC, total AC)'''
+    mt = mt.explode_rows(mt.vep.worst_csq_by_gene_canonical)
     mt = mt.filter_rows(mt.info.AC > 0)
     d = mt.aggregate_rows(hl.agg.counter(mt.info.AC))
     if 1 in d.keys():
@@ -152,7 +157,8 @@ def count_alleles(mt):
 
 def count_genes(mt):
     r'''Collapse variants into genes and count affected genes'''
-    d = mt.aggregate_entries(hl.agg.group_by(mt.vep.Gene, hl.agg.count_where(mt.GT.is_non_ref())))
+    mt = mt.explode_rows(mt.vep.worst_csq_by_gene_canonical)
+    d = mt.aggregate_entries(hl.agg.group_by(mt.vep.worst_csq_by_gene_canonical.gene_id, hl.agg.count_where(mt.GT.is_non_ref())))
     n_genes = len([(key, value) for key, value in d.items() if value != 0])
     return n_genes
 
@@ -164,18 +170,19 @@ def summarize_variants(mt, what = 'ptv', vep_field = 'consequence_category'):
     out = ht_alleles + [ht_genes]
     return out
 
-def gene_burden_annotations_per_sample(mt, gene_field = 'Gene'):
+def gene_burden_annotations_per_sample(mt):
     r''' calculate gene burden by counting variants in gene'''
+    mt = mt.explode_rows(mt.vep.worst_csq_by_gene_canonical)
     mt = mt.group_rows_by(
-        Gene = mt.vep.Gene#,
-        #consequence_category = mt.vep.consequence_category
+        gene_id = mt.vep.worst_csq_by_gene_canonical.gene_id
         ).aggregate(n = hl.agg.count_where(mt.GT.is_non_ref()))
     return mt
 
-def gene_burden_category_annotations_per_sample(mt, gene_field = 'Gene'):
+def gene_burden_category_annotations_per_sample(mt):
     r''' calculate gene burden by counting variants in gene stratified by variant category'''
+    mt = mt.explode_rows(mt.vep.worst_csq_by_gene_canonical)
     mt = mt.group_rows_by(
-        Gene = mt.vep.Gene,
+        gene_id = mt.vep.worst_csq_by_gene_canonical.gene_id,
         consequence_category = mt.vep.consequence_category
         ).aggregate(n = hl.agg.count_where(mt.GT.is_non_ref()))
     return mt
@@ -195,8 +202,7 @@ def calc_p_ko(mt):
     )
     return ko_mt
 
-def gene_csqs_calc_pKO(mt_phased, mt_unphased, fields_drop = ['DT','sigletons']):
-    
+def gene_csqs_calc_pKO(mt_phased, mt_unphased, fields_drop = ['DT','singletons']):
     '''Annotates entries with P(Knockout). Requires a phased matrix and an unphased matrix that only contains singletons.'''
     
     # setup variables
@@ -206,13 +212,15 @@ def gene_csqs_calc_pKO(mt_phased, mt_unphased, fields_drop = ['DT','sigletons'])
     # Determine probability of being KO given singletons and phased hetz
     mt1_burden = gene_csqs_dosage_builder(mt1)
     mt2_burden = gene_burden_annotations_per_sample(mt2)
-    mt_ko = mt1_burden.annotate_entries(singletons = mt2_burden[(mt1_burden.Gene, mt1_burden.s)].n)
+    mt_ko = mt1_burden.annotate_entries(singletons = mt2_burden[(mt1_burden.gene_id, mt1_burden.s)].n)
     mt_ko = mt_ko.annotate_entries(singletons = hl.if_else(~hl.is_missing(mt_ko.singletons), mt_ko.singletons, 0 ))
     mt_ko = calc_p_ko(mt_ko)
 
     # drop not needed rows
-    mt_ko = mt_ko.drop(*[f for f in fields_drop if f in mt_ko.entry])
+    if fields_drop is not None:
+        mt_ko = mt_ko.drop(*[f for f in fields_drop if f in mt_ko.entry])
     return mt_ko
+
 
 def gene_csqs_calc_pKO_pseudoSNP(mt1, mt2, chrom):
     '''Calculate probability of being a knockout incoporating phased 
@@ -229,9 +237,9 @@ def gene_csqs_calc_pKO_pseudoSNP(mt1, mt2, chrom):
     # create fake loci
     pmt = pmt.annotate_rows(locus = hl.parse_locus('chr' + str(chrom) + ':1'))
     pmt = pmt.annotate_rows(alleles = hl.literal(['X','Y']))
-    pmt = pmt.annotate_rows(rsid = pmt.Gene)
+    pmt = pmt.annotate_rows(rsid = pmt.gene_id)
     pmt = pmt.key_rows_by(pmt.locus, pmt.alleles)
-    pmt = pmt.drop('Gene')
+    pmt = pmt.drop('gene_id')
     return pmt
 
 def maf_category_case_builder(mt):
@@ -255,110 +263,34 @@ def mac_category_case_builder(call_stats_expr):
             .when(call_stats_expr.AC <= 1000000, 1000000)
             .default(0))
 
-def gene_csqs_vep_builder(in_mt):
-    r'''Makes a matrix table that contains variants for each (phased) strand. Uses VEP information.'''
-    # annotate with rsid
-    in_mt = in_mt.annotate_entries(rsid_entry = in_mt.rsid)
-    in_mt = in_mt.annotate_entries(snpid_entry = in_mt.snpid)
-    in_mt = in_mt.annotate_entries(af_entry = in_mt.info.AF)
-    in_mt = in_mt.annotate_entries(ac_entry = in_mt.info.AC)
-    in_mt = in_mt.annotate_entries(rsid_gt = hl.delimit([in_mt.snpid_entry,
-                                                         in_mt.rsid_entry,
-                                                         hl.str(in_mt.af_entry),
-                                                         hl.str(in_mt.ac_entry),
-                                                         in_mt.vep.consequence_category,
-                                                         in_mt.vep.most_severe_consequence,
-                                                         in_mt.vep.worst_csq_by_gene_canonical.lof[0],
-                                                         in_mt.vep.worst_csq_by_gene_canonical.lof_flags[0],
-                                                         hl.str(in_mt.dbnsfp.revel_score),
-                                                         hl.str(in_mt.dbnsfp.cadd_phred_score)], ';'))
-    #in_mt = in_mt.annotate_entries(rsid_gt = hl.delimit([in_mt.rsid_entry, in_mt.vep.consequence]))
-    # get all snps that are not homozygous
-    mt = in_mt
+def gene_strand_builder(mt, field = 'snpid'):
+    '''Returns hail table that contains genes, samples, rsids, knockout status'''
+    
+    # annotate entries with phased data
+    mt = mt.explode_rows(mt.vep.worst_csq_by_gene_canonical)
+    mt = mt.annotate_entries(rsid_entry = mt[field])
+    mt = mt.annotate_rows(gene_id = mt.vep.worst_csq_by_gene_canonical.gene_id)
     mt = annotate_phased_entries(mt)
-    mt = mt.filter_entries(~mt.GT.is_hom_var())
-    # create table for each strand and combine to gene
-    ht0 = (mt.group_rows_by(mt.vep.Gene).aggregate(s0 = hl.agg.filter(mt.a0_alt, hl.agg.collect(mt.rsid_gt))))
-    ht1 = (mt.group_rows_by(mt.vep.Gene).aggregate(s1 = hl.agg.filter(mt.a1_alt, hl.agg.collect(mt.rsid_gt))))
-    ht2 = (in_mt.group_rows_by(in_mt.vep.Gene).aggregate(hom_var = hl.agg.filter(in_mt.GT.is_hom_var(), hl.agg.collect(in_mt.rsid_gt))))
-    # combine entries
-    ht = ht0.annotate_entries(s1 = ht1[ht0.Gene, ht0.s].s1)
-    ht = ht.annotate_entries(hom_var = ht2[ht.Gene, ht.s].hom_var)
-    return ht
- 
-def gene_csqs_rsid_builder(in_mt, keep = ['CH','HO','CH+HO']):
-    r'''Makes a matrix that cotanins knockout type and the variant (rsID) involved in the KO'''
-    # build gene x variants/ko status
-    mt_rs = gene_csqs_vep_builder(in_mt)
-    mt_dt = gene_csqs_case_builder(in_mt)
-    # combine the two annotations in a single table 
-    combined = mt_rs.annotate_entries(csqs = mt_dt[mt_rs.Gene, mt_rs.s].csqs)
-    combined = combined.filter_entries(hl.literal(keep).contains(combined.csqs))
-    return combined
 
-def annotate_vep(mt, vep_path):
-    r'''Annotate matrix table with VEP consequence from external file.'''
-    print(f'Annotating with VEP file: {vep_path}')
-    
-    # Open file containing VEP fields
-    with open('data/vep/vep_fields.txt', 'r') as file:
-        fields = file.read().strip().split(',')
-    ht = hl.import_vcf(vep_path).rename({'info':'vep'}) 
-    
-    # Add VEP fields by iteration
-    for i in range(len(fields)):
-        ht = ht.annotate_rows(
-            vep=ht.vep.annotate(
-                col=ht.vep.CSQ.map(lambda x: (x.split('\\|')[i]))[0]
-                ).rename({'col':f'{fields[i]}'})
-        )
-    
-    # Most severe variant consequence
-    ht = ht.annotate_rows(vep = ht.vep.annotate(most_severe_consequence = ht.vep.Consequence.split('&')[0]))
-    
-    # Extract various categories annotations and change type
-    ht = ht.annotate_rows(vep = ht.vep.annotate(sift_pred = ht.vep.SIFT_pred.split('&')[0]))
-    ht = ht.annotate_rows(vep = ht.vep.annotate(polyphen2_hdiv_pred = ht.vep.Polyphen2_HDIV_pred.split('&')[0]))
-    ht = ht.annotate_rows(vep = ht.vep.annotate(polyphen2_hvar_pred = ht.vep.Polyphen2_HVAR_pred.split('&')[0]))
-    ht = ht.annotate_rows(vep = ht.vep.annotate(cadd_phred_score = hl.parse_float(ht.vep.CADD_phred)))
-    ht = ht.annotate_rows(vep = ht.vep.annotate(revel_score = hl.parse_float(ht.vep.REVEL_score)))
-    
-    # Define protein truncating variants
-    ptv = hl.set(["transcript_ablation", "splice_acceptor_variant",
-              "splice_donor_variant", "stop_gained", "frameshift_variant"])
-    
-    # Define missense variation
-    missense = hl.set(["stop_lost", "start_lost", "transcript_amplification",
-                   "inframe_insertion", "inframe_deletion", "missense_variant",
-                   "protein_altering_variant", "splice_region_variant"])
-    
-    # Define synonymous
-    synonymous = hl.set(["incomplete_terminal_codon_variant", "stop_retained_variant", "synonymous_variant"])
-    
-    # Define non coding variation
-    non_coding = hl.set(["coding_sequence_variant", "mature_miRNA_variant", "5_prime_UTR_variant",
-              "3_prime_UTR_variant", "non_coding_transcript_exon_variant", "intron_variant",
-              "NMD_transcript_variant", "non_coding_transcript_variant", "upstream_gene_variant",
-              "downstream_gene_variant", "TFBS_ablation", "TFBS_amplification", "TF_binding_site_variant",
-              "regulatory_region_ablation", "regulatory_region_amplification", "feature_elongation",
-              "regulatory_region_variant", "feature_truncation", "intergenic_variant"])
-    
-    # Create categories for downstream analysis
-    ht = ht.annotate_rows(vep = ht.vep.annotate(consequence_category = 
-        hl.case().when(ptv.contains(ht.vep.most_severe_consequence), "ptv")
-             .when(missense.contains(ht.vep.most_severe_consequence) & 
-                   (~hl.is_defined(ht.vep.cadd_phred_score) | 
-                    ~hl.is_defined(ht.vep.revel_score)), "other_missense")                                   
-             .when(missense.contains(ht.vep.most_severe_consequence) & 
-                   (ht.vep.cadd_phred_score >= 20) & 
-                   (ht.vep.revel_score >= 0.6), "damaging_missense") 
-             .when(missense.contains(ht.vep.most_severe_consequence), "other_missense")
-             .when(synonymous.contains(ht.vep.most_severe_consequence), "synonymous")
-             .when(non_coding.contains(ht.vep.most_severe_consequence), "non_coding")
-             .default("NA")
-    ))
-                                                
-    # combine with matrix table
-    mt = mt.annotate_rows(vep = ht.index_rows(mt.locus, mt.alleles).vep.drop('CSQ'))
-    return(mt)
+    # filter to each strand
+    strand1 = mt.filter_entries((mt.a0_alt == True) | (mt.a_homo == True)).entries() # sets entries to NA in matrix table
+    strand2 = mt.filter_entries((mt.a1_alt == True) | (mt.a_homo == True)).entries()
+
+    # filter to each gene
+    strand1 = strand1.group_by(strand1.gene_id, strand1.s).aggregate(phase1 = hl.agg.collect(strand1.rsid_entry))
+    strand2 = strand2.group_by(strand2.gene_id, strand2.s).aggregate(phase2 = hl.agg.collect(strand2.rsid_entry))
+
+    # combine each strand
+    ht = strand1.annotate(phase2 = strand2[strand1.gene_id, strand1.s].phase2)
+    ht = ht.annotate(knockout = (~hl.is_missing(ht.phase1)) & ~(hl.is_missing(ht.phase2)))
+    return ht
+
+def gene_csqs_knockout_builder(in_mt, keep = None):
+    '''Return a hail table that contains knockout status alongside phase of variants in genes'''
+    mt_rs = gene_strand_builder(in_mt, 'snpid')
+    mt_dt = gene_csqs_case_builder(in_mt)
+    combined = mt_rs.annotate(csqs = mt_dt[mt_rs.gene_id, mt_rs.s].csqs)
+    if keep is not None:
+        combined = combined.filter(hl.literal(keep).contains(combined.csqs))
+    return combined
 

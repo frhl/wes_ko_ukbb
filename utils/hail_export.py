@@ -1,18 +1,5 @@
 #!/usr/bin/env python3
 
-#' @description Compound heterozygos HAIL pipeline
-#' @todo Integrate SAIGE-GENE+
-#' @DONE @todo Convert MatrixTable (sample, variant)-pairs to 'long' format
-#' @DONE @todo Long format table should also contain variants found and their strand.
-#' @DONE @todo Test burden_dosage function
-#' @DONE @todo Create function that subsets variants of MODERATE impact
-#' @DONE @todo hardy eq test for each variant
-#' @DONE @todo add mt.repartition to different commands
-#' @DONE @todo check worst consequence
-#' @DONE @todo export ultra rare variants
-#' @todo check which allele is included in VEP? What about MAF thresholds?
-
-
 import hail as hl
 import argparse
 import pandas
@@ -33,7 +20,6 @@ def main(args):
     input_unphased_type = args.input_unphased_type
     out_prefix = args.out_prefix
     out_type   = args.out_type
-    vep_path   = args.vep_path
     
     # variant filters
     chrom      = int(args.chrom)
@@ -42,6 +28,7 @@ def main(args):
     hwe        = (args.hwe)
     missing    = args.missing
     annotate_rsid = args.annotate_rsid   
+    annotate_snpid = args.annotate_snpid
  
     # sample filtering options
     get_related = args.get_related
@@ -58,7 +45,7 @@ def main(args):
     export_ko_rsid = args.export_ko_rsid
 
     # run parser
-    hail_init.hail_bmrc_init('logs/hail/hail_export.log', 'GRCh38')
+    hail_init.hail_bmrc_init('logs/hail/knockout.log', 'GRCh38')
     mt1 = qc.get_table(input_path=input_phased_path, input_type=input_phased_type) # 12788
     mt2 = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type) # 11867 (for singletons)
 
@@ -71,15 +58,26 @@ def main(args):
         mt1 = qc.filter_to_unrelated(mt1, get_related = False)
         mt2 = qc.filter_to_unrelated(mt2, get_related = False)
 
-	# note: need to translate ids to combine later!
-    mt1 = qc.translate_sample_ids(mt1, 12788, 11867)
-    if get_europeans or annotate_europeans:
-        mt1 = qc.filter_to_european(mt1, only_annotate = annotate_europeans)
-        mt2 = qc.filter_to_european(mt2, only_annotate = annotate_europeans)
+	# annotate europeans
+    if annotate_europeans:
+
+        mt1 = qc.filter_to_european(mt1, only_annotate = True)
+        mt2 = qc.filter_to_european(mt2, only_annotate = True)
+
+    # subset to europeans
+    if get_europeans: 
+        
+        if 'eur' not in mt1.row or 'eur' not in mt2.row:
+            mt1 = qc.filter_to_european(mt1, only_annotate = True)
+            mt2 = qc.filter_to_european(mt2, only_annotate = True)
+        else:
+            print('Filtering on field "eur".')
+            mt1 = mt1.filter_cols(mt1.eur == 1)
+            mt2 = mt2.filter_cols(mt2.eur == 1)
 
     ### Variant filtering/annotations
     # Using mt2 as a singleton refereence, so remove those with AC > 1
-    mt2 = qc.filter_max_mac(mt2, 1)
+    # mt2 = qc.filter_max_mac(mt2, 1)
 
     if missing:
         mt1 = qc.filter_min_missing(mt1, float(missing))
@@ -94,42 +92,9 @@ def main(args):
     if hwe:
         mt1 = qc.filter_hwe(mt1, float(hwe))
 
-    if vep_path:
-        
-        # Run VEP + gnomAD variant annotations
-        mt1 = process_consequences(hl.vep(mt1, "utils/configs/vep_env.json"))
-        mt2 = process_consequences(hl.vep(mt2, "utils/configs/vep_env.json"))
-        
-        # Annotate with REVEL+CADD scores
-        mt1 = analysis.annotate_dbnsfp(mt1, vep_path)
-        mt2 = analysis.annotate_dbnsfp(mt2, vep_path)
-        
-        # annotate consequnece categories 
-        mt1 = analysis.variant_csqs_category_builder(mt1)
-        mt2 = analysis.variant_csqs_category_builder(mt2)
-        
-        # annotate Gene (In the future just use vep.worst_csq_by_gene_canonical downstream..) 
-        mt1 = mt1.annotate_rows(vep = mt1.vep.annotate(Gene = mt1.vep.worst_csq_by_gene_canonical))
-        mt2 = mt2.annotate_rows(vep = mt2.vep.annotate(Gene = mt2.vep.worst_csq_by_gene_canonical))
-        
-        # only keep selected consequences
-        if vep_filter: 
-            mt1 = analysis.filter_vep(mt1, 'consequence_category', vep_filter)
-            mt2 = analysis.filter_vep(mt2, 'consequence_category', vep_filter) 
-
-    # By default add snpid id annotation
-    mt1 = qc.annotate_snpid(mt1)
-    mt2 = qc.annotate_snpid(mt2)
-
-    if annotate_rsid:
-
-        # annotate mt1 with dbSNP
-        mt1 = qc.annotate_rsid(mt1)
-        mt1 = qc.default_to_snpid_when_missing_rsid(mt1)
-
-        # annotate mt2 with dbSNP
-        mt2 = qc.annotate_rsid(mt2)
-        mt2 = qc.default_to_snpid_when_missing_rsid(mt2)
+    if vep_filter: 
+        mt1 = analysis.filter_vep(mt1, 'consequence_category', vep_filter)
+        mt2 = analysis.filter_vep(mt2, 'consequence_category', vep_filter) 
 
     #### get stats
 
@@ -140,7 +105,7 @@ def main(args):
         mt2_cat = analysis.gene_burden_category_annotations_per_sample(mt2)
 
         # combine singleton table and full table
-        res = mt1_cat.annotate_entries(singletons = mt2_cat[(mt1_cat.Gene, mt1_cat.consequence_category), mt1_cat.s].n)
+        res = mt1_cat.annotate_entries(singletons = mt2_cat[(mt1_cat.gene_id, mt1_cat.consequence_category), mt1_cat.s].n)
         res = res.annotate_entries(singletons = hl.if_else(hl.is_missing(res.singletons),0,res.singletons))
         res = res.annotate_entries(total = res.n + res.singletons)
         res = res.entries()
@@ -159,14 +124,9 @@ def main(args):
         # export data
         mt_ko_entries.export(out_prefix + '_ko_prob.tsv.gz')
 
-    if export_ko_dosage_matrix:
-        # ignores singletons (but gives an overview)
-        mt_ko_matrix = analysis.gene_csqs_case_builder(mt1)
-        mt_ko_matrix.export(out_prefix + '_ko_matrix_no_singletons.tsv.gz')
-
     if export_ko_rsid:
-        mt_ko_rsid = analysis.gene_csqs_rsid_builder(mt1).entries()
-        mt_ko_rsid.export(out_prefix + '_ko_rsid.tsv.gz')
+        mt_ko_rsid = analysis.gene_csqs_knockout_builder(mt1)
+        mt_ko_rsid.export(out_prefix + '_knockouts.tsv.gz')
 
     if export_fake_vcf:
         out = analysis.gene_csqs_calc_pKO_pseudoSNP(mt1, mt2, chrom)
@@ -182,6 +142,7 @@ if __name__=='__main__':
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Type of output dataset (options: mt, vcf, plink)')
     # filtering variants
+    parser.add_argument('--annotate_snpid', action = 'store_true', help = 'use chr:pos:a1:a2 to annotate snpids in data')
     parser.add_argument('--annotate_rsid', action = 'store_true', help = 'use dbSNP to annotate rsids in data')
     parser.add_argument('--chrom', default=None, help='Chromosome to be used')
     parser.add_argument('--maf_max', default=None, help='Select all variants with a maf less than the indicated value')
@@ -198,11 +159,12 @@ if __name__=='__main__':
     parser.add_argument('--export_ko_probability', action='store_true', help='Exports the KO probability.')
     parser.add_argument('--export_burden', action='store_true', help='Export burden variant count by gene and and individuals.')
     parser.add_argument('--export_fake_vcf', action='store_true', help='Export a "fake" VCF file that contains KO probabilities as DP field..')
-    parser.add_argument('--vep_path', default=None, help='path to a .vcf file containing annotated entries by locus and alleles')
     parser.add_argument('--vep_filter', nargs='+', help='Filter consequence_category by mutations e.g., "damaging_missense" or "ptv"')
     parser.add_argument('--export_ko_dosage_matrix', action='store_true', help='Generate a gene x sample matrix with KO status')
     
     args = parser.parse_args()
 
     main(args)
+
+
 
