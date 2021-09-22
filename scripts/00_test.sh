@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N knockout
+#$ -N test_hail
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/knockout.log
-#$ -e logs/knockout.errors.log
+#$ -o logs/test_hail.log
+#$ -e logs/test_hail.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 10
 #$ -q short.qe
@@ -33,23 +33,16 @@ readonly in_unphased="${in_dir}/ukb_wes_200k_annotated_chr${chr}_singletons.mt"
 readonly out_prefix="${out_dir}/ukb_wes_200k_maf002_miss005_ptv_chr${chr}"
 readonly out="${out_prefix}.mt"
 
+# echo script into log
+echo "##### SCRIPT ######" >> logs/test_hail.errors.log
+echo $( cat ${hail_script} ) >> logs/test_hail.errors.log 
+echo "##### END ######" >> logs/test_hail.errors.log
+
 # run hail
 set_up_hail
 set_up_pythonpath
 mkdir -p ${out_dir}
-python3 "${hail_script}" \
-    --chrom ${chr} \
-    --input_phased_path ${in_phased}\
-    --input_unphased_path ${in_unphased} \
-    --input_phased_type "mt" \
-    --input_unphased_type "mt" \
-    --vep_filter "ptv" \
-    --maf_max 0.02 \
-    --missing 0.05 \
-    --out_prefix ${out_prefix} \
-    --export_burden \
-    --export_ko_probability \
-    --export_fake_vcf
+python3 "${hail_script}" 
 
 
 print_update "Finished running HAIL for chr${chr}" "${SECONDS}"

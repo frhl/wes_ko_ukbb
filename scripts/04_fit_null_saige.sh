@@ -5,9 +5,9 @@
 #$ -o logs/step1_saige.log
 #$ -e logs/step1_saige.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 2
+#$ -pe shmem 4
 #$ -q short.qe
-#$ -t 2
+#$ -t 1-10
 
 
 module purge

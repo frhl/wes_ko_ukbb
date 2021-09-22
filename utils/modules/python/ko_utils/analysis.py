@@ -88,17 +88,19 @@ def gene_csqs_case_builder(in_mt):
     "CH": two alternate allele on either strand in a locus (compound heterozygous)
     "CH+HO": two alternate allele on either strand in a locus (either as homozygous or compound heterozygous)
     '''
+    # create one gene_id for each item in gene_id array
+    in_mt = in_mt.explode_rows(in_mt.vep.worst_csq_by_gene_canonical)
     # get all snps that are not homozygous
     mt = in_mt
     mt = annotate_phased_entries(mt)
     mt = mt.filter_entries(~mt.GT.is_hom_var())
     # create table for each strand and combine to gene
-    ht0 = (mt.group_rows_by(mt.vep.Gene).aggregate(s0 = hl.agg.any(mt.a0_alt)))
-    ht1 = (mt.group_rows_by(mt.vep.Gene).aggregate(s1 = hl.agg.any(mt.a1_alt)))
-    ht2 = (in_mt.group_rows_by(in_mt.vep.Gene).aggregate(hom_var = hl.agg.any(in_mt.GT.is_hom_var())))
+    ht0 = (mt.group_rows_by(mt.vep.worst_csq_by_gene_canonical.gene_id).aggregate(s0 = hl.agg.any(mt.a0_alt)))
+    ht1 = (mt.group_rows_by(mt.vep.worst_csq_by_gene_canonical.gene_id).aggregate(s1 = hl.agg.any(mt.a1_alt)))
+    ht2 = (in_mt.group_rows_by(in_mt.vep.worst_csq_by_gene_canonical.gene_id).aggregate(hom_var = hl.agg.any(in_mt.GT.is_hom_var())))
     # combine entries
-    ht = ht0.annotate_entries(s1 = ht1[ht0.Gene, ht0.s].s1)
-    ht = ht.annotate_entries(hom_var = ht2[ht.Gene, ht.s].hom_var)
+    ht = ht0.annotate_entries(s1 = ht1[ht0.gene_id, ht0.s].s1)
+    ht = ht.annotate_entries(hom_var = ht2[ht.gene_id, ht.s].hom_var)
     expr = (hl.case()
            .when( (ht.s0) & (ht.s1) & (ht.hom_var), 'CH+HO')
            .when( (ht.s0) & (ht.s1), "CH")
@@ -110,23 +112,26 @@ def gene_csqs_case_builder(in_mt):
     ht = ht.drop('s0').drop('s1').drop('hom_var')    
     return ht
 
+
 def gene_csqs_dosage_builder(in_mt):
     r''' Returns matrix table that contains dosage information from phased geneotypes.
     0: two refererence alleles in locus,
     1: one alternate allele on either strand in a locus, 
     2: two alternate allele on either strand in a locus (either as homozygous or compound heterozygous)
     '''
+    # create one gene_id for each item in gene_id array
+    in_mt = in_mt.explode_rows(in_mt.vep.worst_csq_by_gene_canonical)
     # get all snps that are not homozygous
     mt = in_mt
     mt = annotate_phased_entries(mt)
     mt = mt.filter_entries(~mt.GT.is_hom_var())
     # create table for each strand and combine to gene
-    ht0 = (mt.group_rows_by(mt.vep.Gene).aggregate(s0 = hl.agg.any(mt.a0_alt)))
-    ht1 = (mt.group_rows_by(mt.vep.Gene).aggregate(s1 = hl.agg.any(mt.a1_alt)))
-    ht2 = (in_mt.group_rows_by(in_mt.vep.Gene).aggregate(hom_var = hl.agg.any(in_mt.GT.is_hom_var())))
+    ht0 = (mt.group_rows_by(mt.vep.worst_csq_by_gene_canonical.gene_id).aggregate(s0 = hl.agg.any(mt.a0_alt)))
+    ht1 = (mt.group_rows_by(mt.vep.worst_csq_by_gene_canonical.gene_id).aggregate(s1 = hl.agg.any(mt.a1_alt)))
+    ht2 = (in_mt.group_rows_by(in_mt.vep.worst_csq_by_gene_canonical.gene_id).aggregate(hom_var = hl.agg.any(in_mt.GT.is_hom_var())))
     # combine entries
-    ht = ht0.annotate_entries(s1 = ht1[ht0.Gene, ht0.s].s1)
-    ht = ht.annotate_entries(hom_var = ht2[ht.Gene, ht.s].hom_var)
+    ht = ht0.annotate_entries(s1 = ht1[ht0.gene_id, ht0.s].s1)
+    ht = ht.annotate_entries(hom_var = ht2[ht.gene_id, ht.s].hom_var)
     expr = (hl.case()
            .when( (ht.s0) & (ht.s1) & (ht.hom_var), 2)
            .when( (ht.s0) & (ht.s1), 2)
@@ -137,6 +142,7 @@ def gene_csqs_dosage_builder(in_mt):
     ht = ht.annotate_entries(DT = expr)
     ht = ht.drop('s0').drop('s1').drop('hom_var')    
     return ht
+
 
 
 def count_alleles(mt):
@@ -195,8 +201,7 @@ def calc_p_ko(mt):
     )
     return ko_mt
 
-def gene_csqs_calc_pKO(mt_phased, mt_unphased, fields_drop = ['DT','sigletons']):
-    
+def gene_csqs_calc_pKO(mt_phased, mt_unphased, fields_drop = ['DT','singletons']):
     '''Annotates entries with P(Knockout). Requires a phased matrix and an unphased matrix that only contains singletons.'''
     
     # setup variables
@@ -211,8 +216,10 @@ def gene_csqs_calc_pKO(mt_phased, mt_unphased, fields_drop = ['DT','sigletons'])
     mt_ko = calc_p_ko(mt_ko)
 
     # drop not needed rows
-    mt_ko = mt_ko.drop(*[f for f in fields_drop if f in mt_ko.entry])
+    if fields_drop is not None:
+        mt_ko = mt_ko.drop(*[f for f in fields_drop if f in mt_ko.entry])
     return mt_ko
+
 
 def gene_csqs_calc_pKO_pseudoSNP(mt1, mt2, chrom):
     '''Calculate probability of being a knockout incoporating phased 
