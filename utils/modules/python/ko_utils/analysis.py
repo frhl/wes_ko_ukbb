@@ -263,18 +263,18 @@ def mac_category_case_builder(call_stats_expr):
             .when(call_stats_expr.AC <= 1000000, 1000000)
             .default(0))
 
-def gene_strand_snpid_builder(mt):
+def gene_strand_builder(mt, field = 'snpid'):
     '''Returns hail table that contains genes, samples, rsids, knockout status'''
     
     # annotate entries with phased data
     mt = mt.explode_rows(mt.vep.worst_csq_by_gene_canonical)
-    mt = mt.annotate_entries(rsid_entry = mt.snpid)
+    mt = mt.annotate_entries(rsid_entry = mt[field])
     mt = mt.annotate_rows(gene_id = mt.vep.worst_csq_by_gene_canonical.gene_id)
     mt = analysis.annotate_phased_entries(mt)
 
     # filter to each strand
-    strand1 = mt.filter_entries((mt.a0_alt == True)).entries() # sets entries to NA in matrix table
-    strand2 = mt.filter_entries((mt.a1_alt == True)).entries()
+    strand1 = mt.filter_entries((mt.a0_alt == True) | (mt.a_homo == True)).entries() # sets entries to NA in matrix table
+    strand2 = mt.filter_entries((mt.a1_alt == True) | (mt.a_homo == True)).entries()
 
     # filter to each gene
     strand1 = strand1.group_by(strand1.gene_id, strand1.s).aggregate(phase1 = hl.agg.collect(strand1.rsid_entry))
@@ -287,11 +287,10 @@ def gene_strand_snpid_builder(mt):
 
 def gene_csqs_knockout_builder(in_mt, keep = None):
     '''Return a hail table that contains knockout status alongside phase of variants in genes'''
-    mt_rs = gene_strand_snpid_builder(in_mt)
+    mt_rs = gene_strand_builder(in_mt, 'snpid')
     mt_dt = analysis.gene_csqs_case_builder(in_mt)
     combined = mt_rs.annotate(csqs = mt_dt[mt_rs.gene_id, mt_rs.s].csqs)
     if keep is not None:
         combined = combined.filter(hl.literal(keep).contains(combined.csqs))
     return combined
-
 

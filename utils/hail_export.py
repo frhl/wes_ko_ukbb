@@ -49,11 +49,6 @@ def main(args):
     mt1 = qc.get_table(input_path=input_phased_path, input_type=input_phased_type) # 12788
     mt2 = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type) # 11867 (for singletons)
 
-    # // TMP START
-    mt1 = mt1.annotate_rows(vep = mt1.vep.annotate(Gene = mt1.vep.worst_csq_by_gene_canonical.gene_symbol))
-    mt2 = mt2.annotate_rows(vep = mt2.vep.annotate(Gene = mt2.vep.worst_csq_by_gene_canonical.gene_symbol))
-    # // TMP END
-
     ### Sample filtering
     if get_related and not get_unrelated:
         mt1 = qc.filter_to_unrelated(mt1, get_related = True)
@@ -110,7 +105,7 @@ def main(args):
         mt2_cat = analysis.gene_burden_category_annotations_per_sample(mt2)
 
         # combine singleton table and full table
-        res = mt1_cat.annotate_entries(singletons = mt2_cat[(mt1_cat.Gene, mt1_cat.consequence_category), mt1_cat.s].n)
+        res = mt1_cat.annotate_entries(singletons = mt2_cat[(mt1_cat.gene_id, mt1_cat.consequence_category), mt1_cat.s].n)
         res = res.annotate_entries(singletons = hl.if_else(hl.is_missing(res.singletons),0,res.singletons))
         res = res.annotate_entries(total = res.n + res.singletons)
         res = res.entries()
@@ -129,14 +124,14 @@ def main(args):
         # export data
         mt_ko_entries.export(out_prefix + '_ko_prob.tsv.gz')
 
-    if export_ko_dosage_matrix:
-        # ignores singletons (but gives an overview)
-        mt_ko_matrix = analysis.gene_csqs_case_builder(mt1)
-        mt_ko_matrix.export(out_prefix + '_ko_matrix_no_singletons.tsv.gz')
+    #if export_ko_dosage_matrix:
+    #    # ignores singletons (but gives an overview)
+    #    mt_ko_matrix = analysis.gene_csqs_case_builder(mt1)
+    #    mt_ko_matrix.export(out_prefix + '_ko_matrix_no_singletons.tsv.gz')
 
     if export_ko_rsid:
-        mt_ko_rsid = analysis.gene_csqs_rsid_builder(mt1).entries()
-        mt_ko_rsid.export(out_prefix + '_ko_rsid.tsv.gz')
+        mt_ko_rsid = analysis.gene_csqs_knockout_builder(mt1).entries()
+        mt_ko_rsid.export(out_prefix + '_knockouts.tsv.gz')
 
     if export_fake_vcf:
         out = analysis.gene_csqs_calc_pKO_pseudoSNP(mt1, mt2, chrom)

@@ -5,7 +5,7 @@
 #$ -o logs/knockout.log
 #$ -e logs/knockout.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 10
+#$ -pe shmem 5
 #$ -q short.qe
 #$ -t 22
 
@@ -19,7 +19,7 @@ source utils/hail_utils.sh
 readonly in_dir="data/mt"
 readonly vep_dir="data/vep/full/"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/ptvs_test3"
+readonly out_dir="derived/ptvs_test4"
 
 # hail script
 readonly hail_script="utils/hail_export.py"
@@ -43,12 +43,13 @@ python3 "${hail_script}" \
     --input_unphased_path ${in_unphased} \
     --input_phased_type "mt" \
     --input_unphased_type "mt" \
-    --vep_filter "ptv" \
+    --vep_filter "ptv" "damaging_missense" \
     --maf_max 0.02 \
     --missing 0.05 \
     --out_prefix ${out_prefix} \
     --export_burden \
     --export_ko_probability \
+    --export_ko_rsid \
     --export_fake_vcf
 
 
