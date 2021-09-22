@@ -270,7 +270,7 @@ def gene_strand_builder(mt, field = 'snpid'):
     mt = mt.explode_rows(mt.vep.worst_csq_by_gene_canonical)
     mt = mt.annotate_entries(rsid_entry = mt[field])
     mt = mt.annotate_rows(gene_id = mt.vep.worst_csq_by_gene_canonical.gene_id)
-    mt = analysis.annotate_phased_entries(mt)
+    mt = annotate_phased_entries(mt)
 
     # filter to each strand
     strand1 = mt.filter_entries((mt.a0_alt == True) | (mt.a_homo == True)).entries() # sets entries to NA in matrix table
@@ -288,7 +288,7 @@ def gene_strand_builder(mt, field = 'snpid'):
 def gene_csqs_knockout_builder(in_mt, keep = None):
     '''Return a hail table that contains knockout status alongside phase of variants in genes'''
     mt_rs = gene_strand_builder(in_mt, 'snpid')
-    mt_dt = analysis.gene_csqs_case_builder(in_mt)
+    mt_dt = gene_csqs_case_builder(in_mt)
     combined = mt_rs.annotate(csqs = mt_dt[mt_rs.gene_id, mt_rs.s].csqs)
     if keep is not None:
         combined = combined.filter(hl.literal(keep).contains(combined.csqs))
