@@ -2,7 +2,7 @@
 
 * Counts can be found here https://docs.google.com/spreadsheets/d/1p3wvZx7BNcMDg2BBT1wNSpVjC9gEwOloDEqeKMrcRAM/edit#gid=0
 
-updated 17-sep-2021
+updated 22-sep-2021
 
 ## todo
 * (DONE) use UKBB kinship markers to generate a sparse matrix of all chromosomes
