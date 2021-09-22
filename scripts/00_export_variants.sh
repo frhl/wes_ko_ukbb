@@ -5,11 +5,11 @@
 #$ -N vep_rows
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/vep_rows.log
-#$ -e logs/vep_rows.log
+#$ -e logs/vep_rows.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 5
+#$ -pe shmem 10
 #$ -q short.qe
-#$ -t 22
+#$ -t 1-21
 #$ -V
 
 

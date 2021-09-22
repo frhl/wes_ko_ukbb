@@ -14,3 +14,11 @@
 2021-09-22 18:15:15 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
   Compatibility is not guaranteed.
 2021-09-22 18:15:15 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-22 19:20:17 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-22 19:20:18 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-22 19:20:18 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+
+Exporting to VCF: derived/ptvs_test4/ukb_wes_200k_maf002_miss005_ptv_chr22_ko.vcf.bgz
+
+Finished running HAIL for chr22. Elapsed time: .82 hrs (job id: 54389484.22 Wed Sep 22 20:09:12 BST 2021)

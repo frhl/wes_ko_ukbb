@@ -124,13 +124,8 @@ def main(args):
         # export data
         mt_ko_entries.export(out_prefix + '_ko_prob.tsv.gz')
 
-    #if export_ko_dosage_matrix:
-    #    # ignores singletons (but gives an overview)
-    #    mt_ko_matrix = analysis.gene_csqs_case_builder(mt1)
-    #    mt_ko_matrix.export(out_prefix + '_ko_matrix_no_singletons.tsv.gz')
-
     if export_ko_rsid:
-        mt_ko_rsid = analysis.gene_csqs_knockout_builder(mt1).entries()
+        mt_ko_rsid = analysis.gene_csqs_knockout_builder(mt1)
         mt_ko_rsid.export(out_prefix + '_knockouts.tsv.gz')
 
     if export_fake_vcf:

@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
-#$ -N knockout
+#$ -N knockout_l
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/knockout.log
-#$ -e logs/knockout.errors.log
+#$ -o logs/knockout_l.log
+#$ -e logs/knockout_l.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 5
+#$ -pe shmem 10
 #$ -q short.qe
-#$ -t 22
+#$ -t 1-22
 
 set -o errexit
 set -o nounset
@@ -19,7 +19,7 @@ source utils/hail_utils.sh
 readonly in_dir="data/mt"
 readonly vep_dir="data/vep/full/"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/ptvs_test4"
+readonly out_dir="derived/ptvs_only"
 
 # hail script
 readonly hail_script="utils/hail_export.py"
@@ -43,7 +43,7 @@ python3 "${hail_script}" \
     --input_unphased_path ${in_unphased} \
     --input_phased_type "mt" \
     --input_unphased_type "mt" \
-    --vep_filter "ptv" "damaging_missense" \
+    --vep_filter "ptv" \
     --maf_max 0.02 \
     --missing 0.05 \
     --out_prefix ${out_prefix} \

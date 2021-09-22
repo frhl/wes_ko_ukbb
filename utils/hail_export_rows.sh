@@ -19,7 +19,7 @@ def main(args):
     translate_iid = args.translate_iid
     
     # annotate with VEP
-    hail_init.hail_bmrc_init('/logs/hail/hail_vep_export.log', 'GRCh38')
+    hail_init.hail_bmrc_init('logs/hail/hail_vep_rows.log', 'GRCh38')
     dataset = qc.get_table(input_path, input_type)
     
     # clean up snpID and rsID
