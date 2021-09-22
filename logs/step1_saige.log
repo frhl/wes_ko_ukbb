@@ -10559,3 +10559,20 @@ varRatio 0.9957029
          V1
 1 0.9957029
 closed the plinkFile!
+pcg did not converge. You may increase maxiter number.
+iter from getPCG1ofSigmaAndVector 500
+t1_Rinv_1 is  1.462551e+18 
+Nglmm  5.68915e+17 
+     user    system   elapsed 
+39788.053    92.372 13503.542 
+t_end - t_begin, fitting the NULL model took
+    user   system  elapsed 
+39778.92    90.49 13492.38 
+Start estimating variance ratios
+
+Family: binomial 
+Link function: logit 
+
+iter from getPCG1ofSigmaAndVector 5
+iter from getPCG1ofSigmaAndVector 5
+iter from getPCG1ofSigmaAndVector 4
