@@ -58,13 +58,13 @@ def main(args):
         mt1 = qc.filter_to_unrelated(mt1, get_related = False)
         mt2 = qc.filter_to_unrelated(mt2, get_related = False)
 
-	# note: need to translate ids to combine later!
-    mt1 = qc.translate_sample_ids(mt1, 12788, 11867)
+	# annotate europeans
     if annotate_europeans:
 
         mt1 = qc.filter_to_european(mt1, only_annotate = True)
         mt2 = qc.filter_to_european(mt2, only_annotate = True)
 
+    # subset to europeans
     if get_europeans: 
         
         if 'eur' not in mt1.row or 'eur' not in mt2.row:

@@ -2,8 +2,8 @@
 #
 #$ -N knockout
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/knockout19.log
-#$ -e logs/knockout19.errors.log
+#$ -o logs/knockout.log
+#$ -e logs/knockout.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 10
 #$ -q short.qe

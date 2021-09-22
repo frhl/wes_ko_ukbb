@@ -1,0 +1,21 @@
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+[Stage 0:>                                                          (0 + 1) / 1]Running on Apache Spark version 3.1.2
+SparkUI available at http://compe005.hpc.in.bmrc.ox.ac.uk:4040
+Welcome to
+     __  __     <>__
+    / /_/ /__  __/ /
+   / __  / _ `/ / /
+  /_/ /_/\_,_/_/_/   version 0.2.74-0c3a74d12093
+LOGGING: writing to logs/hail/hail_export.log
+2021-09-22 09:27:15 Hail: INFO: Reading table without type imputation
+  Loading field 'eid_11867' as type str (not specified)
+  Loading field 'eid_12788' as type str (not specified)
+Traceback (most recent call last):
+  File "utils/hail_export.py", line 172, in <module>
+    main(args)
+  File "utils/hail_export.py", line 62, in main
+    mt1 = qc.translate_sample_ids(mt1, 12788, 11867)
+  File "/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/utils/modules/python/ko_utils/qc.py", line 106, in translate_sample_ids
+    assert undefined_ct==0, f'[translate_sample_ids]: Not all sample IDs mapped perfectly ({undefined_ct}/{ht.count()} IDs are undefined)'
+AssertionError: [translate_sample_ids]: Not all sample IDs mapped perfectly (199795/(156977, 199795) IDs are undefined)
