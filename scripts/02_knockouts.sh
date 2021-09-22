@@ -47,9 +47,6 @@ python3 "${hail_script}" \
     --maf_max 0.02 \
     --missing 0.05 \
     --out_prefix ${out_prefix} \
-    --export_ko_rsid \
-    --export_ko_probability \
-    --export_burden \
     --export_fake_vcf
 
 
