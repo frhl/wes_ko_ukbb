@@ -52,9 +52,7 @@ python3 "${hail_script}" \
     --export_ko_rsid \
     --export_fake_vcf
 
-
 print_update "Finished running HAIL for chr${chr}" "${SECONDS}"
-
 
 
 

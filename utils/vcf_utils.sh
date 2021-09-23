@@ -1,0 +1,1 @@
+/well/lindgren/flassen/ressources/ukb/ukb_utils/bash/vcf_utils.sh
