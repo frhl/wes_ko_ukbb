@@ -26,3 +26,5 @@ Loading required package: optparse
 Loading required package: optparse
 Loading required package: optparse
 Loading required package: optparse
+Warning message:
+glm.fit: fitted probabilities numerically 0 or 1 occurred 

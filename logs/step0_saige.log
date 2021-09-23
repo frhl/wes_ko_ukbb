@@ -7,3 +7,7 @@ Successfully combined .bgen files for GRM input.. Elapsed time: 0 hrs (job id: 5
 2021-09-23 11:57:49 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
   Compatibility is not guaranteed.
 2021-09-23 11:57:49 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+2021-09-23 11:59:15 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-23 11:59:16 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+  Compatibility is not guaranteed.
+2021-09-23 11:59:16 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
