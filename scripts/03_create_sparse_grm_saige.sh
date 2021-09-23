@@ -6,8 +6,8 @@
 #$ -o logs/step0_saige.log
 #$ -e logs/step0_saige.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 5
-#$ -q short.qe
+#$ -pe shmem 10
+#$ -q long.qc
 
 module purge
 source utils/qsub_utils.sh

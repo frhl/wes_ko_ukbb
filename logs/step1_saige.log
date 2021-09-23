@@ -11251,3 +11251,1755 @@ varRatio 0.9925023
          V1
 1 0.9925023
 closed the plinkFile!
+R version 3.6.1 (2019-07-05)
+R version 3.6.1 (2019-07-05)R version 3.6.1 (2019-07-05)
+Platform: x86_64-conda_cos6-linux-gnu (64-bit)
+Running under: CentOS Linux 7 (Core)
+
+Matrix products: default
+BLAS/LAPACK: /gpfs3/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/lib/R/lib/libRblas.so
+
+locale:
+R version 3.6.1 (2019-07-05)R version 3.6.1 (2019-07-05)R version 3.6.1 (2019-07-05)
+Platform: Platform: [1]
+R version 3.6.1 (2019-07-05)
+
+Platform: x86_64-conda_cos6-linux-gnu (64-bit)
+Platform:  C
+Platform: 
+x86_64-conda_cos6-linux-gnu (64-bit)
+x86_64-conda_cos6-linux-gnu (64-bit)
+Running under: CentOS Linux 7 (Core)
+
+Matrix products: default
+Running under: x86_64-conda_cos6-linux-gnu (64-bit)
+x86_64-conda_cos6-linux-gnu (64-bit)
+Platform: Running under: BLAS/LAPACK: /gpfs3/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/lib/R/lib/libRblas.so
+
+CentOS Linux 7 (Core)
+
+attached base packages:
+Running under: x86_64-conda_cos6-linux-gnu (64-bit)CentOS Linux 7 (Core)locale:
+
+Matrix products: defaultRunning under: [1] stats     graphics  grDevices utils     datasets  methods   base     
+CentOS Linux 7 (Core)
+other attached packages:
+
+[1]
+CentOS Linux 7 (Core)
+Running under: 
+[1]
+ CBLAS/LAPACK: 
+CentOS Linux 7 (Core)
+ optparse_1.6.4 SAIGE_0.44.6.4
+Matrix products: 
+/gpfs3/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/lib/R/lib/libRblas.so
+
+Matrix products: default
+
+loaded via a namespace (and not attached):
+default
+
+Matrix products: default
+BLAS/LAPACK: [1] compiler_3.6.1     Matrix_1.2-17      Rcpp_1.0.1         getopt_1.20.3     
+[5]
+attached base packages:
+
+
+Matrix products: /gpfs3/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/lib/R/lib/libRblas.so grid_3.6.1         RcppParallel_5.1.4 lattice_0.20-44   
+BLAS/LAPACK: [1]locale:
+BLAS/LAPACK: /gpfs3/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/lib/R/lib/libRblas.so
+default
+/gpfs3/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/lib/R/lib/libRblas.so stats    [1]
+
+
+
+locale:
+
+[1]BLAS/LAPACK:  graphics  Clocale:
+locale:
+ C
+
+attached base packages:
+/gpfs3/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/lib/R/lib/libRblas.so grDevices$plinkFile
+[1] "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers"
+
+
+[1][1][1]
+ utils    $phenoFile
+[1]
+ C C
+
+
+
+attached base packages:
+attached base packages:
+[1] datasets  "/well/lindgren/UKBIOBANK/dpalmer/ukb_wes_phenotypes/200k/UKBB_WES200k_filtered_binary_phenotypes.tsv"attached base packages:
+ stats     graphics  grDevices
+[1] stats     methods  
+
+[1] utils     datasets  methods   base     
+locale:
+ stats     graphics  base     $phenoCol
+[1] "ADHD"
+
+ stats    
+other attached packages:
+[1] graphics  grDevices utils     datasets  methods   base     
+
+
+other attached packages:
+$traitType
+[1] "binary"
+
+ graphics [1] C grDevices
+ utils    $invNormalize
+[1] TRUE
+
+ grDevices optparse_1.6.4
+other attached packages:
+[1] optparse_1.6.4 SAIGE_0.44.6.4
+
+loaded via a namespace (and not attached):
+
+ datasets $covarColList
+ utils     SAIGE_0.44.6.4[1] optparse_1.6.4 SAIGE_0.44.6.4
+[1]attached base packages:
+ methods   base     [1] datasets 
+
+loaded via a namespace (and not attached):
+
+loaded via a namespace (and not attached):
+ compiler_3.6.1     Matrix_1.2-17      Rcpp_1.0.1         getopt_1.20.3     
+[5] grid_3.6.1         RcppParallel_5.1.4 lattice_0.20-44   
+[1] "age,sex2,genotyping.array2,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10"
+
+$sampleIDColinphenoFile
+
+ stats     methods  [1][1][1] "ID"
+
+$tol
+
+other attached packages:
+[1] base      compiler_3.6.1     compiler_3.6.1     Matrix_1.2-17      Rcpp_1.0.1         getopt_1.20.3     
+ graphics [1] 0.02
+
+ Matrix_1.2-17     [5] grDevices utils     datasets  methods   base     
+$plinkFile
+ optparse_1.6.4
+
+other attached packages:
+ Rcpp_1.0.1         grid_3.6.1         RcppParallel_5.1.4 lattice_0.20-44   
+other attached packages:
+[1] SAIGE_0.44.6.4
+$maxiter
+[1] getopt_1.20.3     
+[1] optparse_1.6.4 SAIGE_0.44.6.4
+ "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers"
+
+$phenoFile
+[1] "/well/lindgren/UKBIOBANK/dpalmer/ukb_wes_phenotypes/200k/UKBB_WES200k_filtered_binary_phenotypes.tsv"
+
+$phenoCol
+
+loaded via a namespace (and not attached):
+[1] optparse_1.6.4
+
+loaded via a namespace (and not attached):
+[1][1] 20
+
+$tolPCG
+[1] 1e-05
+ SAIGE_0.44.6.4[5][1] "Trachea_bronchus_lung_cancer"$plinkFile
+ compiler_3.6.1    [1]
+ grid_3.6.1         compiler_3.6.1     Matrix_1.2-17      Rcpp_1.0.1         getopt_1.20.3     
+[5] grid_3.6.1         RcppParallel_5.1.4 lattice_0.20-44   
+
+
+ Matrix_1.2-17      "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers"
+loaded via a namespace (and not attached):
+
+
+$maxiterPCG
+ Rcpp_1.0.1        [1] getopt_1.20.3      500
+
+$traitType
+$plinkFile
+ RcppParallel_5.1.4 lattice_0.20-44   
+[1]
+
+$nThreads
+[1] "binary"
+
+$invNormalize
+[1] compiler_3.6.1    $phenoFile
+[5] grid_3.6.1         RcppParallel_5.1.4 lattice_0.20-44   
+[1][1] "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers" Matrix_1.2-17     [1] 3
+
+$plinkFile
+ TRUE
+
+$phenoFile
+ Rcpp_1.0.1         "/well/lindgren/UKBIOBANK/dpalmer/ukb_wes_phenotypes/200k/UKBB_WES200k_filtered_binary_phenotypes.tsv"
+
+$SPAcutoff
+[1]
+[1]$plinkFile
+ getopt_1.20.3     
+[5] grid_3.6.1         RcppParallel_5.1.4$phenoCol
+[1][1] "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers"
+ "/well/lindgren/UKBIOBANK/dpalmer/ukb_wes_phenotypes/200k/UKBB_WES200k_filtered_binary_phenotypes.tsv"[1] lattice_0.20-44    "depression" 2
+$covarColList
+
+ "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers"
+
+
+
+$numRandomMarkerforVarianceRatio
+[1] 30
+
+$skipModelFitting
+[1] FALSE
+
+$memoryChunk
+[1]
+[1]
+
+$phenoCol
+
+ 2
+
+$phenoFile
+ "age,sex2,genotyping.array2,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10"$plinkFile
+
+[1]$traitType
+$tauInit
+[1] "0,0"
+[1] "/well/lindgren/UKBIOBANK/dpalmer/ukb_wes_phenotypes/200k/UKBB_WES200k_filtered_binary_phenotypes.tsv"
+
+
+[1]$phenoFile
+ "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers"[1]
+$LOCO
+[1] FALSE
+$phenoCol
+
+$sampleIDColinphenoFile
+[1] "ID"
+
+$tol
+[1] 0.02
+ "hypothalamic_amenorrhea"[1] "binary"
+ "/well/lindgren/UKBIOBANK/dpalmer/ukb_wes_phenotypes/200k/UKBB_WES200k_filtered_binary_phenotypes.tsv"
+
+
+$phenoCol
+[1]
+$maxiter
+[1] 20
+
+$tolPCG
+[1] 1e-05
+
+$maxiterPCG
+[1] 500
+
+
+
+
+$traceCVcutoff
+[1] 0.0025[1]$phenoFile
+ "colorectal_cancer"
+
+$nThreads
+[1] 3
+
+$SPAcutoff
+[1] 2
+
+$invNormalize
+
+
+ "Alzheimers_disease"[1]
+
+$traitType
+[1]$ratioCVcutoff
+[1] 0.001
+
+$outputPrefix
+[1] "derived/saige/binary/step1/ukb_wes_200k_ADHD"
+
+
+
+$traitType
+[1] "/well/lindgren/UKBIOBANK/dpalmer/ukb_wes_phenotypes/200k/UKBB_WES200k_filtered_binary_phenotypes.tsv"$traitType
+$numRandomMarkerforVarianceRatio
+[1] 30
+
+$skipModelFitting
+[1] FALSE
+
+$memoryChunk
+[1][1] TRUE$outputPrefix_varRatio
+[1] "derived/saige/binary/step1/ukb_wes_200k_ADHD"
+
+$IsOverwriteVarianceRatioFile
+[1] TRUE "binary"
+[1] 2
+ "binary"
+
+$covarColList
+[1] "age,sex2,genotyping.array2,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10"
+
+
+
+
+
+ "binary"
+
+
+
+$sampleIDColinphenoFile
+[1]$IsSparseKin
+[1]
+$phenoCol
+$invNormalize
+$tauInit
+[1] "0,0"
+
+
+ "ID"
+
+$tol
+ TRUE
+$invNormalize
+[1][1]$LOCO
+$invNormalize
+[1]
+$sparseGRMFile
+[1] "POI" TRUE[1][1] 0.02[1] "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx" TRUE
+
+
+$covarColList
+[1] "age,sex2,genotyping.array2,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10"
+ FALSE TRUE
+
+
+
+
+
+
+
+$traceCVcutoff
+[1] 0.0025
+
+$ratioCVcutoff
+[1] 0.001
+
+$sparseGRMSampleIDFile
+[1] "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt"
+
+
+$traitType
+$sampleIDColinphenoFile
+
+
+$maxiter
+$numRandomMarkerforSparseKin
+[1] 2000
+
+$covarColList
+[1] "age,sex2,genotyping.array2,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10"
+[1][1]
+$covarColList
+[1]$isCateVarianceRatio
+[1] FALSE
+
+
+ "binary" "ID"$outputPrefix
+[1] 20
+
+$tolPCG
+[1]$relatednessCutoff
+[1] 0.125
+
+$sampleIDColinphenoFile
+
+
+[1] "age,sex2,genotyping.array2,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10" 1e-05$cateVarRatioMinMACVecExclude
+[1] "0.5,1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+[1] "ID"
+
+
+
+$invNormalize
+
+
+$sampleIDColinphenoFile
+[1] "ID"
+
+$cateVarRatioMaxMACVecInclude
+[1] "1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+$isCovariateTransform
+$tol
+ "derived/saige/binary/step1/ukb_wes_200k_Trachea_bronchus_lung_cancer"$tol
+[1]
+
+[1] TRUE
+
+$isDiagofKinSetAsOne
+[1]
+
+$outputPrefix_varRatio
+[1] "derived/saige/binary/step1/ukb_wes_200k_Trachea_bronchus_lung_cancer"
+
+$IsOverwriteVarianceRatioFile
+[1] TRUE
+[1] TRUE$tol
+$maxiterPCG
+[1] FALSE
+
+$useSparseSigmaConditionerforPCG
+[1] FALSE
+
+$useSparseSigmaforInitTau
+[1] FALSE 0.02
+ 0.02
+[1][1]
+
+
+$IsSparseKin
+
+
+ 0.02 500$useSparseGRMtoFitNULL
+[1] FALSE
+
+
+[1] TRUE
+
+$sparseGRMFile
+[1] "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+
+$sparseGRMSampleIDFile
+[1]
+$covarColList
+
+
+$minMAFforGRM
+[1] 0.01
+
+$minCovariateCount
+$maxiter
+[1] "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt"$maxiter
+[1] 20[1] "age,sex2,genotyping.array2,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10"
+
+$sampleIDColinphenoFile
+[1] "ID"
+
+
+
+[1] 20
+
+$tolPCG
+
+
+$tol
+$maxiter
+$nThreads
+ -1
+[1]
+
+[1][1][1]
+ 1e-05$numRandomMarkerforSparseKin
+$tolPCG
+ 0.02 20 3$includeNonautoMarkersforVarRatio
+
+[1][1]
+
+
+[1] FALSE
+
+$FemaleOnly
+
+ 2000 1e-05
+
+
+[1] FALSE
+
+$MaleOnly
+$maxiterPCG
+
+
+
+
+$SPAcutoff
+[1] FALSE
+
+$sexCol
+[1]$maxiter
+$tolPCG
+$isCateVarianceRatio
+$maxiterPCG
+[1][1] 500[1][1][1][1] 2 ""
+
+$FemaleCode
+[1]
+ 20 1e-05 FALSE
+
+ 500
+
+
+ "1"
+
+$MaleCode
+[1] "0"
+
+$noEstFixedEff
+[1] FALSE
+
+
+
+
+$relatednessCutoff
+$nThreads
+
+$help
+[1] FALSE
+$nThreads
+
+
+[1][1]$numRandomMarkerforVarianceRatio
+
+[1]$tolPCG
+$maxiterPCG
+ 0.125 3[1]tauInit  is   3[1][1]
+
+
+$SPAcutoff
+ 300 
+
+$SPAcutoff
+[1] 1e-05 500
+$cateVarRatioMinMACVecExclude
+[1] "0.5,1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+$cateVarRatioMaxMACVecInclude
+[1] "1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+$isCovariateTransform
+[1]
+0  2
+
+$numRandomMarkerforVarianceRatio
+
+
+[1] 2
+
+[1]
+
+ TRUE
+
+$numRandomMarkerforVarianceRatio
+$skipModelFitting
+ 30$maxiterPCG
+$nThreads
+
+
+$isDiagofKinSetAsOne
+[1] FALSE
+
+$useSparseSigmaConditionerforPCG
+[1] FALSE
+
+$useSparseSigmaforInitTau
+[1] FALSE
+
+$useSparseGRMtoFitNULL
+[1] FALSE
+
+$minMAFforGRM
+[1][1][1]cateVarRatioMinMACVecExclude  is  
+[1][1] 0.01
+ 30
+
+
+$skipModelFitting
+
+ 500 3 FALSE0.5 1.5 2.5 3.5 4.5 5.5 10.5$minCovariateCount
+[1] -1
+
+$includeNonautoMarkersforVarRatio
+[1] FALSE
+
+$FemaleOnly
+[1] FALSE
+
+[1] FALSE$skipModelFitting
+
+
+$nThreads
+
+
+
+ $MaleOnly
+[1] FALSE
+
+
+[1][1]
+$memoryChunk
+20.5 
+$sexCol
+[1] ""
+
+$FemaleCode
+[1] "1"
+
+
+ FALSE 3$SPAcutoff
+[1]cateVarRatioMaxMACVecInclude  is  $MaleCode
+[1] "0"
+
+$noEstFixedEff
+[1] FALSE
+$memoryChunk
+[1] 2
+
+$tauInit
+[1] "0,0"
+
+$LOCO
+[1] FALSE
+
+
+
+[1] 2
+1.5 2.5 
+$traceCVcutoff
+
+
+$SPAcutoff
+[1] 2
+
+$numRandomMarkerforVarianceRatio
+[1] 2
+$tauInit
+3.5 $help
+[1] FALSE
+
+[1]tauInit 0.0025
+
+ $ratioCVcutoff
+ is $memoryChunk
+[1] 2
+
+$tauInit
+[1] 30
+[1]4.5 [1] 0 0 
+ "0,0"
+
+$numRandomMarkerforVarianceRatio
+[1] 30
+
+ "0,0"5.5 10.5 20.5 
+ 0.001
+
+$skipModelFitting
+[1] FALSE
+
+$memoryChunk
+[1]
+
+
+cateVarRatioMinMACVecExclude  is  $skipModelFitting
+ 2
+
+$LOCO
+0.5 1.5 [1]
+$LOCO
+$outputPrefix
+Markers in the Plink file with MAF >=  0.01  will be used to construct GRM
+[1] FALSE
+
+$traceCVcutoff
+2.5 3.5  FALSE
+[1] FALSE
+
+$traceCVcutoff
+[1]3[1]4.5 
+$tauInit
+[1] "derived/saige/binary/step1/ukb_wes_200k_colorectal_cancer"  threads are set to be used  
+ 0.00255.5 10.5 20.5 
+
+cateVarRatioMaxMACVecInclude  is   0.0025
+
+$ratioCVcutoff
+
+
+[1]
+1.5 2.5 [1]
+$memoryChunk
+ "0,0"$ratioCVcutoff
+3.5 4.5 5.5 10.5 20.5 
+ 0.001
+
+$outputPrefix
+$outputPrefix_varRatio
+[1]
+[1][1]Markers in the Plink file with MAF >=  0.01  will be used to construct GRM
+[1]3  threads are set to be used  
+
+ 0.001 "derived/saige/binary/step1/ukb_wes_200k_depression" 2 "derived/saige/binary/step1/ukb_wes_200k_colorectal_cancer"$LOCO
+[1] FALSE
+
+$traceCVcutoff
+[1]
+
+
+
+ 0.0025
+$outputPrefix
+[1] "derived/saige/binary/step1/ukb_wes_200k_Alzheimers_disease"
+
+
+
+
+$outputPrefix_varRatio
+
+$outputPrefix_varRatio
+[1]
+$ratioCVcutoff
+[1]$tauInit
+$IsOverwriteVarianceRatioFile
+[1] "derived/saige/binary/step1/ukb_wes_200k_depression"
+
+$IsOverwriteVarianceRatioFile
+ 0.001[1][1] "0,0"[1]
+ "derived/saige/binary/step1/ukb_wes_200k_Alzheimers_disease" TRUE
+ TRUE
+
+
+
+$IsSparseKin
+
+
+
+$IsSparseKin
+[1]$outputPrefix
+
+[1]$IsOverwriteVarianceRatioFile
+[1] TRUE
+
+ TRUE
+
+[1]$LOCO
+ TRUE
+
+$IsSparseKin
+$sparseGRMFile
+ "derived/saige/binary/step1/ukb_wes_200k_hypothalamic_amenorrhea"[1]$sparseGRMFile
+[1][1]
+ FALSE[1] TRUE "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+$outputPrefix_varRatio
+[1]
+ "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+
+ "derived/saige/binary/step1/ukb_wes_200k_hypothalamic_amenorrhea"
+
+
+$sparseGRMSampleIDFile
+[1]
+
+$sparseGRMSampleIDFile
+[1]
+$traceCVcutoff
+ "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt"$sparseGRMFile
+ "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt"
+[1]
+[1] "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+
+$sparseGRMSampleIDFile
+
+$IsOverwriteVarianceRatioFile
+ 0.0025
+[1]
+[1]
+$numRandomMarkerforSparseKin
+ "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt"$numRandomMarkerforSparseKin
+ TRUE
+[1]
+[1]
+$ratioCVcutoff
+[1] 0.001
+
+$outputPrefix
+[1] 2000
+ 2000
+ "derived/saige/binary/step1/ukb_wes_200k_POI"
+
+$isCateVarianceRatio
+[1]$numRandomMarkerforSparseKin
+
+$IsSparseKin
+[1] TRUE
+
+$sparseGRMFile
+[1] "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+
+$sparseGRMSampleIDFile
+[1] "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt"
+
+$numRandomMarkerforSparseKin
+[1] 2000
+
+$isCateVarianceRatio
+[1] FALSE
+
+$relatednessCutoff
+[1] 0.125
+
+$cateVarRatioMinMACVecExclude
+[1] "0.5,1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+$cateVarRatioMaxMACVecInclude
+[1] "1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+$isCovariateTransform
+[1] TRUE
+
+$isDiagofKinSetAsOne
+[1] FALSE
+
+$useSparseSigmaConditionerforPCG
+[1] FALSE
+
+$useSparseSigmaforInitTau
+[1] FALSE
+
+$useSparseGRMtoFitNULL
+[1] FALSE
+
+$minMAFforGRM
+[1] 0.01
+
+$minCovariateCount
+[1] -1
+
+
+$includeNonautoMarkersforVarRatio
+[1] 2000
+
+$isCateVarianceRatio
+
+ FALSE$isCateVarianceRatio
+[1][1] FALSE
+
+$relatednessCutoff
+[1]
+ FALSE
+[1] FALSE$outputPrefix_varRatio
+
+
+$relatednessCutoff
+
+[1]
+
+$relatednessCutoff
+[1] 0.125
+
+$FemaleOnly
+ 0.125[1] "derived/saige/binary/step1/ukb_wes_200k_POI"$cateVarRatioMinMACVecExclude
+[1] FALSE
+
+$MaleOnly
+
+ 0.125
+
+$IsOverwriteVarianceRatioFile
+[1] TRUE
+
+$IsSparseKin
+[1] TRUE
+
+$sparseGRMFile
+[1][1][1]
+
+ "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx" "0.5,1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+ FALSE$cateVarRatioMinMACVecExclude
+
+
+$cateVarRatioMaxMACVecInclude
+
+[1]$cateVarRatioMinMACVecExclude
+
+$sparseGRMSampleIDFile
+[1] "data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt"
+
+$numRandomMarkerforSparseKin
+[1] 2000
+
+[1]
+ "0.5,1.5,2.5,3.5,4.5,5.5,10.5,20.5"[1]$isCateVarianceRatio
+ "1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+$sexCol
+
+ "0.5,1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+$isCovariateTransform
+[1] ""
+[1]
+$cateVarRatioMaxMACVecInclude
+[1]
+ FALSE
+[1] TRUE$FemaleCode
+
+$cateVarRatioMaxMACVecInclude
+ "1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+[1] "1"
+
+$MaleCode
+
+[1]
+
+$isCovariateTransform
+[1]
+[1]$relatednessCutoff
+ "1.5,2.5,3.5,4.5,5.5,10.5,20.5" TRUE
+
+$isDiagofKinSetAsOne
+[1]$isDiagofKinSetAsOne
+ "0"[1]
+ FALSE[1]
+ 0.125
+
+ FALSE
+
+$isCovariateTransform
+
+
+$noEstFixedEff
+
+[1]$useSparseSigmaConditionerforPCG
+
+[1]$cateVarRatioMinMACVecExclude
+[1] "0.5,1.5,2.5,3.5,4.5,5.5,10.5,20.5" TRUE[1]$useSparseSigmaConditionerforPCG
+ FALSE
+
+$help
+458841  samples have genotypes
+
+
+
+$cateVarRatioMaxMACVecInclude
+[1] "1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+$isDiagofKinSetAsOne
+[1] FALSE
+[1][1] FALSE
+
+ FALSE FALSE
+$isCovariateTransform
+$useSparseSigmaConditionerforPCG
+[1]
+
+
+[1] FALSE
+
+$useSparseSigmaforInitTau
+ TRUE
+$useSparseSigmaforInitTau
+tauInit[1]
+
+[1]$useSparseSigmaforInitTau
+[1] FALSE
+
+ FALSE
+ 458841 FALSE$useSparseGRMtoFitNULL
+
+$isDiagofKinSetAsOne
+ is   
+[1]
+[1]0 samples have genotypes
+
+ FALSE$useSparseGRMtoFitNULL
+ FALSE $useSparseGRMtoFitNULL
+
+[1]
+0[1]
+ FALSE
+  FALSE$minMAFforGRM
+
+$useSparseSigmaConditionerforPCG
+
+
+[1]
+$minMAFforGRM
+[1] FALSE
+
+$useSparseSigmaforInitTau
+[1] FALSE
+ 0.01[1]
+ 0.01
+cateVarRatioMinMACVecExclude$minMAFforGRM
+
+
+
+ [1]$minCovariateCount
+
+$useSparseGRMtoFitNULL
+ is  0.01
+
+$minCovariateCount
+[1] -1[1]$minCovariateCount
+[1] 
+ -1[1] FALSE0.5
+
+ -1
+ $includeNonautoMarkersforVarRatio
+
+
+
+1.5[1]$includeNonautoMarkersforVarRatio
+
+$minMAFforGRM
+  FALSE[1]$includeNonautoMarkersforVarRatio
+[1]2.5 
+ FALSE[1]
+ FALSE
+ 0.013.5
+
+$FemaleOnly
+
+ $FemaleOnly
+4.5[1]
+
+[1]  FALSE$minCovariateCount
+$FemaleOnly
+ FALSE5.5
+[1][1]
+ 
+ -1 FALSE
+10.5 $MaleOnly
+
+
+$MaleOnly
+20.5[1]
+
+[1]$MaleOnly
+ FALSE$includeNonautoMarkersforVarRatio
+  FALSE[1]
+[1]
+ FALSE FALSE
+
+cateVarRatioMaxMACVecInclude
+
+$sexCol
+
+ 
+
+[1]$sexCol
+ is $FemaleOnly
+ [1][1]$sexCol
+ ""1.5 FALSE ""[1]
+ ""
+
+ 
+
+
+
+2.5$FemaleCode
+
+$MaleOnly
+$FemaleCode
+ [1]$FemaleCode
+[1][1] FALSE "1"[1]3.5 "1"
+
+ "1" 
+
+
+
+4.5 5.5 10.5 20.5 
+
+$sexCol
+$MaleCode
+[1]$MaleCode
+
+Markers in the Plink file with MAF >= [1] ""[1] "0"
+
+$MaleCode
+  "0"
+$noEstFixedEff
+[1]0.01  will be used to construct GRM
+
+
+$FemaleCode
+[1] "1"
+
+$MaleCode
+[1] "0"3
+[1] FALSE
+ $noEstFixedEff
+ "0"
+
+
+[1]
+ threads are set to be used $noEstFixedEff
+$help
+ FALSE
+ [1]
+
+$noEstFixedEff
+[1] FALSE
+[1]$help
+ FALSE[1]
+ FALSE
+
+
+
+tauInit
+ FALSE
+
+$help
+ $help
+tauInit[1] is [1]  FALSE  FALSE is 
+0
+ 0 0 
+
+ 
+tauInittauInit0    is  is 
+cateVarRatioMinMACVecExclude   is  0.5 1.5  02.5 3.5 4.5 0  005.5 10.5 cateVarRatioMinMACVecExclude  
+
+20.5 
+ cateVarRatioMaxMACVecInclude is    is 0.5  cateVarRatioMinMACVecExcludecateVarRatioMinMACVecExclude1.5 1.5  2.5 is  is    3.5 0.54.5 5.5  10.5 20.5 
+2.5 1.5 3.5 4.5 5.50.5  Markers in the Plink file with MAF >=  10.5 20.5 2.5 0.01  will be used to construct GRM
+1.5
+ 3 cateVarRatioMaxMACVecInclude3.5 2.5   is   threads are set to be used 4.5 3.5 4.5  1.5  
+5.52.55.5   3.510.5 10.54.5  20.5 5.5 20.5
+ cateVarRatioMaxMACVecInclude 10.5 
+20.5 cateVarRatioMaxMACVecInclude 
+  is  is Markers in the Plink file with MAF >=   1.51.5   0.012.52.5   3.53.5  will be used to construct GRM
+ 34.54.5  5.55.5   threads are set to be used  
+ 10.510.5  20.5 
+20.5 
+Markers in the Plink file with MAF >=  0.01  will be used to construct GRM
+3  threads are set to be used  
+Markers in the Plink file with MAF >=  0.01  will be used to construct GRM
+3  threads are set to be used  
+458841  samples have genotypes
+formula is  Trachea_bronchus_lung_cancer~age+sex2+genotyping.array2+PC1+PC2+PC3+PC4+PC5+PC6+PC7+PC8+PC9+PC10 
+458841  samples have genotypes
+458841  samples have genotypes
+458841  samples have genotypes
+formula is 458841 ADHD~age+sex2+genotyping.array2+PC1+PC2+PC3+PC4+PC5+PC6+PC7+PC8+PC9+PC10  
+ samples have genotypes
+111662  samples have non-missing phenotypes
+110649  samples have non-missing phenotypes
+347179  samples in geno file do not have phenotypes
+111662  samples will be used for analysis
+348192  samples in geno file do not have phenotypes
+110649  samples will be used for analysis
+formula is  hypothalamic_amenorrhea~age+sex2+genotyping.array2+PC1+PC2+PC3+PC4+PC5+PC6+PC7+PC8+PC9+PC10 
+67938  samples have non-missing phenotypes
+formula is  depression~age+sex2+genotyping.array2+PC1+PC2+PC3+PC4+PC5+PC6+PC7+PC8+PC9+PC10 
+formula is  POI~age+sex2+genotyping.array2+PC1+PC2+PC3+PC4+PC5+PC6+PC7+PC8+PC9+PC10 
+formula is  Alzheimers_disease~age+sex2+genotyping.array2+PC1+PC2+PC3+PC4+PC5+PC6+PC7+PC8+PC9+PC10 
+qr transformation has been performed on covariates
+formula is  colorectal_cancer~age+sex2+genotyping.array2+PC1+PC2+PC3+PC4+PC5+PC6+PC7+PC8+PC9+PC10 
+390903  samples in geno file do not have phenotypes
+67938  samples will be used for analysis
+67112  samples have non-missing phenotypes
+qr transformation has been performed on covariates
+110939  samples have non-missing phenotypes
+124185  samples have non-missing phenotypes
+112462  samples have non-missing phenotypes
+qr transformation has been performed on covariates
+391729  samples in geno file do not have phenotypes
+67112  samples will be used for analysis
+      (Intercept) age sex2 genotyping.array2      PC1      PC2       PC3
+28934           1  58    1                 1 -11.3679 0.777251 -0.858586
+57243           1  49    1                 1 -12.0282 4.860650 -1.461230
+53323           1  59    1                 1 -13.0833 4.791800 -0.311764
+55855           1  56    1                 1 -12.1139 4.022000 -1.220190
+44030           1  59    1                 1 -12.9659 3.183150 -3.873470
+28127           1  54    1                 1 -13.7915 5.860970 -1.219940
+           PC4      PC5       PC6       PC7       PC8      PC9       PC10
+28934  2.21528 -5.91569 -0.834556  0.561720  1.122560 -2.59272 -1.0095100
+57243  2.14385  1.71537  0.854530 -0.778956  0.909869  3.86250  0.7915090
+53323  2.35518 -6.67064  0.131169 -0.230556 -4.491180  1.86527 -2.4304600
+55855  2.47985  4.12809 -1.557210 -0.522687 -1.027270  3.85032  0.2718160
+44030 -1.12144 -5.55567 -2.298910  1.339800 -0.317508  3.37227 -0.0320855
+28127  2.77276 -2.04650 -2.351210 -0.622781  0.981866 -2.91856  3.0492100
+      (Intercept) age genotyping.array2      PC1      PC2       PC3      PC4
+28934           1  58                 1 -11.3679 0.777251 -0.858586  2.21528
+57243           1  49                 1 -12.0282 4.860650 -1.461230  2.14385
+53323           1  59                 1 -13.0833 4.791800 -0.311764  2.35518
+55855           1  56                 1 -12.1139 4.022000 -1.220190  2.47985
+44030           1  59                 1 -12.9659 3.183150 -3.873470 -1.12144
+28127           1  54                 1 -13.7915 5.860970 -1.219940  2.77276
+           PC5       PC6       PC7       PC8      PC9       PC10
+28934 -5.91569 -0.834556  0.561720  1.122560 -2.59272 -1.0095100
+57243  1.71537  0.854530 -0.778956  0.909869  3.86250  0.7915090
+53323 -6.67064  0.131169 -0.230556 -4.491180  1.86527 -2.4304600
+55855  4.12809 -1.557210 -0.522687 -1.027270  3.85032  0.2718160
+44030 -5.55567 -2.298910  1.339800 -0.317508  3.37227 -0.0320855
+28127 -2.04650 -2.351210 -0.622781  0.981866 -2.91856  3.0492100
+Warning: multi collinearity is detected in covariates!  sex2  will be excluded in the model
+347902  samples in geno file do not have phenotypes
+110939  samples will be used for analysis
+346379  samples in geno file do not have phenotypes
+112462  samples will be used for analysis
+334656  samples in geno file do not have phenotypes
+124185  samples will be used for analysis
+qr transformation has been performed on covariates
+colnames(data.new) is  Y minus1 age sex2 genotyping.array2 PC1 PC2 PC3 PC4 PC5 PC6 PC7 PC8 PC9 PC10 
+out.transform$Param.transform$qrr:  14 14 
+extract sparse GRM
+colnames(data.new) is  Y minus1 age genotyping.array2 PC1 PC2 PC3 PC4 PC5 PC6 PC7 PC8 PC9 PC10 
+out.transform$Param.transform$qrr:  13 13 
+extract sparse GRM
+colnames(data.new) is  Y minus1 age sex2 genotyping.array2 PC1 PC2 PC3 PC4 PC5 PC6 PC7 PC8 PC9 PC10 
+out.transform$Param.transform$qrr:  14 14 
+extract sparse GRM
+      (Intercept) age sex2 genotyping.array2      PC1      PC2       PC3
+28547           1  58    1                 1 -11.3679 0.777251 -0.858586
+56544           1  49    1                 1 -12.0282 4.860650 -1.461230
+52666           1  59    1                 1 -13.0833 4.791800 -0.311764
+55173           1  56    1                 1 -12.1139 4.022000 -1.220190
+43479           1  59    1                 1 -12.9659 3.183150 -3.873470
+27755           1  54    1                 1 -13.7915 5.860970 -1.219940
+           PC4      PC5       PC6       PC7       PC8      PC9       PC10
+28547  2.21528 -5.91569 -0.834556  0.561720  1.122560 -2.59272 -1.0095100
+56544  2.14385  1.71537  0.854530 -0.778956  0.909869  3.86250  0.7915090
+52666  2.35518 -6.67064  0.131169 -0.230556 -4.491180  1.86527 -2.4304600
+55173  2.47985  4.12809 -1.557210 -0.522687 -1.027270  3.85032  0.2718160
+43479 -1.12144 -5.55567 -2.298910  1.339800 -0.317508  3.37227 -0.0320855
+27755  2.77276 -2.04650 -2.351210 -0.622781  0.981866 -2.91856  3.0492100
+      (Intercept) age genotyping.array2      PC1      PC2       PC3      PC4
+28547           1  58                 1 -11.3679 0.777251 -0.858586  2.21528
+56544           1  49                 1 -12.0282 4.860650 -1.461230  2.14385
+52666           1  59                 1 -13.0833 4.791800 -0.311764  2.35518
+55173           1  56                 1 -12.1139 4.022000 -1.220190  2.47985
+43479           1  59                 1 -12.9659 3.183150 -3.873470 -1.12144
+27755           1  54                 1 -13.7915 5.860970 -1.219940  2.77276
+           PC5       PC6       PC7       PC8      PC9       PC10
+28547 -5.91569 -0.834556  0.561720  1.122560 -2.59272 -1.0095100
+56544  1.71537  0.854530 -0.778956  0.909869  3.86250  0.7915090
+52666 -6.67064  0.131169 -0.230556 -4.491180  1.86527 -2.4304600
+55173  4.12809 -1.557210 -0.522687 -1.027270  3.85032  0.2718160
+43479 -5.55567 -2.298910  1.339800 -0.317508  3.37227 -0.0320855
+27755 -2.04650 -2.351210 -0.622781  0.981866 -2.91856  3.0492100
+Warning: multi collinearity is detected in covariates!  sex2  will be excluded in the model
+[1] 568941
+set elements in the sparse GRN <=  0.125  to zero
+[1] 568941
+[1] 568941
+set elements in the sparse GRN <=  0.125  to zero
+110649[1]  568941 samples have been used to fit the glmm null model
+
+qr transformation has been performed on covariates
+qr transformation has been performed on covariates
+colnames(data.new) is  Y minus1 age genotyping.array2 PC1 PC2 PC3 PC4 PC5 PC6 PC7 PC8 PC9 PC10 
+out.transform$Param.transform$qrr:  13 13 
+extract sparse GRM
+qr transformation has been performed on covariates
+[1] 568941
+set elements in the sparse GRN <=  0.125  to zero
+[1] 568941
+111662  samples have been used to fit the glmm null model
+67938  samples have been used to fit the glmm null model
+[1] 568941
+set elements in the sparse GRN <=  0.125  to zero
+[1] 568941
+[1] "print m4"
+[1] 67938 67938
+2 locationMat.n_rows 
+70696 locationMat.n_cols 
+70696 valueVec.n_elem 
+0.994539
+0
+0
+0.997576
+1
+1
+1.02661
+2
+2
+1.0062
+3
+3
+1.00401
+4
+4
+1.0235
+5
+5
+1.00008
+6
+6
+1.0065
+7
+7
+0.999571
+8
+8
+0.990077
+9
+9
+hypothalamic_amenorrhea  is a binary trait
+[1] "print m4"
+[1] 110649 110649
+2 locationMat.n_rows 
+117195 locationMat.n_cols 
+117195 valueVec.n_elem 
+1.08047
+0
+0
+0.994459
+1
+1
+0.997576
+2
+2
+1.01329
+3
+3
+0.994539
+4
+4
+1.0122
+5
+5
+0.997576
+6
+6
+1.0061
+7
+7
+0.999909
+8
+8
+1.00852
+9
+9
+ADHD  is a binary trait
+67112  samples have been used to fit the glmm null model
+[1] "print m4"
+[1] 111662 111662
+2 locationMat.n_rows 
+118318 locationMat.n_cols 
+118318 valueVec.n_elem 
+1.08047
+0
+0
+0.994459
+1
+1
+0.997576
+2
+2
+1.01329
+3
+3
+0.994539
+4
+4
+1.0122
+5
+5
+0.997576
+6
+6
+1.0061
+7
+7
+0.999909
+8
+8
+1.00852
+9
+9
+Trachea_bronchus_lung_cancer  is a binary trait
+colnames(data.new) is  Y minus1 age sex2 genotyping.array2 PC1 PC2 PC3 PC4 PC5 PC6 PC7 PC8 PC9 PC10 
+out.transform$Param.transform$qrr:  14 14 
+extract sparse GRM
+glm:
+
+Call:  glm(formula = formula.new, family = binomial, data = data.new)
+
+Coefficients:
+           minus1                age  genotyping.array2                PC1  
+         2.056025          -0.344843           0.089875          -0.011010  
+              PC2                PC3                PC4                PC5  
+         0.004171           0.034679           0.015795          -0.069233  
+              PC6                PC7                PC8                PC9  
+        -0.030870           0.016040          -0.020615          -0.082098  
+             PC10  
+        -0.028082  
+
+Degrees of Freedom: 67938 Total (i.e. Null);  67925 Residual
+Null Deviance:	    94180 
+Residual Deviance: 48560 	AIC: 48590
+Start fitting the NULL GLMM
+   user  system elapsed 
+  6.536   1.443   9.849 
+colnames(data.new) is [1]  "print m4"Y 
+minus1 age [1]sex2 67112  67112
+genotyping.array2   user  2 locationMat.n_rows 
+ system PC1elapsed 
+  6.917   1.546  10.141 
+ [1]PC2 "Start reading genotype plink file here"
+ PC3 PC4 PC5 PC6 PC7 PC8 PC969818 locationMat.n_cols 
+ PC10 
+69818 valueVec.n_elem 
+out.transform$Param.transform$qrr:  140.994539
+0
+0
+0.997576
+1
+1
+1.02661
+2
+2
+1.0062
+3
+3
+ 141.00401
+ 
+4
+extract sparse GRM
+4
+1.0235
+5
+5
+1.00008
+6
+6
+1.0065
+7
+7
+0.999571
+8
+8
+0.990077
+9
+9
+POI  is a binary trait
+[1] 568941
+set elements in the sparse GRN <=  0.125  to zero
+colnames(data.new) is  Y minus1 age sex2 genotyping.array2 PC1 PC2 PC3 PC4 PC5 PC6 PC7 PC8 PC9 PC10 
+out.transform$Param.transform$qrr:  14 14 
+extract sparse GRM
+[1] 568941
+110939  samples have been used to fit the glmm null model
+glm:
+
+Call:  glm(formula = formula.new, family = binomial, data = data.new)
+
+Coefficients:
+           minus1                age               sex2  genotyping.array2  
+          9.13368           -0.14508           -0.13418            0.15766  
+              PC1                PC2                PC3                PC4  
+          0.45420            0.25365           -0.30340           -0.08319  
+              PC5                PC6                PC7                PC8  
+         -0.01061           -0.20897            0.28151           -0.30492  
+              PC9               PC10  
+          0.34537           -0.33280  
+
+Degrees of Freedom: 110649 Total (i.e. Null);  110635 Residual
+Null Deviance:	    153400 
+Residual Deviance: 319.9 	AIC: 347.9
+Start fitting the NULL GLMM
+   user  system elapsed 
+  8.875   2.251  10.280 
+glm:
+
+Call:  glm(formula = formula.new, family = binomial, data = data.new)
+
+Coefficients:
+           minus1                age  genotyping.array2                PC1  
+        2.1832672         -0.4138129          0.0736441         -0.0171226  
+              PC2                PC3                PC4                PC5  
+        0.0004588          0.0263899          0.0122126         -0.0532128  
+              PC6                PC7                PC8                PC9  
+       -0.0348614          0.0128792         -0.0173874         -0.0708910  
+             PC10  
+       -0.0332057  
+
+Degrees of Freedom: 67112 Total (i.e. Null);  67099 Residual
+Null Deviance:	    93040 
+Residual Deviance: 44780 	AIC: 44800
+Start fitting the NULL GLMM
+   user  system elapsed 
+  6.582   1.421  10.326 
+nbyte: 114711
+nbyte: 16985
+reserve: 1582899584
+
+M: 93183, N: 458841
+size of genoVecofPointers: 6
+setgeno mark1
+setgeno mark2
+glm:
+
+Call:  glm(formula = formula.new, family = binomial, data = data.new)
+
+Coefficients:
+           minus1                age               sex2  genotyping.array2  
+         5.110291           0.946748          -0.169788           0.139142  
+              PC1                PC2                PC3                PC4  
+         0.046951           0.002736          -0.005346           0.135491  
+              PC5                PC6                PC7                PC8  
+        -0.103375           0.003247          -0.051227          -0.038765  
+              PC9               PC10  
+         0.107264          -0.026342  
+
+Degrees of Freedom: 111662 Total (i.e. Null);  111648 Residual
+Null Deviance:	    154800 
+Residual Deviance: 10940 	AIC: 10960
+Start fitting the NULL GLMM
+   user  system elapsed 
+  8.859   2.259  10.639 
+[1] 568941
+set elements in the sparse GRN <=  0.125  to zero
+[1] 568941
+   user  system elapsed 
+  9.137   2.287  10.534 
+[1][1] "Start reading genotype plink file here"
+ 568941
+set elements in the sparse GRN <=  0.125  to zero
+[1] 568941
+112462  samples have been used to fit the glmm null model
+   user  system elapsed 
+  6.904   1.538  10.609 
+[1] "Start reading genotype plink file here"
+   user  system elapsed 
+  9.176   2.347  10.884 
+[1] "Start reading genotype plink file here"
+124185  samples have been used to fit the glmm null model
+nbyte: 114711
+nbyte: 27663
+reserve: 2577907712
+
+M: 93183, N: 458841
+size of genoVecofPointers: 6
+setgeno mark1
+setgeno mark2
+nbyte: 114711
+nbyte: 27916
+reserve: 2601483008
+
+M: 93183, N: 458841
+size of genoVecofPointers: 6
+setgeno mark1
+setgeno mark2
+nbyte: 114711
+nbyte: 16778
+reserve: 1563610752
+
+M: 93183, N: 458841
+size of genoVecofPointers: 6
+setgeno mark1
+setgeno mark2
+[1] "print m4"
+[1] 110939 110939
+2 locationMat.n_rows 
+117513 locationMat.n_cols 
+117513 valueVec.n_elem 
+1.08047
+0
+0
+0.994459
+1
+1
+0.997576
+2
+2
+1.01329
+3
+3
+0.994539
+4
+4
+1.0122
+5
+5
+0.997576
+6
+6
+1.0061
+7
+7
+0.999909
+8
+8
+1.00852
+9
+9
+Alzheimers_disease  is a binary trait
+[1] "print m4"
+[1] 112462 112462
+2 locationMat.n_rows 
+119222 locationMat.n_cols 
+119222 valueVec.n_elem 
+1.08047
+0
+0
+0.994459
+1
+1
+0.997576
+2
+2
+1.01329
+3
+3
+0.994539
+4
+4
+1.0122
+5
+5
+0.997576
+6
+6
+1.02661
+7
+7
+1.0061
+8
+8
+0.999909
+9
+9
+colorectal_cancer  is a binary trait
+[1] "print m4"
+[1] 124185 124185
+2 locationMat.n_rows 
+132339 locationMat.n_cols 
+132339 valueVec.n_elem 
+1.08047
+0
+0
+0.994459
+1
+1
+0.997576
+2
+2
+1.01329
+3
+3
+0.994539
+4
+4
+1.0122
+5
+5
+0.997576
+6
+6
+1.0357
+7
+7
+1.0061
+8
+8
+0.98345
+9
+9
+depression  is a binary trait
+glm:
+
+Call:  glm(formula = formula.new, family = binomial, data = data.new)
+
+Coefficients:
+           minus1                age               sex2  genotyping.array2  
+         4.432473           0.842414          -0.172873           0.030598  
+              PC1                PC2                PC3                PC4  
+         0.020961          -0.036243           0.005921          -0.062906  
+              PC5                PC6                PC7                PC8  
+        -0.103096           0.016243          -0.040096          -0.036277  
+              PC9               PC10  
+        -0.039519           0.019853  
+
+Degrees of Freedom: 112462 Total (i.e. Null);  112448 Residual
+Null Deviance:	    155900 
+Residual Deviance: 17650 	AIC: 17680
+Start fitting the NULL GLMM
+   user  system elapsed 
+  8.341   1.903  11.770 
+glm:
+
+Call:  glm(formula = formula.new, family = binomial, data = data.new)
+
+Coefficients:
+           minus1                age               sex2  genotyping.array2  
+          6.97939            1.67769           -0.03558            0.06686  
+              PC1                PC2                PC3                PC4  
+          0.04122           -0.03441           -0.08372            0.08216  
+              PC5                PC6                PC7                PC8  
+         -0.14852            0.19662            0.10057            0.04896  
+              PC9               PC10  
+          0.12955           -0.01140  
+
+Degrees of Freedom: 110939 Total (i.e. Null);  110925 Residual
+Null Deviance:	    153800 
+Residual Deviance: 3777 	AIC: 3805
+Start fitting the NULL GLMM
+   user  system elapsed 
+  9.016   2.266  11.770 
+   user  system elapsed 
+  8.644   1.995  12.011 
+[1] "Start reading genotype plink file here"
+glm:
+
+Call:  glm(formula = formula.new, family = binomial, data = data.new)
+
+Coefficients:
+           minus1                age               sex2  genotyping.array2  
+        2.1317994         -0.0195733          0.2365188          0.1056384  
+              PC1                PC2                PC3                PC4  
+        0.0302158         -0.0131432          0.0173506         -0.0002841  
+              PC5                PC6                PC7                PC8  
+        0.0612513          0.0390462          0.0096725          0.0167943  
+              PC9               PC10  
+       -0.0854735          0.0310136  
+
+Degrees of Freedom: 124185 Total (i.e. Null);  124171 Residual
+Null Deviance:	    172200 
+Residual Deviance: 84620 	AIC: 84650
+Start fitting the NULL GLMM
+   user  system elapsed 
+  8.907   1.772  12.000 
+   user  system elapsed 
+  9.324   2.350  12.004 
+[1] "Start reading genotype plink file here"
+nbyte: 114711
+nbyte: 28116
+reserve: 2620119552
+
+M: 93183, N: 458841
+size of genoVecofPointers: 6
+setgeno mark1
+setgeno mark2
+   user  system elapsed 
+  9.157   1.812  12.218 
+[1] "Start reading genotype plink file here"
+nbyte: 114711
+nbyte: 27735
+reserve: 2584616960
+
+M: 93183, N: 458841
+size of genoVecofPointers: 6
+setgeno mark1
+setgeno mark2
+nbyte: 114711
+nbyte: 31047
+reserve: 2893239040
+
+M: 93183, N: 458841
+size of genoVecofPointers: 6
+setgeno mark1
+setgeno mark2

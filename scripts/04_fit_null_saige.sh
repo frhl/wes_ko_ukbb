@@ -25,14 +25,14 @@ readonly grm_dir="data/saige/grm/input"
 readonly covar_dir="data/saige/input"
 readonly pheno_dir="/well/lindgren/UKBIOBANK/dpalmer/ukb_wes_phenotypes/200k"
 readonly plink_dir="data/saige/grm/input"
-readonly out_dir="derived/saige/binary"
+readonly out_dir="derived/saige/binary/step1"
 
 # input path
 readonly chr=${SGE_TASK_ID}
 readonly grm_mtx="${grm_dir}/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_dir}/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt"
 readonly plink_file="${plink_dir}/ukb_imp_eur_chr1_22_sparse_markers"
-readonly pheno_file="${pheno_dir}/UKBB_WES200k_binary_phenotypes.tsv"
+readonly pheno_file="${pheno_dir}/UKBB_WES200k_filtered_binary_phenotypes.tsv"
 readonly covar_file="${covar_dir}/COVARS1.csv"
 
 # select covars and phenotype (0-42)
