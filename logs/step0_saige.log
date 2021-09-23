@@ -1,18 +1,9 @@
-Successfully combined .bgen files for GRM input.. Elapsed time: 0 hrs (job id: 54367285.undefined Tue Sep 21 13:07:11 BST 2021)
-Successfully combined .bgen files for GRM input.. Elapsed time: 0 hrs (job id: 54367290.undefined Tue Sep 21 13:08:49 BST 2021)
-2021-09-21 13:11:01 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-2021-09-21 13:11:01 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
+Successfully combined .bgen files for GRM input.. Elapsed time: 0 hrs (job id: 54408585.undefined Thu Sep 23 11:40:59 BST 2021)
+Generating GRM from plink files.. . (job id: 54408585.undefined Thu Sep 23 11:41:00 BST 2021)
+Successfully combined .bgen files for GRM input.. Elapsed time: 0 hrs (job id: 54408663.undefined Thu Sep 23 11:43:44 BST 2021)
+Successfully combined .bgen files for GRM input.. Elapsed time: 0 hrs (job id: 54408727.undefined Thu Sep 23 11:46:29 BST 2021)
+Successfully combined .bgen files for GRM input.. Elapsed time: 0 hrs (job id: 54408762.undefined Thu Sep 23 11:48:14 BST 2021)
+2021-09-23 11:57:48 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-09-23 11:57:49 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
   Compatibility is not guaranteed.
-2021-09-21 13:11:01 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
-Successfully combined .bgen files for GRM input.. Elapsed time: .03 hrs (job id: 54367298.undefined Tue Sep 21 13:12:32 BST 2021)
-2021-09-21 13:29:19 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-2021-09-21 13:29:19 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
-  Compatibility is not guaranteed.
-2021-09-21 13:29:19 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
-2021-09-21 13:29:20 WARN  Utils:69 - Service 'SparkUI' could not bind on port 4040. Attempting port 4041.
-2021-09-21 17:52:54 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-2021-09-21 17:52:55 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
-  Compatibility is not guaranteed.
-2021-09-21 17:52:55 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
-Successfully combined .bgen files for GRM input.. Elapsed time: 0 hrs (job id: 54406971.undefined Thu Sep 23 10:26:56 BST 2021)
-Generating GRM from plink files.. . (job id: 54406971.undefined Thu Sep 23 10:26:56 BST 2021)
+2021-09-23 11:57:49 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).

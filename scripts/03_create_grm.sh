@@ -9,7 +9,9 @@
 #$ -pe shmem 10
 #$ -q long.qc
 
-module purge
+set -o errexit
+set -o nounset
+
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
 
@@ -28,7 +30,7 @@ chroms=$( seq 1 22 | tr '\n' ' ' )
 set_up_hail
 set_up_pythonpath
 mkdir -p ${out_dir}
-python "${hail_script}" \
+python3 "${hail_script}" \
 	--chroms ${chroms}  \
 	--out_prefix ${out_prefix} \
 	--subset_markers_by_kinship \
@@ -38,6 +40,7 @@ python "${hail_script}" \
 print_update "Successfully combined .bgen files for GRM input." "${SECONDS}"
 
 # generate GRM using SAIGE
+conda deactivate
 set_up_RSAIGE
 print_update "Generating GRM from plink files.. "
 Rscript "${createSparseGRM}" \
