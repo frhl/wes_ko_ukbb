@@ -34,8 +34,9 @@ readonly step2_SPAtests="/well/lindgren/flassen/software/dev/SAIGE/extdata/step2
 # out prefix
 readonly out_prefix_chr="${out_prefix}_${chr}"
 
-set_up_RSAIGE
 # run saige
+set_up_RSAIGE
+SECONDS=0
 Rscript "${step1_SPAtests}"	\
 	--vcfFile=${in_vcf} \
 	--vcfFileIndex=${in_csi} \
@@ -51,5 +52,7 @@ Rscript "${step1_SPAtests}"	\
 	--IsOutputNinCaseCtrl=TRUE	\
 	--IsOutputHetHomCountsinCaseCtrl=TRUE
 
+duration=${SECONDS}
+print_update "[${phenotype}-chr${chr}]: finished saige step 2 after ${duration}"
 
 

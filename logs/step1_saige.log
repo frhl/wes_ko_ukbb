@@ -13003,3 +13003,319 @@ M: 93183, N: 458841
 size of genoVecofPointers: 6
 setgeno mark1
 setgeno mark2
+92820 markers with MAF >= 0.01 are used for GRM.
+setgeno mark5
+setgeno mark6
+time: 200080
+[1] "Genotype reading is done"
+inital tau is  1 0.1 
+92819 markers with MAF >= 0.01 are used for GRM.
+setgeno mark5
+setgeno mark6
+time: 201410
+[1] "Genotype reading is done"
+inital tau is  1 0.1 
+92827 markers with MAF >= 0.01 are used for GRM.
+setgeno mark5
+setgeno mark6
+time: 220380
+[1] "Genotype reading is done"
+inital tau is  1 0.1 
+92828 markers with MAF >= 0.01 are used for GRM.
+setgeno mark5
+setgeno mark6
+time: 221910
+[1] "Genotype reading is done"
+inital tau is  1 0.1 
+92825 markers with MAF >= 0.01 are used for GRM.
+setgeno mark5
+setgeno mark6
+time: 220930
+[1] "Genotype reading is done"
+inital tau is  1 0.1 
+92829 markers with MAF >= 0.01 are used for GRM.
+setgeno mark5
+setgeno mark6
+time: 226900
+[1] "Genotype reading is done"
+inital tau is  1 0.1 
+iter from getPCG1ofSigmaAndVector 4
+92825 markers with MAF >= 0.01 are used for GRM.
+setgeno mark5
+setgeno mark6
+time: 219700
+[1] "Genotype reading is done"
+inital tau is  1 0.1 
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 4
+Tau:
+[1] 1.0 0.1
+Fixed-effect coefficients:
+               [,1]
+ [1,]  2.1833474636
+ [2,] -0.4141660929
+ [3,]  0.0735694617
+ [4,] -0.0168904457
+ [5,]  0.0004270891
+ [6,]  0.0263868254
+ [7,]  0.0122147053
+ [8,] -0.0535594486
+ [9,] -0.0343858488
+[10,]  0.0127457688
+[11,] -0.0172897018
+[12,] -0.0706721097
+[13,] -0.0324929394
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 4
+Tau:
+[1] 1.0 0.1
+Fixed-effect coefficients:
+              [,1]
+ [1,]  2.056060553
+ [2,] -0.345129848
+ [3,]  0.089752853
+ [4,] -0.010723222
+ [5,]  0.004176097
+ [6,]  0.034559511
+ [7,]  0.016005874
+ [8,] -0.069472626
+ [9,] -0.030467046
+[10,]  0.015874783
+[11,] -0.020447133
+[12,] -0.081777550
+[13,] -0.027251270
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+Tau:
+[1] 1.0 0.1
+Fixed-effect coefficients:
+             [,1]
+ [1,]  9.13365650
+ [2,] -0.14505592
+ [3,] -0.13414264
+ [4,]  0.15765896
+ [5,]  0.45419088
+ [6,]  0.25362217
+ [7,] -0.30334294
+ [8,] -0.08315670
+ [9,] -0.01060659
+[10,] -0.20898552
+[11,]  0.28151470
+[12,] -0.30493423
+[13,]  0.34537840
+[14,] -0.33282965
+iter from getPCG1ofSigmaAndVector 2
+Tau:
+[1] 1.0 0.1
+Fixed-effect coefficients:
+             [,1]
+ [1,]  6.97947407
+ [2,]  1.67778552
+ [3,] -0.03560580
+ [4,]  0.06683815
+ [5,]  0.04129861
+ [6,] -0.03447283
+ [7,] -0.08367931
+ [8,]  0.08205599
+ [9,] -0.14860491
+[10,]  0.19656719
+[11,]  0.10056320
+[12,]  0.04900972
+[13,]  0.12949219
+[14,] -0.01150603
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 3
+Tau:
+[1] 1.0 0.1
+Fixed-effect coefficients:
+              [,1]
+ [1,]  5.110310555
+ [2,]  0.946862817
+ [3,] -0.169642806
+ [4,]  0.139184371
+ [5,]  0.046989519
+ [6,]  0.002871018
+ [7,] -0.005231659
+ [8,]  0.135370880
+ [9,] -0.103189416
+[10,]  0.003233751
+[11,] -0.051193606
+[12,] -0.038773879
+[13,]  0.107275300
+[14,] -0.026340287
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+Tau:
+[1] 1.0 0.1
+Fixed-effect coefficients:
+              [,1]
+ [1,]  4.432407379
+ [2,]  0.842304468
+ [3,] -0.172739267
+ [4,]  0.030576540
+ [5,]  0.021000659
+ [6,] -0.036223367
+ [7,]  0.005940095
+ [8,] -0.062889144
+ [9,] -0.103131846
+[10,]  0.016113855
+[11,] -0.040028274
+[12,] -0.036270369
+[13,] -0.039536759
+[14,]  0.019840488
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2

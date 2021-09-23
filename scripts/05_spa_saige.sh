@@ -15,7 +15,7 @@ source utils/bash_utils.sh
 
 # directories
 readonly vcf_dir="derived/knockouts/all/ptvs_damaging_missense"
-readonly var_dir="derived/saige/binary/step1"
+readonly step1_dir="derived/saige/binary/step1"
 readonly out_dir="derived/saige/binary/step2"
 
 # input path
@@ -24,15 +24,15 @@ readonly in_vcf="${vcf_dir}/ukb_wes_200k_maf002_miss005_ptv_chr${chr}_ko.vcf.bgz
 readonly in_csi="${vcf}.csi"
 readonly spa_script="utils/_spa_test.sh"
 
-# select phenotype (0-42)
+# select phenotype (1-42)
 set_up_pythonpath
 phenotype=$( python utils/extract_phenos_from_header.py \
     --input ${pheno_file} \
     --index ${SGE_TASK_ID})
 
 # setup input phenotypes
-readonly in_gmat="${out_dir}/ukb_wes_200k_${phenotype}.rda"
-readonly in_var="${out_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
+readonly in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
+readonly in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
 
 # output
 readonly out_prefix="${out_dir}/ukb_wes_200k_${phenotype}"
@@ -51,4 +51,6 @@ submit_spa_job() {
     ${out_prefix}
 }
 
+submit_spa_job
+echo "[${phenotype}]: SPA job submitted."
 
