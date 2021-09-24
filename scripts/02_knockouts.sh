@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 10
 #$ -q short.qe
-#$ -t 22
+#$ -t 1-22
 
 set -o errexit
 set -o nounset
@@ -20,7 +20,7 @@ source utils/vcf_utils.sh
 readonly in_dir="data/mt"
 readonly vep_dir="data/vep/full/"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/knockouts/all/ptvs_only"
+readonly out_dir="derived/knockouts/all/ptvs_damaging_missense_vcfs"
 
 # hail script
 readonly hail_script="utils/subscripts/hail_export.py"
@@ -44,7 +44,7 @@ python3 "${hail_script}" \
     --input_unphased_path ${in_unphased} \
     --input_phased_type "mt" \
     --input_unphased_type "mt" \
-    --vep_filter "ptv" \
+    --vep_filter "ptv" "damaging_missense" \
     --maf_max 0.02 \
     --missing 0.05 \
     --out_prefix ${out_prefix} \

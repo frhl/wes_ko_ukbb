@@ -128,3 +128,6 @@ Warning message:
 glm.fit: fitted probabilities numerically 0 or 1 occurred 
 
 error: inv_sympd(): matrix is singular or not positive definite
+Warning messages:
+1: glm.fit: algorithm did not converge 
+2: glm.fit: fitted probabilities numerically 0 or 1 occurred 

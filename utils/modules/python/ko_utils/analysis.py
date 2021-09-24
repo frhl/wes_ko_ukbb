@@ -20,16 +20,16 @@ OTHER_CSQS = ["mature_miRNA_variant", "5_prime_UTR_variant",
 def variant_csqs_category_builder(mt):
     r'''Create categories for downstream analysis'''
     return mt.annotate_rows(vep = mt.vep.annotate(consequence_category = 
-        hl.case().when(hl.literal(set(PLOF_CSQS)).contains(mt.vep.most_severe_consequence), "ptv")
-             .when(hl.literal(set(MISSENSE_CSQS)).contains(mt.vep.most_severe_consequence) & 
+        hl.case().when(hl.literal(set(PLOF_CSQS)).contains(mt.vep.worst_csq_by_gene_canonical.most_severe_consequence), "ptv")
+             .when(hl.literal(set(MISSENSE_CSQS)).contains(mt.vep.worst_csq_by_gene_canonical.most_severe_consequence) & 
                    (~hl.is_defined(mt.dbnsfp.cadd_phred_score) | 
                     ~hl.is_defined(mt.dbnsfp.revel_score)), "other_missense")                                   
-             .when(hl.literal(set(MISSENSE_CSQS)).contains(mt.vep.most_severe_consequence) & 
+             .when(hl.literal(set(MISSENSE_CSQS)).contains(mt.vep.worst_csq_by_gene_canonical.most_severe_consequence) & 
                    (mt.dbnsfp.cadd_phred_score >= 20) & 
                    (mt.dbnsfp.revel_score >= 0.6), "damaging_missense") 
-             .when(hl.literal(set(MISSENSE_CSQS)).contains(mt.vep.most_severe_consequence), "other_missense")
-             .when(hl.literal(set(SYNONYMOUS_CSQS)).contains(mt.vep.most_severe_consequence), "synonymous")
-             .when(hl.literal(set(OTHER_CSQS)).contains(mt.vep.most_severe_consequence), "non_coding")
+             .when(hl.literal(set(MISSENSE_CSQS)).contains(mt.vep.worst_csq_by_gene_canonical.most_severe_consequence), "other_missense")
+             .when(hl.literal(set(SYNONYMOUS_CSQS)).contains(mt.vep.worst_csq_by_gene_canonical.most_severe_consequence), "synonymous")
+             .when(hl.literal(set(OTHER_CSQS)).contains(mt.vep.worst_csq_by_gene_canonical.most_severe_consequence), "non_coding")
              .default("NA")))
 
 def annotate_dbnsfp(mt, vep_path):
@@ -69,7 +69,7 @@ def annotate_dbnsfp(mt, vep_path):
 
 def filter_vep(mt, field, conds):
     r'''Filter VEP field by condition(s) '''
-    mt = mt.filter_rows(hl.literal(set(conds)).contains(mt.vep[field]))
+    mt = mt.filter_rows(hl.literal(set(conds)).contains(mt.vep.worst_csq_by_gene_canonical[field]))
     return mt
 
 
