@@ -9,9 +9,6 @@
 #$ -pe shmem 1
 #$ -q lindgren.qe
 
-set -o errexit
-set -o nounset
-
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
@@ -50,14 +47,17 @@ spa_test() {
      --numLinesOutput=2 \
      --IsOutputAFinCaseCtrl=TRUE	\
 	 --IsOutputNinCaseCtrl=TRUE	\
-  	 --IsOutputHetHomCountsinCaseCtrl=TRUE
+  	 --IsOutputHetHomCountsinCaseCtrl=TRUE \
+     --LOCO=FALSE
    set +x
    duration=${SECONDS}
    	print_update "Finished SPA test for ${out} at ${duration}"
 }
 
 if [ ! -f ${out}* ]; then
+   echo "pre rsaige"
    set_up_RSAIGE
+   echo "post rsaige"
    spa_test
 else
    print_update "${out} already exists. Skipping." | tee /dev/stderr

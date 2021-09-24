@@ -45,7 +45,7 @@ readonly out_prefix="${out_dir}/ukb_wes_200k_${phenotype}"
 
 submit_spa_job() {
   #set -x
-  qsub -N "_spa_${phenotype}" \
+  qsub -N "spa_${phenotype}" \
     -t 22 \
     -q "short.qe" \
     -pe shmem 2 \
@@ -59,5 +59,5 @@ submit_spa_job() {
 }
 
 submit_spa_job
-echo "[${phenotype}]: SPA job submitted."
+print_update "Submitted SPA scripts for ${phenotype}"
 
