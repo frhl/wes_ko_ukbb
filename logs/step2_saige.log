@@ -198,3 +198,422 @@ cateVarRatioMaxMACVecInclude  is  1.5 2.5 3.5 4.5 5.5 10.5 20.5
 single-variant association test will be performed
 112462  samples have been used to fit the glmm null model
 Finished SPA test for derived/saige/binary/step2/ukb_wes_200k_colorectal_cancer_22 at 2 (job id: 54445744.22 Fri Sep 24 10:34:21 BST 2021)
+Your job-array 54445771.22-22:1 ("spa_colorectal_cancer") has been submitted
+Submitted SPA scripts for colorectal_cancer (job id: 54445770.1 Fri Sep 24 10:38:21 BST 2021)
+derived/saige/binary/step2/ukb_wes_200k_colorectal_cancer_22 already exists. Skipping. (job id: 54445771.22 Fri Sep 24 10:38:30 BST 2021)
+Your job-array 54445775.22-22:1 ("spa_colorectal_cancer") has been submitted
+Submitted SPA scripts for colorectal_cancer (job id: 54445773.1 Fri Sep 24 10:40:47 BST 2021)
+pre rsaige
+post rsaige
+starting SPA test for derived/saige/binary/step2/wes_200k_colorectal_cancer_chr22 (job id: 54445775.22 Fri Sep 24 10:41:03 BST 2021)
+R version 3.6.1 (2019-07-05)
+Platform: x86_64-conda_cos6-linux-gnu (64-bit)
+Running under: CentOS Linux 7 (Core)
+
+Matrix products: default
+BLAS/LAPACK: /gpfs3/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/lib/R/lib/libRblas.so
+
+locale:
+[1] C
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] SAIGE_0.44.6.4
+
+loaded via a namespace (and not attached):
+[1] compiler_3.6.1     Matrix_1.2-17      Rcpp_1.0.1         grid_3.6.1        
+[5] RcppParallel_5.1.4 lattice_0.20-44   
+$vcfFile
+[1] "derived/knockouts/all/ptvs_damaging_missense/ukb_wes_200k_maf002_miss005_ptv_chr1_ko.vcf.bgz"
+
+$vcfFileIndex
+[1] ".csi"
+
+$vcfField
+[1] "DS"
+
+$bgenFile
+[1] ""
+
+$bgenFileIndex
+[1] ""
+
+$savFile
+[1] ""
+
+$savFileIndex
+[1] ""
+
+$idstoExcludeFile
+[1] ""
+
+$idstoIncludeFile
+[1] ""
+
+$rangestoExcludeFile
+[1] ""
+
+$rangestoIncludeFile
+[1] ""
+
+$chrom
+[1] "22"
+
+$start
+[1] 1
+
+$end
+[1] 2.5e+08
+
+$IsDropMissingDosages
+[1] FALSE
+
+$minMAF
+[1] 1e-05
+
+$minMAC
+[1] 1
+
+$maxMAFforGroupTest
+[1] 0.5
+
+$minInfo
+[1] 0
+
+$sampleFile
+[1] ""
+
+$GMMATmodelFile
+[1] "derived/saige/binary/step1/wes_200k_colorectal_cancer.rda"
+
+$varianceRatioFile
+[1] "derived/saige/binary/step1/wes_200k_colorectal_cancer.varianceRatio.txt"
+
+$SAIGEOutputFile
+[1] "derived/saige/binary/step2/wes_200k_colorectal_cancer_chr22"
+
+$numLinesOutput
+[1] 2
+
+$IsSparse
+[1] TRUE
+
+$SPAcutoff
+[1] 2
+
+$IsOutputAFinCaseCtrl
+[1] TRUE
+
+$IsOutputNinCaseCtrl
+[1] TRUE
+
+$IsOutputHetHomCountsinCaseCtrl
+[1] TRUE
+
+$LOCO
+[1] FALSE
+
+$condition
+[1] ""
+
+$sparseSigmaFile
+[1] ""
+
+$groupFile
+[1] ""
+
+$kernel
+[1] "linear.weighted"
+
+$method
+[1] "optimal.adj"
+
+$weights.beta.rare
+[1] "1,25"
+
+$weights.beta.common
+[1] "1,25"
+
+$weightMAFcutoff
+[1] 0.01
+
+$r.corr
+[1] "0"
+
+$IsSingleVarinGroupTest
+[1] FALSE
+
+$IsOutputMAFinCaseCtrlinGroupTest
+[1] FALSE
+
+$cateVarRatioMinMACVecExclude
+[1] "0.5,1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+$cateVarRatioMaxMACVecInclude
+[1] "1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+$dosageZerodCutoff
+[1] 0.2
+
+$IsOutputPvalueNAinGroupTestforBinary
+[1] FALSE
+
+$IsAccountforCasecontrolImbalanceinGroupTest
+[1] TRUE
+
+$weightsIncludeinGroupFile
+[1] FALSE
+
+$IsOutputBETASEinBurdenTest
+[1] FALSE
+
+$IsOutputlogPforSingle
+[1] FALSE
+
+$sampleFile_male
+[1] ""
+
+$X_PARregion
+[1] ""
+
+$is_rewrite_XnonPAR_forMales
+[1] FALSE
+
+$method_to_CollapseUltraRare
+[1] "absence_or_presence"
+
+$MACCutoff_to_CollapseUltraRare
+[1] 10
+
+$DosageCutoff_for_UltraRarePresence
+[1] 0.5
+
+$help
+[1] FALSE
+
+weights.beta.rare  is  1 25 
+weights.beta.common  is  1 25 
+cateVarRatioMinMACVecExclude  is  0.5 1.5 2.5 3.5 4.5 5.5 10.5 20.5 
+cateVarRatioMaxMACVecInclude  is  1.5 2.5 3.5 4.5 5.5 10.5 20.5 
+single-variant association test will be performed
+Finished SPA test for derived/saige/binary/step2/wes_200k_colorectal_cancer_chr22 at 1 (job id: 54445775.22 Fri Sep 24 10:41:04 BST 2021)
+Your job-array 54445796.22-22:1 ("spa_colorectal_cancer") has been submitted
+Submitted SPA scripts for colorectal_cancer (job id: 54445795.1 Fri Sep 24 10:42:37 BST 2021)
+pre rsaige
+post rsaige
+starting SPA test for derived/saige/binary/step2/ukb_wes_200k_colorectal_cancer_chr22 (job id: 54445796.22 Fri Sep 24 10:42:49 BST 2021)
+R version 3.6.1 (2019-07-05)
+Platform: x86_64-conda_cos6-linux-gnu (64-bit)
+Running under: CentOS Linux 7 (Core)
+
+Matrix products: default
+BLAS/LAPACK: /gpfs3/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/lib/R/lib/libRblas.so
+
+locale:
+[1] C
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] SAIGE_0.44.6.4
+
+loaded via a namespace (and not attached):
+[1] compiler_3.6.1     Matrix_1.2-17      Rcpp_1.0.1         grid_3.6.1        
+[5] RcppParallel_5.1.4 lattice_0.20-44   
+$vcfFile
+[1] "derived/knockouts/all/ptvs_damaging_missense/ukb_wes_200k_maf002_miss005_ptv_chr1_ko.vcf.bgz"
+
+$vcfFileIndex
+[1] ".csi"
+
+$vcfField
+[1] "DS"
+
+$bgenFile
+[1] ""
+
+$bgenFileIndex
+[1] ""
+
+$savFile
+[1] ""
+
+$savFileIndex
+[1] ""
+
+$idstoExcludeFile
+[1] ""
+
+$idstoIncludeFile
+[1] ""
+
+$rangestoExcludeFile
+[1] ""
+
+$rangestoIncludeFile
+[1] ""
+
+$chrom
+[1] "22"
+
+$start
+[1] 1
+
+$end
+[1] 2.5e+08
+
+$IsDropMissingDosages
+[1] FALSE
+
+$minMAF
+[1] 1e-05
+
+$minMAC
+[1] 1
+
+$maxMAFforGroupTest
+[1] 0.5
+
+$minInfo
+[1] 0
+
+$sampleFile
+[1] ""
+
+$GMMATmodelFile
+[1] "derived/saige/binary/step1/ukb_wes_200k_colorectal_cancer.rda"
+
+$varianceRatioFile
+[1] "derived/saige/binary/step1/ukb_wes_200k_colorectal_cancer.varianceRatio.txt"
+
+$SAIGEOutputFile
+[1] "derived/saige/binary/step2/ukb_wes_200k_colorectal_cancer_chr22"
+
+$numLinesOutput
+[1] 2
+
+$IsSparse
+[1] TRUE
+
+$SPAcutoff
+[1] 2
+
+$IsOutputAFinCaseCtrl
+[1] TRUE
+
+$IsOutputNinCaseCtrl
+[1] TRUE
+
+$IsOutputHetHomCountsinCaseCtrl
+[1] TRUE
+
+$LOCO
+[1] FALSE
+
+$condition
+[1] ""
+
+$sparseSigmaFile
+[1] ""
+
+$groupFile
+[1] ""
+
+$kernel
+[1] "linear.weighted"
+
+$method
+[1] "optimal.adj"
+
+$weights.beta.rare
+[1] "1,25"
+
+$weights.beta.common
+[1] "1,25"
+
+$weightMAFcutoff
+[1] 0.01
+
+$r.corr
+[1] "0"
+
+$IsSingleVarinGroupTest
+[1] FALSE
+
+$IsOutputMAFinCaseCtrlinGroupTest
+[1] FALSE
+
+$cateVarRatioMinMACVecExclude
+[1] "0.5,1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+$cateVarRatioMaxMACVecInclude
+[1] "1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+$dosageZerodCutoff
+[1] 0.2
+
+$IsOutputPvalueNAinGroupTestforBinary
+[1] FALSE
+
+$IsAccountforCasecontrolImbalanceinGroupTest
+[1] TRUE
+
+$weightsIncludeinGroupFile
+[1] FALSE
+
+$IsOutputBETASEinBurdenTest
+[1] FALSE
+
+$IsOutputlogPforSingle
+[1] FALSE
+
+$sampleFile_male
+[1] ""
+
+$X_PARregion
+[1] ""
+
+$is_rewrite_XnonPAR_forMales
+[1] FALSE
+
+$method_to_CollapseUltraRare
+[1] "absence_or_presence"
+
+$MACCutoff_to_CollapseUltraRare
+[1] 10
+
+$DosageCutoff_for_UltraRarePresence
+[1] 0.5
+
+$help
+[1] FALSE
+
+weights.beta.rare  is  1 25 
+weights.beta.common  is  1 25 
+cateVarRatioMinMACVecExclude  is  0.5 1.5 2.5 3.5 4.5 5.5 10.5 20.5 
+cateVarRatioMaxMACVecInclude  is  1.5 2.5 3.5 4.5 5.5 10.5 20.5 
+single-variant association test will be performed
+112462  samples have been used to fit the glmm null model
+[1] "Leave-one-chromosome-out is not applied"
+Single variance ratio is provided, so categorical variance ratio won't be used!
+variance Ratio is  0.9968297 
+isCondition is  FALSE 
+Setting genomic region 22:1:250000000
+199795  sample IDs are found in the vcf file
+[1] 199795      4
+[1] "IID"          "IndexInModel" "IndexDose.x"  "IndexDose.y" 
+112462  samples were used in fitting the NULL glmm model and are found in sample file
+sparse kinship matrix is not used
+Missing dosages will be mean imputed for the analysis
+Analysis started at  1632476573 Seconds
+minMAC:  1 
+minMAF:  1e-05 
+Minimum MAF of markers to be tested is  1e-05 
+It is a binary trait
+Analyzing  1830  cases and  110632  controls 
+isCondition is  FALSE 
+Analysis started at  1632476573 Seconds
+Finished SPA test for derived/saige/binary/step2/ukb_wes_200k_colorectal_cancer_chr22 at 4 (job id: 54445796.22 Fri Sep 24 10:42:53 BST 2021)

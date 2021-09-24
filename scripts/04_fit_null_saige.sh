@@ -45,23 +45,38 @@ phenotype=$( python utils/extract_phenos_from_header.py \
 # output path
 readonly out_prefix="${out_dir}/ukb_wes_200k_${phenotype}"
 
-set_up_RSAIGE
-Rscript "${step1_fitNULLGLMM}" \
-	--plinkFile="${plink_file}" \
-    --phenoFile="${pheno_file}" \
-    --phenoCol="${phenotype}" \
-    --covarColList=${covariates} \
-    --sampleIDColinphenoFile="ID" \
-    --traitType="binary" \
-    --invNormalize=TRUE \
-    --outputPrefix="${out_prefix}" \
-	--outputPrefix_varRatio="${out_prefix}" \
-	--IsOverwriteVarianceRatioFile=TRUE \
-    --sparseGRMFile=${grm_mtx} \
-    --sparseGRMSampleIDFile=${grm_sam}  \
-    --nThreads=${threads} \
-    --LOCO=FALSE\
-	--skipModelFitting=FALSE \
-    --IsSparseKin=TRUE      \
-    --isCateVarianceRatio=FALSE # Only needed for SAIGE-GENE+ (geneset)	
+# null model script
+fit_null() {
+   SECONDS=0
+   print_update "Fitting null model for ${phenotype}, out: ${out_prefix}"
+   Rscript "${step1_fitNULLGLMM}" \
+	 --plinkFile="${plink_file}" \
+     --phenoFile="${pheno_file}" \
+     --phenoCol="${phenotype}" \
+     --covarColList=${covariates} \
+     --sampleIDColinphenoFile="ID" \
+     --traitType="binary" \
+     --invNormalize=TRUE \
+     --outputPrefix="${out_prefix}" \
+	 --outputPrefix_varRatio="${out_prefix}" \
+	 --IsOverwriteVarianceRatioFile=TRUE \
+     --sparseGRMFile=${grm_mtx} \
+     --sparseGRMSampleIDFile=${grm_sam}  \
+     --nThreads=${threads} \
+     --LOCO=FALSE\
+	 --skipModelFitting=FALSE \
+     --IsSparseKin=TRUE      \
+     --isCateVarianceRatio=FALSE # Only needed for SAIGE-GENE+ (geneset)	
+   duration=${SECONDS}
+   print_update "Finished fitting null model for ${phenotype}" "$duration"
+}
+
+if [ ! -f ${out}.rda ]; then
+   set_up_RSAIGE
+   fit_null
+else
+   print_update "Warning: Null model at ${out_prefix} already exists. Skipping."
+fi 
+
+
 

@@ -1,9 +1,17 @@
-/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/etc/conda/activate.d/activate-binutils_linux-64.sh: line 67: HOST: unbound variable
-+ Rscript /well/lindgren/flassen/software/dev/SAIGE/extdata/step2_SPAtests.R --vcfFile=derived/knockouts/all/ptvs_damaging_missense/ukb_wes_200k_maf002_miss005_ptv_chr1_ko.vcf.bgz --vcfFileIndex=.csi --vcfField=DS --chrom=22 --minMAF=0.00001 --minMAC=1 --GMMATmodelFile=derived/saige/binary/step1/ukb_wes_200k_colorectal_cancer.rda --varianceRatioFile=derived/saige/binary/step1/ukb_wes_200k_colorectal_cancer.varianceRatio.txt --SAIGEOutputFile=derived/saige/binary/step2/ukb_wes_200k_colorectal_cancer_22 --numLinesOutput=2 --IsOutputAFinCaseCtrl=TRUE --IsOutputNinCaseCtrl=TRUE --IsOutputHetHomCountsinCaseCtrl=TRUE
+derived/saige/binary/step2/ukb_wes_200k_colorectal_cancer_22 already exists. Skipping. (job id: 54445771.22 Fri Sep 24 10:38:30 BST 2021)
++ Rscript /well/lindgren/flassen/software/dev/SAIGE/extdata/step2_SPAtests.R --vcfFile=derived/knockouts/all/ptvs_damaging_missense/ukb_wes_200k_maf002_miss005_ptv_chr1_ko.vcf.bgz --vcfFileIndex=.csi --vcfField=DS --chrom=22 --minMAF=0.00001 --minMAC=1 --GMMATmodelFile=derived/saige/binary/step1/wes_200k_colorectal_cancer.rda --varianceRatioFile=derived/saige/binary/step1/wes_200k_colorectal_cancer.varianceRatio.txt --SAIGEOutputFile=derived/saige/binary/step2/wes_200k_colorectal_cancer_chr22 --numLinesOutput=2 --IsOutputAFinCaseCtrl=TRUE --IsOutputNinCaseCtrl=TRUE --IsOutputHetHomCountsinCaseCtrl=TRUE --LOCO=FALSE
+Error in SPAGMMATtest(vcfFile = opt$vcfFile, vcfFileIndex = opt$vcfFileIndex,  : 
+  ERROR! GMMATmodelFile derived/saige/binary/step1/wes_200k_colorectal_cancer.rda does not exsit
+Execution halted
++ set +x
++ Rscript /well/lindgren/flassen/software/dev/SAIGE/extdata/step2_SPAtests.R --vcfFile=derived/knockouts/all/ptvs_damaging_missense/ukb_wes_200k_maf002_miss005_ptv_chr1_ko.vcf.bgz --vcfFileIndex=.csi --vcfField=DS --chrom=22 --minMAF=0.00001 --minMAC=1 --GMMATmodelFile=derived/saige/binary/step1/ukb_wes_200k_colorectal_cancer.rda --varianceRatioFile=derived/saige/binary/step1/ukb_wes_200k_colorectal_cancer.varianceRatio.txt --SAIGEOutputFile=derived/saige/binary/step2/ukb_wes_200k_colorectal_cancer_chr22 --numLinesOutput=2 --IsOutputAFinCaseCtrl=TRUE --IsOutputNinCaseCtrl=TRUE --IsOutputHetHomCountsinCaseCtrl=TRUE --LOCO=FALSE
 Garbage collection 16 = 9+2+5 (level 2) ... 
 85.1 Mbytes of cons cells used (59%)
 76.0 Mbytes of vectors used (68%)
-Error in SPAGMMATtest(vcfFile = opt$vcfFile, vcfFileIndex = opt$vcfFileIndex,  : 
-  LOCO is TRUE but the null model file .rda does not contain LOCO results. In order to apply Leave-one-chromosome-out, please run Step 1 using LOCO. Otherwise, please set LOCO=FALSE in this step (Step 2).
+WARNING: Open VCF failed
+Warning: missing FMT field (DS)
+Error in if (markerInfo >= 0 & markerInfo <= 1) { : 
+  argument is of length zero
+Calls: SPAGMMATtest
 Execution halted
 + set +x

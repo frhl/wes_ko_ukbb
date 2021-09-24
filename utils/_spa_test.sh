@@ -28,7 +28,7 @@ readonly step1_fitNULLGLMM="/well/lindgren/flassen/software/dev/SAIGE/extdata/st
 readonly step2_SPAtests="/well/lindgren/flassen/software/dev/SAIGE/extdata/step2_SPAtests.R"
 
 # out prefix
-readonly out="${out_prefix}_${chr}"
+readonly out="${out_prefix}_chr${chr}"
 
 spa_test() {
    SECONDS=0
