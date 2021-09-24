@@ -120,3 +120,5 @@ Loading required package: optparse
 Loading required package: optparse
 
 error: inv_sympd(): matrix is singular or not positive definite
+
+error: inv_sympd(): matrix is singular or not positive definite

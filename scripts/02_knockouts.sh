@@ -7,13 +7,14 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 10
 #$ -q short.qe
-#$ -t 1-22
+#$ -t 22
 
 set -o errexit
 set -o nounset
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
+source utils/vcf_utils.sh
 
 # directories
 readonly in_dir="data/mt"
@@ -47,13 +48,16 @@ python3 "${hail_script}" \
     --maf_max 0.02 \
     --missing 0.05 \
     --out_prefix ${out_prefix} \
-    --export_burden \
-    --export_ko_probability \
-    --export_ko_rsid \
     --export_fake_vcf
+    #--export_burden \
+    #--export_ko_probability \
+    #--export_ko_rsid \
 
 print_update "Finished running HAIL for chr${chr}" "${SECONDS}"
 
+# index with csi
+module load BCFtools/1.12-GCC-10.3.0
+make_tabix "${out_prefix}_ko.vcf.bgz" "csi"
 
 
 
