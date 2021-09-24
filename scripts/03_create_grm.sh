@@ -18,7 +18,7 @@ source utils/hail_utils.sh
 # paths for hail script
 readonly out_dir="data/saige/grm/input/eur_ukbb"
 readonly out_prefix="${out_dir}/ukb_imp_eur_wes_chr1_22_sparse_markers"
-readonly hail_script="utils/create_grm_input.py"
+readonly hail_script="utils/subscripts/create_grm_input.py"
 readonly spark_dir="data/tmp/spark"
 readonly threads=$(( ${NSLOTS}-1 ))
 readonly createSparseGRM="/well/lindgren/flassen/software/dev/SAIGE/extdata/createSparseGRM.R"

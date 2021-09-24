@@ -28,11 +28,12 @@ readonly in_vcf="${vcf_dir}/ukb_wes_200k_maf002_miss005_ptv_chr${chr}_ko.vcf.bgz
 readonly in_csi="${vcf}.csi"
 readonly pheno_file="${pheno_dir}/UKBB_WES200k_filtered_binary_phenotypes.tsv"
 readonly spa_script="utils/_spa_test.sh"
+readonly pyscript="utils/subscripts/extract_phenos_from_header"
 
 # select phenotype (1-42)
 set_up_hail
 set_up_pythonpath
-phenotype=$( python utils/extract_phenos_from_header.py \
+phenotype=$( python ${pyscript} \
     --input ${pheno_file} \
     --index ${SGE_TASK_ID})
 

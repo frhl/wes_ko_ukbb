@@ -23,7 +23,7 @@ readonly spark_dir="data/tmp/spark"
 readonly out_dir="derived/ptvs_only"
 
 # hail script
-readonly hail_script="utils/hail_export.py"
+readonly hail_script="utils/subscripts/hail_export.py"
 
 # input path
 readonly chr=${SGE_TASK_ID}

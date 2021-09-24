@@ -34,11 +34,12 @@ readonly grm_sam="${grm_dir}/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutof
 readonly plink_file="${plink_dir}/ukb_imp_eur_chr1_22_sparse_markers"
 readonly pheno_file="${pheno_dir}/UKBB_WES200k_filtered_binary_phenotypes.tsv"
 readonly covar_file="${covar_dir}/COVARS1.csv"
+readonly pyscript="utils/subscript/extract_phenos_from_header.py"
 
 # select covars and phenotype (0-42)
 set_up_pythonpath
 covariates=$( cat ${covar_file} )
-phenotype=$( python utils/extract_phenos_from_header.py \
+phenotype=$( python ${pyscript} \
     --input ${pheno_file} \
     --index ${SGE_TASK_ID})
 

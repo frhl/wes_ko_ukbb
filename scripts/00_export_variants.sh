@@ -23,7 +23,7 @@ readonly in="${in_dir}/ukb_wes_200k_filtered_chr${chr}.vcf.bgz"
 readonly out_dir="data/variants" 
 readonly out="${out_dir}/ukb_wes_200_chr${chr}" 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script='utils/hail_export_rows.sh'
+readonly hail_script='utils/subscripts/hail_export_rows.sh'
 readonly vep_dir="data/vep/full/"
 readonly vep="${vep_dir}/ukb_wes_200k_full_vep_chr${chr}.vcf"
 
