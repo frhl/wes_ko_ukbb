@@ -5,9 +5,9 @@
 #$ -o logs/step1_saige.log
 #$ -e logs/step1_saige.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 4
+#$ -pe shmem 8
 #$ -q short.qe
-#$ -t 1-10
+#$ -t 1-42
 
 
 module purge
@@ -71,7 +71,7 @@ fit_null() {
    print_update "Finished fitting null model for ${phenotype}" "$duration"
 }
 
-if [ ! -f ${out}.rda ]; then
+if [ ! -f ${out_prefix}* ]; then
    set_up_RSAIGE
    fit_null
 else

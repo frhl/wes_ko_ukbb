@@ -139,7 +139,7 @@ def gene_csqs_dosage_builder(in_mt):
            .when( (ht.s0) & (ht.s1 == False), 1)
            .when( (ht.s1) & (ht.s0 == False), 1)
            .default(0))
-    ht = ht.annotate_entries(DT = expr)
+    ht = ht.annotate_entries(DS = expr)
     ht = ht.drop('s0').drop('s1').drop('hom_var')    
     return ht
 
@@ -189,12 +189,12 @@ def gene_burden_category_annotations_per_sample(mt):
 
 def calc_p_ko(mt):
     '''Annotates entries with P(Knockout). Requires, that fields are
-       already annotated with "singletons" count, and "DT". '''
+       already annotated with "singletons" count, and "DS". '''
     ko_mt = mt.annotate_entries(
         pKO = hl.if_else(
-            mt.DT == 2, 1, # knockout
+            mt.DS == 2, 1, # knockout
             hl.if_else(
-                mt.DT == 1, 
+                mt.DS == 1, 
                 hl.if_else(mt.singletons >= 1, 1 - (1/2)**mt.singletons, 0), # one phased hetz
                 hl.if_else(mt.singletons >= 2, 1 - 2*(1/2)**mt.singletons, 0), # zero phased hetz
             )
@@ -202,7 +202,7 @@ def calc_p_ko(mt):
     )
     return ko_mt
 
-def gene_csqs_calc_pKO(mt_phased, mt_unphased, fields_drop = ['DT','singletons']):
+def gene_csqs_calc_pKO(mt_phased, mt_unphased, fields_drop = ['DS','singletons']):
     '''Annotates entries with P(Knockout). Requires a phased matrix and an unphased matrix that only contains singletons.'''
     
     # setup variables
@@ -230,8 +230,8 @@ def gene_csqs_calc_pKO_pseudoSNP(mt1, mt2, chrom):
     # mt2 is unphased
 
     # get probability matrix
-    pmt = gene_csqs_calc_pKO(mt1, mt2, ["DT","singletons"])
-    pmt = pmt.annotate_entries(DT = pmt.pKO*2) # multiply probability by 2 (dosage encoded [0:2])
+    pmt = gene_csqs_calc_pKO(mt1, mt2, ["DS","singletons"])
+    pmt = pmt.annotate_entries(DS = pmt.pKO*2) # multiply probability by 2 (dosage encoded [0:2])
     pmt = pmt.drop('pKO')
 
     # create fake loci
