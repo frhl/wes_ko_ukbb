@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N knockout_l
+#$ -N knockout
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/knockout_l.log
-#$ -e logs/knockout_l.errors.log
+#$ -o logs/knockout.log
+#$ -e logs/knockout.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 10
 #$ -q short.qe
@@ -20,7 +20,7 @@ source utils/vcf_utils.sh
 readonly in_dir="data/mt"
 readonly vep_dir="data/vep/full/"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/ptvs_only"
+readonly out_dir="derived/knockouts/all/ptvs_only"
 
 # hail script
 readonly hail_script="utils/subscripts/hail_export.py"

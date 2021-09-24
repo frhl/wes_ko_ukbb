@@ -122,3 +122,9 @@ Loading required package: optparse
 error: inv_sympd(): matrix is singular or not positive definite
 
 error: inv_sympd(): matrix is singular or not positive definite
+
+error: inv_sympd(): matrix is singular or not positive definite
+Warning message:
+glm.fit: fitted probabilities numerically 0 or 1 occurred 
+
+error: inv_sympd(): matrix is singular or not positive definite

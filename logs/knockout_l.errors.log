@@ -77,3 +77,26 @@ LOGGING: writing to logs/hail/knockout.log
 2021-09-24 11:36:19 Hail: INFO: while writing:
     derived/ptvs_only/ukb_wes_200k_maf002_miss005_ptv_chr22_ko.vcf.bgz
   merge time: 17.632ms
+/var/spool/default/compe006/job_scripts/54445877: line 16: utils/hail_utils.sh: No such file or directory
+/var/spool/default/compe083/job_scripts/54445877: line 16: utils/hail_utils.sh: No such file or directory
+/var/spool/default/compe076/job_scripts/54445877: line 16: utils/hail_utils.sh: No such file or directory
+/var/spool/default/compe001/job_scripts/54445877: line 16: utils/hail_utils.sh: No such file or directory
+/var/spool/default/compe088/job_scripts/54445877: line 16: utils/hail_utils.sh: No such file or directory
+/var/spool/default/compe055/job_scripts/54445877: line 16: utils/hail_utils.sh: No such file or directory
+/var/spool/default/compe052/job_scripts/54445877: line 16: utils/hail_utils.sh: No such file or directory
+/var/spool/default/compe045/job_scripts/54445877: line 16: utils/hail_utils.sh: No such file or directory
+/var/spool/default/compe047/job_scripts/54445877: line 16: utils/hail_utils.sh: No such file or directory
+/var/spool/default/compe059/job_scripts/54445877: line 16: utils/hail_utils.sh: No such file or directory
+/var/spool/default/compe090/job_scripts/54445877: line 16: utils/hail_utils.sh: No such file or directory
+/var/spool/default/compe085/job_scripts/54445877: line 16: utils/hail_utils.sh: No such file or directory
+/var/spool/default/compe063/job_scripts/54445877: line 16: utils/hail_utils.sh: No such file or directory
+/var/spool/default/compe092/job_scripts/54445877: line 16: utils/hail_utils.sh: No such file or directory
+/var/spool/default/compe072/job_scripts/54445877: line 16: utils/hail_utils.sh: No such file or directory
+/var/spool/default/compe094/job_scripts/54445877: line 16: utils/hail_utils.sh: No such file or directory
+/var/spool/default/compe087/job_scripts/54445877: line 16: utils/hail_utils.sh: No such file or directory
+/var/spool/default/compe058/job_scripts/54445877: line 16: utils/hail_utils.sh: No such file or directory
+/var/spool/default/compe089/job_scripts/54445877: line 16: utils/hail_utils.sh: No such file or directory
+/var/spool/default/compe048/job_scripts/54445877: line 16: utils/hail_utils.sh: No such file or directory
+/var/spool/default/compe076/job_scripts/54445877: line 16: utils/hail_utils.sh: No such file or directory
+/var/spool/default/compe045/job_scripts/54445877: line 16: utils/hail_utils.sh: No such file or directory
+/var/spool/default/compe052/job_scripts/54445881: line 16: utils/hail_utils.sh: No such file or directory
