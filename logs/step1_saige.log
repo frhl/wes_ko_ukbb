@@ -36822,3 +36822,140 @@ t_end_null - t_begin, fitting the NULL model without LOCO took
 14488.454    83.115  2268.072 
 iter from getPCG1ofSigmaAndVector 4
 iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+t_end_fitglmmaiRPCG - t_begin_fitglmmaiRPCG
+    user   system  elapsed 
+1292.252   12.632  184.279 
+[1] 0.00000000 0.03872713
+tau:  1 0.681947 
+tau0:  1 0.7377004 
+
+Iteration  8 1 0.681947 :
+tau0_v1:  1 0.681947 
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 4
+t_end_fitglmmaiRPCG - t_begin_fitglmmaiRPCG
+    user   system  elapsed 
+4928.732   20.543  706.292 
+[1] 0.0000000 0.2143789
+tau:  1 0.1600667 
+tau0:  1 0.1000216 
+
+Iteration  2 1 0.1600667 :
+tau0_v1:  1 0.1600667 
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 4
+t_end_fitglmmaiRPCG - t_begin_fitglmmaiRPCG
+    user   system  elapsed 
+4948.022   17.602  709.011 
+[1] 0.0000000 0.3433232
+tau:  1 0.2151103 
+tau0:  1 0.100044 
+
+Iteration  2 1 0.2151103 :
+tau0_v1:  1 0.2151103 
+pcg did not converge. You may increase maxiter number.
+iter from getPCG1ofSigmaAndVector 500
+t1_Rinv_1 is  3.696374e+15 
+Nglmm  9.822757e+13 
+     user    system   elapsed 
+14852.519    65.588  2335.010 
+t_end - t_begin, fitting the NULL model took
+     user    system   elapsed 
+14844.210    61.755  2320.239 
+Start estimating variance ratios
+iter from getPCG1ofSigmaAndVector 2
+
+Family: binomial 
+Link function: logit 
+
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 4
+Tau:
+[1] 1.0000000 0.1764276
+Fixed-effect coefficients:
+              [,1]
+ [1,]  2.845409393
+ [2,]  0.801830769
+ [3,] -0.057328459
+ [4,]  0.102431737
+ [5,] -0.003998049
+ [6,]  0.003200968
+ [7,] -0.001249535
+ [8,] -0.048164759
+ [9,]  0.114036784
+[10,]  0.035474110
+[11,]  0.006474700
+[12,]  0.030967997
+[13,]  0.155452147
+[14,]  0.048331019
+t_end_Get_Coef - t_begin_Get_Coef
+    user   system  elapsed 
+2099.761    3.599  301.419 
+iter from getPCG1ofSigmaAndVector 3
+t_end_fitglmmaiRPCG - t_begin_fitglmmaiRPCG
+    user   system  elapsed 
+3767.479   17.372  539.440 
+[1] 0.00000000 0.02025201
+tau:  1 0.3146515 
+tau0:  1 0.3017628 
+
+Iteration  3 1 0.3146515 :
+tau0_v1:  1 0.3146515 
