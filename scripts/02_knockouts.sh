@@ -20,7 +20,7 @@ source utils/vcf_utils.sh
 readonly in_dir="data/mt"
 readonly vep_dir="data/vep/full/"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/knockouts/all/ptvs_damaging_missense_vcfs"
+readonly out_dir="derived/knockouts/all/210924_synonymous"
 
 # hail script
 readonly hail_script="utils/subscripts/hail_export.py"
@@ -44,14 +44,14 @@ python3 "${hail_script}" \
     --input_unphased_path ${in_unphased} \
     --input_phased_type "mt" \
     --input_unphased_type "mt" \
-    --vep_filter "ptv" "damaging_missense" \
+    --vep_filter "synonymous" \
     --maf_max 0.02 \
     --missing 0.05 \
     --out_prefix ${out_prefix} \
     --export_fake_vcf
-    #--export_burden \
-    #--export_ko_probability \
-    #--export_ko_rsid \
+    --export_burden \
+    --export_ko_probability \
+    --export_ko_rsid \
 
 print_update "Finished running HAIL for chr${chr}" "${SECONDS}"
 

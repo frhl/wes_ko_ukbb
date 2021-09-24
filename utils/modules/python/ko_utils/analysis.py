@@ -69,7 +69,7 @@ def annotate_dbnsfp(mt, vep_path):
 
 def filter_vep(mt, field, conds):
     r'''Filter VEP field by condition(s) '''
-    mt = mt.filter_rows(hl.literal(set(conds)).contains(mt.vep.worst_csq_by_gene_canonical[field]))
+    mt = mt.filter_rows(hl.literal(set(conds)).contains(mt.vep[field]))
     return mt
 
 
