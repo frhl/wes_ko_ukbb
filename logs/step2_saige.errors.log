@@ -1,0 +1,66 @@
+/var/spool/default/compe094/job_scripts/54445316: line 28: set_up_pythonpath: command not found
+Traceback (most recent call last):
+  File "utils/extract_phenos_from_header.py", line 3, in <module>
+    from ko_utils import phenos
+ImportError: No module named ko_utils
+/var/spool/default/compe094/job_scripts/54445316: line 41: qsub: command not found
+mkdir: missing operand
+Try 'mkdir --help' for more information.
+utils/bash_utils.sh: line 95: spark_dir: unbound variable
+/var/spool/default/compe076/job_scripts/54445629: line 30: set_up_pythonpath: command not found
+/var/spool/default/compe076/job_scripts/54445629: line 33: pheno_file: unbound variable
+/var/spool/default/compe076/job_scripts/54445629: line 43: pheno: unbound variable
+/var/spool/default/compe094/job_scripts/54445632: line 46: pheno: unbound variable
+/var/spool/default/compe076/job_scripts/54445634: line 46: qsub: command not found
++ qsub -N _spa_colorectal_cancer -V -t 22 -q e -pe shmem 2 utils/_spa_test.sh colorectal_cancer derived/knockouts/all/ptvs_damaging_missense/ukb_wes_200k_maf002_miss005_ptv_chr1_ko.vcf.bgz .csi derived/saige/binary/step1/ukb_wes_200k_colorectal_cancer.rda derived/saige/binary/step1/ukb_wes_200k_colorectal_cancer.varianceRatio.txt derived/saige/binary/step2/ukb_wes_200k_colorectal_cancer
+/var/spool/default/compe001/job_scripts/54445652: line 47: qsub: command not found
++ echo '[colorectal_cancer]: SPA job submitted.'
++ qsub -N _spa_colorectal_cancer -t 22 -q e -pe shmem 2 utils/_spa_test.sh colorectal_cancer derived/knockouts/all/ptvs_damaging_missense/ukb_wes_200k_maf002_miss005_ptv_chr1_ko.vcf.bgz .csi derived/saige/binary/step1/ukb_wes_200k_colorectal_cancer.rda derived/saige/binary/step1/ukb_wes_200k_colorectal_cancer.varianceRatio.txt derived/saige/binary/step2/ukb_wes_200k_colorectal_cancer
+Unable to run job: Job was rejected because job requests unknown queue "e".
+Exiting.
++ echo '[colorectal_cancer]: SPA job submitted.'
++ qsub -N _spa_colorectal_cancer -t 22 -q short.qe -pe shmem 2 utils/_spa_test.sh colorectal_cancer derived/knockouts/all/ptvs_damaging_missense/ukb_wes_200k_maf002_miss005_ptv_chr1_ko.vcf.bgz .csi derived/saige/binary/step1/ukb_wes_200k_colorectal_cancer.rda derived/saige/binary/step1/ukb_wes_200k_colorectal_cancer.varianceRatio.txt derived/saige/binary/step2/ukb_wes_200k_colorectal_cancer
++ echo '[colorectal_cancer]: SPA job submitted.'
+/var/spool/default/compe045/job_scripts/54445657: line 25: 8: Error: Missing arg5 (path prefix for saige output)
++ qsub -N _spa_colorectal_cancer -t 22 -q short.qe -pe shmem 2 utils/_spa_test.sh colorectal_cancer derived/knockouts/all/ptvs_damaging_missense/ukb_wes_200k_maf002_miss005_ptv_chr1_ko.vcf.bgz .csi derived/saige/binary/step1/ukb_wes_200k_colorectal_cancer.rda derived/saige/binary/step1/ukb_wes_200k_colorectal_cancer.varianceRatio.txt derived/saige/binary/step2/ukb_wes_200k_colorectal_cancer
++ echo '[colorectal_cancer]: SPA job submitted.'
+
+CommandNotFoundError: Your shell has not been properly configured to use 'conda activate'.
+To initialize your shell, run
+
+    $ conda init <SHELL_NAME>
+
+Currently supported shells are:
+  - bash
+  - fish
+  - tcsh
+  - xonsh
+  - zsh
+  - powershell
+
+See 'conda init --help' for more information and options.
+
+IMPORTANT: You may need to close and restart your shell after running 'conda init'.
+
+
++ qsub -N _spa_colorectal_cancer -t 22 -q short.qe -pe shmem 2 utils/_spa_test.sh colorectal_cancer derived/knockouts/all/ptvs_damaging_missense/ukb_wes_200k_maf002_miss005_ptv_chr1_ko.vcf.bgz .csi derived/saige/binary/step1/ukb_wes_200k_colorectal_cancer.rda derived/saige/binary/step1/ukb_wes_200k_colorectal_cancer.varianceRatio.txt derived/saige/binary/step2/ukb_wes_200k_colorectal_cancer
++ echo '[colorectal_cancer]: SPA job submitted.'
+
+CommandNotFoundError: Your shell has not been properly configured to use 'conda activate'.
+To initialize your shell, run
+
+    $ conda init <SHELL_NAME>
+
+Currently supported shells are:
+  - bash
+  - fish
+  - tcsh
+  - xonsh
+  - zsh
+  - powershell
+
+See 'conda init --help' for more information and options.
+
+IMPORTANT: You may need to close and restart your shell after running 'conda init'.
+
+

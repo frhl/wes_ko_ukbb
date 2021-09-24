@@ -17666,3 +17666,866 @@ iter from getPCG1ofSigmaAndVector 3
 iter from getPCG1ofSigmaAndVector 3
 iter from getPCG1ofSigmaAndVector 3
 iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+t_end_fitglmmaiRPCG - t_begin_fitglmmaiRPCG
+    user   system  elapsed 
+2935.228    6.296  980.031 
+[1] 0.00000000 0.09315671
+tau:  1 0.5395272 
+tau0:  1 0.6524291 
+
+Iteration  14 1 0.5395272 :
+tau0_v1:  1 0.5395272 
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+Tau:
+[1] 1.0000000 0.5395272
+Fixed-effect coefficients:
+             [,1]
+ [1,]  6.97987795
+ [2,]  1.67664814
+ [3,] -0.03567524
+ [4,]  0.06664904
+ [5,]  0.04166278
+ [6,] -0.03475870
+ [7,] -0.08337848
+ [8,]  0.08140990
+ [9,] -0.14878587
+[10,]  0.19613455
+[11,]  0.10046936
+[12,]  0.04928397
+[13,]  0.12904513
+[14,] -0.01200338
+t_end_Get_Coef - t_begin_Get_Coef
+    user   system  elapsed 
+1057.996    0.247  353.547 
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+t_end_fitglmmaiRPCG - t_begin_fitglmmaiRPCG
+    user   system  elapsed 
+2873.561    6.196  959.325 
+[1] 0.0000000 0.0216283
+tau:  1 0.5162598 
+tau0:  1 0.5395272 
+
+Iteration  15 1 0.5162598 :
+tau0_v1:  1 0.5162598 
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+Tau:
+[1] 1.0000000 0.5162598
+Fixed-effect coefficients:
+             [,1]
+ [1,]  6.97993851
+ [2,]  1.67674839
+ [3,] -0.03567167
+ [4,]  0.06665758
+ [5,]  0.04164506
+ [6,] -0.03474515
+ [7,] -0.08339405
+ [8,]  0.08144222
+ [9,] -0.14877476
+[10,]  0.19615991
+[11,]  0.10047592
+[12,]  0.04927249
+[13,]  0.12906046
+[14,] -0.01197752
+t_end_Get_Coef - t_begin_Get_Coef
+    user   system  elapsed 
+1069.676    0.282  357.497 
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+t_end_fitglmmaiRPCG - t_begin_fitglmmaiRPCG
+    user   system  elapsed 
+2890.973    6.080  965.119 
+[1] 0.00000000 0.08720263
+tau:  1 0.6168106 
+tau0:  1 0.5162598 
+
+Iteration  16 1 0.6168106 :
+tau0_v1:  1 0.6168106 
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+Tau:
+[1] 1.0000000 0.6168106
+Fixed-effect coefficients:
+             [,1]
+ [1,]  6.98005056
+ [2,]  1.67623854
+ [3,] -0.03568249
+ [4,]  0.06659604
+ [5,]  0.04173021
+ [6,] -0.03481203
+ [7,] -0.08330724
+ [8,]  0.08126865
+ [9,] -0.14878677
+[10,]  0.19602847
+[11,]  0.10044887
+[12,]  0.04934629
+[13,]  0.12892143
+[14,] -0.01209446
+t_end_Get_Coef - t_begin_Get_Coef
+    user   system  elapsed 
+1092.077    0.235  364.937 
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+t_end_fitglmmaiRPCG - t_begin_fitglmmaiRPCG
+    user   system  elapsed 
+2921.018    6.184  975.055 
+[1] 0.00000000 0.04395339
+tau:  1 0.6744447 
+tau0:  1 0.6168106 
+
+Iteration  17 1 0.6744447 :
+tau0_v1:  1 0.6744447 
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+Tau:
+[1] 1.0000000 0.6744447
+Fixed-effect coefficients:
+             [,1]
+ [1,]  6.98019409
+ [2,]  1.67586482
+ [3,] -0.03568586
+ [4,]  0.06654894
+ [5,]  0.04178040
+ [6,] -0.03485032
+ [7,] -0.08324741
+ [8,]  0.08115385
+ [9,] -0.14877596
+[10,]  0.19593568
+[11,]  0.10042827
+[12,]  0.04939598
+[13,]  0.12883349
+[14,] -0.01216389
+t_end_Get_Coef - t_begin_Get_Coef
+    user   system  elapsed 
+1104.336    0.236  369.048 
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+t_end_fitglmmaiRPCG - t_begin_fitglmmaiRPCG
+    user   system  elapsed 
+2900.209    6.158  968.135 
+[1] 0.00000000 0.03171485
+tau:  1 0.6323651 
+tau0:  1 0.6744447 
+
+Iteration  18 1 0.6323651 :
+tau0_v1:  1 0.6323651 
+iter from getPCG1ofSigmaAndVector 4
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+Tau:
+[1] 1.0000000 0.6323651
+Fixed-effect coefficients:
+             [,1]
+ [1,]  6.98005772
+ [2,]  1.67607939
+ [3,] -0.03568281
+ [4,]  0.06657844
+ [5,]  0.04174351
+ [6,] -0.03482126
+ [7,] -0.08328716
+ [8,]  0.08123161
+ [9,] -0.14877839
+[10,]  0.19599542
+[11,]  0.10043973
+[12,]  0.04935978
+[13,]  0.12889048
+[14,] -0.01211424
+t_end_Get_Coef - t_begin_Get_Coef
+    user   system  elapsed 
+1063.549    0.269  355.457 
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+t_end_fitglmmaiRPCG - t_begin_fitglmmaiRPCG
+    user   system  elapsed 
+2857.276    6.272  953.955 
+[1] 0.00000000 0.06423961
+tau:  1 0.5548162 
+tau0:  1 0.6323651 
+
+Iteration  19 1 0.5548162 :
+tau0_v1:  1 0.5548162 
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+Tau:
+[1] 1.0000000 0.5548162
+Fixed-effect coefficients:
+             [,1]
+ [1,]  6.97998762
+ [2,]  1.67658961
+ [3,] -0.03567538
+ [4,]  0.06663538
+ [5,]  0.04167695
+ [6,] -0.03477088
+ [7,] -0.08336160
+ [8,]  0.08137906
+ [9,] -0.14878167
+[10,]  0.19611238
+[11,]  0.10046568
+[12,]  0.04929946
+[13,]  0.12901185
+[14,] -0.01202196
+t_end_Get_Coef - t_begin_Get_Coef
+    user   system  elapsed 
+1045.310    0.261  349.333 
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 2
+t_end_fitglmmaiRPCG - t_begin_fitglmmaiRPCG
+    user   system  elapsed 
+2894.828    6.206  966.352 
+[1] 0.00000000 0.00497831
+tau:  1 0.5492204 
+tau0:  1 0.5548162 
+
+Final  1 0.5492204 :
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+Tau:
+[1] 1.0000000 0.5492204
+Fixed-effect coefficients:
+             [,1]
+ [1,]  6.97991848
+ [2,]  1.67652333
+ [3,] -0.03567402
+ [4,]  0.06663398
+ [5,]  0.04167068
+ [6,] -0.03476359
+ [7,] -0.08336270
+ [8,]  0.08138365
+ [9,] -0.14877322
+[10,]  0.19610499
+[11,]  0.10046154
+[12,]  0.04929365
+[13,]  0.12901577
+[14,] -0.01201590
+t_end_null - t_begin, fitting the NULL model without LOCO took
+     user    system   elapsed 
+81645.686   150.306 27435.463 
+pcg did not converge. You may increase maxiter number.
+iter from getPCG1ofSigmaAndVector 500
+t1_Rinv_1 is  4.467848e+17 
+Nglmm  4.93184e+15 
+     user    system   elapsed 
+93622.048   153.478 31449.751 
+t_end - t_begin, fitting the NULL model took
+     user    system   elapsed 
+93613.032   151.212 31437.981 
+Start estimating variance ratios
+
+Family: binomial 
+Link function: logit 
+
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+sparse GRM will be used
+sparse GRM has been specified
+read in sparse GRM from  data/saige/grm/input/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx 
+length(sparseGRMSampleID$IndexGRM):  458841 
+nrow(sparseGRMSampleID):  458841 
+110939  samples have been used to fit the glmm null model
+[1] 110939      3
+          IID IndexInModel IndexGRM
+62725 3836967            1        6
+66103 3989903            2       20
+4180  1187038            3       22
+98896 5483168            4       33
+47203 3133758            5       67
+48226 3179667            6       91
+write sparse Sigma to  derived/saige/binary/step1/ukb_wes_200k_Alzheimers_disease.varianceRatio.txt_relatednessCutoff_0.125_2000_randomMarkersUsed.sparseSigma.mtx 
+Only one variance ratio will be estimated using randomly selected markers with MAC >= 20
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+iter from getPCG1ofSigmaAndVector 3
+48886 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.029   0.030   0.015 
+31271 th marker
+G0 0 1 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.016   0.005   0.006 
+43060 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.012   0.008   0.005 
+71295 th marker
+G0 1 1 1 1 1 2 2 2 2 1 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.016   0.018   0.009 
+68513 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.009   0.011   0.005 
+42301 th marker
+G0 0 0 0 0 0 0 1 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.013   0.010   0.006 
+54245 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.010   0.012   0.005 
+66836 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.009   0.011   0.005 
+78391 th marker
+G0 0 0 1 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.009   0.014   0.006 
+82470 th marker
+G0 1 0 1 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.014   0.006   0.005 
+[1] "OK"
+[1] "OK1"
+65723 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.011   0.010   0.005 
+73218 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.011   0.011   0.006 
+26334 th marker
+G0 0 0 0 1 0 0 0 0 1 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.011   0.009   0.005 
+9402 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.007   0.017   0.006 
+73275 th marker
+G0 0 0 0 0 0 0 1 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.070   0.074   0.036 
+60406 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.014   0.006   0.005 
+28162 th marker
+G0 1 1 1 1 1 1 1 0 2 2 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.011   0.010   0.005 
+74702 th marker
+G0 1 1 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.007   0.013   0.005 
+6679 th marker
+G0 2 1 2 2 2 2 2 1 1 1 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.014   0.008   0.005 
+76518 th marker
+G0 0 0 0 0 0 0 0 0 1 1 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.010   0.010   0.005 
+[1] "OK"
+[1] "OK1"
+80542 th marker
+G0 0 0 0 0 0 1 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.011   0.008   0.005 
+21364 th marker
+G0 0 0 0 0 0 1 0 1 1 1 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.007   0.016   0.005 
+49564 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.013   0.010   0.006 
+65073 th marker
+G0 2 2 0 0 2 0 0 1 1 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.006   0.015   0.005 
+47020 th marker
+G0 0 0 0 1 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.011   0.009   0.005 
+79919 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.010   0.010   0.005 
+51600 th marker
+G0 2 2 2 0 1 2 1 1 2 1 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.011   0.010   0.005 
+83088 th marker
+G0 0 0 0 1 0 0 0 0 1 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.012   0.008   0.005 
+77557 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.010   0.017   0.007 
+45514 th marker
+G0 0 0 0 0 0 0 0 0 0 0 
+iter from getPCG1ofSigmaAndVector 2
+t1
+t1again
+[1] "pcginvSigma"
+t2-t1
+   user  system elapsed 
+  0.008   0.012   0.005 
+[1] "OK"
+[1] "OK1"
+[1] "OK2"
+CV for variance ratio estimate using  30  markers is  5.836513e-06  <  0.001 
+varRatio 0.9979222 
+[1] 0.9979222
+          [,1]
+[1,] 0.9979222
+          [,1]
+[1,] 0.9979222
+[1] "derived/saige/binary/step1/ukb_wes_200k_Alzheimers_disease.varianceRatio.txt"
+         V1
+1 0.9979222
+closed the plinkFile!

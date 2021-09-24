@@ -9,22 +9,28 @@
 #$ -pe shmem 1
 #$ -q short.qe
 #$ -t 1
+#$ -V
 
 module purge
 source utils/bash_utils.sh
+source utils/hail_utils.sh
 
 # directories
 readonly vcf_dir="derived/knockouts/all/ptvs_damaging_missense"
 readonly step1_dir="derived/saige/binary/step1"
 readonly out_dir="derived/saige/binary/step2"
+readonly pheno_dir="/well/lindgren/UKBIOBANK/dpalmer/ukb_wes_phenotypes/200k"
+readonly spark_dir="data/tmp/spark"
 
 # input path
 readonly chr=${SGE_TASK_ID}
 readonly in_vcf="${vcf_dir}/ukb_wes_200k_maf002_miss005_ptv_chr${chr}_ko.vcf.bgz"
 readonly in_csi="${vcf}.csi"
+readonly pheno_file="${pheno_dir}/UKBB_WES200k_filtered_binary_phenotypes.tsv"
 readonly spa_script="utils/_spa_test.sh"
 
 # select phenotype (1-42)
+set_up_hail
 set_up_pythonpath
 phenotype=$( python utils/extract_phenos_from_header.py \
     --input ${pheno_file} \
@@ -38,9 +44,10 @@ readonly in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
 readonly out_prefix="${out_dir}/ukb_wes_200k_${phenotype}"
 
 submit_spa_job() {
-  qsub -N "_spa_${pheno}" \
+  #set -x
+  qsub -N "_spa_${phenotype}" \
     -t 22 \
-    -q e \
+    -q "short.qe" \
     -pe shmem 2 \
     ${spa_script} \
     ${phenotype} \
