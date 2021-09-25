@@ -89,7 +89,7 @@ def gene_csqs_case_builder(in_mt):
     "CH+HO": two alternate allele on either strand in a locus (either as homozygous or compound heterozygous)
     '''
     # create one gene_id for each item in gene_id array
-    in_mt = in_mt.explode_rows(in_mt.vep.worst_csq_by_gene_canonical)
+    #in_mt = in_mt.explode_rows(in_mt.vep.worst_csq_by_gene_canonical)
     # get all snps that are not homozygous
     mt = in_mt
     mt = annotate_phased_entries(mt)
@@ -120,7 +120,7 @@ def gene_csqs_dosage_builder(in_mt):
     2: two alternate allele on either strand in a locus (either as homozygous or compound heterozygous)
     '''
     # create one gene_id for each item in gene_id array
-    in_mt = in_mt.explode_rows(in_mt.vep.worst_csq_by_gene_canonical)
+    #in_mt = in_mt.explode_rows(in_mt.vep.worst_csq_by_gene_canonical)
     # get all snps that are not homozygous
     mt = in_mt
     mt = annotate_phased_entries(mt)
@@ -145,7 +145,7 @@ def gene_csqs_dosage_builder(in_mt):
 
 def count_alleles(mt):
     r'''Count up alleles in a vector (singleton AC, not singletons AC, total AC)'''
-    mt = mt.explode_rows(mt.vep.worst_csq_by_gene_canonical)
+    #mt = mt.explode_rows(mt.vep.worst_csq_by_gene_canonical)
     mt = mt.filter_rows(mt.info.AC > 0)
     d = mt.aggregate_rows(hl.agg.counter(mt.info.AC))
     if 1 in d.keys():
@@ -157,7 +157,7 @@ def count_alleles(mt):
 
 def count_genes(mt):
     r'''Collapse variants into genes and count affected genes'''
-    mt = mt.explode_rows(mt.vep.worst_csq_by_gene_canonical)
+    #mt = mt.explode_rows(mt.vep.worst_csq_by_gene_canonical)
     d = mt.aggregate_entries(hl.agg.group_by(mt.vep.worst_csq_by_gene_canonical.gene_id, hl.agg.count_where(mt.GT.is_non_ref())))
     n_genes = len([(key, value) for key, value in d.items() if value != 0])
     return n_genes
@@ -172,7 +172,7 @@ def summarize_variants(mt, what = 'ptv', vep_field = 'consequence_category'):
 
 def gene_burden_annotations_per_sample(mt):
     r''' calculate gene burden by counting variants in gene'''
-    mt = mt.explode_rows(mt.vep.worst_csq_by_gene_canonical)
+    #mt = mt.explode_rows(mt.vep.worst_csq_by_gene_canonical)
     mt = mt.group_rows_by(
         gene_id = mt.vep.worst_csq_by_gene_canonical.gene_id
         ).aggregate(n = hl.agg.count_where(mt.GT.is_non_ref()))
@@ -180,7 +180,7 @@ def gene_burden_annotations_per_sample(mt):
 
 def gene_burden_category_annotations_per_sample(mt):
     r''' calculate gene burden by counting variants in gene stratified by variant category'''
-    mt = mt.explode_rows(mt.vep.worst_csq_by_gene_canonical)
+    #mt = mt.explode_rows(mt.vep.worst_csq_by_gene_canonical)
     mt = mt.group_rows_by(
         gene_id = mt.vep.worst_csq_by_gene_canonical.gene_id,
         consequence_category = mt.vep.consequence_category
@@ -267,7 +267,7 @@ def gene_strand_builder(mt, field = 'snpid'):
     '''Returns hail table that contains genes, samples, rsids, knockout status'''
     
     # annotate entries with phased data
-    mt = mt.explode_rows(mt.vep.worst_csq_by_gene_canonical)
+    #mt = mt.explode_rows(mt.vep.worst_csq_by_gene_canonical)
     mt = mt.annotate_entries(rsid_entry = mt[field])
     mt = mt.annotate_rows(gene_id = mt.vep.worst_csq_by_gene_canonical.gene_id)
     mt = annotate_phased_entries(mt)

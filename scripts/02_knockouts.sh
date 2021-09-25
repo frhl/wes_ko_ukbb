@@ -20,7 +20,7 @@ source utils/vcf_utils.sh
 readonly in_dir="data/mt"
 readonly vep_dir="data/vep/full/"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/knockouts/all/210924_synonymous"
+readonly out_dir="derived/knockouts/all/210925_synonymous"
 
 # hail script
 readonly hail_script="utils/subscripts/hail_export.py"
@@ -48,7 +48,7 @@ python3 "${hail_script}" \
     --maf_max 0.02 \
     --missing 0.05 \
     --out_prefix ${out_prefix} \
-    --export_fake_vcf
+    --export_fake_vcf \
     --export_burden \
     --export_ko_probability \
     --export_ko_rsid \

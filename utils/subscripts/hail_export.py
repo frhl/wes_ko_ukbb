@@ -96,6 +96,12 @@ def main(args):
         mt1 = analysis.filter_vep(mt1, 'consequence_category', vep_filter)
         mt2 = analysis.filter_vep(mt2, 'consequence_category', vep_filter) 
 
+    # re-annotate burden variant category
+    mt1 = mt1.explode_rows(mt1.vep.worst_csq_by_gene_canonical)
+    mt1 = analysis.variant_csqs_category_builder(mt1)
+    mt2 = mt2.explode_rows(mt2.vep.worst_csq_by_gene_canonical)
+    mt2 = analysis.variant_csqs_category_builder(mt2)
+
     #### get stats
 
     if export_burden:

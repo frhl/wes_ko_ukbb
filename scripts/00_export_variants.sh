@@ -9,7 +9,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 10
 #$ -q short.qe
-#$ -t 1-21
+#$ -t 1-22
 #$ -V
 
 
