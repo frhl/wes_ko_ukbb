@@ -61,15 +61,25 @@ def export_table(mt, out_prefix, out_type, checkpoint=False, format_fields_to_dr
         else:
             raise ValueError(f'Cannot export to PLINK because at least one of {out_prefix}.{{bed,bim,fam}} already exists')
 
+
+
 def filter_max_maf(mt, maf=None):
-    r'''Filter to variants to have maf less than {maf}'''
-    mt = mt.filter_rows(hl.min(mt.info.AF)<maf)
-    return mt
+    r'''boolean for variants that have maf less than {maf}'''
+    maf_expr = (mt.info.AF<maf) | (mt.info.AF>(1-maf))
+    return maf_expr
 
 def filter_min_maf(mt, maf=None):
-    r'''Filter to variants to have maf gt {maf}'''
-    mt = mt.filter_rows(hl.min(mt.info.AF)>maf)
-    return mt
+    r'''boolean for variants that have maf gt {maf}'''
+	maf_expr = (mt.info.AF>maf) & (mt.info.AF<(1-maf))
+    return maf_expr
+
+def filter_maf(mt, min_maf = None, max_maf = None):
+	r'''Filter to variants based on a certain min/max MAF threshold'''
+	if min_maf is not None:
+			mt = mt.filter_rows(filter_min_maf(mt, min_maf))
+	if max_maf is not None:
+			mt = mt.filter_rows(filter_max_maf(mt, max_maf))
+	return mt
 
 def filter_max_mac(mt, mac=None):
     r'''Filter to variants to have maf less than {maf}'''
@@ -217,7 +227,7 @@ def annotate_snpid(mt, delim = '_'):
     mt = mt.annotate_rows(snpid = ids)
     return mt
 
-def annotate_rsid(mt, dbsnp_path = '/well/lindgren/flassen/ressources/dbsnp/GRCh38/GCF_000001405.39.gz', build = 'GRCh38'):
+def annotate_rsid(mt, dbsnp_path = '/well/lindgren/flassen/ressources/dbsnp/GRCh38/155/GCF_000001405.39.gz', build = 'GRCh38'):
     r'''Use dbSNP to annotate all rsIDs in the a matrix table.'''
     recode = {f"NC_0000{i}.{j}":f"chr{i}" for i in (list(range(1, 23)) + ['X', 'Y']) for j in ('09','10','11','12','13','14')}
     dbsnp = hl.import_vcf(dbsnp_path, 

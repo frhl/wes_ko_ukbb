@@ -617,3 +617,634 @@ Analyzing  1830  cases and  110632  controls
 isCondition is  FALSE 
 Analysis started at  1632476573 Seconds
 Finished SPA test for derived/saige/binary/step2/ukb_wes_200k_colorectal_cancer_chr22 at 4 (job id: 54445796.22 Fri Sep 24 10:42:53 BST 2021)
+Submitted SPA scripts for  (job id: 54449043.18 Sat Sep 25 16:07:23 BST 2021)
+Submitted SPA scripts for  (job id: 54449043.19 Sat Sep 25 16:07:23 BST 2021)
+Submitted SPA scripts for  (job id: 54449043.17 Sat Sep 25 16:07:23 BST 2021)
+Your job-array 54449045.16-16:1 ("spa_") has been submitted
+Submitted SPA scripts for  (job id: 54449044.17 Sat Sep 25 16:08:20 BST 2021)
+Your job-array 54449046.16-16:1 ("spa_") has been submitted
+Submitted SPA scripts for  (job id: 54449044.18 Sat Sep 25 16:08:20 BST 2021)
+Your job-array 54449047.16-16:1 ("spa_") has been submitted
+Submitted SPA scripts for  (job id: 54449044.19 Sat Sep 25 16:08:23 BST 2021)
+Your job-array 54449056.16-16:1 ("spa_chronic_obstructive_pulmonary_disease") has been submitted
+Submitted SPA scripts for chronic_obstructive_pulmonary_disease (job id: 54449055.17 Sat Sep 25 16:12:24 BST 2021)
+Your job-array 54449057.16-16:1 ("spa_Crohns_disease") has been submitted
+Submitted SPA scripts for Crohns_disease (job id: 54449055.18 Sat Sep 25 16:12:24 BST 2021)
+Your job-array 54449058.16-16:1 ("spa_IBD") has been submitted
+Submitted SPA scripts for IBD (job id: 54449055.19 Sat Sep 25 16:12:25 BST 2021)
+pre rsaige
+pre rsaige
+pre rsaige
+post rsaige
+post rsaige
+starting SPA test for derived/saige/binary/step2/ukb_wes_200k_IBD_chr16 (job id: 54449058.16 Sat Sep 25 16:12:36 BST 2021)
+starting SPA test for derived/saige/binary/step2/ukb_wes_200k_chronic_obstructive_pulmonary_disease_chr16 (job id: 54449056.16 Sat Sep 25 16:12:36 BST 2021)
+post rsaige
+starting SPA test for derived/saige/binary/step2/ukb_wes_200k_Crohns_disease_chr16 (job id: 54449057.16 Sat Sep 25 16:12:36 BST 2021)
+R version 3.6.1 (2019-07-05)
+Platform: x86_64-conda_cos6-linux-gnu (64-bit)
+Running under: CentOS Linux 7 (Core)
+
+Matrix products: default
+BLAS/LAPACK: /gpfs3/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/lib/R/lib/libRblas.so
+
+locale:
+[1]R version 3.6.1 (2019-07-05)
+ C
+
+attached base packages:
+Platform: x86_64-conda_cos6-linux-gnu (64-bit)
+[1] stats     graphics  grDevices utils     datasets  methods   base     Running under: 
+CentOS Linux 7 (Core)
+
+other attached packages:
+
+[1] SAIGE_0.44.6.4
+Matrix products: 
+loaded via a namespace (and not attached):
+default
+[1] compiler_3.6.1     Matrix_1.2-17      Rcpp_1.0.1         grid_3.6.1        
+[5] RcppParallel_5.1.4BLAS/LAPACK: /gpfs3/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/lib/R/lib/libRblas.so
+R version 3.6.1 (2019-07-05)
+ lattice_0.20-44   
+
+Platform: x86_64-conda_cos6-linux-gnu (64-bit)
+locale:
+Running under: CentOS Linux 7 (Core)
+
+[1]Matrix products: default
+ C
+
+attached base packages:
+BLAS/LAPACK: /gpfs3/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/lib/R/lib/libRblas.so
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+
+other attached packages:
+locale:
+[1] SAIGE_0.44.6.4
+[1] C
+
+loaded via a namespace (and not attached):
+
+attached base packages:
+[1] compiler_3.6.1     Matrix_1.2-17      Rcpp_1.0.1         grid_3.6.1        
+[5] RcppParallel_5.1.4 lattice_0.20-44   
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] SAIGE_0.44.6.4
+
+loaded via a namespace (and not attached):
+[1] compiler_3.6.1     Matrix_1.2-17      Rcpp_1.0.1         grid_3.6.1        
+[5] RcppParallel_5.1.4 lattice_0.20-44   
+$vcfFile
+[1] "derived/knockouts/all/210925_ptv_damaging_missense/ukb_wes_200k_maf002_miss005_ptv_chr18_ko.vcf.bgz"
+
+$vcfFileIndex
+[1] ".csi"
+
+$vcfField
+[1] "DS"$vcfFile
+[1] "derived/knockouts/all/210925_ptv_damaging_missense/ukb_wes_200k_maf002_miss005_ptv_chr19_ko.vcf.bgz"$vcfFile
+[1] "derived/knockouts/all/210925_ptv_damaging_missense/ukb_wes_200k_maf002_miss005_ptv_chr17_ko.vcf.bgz"
+
+$vcfFileIndex
+
+
+$bgenFile
+[1] ""
+
+$bgenFileIndex
+[1][1] ".csi"
+
+$vcfField
+[1] "DS"
+
+$bgenFile
+
+ ""
+
+$savFile
+[1] ""
+
+$savFileIndex
+[1] ""
+
+
+$vcfFileIndex
+[1] ".csi"$bgenFileIndex
+
+
+$vcfField
+[1][1] ""
+
+$savFile
+[1] ""
+ "DS"
+
+$bgenFile
+[1] ""
+
+$bgenFileIndex
+[1] ""
+
+[1] ""
+
+$idstoExcludeFile
+[1] ""
+
+
+$idstoIncludeFile
+[1] ""
+
+$rangestoExcludeFile
+[1] ""$savFile
+[1] ""
+
+
+$savFileIndex
+
+[1]$rangestoIncludeFile
+ ""[1]$savFileIndex
+[1] ""
+
+
+
+$idstoExcludeFile
+[1] ""
+
+$idstoExcludeFile
+$idstoIncludeFile
+[1] ""
+
+$chrom
+[1] "16"
+
+$start
+[1][1] ""
+
+$rangestoExcludeFile
+ 1
+
+$end
+[1] 2.5e+08
+[1]
+ "" ""
+
+$idstoIncludeFile
+[1]$IsDropMissingDosages
+[1] FALSE
+
+$minMAF
+[1] ""
+
+$rangestoIncludeFile
+[1] ""
+
+ 1e-05
+
+$minMAC
+[1] 1
+
+$maxMAFforGroupTest
+[1]$chrom
+ 0.5
+
+$minInfo
+[1] 0
+[1]
+$sampleFile
+[1] ""
+
+$GMMATmodelFile
+[1] "16" "derived/saige/binary/step1/ukb_wes_200k_Crohns_disease.rda"
+
+
+$varianceRatioFile
+[1] "derived/saige/binary/step1/ukb_wes_200k_Crohns_disease.varianceRatio.txt"
+
+$SAIGEOutputFile
+[1] "derived/saige/binary/step2/ukb_wes_200k_Crohns_disease_chr16"
+
+
+$start
+[1]$numLinesOutput
+[1] 2
+
+$IsSparse
+[1]
+
+$rangestoExcludeFile
+[1] ""
+
+ 1
+
+$end
+[1]$rangestoIncludeFile
+ 2.5e+08
+
+$IsDropMissingDosages
+[1] TRUE
+
+$SPAcutoff
+[1] 2
+
+$IsOutputAFinCaseCtrl
+[1] ""
+
+[1] TRUE
+
+$IsOutputNinCaseCtrl
+[1] TRUE
+
+$chrom
+[1] "16"
+ FALSE
+
+$minMAF
+[1]$IsOutputHetHomCountsinCaseCtrl
+[1] TRUE
+
+$LOCO
+[1] FALSE
+$start
+[1] 1e-05
+
+
+
+$condition
+[1] ""
+
+$sparseSigmaFile
+[1] 1
+
+$end
+[1] 2.5e+08$minMAC
+[1] 1
+
+
+
+$IsDropMissingDosages
+[1] FALSE ""
+
+$groupFile
+[1] ""
+
+$kernel
+[1]$maxMAFforGroupTest
+[1] 0.5
+
+
+
+$minMAF
+[1] 1e-05
+ "linear.weighted"
+
+$method
+[1] "optimal.adj"
+
+$weights.beta.rare
+[1] "1,25"
+
+$minInfo
+[1] 0
+
+$sampleFile
+[1]$weights.beta.common
+[1] "1,25"
+
+$weightMAFcutoff
+ ""[1] 0.01
+
+$r.corr
+[1] "0"
+
+
+
+$GMMATmodelFile
+[1]$IsSingleVarinGroupTest
+[1] FALSE
+
+$IsOutputMAFinCaseCtrlinGroupTest
+[1] FALSE
+ "derived/saige/binary/step1/ukb_wes_200k_IBD.rda"
+$cateVarRatioMinMACVecExclude
+[1] "0.5,1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+$cateVarRatioMaxMACVecInclude
+
+$minMAC
+[1] 1
+
+
+
+$varianceRatioFile
+[1]$maxMAFforGroupTest
+[1] 0.5
+
+ "derived/saige/binary/step1/ukb_wes_200k_IBD.varianceRatio.txt"
+
+$SAIGEOutputFile
+[1] "derived/saige/binary/step2/ukb_wes_200k_IBD_chr16"
+
+$numLinesOutput
+[1]$minInfo
+[1] 0
+
+ 2
+
+$IsSparse
+[1] TRUE
+
+$SPAcutoff
+[1] 2
+
+[1] "1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+$dosageZerodCutoff
+[1] 0.2
+
+$IsOutputPvalueNAinGroupTestforBinary
+$sampleFile
+[1] ""
+
+$GMMATmodelFile
+[1] "derived/saige/binary/step1/ukb_wes_200k_chronic_obstructive_pulmonary_disease.rda"
+
+$IsOutputAFinCaseCtrl
+[1] TRUE
+
+$IsOutputNinCaseCtrl
+[1] TRUE
+
+$IsOutputHetHomCountsinCaseCtrl
+$varianceRatioFile
+[1] "derived/saige/binary/step1/ukb_wes_200k_chronic_obstructive_pulmonary_disease.varianceRatio.txt"
+
+$SAIGEOutputFile
+[1][1] TRUE
+
+$LOCO
+[1] FALSE
+
+$condition
+[1] ""
+
+$sparseSigmaFile
+[1] ""
+
+$groupFile
+ "derived/saige/binary/step2/ukb_wes_200k_chronic_obstructive_pulmonary_disease_chr16"
+
+$numLinesOutput
+[1] 2
+[1] ""
+
+
+[1] FALSE
+
+$IsAccountforCasecontrolImbalanceinGroupTest
+[1] TRUE
+
+$kernel
+$weightsIncludeinGroupFile
+[1] FALSE
+
+$IsOutputBETASEinBurdenTest
+[1] FALSE
+
+$IsOutputlogPforSingle
+[1] FALSE[1]
+ "linear.weighted"
+$sampleFile_male
+[1] ""
+
+
+$X_PARregion
+[1] ""
+
+$is_rewrite_XnonPAR_forMales
+[1] FALSE
+
+
+$method_to_CollapseUltraRare
+$method
+[1] "absence_or_presence"
+
+$MACCutoff_to_CollapseUltraRare
+[1] 10
+$IsSparse
+[1] TRUE
+
+$SPAcutoff
+[1][1] "optimal.adj"
+
+$weights.beta.rare
+[1] "1,25"
+
+$weights.beta.common
+ 2
+
+$IsOutputAFinCaseCtrl
+[1] TRUE
+
+
+$DosageCutoff_for_UltraRarePresence
+[1] 0.5
+
+$help
+[1][1] "1,25"
+
+$weightMAFcutoff
+[1] 0.01
+
+$r.corr
+$IsOutputNinCaseCtrl
+[1] TRUE
+
+$IsOutputHetHomCountsinCaseCtrl
+[1] TRUE
+
+ FALSE
+
+$LOCO
+weights.beta.rare[1][1] "0"
+
+$IsSingleVarinGroupTest
+[1] FALSE
+
+$IsOutputMAFinCaseCtrlinGroupTest
+  is  1 25 [1] FALSE
+
+$cateVarRatioMinMACVecExclude
+[1] "0.5,1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+$cateVarRatioMaxMACVecInclude
+
+ FALSE
+
+$condition
+[1] ""[1] "1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+$dosageZerodCutoff
+[1] 0.2
+
+$IsOutputPvalueNAinGroupTestforBinary
+[1] FALSE
+
+
+
+$IsAccountforCasecontrolImbalanceinGroupTest
+$sparseSigmaFile
+[1][1]weights.beta.common  is  1 25 
+ TRUE
+
+$weightsIncludeinGroupFile
+[1] FALSE
+
+$IsOutputBETASEinBurdenTest
+[1]cateVarRatioMinMACVecExclude  is  0.5 1.5 2.5 FALSE 3.5 4.5 5.5 10.5 20.5
+ 
+
+cateVarRatioMaxMACVecInclude  is  1.5 2.5 3.5 $IsOutputlogPforSingle
+[1] FALSE
+
+$sampleFile_male
+[1] ""
+
+$X_PARregion
+[1] ""
+
+$is_rewrite_XnonPAR_forMales
+[1] FALSE
+ ""
+
+$groupFile
+[1] ""
+
+4.5 5.5 10.5 $kernel
+20.5 
+[1]
+$method_to_CollapseUltraRare
+[1] "absence_or_presence"
+
+$MACCutoff_to_CollapseUltraRare
+[1] 10
+
+$DosageCutoff_for_UltraRarePresence
+[1] "linear.weighted" 0.5
+
+$help
+[1] FALSE
+
+
+weights.beta.rare  is  1 25 
+
+$method
+[1] "optimal.adj"
+
+$weights.beta.rare
+[1] "1,25"
+
+$weights.beta.common
+[1] "1,25"
+
+$weightMAFcutoff
+[1] 0.01
+
+$r.corr
+[1] "0"
+
+$IsSingleVarinGroupTest
+[1] FALSE
+
+$IsOutputMAFinCaseCtrlinGroupTest
+[1] FALSE
+
+$cateVarRatioMinMACVecExclude
+[1] "0.5,1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+$cateVarRatioMaxMACVecInclude
+[1] "1.5,2.5,3.5,4.5,5.5,10.5,20.5"
+
+$dosageZerodCutoff
+[1] 0.2
+
+$IsOutputPvalueNAinGroupTestforBinary
+[1] FALSE
+
+$IsAccountforCasecontrolImbalanceinGroupTest
+[1] TRUE
+
+$weightsIncludeinGroupFile
+[1] FALSE
+
+$IsOutputBETASEinBurdenTest
+[1] FALSE
+
+$IsOutputlogPforSingle
+[1] FALSE
+
+$sampleFile_male
+[1] ""
+
+$X_PARregion
+[1] ""
+
+$is_rewrite_XnonPAR_forMales
+[1] FALSE
+
+$method_to_CollapseUltraRare
+[1] "absence_or_presence"
+
+$MACCutoff_to_CollapseUltraRare
+[1] 10
+
+$DosageCutoff_for_UltraRarePresence
+[1] 0.5
+
+$help
+[1] FALSE
+
+weights.beta.rare  is  1 25 
+single-variant association test will be performed
+weights.beta.common  is  1 25 
+weights.beta.common  is  1 cateVarRatioMinMACVecExclude  is  0.5 1.5 2.5 25 
+3.5 4.5 5.5 10.5 20.5 
+cateVarRatioMinMACVecExcludecateVarRatioMaxMACVecInclude   is  1.5 2.5 3.5 4.5 is  5.5 10.5 20.5 
+ 0.5 1.5 2.5 3.5 4.5 5.5 10.5 20.5 
+cateVarRatioMaxMACVecInclude  is  1.5 2.5 3.5 4.5 5.5 10.5 20.5 
+single-variant association test will be performed
+single-variant association test will be performed
+111438  samples have been used to fit the glmm null model
+[1] "Leave-one-chromosome-out is not applied"
+110634  samples have been used to fit the glmm null model
+[1] "Leave-one-chromosome-out is not applied"
+Single variance ratio is provided, so categorical variance ratio won't be used!
+variance Ratio is  1 
+128539  samples have been used to fit the glmm null model
+Single variance ratio is provided, so categorical variance ratio won't be used!
+variance Ratio is  [1] "Leave-one-chromosome-out is not applied"
+0.9945335Finished SPA test for derived/saige/binary/step2/ukb_wes_200k_IBD_chr16 at 3 (job id: 54449058.16 Sat Sep 25 16:12:39 BST 2021)
+Single variance ratio is provided, so categorical variance ratio won't be used!
+ variance Ratio is  0.9639735 
+
+isCondition is  FALSE 
+Finished SPA test for derived/saige/binary/step2/ukb_wes_200k_chronic_obstructive_pulmonary_disease_chr16 at 3 (job id: 54449056.16 Sat Sep 25 16:12:39 BST 2021)
+Setting genomic region 16:1:250000000
+199795  sample IDs are found in the vcf file
+[1] 199795      4
+[1] "IID"          "IndexInModel" "IndexDose.x"  "IndexDose.y" 
+111438  samples were used in fitting the NULL glmm model and are found in sample file
+sparse kinship matrix is not used
+Missing dosages will be mean imputed for the analysis
+Analysis started at  1632582761 Seconds
+minMAC:  1 
+minMAF:  1e-05 
+Minimum MAF of markers to be tested is  1e-05 
+It is a binary trait
+Analyzing  806  cases and  110632  controls 
+isCondition is  FALSE 
+Analysis started at  1632582761 Seconds
+Finished SPA test for derived/saige/binary/step2/ukb_wes_200k_Crohns_disease_chr16 at 5 (job id: 54449057.16 Sat Sep 25 16:12:41 BST 2021)

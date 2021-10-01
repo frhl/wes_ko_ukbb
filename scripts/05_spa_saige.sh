@@ -8,7 +8,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qe
-#$ -t 1
+#$ -t 17-19
 #$ -V
 
 module purge
@@ -16,7 +16,7 @@ source utils/bash_utils.sh
 source utils/hail_utils.sh
 
 # directories
-readonly vcf_dir="derived/knockouts/all/ptvs_damaging_missense"
+readonly vcf_dir="derived/knockouts/all/210925_ptv_damaging_missense"
 readonly step1_dir="derived/saige/binary/step1"
 readonly out_dir="derived/saige/binary/step2"
 readonly pheno_dir="/well/lindgren/UKBIOBANK/dpalmer/ukb_wes_phenotypes/200k"
@@ -27,8 +27,8 @@ readonly chr=${SGE_TASK_ID}
 readonly in_vcf="${vcf_dir}/ukb_wes_200k_maf002_miss005_ptv_chr${chr}_ko.vcf.bgz"
 readonly in_csi="${vcf}.csi"
 readonly pheno_file="${pheno_dir}/UKBB_WES200k_filtered_binary_phenotypes.tsv"
-readonly spa_script="utils/_spa_test.sh"
-readonly pyscript="utils/subscripts/extract_phenos_from_header"
+readonly spa_script="utils/subscripts/_spa_test.sh"
+readonly pyscript="utils/subscripts/extract_phenos_from_header.py"
 
 # select phenotype (1-42)
 set_up_hail
@@ -47,9 +47,9 @@ readonly out_prefix="${out_dir}/ukb_wes_200k_${phenotype}"
 submit_spa_job() {
   #set -x
   qsub -N "spa_${phenotype}" \
-    -t 22 \
+    -t 16 \
     -q "short.qe" \
-    -pe shmem 2 \
+    -pe shmem 4 \
     ${spa_script} \
     ${phenotype} \
     ${in_vcf} \
