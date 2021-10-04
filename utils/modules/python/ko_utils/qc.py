@@ -78,16 +78,16 @@ def filter_max_maf(mt, maf=None):
 
 def filter_min_maf(mt, maf=None):
     r'''boolean for variants that have maf gt {maf}'''
-	maf_expr = (mt.info.AF>maf) & (mt.info.AF<(1-maf))
+    maf_expr = (mt.info.AF>maf) & (mt.info.AF<(1-maf))
     return maf_expr
 
 def filter_maf(mt, min_maf = None, max_maf = None):
-	r'''Filter to variants based on a certain min/max MAF threshold'''
-	if min_maf is not None:
-			mt = mt.filter_rows(filter_min_maf(mt, min_maf))
-	if max_maf is not None:
-			mt = mt.filter_rows(filter_max_maf(mt, max_maf))
-	return mt
+    r'''Filter to variants based on a certain min/max MAF threshold'''
+    if min_maf is not None:
+            mt = mt.filter_rows(filter_min_maf(mt, min_maf))
+    if max_maf is not None:
+            mt = mt.filter_rows(filter_max_maf(mt, max_maf))
+    return mt
 
 def filter_max_mac(mt, mac=None):
     r'''Filter to variants to have maf less than {maf}'''
@@ -262,4 +262,3 @@ def is_phased(mt):
                         (mt.GT ==  hl.parse_call('1|1'))
                        )
     return mt.aggregate_entries(hl.agg.any(mt.phased))
-
