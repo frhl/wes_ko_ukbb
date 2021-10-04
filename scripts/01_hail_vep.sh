@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 #
+# Run Hail & VEP on phased and unphased data seperately since 
+# unnphased data only contains singletons, and phased data only
+# contains non-singletons. Generates a seperate matrix-table for
+# each.
+#
 #$ -N hail_vep
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/hail_vep.log

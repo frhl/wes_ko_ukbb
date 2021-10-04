@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 #
+# Combine phased and unphased data to make a probabilistic model
+# for human knockouts. This function is versatile and produces
+# a many different of summary-level files, including:
+#
+# 1) A fake VCF with probablistic encoding of KO (for SAIGE+ input)
+# 2) A matrix containg the variant consequences in each gene for each sample
+# 3) A ko probabiltiy matrix containg individuals, genes and probability of KO
+# 4) A ko probability matrix with the above + variants involved in KO.
+#
 #$ -N knockout
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/knockout.log
