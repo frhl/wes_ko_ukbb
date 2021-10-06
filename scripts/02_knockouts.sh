@@ -32,7 +32,7 @@ readonly spark_dir="data/tmp/spark"
 readonly out_dir="derived/knockouts/all/210925_synonymous"
 
 # hail script
-readonly hail_script="utils/subscripts/hail_export.py"
+readonly hail_script="utils/subscripts/hail_knockouts.py"
 
 # input path
 readonly chr=${SGE_TASK_ID}

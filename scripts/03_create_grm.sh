@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 #
+# Create sparse genetic relatedness matrix using genotyped data.
 #
 #$ -N step0_saige
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
@@ -31,11 +32,11 @@ set_up_hail
 set_up_pythonpath
 mkdir -p ${out_dir}
 python3 "${hail_script}" \
-	--chroms ${chroms}  \
-	--out_prefix ${out_prefix} \
-	--subset_markers_by_kinship \
-    --subset_samples_by_wes200k \
-    --subset_samples_by_ukbb_eur
+  chroms ${chroms}  \
+  out_prefix ${out_prefix} \
+  subset_markers_by_kinship \
+  subset_samples_by_wes200k \
+  subset_samples_by_ukbb_eur
 
 print_update "Successfully combined .bgen files for GRM input." "${SECONDS}"
 

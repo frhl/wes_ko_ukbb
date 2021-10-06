@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# A script that extract a list of strings from a header (e.g. a header).
+
 from ko_utils import phenos
 import argparse
 import sys

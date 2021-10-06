@@ -2,10 +2,14 @@
 #
 # Author: Frederik Lassen (2021-06-25)
 #
-#$ -N vep_rows
+# Opens unphased files and annotates and writes VEP
+# consequence, which can be imported later as a seperate
+# annotation for either unphased singletons or phased non-singletons. 
+#
+#$ -N vep_annot
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/vep_rows.log
-#$ -e logs/vep_rows.errors.log
+#$ -o logs/vep_annot.log
+#$ -e logs/vep_annot.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 10
 #$ -q short.qe
@@ -33,9 +37,9 @@ set_up_vep
 set_up_pythonpath
 mkdir -p ${out_dir}
 python3 "${hail_script}" \
-	--input_path ${in} \
-    --input_type "vcf" \
-    --vep_path "${vep}" \
-    --out_prefix ${out}
+  --input_path ${in} \
+  --input_type "vcf" \
+  --vep_path "${vep}" \
+  --out_prefix ${out}
 
 

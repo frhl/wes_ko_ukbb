@@ -126,6 +126,30 @@ def translate_sample_ids(ht, from_app: int, to_app: int):
 
 def filter_to_european(mt, genetically_european = True, only_annotate = False):
     r'''Get white british (app 11867) /well/lindgren/UKBIOBANK/DATA/QC/ukb_sqc_v2.txt
+    or genetically european by projecting ancestries into 1KG prpject data''' 
+    if genetically_european:
+        ht1 = hl.import_table('/well/lindgren/dpalmer/ukb_get_EUR/data/final_EUR_list.tsv', no_header = True).rename({'f0':'eid'})
+        ht1 = ht1.annotate_rows(genetically_european = 1)
+        mt = mt.annotate_cols(eur = ht1[mt.s].genetically_european)
+    else:
+        ht2 = hl.import_table('/well/lindgren/flassen/ressources/ukb/white_british/210921_ukbb_white_british_samples.txt',
+            types={'eid': hl.tstr, 'in.white.British.ancestry.subset': hl.tint32}).key_by('eid')
+        mt = mt.annotate_cols(eur = ht2[mt.s]['in.white.British.ancestry.subset'])
+    # count and subset
+    undefined_eur = mt.aggregate_cols(hl.agg.sum(hl.is_missing(mt.eur)))
+    pre_filter_count = mt.count()
+    if undefined_eur == pre_filter_count[1]:
+        raise ValueError('[get_european]: IDs for europeans does not match keys in MatrixTable!')
+    if undefined_eur > 0:
+        print(f'[get_european]: Not all samples IDs mapped perfectly ({undefined_eur}/{pre_filter_count[1]} IDs are undefined)')
+    if only_annotate == False:
+        mt = mt.filter_cols(mt.eur == 1)
+        post_filter_count = mt.count()
+        print(f'[get_european]:{post_filter_count[1]}/{pre_filter_count[1]} IDs were included as genetically european.')
+    return mt
+
+def filter_to_european_legacy(mt, genetically_european = True, only_annotate = False):
+    r'''Get white british (app 11867) /well/lindgren/UKBIOBANK/DATA/QC/ukb_sqc_v2.txt
     and genetically european from /well/lindgren/UKBIOBANK/laura/k_means_clustering_pcs/ukbb_genetically_european_k4_4PCs_self_rep_Nov2020.txt''' 
     
     # filter to either genetically european or UKBB 
@@ -262,3 +286,4 @@ def is_phased(mt):
                         (mt.GT ==  hl.parse_call('1|1'))
                        )
     return mt.aggregate_entries(hl.agg.any(mt.phased))
+
