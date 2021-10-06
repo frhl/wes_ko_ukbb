@@ -32,7 +32,7 @@ set_up_hail
 set_up_pythonpath
 mkdir -p ${out_dir}
 python3 "${hail_script}" \
-  chroms ${chroms}  \
+  chroms ${chroms} \
   out_prefix ${out_prefix} \
   subset_markers_by_kinship \
   subset_samples_by_wes200k \
@@ -45,9 +45,9 @@ conda deactivate
 set_up_RSAIGE
 print_update "Generating GRM from plink files.. "
 Rscript "${createSparseGRM}" \
-	--plinkFile=${out_prefix} \
-	--nThreads=4 \
-	--outputPrefix=${out_prefix}	\
-	--numRandomMarkerforSparseKin=1000	\
-	--relatednessCutoff=0.125
+  --plinkFile=${out_prefix} \
+  --nThreads=4 \
+  --outputPrefix=${out_prefix}	\
+  --numRandomMarkerforSparseKin=1000	\
+  --relatednessCutoff=0.125
 
