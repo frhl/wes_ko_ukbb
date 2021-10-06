@@ -1,0 +1,9 @@
+usage: create_grm_input.py [-h] [--chroms CHROMS [CHROMS ...]]
+                           [--subset_markers_by_kinship]
+                           [--subset_samples_by_wes200k]
+                           [--subset_samples_by_eur]
+                           [--subset_samples_by_ukbb_eur]
+                           [--out_prefix OUT_PREFIX]
+create_grm_input.py: error: unrecognized arguments: chroms 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 out_prefix data/saige/grm/input/eur_ukbb/ukb_imp_eur_wes_chr1_22_sparse_markers subset_markers_by_kinship subset_samples_by_wes200k subset_samples_by_ukbb_eur
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
