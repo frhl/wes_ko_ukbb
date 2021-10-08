@@ -128,8 +128,8 @@ def filter_to_european(mt, genetically_european = True, only_annotate = False):
     r'''Get white british (app 11867) /well/lindgren/UKBIOBANK/DATA/QC/ukb_sqc_v2.txt
     or genetically european by projecting ancestries into 1KG prpject data''' 
     if genetically_european:
-        ht1 = hl.import_table('/well/lindgren/dpalmer/ukb_get_EUR/data/final_EUR_list.tsv', no_header = True).rename({'f0':'eid'})
-        ht1 = ht1.annotate_rows(genetically_european = 1)
+        ht1 = hl.import_table('/well/lindgren/dpalmer/ukb_get_EUR/data/final_EUR_list.tsv', no_header = True).rename({'f0':'eid'}).key_by('eid')
+        ht1 = ht1.annotate(genetically_european = 1)
         mt = mt.annotate_cols(eur = ht1[mt.s].genetically_european)
     else:
         ht2 = hl.import_table('/well/lindgren/flassen/ressources/ukb/white_british/210921_ukbb_white_british_samples.txt',

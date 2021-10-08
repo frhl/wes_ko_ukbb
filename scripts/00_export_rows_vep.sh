@@ -22,9 +22,9 @@ source utils/hail_utils.sh
 
 # Set variables
 readonly chr=${SGE_TASK_ID}
-readonly in_dir="/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/data/unphased/unfiltered"
+readonly in_dir="/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/data/unphased/post-qc"
 readonly in="${in_dir}/ukb_wes_200k_filtered_chr${chr}.vcf.bgz"
-readonly out_dir="data/variants" 
+readonly out_dir="data/vep/hail" 
 readonly out="${out_dir}/ukb_wes_200_chr${chr}" 
 readonly spark_dir="data/tmp/spark"
 readonly hail_script='utils/subscripts/hail_export_rows.sh'

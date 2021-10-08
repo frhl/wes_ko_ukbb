@@ -27,8 +27,8 @@ def main(args):
     mt1 = qc.get_table(input_path=input_phased_path, input_type=input_phased_type) # 12788
     mt2 = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type) # 11867 (for singletons)
 
-	# note: need to translate ids to combine later!
-    mt1 = qc.translate_sample_ids(mt1, 12788, 11867)
+    # note: need to translate ids to combine later!
+    #mt1 = qc.translate_sample_ids(mt1, 12788, 11867)
     mt1 = qc.filter_to_european(mt1, only_annotate = True)
     mt2 = qc.filter_to_european(mt2, only_annotate = True)
 
