@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 #
+# run vep to get dbNSFP annotations (currently not available through hail VEP)
 #
 #$ -N dbNSFP
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
@@ -8,7 +9,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 4
 #$ -q short.qe
-#$ -t 22
+#$ -t 1-21
 #$ -V
 
 set -o errexit
@@ -16,7 +17,6 @@ set -o nounset
 
 source utils/hail_utils.sh
 
-# Set variables
 readonly chr=${SGE_TASK_ID}
 readonly RAW_ROOT="/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/data/unphased/post-qc"
 readonly RAW_FILE="/ukb_wes_200k_filtered_chr${chr}.vcf.bgz"
