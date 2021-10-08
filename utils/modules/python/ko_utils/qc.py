@@ -18,7 +18,7 @@ def get_table(input_path, input_type, cache=False):
     if input_type=='mt':
         mt = hl.read_matrix_table(input_path)
     elif input_type=='vcf':
-        mt = hl.import_vcf(input_path, force_bgz=True, array_elements_required=False, min_partitions=100)
+        mt = hl.import_vcf(input_path, force_bgz=True, array_elements_required=False)
     elif input_type=='plink':
         mt = hl.import_plink(*[f'{input_path}.{x}' for x in ['bed','bim','fam']])
     if input_type!='mt' and cache:
@@ -129,8 +129,8 @@ def filter_to_european(mt, genetically_european = True, only_annotate = False):
     or genetically european by projecting ancestries into 1KG prpject data''' 
     if genetically_european:
         ht1 = hl.import_table('/well/lindgren/dpalmer/ukb_get_EUR/data/final_EUR_list.tsv', no_header = True).rename({'f0':'eid'}).key_by('eid')
-        ht1 = ht1.annotate(genetically_european = 1)
-        mt = mt.annotate_cols(eur = ht1[mt.s].genetically_european)
+        ht1 = ht1.annotate(eur = 1)
+        mt = mt.annotate_cols(eur = ht1[mt.s].eur)
     else:
         ht2 = hl.import_table('/well/lindgren/flassen/ressources/ukb/white_british/210921_ukbb_white_british_samples.txt',
             types={'eid': hl.tstr, 'in.white.British.ancestry.subset': hl.tint32}).key_by('eid')
