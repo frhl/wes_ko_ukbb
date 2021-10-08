@@ -16,7 +16,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 10
 #$ -q short.qe
-#$ -t 1-22
+#$ -t 21
 
 set -o errexit
 set -o nounset
@@ -29,7 +29,7 @@ source utils/vcf_utils.sh
 readonly in_dir="data/mt"
 readonly vep_dir="data/vep/full/"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/knockouts/all/210925_synonymous"
+readonly out_dir="derived/knockouts/all/test"
 
 # hail script
 readonly hail_script="utils/subscripts/hail_knockouts.py"
