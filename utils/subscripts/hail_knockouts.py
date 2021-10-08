@@ -23,33 +23,31 @@ def main(args):
     
     # variant filters
     chrom      = int(args.chrom)
-    maf_max    = (args.maf_max)
-    maf_min    = (args.maf_min)
-    hwe        = (args.hwe)
-    missing    = args.missing
-    annotate_rsid = args.annotate_rsid   
-    annotate_snpid = args.annotate_snpid
- 
+    maf_max    = float(args.maf_max)
+    maf_min    = float(args.maf_min)
+    hwe        = float(args.hwe)
+    missing    = float(args.missing)
+    min_dp     = float(args.min_dp)
+    min_gq     = float(args.min_gq)
+    
     # sample filtering options
-    get_related = args.get_related
-    get_unrelated = args.get_unrelated
-    get_europeans = args.get_europeans
-    annotate_europeans = args.annotate_europeans
+    get_related = bool(args.get_related)
+    get_unrelated = bool(args.get_unrelated)
+    get_europeans = bool(args.get_europeans)
 
     # output options
     vep_filter = args.vep_filter
     export_ko_dosage_matrix = args.export_ko_dosage_matrix
     export_burden = args.export_burden
     export_ko_probability = args.export_ko_probability
-    export_fake_vcf = args.export_fake_vcf
+    export_saige_vcf = args.export_saige_vcf
     export_ko_rsid = args.export_ko_rsid
 
     # run parser
     hail_init.hail_bmrc_init('logs/hail/knockout.log', 'GRCh38')
-    mt1 = qc.get_table(input_path=input_phased_path, input_type=input_phased_type) # 12788
-    mt2 = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type) # 11867 (for singletons)
+    mt1 = qc.get_table(input_path=input_phased_path, input_type=input_phased_type) 
+    mt2 = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type)
 
-    ### Sample filtering
     if get_related and not get_unrelated:
         mt1 = qc.filter_to_unrelated(mt1, get_related = True)
         mt2 = qc.filter_to_unrelated(mt2, get_related = True)
@@ -57,27 +55,10 @@ def main(args):
     if get_unrelated and not get_related:
         mt1 = qc.filter_to_unrelated(mt1, get_related = False)
         mt2 = qc.filter_to_unrelated(mt2, get_related = False)
-
-	# annotate europeans
-    if annotate_europeans:
-
-        mt1 = qc.filter_to_european(mt1, only_annotate = True)
-        mt2 = qc.filter_to_european(mt2, only_annotate = True)
-
-    # subset to europeans
-    if get_europeans: 
         
-        if 'eur' not in mt1.row or 'eur' not in mt2.row:
-            mt1 = qc.filter_to_european(mt1, only_annotate = True)
-            mt2 = qc.filter_to_european(mt2, only_annotate = True)
-        else:
-            print('Filtering on field "eur".')
-            mt1 = mt1.filter_cols(mt1.eur == 1)
-            mt2 = mt2.filter_cols(mt2.eur == 1)
-
-    ### Variant filtering/annotations
-    # Using mt2 as a singleton refereence, so remove those with AC > 1
-    # mt2 = qc.filter_max_mac(mt2, 1)
+    if get_europeans: 
+        mt1 = qc.filter_to_european(mt1, genetically_european = True)
+        mt2 = qc.filter_to_european(mt2, genetically_european = True)
 
     if missing:
         mt1 = qc.filter_min_missing(mt1, float(missing))
@@ -92,15 +73,23 @@ def main(args):
     if hwe:
         mt1 = qc.filter_hwe(mt1, float(hwe))
 
-    if vep_filter: 
-        mt1 = analysis.filter_vep(mt1, 'consequence_category', vep_filter)
-        mt2 = analysis.filter_vep(mt2, 'consequence_category', vep_filter) 
+    if min_dp:
+        mt1 = mt1.filter_entries(mt1.DP >= min_dp) 
+        mt2 = mt2.filter_entries(mt2.DP >= min_dp)
 
-    # re-annotate burden variant category
+    if min_gq:
+        mt1 = mt1.filter_entries(mt1.GQ >= min_gq) 
+        mt1 = mt1.filter_entries(mt1.GQ >= min_gq) 
+
+    # Annotate burden variant category
     mt1 = mt1.explode_rows(mt1.vep.worst_csq_by_gene_canonical)
     mt1 = analysis.variant_csqs_category_builder(mt1)
     mt2 = mt2.explode_rows(mt2.vep.worst_csq_by_gene_canonical)
     mt2 = analysis.variant_csqs_category_builder(mt2)
+
+    if vep_filter: 
+        mt1 = analysis.filter_vep(mt1, 'consequence_category', vep_filter)
+        mt2 = analysis.filter_vep(mt2, 'consequence_category', vep_filter) 
 
     #### get stats
 
@@ -134,37 +123,40 @@ def main(args):
         mt_ko_rsid = analysis.gene_csqs_knockout_builder(mt1)
         mt_ko_rsid.export(out_prefix + '_knockouts.tsv.gz')
 
-    if export_fake_vcf:
+    if export_saige_vcf:
         out = analysis.gene_csqs_calc_pKO_pseudoSNP(mt1, mt2, chrom)
         qc.export_table(out, out_prefix = out_prefix + "_ko", out_type = 'vcf')
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
-    # initial params
+    
+    # required params
     parser.add_argument('--input_phased_path', default=None, help='Path to input')
     parser.add_argument('--input_phased_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
     parser.add_argument('--input_unphased_path', default=None, help='Path to input that contains singletons')
     parser.add_argument('--input_unphased_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Type of output dataset (options: mt, vcf, plink)')
-    # filtering variants
-    parser.add_argument('--annotate_snpid', action = 'store_true', help = 'use chr:pos:a1:a2 to annotate snpids in data')
-    parser.add_argument('--annotate_rsid', action = 'store_true', help = 'use dbSNP to annotate rsids in data')
-    parser.add_argument('--chrom', default=None, help='Chromosome to be used')
+    parser.add_argument('--chrom', default=None, help='Chromosome to be used') 
+    
+    # variant and entry filtering
     parser.add_argument('--maf_max', default=None, help='Select all variants with a maf less than the indicated value')
     parser.add_argument('--maf_min', default=None, help='Select all variants with a maf greater than the indicated values')
     parser.add_argument('--hwe', default=None, help='Filter variants by HWE threshold')
     parser.add_argument('--missing', default=0.05, help='Filter variants by missingness threshold')
-    # filtering samples
+    parser.add_argument('--min_dp', default=20, help='filter variants by minimum sequencing depth (DP)')
+    parser.add_argument('--min_gq', default=48, help='filter variants by genotype quality (GQ)')
+    
+    # sample filtering
     parser.add_argument('--get_related', action='store_true', help='Select all samples that are related')
     parser.add_argument('--get_unrelated', action='store_true', help='Select all samples that are unrelated') 
     parser.add_argument('--get_europeans', action='store_true', help='Filter to genetically confimed europeans.')
-    parser.add_argument('--annotate_europeans', default=False, action='store_true', help='Annotate genetically confirmed europeans in output.')
+    
     # out 
     parser.add_argument('--export_ko_rsid', action='store_true', help='Exports the table with rsIDs involved in KOs.')
     parser.add_argument('--export_ko_probability', action='store_true', help='Exports the KO probability.')
     parser.add_argument('--export_burden', action='store_true', help='Export burden variant count by gene and and individuals.')
-    parser.add_argument('--export_fake_vcf', action='store_true', help='Export a "fake" VCF file that contains KO probabilities as DP field..')
+    parser.add_argument('--export_saige_vcf', action='store_true', help='Export a "fake" VCF file that contains KO probabilities as DS field..')
     parser.add_argument('--vep_filter', nargs='+', help='Filter consequence_category by mutations e.g., "damaging_missense" or "ptv"')
     parser.add_argument('--export_ko_dosage_matrix', action='store_true', help='Generate a gene x sample matrix with KO status')
     
