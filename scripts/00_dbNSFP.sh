@@ -7,9 +7,9 @@
 #$ -o logs/dbNSFP.log
 #$ -e logs/dbNSFP.log
 #$ -P lindgren.prjc
-#$ -pe shmem 4
+#$ -pe shmem 8
 #$ -q short.qe
-#$ -t 1-21
+#$ -t 1-22
 #$ -V
 
 set -o errexit

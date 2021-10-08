@@ -10,8 +10,8 @@
 #$ -o logs/hail_vep.log
 #$ -e logs/hail_vep.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 10
-#$ -q short.qe
+#$ -pe shmem 20
+#$ -q short.qf
 #$ -t 22
 
 set -o errexit

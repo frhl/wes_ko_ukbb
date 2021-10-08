@@ -69,8 +69,11 @@ def main(args):
     mt2 = qc.default_to_snpid_when_missing_rsid(mt2)
     
     # export files
-    qc.export_table(mt1, out_prefix = out_prefix, out_type = 'mt')
-    qc.export_table(mt2, out_prefix = out_prefix + "_singletons", out_type = 'mt')
+    mt1.write(out_prefix + ".mt")
+    mt2.write(out_prefix + "_singletons.mt")
+    
+    #qc.export_table(mt1, out_prefix = out_prefix, out_type = 'mt')
+    #qc.export_table(mt2, out_prefix = out_prefix + "_singletons", out_type = 'mt')
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
