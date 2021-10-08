@@ -53,8 +53,8 @@ def main(args):
     mt2 = analysis.variant_csqs_category_builder(mt2)
         
     # annotate Gene (In the future just use vep.worst_csq_by_gene_canonical downstream..) 
-    mt1 = mt1.annotate_rows(vep = mt1.vep.annotate(Gene = mt1.vep.worst_csq_by_gene_canonical.gene_id))
-    mt2 = mt2.annotate_rows(vep = mt2.vep.annotate(Gene = mt2.vep.worst_csq_by_gene_canonical.gene_id))
+    #mt1 = mt1.annotate_rows(vep = mt1.vep.annotate(Gene = mt1.vep.worst_csq_by_gene_canonical.gene_id))
+    #mt2 = mt2.annotate_rows(vep = mt2.vep.annotate(Gene = mt2.vep.worst_csq_by_gene_canonical.gene_id))
         
     # By default add snpid id annotation
     mt1 = qc.annotate_snpid(mt1)
