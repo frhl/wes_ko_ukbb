@@ -1,0 +1,205 @@
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Running on Apache Spark version 3.1.2
+SparkUI available at http://compd031.hpc.in.bmrc.ox.ac.uk:4040
+Welcome to
+     __  __     <>__
+    / /_/ /__  __/ /
+   / __  / _ `/ / /
+  /_/ /_/\_,_/_/_/   version 0.2.77-684f32d73643
+LOGGING: writing to logs/hail/mt_to_vcf.log
+Traceback (most recent call last):
+  File "utils/subscripts/mt_to_vcf.py", line 27, in <module>
+    main(args)
+  File "utils/subscripts/mt_to_vcf.py", line 17, in main
+    mt = qc.get_table(input_path, 'mt')
+  File "/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/utils/modules/python/ko_utils/qc.py", line 19, in get_table
+    mt = hl.read_matrix_table(input_path)
+  File "<decorator-gen-1459>", line 2, in read_matrix_table
+  File "/well/lindgren/users/mmq446/conda/skylake/envs/hail-updated/lib/python3.6/site-packages/hail/typecheck/check.py", line 577, in wrapper
+    return __original_func(*args_, **kwargs_)
+  File "/well/lindgren/users/mmq446/conda/skylake/envs/hail-updated/lib/python3.6/site-packages/hail/methods/impex.py", line 2115, in read_matrix_table
+    for rg_config in Env.backend().load_references_from_dataset(path):
+  File "/well/lindgren/users/mmq446/conda/skylake/envs/hail-updated/lib/python3.6/site-packages/hail/backend/spark_backend.py", line 326, in load_references_from_dataset
+    return json.loads(Env.hail().variant.ReferenceGenome.fromHailDataset(self.fs._jfs, path))
+  File "/well/lindgren/users/mmq446/conda/skylake/envs/hail-updated/lib/python3.6/site-packages/py4j/java_gateway.py", line 1305, in __call__
+    answer, self.gateway_client, self.target_id, self.name)
+  File "/well/lindgren/users/mmq446/conda/skylake/envs/hail-updated/lib/python3.6/site-packages/hail/backend/py4j_backend.py", line 32, in deco
+    'Error summary: %s' % (deepest, full, hail.__version__, deepest), error_id) from None
+hail.utils.java.FatalError: HailException: MatrixTable and Table files are directories; path '/well/lindgren/UKBIOBANK/nbaya/wes_200k/phase_ukb_wes/data/phased/non_singleton/ukb_wes_phased_non_singleton_chr7-24xlong.qc-v4.2.2.vcf.gz' is not a directory
+
+Java stack trace:
+is.hail.utils.HailException: MatrixTable and Table files are directories; path '/well/lindgren/UKBIOBANK/nbaya/wes_200k/phase_ukb_wes/data/phased/non_singleton/ukb_wes_phased_non_singleton_chr7-24xlong.qc-v4.2.2.vcf.gz' is not a directory
+	at is.hail.utils.ErrorHandling.fatal(ErrorHandling.scala:11)
+	at is.hail.utils.ErrorHandling.fatal$(ErrorHandling.scala:11)
+	at is.hail.utils.package$.fatal(package.scala:78)
+	at is.hail.expr.ir.RelationalSpec$.readMetadata(AbstractMatrixTableSpec.scala:34)
+	at is.hail.expr.ir.RelationalSpec$.readReferences(AbstractMatrixTableSpec.scala:73)
+	at is.hail.variant.ReferenceGenome$.fromHailDataset(ReferenceGenome.scala:581)
+	at is.hail.variant.ReferenceGenome.fromHailDataset(ReferenceGenome.scala)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at py4j.reflection.MethodInvoker.invoke(MethodInvoker.java:244)
+	at py4j.reflection.ReflectionEngine.invoke(ReflectionEngine.java:357)
+	at py4j.Gateway.invoke(Gateway.java:282)
+	at py4j.commands.AbstractCommand.invokeMethod(AbstractCommand.java:132)
+	at py4j.commands.CallCommand.execute(CallCommand.java:79)
+	at py4j.GatewayConnection.run(GatewayConnection.java:238)
+	at java.lang.Thread.run(Thread.java:748)
+
+
+
+Hail version: 0.2.77-684f32d73643
+Error summary: HailException: MatrixTable and Table files are directories; path '/well/lindgren/UKBIOBANK/nbaya/wes_200k/phase_ukb_wes/data/phased/non_singleton/ukb_wes_phased_non_singleton_chr7-24xlong.qc-v4.2.2.vcf.gz' is not a directory
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Running on Apache Spark version 3.1.2
+SparkUI available at http://compd031.hpc.in.bmrc.ox.ac.uk:4040
+Welcome to
+     __  __     <>__
+    / /_/ /__  __/ /
+   / __  / _ `/ / /
+  /_/ /_/\_,_/_/_/   version 0.2.77-684f32d73643
+LOGGING: writing to logs/hail/mt_to_vcf.log
+Traceback (most recent call last):
+  File "utils/subscripts/mt_to_vcf.py", line 27, in <module>
+    main(args)
+  File "utils/subscripts/mt_to_vcf.py", line 17, in main
+    mt = qc.get_table(input_path, 'mt')
+  File "/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/utils/modules/python/ko_utils/qc.py", line 19, in get_table
+    mt = hl.read_matrix_table(input_path)
+  File "<decorator-gen-1459>", line 2, in read_matrix_table
+  File "/well/lindgren/users/mmq446/conda/skylake/envs/hail-updated/lib/python3.6/site-packages/hail/typecheck/check.py", line 577, in wrapper
+    return __original_func(*args_, **kwargs_)
+  File "/well/lindgren/users/mmq446/conda/skylake/envs/hail-updated/lib/python3.6/site-packages/hail/methods/impex.py", line 2115, in read_matrix_table
+    for rg_config in Env.backend().load_references_from_dataset(path):
+  File "/well/lindgren/users/mmq446/conda/skylake/envs/hail-updated/lib/python3.6/site-packages/hail/backend/spark_backend.py", line 326, in load_references_from_dataset
+    return json.loads(Env.hail().variant.ReferenceGenome.fromHailDataset(self.fs._jfs, path))
+  File "/well/lindgren/users/mmq446/conda/skylake/envs/hail-updated/lib/python3.6/site-packages/py4j/java_gateway.py", line 1305, in __call__
+    answer, self.gateway_client, self.target_id, self.name)
+  File "/well/lindgren/users/mmq446/conda/skylake/envs/hail-updated/lib/python3.6/site-packages/hail/backend/py4j_backend.py", line 32, in deco
+    'Error summary: %s' % (deepest, full, hail.__version__, deepest), error_id) from None
+hail.utils.java.FatalError: HailException: No file or directory found at /well/lindgren/UKBIOBANK/nbaya/wes_200k/phase_ukb_wes/data/phased/non_singleton/ukb_wes_phased_non_singleton_chr1-24xlong.qc-v4.2.2.mt
+
+Java stack trace:
+is.hail.utils.HailException: No file or directory found at /well/lindgren/UKBIOBANK/nbaya/wes_200k/phase_ukb_wes/data/phased/non_singleton/ukb_wes_phased_non_singleton_chr1-24xlong.qc-v4.2.2.mt
+	at is.hail.utils.ErrorHandling.fatal(ErrorHandling.scala:11)
+	at is.hail.utils.ErrorHandling.fatal$(ErrorHandling.scala:11)
+	at is.hail.utils.package$.fatal(package.scala:78)
+	at is.hail.expr.ir.RelationalSpec$.readMetadata(AbstractMatrixTableSpec.scala:32)
+	at is.hail.expr.ir.RelationalSpec$.readReferences(AbstractMatrixTableSpec.scala:73)
+	at is.hail.variant.ReferenceGenome$.fromHailDataset(ReferenceGenome.scala:581)
+	at is.hail.variant.ReferenceGenome.fromHailDataset(ReferenceGenome.scala)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at py4j.reflection.MethodInvoker.invoke(MethodInvoker.java:244)
+	at py4j.reflection.ReflectionEngine.invoke(ReflectionEngine.java:357)
+	at py4j.Gateway.invoke(Gateway.java:282)
+	at py4j.commands.AbstractCommand.invokeMethod(AbstractCommand.java:132)
+	at py4j.commands.CallCommand.execute(CallCommand.java:79)
+	at py4j.GatewayConnection.run(GatewayConnection.java:238)
+	at java.lang.Thread.run(Thread.java:748)
+
+
+
+Hail version: 0.2.77-684f32d73643
+Error summary: HailException: No file or directory found at /well/lindgren/UKBIOBANK/nbaya/wes_200k/phase_ukb_wes/data/phased/non_singleton/ukb_wes_phased_non_singleton_chr1-24xlong.qc-v4.2.2.mt
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Running on Apache Spark version 3.1.2
+SparkUI available at http://compd031.hpc.in.bmrc.ox.ac.uk:4040
+Welcome to
+     __  __     <>__
+    / /_/ /__  __/ /
+   / __  / _ `/ / /
+  /_/ /_/\_,_/_/_/   version 0.2.77-684f32d73643
+LOGGING: writing to logs/hail/mt_to_vcf.log
+Traceback (most recent call last):
+  File "utils/subscripts/mt_to_vcf.py", line 27, in <module>
+    main(args)
+  File "utils/subscripts/mt_to_vcf.py", line 18, in main
+    qc.export_table(mt, out_prefix = out_prefix, out_type = 'mt')
+  File "/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/utils/modules/python/ko_utils/qc.py", line 37, in export_table
+    mt.write(out_prefix+'.mt')
+  File "<decorator-gen-1265>", line 2, in write
+  File "/well/lindgren/users/mmq446/conda/skylake/envs/hail-updated/lib/python3.6/site-packages/hail/typecheck/check.py", line 577, in wrapper
+    return __original_func(*args_, **kwargs_)
+  File "/well/lindgren/users/mmq446/conda/skylake/envs/hail-updated/lib/python3.6/site-packages/hail/matrixtable.py", line 2529, in write
+    Env.backend().execute(ir.MatrixWrite(self._mir, writer))
+  File "/well/lindgren/users/mmq446/conda/skylake/envs/hail-updated/lib/python3.6/site-packages/hail/backend/py4j_backend.py", line 98, in execute
+    raise e
+  File "/well/lindgren/users/mmq446/conda/skylake/envs/hail-updated/lib/python3.6/site-packages/hail/backend/py4j_backend.py", line 74, in execute
+    result = json.loads(self._jhc.backend().executeJSON(jir))
+  File "/well/lindgren/users/mmq446/conda/skylake/envs/hail-updated/lib/python3.6/site-packages/py4j/java_gateway.py", line 1305, in __call__
+    answer, self.gateway_client, self.target_id, self.name)
+  File "/well/lindgren/users/mmq446/conda/skylake/envs/hail-updated/lib/python3.6/site-packages/hail/backend/py4j_backend.py", line 32, in deco
+    'Error summary: %s' % (deepest, full, hail.__version__, deepest), error_id) from None
+hail.utils.java.FatalError: HailException: file already exists: data/unphased/post-qc/ukb_wes_200k_filtered_chr1.mt
+
+Java stack trace:
+is.hail.utils.HailException: file already exists: data/unphased/post-qc/ukb_wes_200k_filtered_chr1.mt
+	at __C9Compiled.apply(Emit.scala)
+	at is.hail.expr.ir.CompileAndEvaluate$.$anonfun$_apply$3(CompileAndEvaluate.scala:56)
+	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:23)
+	at is.hail.utils.ExecutionTimer.time(ExecutionTimer.scala:81)
+	at is.hail.expr.ir.CompileAndEvaluate$._apply(CompileAndEvaluate.scala:56)
+	at is.hail.expr.ir.CompileAndEvaluate$.evalToIR(CompileAndEvaluate.scala:29)
+	at is.hail.expr.ir.LowerOrInterpretNonCompilable$.evaluate$1(LowerOrInterpretNonCompilable.scala:29)
+	at is.hail.expr.ir.LowerOrInterpretNonCompilable$.rewrite$1(LowerOrInterpretNonCompilable.scala:66)
+	at is.hail.expr.ir.LowerOrInterpretNonCompilable$.apply(LowerOrInterpretNonCompilable.scala:71)
+	at is.hail.expr.ir.lowering.LowerOrInterpretNonCompilablePass$.transform(LoweringPass.scala:68)
+	at is.hail.expr.ir.lowering.LoweringPass.$anonfun$apply$3(LoweringPass.scala:15)
+	at is.hail.utils.ExecutionTimer.time(ExecutionTimer.scala:81)
+	at is.hail.expr.ir.lowering.LoweringPass.$anonfun$apply$1(LoweringPass.scala:15)
+	at is.hail.utils.ExecutionTimer.time(ExecutionTimer.scala:81)
+	at is.hail.expr.ir.lowering.LoweringPass.apply(LoweringPass.scala:13)
+	at is.hail.expr.ir.lowering.LoweringPass.apply$(LoweringPass.scala:12)
+	at is.hail.expr.ir.lowering.LowerOrInterpretNonCompilablePass$.apply(LoweringPass.scala:63)
+	at is.hail.expr.ir.lowering.LoweringPipeline.$anonfun$apply$1(LoweringPipeline.scala:14)
+	at is.hail.expr.ir.lowering.LoweringPipeline.$anonfun$apply$1$adapted(LoweringPipeline.scala:12)
+	at scala.collection.IndexedSeqOptimized.foreach(IndexedSeqOptimized.scala:36)
+	at scala.collection.IndexedSeqOptimized.foreach$(IndexedSeqOptimized.scala:33)
+	at scala.collection.mutable.WrappedArray.foreach(WrappedArray.scala:38)
+	at is.hail.expr.ir.lowering.LoweringPipeline.apply(LoweringPipeline.scala:12)
+	at is.hail.expr.ir.CompileAndEvaluate$._apply(CompileAndEvaluate.scala:46)
+	at is.hail.backend.spark.SparkBackend._execute(SparkBackend.scala:381)
+	at is.hail.backend.spark.SparkBackend.$anonfun$execute$1(SparkBackend.scala:365)
+	at is.hail.expr.ir.ExecuteContext$.$anonfun$scoped$3(ExecuteContext.scala:47)
+	at is.hail.utils.package$.using(package.scala:638)
+	at is.hail.expr.ir.ExecuteContext$.$anonfun$scoped$2(ExecuteContext.scala:47)
+	at is.hail.utils.package$.using(package.scala:638)
+	at is.hail.annotations.RegionPool$.scoped(RegionPool.scala:17)
+	at is.hail.expr.ir.ExecuteContext$.scoped(ExecuteContext.scala:46)
+	at is.hail.backend.spark.SparkBackend.withExecuteContext(SparkBackend.scala:275)
+	at is.hail.backend.spark.SparkBackend.execute(SparkBackend.scala:362)
+	at is.hail.backend.spark.SparkBackend.$anonfun$executeJSON$1(SparkBackend.scala:406)
+	at is.hail.utils.ExecutionTimer$.time(ExecutionTimer.scala:52)
+	at is.hail.backend.spark.SparkBackend.executeJSON(SparkBackend.scala:404)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at py4j.reflection.MethodInvoker.invoke(MethodInvoker.java:244)
+	at py4j.reflection.ReflectionEngine.invoke(ReflectionEngine.java:357)
+	at py4j.Gateway.invoke(Gateway.java:282)
+	at py4j.commands.AbstractCommand.invokeMethod(AbstractCommand.java:132)
+	at py4j.commands.CallCommand.execute(CallCommand.java:79)
+	at py4j.GatewayConnection.run(GatewayConnection.java:238)
+	at java.lang.Thread.run(Thread.java:748)
+
+
+
+Hail version: 0.2.77-684f32d73643
+Error summary: HailException: file already exists: data/unphased/post-qc/ukb_wes_200k_filtered_chr1.mt
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+[Stage 0:>                                                      (0 + 20) / 2851]ModuleCmd_Load.c(208):ERROR:105: Unable to locate a modulefile for 'Anaconda3/2020.07'
+[Stage 0:>                                                      (0 + 20) / 4539]Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+[Stage 0:>                                                      (0 + 20) / 1679][Stage 0:>                                                      (1 + 20) / 2851][Stage 0:>                                                      (2 + 20) / 2851][Stage 0:>                                                      (3 + 20) / 2851][Stage 0:>                                                      (4 + 20) / 2851][Stage 0:>                                                      (1 + 20) / 4539][Stage 0:>                                                      (5 + 20) / 2851][Stage 0:>                                                      (2 + 20) / 4539][Stage 0:>                                                      (6 + 20) / 2851][Stage 0:>                                                      (3 + 20) / 4539][Stage 0:>                                                      (7 + 20) / 2851][Stage 0:>                                                      (8 + 20) / 2851][Stage 0:>                                                      (5 + 20) / 4539][Stage 0:>                                                      (9 + 20) / 2851][Stage 0:>                                                     (11 + 20) / 2851][Stage 0:>                                                      (6 + 20) / 4539][Stage 0:>                                                     (11 + 21) / 2851][Stage 0:>                                                     (12 + 20) / 2851][Stage 0:>                                                     (13 + 20) / 2851][Stage 0:>                                                     (14 + 20) / 2851][Stage 0:>                                                      (7 + 20) / 4539][Stage 0:>                                                      (8 + 20) / 4539][Stage 0:>                                                     (15 + 20) / 2851][Stage 0:>                                                     (16 + 20) / 2851][Stage 0:>                                                      (9 + 20) / 4539][Stage 0:>                                                     (10 + 20) / 4539][Stage 0:>                                                     (17 + 20) / 2851][Stage 0:>                                                     (12 + 20) / 4539][Stage 0:>                                                     (18 + 20) / 2851][Stage 0:>                                                     (20 + 20) / 2851][Stage 0:>                                                     (13 + 20) / 4539][Stage 0:>                                                     (14 + 20) / 4539][Stage 0:>                                                     (15 + 20) / 4539][Stage 0:>                                                     (16 + 20) / 4539][Stage 0:>                                                     (17 + 20) / 4539][Stage 0:>                                                     (18 + 20) / 4539][Stage 0:>                                                     (19 + 20) / 4539][Stage 0:>                                                      (2 + 20) / 1679][Stage 0:>                                                      (3 + 20) / 1679][Stage 0:>                                                      (4 + 20) / 1679][Stage 0:>                                                      (5 + 20) / 1679][Stage 0:>                                                     (20 + 20) / 4539][Stage 0:>                                                      (6 + 20) / 1679][Stage 0:>                                                      (7 + 20) / 1679][Stage 0:>                                                      (8 + 20) / 1679][Stage 0:>                                                      (9 + 20) / 1679][Stage 0:>                                                     (10 + 20) / 1679][Stage 0:>                                                     (11 + 20) / 1679][Stage 0:>                                                     (12 + 20) / 1679][Stage 0:>                                                     (14 + 20) / 1679][Stage 0:>                                                     (15 + 20) / 1679][Stage 0:>                                                     (16 + 20) / 1679][Stage 0:>                                                     (17 + 20) / 1679][Stage 0:>                                                     (18 + 20) / 1679][Stage 0:>                                                     (19 + 20) / 1679][Stage 0:>                                                     (20 + 20) / 1679][Stage 0:>                                                     (21 + 20) / 2851][Stage 0:>                                                     (21 + 20) / 4539]

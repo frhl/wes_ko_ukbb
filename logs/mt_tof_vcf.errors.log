@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "utils/subscripts/mt_to_vcf.py", line 7, in <module>
+    from ukb_utils import hail_init
+ModuleNotFoundError: No module named 'ukb_utils'
