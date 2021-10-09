@@ -37,36 +37,36 @@ def main(args):
     mt2 = qc.filter_max_mac(mt2, 1)
 
     # Run VEP + gnomAD variant annotations
-    #mt1 = process_consequences(hl.vep(mt1, "utils/configs/vep_env.json"))
-    #mt2 = process_consequences(hl.vep(mt2, "utils/configs/vep_env.json"))
+    mt1 = process_consequences(hl.vep(mt1, "utils/configs/vep_env.json"))
+    mt2 = process_consequences(hl.vep(mt2, "utils/configs/vep_env.json"))
     
     # Annotate with REVEL+CADD scores
-    #mt1 = analysis.annotate_dbnsfp(mt1, vep_path)
-    #mt2 = analysis.annotate_dbnsfp(mt2, vep_path)
+    mt1 = analysis.annotate_dbnsfp(mt1, vep_path)
+    mt2 = analysis.annotate_dbnsfp(mt2, vep_path)
    
     # Annotate for each consequence
-    #mt1 = mt1.explode_rows(mt1.vep.worst_csq_by_gene_canonical)
-    #mt2 = mt2.explode_rows(mt2.vep.worst_csq_by_gene_canonical)
+    mt1 = mt1.explode_rows(mt1.vep.worst_csq_by_gene_canonical)
+    mt2 = mt2.explode_rows(mt2.vep.worst_csq_by_gene_canonical)
 
     # annotate consequnece categories 
-    #mt1 = analysis.variant_csqs_category_builder(mt1)
-    #mt2 = analysis.variant_csqs_category_builder(mt2)
+    mt1 = analysis.variant_csqs_category_builder(mt1)
+    mt2 = analysis.variant_csqs_category_builder(mt2)
         
     # annotate Gene (In the future just use vep.worst_csq_by_gene_canonical downstream..) 
-    #mt1 = mt1.annotate_rows(vep = mt1.vep.annotate(Gene = mt1.vep.worst_csq_by_gene_canonical.gene_id))
-    #mt2 = mt2.annotate_rows(vep = mt2.vep.annotate(Gene = mt2.vep.worst_csq_by_gene_canonical.gene_id))
+    mt1 = mt1.annotate_rows(vep = mt1.vep.annotate(Gene = mt1.vep.worst_csq_by_gene_canonical.gene_id))
+    mt2 = mt2.annotate_rows(vep = mt2.vep.annotate(Gene = mt2.vep.worst_csq_by_gene_canonical.gene_id))
         
     # By default add snpid id annotation
     mt1 = qc.annotate_snpid(mt1)
     mt2 = qc.annotate_snpid(mt2)
     
     # annotate mt1 with dbSNP
-    mt1 = qc.annotate_rsid(mt1)
-    mt1 = qc.default_to_snpid_when_missing_rsid(mt1)
+    #mt1 = qc.annotate_rsid(mt1)
+    #mt1 = qc.default_to_snpid_when_missing_rsid(mt1)
 
     # annotate mt2 with dbSNP
-    mt2 = qc.annotate_rsid(mt2)
-    mt2 = qc.default_to_snpid_when_missing_rsid(mt2)
+    #mt2 = qc.annotate_rsid(mt2)
+    #mt2 = qc.default_to_snpid_when_missing_rsid(mt2)
     
     # export files
     mt1.write(out_prefix + ".mt")
