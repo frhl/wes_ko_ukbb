@@ -16,7 +16,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 10
 #$ -q short.qc
-#$ -t 21
+#$ -t 22
 
 set -o errexit
 set -o nounset
@@ -26,10 +26,9 @@ source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
 # directories
-readonly in_dir="data/mt/old"
-readonly vep_dir="data/vep/full/"
+readonly in_dir="data/mt"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/knockouts/all/211009_ptv_damaging_missense"
+readonly out_dir="derived/knockouts/all/test_ptv_damaging_missense"
 
 # hail script
 readonly hail_script="utils/subscripts/hail_knockouts.py"

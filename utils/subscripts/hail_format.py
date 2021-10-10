@@ -32,8 +32,8 @@ def main(args):
     mt1 = mt1.annotate_entries(GQ = mt2[(mt1.locus, mt1.alleles), mt1.s].GQ)
 
     # note: need to translate ids to combine later!
-    mt1 = qc.filter_to_european(mt1, only_annotate = True)
-    mt2 = qc.filter_to_european(mt2, only_annotate = True)
+    mt1 = qc.annotate_european(mt1)
+    mt2 = qc.annotate_european(mt2)
 
     ### Variant filtering/annotations
     # Using mt2 as a singleton refereence, so remove those with AC > 1

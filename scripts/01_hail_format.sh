@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 10
 #$ -q short.qc@@short.hge
-#$ -t 1-22
+#$ -t 1-20
 
 set -o errexit
 set -o nounset
@@ -27,7 +27,7 @@ readonly hail_script="utils/subscripts/hail_format.py"
 
 # input path
 readonly chr=${SGE_TASK_ID}
-readonly in_phased="${in_dir_phased}/ukb_wes_phased_non_singleton_chr${chr}-24xlong.qc-v4.2.2.vcf.gz"
+readonly in_phased="${in_dir_phased}/ukb_wes_200k_phased_chr${chr}.vcf.gz"
 readonly in_unphased="${in_dir_unphased}/ukb_wes_200k_filtered_chr${chr}.mt"
 readonly vep="${vep_dir}/ukb_wes_200k_full_vep_chr${chr}.vcf"
 

@@ -13,7 +13,7 @@ def hail_init(chrom=None, log_prefix='wes_analysis'):
             default_reference='GRCh38',
             master=f'local[{n_slots}]')
 
-def get_table(input_path, input_type, cache=False):
+def get_table(input_path, input_type, calc_info = True, cache=False):
     r'''Import mt/vcf/plink tables '''
     if input_type=='mt':
         mt = hl.read_matrix_table(input_path)
@@ -23,7 +23,8 @@ def get_table(input_path, input_type, cache=False):
         mt = hl.import_plink(*[f'{input_path}.{x}' for x in ['bed','bim','fam']])
     if input_type!='mt' and cache:
         mt = mt.cache()
-    mt = recalc_info(mt)
+    if calc_info:
+        mt = recalc_info(mt)
     return mt
 
 def export_table(mt, out_prefix, out_type, checkpoint=False, format_fields_to_drop=[]):
@@ -124,9 +125,9 @@ def translate_sample_ids(ht, from_app: int, to_app: int):
     assert undefined_ct==0, f'[translate_sample_ids]: Not all sample IDs mapped perfectly ({undefined_ct}/{ht.count()} IDs are undefined)'
     return ht
 
-def filter_to_european(mt, genetically_european = True, only_annotate = False):
-    r'''Get white british (app 11867) /well/lindgren/UKBIOBANK/DATA/QC/ukb_sqc_v2.txt
-    or genetically european by projecting ancestries into 1KG prpject data''' 
+def annotate_european(mt, genetically_european = True):
+    r'''annotate white british (app 11867) /well/lindgren/UKBIOBANK/DATA/QC/ukb_sqc_v2.txt
+    or genetically european by projecting ancestries into 1KG prpject data'''  
     if genetically_european:
         ht1 = hl.import_table('/well/lindgren/dpalmer/ukb_get_EUR/data/final_EUR_list.tsv', no_header = True).rename({'f0':'eid'}).key_by('eid')
         ht1 = ht1.annotate(eur = 1)
@@ -135,17 +136,23 @@ def filter_to_european(mt, genetically_european = True, only_annotate = False):
         ht2 = hl.import_table('/well/lindgren/flassen/ressources/ukb/white_british/210921_ukbb_white_british_samples.txt',
             types={'eid': hl.tstr, 'in.white.British.ancestry.subset': hl.tint32}).key_by('eid')
         mt = mt.annotate_cols(eur = ht2[mt.s]['in.white.British.ancestry.subset'])
-    # count and subset
+    return mt
+
+def filter_to_european(mt, genetically_european = True, use_existing_field = True):
+    r'''Get white british (app 11867) /well/lindgren/UKBIOBANK/DATA/QC/ukb_sqc_v2.txt
+    or genetically european by projecting ancestries into 1KG prpject data''' 
+    if 'eur' not in list(mt.cols) or not use_existing_field:
+        mt = annotate_european(mt, genetically_european)
     undefined_eur = mt.aggregate_cols(hl.agg.sum(hl.is_missing(mt.eur)))
     pre_filter_count = mt.count()
     if undefined_eur == pre_filter_count[1]:
         raise ValueError('[get_european]: IDs for europeans does not match keys in MatrixTable!')
     if undefined_eur > 0:
         print(f'[get_european]: Not all samples IDs mapped perfectly ({undefined_eur}/{pre_filter_count[1]} IDs are undefined)')
-    if only_annotate == False:
-        mt = mt.filter_cols(mt.eur == 1)
-        post_filter_count = mt.count()
-        print(f'[get_european]:{post_filter_count[1]}/{pre_filter_count[1]} IDs were included as genetically european.')
+    mt = mt.filter_cols(mt.eur == 1)
+    post_filter_count = mt.count()
+    print(f'[get_european]:{post_filter_count[1]}/{pre_filter_count[1]} IDs were included as genetically european.')
+    
     return mt
 
 def filter_to_european_legacy(mt, genetically_european = True, only_annotate = False):

@@ -63,8 +63,8 @@ def main(args):
         mt2 = qc.filter_to_unrelated(mt2, get_related = False)
         
     if get_europeans: 
-        mt1 = qc.filter_to_european(mt1, genetically_european = True)
-        mt2 = qc.filter_to_european(mt2, genetically_european = True)
+        mt1 = qc.filter_to_european(mt1)
+        mt2 = qc.filter_to_european(mt2)
 
     if missing:
         mt1 = qc.filter_min_missing(mt1, float(missing))
@@ -94,9 +94,9 @@ def main(args):
         mt1 = mt1.filter_entries(mt1.GQ >= min_gq) 
 
     # Annotate burden variant category
-    mt1 = mt1.explode_rows(mt1.vep.worst_csq_by_gene_canonical)
+    #mt1 = mt1.explode_rows(mt1.vep.worst_csq_by_gene_canonical)
     mt1 = analysis.variant_csqs_category_builder(mt1)
-    mt2 = mt2.explode_rows(mt2.vep.worst_csq_by_gene_canonical)
+    #mt2 = mt2.explode_rows(mt2.vep.worst_csq_by_gene_canonical)
     mt2 = analysis.variant_csqs_category_builder(mt2)
 
     if vep_filter: 

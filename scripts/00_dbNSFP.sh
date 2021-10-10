@@ -7,17 +7,18 @@
 #$ -o logs/dbNSFP.log
 #$ -e logs/dbNSFP.log
 #$ -P lindgren.prjc
-#$ -pe shmem 8
-#$ -q short.qe
-#$ -t 1-22
+#$ -pe shmem 10
+#$ -q short.qc@@short.hge
+#$ -t 24
 #$ -V
 
 set -o errexit
 set -o nounset
 
 source utils/hail_utils.sh
+source utils/qsub_utils.sh
 
-readonly chr=${SGE_TASK_ID}
+readonly chr=$( get_chr ${SGE_TASK_ID} ) 
 readonly RAW_ROOT="/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/data/unphased/post-qc"
 readonly RAW_FILE="/ukb_wes_200k_filtered_chr${chr}.vcf.bgz"
 readonly TMP_FILE="/ukb_wes_200k_filtered_tmp_chr${chr}.vcf.gz"
