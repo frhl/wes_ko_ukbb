@@ -9,14 +9,14 @@
 # 3) A ko probabiltiy matrix containg individuals, genes and probability of KO
 # 4) A ko probability matrix with the above + variants involved in KO.
 #
-#$ -N knockout
+#$ -N knockout_synonymous
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/knockout.log
 #$ -e logs/knockout.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 10
-#$ -q short.qc
-#$ -t 22
+#$ -q short.qc@@short.hge
+#$ -t 1-22
 
 set -o errexit
 set -o nounset
@@ -28,7 +28,7 @@ source utils/vcf_utils.sh
 # directories
 readonly in_dir="data/mt"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/knockouts/all/test_ptv_damaging_missense"
+readonly out_dir="derived/knockouts/all/211010_synonymous"
 
 # hail script
 readonly hail_script="utils/subscripts/hail_knockouts.py"
@@ -52,9 +52,11 @@ python3 "${hail_script}" \
     --input_unphased_path ${in_unphased} \
     --input_phased_type "mt" \
     --input_unphased_type "mt" \
-    --vep_filter "damaging_missense" "ptv" \
+    --vep_filter "synonymous" \
     --af_max 0.02 \
     --missing 0.05 \
+    --min_dp 47.8 \
+    --min_gq 19.5 \
     --out_prefix ${out_prefix} \
     --export_saige_vcf \
     --export_burden \

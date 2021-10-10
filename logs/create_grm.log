@@ -1,15 +1,1 @@
-2021-10-06 09:49:56 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-2021-10-06 09:49:56 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
-  Compatibility is not guaranteed.
-2021-10-06 09:49:56 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
-2021-10-06 09:53:54 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-2021-10-06 09:53:55 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
-  Compatibility is not guaranteed.
-2021-10-06 09:53:55 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
-2021-10-06 10:14:57 WARN  NativeCodeLoader:60 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-2021-10-06 10:14:57 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
-  Compatibility is not guaranteed.
-2021-10-06 10:14:57 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
-[get_european]: Not all samples IDs mapped perfectly (14096/199273 IDs are undefined)
-[get_european]:185177/199273 IDs were included as genetically european.
-Successfully combined .bgen files for GRM input.. Elapsed time: 20.68 hrs (job id: 54609626.undefined, 10xlong.qc, Thu Oct  7 06:55:48 BST 2021)
+data/saige/grm/input/eur_ukbb/ukb_eur_wes_sparse_markers_autosomes.bed/bim/fam already exists. Skipping. (job id: 54657456.undefined, 10xlong.qc, Sun Oct 10 21:45:52 BST 2021)

@@ -8,12 +8,13 @@
 #$ -e logs/create_grm.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 10
-#$ -q long.qc
+#$ -q long.qc@@long.hge
 
 set -o errexit
 set -o nounset
 
 source utils/qsub_utils.sh
+source utils/bash_utils.sh
 source utils/hail_utils.sh
 
 # paths for hail script
@@ -28,20 +29,23 @@ readonly createSparseGRM="/well/lindgren/flassen/software/dev/SAIGE/extdata/crea
 chroms=$( seq 1 22 | tr '\n' ' ' )
 
 # combine markers from UKBB imputed data
-set_up_hail
-set_up_pythonpath
-mkdir -p ${out_dir}
-python3 "${hail_script}" \
-  --chroms ${chroms} \
-  --out_prefix ${out_prefix} \
-  --subset_markers_by_kinship \
-  --subset_samples_by_wes200k \
-  --subset_samples_by_ukbb_eur
+if [ $( ls -1 ${out_prefix}.{bed,bim,fam} 2> /dev/null | wc -l ) -ne 3 ]; then
+  set_up_hail
+  set_up_pythonpath
+  mkdir -p ${out_dir}
+  python3 "${hail_script}" \
+   --chroms ${chroms} \
+   --out_prefix ${out_prefix} \
+   --subset_markers_by_kinship \
+   --subset_samples_by_wes200k \
+   --subset_samples_by_ukbb_eur
+  conda deactivate
+else
+  print_update "${out_prefix}.bed/bim/fam already exists. Skipping"
+fi
 
-print_update "Successfully combined .bgen files for GRM input." "${SECONDS}"
 
 # generate GRM using SAIGE
-conda deactivate
 set_up_RSAIGE
 print_update "Generating GRM from plink files.. "
 Rscript "${createSparseGRM}" \

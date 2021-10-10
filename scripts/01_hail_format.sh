@@ -26,7 +26,7 @@ readonly out_dir="data/mt"
 readonly hail_script="utils/subscripts/hail_format.py"
 
 # input path
-readonly chr=${SGE_TASK_ID}
+readonly chr=$( get_chr ${SGE_TASK_ID} ) 
 readonly in_phased="${in_dir_phased}/ukb_wes_200k_phased_chr${chr}.vcf.gz"
 readonly in_unphased="${in_dir_unphased}/ukb_wes_200k_filtered_chr${chr}.mt"
 readonly vep="${vep_dir}/ukb_wes_200k_full_vep_chr${chr}.vcf"
