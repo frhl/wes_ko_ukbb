@@ -1422,3 +1422,19 @@ Use of uninitialized value in split at /well/lindgren/flassen/software/VEP/plugi
 Use of uninitialized value $number_of_exons in subtraction (-) at /well/lindgren/flassen/software/VEP/plugins_grch38/LoF.pm line 575, <__ANONIO__> line 695001.
 Use of uninitialized value in split at /well/lindgren/flassen/software/VEP/plugins_grch38/LoF.pm line 562, <__ANONIO__> line 715001.
 Use of uninitialized value $number_of_exons in subtraction (-) at /well/lindgren/flassen/software/VEP/plugins_grch38/LoF.pm line 575, <__ANONIO__> line 715001.
+Use of uninitialized value in split at /well/lindgren/flassen/software/VEP/plugins_grch38/LoF.pm line 562, <__ANONIO__> line 835001.
+Use of uninitialized value $number_of_exons in subtraction (-) at /well/lindgren/flassen/software/VEP/plugins_grch38/LoF.pm line 575, <__ANONIO__> line 835001.
+Use of uninitialized value in split at /well/lindgren/flassen/software/VEP/plugins_grch38/LoF.pm line 562, <__ANONIO__> line 845001.
+Use of uninitialized value $number_of_exons in subtraction (-) at /well/lindgren/flassen/software/VEP/plugins_grch38/LoF.pm line 575, <__ANONIO__> line 845001.
+Use of uninitialized value in split at /well/lindgren/flassen/software/VEP/plugins_grch38/LoF.pm line 562, <__ANONIO__> line 915001.
+Use of uninitialized value $number_of_exons in subtraction (-) at /well/lindgren/flassen/software/VEP/plugins_grch38/LoF.pm line 575, <__ANONIO__> line 915001.
+Use of uninitialized value in split at /well/lindgren/flassen/software/VEP/plugins_grch38/LoF.pm line 562, <__ANONIO__> line 970001.
+Use of uninitialized value $number_of_exons in subtraction (-) at /well/lindgren/flassen/software/VEP/plugins_grch38/LoF.pm line 575, <__ANONIO__> line 970001.
+Use of uninitialized value in split at /well/lindgren/flassen/software/VEP/plugins_grch38/LoF.pm line 562, <__ANONIO__> line 1005001.
+Use of uninitialized value $number_of_exons in subtraction (-) at /well/lindgren/flassen/software/VEP/plugins_grch38/LoF.pm line 575, <__ANONIO__> line 1005001.
+Use of uninitialized value in split at /well/lindgren/flassen/software/VEP/plugins_grch38/LoF.pm line 562, <__ANONIO__> line 1020001.
+Use of uninitialized value $number_of_exons in subtraction (-) at /well/lindgren/flassen/software/VEP/plugins_grch38/LoF.pm line 575, <__ANONIO__> line 1020001.
+Use of uninitialized value in split at /well/lindgren/flassen/software/VEP/plugins_grch38/LoF.pm line 562, <__ANONIO__> line 1040001.
+Use of uninitialized value $number_of_exons in subtraction (-) at /well/lindgren/flassen/software/VEP/plugins_grch38/LoF.pm line 575, <__ANONIO__> line 1040001.
+Use of uninitialized value in split at /well/lindgren/flassen/software/VEP/plugins_grch38/LoF.pm line 562, <__ANONIO__> line 1065001.
+Use of uninitialized value $number_of_exons in subtraction (-) at /well/lindgren/flassen/software/VEP/plugins_grch38/LoF.pm line 575, <__ANONIO__> line 1065001.

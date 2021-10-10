@@ -59,3 +59,28 @@ M: 93183, N: 185177
 size of genoVecofPointers: 3
 setgeno mark1
 setgeno mark2
+92839 markers with MAF >= 0.01 are used for GRM.
+setgeno mark5
+setgeno mark6
+time: 166000
+92839  markers have MAF >=  0.01 
+1000  genetic markers are randomly selected to decide which samples are related
+Start detecting related samples for the sparse GRM
+tb-ta
+   user  system elapsed 
+  0.000   0.001   0.000 
+Start creating sparse GRM
+freq: 0.0906268 invStd: 2.46312  SNPIdx: 24481
+stdGenoMultiMarkersMat.n_rows: 1000
+stdGenoMultiMarkersMat.n_cols: 185177
+i,j 0,0
+i,j 0,1
+Ntotal: 185177
+2147483647
+9223372036854775807
+9223372036854775807
+totalCombination: 17145168075
+a 74116
+b 5
+tp1 - tp0:  8159.257 5.556 2046.465 0 0 
+ni: 12720740

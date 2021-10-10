@@ -29,9 +29,9 @@ readonly out_dir="derived/saige/binary/step1"
 
 # input path
 readonly chr=${SGE_TASK_ID}
-readonly grm_mtx="${grm_dir}/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
-readonly grm_sam="${grm_dir}/ukb_imp_eur_chr1_22_sparse_markers_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt"
-readonly plink_file="${plink_dir}/ukb_imp_eur_chr1_22_sparse_markers"
+readonly grm_mtx="${grm_dir}/ukb_eur_wes_sparse_markers_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+readonly grm_sam="${grm_dir}/ukb_eur_wes_sparse_markers_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt"
+readonly plink_file="${plink_dir}/ukb_eur_wes_sparse_markers_autosomes"
 readonly pheno_file="${pheno_dir}/UKBB_WES200k_filtered_binary_phenotypes.tsv"
 readonly covar_file="${covar_dir}/COVARS1.csv"
 readonly pyscript="utils/subscript/extract_phenos_from_header.py"
@@ -51,7 +51,7 @@ fit_null() {
    SECONDS=0
    print_update "Fitting null model for ${phenotype}, out: ${out_prefix}"
    Rscript "${step1_fitNULLGLMM}" \
-	 --plinkFile="${plink_file}" \
+     --plinkFile="${plink_file}" \
      --phenoFile="${pheno_file}" \
      --phenoCol="${phenotype}" \
      --covarColList=${covariates} \
@@ -59,13 +59,13 @@ fit_null() {
      --traitType="binary" \
      --invNormalize=TRUE \
      --outputPrefix="${out_prefix}" \
-	 --outputPrefix_varRatio="${out_prefix}" \
-	 --IsOverwriteVarianceRatioFile=TRUE \
+     --outputPrefix_varRatio="${out_prefix}" \
+     --IsOverwriteVarianceRatioFile=TRUE \
      --sparseGRMFile=${grm_mtx} \
      --sparseGRMSampleIDFile=${grm_sam}  \
      --nThreads=${threads} \
      --LOCO=FALSE\
-	 --skipModelFitting=FALSE \
+     --skipModelFitting=FALSE \
      --IsSparseKin=TRUE      \
      --isCateVarianceRatio=FALSE # Only needed for SAIGE-GENE+ (geneset)	
    duration=${SECONDS}
