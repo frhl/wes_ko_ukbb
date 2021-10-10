@@ -10,8 +10,6 @@
 #$ -pe shmem 10
 #$ -q long.qc@@long.hge
 
-set -o errexit
-set -o nounset
 
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
@@ -30,6 +28,8 @@ chroms=$( seq 1 22 | tr '\n' ' ' )
 
 # combine markers from UKBB imputed data
 if [ $( ls -1 ${out_prefix}.{bed,bim,fam} 2> /dev/null | wc -l ) -ne 3 ]; then
+  #set -o errexit
+  #set -o nounset
   set_up_hail
   set_up_pythonpath
   mkdir -p ${out_dir}
@@ -43,7 +43,6 @@ if [ $( ls -1 ${out_prefix}.{bed,bim,fam} 2> /dev/null | wc -l ) -ne 3 ]; then
 else
   print_update "${out_prefix}.bed/bim/fam already exists. Skipping"
 fi
-
 
 # generate GRM using SAIGE
 set_up_RSAIGE
