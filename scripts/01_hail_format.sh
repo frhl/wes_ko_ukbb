@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
-#$ -N hail_vep
+#$ -N hail_format
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/hail_format.log
 #$ -e logs/hail_format.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 20
-#$ -q short.qf
-#$ -t 5-8
+#$ -pe shmem 10
+#$ -q short.qc@@short.hge
+#$ -t 1-22
 
 set -o errexit
 set -o nounset
