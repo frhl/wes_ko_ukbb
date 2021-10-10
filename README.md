@@ -1,24 +1,12 @@
 # wes_ko_ukbb
 
-* Counts can be found here https://docs.google.com/spreadsheets/d/1p3wvZx7BNcMDg2BBT1wNSpVjC9gEwOloDEqeKMrcRAM/edit#gid=0
 
-updated 22-sep-2021
+## 00_dbNSFP.sh 
+Use VEP to generate annotations for dbNSFP including REVEL_score and CADD_score. So far, we have been unable to change the change the hail.vep condig file to also use the dbSNP library. For this reason, we are generating these annotaitons externally, and them adding them later to hail matrix tables.
 
-## todo
-* (DONE) use UKBB kinship markers to generate a sparse matrix of all chromosomes
-* (DONE) use these markers to generate a sparse matrix (also filter by 95% missingness)
-* (DONE) Should result in around 93k markers in total.
-* Setup SAIGE pipeline (fit null)
-* setup SAIGE pipeline (SPA test)
-* get phenotypes (Teresa)
-* (DONE) extract allels that are compound hetz. Validate with known compound hetz analysis.
-* extract allele consequence for compound hetz/homozygous individuals. 
-* run saige with with sparse matrix and fake VCF files that represent knockouts. (Notice, that we treat these files as single markers and not genesets!). Note: when running SAIGE, you can use the full file with non white british. These will be removed since GRM is created on only WB.
+## 01_hail_format
+Run hail.vep and gnomad.process_consequence to generate two matrix tables: one for unphased singletons and another for phased non-singletons.  
 
-## Current pipeline:
-* Core functions are found in utils/hail_export.py
-* Functions are called in shell scripts within the /scripts folder
-* remember to use either 'jupyter-hail' condaenv when working with this data
 
 
 

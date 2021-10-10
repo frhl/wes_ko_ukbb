@@ -61,12 +61,12 @@ def export_table(mt, out_prefix, out_type, checkpoint=False, format_fields_to_dr
         else:
             raise ValueError(f'Cannot export to PLINK because at least one of {out_prefix}.{{bed,bim,fam}} already exists')
 
-def filter_max_af(mt, maf=None):
+def filter_max_af(mt, af=None):
     r'''Filter to variants to have af less than {maf}'''
     mt = mt.filter_rows(hl.min(mt.info.AF)<af)
     return mt
 
-def filter_min_af(mt, maf=None):
+def filter_min_af(mt, af=None):
     r'''Filter to variants to have af gt {maf}'''
     mt = mt.filter_rows(hl.min(mt.info.AF)>af)
     return mt

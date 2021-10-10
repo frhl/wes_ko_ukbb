@@ -15,7 +15,7 @@
 #$ -e logs/knockout.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 10
-#$ -q short.qe
+#$ -q short.qc
 #$ -t 21
 
 set -o errexit
@@ -26,10 +26,10 @@ source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
 # directories
-readonly in_dir="data/mt"
+readonly in_dir="data/mt/old"
 readonly vep_dir="data/vep/full/"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/knockouts/all/test"
+readonly out_dir="derived/knockouts/all/211009_ptv_damaging_missense"
 
 # hail script
 readonly hail_script="utils/subscripts/hail_knockouts.py"
@@ -40,7 +40,7 @@ readonly in_phased="${in_dir}/ukb_wes_200k_annotated_chr${chr}.mt"
 readonly in_unphased="${in_dir}/ukb_wes_200k_annotated_chr${chr}_singletons.mt"
 
 # output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_maf002_miss005_ptv_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_wes_200k_af02_chr${chr}"
 readonly out="${out_prefix}.mt"
 
 # run hail
@@ -53,11 +53,11 @@ python3 "${hail_script}" \
     --input_unphased_path ${in_unphased} \
     --input_phased_type "mt" \
     --input_unphased_type "mt" \
-    --vep_filter "synonymous" \
-    --maf_max 0.02 \
+    --vep_filter "damaging_missense" "ptv" \
+    --af_max 0.02 \
     --missing 0.05 \
     --out_prefix ${out_prefix} \
-    --export_fake_vcf \
+    --export_saige_vcf \
     --export_burden \
     --export_ko_probability \
     --export_ko_rsid \

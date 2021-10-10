@@ -1,18 +1,13 @@
 #!/usr/bin/env bash
 #
-# Run Hail & VEP on phased and unphased data seperately since 
-# unnphased data only contains singletons, and phased data only
-# contains non-singletons. Generates a seperate matrix-table for
-# each.
-#
 #$ -N hail_vep
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/hail_vep.log
-#$ -e logs/hail_vep.errors.log
+#$ -o logs/hail_format.log
+#$ -e logs/hail_format.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 5
-#$ -q short.qe
-#$ -t 1-22
+#$ -pe shmem 20
+#$ -q short.qf
+#$ -t 5-8
 
 set -o errexit
 set -o nounset
@@ -41,18 +36,23 @@ readonly out_prefix="${out_dir}/ukb_wes_200k_annotated_chr${chr}"
 readonly out="${out_prefix}.mt"
 
 # run hail
-set_up_hail
-set_up_vep
-set_up_pythonpath
 mkdir -p ${out_dir}
-python3 "${hail_script}" \
-    --chrom ${chr} \
-    --input_phased_path ${in_phased}\
-    --input_unphased_path ${in_unphased} \
-    --input_phased_type "vcf" \
-    --input_unphased_type "mt" \
-    --vep_path ${vep} \
-    --out_prefix ${out_prefix}
+if [ ! -f "${out}/_SUCCESS" ]; then
+  set_up_hail
+  set_up_vep
+  set_up_pythonpath  
+  python3 "${hail_script}" \
+     --chrom ${chr} \
+     --input_phased_path ${in_phased}\
+     --input_unphased_path ${in_unphased} \
+     --input_phased_type "vcf" \
+     --input_unphased_type "mt" \
+     --vep_path ${vep} \
+     --out_prefix ${out_prefix}
+else
+  print_update "file ${out} already exists. Skipping!"
+fi
+
 
 
 print_update "Finished running HAIL for chr${chr}" "${SECONDS}"

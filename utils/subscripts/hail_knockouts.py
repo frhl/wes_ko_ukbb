@@ -23,12 +23,14 @@ def main(args):
     
     # variant filters
     chrom      = int(args.chrom)
-    maf_max    = float(args.maf_max)
-    maf_min    = float(args.maf_min)
-    hwe        = float(args.hwe)
-    missing    = float(args.missing)
-    min_dp     = float(args.min_dp)
-    min_gq     = float(args.min_gq)
+    af_max     = (args.af_max)
+    af_min     = (args.af_min)
+    maf_max    = (args.maf_max)
+    maf_min    = (args.maf_min)
+    hwe        = (args.hwe)
+    missing    = (args.missing)
+    min_dp     = (args.min_dp)
+    min_gq     = (args.min_gq)
     
     # sample filtering options
     get_related = bool(args.get_related)
@@ -47,6 +49,10 @@ def main(args):
     hail_init.hail_bmrc_init('logs/hail/knockout.log', 'GRCh38')
     mt1 = qc.get_table(input_path=input_phased_path, input_type=input_phased_type) 
     mt2 = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type)
+    
+    # add tmp rsid
+    mt1 = mt1.annotate_rows(rsid = mt1.snpid)
+    mt2 = mt2.annotate_rows(rsid = mt2.snpid)
 
     if get_related and not get_unrelated:
         mt1 = qc.filter_to_unrelated(mt1, get_related = True)
@@ -63,6 +69,12 @@ def main(args):
     if missing:
         mt1 = qc.filter_min_missing(mt1, float(missing))
         mt2 = qc.filter_min_missing(mt2, float(missing))
+    
+    if af_max:
+        mt1 = qc.filter_max_af(mt1, float(af_max))
+
+    if af_min:
+        mt1 = qf.fiter_min_af(mt1, float(af_min))
 
     if maf_max:
         mt1 = qc.filter_max_maf(mt1, float(maf_max))
@@ -74,12 +86,14 @@ def main(args):
         mt1 = qc.filter_hwe(mt1, float(hwe))
 
     if min_dp:
-        mt1 = mt1.filter_entries(mt1.DP >= min_dp) 
-        mt2 = mt2.filter_entries(mt2.DP >= min_dp)
+        mt1 = mt1
+        #mt1 = mt1.filter_entries(mt1.DP >= min_dp) 
+        #mt2 = mt2.filter_entries(mt2.DP >= min_dp)
 
     if min_gq:
-        mt1 = mt1.filter_entries(mt1.GQ >= min_gq) 
-        mt1 = mt1.filter_entries(mt1.GQ >= min_gq) 
+        mt1 = mt1
+        #mt1 = mt1.filter_entries(mt1.GQ >= min_gq) 
+        #mt1 = mt1.filter_entries(mt1.GQ >= min_gq) 
 
     # Annotate burden variant category
     mt1 = mt1.explode_rows(mt1.vep.worst_csq_by_gene_canonical)
@@ -140,8 +154,10 @@ if __name__=='__main__':
     parser.add_argument('--chrom', default=None, help='Chromosome to be used') 
     
     # variant and entry filtering
-    parser.add_argument('--maf_max', default=None, help='Select all variants with a maf less than the indicated value')
     parser.add_argument('--maf_min', default=None, help='Select all variants with a maf greater than the indicated values')
+    parser.add_argument('--maf_max', default=None, help='Select all variants with a maf less than the indicated value')
+    parser.add_argument('--af_min', default=None, help='Select all variants with a AF greater than the indicated value')
+    parser.add_argument('--af_max', default=None, help='Select all variants with a AF less than the indicated value')
     parser.add_argument('--hwe', default=None, help='Filter variants by HWE threshold')
     parser.add_argument('--missing', default=0.05, help='Filter variants by missingness threshold')
     parser.add_argument('--min_dp', default=20, help='filter variants by minimum sequencing depth (DP)')
