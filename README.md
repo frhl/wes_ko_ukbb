@@ -26,7 +26,7 @@ Run hail.vep and gnomad.process_consequence to generate two matrix tables: one f
 * matrix table of phased non-singletons
 
 ### 02_knockouts.sh
-Performs various filtering operations on matrix tables based on variant and sample-level metrics. We consider three categories of mutations that are manually specified: PTV+damaging_missense, PTV and synonomous as a negative control. Then, it will aggregate variants by genes and determine what individuals that harbor homozygous, heterozygous or compound heterozygous variations. Additionally, the script will output a synthethic VCF of markers (genes) in which the dosage (DT) has been encoded as the probability of being a knockout. We use a probabilistic model, since we are otherwise unable to incorporate singletons that can't be phased.
+Performs various filtering operations on matrix tables based on variant and sample-level metrics. We consider three categories of mutations that are manually specified: PTV+damaging_missense, PTV and synonomous as a negative control. Then, it will aggregate variants by genes and determine what individuals that harbor homozygous, heterozygous or compound heterozygous variations. Additionally, the script will output a synthethic VCF of markers (genes) in which the dosage (DT) has been encoded as P(knockout).
 
 **input:**
 * matrix table of unphased singletons
@@ -36,6 +36,7 @@ Performs various filtering operations on matrix tables based on variant and samp
 * burden matrix:
 * knockout_matrix: 
 * saige_vcf:
+
 
 ### 03_create_grm.sh
 

@@ -2,12 +2,12 @@
 #
 #$ -N hail_format
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/hail_format.log
-#$ -e logs/hail_format.errors.log
+#$ -o logs/hail_format_out.log
+#$ -e logs/hail_format_out.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 10
 #$ -q short.qc@@short.hge
-#$ -t 1-20
+#$ -t 6
 
 set -o errexit
 set -o nounset
@@ -16,9 +16,11 @@ source utils/qsub_utils.sh
 source utils/hail_utils.sh
 
 # directories
-readonly in_dir_phased="data/phased"
+
+readonly in_dir_phased="/well/lindgren/UKBIOBANK/nbaya/wes_200k/phase_ukb_wes/data/phased/non_singleton"
+#readonly in_dir_phased="data/phased"
 readonly in_dir_unphased="data/unphased/post-qc"
-readonly vep_dir="data/vep/full/"
+readonly vep_dir="data/vep/full"
 readonly spark_dir="data/tmp/spark"
 readonly out_dir="data/mt"
 
@@ -27,7 +29,8 @@ readonly hail_script="utils/subscripts/hail_format.py"
 
 # input path
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 
-readonly in_phased="${in_dir_phased}/ukb_wes_200k_phased_chr${chr}.vcf.gz"
+readonly in_phased="${in_dir_phased}/ukb_wes_phased_non_singleton_chr${chr}-24xlong.qc-v4.2.2.vcf.gz"
+#readonly in_phased="${in_dir_phased}/ukb_wes_200k_phased_chr${chr}.vcf.gz"
 readonly in_unphased="${in_dir_unphased}/ukb_wes_200k_filtered_chr${chr}.mt"
 readonly vep="${vep_dir}/ukb_wes_200k_full_vep_chr${chr}.vcf"
 

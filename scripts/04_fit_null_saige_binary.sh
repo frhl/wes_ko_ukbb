@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 #
-#$ -N step1_saige
+#$ -N saige_null_binary
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/step1_saige.log
-#$ -e logs/step1_saige.errors.log
+#$ -o logs/saige_null_binary.log
+#$ -e logs/saige_null_binary.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 8
 #$ -q short.qe
-#$ -t 1-42
-
+#$ -t 1
 
 module purge
 source utils/bash_utils.sh
@@ -21,10 +20,10 @@ readonly step1_fitNULLGLMM="/well/lindgren/flassen/software/dev/SAIGE/extdata/st
 readonly step2_SPAtests="/well/lindgren/flassen/software/dev/SAIGE/extdata/step2_SPAtests.R"
 
 # directories
-readonly grm_dir="data/saige/grm/input"
-readonly covar_dir="data/saige/input"
-readonly pheno_dir="/well/lindgren/UKBIOBANK/dpalmer/ukb_wes_phenotypes/200k"
-readonly plink_dir="data/saige/grm/input"
+readonly plink_dir="data/saige/grm/input/eur_ukbb"
+readonly grm_dir="data/saige/grm/input/eur_ukbb"
+readonly covar_dir="data/phenotypes"
+readonly pheno_dir="data/phenotypes"
 readonly out_dir="derived/saige/binary/step1"
 
 # input path
@@ -32,16 +31,14 @@ readonly chr=${SGE_TASK_ID}
 readonly grm_mtx="${grm_dir}/ukb_eur_wes_sparse_markers_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_dir}/ukb_eur_wes_sparse_markers_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt"
 readonly plink_file="${plink_dir}/ukb_eur_wes_sparse_markers_autosomes"
-readonly pheno_file="${pheno_dir}/UKBB_WES200k_filtered_binary_phenotypes.tsv"
+readonly pheno_file="${pheno_dir}/UKBB_WES200k_filtered_binary_phenotypes.tsv.gz"
 readonly covar_file="${covar_dir}/COVARS1.csv"
-readonly pyscript="utils/subscript/extract_phenos_from_header.py"
+readonly pheno_list="${pheno_dir}/UKBB_WES200k_binary_phenotypes_header.txt"
 
 # select covars and phenotype (0-42)
-set_up_pythonpath
-covariates=$( cat ${covar_file} )
-phenotype=$( python ${pyscript} \
-    --input ${pheno_file} \
-    --index ${SGE_TASK_ID})
+readonly index=${SGE_TASK_ID}
+readonly covariates=$( cat ${covar_file} )
+readonly phenotype=$( cut -f${index} ${pheno_list} )
 
 # output path
 readonly out_prefix="${out_dir}/ukb_wes_200k_${phenotype}"

@@ -23,7 +23,8 @@ def main(args):
     vep_path   = args.vep_path
     
     # run parser
-    hail_init.hail_bmrc_init('logs/hail/hail_export.log', 'GRCh38')
+    hail_init.hail_bmrc_init('logs/hail/hail_format_out.log', 'GRCh38')
+    hl._set_flags(no_whole_stage_codegen='1')
     mt1 = qc.get_table(input_path=input_phased_path, input_type=input_phased_type) # 12788
     mt2 = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type) # 11867 (for singletons)
 

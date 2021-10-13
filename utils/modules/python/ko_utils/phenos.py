@@ -8,6 +8,7 @@ def extract_from_header(path, regexes = ['ID','age','PC+','ukbb', 'sex','array']
     infile = open(path,'r')
     line = infile.readline().strip('\n').split(delim)
     line_clean = [l for l in line if not re.match(combined, l)]
+    infile.close()
     return line_clean
 
 
