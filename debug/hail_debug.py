@@ -23,7 +23,7 @@ def main(args):
     vep_path   = args.vep_path
     
     # setup flags
-    hail_init.hail_bmrc_init('logs/hail/hail_format.log', 'GRCh38')
+    hail_init.hail_bmrc_init_local('logs/hail/hail_format.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
     
     # get tables
@@ -31,17 +31,17 @@ def main(args):
     mt2 = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type) # 11867 (for singletons)
 
     # Add QC fields that has been removed during phasing to mt1
-    mt1 = mt1.annotate_entries(DP = mt2[(mt1.locus, mt1.alleles), mt1.s].DP)
-    mt1 = mt1.annotate_entries(GQ = mt2[(mt1.locus, mt1.alleles), mt1.s].GQ)
+    #mt1 = mt1.annotate_entries(DP = mt2[(mt1.locus, mt1.alleles), mt1.s].DP)
+    #mt1 = mt1.annotate_entries(GQ = mt2[(mt1.locus, mt1.alleles), mt1.s].GQ)
 
     # note: need to translate ids to combine later!
-    mt1 = qc.annotate_european(mt1)
-    mt2 = qc.annotate_european(mt2)
+    #mt1 = qc.annotate_european(mt1)
+    #mt2 = qc.annotate_european(mt2)
 
     ### Variant filtering/annotations
     # Using mt2 as a singleton matrix so remove those with AC > 1
-    mt2 = qc.filter_max_mac(mt2, 1)
-    mt2 = qc.filter_min_mac(mt2, 1)
+    #mt2 = qc.filter_max_mac(mt2, 1)
+    #mt2 = qc.filter_min_mac(mt2, 1)
 
     # Run VEP + gnomAD variant annotations
     mt1 = process_consequences(hl.vep(mt1, "utils/configs/vep_env.json"))
@@ -58,18 +58,45 @@ def main(args):
     # annotate consequnece categories 
     mt1 = analysis.variant_csqs_category_builder(mt1)
     mt2 = analysis.variant_csqs_category_builder(mt2)
-        
+    
+    # filter to PTVs
+    mt1 = mt1.filter_rows(mt1.vep.consequence_category == 'ptv')
+    mt2 = mt2.filter_rows(mt2.vep.consequence_category == 'ptv')
+
+    # counts
+    mt1 = mt1.annotate_entries(homozygous = mt1.GT.is_hom_var())
+    mt2 = mt2.annotate_entries(homozygous = mt2.GT.is_hom_var())
+
+    mt1 = mt1.annotate_entries(heterozygous = mt1.GT.is_het_ref())
+    mt2 = mt2.annotate_entries(heterozygous = mt2.GT.is_het_ref())
+    
+    # collect and count
+    hom1 = sum(mt1.homozygous.collect())
+    hom2 = sum(mt2.homozygous.collect())
+
+    # homozygoys PTVs
+    print(f"chr{chrom}: Phased data has {hom1} homozygous PTVs")
+    print(f"chr{chrom}: Non-phased data (including singletons) has {hom2} homozygous PTVs")
+
+    # get hetz
+    het1 = sum(mt1.heterozygous.collect())
+    het2 = sum(mt2.heterozygous.collect())
+
+    # heterozygous PTVs
+    print(f"chr{chrom}: Phased data has {het1} heterozygous PTVs")
+    print(f"chr{chrom}: Non-phased data (including singletons) has {het2} heterzygous PTVs")
+    
     # annotate Gene (In the future just use vep.worst_csq_by_gene_canonical downstream..) 
-    mt1 = mt1.annotate_rows(vep = mt1.vep.annotate(Gene = mt1.vep.worst_csq_by_gene_canonical.gene_id))
-    mt2 = mt2.annotate_rows(vep = mt2.vep.annotate(Gene = mt2.vep.worst_csq_by_gene_canonical.gene_id))
+    #mt1 = mt1.annotate_rows(vep = mt1.vep.annotate(Gene = mt1.vep.worst_csq_by_gene_canonical.gene_id))
+    #mt2 = mt2.annotate_rows(vep = mt2.vep.annotate(Gene = mt2.vep.worst_csq_by_gene_canonical.gene_id))
         
     # By default add snpid id annotation
-    mt1 = qc.annotate_snpid(mt1)
-    mt2 = qc.annotate_snpid(mt2)
+    #mt1 = qc.annotate_snpid(mt1)
+    #mt2 = qc.annotate_snpid(mt2)
     
     # export files
-    mt1.write(out_prefix + ".mt")
-    mt2.write(out_prefix + "_singletons.mt")
+    #mt1.write(out_prefix + ".mt")
+    #mt2.write(out_prefix + "_singletons.mt")
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()

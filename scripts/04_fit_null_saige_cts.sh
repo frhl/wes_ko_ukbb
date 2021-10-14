@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
-#$ -N saige_null_binary
+#$ -N saige_null_cts
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/saige_null_binary.log
-#$ -e logs/saige_null_binary.errors.log
+#$ -o logs/saige_null_cts.log
+#$ -e logs/saige_null_cts.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 8
 #$ -q short.qe
-#$ -t 3-46
+#$ -t 1-40
 
 module purge
 source utils/bash_utils.sh
@@ -24,16 +24,16 @@ readonly plink_dir="data/saige/grm/input/eur_ukbb"
 readonly grm_dir="data/saige/grm/input/eur_ukbb"
 readonly covar_dir="data/phenotypes"
 readonly pheno_dir="data/phenotypes"
-readonly out_dir="derived/saige/binary/step1"
+readonly out_dir="derived/saige/cts/step1"
 
 # input path
 readonly chr=${SGE_TASK_ID}
 readonly grm_mtx="${grm_dir}/ukb_eur_wes_sparse_markers_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_dir}/ukb_eur_wes_sparse_markers_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt"
 readonly plink_file="${plink_dir}/ukb_eur_wes_sparse_markers_autosomes"
-readonly pheno_file="${pheno_dir}/UKBB_WES200k_filtered_binary_phenotypes.tsv.gz"
+readonly pheno_file="${pheno_dir}/UKBB_WES200k_filtered_cts_phenotypes.tsv.gz"
 readonly covar_file="${covar_dir}/COVARS1.csv"
-readonly pheno_list="${pheno_dir}/UKBB_WES200k_binary_phenotypes_header.txt"
+readonly pheno_list="${pheno_dir}/UKBB_WES200k_cts_phenotypes_header.txt"
 
 # select covars and phenotype (0-42)
 readonly index=${SGE_TASK_ID}
@@ -53,7 +53,7 @@ fit_null() {
      --phenoCol="${phenotype}" \
      --covarColList=${covariates} \
      --sampleIDColinphenoFile="ID" \
-     --traitType="binary" \
+     --traitType="quantitative" \
      --invNormalize=TRUE \
      --outputPrefix="${out_prefix}" \
      --outputPrefix_varRatio="${out_prefix}" \

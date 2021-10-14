@@ -85,13 +85,13 @@ def main(args):
     if hwe:
         mt1 = qc.filter_hwe(mt1, float(hwe))
 
-    if min_dp:
-        mt1 = mt1.filter_entries(mt1.DP >= float(min_dp)) 
-        mt2 = mt2.filter_entries(mt2.DP >= float(min_dp))
+    #if min_dp:
+    #    mt1 = mt1.filter_entries(mt1.DP >= float(min_dp)) 
+    #    mt2 = mt2.filter_entries(mt2.DP >= float(min_dp))
 
-    if min_gq:
-        mt1 = mt1.filter_entries(mt1.GQ >= float(min_gq)) 
-        mt1 = mt1.filter_entries(mt1.GQ >= float(min_gq))
+    #if min_gq:
+    #    mt1 = mt1.filter_entries(mt1.GQ >= float(min_gq)) 
+    #    mt1 = mt1.filter_entries(mt1.GQ >= float(min_gq))
 
     # Annotate burden variant category
     #mt1 = mt1.explode_rows(mt1.vep.worst_csq_by_gene_canonical)
