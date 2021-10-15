@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 #
-#$ -N old_homozygous
+#$ -N old_phased_homozygous
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/old_homozygous.log
-#$ -e logs/old_homozygous.errors.log
+#$ -o logs/old_phased_homozygous.log
+#$ -e logs/old_phased_homozygous.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 20
+#$ -pe shmem 10
 #$ -q short.qe
 #$ -t 21
 

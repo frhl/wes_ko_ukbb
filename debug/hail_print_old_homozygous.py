@@ -28,9 +28,9 @@ def main(args):
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
     
     # get tables
-    #mt1 = qc.get_table(input_path=input_phased_path, input_type=input_phased_type) # 12788
-    #mt2 = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type) # 11867 (for singletons)
-    mt2 = hl.read_matrix_table(f'/well/lindgren/UKBIOBANK/nbaya/wes_200k/ukb_wes_qc/data/old-filtered/ukb_wes_200k_filtered_chr{chrom}.mt')
+    mt1 = qc.get_table(input_path=input_phased_path, input_type=input_phased_type) # 12788
+    mt2 = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type) # 11867 (for singletons)
+    #mt2 = hl.read_matrix_table(f'/well/lindgren/UKBIOBANK/nbaya/wes_200k/ukb_wes_qc/data/old-filtered/ukb_wes_200k_filtered_chr{chrom}.mt')
  
     # Add QC fields that has been removed during phasing to mt1
     #mt1 = mt1.annotate_entries(DP = mt2[(mt1.locus, mt1.alleles), mt1.s].DP)
@@ -46,46 +46,46 @@ def main(args):
     #mt2 = qc.filter_min_mac(mt2, 1)
 
     # Run VEP + gnomAD variant annotations
-    #mt1 = process_consequences(hl.vep(mt1, "utils/configs/vep_env.json"))
+    mt1 = process_consequences(hl.vep(mt1, "utils/configs/vep_env.json"))
     mt2 = process_consequences(hl.vep(mt2, "utils/configs/vep_env.json"))
     
     # Annotate with REVEL+CADD scores
-    #mt1 = analysis.annotate_dbnsfp(mt1, vep_path)
+    mt1 = analysis.annotate_dbnsfp(mt1, vep_path)
     mt2 = analysis.annotate_dbnsfp(mt2, vep_path)
    
     # Annotate for each consequence
-    #mt1 = mt1.explode_rows(mt1.vep.worst_csq_by_gene_canonical)
+    mt1 = mt1.explode_rows(mt1.vep.worst_csq_by_gene_canonical)
     mt2 = mt2.explode_rows(mt2.vep.worst_csq_by_gene_canonical)
 
     # annotate consequnece categories 
-    #mt1 = analysis.variant_csqs_category_builder(mt1)
+    mt1 = analysis.variant_csqs_category_builder(mt1)
     mt2 = analysis.variant_csqs_category_builder(mt2)
     
     # filter to PTVs
-    #mt1 = mt1.filter_rows(mt1.vep.consequence_category == 'ptv')
+    mt1 = mt1.filter_rows(mt1.vep.consequence_category == 'ptv')
     mt2 = mt2.filter_rows(mt2.vep.consequence_category == 'ptv')
 
     # counts
-    #mt1 = mt1.annotate_entries(homozygous = mt1.GT.is_hom_var())
+    mt1 = mt1.annotate_entries(homozygous = mt1.GT.is_hom_var())
     mt2 = mt2.annotate_entries(homozygous = mt2.GT.is_hom_var())
 
-    #mt1 = mt1.annotate_entries(heterozygous = mt1.GT.is_het_ref())
+    mt1 = mt1.annotate_entries(heterozygous = mt1.GT.is_het_ref())
     mt2 = mt2.annotate_entries(heterozygous = mt2.GT.is_het_ref())
     
     # collect and count
-    #hom1 = sum(mt1.homozygous.collect())
-    hom2 = sum(mt2.homozygous.collect())
+    hom1 = mt1.aggregate_entries(hl.agg.sum(hl.int32(mt1.homozygous)))
+    hom2 = mt2.aggregate_entries(hl.agg.sum(hl.int32(mt2.homozygous)))
 
     # homozygoys PTVs
-    #print(f"chr{chrom}: Phased data has {hom1} homozygous PTVs")
+    print(f"chr{chrom}: Phased data has {hom1} homozygous PTVs")
     print(f"chr{chrom}: Non-phased data (including singletons) has {hom2} homozygous PTVs")
 
     # get hetz
-    #het1 = sum(mt1.heterozygous.collect())
-    het2 = sum(mt2.heterozygous.collect())
+    het1 = mt1.aggregate_entries(hl.agg.sum(hl.int32(mt1.heterozygous)))
+    het2 = mt2.aggregate_entries(hl.agg.sum(hl.int32(mt2.heterozygous)))
 
     # heterozygous PTVs
-    #print(f"chr{chrom}: Phased data has {het1} heterozygous PTVs")
+    print(f"chr{chrom}: Phased data has {het1} heterozygous PTVs")
     print(f"chr{chrom}: Non-phased data (including singletons) has {het2} heterzygous PTVs")
     
     # annotate Gene (In the future just use vep.worst_csq_by_gene_canonical downstream..) 

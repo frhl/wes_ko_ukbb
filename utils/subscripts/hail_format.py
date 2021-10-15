@@ -23,7 +23,7 @@ def main(args):
     vep_path   = args.vep_path
     
     # setup flags
-    hail_init.hail_bmrc_init('logs/hail/hail_format.log', 'GRCh38')
+    hail_init.hail_bmrc_init_local('logs/hail/hail_format.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
     
     # get tables
