@@ -21,15 +21,17 @@ def main(args):
     out_prefix = args.out_prefix
     out_type   = args.out_type
     vep_path   = args.vep_path
-    
+    chrom      = args.chrom
+
     # setup flags
     hail_init.hail_bmrc_init_local('logs/hail/hail_format.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
     
     # get tables
     #mt1 = qc.get_table(input_path=input_phased_path, input_type=input_phased_type) # 12788
-    mt2 = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type) # 11867 (for singletons)
-
+    #mt2 = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type) # 11867 (for singletons)
+    mt2 = hl.read_matrix_table(f'/well/lindgren/UKBIOBANK/nbaya/wes_200k/ukb_wes_qc/data/old-filtered/ukb_wes_200k_filtered_chr{chrom}.mt')
+ 
     # Add QC fields that has been removed during phasing to mt1
     #mt1 = mt1.annotate_entries(DP = mt2[(mt1.locus, mt1.alleles), mt1.s].DP)
     #mt1 = mt1.annotate_entries(GQ = mt2[(mt1.locus, mt1.alleles), mt1.s].GQ)

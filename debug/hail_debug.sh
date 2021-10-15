@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N hail_debug2
+#$ -N hail_debug_new
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/hail_debug2.log
-#$ -e logs/hail_debug2.errors.log
+#$ -o logs/hail_debug_new.log
+#$ -e logs/hail_debug_new.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 20
 #$ -q short.qc@@short.hge
