@@ -142,8 +142,8 @@ def annotate_european(mt, genetically_european = True):
 def filter_to_european(mt, genetically_european = True, use_existing_field = True):
     r'''Get white british (app 11867) /well/lindgren/UKBIOBANK/DATA/QC/ukb_sqc_v2.txt
     or genetically european by projecting ancestries into 1KG prpject data''' 
-    if 'eur' not in list(mt.cols) or not use_existing_field:
-        mt = annotate_european(mt, genetically_european)
+    #if 'eur' not in list(mt.cols) or not use_existing_field:
+    mt = annotate_european(mt, genetically_european)
     undefined_eur = mt.aggregate_cols(hl.agg.sum(hl.is_missing(mt.eur)))
     pre_filter_count = mt.count()
     if undefined_eur == pre_filter_count[1]:
