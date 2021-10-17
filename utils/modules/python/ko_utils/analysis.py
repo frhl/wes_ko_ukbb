@@ -65,8 +65,6 @@ def annotate_dbnsfp(mt, vep_path):
 
     return(mt)
 
-
-
 def filter_vep(mt, field, conds):
     r'''Filter VEP field by condition(s) '''
     mt = mt.filter_rows(hl.literal(set(conds)).contains(mt.vep[field]))
@@ -200,10 +198,17 @@ def gene_csqs_calc_pKO_pseudoSNP(mt1, mt2, chrom):
 
 
 def gene_strand_builder(mt, field = 'snpid'):
-    '''Returns hail table that contains genes, samples, rsids, knockout status'''
-    
+    ''' Build a summary table of samples, genes and variants.
+
+    Returns hail table that contains genes, samples, variants, knockout status
+    stratified by what strand a variant fall onto.
+
+    :param mt: MatrixTable with row field 'vep.worst_csq_by_gene_canonical.gene_id'
+    :param field: String for row field that is found in the MatrixTable 
+
+    '''  
+
     # annotate entries with phased data
-    #mt = mt.explode_rows(mt.vep.worst_csq_by_gene_canonical)
     mt = mt.annotate_entries(rsid_entry = mt[field])
     mt = mt.annotate_rows(gene_id = mt.vep.worst_csq_by_gene_canonical.gene_id)
     mt = annotate_phased_entries(mt)
