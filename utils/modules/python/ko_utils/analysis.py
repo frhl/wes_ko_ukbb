@@ -143,50 +143,6 @@ def gene_csqs_dosage_builder(in_mt):
     ht = ht.drop('s0').drop('s1').drop('hom_var')    
     return ht
 
-def count_alleles(mt):
-    r'''Count up alleles in a vector (singleton AC, not singletons AC, total AC)'''
-    #mt = mt.explode_rows(mt.vep.worst_csq_by_gene_canonical)
-    mt = mt.filter_rows(mt.info.AC > 0)
-    d = mt.aggregate_rows(hl.agg.counter(mt.info.AC))
-    if 1 in d.keys():
-        n_singletons_ac = d[1]
-    else:
-        n_singletons_ac = 0
-    n_not_singletons_ac = sum([value*key for key, value in d.items() if key != 1])
-    return [n_singletons_ac, n_not_singletons_ac, n_singletons_ac + n_not_singletons_ac]
-
-def count_genes(mt):
-    r'''Collapse variants into genes and count affected genes'''
-    #mt = mt.explode_rows(mt.vep.worst_csq_by_gene_canonical)
-    d = mt.aggregate_entries(hl.agg.group_by(mt.vep.worst_csq_by_gene_canonical.gene_id, hl.agg.count_where(mt.GT.is_non_ref())))
-    n_genes = len([(key, value) for key, value in d.items() if value != 0])
-    return n_genes
-
-def summarize_variants(mt, what = 'ptv', vep_field = 'consequence_category'):
-    r'''Count up singletons, non singletons, total and genes affected by variants'''
-    ht = mt.filter_rows(hl.literal(set([what])).contains(mt.vep[vep_field]))
-    ht_alleles = count_alleles(ht)
-    ht_genes = count_genes(ht)
-    out = ht_alleles + [ht_genes]
-    return out
-
-def gene_burden_annotations_per_sample(mt):
-    r''' calculate gene burden by counting variants in gene'''
-    #mt = mt.explode_rows(mt.vep.worst_csq_by_gene_canonical)
-    mt = mt.group_rows_by(
-        gene_id = mt.vep.worst_csq_by_gene_canonical.gene_id
-        ).aggregate(n = hl.agg.count_where(mt.GT.is_non_ref()))
-    return mt
-
-def gene_burden_category_annotations_per_sample(mt):
-    r''' calculate gene burden by counting variants in gene stratified by variant category'''
-    #mt = mt.explode_rows(mt.vep.worst_csq_by_gene_canonical)
-    mt = mt.group_rows_by(
-        gene_id = mt.vep.worst_csq_by_gene_canonical.gene_id,
-        consequence_category = mt.vep.consequence_category
-        ).aggregate(n = hl.agg.count_where(mt.GT.is_non_ref()))
-    return mt
-
 def calc_p_ko(mt):
     '''Annotates entries with P(Knockout). Requires, that fields are
        already annotated with "singletons" count, and "DS". '''
@@ -242,26 +198,6 @@ def gene_csqs_calc_pKO_pseudoSNP(mt1, mt2, chrom):
     pmt = pmt.drop('gene_id')
     return pmt
 
-def maf_category_case_builder(call_stats_expr):
-    return (hl.case()
-            .when(call_stats_expr.AF <= 0.00001, 0.00001)
-            .when(call_stats_expr.AF <= 0.0001, 0.0001)
-            .when(call_stats_expr.AF <= 0.001, 0.001)
-            .when(call_stats_expr.AF <= 0.01, 0.01)
-            .when(call_stats_expr.AF <= 0.1, 0.1)
-            .default(0.99))
-
-def mac_category_case_builder(call_stats_expr):
-    return (hl.case()
-            .when(call_stats_expr.AC <= 5, call_stats_expr.AC)
-            .when(call_stats_expr.AC <= 10, 10)
-            .when(call_stats_expr.AC <= 25, 25)
-            .when(call_stats_expr.AC <= 100, 100)
-            .when(call_stats_expr.AC <= 1000, 1000)
-            .when(call_stats_expr.AC <= 10000, 10000)
-            .when(call_stats_expr.AC <= 100000, 100000)
-            .when(call_stats_expr.AC <= 1000000, 1000000)
-            .default(0))
 
 def gene_strand_builder(mt, field = 'snpid'):
     '''Returns hail table that contains genes, samples, rsids, knockout status'''
@@ -293,4 +229,42 @@ def gene_csqs_knockout_builder(in_mt, keep = None):
     if keep is not None:
         combined = combined.filter(hl.literal(keep).contains(combined.csqs))
     return combined
+
+
+
+def gene_burden_annotations_per_sample(mt):
+    r'''count non-ref genotypes per sample'''
+    mt = mt.group_rows_by(
+        gene_id = mt.vep.worst_csq_by_gene_canonical.gene_id
+        ).aggregate(n = hl.agg.count_where(mt.GT.is_non_ref()))
+    return mt
+
+def gene_burden_category_annotations_per_sample(mt):
+    r'''count non-ref genotypes per consequence category per sample'''
+    mt = mt.group_rows_by(
+        gene_id = mt.vep.worst_csq_by_gene_canonical.gene_id,
+        consequence_category = mt.vep.consequence_category
+        ).aggregate(n = hl.agg.count_where(mt.GT.is_non_ref()))
+    return mt
+
+def maf_category_case_builder(call_stats_expr):
+    return (hl.case()
+            .when(call_stats_expr.AF <= 0.00001, 0.00001)
+            .when(call_stats_expr.AF <= 0.0001, 0.0001)
+            .when(call_stats_expr.AF <= 0.001, 0.001)
+            .when(call_stats_expr.AF <= 0.01, 0.01)
+            .when(call_stats_expr.AF <= 0.1, 0.1)
+            .default(0.99))
+
+def mac_category_case_builder(call_stats_expr):
+    return (hl.case()
+            .when(call_stats_expr.AC <= 5, call_stats_expr.AC)
+            .when(call_stats_expr.AC <= 10, 10)
+            .when(call_stats_expr.AC <= 25, 25)
+            .when(call_stats_expr.AC <= 100, 100)
+            .when(call_stats_expr.AC <= 1000, 1000)
+            .when(call_stats_expr.AC <= 10000, 10000)
+            .when(call_stats_expr.AC <= 100000, 100000)
+            .when(call_stats_expr.AC <= 1000000, 1000000)
+            .default(0))
 
