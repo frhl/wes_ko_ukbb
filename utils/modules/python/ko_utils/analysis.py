@@ -242,7 +242,7 @@ def gene_csqs_calc_pKO_pseudoSNP(mt1, mt2, chrom):
     pmt = pmt.drop('gene_id')
     return pmt
 
-def maf_category_case_builder(mt):
+def maf_category_case_builder(call_stats_expr):
     return (hl.case()
             .when(call_stats_expr.AF <= 0.00001, 0.00001)
             .when(call_stats_expr.AF <= 0.0001, 0.0001)
