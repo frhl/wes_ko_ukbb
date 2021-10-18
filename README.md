@@ -1,5 +1,7 @@
 # wes_ko_ukbb
 
+Started script overhaul
+
 Pipeline for assessing compound heterozygous variation in UKBB using HAIL and SAIGE.
 
 ## scripts
