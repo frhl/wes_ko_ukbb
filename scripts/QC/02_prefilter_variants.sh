@@ -5,9 +5,9 @@
 #$ -o logs/prefilter_variants.log
 #$ -e logs/prefilter_variants.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 5
+#$ -pe shmem 2
 #$ -q short.qc
-#$ -t 21
+#$ -t 1-24
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh

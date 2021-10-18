@@ -7,27 +7,29 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 4
 #$ -q short.qc@@short.hge
-#$ -t 1-24
+#$ -t 21
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
 
 # directories
-
-readonly in_dir="data/unphased/post-qc"
 readonly spark_dir="data/tmp/spark"
+readonly in_dir="data/hardcalls"
 readonly out_dir="data/variants"
-readonly gnomad_dir="/well/lindgren/flassen/ressources/gnomad/gnomad_v2_liftover/exomes"
 readonly vep_dir="data/vep/full"
+
+readonly samples_dir="data/samples"
+readonly variant_dir="data/variants"
+readonly sex_dir="/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/"
 
 # hail script
 readonly hail_script="scripts/QC/05_annotate_variants_vep.py"
 
-# input path
+# input
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 
 readonly in_file="${in_dir}/ukb_wes_200k_filtered_chr${chr}.mt"
-readonly gnomad="${gnomad_dir}/gnomad.exomes.r2.1.1.sites.${chr}.liftover_grch38.vcf.bgz"
-readonly vep="${vep_dir}/ukb_wes_200k_full_vep_chr${chr}.vcf"
+readonly variants="${variants_dir}/02_prefilter_chr${chr}.keep.variant.ht'"
+#readonly samples="${samples_dir}/03_initial_qc.keep.sample_list"
 
 # output path
 readonly out_prefix="${out_dir}/ukb_wes_200k_filtered_chr${chr}"
