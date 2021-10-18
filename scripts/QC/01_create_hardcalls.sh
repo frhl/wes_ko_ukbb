@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 8
 #$ -q short.qc@@short.hge
-#$ -t 20-22
+#$ -t 1-24
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
@@ -16,7 +16,7 @@ source utils/hail_utils.sh
 
 readonly in_dir="data/unphased/post-qc"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="data/hardcalls/unphased"
+readonly out_dir="data/hardcalls"
 
 # hail script
 readonly hail_script="scripts/QC/01_create_hardcalls.py"

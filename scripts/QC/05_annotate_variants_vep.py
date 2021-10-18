@@ -5,6 +5,7 @@ import argparse
 
 from ukb_utils import hail_init
 from ko_utils import qc
+from ko_utils import analysis
 
 def main(args):
     
@@ -21,15 +22,16 @@ def main(args):
 
     # subset to rows
     ht = mt.rows()
-    ht = hl.vep(ht, vep_config)
+    ht = hl.vep(ht, 'utils/configs/vep_env.json')
     ht = process_consequences(ht)
 
     # Annotate with gnomAD information for the relevant chromosome
     gnomad_variants_ht = hl.import_vcf(gnomad_path, reference_genome ='GRCh38', force_bgz=True, array_elements_required=False).rows()
     ht = ht.annotate(inGnomAD = hl.is_defined(gnomad_variants_ht[ht.key]))
     #ht = ht.annotate(annotation=annotation_case_builder(ht.vep.worst_csq_for_variant_canonical)) # from ukb_common import *
+    ht = analysis.variant_csqs_category_builder(mt1)
 
-    ht.write(out_prefix, overwrite=True)
+    ht.write(out_prefix + "_vep_qc.ht", overwrite=True)
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()

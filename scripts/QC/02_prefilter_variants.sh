@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
 #
-#$ -N phased_prefilter
+#$ -N prefilter_variants
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/prefilter_variants_phased.log
-#$ -e logs/prefilter_variants_unphased.errors.log
+#$ -o logs/prefilter_variants.log
+#$ -e logs/prefilter_variants.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 5
 #$ -q short.qc
-#$ -t 20-22
+#$ -t 21
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
 
 # directories
-readonly in_dir="data/hardcalls/phased"
+readonly in_dir="data/hardcalls"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="data/variants/phased"
+readonly out_dir="data/variants"
 
 # hail script
 readonly hail_script="scripts/QC/02_prefilter_variants.py"
@@ -29,6 +29,7 @@ readonly out_prefix="${out_dir}/02_prefilter_chr${chr}.keep.variant.ht"
 
 mkdir -p ${out_dir}
 set_up_hail
+set_up_pythonpath_legacy
 python3 "${hail_script}" \
      --input_path ${in_file}\
      --input_type "mt" \
