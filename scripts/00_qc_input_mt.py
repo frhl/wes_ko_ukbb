@@ -18,6 +18,8 @@ def main(args):
     input_phased_type = args.input_phased_type
     input_unphased_path = args.input_unphased_path
     input_unphased_type = args.input_unphased_type
+    input_gnomad_path = args.input_gnomad_path
+    input_imputed_path = args.input_imputed_path
     out_prefix = args.out_prefix
     out_type   = args.out_type
     vep_path   = args.vep_path
@@ -44,7 +46,19 @@ def main(args):
         ht_final_variants = ht_final_variants.key_by(ht_final_variants.locus, ht_final_variants.alleles)
         mt1 = mt1.filter_rows(hl.is_defined(ht_final_variants[mt1.row_key]))
         mt2 = mt2.filter_rows(hl.is_defined(ht_final_variants[mt2.row_key]))
+    
+    # annotate with gnomAD
+    if input_gnomad_path:
+        gnomad_variants_ht = hl.import_vcf(input_gnomad_path, reference_genome ='GRCh38', force_bgz=True, array_elements_required=False).rows()
+        mt1 = mt1.annotate_rows(inGnomAD = hl.is_defined(gnomad_variants_ht[mt1.row_key]))
+        mt2 = mt2.annotate_rows(inGnomAD = hl.is_defined(gnomad_variants_ht[mt2.row_key]))
 
+    # annotate with imputed data
+    if input_imputed_path:
+        imputed = hl.read_table(input_imputed_path)
+        mt1 = mt1.annotate_rows(imputed_info = imputed[mt1.row_key].info) 
+        mt2 = mt2.annotate_rows(imputed_info = imputed[mt2.row_key].info)
+    
     # Add QC fields that has been removed during phasing to mt1
     mt1 = mt1.annotate_entries(DP = mt2[(mt1.locus, mt1.alleles), mt1.s].DP)
     mt1 = mt1.annotate_entries(GQ = mt2[(mt1.locus, mt1.alleles), mt1.s].GQ)
@@ -76,11 +90,11 @@ def main(args):
     # write out variant stats
     mt1 = hl.variant_qc(mt1, name='variant_qc')
     ht1_rows_filter = mt1.rows()
-    ht1_rows_filter.select().write(out_prefix + "_variants_phased.tsv.bgz", overwrite=True)
+    ht1_rows_filter.select().write(out_prefix + "_variants_phased.ht", overwrite=True)
  
     mt2 = hl.variant_qc(mt2, name='variant_qc')
     ht2_rows_filter = mt2.rows()
-    ht2_rows_filter.select().write(out_prefix + "_variants_unphased.tsv.bgz", overwrite=True)
+    ht2_rows_filter.select().write(out_prefix + "_variants_unphased.ht", overwrite=True)
     
     # write out samples stats
     mt1 = mt.annotate_cols(gq = hl.agg.stats(mt1.GQ), dp = hl.agg.stats(mt1.DP))
@@ -98,6 +112,8 @@ if __name__=='__main__':
     parser.add_argument('--input_phased_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
     parser.add_argument('--input_unphased_path', default=None, help='Path to input that contains singletons')
     parser.add_argument('--input_unphased_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
+    parser.add_argument('--input_gnomad_path', default=None, help='Get path to gnomAD')
+    parser.add_argument('--input_imputed_path', default=None, help='Get path to imputed data')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Type of output dataset (options: mt, vcf, plink)')
     parser.add_argument('--chrom', default=None, help='Chromosome to be used')
