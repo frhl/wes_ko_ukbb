@@ -2,8 +2,8 @@
 #
 #$ -N hail_format
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/hail_format_out.log
-#$ -e logs/hail_format_out.errors.log
+#$ -o logs/create_mt.log
+#$ -e logs/create_mt.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 10
 #$ -q short.qc@@short.hge
