@@ -13,17 +13,18 @@ def hail_init(chrom=None, log_prefix='wes_analysis'):
             default_reference='GRCh38',
             master=f'local[{n_slots}]')
 
-def get_table(input_path, input_type, cache=False):
+def get_table(input_path, input_type, calc_info = True, cache=False):
     r'''Import mt/vcf/plink tables '''
     if input_type=='mt':
         mt = hl.read_matrix_table(input_path)
     elif input_type=='vcf':
-        mt = hl.import_vcf(input_path, force_bgz=True, array_elements_required=False, min_partitions=100)
+        mt = hl.import_vcf(input_path, force_bgz=True, array_elements_required=False)
     elif input_type=='plink':
         mt = hl.import_plink(*[f'{input_path}.{x}' for x in ['bed','bim','fam']])
     if input_type!='mt' and cache:
         mt = mt.cache()
-    mt = recalc_info(mt)
+    if calc_info:
+        mt = recalc_info(mt)
     return mt
 
 def export_table(mt, out_prefix, out_type, checkpoint=False, format_fields_to_drop=[]):
@@ -44,7 +45,7 @@ def export_table(mt, out_prefix, out_type, checkpoint=False, format_fields_to_dr
                           output=out_vcf_path,
                           parallel=None,
                           metadata = metadata,
-                          tabix = True)
+                          tabix = False)
         else:
             raise ValueError(f'Cannot export VCF because {out_vcf_path} already exists')
     elif out_type=='plink':
@@ -61,14 +62,33 @@ def export_table(mt, out_prefix, out_type, checkpoint=False, format_fields_to_dr
         else:
             raise ValueError(f'Cannot export to PLINK because at least one of {out_prefix}.{{bed,bim,fam}} already exists')
 
-def filter_max_maf(mt, maf=None):
-    r'''Filter to variants to have maf less than {maf}'''
-    mt = mt.filter_rows(hl.min(mt.info.AF)<maf)
+
+def filter_max_af(mt, af=None):
+    r'''Filter to variants to have af less than {maf}'''
+    mt = mt.filter_rows(hl.min(mt.info.AF)<af)
     return mt
 
+def filter_min_af(mt, af=None):
+    r'''Filter to variants to have af gt {maf}'''
+    mt = mt.filter_rows(hl.min(mt.info.AF)>af)
+    return mt
+
+def filter_max_maf(mt, maf=None):
+    r'''boolean for variants that have maf less than {maf}'''
+    maf_expr = (mt.info.AF<maf) | (mt.info.AF>(1-maf))
+    return maf_expr
+
 def filter_min_maf(mt, maf=None):
-    r'''Filter to variants to have maf gt {maf}'''
-    mt = mt.filter_rows(hl.min(mt.info.AF)>maf)
+    r'''boolean for variants that have maf gt {maf}'''
+    maf_expr = (mt.info.AF>maf) & (mt.info.AF<(1-maf))
+    return maf_expr
+
+def filter_maf(mt, min_maf = None, max_maf = None):
+    r'''Filter to variants based on a certain min/max MAF threshold'''
+    if min_maf is not None:
+            mt = mt.filter_rows(filter_min_maf(mt, min_maf))
+    if max_maf is not None:
+            mt = mt.filter_rows(filter_max_maf(mt, max_maf))
     return mt
 
 def filter_max_mac(mt, mac=None):
@@ -106,7 +126,37 @@ def translate_sample_ids(ht, from_app: int, to_app: int):
     assert undefined_ct==0, f'[translate_sample_ids]: Not all sample IDs mapped perfectly ({undefined_ct}/{ht.count()} IDs are undefined)'
     return ht
 
-def filter_to_european(mt, genetically_european = True, only_annotate = False):
+def annotate_european(mt, genetically_european = True):
+    r'''annotate white british (app 11867) /well/lindgren/UKBIOBANK/DATA/QC/ukb_sqc_v2.txt
+    or genetically european by projecting ancestries into 1KG prpject data'''  
+    if genetically_european:
+        ht1 = hl.import_table('/well/lindgren/dpalmer/ukb_get_EUR/data/final_EUR_list.tsv', no_header = True).rename({'f0':'eid'}).key_by('eid')
+        ht1 = ht1.annotate(eur = 1)
+        mt = mt.annotate_cols(eur = ht1[mt.s].eur)
+    else:
+        ht2 = hl.import_table('/well/lindgren/flassen/ressources/ukb/white_british/210921_ukbb_white_british_samples.txt',
+            types={'eid': hl.tstr, 'in.white.British.ancestry.subset': hl.tint32}).key_by('eid')
+        mt = mt.annotate_cols(eur = ht2[mt.s]['in.white.British.ancestry.subset'])
+    return mt
+
+def filter_to_european(mt, genetically_european = True, use_existing_field = True):
+    r'''Get white british (app 11867) /well/lindgren/UKBIOBANK/DATA/QC/ukb_sqc_v2.txt
+    or genetically european by projecting ancestries into 1KG prpject data''' 
+    #if 'eur' not in list(mt.cols) or not use_existing_field:
+    mt = annotate_european(mt, genetically_european)
+    undefined_eur = mt.aggregate_cols(hl.agg.sum(hl.is_missing(mt.eur)))
+    pre_filter_count = mt.count()
+    if undefined_eur == pre_filter_count[1]:
+        raise ValueError('[get_european]: IDs for europeans does not match keys in MatrixTable!')
+    if undefined_eur > 0:
+        print(f'[get_european]: Not all samples IDs mapped perfectly ({undefined_eur}/{pre_filter_count[1]} IDs are undefined)')
+    mt = mt.filter_cols(mt.eur == 1)
+    post_filter_count = mt.count()
+    print(f'[get_european]:{post_filter_count[1]}/{pre_filter_count[1]} IDs were included as genetically european.')
+    
+    return mt
+
+def filter_to_european_legacy(mt, genetically_european = True, only_annotate = False):
     r'''Get white british (app 11867) /well/lindgren/UKBIOBANK/DATA/QC/ukb_sqc_v2.txt
     and genetically european from /well/lindgren/UKBIOBANK/laura/k_means_clustering_pcs/ukbb_genetically_european_k4_4PCs_self_rep_Nov2020.txt''' 
     
@@ -217,7 +267,7 @@ def annotate_snpid(mt, delim = '_'):
     mt = mt.annotate_rows(snpid = ids)
     return mt
 
-def annotate_rsid(mt, dbsnp_path = '/well/lindgren/flassen/ressources/dbsnp/GRCh38/GCF_000001405.39.gz', build = 'GRCh38'):
+def annotate_rsid(mt, dbsnp_path = '/well/lindgren/flassen/ressources/dbsnp/GRCh38/155/GCF_000001405.39.gz', build = 'GRCh38'):
     r'''Use dbSNP to annotate all rsIDs in the a matrix table.'''
     recode = {f"NC_0000{i}.{j}":f"chr{i}" for i in (list(range(1, 23)) + ['X', 'Y']) for j in ('09','10','11','12','13','14')}
     dbsnp = hl.import_vcf(dbsnp_path, 
@@ -244,5 +294,4 @@ def is_phased(mt):
                         (mt.GT ==  hl.parse_call('1|1'))
                        )
     return mt.aggregate_entries(hl.agg.any(mt.phased))
-
 

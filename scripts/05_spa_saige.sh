@@ -6,48 +6,59 @@
 #$ -o logs/step2_saige.log
 #$ -e logs/step2_saige.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 2
+#$ -pe shmem 1
 #$ -q short.qe
-#$ -t 22
-
-#set -o errexit
-#set -o nounset
+#$ -t 17-19
+#$ -V
 
 module purge
 source utils/bash_utils.sh
-
-SGE_TASK_ID=22
+source utils/hail_utils.sh
 
 # directories
+readonly vcf_dir="derived/knockouts/all/210925_ptv_damaging_missense"
+readonly step1_dir="derived/saige/binary/step1"
 readonly out_dir="derived/saige/binary/step2"
+readonly pheno_dir="/well/lindgren/UKBIOBANK/dpalmer/ukb_wes_phenotypes/200k"
+readonly spark_dir="data/tmp/spark"
 
 # input path
 readonly chr=${SGE_TASK_ID}
-readonly covar_file="${covar_dir}/COVARS1.csv"
+readonly in_vcf="${vcf_dir}/ukb_wes_200k_maf002_miss005_ptv_chr${chr}_ko.vcf.bgz"
+readonly in_csi="${vcf}.csi"
+readonly pheno_file="${pheno_dir}/UKBB_WES200k_filtered_binary_phenotypes.tsv"
+readonly spa_script="utils/subscripts/_spa_test.sh"
+readonly pyscript="utils/subscripts/extract_phenos_from_header.py"
 
-# output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_test_crohns${chr}"
-readonly out_prefix_ratio="${out_dir}/ukb_wes_200k_test_crohns_cate"
+# select phenotype (1-42)
+set_up_hail
+set_up_pythonpath
+phenotype=$( python ${pyscript} \
+    --input ${pheno_file} \
+    --index ${SGE_TASK_ID})
 
-# SAIGE paths
-readonly threads=$(( ${NSLOTS}-1 ))
-readonly createSparseGRM="/well/lindgren/flassen/software/dev/SAIGE/extdata/createSparseGRM.R"
-readonly step1_fitNULLGLMM="/well/lindgren/flassen/software/dev/SAIGE/extdata/step1_fitNULLGLMM.R"
-readonly step2_SPAtests="/well/lindgren/flassen/software/dev/SAIGE/extdata/step2_SPAtests.R"
+# setup input phenotypes
+readonly in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
+readonly in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
 
-Rscript "${step1_SPAtests}"	\
-	--vcfFile=./input/dosage_10markers.vcf.gz \
-	--vcfFileIndex=./input/dosage_10markers.vcf.gz.tbi \
-	--vcfField="DS" \
-    --chrom=${chr} \
-    --minMAF=0.0001 \
-    --minMAC=1 \
-    --GMMATmodelFile=./output/example_binary_includenonAutoforvarRatio.rda \
-    --varianceRatioFile=./output/example_binary.varianceRatio.txt \
-    --SAIGEOutputFile=./output/example_binary.SAIGE.vcf.genotype.txt_new \
-    --numLinesOutput=2 \
-    --IsOutputAFinCaseCtrl=TRUE	\
-	--IsOutputNinCaseCtrl=TRUE	\
-	--IsOutputHetHomCountsinCaseCtrl=TRUE	
+# output
+readonly out_prefix="${out_dir}/ukb_wes_200k_${phenotype}"
 
+submit_spa_job() {
+  #set -x
+  qsub -N "spa_${phenotype}" \
+    -t 16 \
+    -q "short.qe" \
+    -pe shmem 4 \
+    ${spa_script} \
+    ${phenotype} \
+    ${in_vcf} \
+    ${in_csi} \
+    ${in_gmat} \
+    ${in_var} \
+    ${out_prefix}
+}
+
+submit_spa_job
+print_update "Submitted SPA scripts for ${phenotype}"
 

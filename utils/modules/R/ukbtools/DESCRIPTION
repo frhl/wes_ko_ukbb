@@ -21,4 +21,10 @@ Collate:
     'calc_age.R'
     'extract_covars.R'
     'make_icd_mapping.R' 
+    'collapse_to_most_severe_csqs_category.R'
+    'annotate_csqs_category.R'
+    'unpack_hail_rows.R'
+    'extract_hail_field.R'
+    'stratify_by_variant.R'
+    'format_from_hail.R'
 

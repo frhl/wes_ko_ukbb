@@ -1,3 +1,0 @@
-BCFtools/1.9-foss-2018b(26):ERROR:150: Module 'BCFtools/1.9-foss-2018b' conflicts with the currently loaded module(s) 'BCFtools/1.10.2-GCC-8.3.0'
-BCFtools/1.9-foss-2018b(26):ERROR:102: Tcl command execution failed: conflict BCFtools
-
