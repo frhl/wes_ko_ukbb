@@ -21,8 +21,7 @@ def main(args):
     out_prefix = args.out_prefix
     out_type   = args.out_type
     vep_path   = args.vep_path
-    chrom      = args.chrom
-
+    
     # setup flags
     hail_init.hail_bmrc_init_local('logs/hail/hail_format.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
@@ -30,22 +29,19 @@ def main(args):
     # get tables
     mt1 = qc.get_table(input_path=input_phased_path, input_type=input_phased_type) # 12788
     mt2 = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type) # 11867 (for singletons)
-    #mt2 = hl.read_matrix_table(f'/well/lindgren/UKBIOBANK/nbaya/wes_200k/ukb_wes_qc/data/old-filtered/ukb_wes_200k_filtered_chr{chrom}.mt')
- 
+
     # Add QC fields that has been removed during phasing to mt1
-    #mt1 = mt1.annotate_entries(DP = mt2[(mt1.locus, mt1.alleles), mt1.s].DP)
-    #mt1 = mt1.annotate_entries(GQ = mt2[(mt1.locus, mt1.alleles), mt1.s].GQ)
+    mt1 = mt1.annotate_entries(DP = mt2[(mt1.locus, mt1.alleles), mt1.s].DP)
+    mt1 = mt1.annotate_entries(GQ = mt2[(mt1.locus, mt1.alleles), mt1.s].GQ)
 
     # note: need to translate ids to combine later!
-    #mt1 = qc.annotate_european(mt1)
-    #mt2 = qc.annotate_european(mt2)
+    mt1 = qc.annotate_european(mt1)
+    mt2 = qc.annotate_european(mt2)
 
     ### Variant filtering/annotations
     # Using mt2 as a singleton matrix so remove those with AC > 1
-    #mt2 = qc.filter_max_mac(mt2, 1)
-    #mt2 = qc.filter_min_mac(mt2, 1)
-    mt1 = qc.filter_max_af(mt1, 0.02)
-    mt2 = qc.filter_max_af(mt2, 0.02)
+    mt2 = qc.filter_max_mac(mt2, 1)
+    mt2 = qc.filter_min_mac(mt2, 1)
 
     # Run VEP + gnomAD variant annotations
     mt1 = process_consequences(hl.vep(mt1, "utils/configs/vep_env.json"))
@@ -62,53 +58,18 @@ def main(args):
     # annotate consequnece categories 
     mt1 = analysis.variant_csqs_category_builder(mt1)
     mt2 = analysis.variant_csqs_category_builder(mt2)
-
-    # filter to PTVs
-    mt1 = mt1.filter_rows(mt1.vep.consequence_category == 'ptv')
-    mt2 = mt2.filter_rows(mt2.vep.consequence_category == 'ptv')
-
-    # counts
-    mt1 = mt1.annotate_entries(homozygous = mt1.GT.is_hom_var())
-    mt2 = mt2.annotate_entries(homozygous = mt2.GT.is_hom_var())
-
-    mt1 = mt1.annotate_entries(heterozygous = mt1.GT.is_het_ref())
-    mt2 = mt2.annotate_entries(heterozygous = mt2.GT.is_het_ref())
-    
-    # filter to europeans
-    #mt2_eur = qc.annotate_european(mt2)
-    mt2_eur = qc.filter_to_european(mt2)
-
-    # collect and count
-    hom1 = mt1.aggregate_entries(hl.agg.sum(hl.int32(mt1.homozygous)))
-    hom2 = mt2.aggregate_entries(hl.agg.sum(hl.int32(mt2.homozygous)))
-    hom2_eur = mt2_eur.aggregate_entries(hl.agg.sum(hl.int32(mt2_eur.homozygous)))
-
-    # homozygoys PTVs
-    print(f"chr{chrom}: Phased data has {hom1} homozygous PTVs")
-    print(f"chr{chrom}: Non-phased data has {hom2} homozygous PTVs")
-    print(f"chr{chrom} (EUR): Non-phased data has {hom2_eur} homozygous PTVs")
-
-    # get hetz
-    het1 = mt1.aggregate_entries(hl.agg.sum(hl.int32(mt1.heterozygous)))
-    het2 = mt2.aggregate_entries(hl.agg.sum(hl.int32(mt2.heterozygous)))
-    het2_eur = mt2_eur.aggregate_entries(hl.agg.sum(hl.int32(mt2_eur.heterozygous)))
-
-    # heterozygous PTVs
-    print(f"chr{chrom}: Phased data has {het1} heterozygous PTVs")
-    print(f"chr{chrom}: Non-phased data has {het2} heterzygous PTVs")
-    print(f"chr{chrom} (EUR): Non-phased data has {het2_eur} heterzygous PTVs")
-    
+        
     # annotate Gene (In the future just use vep.worst_csq_by_gene_canonical downstream..) 
-    #mt1 = mt1.annotate_rows(vep = mt1.vep.annotate(Gene = mt1.vep.worst_csq_by_gene_canonical.gene_id))
-    #mt2 = mt2.annotate_rows(vep = mt2.vep.annotate(Gene = mt2.vep.worst_csq_by_gene_canonical.gene_id))
+    mt1 = mt1.annotate_rows(vep = mt1.vep.annotate(Gene = mt1.vep.worst_csq_by_gene_canonical.gene_id))
+    mt2 = mt2.annotate_rows(vep = mt2.vep.annotate(Gene = mt2.vep.worst_csq_by_gene_canonical.gene_id))
         
     # By default add snpid id annotation
-    #mt1 = qc.annotate_snpid(mt1)
-    #mt2 = qc.annotate_snpid(mt2)
+    mt1 = qc.annotate_snpid(mt1)
+    mt2 = qc.annotate_snpid(mt2)
     
     # export files
-    #mt1.write(out_prefix + ".mt")
-    #mt2.write(out_prefix + "_singletons.mt")
+    mt1.write(out_prefix + ".mt")
+    mt2.write(out_prefix + "_singletons.mt")
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()

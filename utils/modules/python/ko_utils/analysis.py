@@ -252,6 +252,14 @@ def gene_burden_category_annotations_per_sample(mt):
         ).aggregate(n = hl.agg.count_where(mt.GT.is_non_ref()))
     return mt
 
+def gene_burden_stats_per_sample(mt, gt_stats_expr):
+    r'''count summary per gene per sample'''
+    mt = mt.group_rows_by(
+        gene_id = mt.vep.worst_csq_by_gene_canonical.gene_id,
+        consequence_category = mt.vep.consequence_category
+        ).aggregate(n = hl.agg.count_where(gt_stats_expr))
+    return mt
+
 def maf_category_case_builder(call_stats_expr):
     return (hl.case()
             .when(call_stats_expr.AF <= 0.00001, 0.00001)
