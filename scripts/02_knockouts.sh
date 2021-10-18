@@ -37,6 +37,8 @@ readonly hail_script="utils/subscripts/hail_knockouts.py"
 readonly chr=${SGE_TASK_ID}
 readonly in_phased="${in_dir}/ukb_wes_200k_annotated_chr${chr}.mt"
 readonly in_unphased="${in_dir}/ukb_wes_200k_annotated_chr${chr}_singletons.mt"
+readonly final_samples_qc=""
+readonly final_variants_qc=""
 
 # output path
 readonly out_prefix="${out_dir}/ukb_wes_200k_af02_chr${chr}"

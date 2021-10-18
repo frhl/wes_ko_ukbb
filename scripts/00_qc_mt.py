@@ -18,8 +18,6 @@ def main(args):
     input_phased_type = args.input_phased_type
     input_unphased_path = args.input_unphased_path
     input_unphased_type = args.input_unphased_type
-    final_sample_list = args.final_sample_list
-    final_variant_list = args.final_variant_list
     out_prefix = args.out_prefix
     out_type   = args.out_type
     vep_path   = args.vep_path
@@ -30,20 +28,7 @@ def main(args):
     
     # get tables
     mt1 = qc.get_table(input_path=input_phased_path, input_type=input_phased_type) # 12788
-    mt2 = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type) # 11867 (for singletons
-
-    # filter by Duncan's final samples
-    if final_sample_list:
-        ht_final_samples = hl.import_table(FINAL_SAMPLE_LIST, no_header=True, key='f0')
-        mt1 = mt1.filter_cols(hl.is_defined(ht_final_samples[mt1.col_key]))
-        mt2 = mt2.filter_cols(hl.is_defined(ht_final_samples[mt2.col_key]))
-   
-    # filter by Ducan's final variants
-    if final_variant_list:
-        ht_final_variants = hl.import_table(FINAL_VARIANT_LIST, types={'locus':hl.tlocus(reference_genome='GRCh38'), 'alleles':hl.tarray(hl.tstr)})
-        ht_final_variants = ht_final_variants.key_by(ht_final_variants.locus, ht_final_variants.alleles)
-        mt1 = mt1.filter_rows(hl.is_defined(ht_final_variants[mt1.row_key]))
-        mt2 = mt2.filter_rows(hl.is_defined(ht_final_variants[mt2.row_key]))
+    mt2 = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type) # 11867 (for singletons)
 
     # Add QC fields that has been removed during phasing to mt1
     mt1 = mt1.annotate_entries(DP = mt2[(mt1.locus, mt1.alleles), mt1.s].DP)
@@ -54,9 +39,6 @@ def main(args):
     mt2 = qc.annotate_european(mt2)
 
     ### Variant filtering/annotations
-    # Using mt2 as a singleton matrix so remove those with AC > 1
-    mt2 = qc.filter_max_mac(mt2, 1)
-    mt2 = qc.filter_min_mac(mt2, 1)
 
     # Run VEP + gnomAD variant annotations
     mt1 = process_consequences(hl.vep(mt1, "utils/configs/vep_env.json"))
@@ -80,11 +62,12 @@ def main(args):
         
     # By default add snpid id annotation
     mt1 = qc.annotate_snpid(mt1)
-    mt2 = qc.annotate_snpid(mt2)
+    mt2 = qc.annotate_snpid(mt2)   
+    
     
     # export files
-    mt1.write(out_prefix + ".mt")
-    mt2.write(out_prefix + "_singletons.mt")
+    mt1.write(out_prefix + "_phased.mt")
+    mt2.write(out_prefix + "_unphased.mt")
 
 
 if __name__=='__main__':
@@ -94,8 +77,6 @@ if __name__=='__main__':
     parser.add_argument('--input_phased_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
     parser.add_argument('--input_unphased_path', default=None, help='Path to input that contains singletons')
     parser.add_argument('--input_unphased_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
-    parser.add_argument('--final_sample_list', default=None, help='Path to hail table with final samples to be included')
-    parser.add_argument('--final_variant_list', default=None, help='Path to hail table with final variants to be included') 
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Type of output dataset (options: mt, vcf, plink)')
     parser.add_argument('--chrom', default=None, help='Chromosome to be used')

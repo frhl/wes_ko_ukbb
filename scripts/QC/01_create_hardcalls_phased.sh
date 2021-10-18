@@ -5,7 +5,7 @@
 #$ -o logs/create_hardcalls_phased.log
 #$ -e logs/create_hardcalls_phased.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 20-22
+#$ -pe shmem 8
 #$ -q short.qc@@short.hge
 #$ -t 21
 

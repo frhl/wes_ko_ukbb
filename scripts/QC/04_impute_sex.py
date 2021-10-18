@@ -7,8 +7,9 @@ from ukb_utils import hail_init
 from ko_utils import qc
 
 def main(args):
-    
-    
+   
+    out_prefix = args.out_prefix
+
     ukb_bed_X="/well/lindgren/UKBIOBANK/DATA/CALLS/ukb_cal_chrX_v2.bed"
     ukb_bim_X="/well/lindgren/UKBIOBANK/DATA/CALLS/ukb_snp_chrX_v2.bim"
     ukb_bed_Y="/well/lindgren/UKBIOBANK/DATA/CALLS/ukb_cal_chrY_v2.bed"
@@ -44,8 +45,8 @@ def main(args):
     mt = mt.annotate_cols(phenotype = sample_annotations[mt.s])
     mt = mt.annotate_cols(impute_sex = imputed_sex[mt.s])
     
-    mt.cols().select('impute_sex', 'phenotype').flatten().export(IMPUTESEX_FILE)
-    mt.cols().write(IMPUTESEX_TABLE, overwrite=True)
+    mt.cols().select('impute_sex', 'phenotype').flatten().export(out_prefix + ".tsv.bgz")
+    mt.cols().write(out_prefix + ".ht", overwrite=True)
 
     # Now, look on the Y chromosome, and determine non-missing allele count on the y.
     mt = hl.import_plink(bed=ukb_bed_Y, bim=ukb_bim_Y, fam=ukb_fam, reference_genome='GRCh37')
@@ -54,7 +55,7 @@ def main(args):
     mt = hl.sample_qc(mt, name='qc')
 
     mt_cols = mt.cols()
-    mt_cols.select(n_called=mt_cols.qc.n_called).export(Y_NCALLED)
+    mt_cols.select(n_called=mt_cols.qc.n_called).export(out_prefix + "_ycalled.tsv.bgz")
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()

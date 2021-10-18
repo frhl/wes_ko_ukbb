@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 5
 #$ -q short.qc
-#$ -t 21
+#$ -t 20-22
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
