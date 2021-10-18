@@ -71,6 +71,7 @@ def main(args):
     mt1.write(out_prefix + ".mt")
     mt2.write(out_prefix + "_singletons.mt")
 
+
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
     # initial params
