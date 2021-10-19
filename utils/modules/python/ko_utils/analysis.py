@@ -113,6 +113,21 @@ def count_urv_by_samples(mt):
                           n_URV_non_coding = hl.agg.count_where(mt.GT.is_non_ref() & (mt.consequence_category == "non_coding"))
                          )
 
+def count_homozygous_urv_by_samples(mt):
+    r'''Count up homozygous variants by samples
+    
+    :param mt: a MatrixTable with the field "consequence_category"
+    '''
+    return mt.annotate_cols(n_hom_coding_URV_SNP = hl.agg.count_where(mt.GT.is_hom_var() & hl.is_snp(mt.alleles[0], mt.alleles[1]) & (mt.consequence_category != "non_coding")),
+                          n_hom_coding_URV_indel = hl.agg.count_where(mt.GT.is_hom_var() & hl.is_indel(mt.alleles[0], mt.alleles[1]) & (mt.consequence_category != "non_coding")),
+                          n_hom_URV_PTV = hl.agg.count_where(mt.GT.is_hom_var() & (mt.consequence_category == "ptv")),
+                          n_hom_URV_PTV_LC = hl.agg.count_where(mt.GT.is_hom_var() & (mt.consequence_category == "ptv_lc")),
+                          n_hom_URV_damaging_missense = hl.agg.count_where(mt.GT.is_hom_var() & (mt.consequence_category == "damaging_missense")),
+                          n_hom_URV_other_missense = hl.agg.count_where(mt.GT.is_hom_var() & (mt.consequence_category == "other_missense")),
+                          n_hom_URV_synonymous = hl.agg.count_where(mt.GT.is_hom_var() & (mt.consequence_category == "synonymous")),
+                          n_hom_URV_non_coding = hl.agg.count_where(mt.GT.is_hom_var() & (mt.consequence_category == "non_coding"))
+                         )
+
 def annotate_phased_entries(mt):
     r'''Annotates alleles that have the alternate allele on either first or second strand.'''
     mt = mt.annotate_entries(a0_alt = mt.GT ==  hl.parse_call('1|0'))

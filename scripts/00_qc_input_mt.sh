@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
-#$ -N qc_input_mt
+#$ -N test_qc_input_mt
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/qc_input_mt.log
-#$ -e logs/qc_input_mt.errors.log
+#$ -o logs/test_qc_input_mt.log
+#$ -e logs/test_qc_input_mt.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 10
 #$ -q short.qc
-#$ -t 21
+#$ -t 22
 
 
 source utils/qsub_utils.sh
