@@ -40,15 +40,6 @@ def main(args):
         mt1 = mt1.filter_cols(hl.is_defined(ht_final_samples[mt1.col_key]))
         mt2 = mt2.filter_cols(hl.is_defined(ht_final_samples[mt2.col_key]))
    
-    # save sample stats
-    mt1 = mt1.annotate_cols(gq = hl.agg.stats(mt1.GQ), dp = hl.agg.stats(mt1.DP))
-    mt1 = hl.sample_qc(mt1, name='sample_qc')
-    mt1.cols().select('sample_qc', 'gq', 'dp').flatten().export(output=out_prefix + "_samples_phased.tsv.bgz")
- 
-    mt2 = mt2.annotate_cols(gq = hl.agg.stats(mt2.GQ), dp = hl.agg.stats(mt2.DP))
-    mt2 = hl.sample_qc(mt2, name='sample_qc')
-    mt2.cols().select('sample_qc', 'gq', 'dp').flatten().export(output=out_prefix + "_samples_unphased.tsv.bgz")
-
     # filter by final variants
     if final_variant_list:
         ht_final_variants = hl.import_table(final_variant_list, types={'locus':hl.tlocus(reference_genome='GRCh38'), 'alleles':hl.tarray(hl.tstr)})
@@ -71,6 +62,15 @@ def main(args):
     # Add QC fields that has been removed during phasing to mt1
     mt1 = mt1.annotate_entries(DP = mt2[(mt1.locus, mt1.alleles), mt1.s].DP)
     mt1 = mt1.annotate_entries(GQ = mt2[(mt1.locus, mt1.alleles), mt1.s].GQ)
+ 
+    # save sample stats
+    #mt1 = mt1.annotate_cols(gq = hl.agg.stats(mt1.GQ), dp = hl.agg.stats(mt1.DP))
+    #mt1 = hl.sample_qc(mt1, name='sample_qc')
+    #mt1.cols().select('sample_qc', 'gq', 'dp').flatten().export(output=out_prefix + "_samples_phased.tsv.bgz")
+ 
+    #mt2 = mt2.annotate_cols(gq = hl.agg.stats(mt2.GQ), dp = hl.agg.stats(mt2.DP))
+    #mt2 = hl.sample_qc(mt2, name='sample_qc')
+    #mt2.cols().select('sample_qc', 'gq', 'dp').flatten().export(output=out_prefix + "_samples_unphased.tsv.bgz")
 
     # Run VEP + gnomAD variant annotations
     mt1 = process_consequences(hl.vep(mt1, "utils/configs/vep_env.json"))

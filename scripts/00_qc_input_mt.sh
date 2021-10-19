@@ -20,7 +20,7 @@ readonly vep_dir="data/vep/full"
 readonly gnomad_dir="/well/lindgren/flassen/ressources/gnomad/gnomad_v2_liftover/exomes"
 readonly imputed_dir="/well/lindgren/UKBIOBANK/flassen/projects/ukb_compare/data/imputed/GRCh38"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="data/qc_new"
+readonly out_dir="data/qc"
 
 # hail script
 readonly hail_script="scripts/00_qc_input_mt.py"
@@ -43,7 +43,7 @@ readonly out_prefix="${out_dir}/ukb_wes_200k_chr${chr}"
 # run hail
 set_up_hail
 set_up_vep
-set_up_pythonpath  
+set_up_pythonpath_legacy  
 python3 "${hail_script}" \
      --chrom ${chr} \
      --input_phased_path ${in_phased}\

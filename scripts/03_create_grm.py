@@ -14,13 +14,14 @@ def main(args):
     chroms = args.chroms
     subset_markers_by_kinship = args.subset_markers_by_kinship
     out_prefix = args.out_prefix
+    add_rare_variants = args.add_rare_variants
     subset_samples_by_genet_eur = args.subset_samples_by_genet_eur
     subset_samples_by_ukbb_eur = args.subset_samples_by_ukbb_eur
     subset_samples_by_wes200k = args.subset_samples_by_wes200k   
      
     # combine multiple matrix tables
-    mt = genotypes.get_ukb_imputed_v3_bgen(chroms)
-       
+    mt = genotypes.get_ukb_imputed_v3_bgen(chroms)   
+
     # createse a sparse GRM
     if subset_markers_by_kinship:
         ht = hl.import_table('/well/lindgren/UKBIOBANK/DATA/QC/ukb_snp_qc.txt', impute = True, delimiter = ' ')
@@ -38,12 +39,31 @@ def main(args):
     if subset_samples_by_genet_eur or subset_samples_by_ukbb_eur:
         mt = qc.filter_to_european(mt, genetically_european = subset_samples_by_genet_eur)
     
-    # get white british ancestry (ukbb)
-    #if subset_samples_by_ukbb_eur:
-    #    mt = mt    
-
     hl.export_plink(mt, out_prefix, ind_id = mt.s)
-    
+   
+    # add rare variants for SAIGE 
+    if add_rare_variants:
+        
+        # get high quality rare variants
+        rsids = hl.literal('')
+        for c in range(1,24):
+            mfi = genotypes.get_ukb_imputed_v3_mfi(c)
+            mfi = mfi.filter((mfi.maf < 0.001) & 
+                     (mfi.maf > 0.000001) &
+                     (mfi.info == 1))
+            rsid = mfi.rsid
+            rsids += rsid
+        rsids = hl.set(rsids.collect())
+        # get genotype file and filter
+        mt2 = genotypes.get_ukb_imputed_v3_bgen(chroms, entry_fields = ['GT'])
+        mt2 = mt2.filter_cols(hl.set(mt.s.collect()).contains(mt.s))
+        mt2 = mt2.filter_rows(rsids.contains(mt2.rsid))
+        n = mt2.count()
+        print(f"added {n} rare variants.")
+        mt_out = mt.union_rows(mt2)
+        hl.export(plink(mt_out, out_prefix + "_rare", ind_id = mt_out.s) 
+
+
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--chroms', nargs='+', default=None, help='chroms to be included')
@@ -51,6 +71,7 @@ if __name__=='__main__':
     parser.add_argument('--subset_samples_by_wes200k', action='store_true', help='Subset samples to those that are presennt in the post QC WES.')
     parser.add_argument('--subset_samples_by_genet_eur', action='store_true', help='Subset samples to those that are genetically european.') 
     parser.add_argument('--subset_samples_by_ukbb_eur', action='store_true', default = False, help='Subset samples to those that are european designated by UKBB.') 
+    parser.add_argument('--add_rare_variants', default=None, help='Add rare variants to plink file (this is required for SAIGE-GENE+ analysis')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset (plink format)')
     args = parser.parse_args()
 

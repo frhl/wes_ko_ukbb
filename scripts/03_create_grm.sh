@@ -16,7 +16,7 @@ source utils/bash_utils.sh
 source utils/hail_utils.sh
 
 # paths for hail script
-readonly out_dir="data/saige/grm/input/eur_ukbb"
+readonly out_dir="data/saige/grm/input"
 readonly out_prefix="${out_dir}/ukb_wes_200k_sparse_autosomes"
 readonly hail_script="scripts/create_grm.py"
 readonly spark_dir="data/tmp/spark"
@@ -28,8 +28,6 @@ chroms=$( seq 1 22 | tr '\n' ' ' )
 
 # combine markers from UKBB imputed data
 if [ $( ls -1 ${out_prefix}.{bed,bim,fam} 2> /dev/null | wc -l ) -ne 3 ]; then
-  #set -o errexit
-  #set -o nounset
   set_up_hail
   set_up_pythonpath
   mkdir -p ${out_dir}
@@ -39,18 +37,22 @@ if [ $( ls -1 ${out_prefix}.{bed,bim,fam} 2> /dev/null | wc -l ) -ne 3 ]; then
    --subset_markers_by_kinship \
    --subset_samples_by_wes200k \
    --subset_samples_by_genet_eur
+   --add_rare_variants
   conda deactivate
 else
   print_update "${out_prefix}.bed/bim/fam already exists. Skipping"
 fi
 
 # generate GRM using SAIGE
-set_up_RSAIGE
-print_update "Generating GRM from plink files.. "
-Rscript "${createSparseGRM}" \
-  --plinkFile=${out_prefix} \
-  --nThreads=4 \
-  --outputPrefix=${out_prefix} \
-  --numRandomMarkerforSparseKin=1000 \
-  --relatednessCutoff=0.125
+#set_up_RSAIGE
+#print_update "Generating GRM from plink files.. "
+#Rscript "${createSparseGRM}" \
+#  --plinkFile=${out_prefix} \
+#  --nThreads=4 \
+#  --outputPrefix=${out_prefix} \
+#  --numRandomMarkerforSparseKin=1000 \
+#  --relatednessCutoff=0.125
+
+
+
 
