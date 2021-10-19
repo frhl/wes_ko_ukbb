@@ -26,7 +26,7 @@ def main(args):
     
     # setup flags
     hail_init.hail_bmrc_init_local('logs/hail/hail_format.log', 'GRCh38')
-    hl._set_flags(no_whole_stage_codegen='1') # from zulip
+    hl._set_flags(no_whole_stage_codegen='1') #
     
     # get tables
     mt1 = qc.get_table(input_path=input_phased_path, input_type=input_phased_type) # 12788
@@ -67,20 +67,26 @@ def main(args):
     mt2 = analysis.annotate_dbnsfp(mt2, vep_path)
    
     # Annotate for each consequence
-    mt1 = mt1.explode_rows(mt1.vep.worst_csq_by_gene_canonical)
-    mt2 = mt2.explode_rows(mt2.vep.worst_csq_by_gene_canonical)
+    #mt1 = mt1.explode_rows(mt1.vep.worst_csq_by_gene_canonical)
+    #mt2 = mt2.explode_rows(mt2.vep.worst_csq_by_gene_canonical)
 
     # annotate consequnece categories 
-    mt1 = analysis.variant_csqs_category_builder(mt1)
-    mt2 = analysis.variant_csqs_category_builder(mt2)
+    #mt1 = analysis.variant_csqs_category_builder(mt1)
+    #mt2 = analysis.variant_csqs_category_builder(mt2)
         
     # annotate Gene (In the future just use vep.worst_csq_by_gene_canonical downstream..) 
-    mt1 = mt1.annotate_rows(vep = mt1.vep.annotate(Gene = mt1.vep.worst_csq_by_gene_canonical.gene_id))
-    mt2 = mt2.annotate_rows(vep = mt2.vep.annotate(Gene = mt2.vep.worst_csq_by_gene_canonical.gene_id))
-        
+    #mt1 = mt1.annotate_rows(vep = mt1.vep.annotate(Gene = mt1.vep.worst_csq_by_gene_canonical.gene_id))
+    #mt2 = mt2.annotate_rows(vep = mt2.vep.annotate(Gene = mt2.vep.worst_csq_by_gene_canonical.gene_id))
+    
     # By default add snpid id annotation
     mt1 = qc.annotate_snpid(mt1)
     mt2 = qc.annotate_snpid(mt2)
+    
+    # annotate rsid
+    mt1 = qc.annotate_rsid(mt1)
+    mt2 = qc.annotate_rsid(mt2)
+    mt1 = qc.default_to_snpid_when_missing_rsid(mt1)
+    mt2 = qc.default_to_snpid_when_missing_rsid(mt2)
     
     # export files
     mt1.write(out_prefix + ".mt")

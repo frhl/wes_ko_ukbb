@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
-#$ -N hail_format
+#$ -N create_mt
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/create_mt.log
 #$ -e logs/create_mt.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 10
 #$ -q short.qc@@short.hge
-#$ -t 6
+#$ -t 1-24
 
 set -o errexit
 set -o nounset
@@ -22,10 +22,10 @@ readonly in_dir_phased="/well/lindgren/UKBIOBANK/nbaya/wes_200k/phase_ukb_wes/da
 readonly in_dir_unphased="data/unphased/post-qc"
 readonly vep_dir="data/vep/full"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="data/mt"
+readonly out_dir="data/mt_new"
 
 # hail script
-readonly hail_script="utils/subscripts/hail_format.py"
+readonly hail_script="scripts/01_create_mt.py"
 
 # input path
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 
@@ -43,7 +43,7 @@ mkdir -p ${out_dir}
 if [ ! -f "${out}/_SUCCESS" ]; then
   set_up_hail
   set_up_vep
-  set_up_pythonpath  
+  set_up_pythonpath_legacy  
   python3 "${hail_script}" \
      --chrom ${chr} \
      --input_phased_path ${in_phased}\
