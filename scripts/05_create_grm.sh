@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Create sparse genetic relatedness matrix using genotyped data.
+# Create sparse genetic relatedness matrix using genotyped/imputed data.
 #
 #$ -N create_grm
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
@@ -8,10 +8,9 @@
 #$ -e logs/create_grm.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 10
-#$ -q short.qc
+#$ -q long.qc@@long.hge
 
-# -q long.qc@@long.hge
-
+# -q short.qc
 
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
@@ -19,7 +18,7 @@ source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark"
 readonly out_dir="data/saige/grm/input"
-readonly out_prefix="${out_dir}/ukb_wes_200k_sparse_autosomes"
+readonly out_prefix="${out_dir}/211020_ukb_wes_200k_sparse_autosomes"
 readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
 
 readonly hail_script="scripts/05_create_grm.py"
@@ -48,14 +47,14 @@ else
 fi
 
 # generate GRM using SAIGE
-#set_up_RSAIGE
-#print_update "Generating GRM from plink files.. "
-#Rscript "${createSparseGRM}" \
-#  --plinkFile=${out_prefix} \
-#  --nThreads=4 \
-#  --outputPrefix=${out_prefix} \
-#  --numRandomMarkerforSparseKin=1000 \
-#  --relatednessCutoff=0.125
+set_up_RSAIGE
+print_update "Generating GRM from plink files.. "
+Rscript "${createSparseGRM}" \
+  --plinkFile=${out_prefix} \
+  --nThreads=4 \
+  --outputPrefix=${out_prefix} \
+  --numRandomMarkerforSparseKin=1000 \
+  --relatednessCutoff=0.125
 
 
 

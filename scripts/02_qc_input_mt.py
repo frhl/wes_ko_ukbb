@@ -15,7 +15,7 @@ from ko_utils import analysis
 def summary_count_urv(mt):
     annotation_by_variant = analysis.annotation_case_builder(mt.vep.worst_csq_for_variant_canonical, mt.dbnsfp)
     mt = mt.annotate_rows(consequence_category = annotation_by_variant)
-    mt = analysis.counts_urv_by_samples(mt)
+    mt = analysis.count_urv_by_samples(mt)
     return mt.cols()
 
 def summary_count_homozygous_urv(mt):
@@ -101,11 +101,11 @@ def main(args):
     # write out variant stats
     print(f'chr{chrom}: Writing out variants stats to {out_prefix}_variants*')
     mt1 = hl.variant_qc(mt1, name='variant_qc')
-    ht1_rows_filter = mt1.select_rows('variant_qc')
+    ht1_rows_filter = mt1.rows().select('variant_qc')
     ht1_rows_filter.write(out_prefix + "_variants_phased.ht", overwrite=True)
  
     mt2 = hl.variant_qc(mt2, name='variant_qc')
-    ht2_rows_filter = mt2.select_rows('variant_qc')
+    ht2_rows_filter = mt2.rows().select('variant_qc')
     ht2_rows_filter.write(out_prefix + "_variants_unphased.ht", overwrite=True)
 
     # write out summary stats
