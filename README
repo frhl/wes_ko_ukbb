@@ -17,4 +17,3 @@ Use hl.vep and gnomad.process_consequence to create a hail table (of rows) that 
 **output**: data/vep/hail/ukb_200k_chr_vep.ht
 
 
-
