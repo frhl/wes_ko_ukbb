@@ -7,8 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 10
 #$ -q short.qf
-#$ -t 1
-
+#$ -t 1-24
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
@@ -16,14 +15,16 @@ source utils/hail_utils.sh
 # directories
 readonly in_dir="data/unphased/post-qc"
 readonly spark_dir="data/tmp/spark"
+readonly vep_dir="data/vep/full"
 readonly out_dir="data/vep/hail"
 
 # hail script
-readonly hail_script="scripts/00_hail_vep.py"
+readonly hail_script="scripts/01_hail_vep.py"
 
 # input paths
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 
 readonly in="${in_dir}/ukb_wes_200k_filtered_chr${chr}.mt"
+readonly vep="${vep_dir}/ukb_wes_200k_full_vep_chr${chr}.vcf"
 
 # output path
 readonly out_prefix="${out_dir}/ukb_wes_200k_chr${chr}"
@@ -36,6 +37,7 @@ python3 "${hail_script}" \
      --chrom ${chr} \
      --input_path ${in}\
      --input_type "mt" \
+     --vep_path ${vep} \
      --out_prefix ${out_prefix}
 
 print_update "Finished running HAIL for chr${chr}" "${SECONDS}"

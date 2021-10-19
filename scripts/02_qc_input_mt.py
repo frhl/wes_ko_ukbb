@@ -35,9 +35,11 @@ def main(args):
     input_unphased_type = args.input_unphased_type
     input_gnomad_path = args.input_gnomad_path
     input_imputed_path = args.input_imputed_path
+    input_annotation_path = args.input_annotation_path
     out_prefix = args.out_prefix
     out_type   = args.out_type
     vep_path   = args.vep_path
+    annotation_table = args.annotation_table
     final_variant_list = args.final_variant_list
     final_sample_list = args.final_sample_list    
 
@@ -91,16 +93,12 @@ def main(args):
     mt2 = mt2.annotate_cols(gq = hl.agg.stats(mt2.GQ), dp = hl.agg.stats(mt2.DP))
     mt2 = hl.sample_qc(mt2, name='sample_qc')
     mt2.cols().select('sample_qc', 'gq', 'dp').flatten().export(output=out_prefix + "_samples_unphased.tsv.bgz")
-
-    # Run VEP + gnomAD variant annotations
-    print('chr{chrom}: Running VEP..')
-    mt1 = process_consequences(hl.vep(mt1, "utils/configs/vep_env.json"))
-    mt2 = process_consequences(hl.vep(mt2, "utils/configs/vep_env.json"))
     
-    # Annotate with REVEL+CADD scores
-    mt1 = analysis.annotate_dbnsfp(mt1, vep_path)
-    mt2 = analysis.annotate_dbnsfp(mt2, vep_path)
-   
+    # add annotations from table
+    consequence_annotations = hl.read_table(input_annotation_path)
+    mt1 = mt1.annotate_rows(consequence = consequence_annotations[mt1.row_key]) 
+    mt2 = mt2.annotate_rows(consequence = consequence_annotations[mt2.row_key]) 
+    
     # write out variant stats
     print(f'chr{chrom}: Writing out variants stats to {out_prefix}_variants*')
     mt1 = hl.variant_qc(mt1, name='variant_qc')
@@ -129,7 +127,8 @@ if __name__=='__main__':
     parser.add_argument('--input_unphased_path', default=None, help='Path to input that contains singletons')
     parser.add_argument('--input_unphased_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
     parser.add_argument('--input_gnomad_path', default=None, help='Get path to gnomAD')
-    parser.add_argument('--input_imputed_path', default=None, help='Get path to imputed data')
+    parser.add_argument('--input_annotation_path', default=None, help='path to HailTable with VEP and dbNSFP annotations')
+    parser.add_argument('--input_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Type of output dataset (options: mt, vcf, plink)')
     parser.add_argument('--chrom', default=None, help='Chromosome to be used')

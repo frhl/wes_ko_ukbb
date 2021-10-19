@@ -18,6 +18,7 @@ def main(args):
     input_phased_type = args.input_phased_type
     input_unphased_path = args.input_unphased_path
     input_unphased_type = args.input_unphased_type
+    input_annotation_path = args.input_annotation_path
     final_sample_list = args.final_sample_list
     final_variant_list = args.final_variant_list
     out_prefix = args.out_prefix
@@ -58,13 +59,18 @@ def main(args):
     mt2 = qc.filter_max_mac(mt2, 1)
     mt2 = qc.filter_min_mac(mt2, 1)
 
+    # add annotations from table
+    consequence_annotations = hl.read_table(input_annotation_path)
+    mt1 = mt1.annotate_rows(consequence = consequence_annotations[mt1.row_key]) 
+    mt2 = mt2.annotate_rows(consequence = consequence_annotations[mt2.row_key]) 
+
     # Run VEP + gnomAD variant annotations
-    mt1 = process_consequences(hl.vep(mt1, "utils/configs/vep_env.json"))
-    mt2 = process_consequences(hl.vep(mt2, "utils/configs/vep_env.json"))
+    #mt1 = process_consequences(hl.vep(mt1, "utils/configs/vep_env.json"))
+    #mt2 = process_consequences(hl.vep(mt2, "utils/configs/vep_env.json"))
     
     # Annotate with REVEL+CADD scores
-    mt1 = analysis.annotate_dbnsfp(mt1, vep_path)
-    mt2 = analysis.annotate_dbnsfp(mt2, vep_path)
+    #mt1 = analysis.annotate_dbnsfp(mt1, vep_path)
+    #mt2 = analysis.annotate_dbnsfp(mt2, vep_path)
    
     # Annotate for each consequence
     #mt1 = mt1.explode_rows(mt1.vep.worst_csq_by_gene_canonical)
@@ -100,6 +106,7 @@ if __name__=='__main__':
     parser.add_argument('--input_phased_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
     parser.add_argument('--input_unphased_path', default=None, help='Path to input that contains singletons')
     parser.add_argument('--input_unphased_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
+    parser.add_argument('--input_annotation_path', default=None, help='Input for annotation path')
     parser.add_argument('--final_sample_list', default=None, help='Path to hail table with final samples to be included')
     parser.add_argument('--final_variant_list', default=None, help='Path to hail table with final variants to be included') 
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')

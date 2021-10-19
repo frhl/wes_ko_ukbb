@@ -8,6 +8,7 @@ import os
 from gnomad.utils.vep import process_consequences
 from ukb_utils import hail_init
 from ko_utils import qc
+from ko_utils import analysis
 
 def main(args):
     
@@ -15,6 +16,7 @@ def main(args):
     chrom = args.chrom
     input_path = args.input_path
     input_type = args.input_type
+    vep_path = args.vep_path
     out_prefix = args.out_prefix
 
     # setup flags
@@ -24,6 +26,7 @@ def main(args):
     # get file and annotate
     mt = qc.get_table(input_path=input_path, input_type=input_type) # 12788
     mt = process_consequences(hl.vep(mt, "utils/configs/vep_env.json"))
+    mt = analysis.annotate_dbnsfp(mt, vep_path)
     ht = mt.rows()
     
     # write out VEP hail table
@@ -34,6 +37,7 @@ if __name__=='__main__':
     # initial params
     parser.add_argument('--input_path', default=None, help='Path to input')
     parser.add_argument('--input_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
+    parser.add_argument('--vep_path', default=None, help='Path to dbNSFP annotations') 
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--chrom', default=None, help='Chromosome to be used')
 
