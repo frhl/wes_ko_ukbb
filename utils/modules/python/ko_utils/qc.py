@@ -76,12 +76,14 @@ def filter_min_af(mt, af=None):
 def filter_max_maf(mt, maf=None):
     r'''boolean for variants that have maf less than {maf}'''
     maf_expr = (mt.info.AF<maf) | (mt.info.AF>(1-maf))
-    return maf_expr
+    mt = mt.filter_rows(maf_expr)
+    return mt
 
 def filter_min_maf(mt, maf=None):
     r'''boolean for variants that have maf gt {maf}'''
     maf_expr = (mt.info.AF>maf) & (mt.info.AF<(1-maf))
-    return maf_expr
+    mt = mt.filter_rows(maf_expr)
+    return mt
 
 def filter_maf(mt, min_maf = None, max_maf = None):
     r'''Filter to variants based on a certain min/max MAF threshold'''
