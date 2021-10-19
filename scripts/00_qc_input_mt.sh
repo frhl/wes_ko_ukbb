@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
-#$ -N test_qc_input_mt
+#$ -N final_qc_input_mt
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/test_qc_input_mt.log
-#$ -e logs/test_qc_input_mt.errors.log
+#$ -o logs/final_qc_input_mt.log
+#$ -e logs/final_qc_input_mt.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 10
+#$ -pe shmem 20
 #$ -q short.qc
-#$ -t 22
+#$ -t 1
 
 
 source utils/qsub_utils.sh
@@ -20,7 +20,7 @@ readonly vep_dir="data/vep/full"
 readonly gnomad_dir="/well/lindgren/flassen/ressources/gnomad/gnomad_v2_liftover/exomes"
 readonly imputed_dir="/well/lindgren/UKBIOBANK/flassen/projects/ukb_compare/data/imputed/GRCh38"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="data/qc_new"
+readonly out_dir="data/qc_final"
 
 # hail script
 readonly hail_script="scripts/00_qc_input_mt.py"

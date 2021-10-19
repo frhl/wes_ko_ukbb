@@ -11,6 +11,20 @@ from ukb_utils import genotypes
 from ko_utils import qc
 from ko_utils import analysis
 
+
+def summary_count_urv(mt):
+    annotation_by_variant = analysis.annotation_case_builder(mt.vep.worst_csq_for_variant_canonical, mt.dbnsfp)
+    mt = mt.annotate_rows(consequence_category = annotation_by_variant)
+    mt = analysis.counts_urv_by_samples(mt)
+    return mt.cols()
+
+def summary_count_homozygous_urv(mt):
+    annotation_by_variant = analysis.annotation_case_builder(mt.vep.worst_csq_for_variant_canonical, mt.dbnsfp)
+    mt = mt.annotate_rows(consequence_category = annotation_by_variant)
+    mt = analysis.count_homozygous_urv_by_samples(mt)
+    return mt.cols()
+
+
 def main(args):
     
     # parser
@@ -51,32 +65,32 @@ def main(args):
         print(f'chr{chrom}: using final variants..')
     
     # annotate with gnomAD
-    #if input_gnomad_path:
-    #    gnomad_variants_ht = hl.import_vcf(input_gnomad_path, reference_genome ='GRCh38', force_bgz=True, array_elements_required=False).rows()
-    #    mt1 = mt1.annotate_rows(inGnomAD = hl.is_defined(gnomad_variants_ht[mt1.row_key]))
-    #    mt2 = mt2.annotate_rows(inGnomAD = hl.is_defined(gnomad_variants_ht[mt2.row_key]))
-    #    print(f'chr{chrom}: annotating with gnomAD..')
+    if input_gnomad_path:
+        gnomad_variants_ht = hl.import_vcf(input_gnomad_path, reference_genome ='GRCh38', force_bgz=True, array_elements_required=False).rows()
+        mt1 = mt1.annotate_rows(inGnomAD = hl.is_defined(gnomad_variants_ht[mt1.row_key]))
+        mt2 = mt2.annotate_rows(inGnomAD = hl.is_defined(gnomad_variants_ht[mt2.row_key]))
+        print(f'chr{chrom}: annotating with gnomAD..')
 
     # annotate with imputed data
-    #if input_imputed_path:
-    #    imputed = hl.read_table(input_imputed_path)
-    #    mt1 = mt1.annotate_rows(imputed_info = imputed[mt1.row_key].info) 
-    #    mt2 = mt2.annotate_rows(imputed_info = imputed[mt2.row_key].info)
-    #    print(f'chr{chrom}: annotating with imputed INFO score..')
+    if input_imputed_path:
+        imputed = hl.read_table(input_imputed_path)
+        mt1 = mt1.annotate_rows(imputed_info = imputed[mt1.row_key].info) 
+        mt2 = mt2.annotate_rows(imputed_info = imputed[mt2.row_key].info)
+        print(f'chr{chrom}: annotating with imputed INFO score..')
     
     # Add QC fields that has been removed during phasing to mt1
-    #mt1 = mt1.annotate_entries(DP = mt2[(mt1.locus, mt1.alleles), mt1.s].DP)
-    #mt1 = mt1.annotate_entries(GQ = mt2[(mt1.locus, mt1.alleles), mt1.s].GQ)
+    mt1 = mt1.annotate_entries(DP = mt2[(mt1.locus, mt1.alleles), mt1.s].DP)
+    mt1 = mt1.annotate_entries(GQ = mt2[(mt1.locus, mt1.alleles), mt1.s].GQ)
  
     # save sample stats
-    #print(f'chr{chrom}: Writing out sample stats to {out_prefix}_samples*') 
-    #mt1 = mt1.annotate_cols(gq = hl.agg.stats(mt1.GQ), dp = hl.agg.stats(mt1.DP))
-    #mt1 = hl.sample_qc(mt1, name='sample_qc')
-    #mt1.cols().select('sample_qc', 'gq', 'dp').flatten().export(output=out_prefix + "_samples_phased.tsv.bgz")
+    print(f'chr{chrom}: Writing out sample stats to {out_prefix}_samples*') 
+    mt1 = mt1.annotate_cols(gq = hl.agg.stats(mt1.GQ), dp = hl.agg.stats(mt1.DP))
+    mt1 = hl.sample_qc(mt1, name='sample_qc')
+    mt1.cols().select('sample_qc', 'gq', 'dp').flatten().export(output=out_prefix + "_samples_phased.tsv.bgz")
  
-    #mt2 = mt2.annotate_cols(gq = hl.agg.stats(mt2.GQ), dp = hl.agg.stats(mt2.DP))
-    #mt2 = hl.sample_qc(mt2, name='sample_qc')
-    #mt2.cols().select('sample_qc', 'gq', 'dp').flatten().export(output=out_prefix + "_samples_unphased.tsv.bgz")
+    mt2 = mt2.annotate_cols(gq = hl.agg.stats(mt2.GQ), dp = hl.agg.stats(mt2.DP))
+    mt2 = hl.sample_qc(mt2, name='sample_qc')
+    mt2.cols().select('sample_qc', 'gq', 'dp').flatten().export(output=out_prefix + "_samples_unphased.tsv.bgz")
 
     # Run VEP + gnomAD variant annotations
     print('chr{chrom}: Running VEP..')
@@ -87,22 +101,6 @@ def main(args):
     mt1 = analysis.annotate_dbnsfp(mt1, vep_path)
     mt2 = analysis.annotate_dbnsfp(mt2, vep_path)
    
-    # Annotate for each consequence
-    #mt1 = mt1.explode_rows(mt1.vep.worst_csq_by_gene_canonical)
-    #mt2 = mt2.explode_rows(mt2.vep.worst_csq_by_gene_canonical)
-
-    # annotate consequnece categories 
-    #mt1 = analysis.variant_csqs_category_builder(mt1)
-    #mt2 = analysis.variant_csqs_category_builder(mt2)
-        
-    # annotate Gene (In the future just use vep.worst_csq_by_gene_canonical downstream..) 
-    #mt1 = mt1.annotate_rows(vep = mt1.vep.annotate(Gene = mt1.vep.worst_csq_by_gene_canonical.gene_id))
-    #mt2 = mt2.annotate_rows(vep = mt2.vep.annotate(Gene = mt2.vep.worst_csq_by_gene_canonical.gene_id))
-        
-    # By default add snpid id annotation
-    mt1 = qc.annotate_snpid(mt1)
-    mt2 = qc.annotate_snpid(mt2)   
-
     # write out variant stats
     print(f'chr{chrom}: Writing out variants stats to {out_prefix}_variants*')
     mt1 = hl.variant_qc(mt1, name='variant_qc')
@@ -112,7 +110,16 @@ def main(args):
     mt2 = hl.variant_qc(mt2, name='variant_qc')
     ht2_rows_filter = mt2.rows()
     ht2_rows_filter.write(out_prefix + "_variants_unphased.ht", overwrite=True)
+
+    # write out summary stats
+    print(f"chr{chrom}: writing out variant summaries")
+    summary_count_urv(mt1).export(out_prefix + "variants_summary_phased.tsv.bgz")
+    summary_count_urv(mt2).export(out_prefix + "variants_summary_unphased.tsv.bgz")
     
+    # get homozygous stats
+    summary_count_homozygous_urv(mt1).export(out_prefix + "variants_homozygous_summary_phased.tsv.bgz")
+    summary_count_homozygous_urv(mt2).export(out_prefix + "variants_homozygous_summary_unphased.tsv.bgz")
+
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
