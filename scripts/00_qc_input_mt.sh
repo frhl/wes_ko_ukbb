@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 10
 #$ -q short.qc@@short.hge
-#$ -t 21
+#$ -t 1-24
 
 
 source utils/qsub_utils.sh
@@ -20,7 +20,7 @@ readonly vep_dir="data/vep/full"
 readonly gnomad_dir="/well/lindgren/flassen/ressources/gnomad/gnomad_v2_liftover/exomes"
 readonly imputed_dir="/well/lindgren/UKBIOBANK/flassen/projects/ukb_compare/data/imputed/GRCh38"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="data/qc"
+readonly out_dir="data/qc_new"
 
 # hail script
 readonly hail_script="scripts/00_qc_input_mt.py"
