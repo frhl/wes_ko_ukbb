@@ -39,7 +39,6 @@ def main(args):
     out_prefix = args.out_prefix
     out_type   = args.out_type
     vep_path   = args.vep_path
-    annotation_table = args.annotation_table
     final_variant_list = args.final_variant_list
     final_sample_list = args.final_sample_list    
 
@@ -126,7 +125,8 @@ if __name__=='__main__':
     parser.add_argument('--input_phased_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
     parser.add_argument('--input_unphased_path', default=None, help='Path to input that contains singletons')
     parser.add_argument('--input_unphased_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
-    parser.add_argument('--input_gnomad_path', default=None, help='Get path to gnomAD')
+    parser.add_argument('--input_gnomad_path', default=None, help='Get path to gnomAD (GRCh38)')
+    parser.add_argument('--input_imputed_path', default=None, help='Path to imputed data (GRCh38)')
     parser.add_argument('--input_annotation_path', default=None, help='path to HailTable with VEP and dbNSFP annotations')
     parser.add_argument('--input_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
