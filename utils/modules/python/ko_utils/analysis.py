@@ -93,11 +93,25 @@ def annotate_dbnsfp(mt, vep_path):
 
     return(mt)
 
-def filter_vep(mt, field, conds):
-    r'''Filter VEP field by condition(s) '''
-    mt = mt.filter_rows(hl.literal(set(conds)).contains(mt.vep[field]))
-    return mt
+#def filter_vep(mt, field, conds):
+#    r'''Filter VEP field by condition(s) '''
+#    mt = mt.filter_rows(hl.literal(set(conds)).contains(mt.vep[field]))
+#    return mt
 
+def count_urv_by_samples(mt):
+    r'''Count up ultra rare variants by cols and cateogry
+    
+    :param mt: a MatrixTable with the field "consequence_category"
+    '''
+    return mt.annotate_cols(n_coding_URV_SNP = hl.agg.count_where(mt.GT.is_non_ref() & hl.is_snp(mt.alleles[0], mt.alleles[1]) & (mt.consequence_category != "non_coding")),
+                          n_coding_URV_indel = hl.agg.count_where(mt.GT.is_non_ref() & hl.is_indel(mt.alleles[0], mt.alleles[1]) & (mt.consequence_category != "non_coding")),
+                          n_URV_PTV = hl.agg.count_where(mt.GT.is_non_ref() & (mt.consequence_category == "ptv")),
+                          n_URV_PTV_LC = hl.agg.count_where(mt.GT.is_non_ref() & (mt.consequence_category == "ptv_lc")),
+                          n_URV_damaging_missense = hl.agg.count_where(mt.GT.is_non_ref() & (mt.consequence_category == "damaging_missense")),
+                          n_URV_other_missense = hl.agg.count_where(mt.GT.is_non_ref() & (mt.consequence_category == "other_missense")),
+                          n_URV_synonymous = hl.agg.count_where(mt.GT.is_non_ref() & (mt.consequence_category == "synonymous")),
+                          n_URV_non_coding = hl.agg.count_where(mt.GT.is_non_ref() & (mt.consequence_category == "non_coding"))
+                         )
 
 def annotate_phased_entries(mt):
     r'''Annotates alleles that have the alternate allele on either first or second strand.'''
@@ -262,8 +276,6 @@ def gene_csqs_knockout_builder(in_mt, keep = None):
     if keep is not None:
         combined = combined.filter(hl.literal(keep).contains(combined.csqs))
     return combined
-
-
 
 def gene_burden_annotations_per_sample(mt):
     r'''count non-ref genotypes per sample'''

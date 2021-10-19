@@ -14,6 +14,7 @@ from ko_utils import analysis
 def main(args):
     
     # parser
+    chrom = args.chrom
     input_phased_path = args.input_phased_path
     input_phased_type = args.input_phased_type
     input_unphased_path = args.input_unphased_path
