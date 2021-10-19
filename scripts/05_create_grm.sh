@@ -8,18 +8,21 @@
 #$ -e logs/create_grm.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 10
-#$ -q long.qc@@long.hge
+#$ -q short.qc
+
+# -q long.qc@@long.hge
 
 
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
-# paths for hail script
+readonly spark_dir="data/tmp/spark"
 readonly out_dir="data/saige/grm/input"
 readonly out_prefix="${out_dir}/ukb_wes_200k_sparse_autosomes"
-readonly hail_script="scripts/create_grm.py"
-readonly spark_dir="data/tmp/spark"
+readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
+
+readonly hail_script="scripts/05_create_grm.py"
 readonly threads=$(( ${NSLOTS}-1 ))
 readonly createSparseGRM="/well/lindgren/flassen/software/dev/SAIGE/extdata/createSparseGRM.R"
 
@@ -29,14 +32,15 @@ chroms=$( seq 1 22 | tr '\n' ' ' )
 # combine markers from UKBB imputed data
 if [ $( ls -1 ${out_prefix}.{bed,bim,fam} 2> /dev/null | wc -l ) -ne 3 ]; then
   set_up_hail
-  set_up_pythonpath
+  set_up_pythonpath_legacy
   mkdir -p ${out_dir}
   python3 "${hail_script}" \
    --chroms ${chroms} \
    --out_prefix ${out_prefix} \
+   --final_sample_list ${final_sample_list} \
    --subset_markers_by_kinship \
    --subset_samples_by_wes200k \
-   --subset_samples_by_genet_eur
+   --subset_samples_by_genet_eur \
    --add_rare_variants
   conda deactivate
 else
