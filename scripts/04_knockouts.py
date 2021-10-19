@@ -49,11 +49,8 @@ def main(args):
     hail_init.hail_bmrc_init('logs/hail/knockout.log', 'GRCh38')
     mt1 = qc.get_table(input_path=input_phased_path, input_type=input_phased_type) 
     mt2 = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type)
-    
-    # add tmp rsid
-    mt1 = mt1.annotate_rows(rsid = mt1.snpid)
-    mt2 = mt2.annotate_rows(rsid = mt2.snpid)
-
+   
+    # additional filtering
     if get_related and not get_unrelated:
         mt1 = qc.filter_to_unrelated(mt1, get_related = True)
         mt2 = qc.filter_to_unrelated(mt2, get_related = True)
@@ -76,60 +73,56 @@ def main(args):
     if af_min:
         mt1 = qf.fiter_min_af(mt1, float(af_min))
 
-    if maf_max:
-        mt1 = qc.filter_max_maf(mt1, float(maf_max))
+    # currently an error in these functions
+    #if maf_max:
+    #    mt1 = qc.filter_max_maf(mt1, float(maf_max))
 
-    if maf_min:
-        mt1 = qc.filter_min_maf(mt1, float(maf_min))
+    #if maf_min:
+    #    mt1 = qc.filter_min_maf(mt1, float(maf_min))
 
     if hwe:
         mt1 = qc.filter_hwe(mt1, float(hwe))
 
     # Annotate burden variant category
+    #by_variant_annotation1 = analysis.annotation_case_builder(mt1.vep.worst_csq_for_variant_canonical, mt1.dbnsfp, use_loftee = False)
+    #by_variant_annotation2 = analysis.annotation_case_builder(mt2.vep.worst_csq_for_variant_canonical, mt2.dbnsfp, use_loftee = False)
+    
+    # required before doing worst_csq_by_gene_canonical
     mt1 = mt1.explode_rows(mt1.vep.worst_csq_by_gene_canonical)
-    mt1 = analysis.variant_csqs_category_builder(mt1)
     mt2 = mt2.explode_rows(mt2.vep.worst_csq_by_gene_canonical)
-    mt2 = analysis.variant_csqs_category_builder(mt2)
+    
+    # create VEP annotation
+    by_gene_annotation1 = analysis.annotation_case_builder(mt1.vep.worst_csq_by_gene_canonical, mt1.dbnsfp, use_loftee = False)
+    by_gene_annotation2 = analysis.annotation_case_builder(mt2.vep.worst_csq_by_gene_canonical, mt2.dbnsfp, use_loftee = False)
+    mt1 = mt1.annotate_rows(consequence_category = by_gene_annotation1)    
+    mt2 = mt2.annotate_rows(consequence_category = by_gene_annotation2)    
 
-    if vep_filter: 
-        mt1 = analysis.filter_vep(mt1, 'consequence_category', vep_filter)
-        mt2 = analysis.filter_vep(mt2, 'consequence_category', vep_filter) 
+    # iterate over the following consequence categories    
+    categories = dict(
+        ptv = ['ptv'],
+        ptv_damaging_missense = ['ptv','damaging_missense'],
+        synonymous = ['synonymous']
+    )
 
-    #### get stats
+    for category, items in categories.items():
+        
+        print(f"chr{chrom}: evaluating '{category}' category")
+        mt1_subset = mt1.filter_rows(hl.literal(set(items)).contains(mt1.consequence_category)) 
+        mt2_subset = mt2.filter_rows(hl.literal(set(items)).contains(mt2.consequence_category))
 
-    if export_burden:
+        if export_ko_probability:
+            mt_ko = analysis.gene_csqs_calc_pKO(mt1_subset, mt2_subset, 'dosage')
+            mt_ko_entries = mt_ko.entries()
+            mt_ko_entries = mt_ko_entries.filter(mt_ko_entries.pKO>0)
+            mt_ko_entries.export(out_prefix + "_" + category +'_ko_prob.tsv.bgz')
 
-        # Count burden per gene per individual
-        mt1_cat = analysis.gene_burden_category_annotations_per_sample(mt1)
-        mt2_cat = analysis.gene_burden_category_annotations_per_sample(mt2)
+        if export_ko_rsid:
+            mt_ko_rsid = analysis.gene_csqs_knockout_builder(mt1_subset)
+            mt_ko_rsid.export(out_prefix + "_" + category + '_knockouts.tsv.bgz')
 
-        # combine singleton table and full table
-        res = mt1_cat.annotate_entries(singletons = mt2_cat[(mt1_cat.gene_id, mt1_cat.consequence_category), mt1_cat.s].n)
-        res = res.annotate_entries(singletons = hl.if_else(hl.is_missing(res.singletons),0,res.singletons))
-        res = res.annotate_entries(total = res.n + res.singletons)
-        res = res.entries()
-        res = res.filter(res.total > 0)
-
-        # export data
-        res.export(out_prefix + '_burden.tsv.bgz')
-
-    if export_ko_probability:
-
-        # determine probability of being a ko
-        mt_ko = analysis.gene_csqs_calc_pKO(mt1, mt2, 'dosage')
-        mt_ko_entries = mt_ko.entries()
-        mt_ko_entries = mt_ko_entries.filter(mt_ko_entries.pKO>0)
-
-        # export data
-        mt_ko_entries.export(out_prefix + '_ko_prob.tsv.bgz')
-
-    if export_ko_rsid:
-        mt_ko_rsid = analysis.gene_csqs_knockout_builder(mt1)
-        mt_ko_rsid.export(out_prefix + '_knockouts.tsv.bgz')
-
-    if export_saige_vcf:
-        out = analysis.gene_csqs_calc_pKO_pseudoSNP(mt1, mt2, chrom)
-        qc.export_table(out, out_prefix = out_prefix + "_ko", out_type = 'vcf')
+        if export_saige_vcf:
+            out = analysis.gene_csqs_calc_pKO_pseudoSNP(mt1_subset, mt2_subset, chrom)
+            qc.export_table(out, out_prefix = out_prefix + "_" + category + "_ko", out_type = 'vcf')
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()

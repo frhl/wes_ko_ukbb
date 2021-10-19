@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N tmp_qc_input_mt
+#$ -N qc_input_mt
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/tmp_qc_input_mt.log
-#$ -e logs/tmp_qc_input_mt.errors.log
+#$ -o logs/qc_input_mt.log
+#$ -e logs/qc_input_mt.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 15
 #$ -q short.qc
