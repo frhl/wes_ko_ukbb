@@ -111,7 +111,7 @@ def main(args):
         res = res.filter(res.total > 0)
 
         # export data
-        res.export(out_prefix + '_burden.tsv.gz')
+        res.export(out_prefix + '_burden.tsv.bgz')
 
     if export_ko_probability:
 
@@ -121,11 +121,11 @@ def main(args):
         mt_ko_entries = mt_ko_entries.filter(mt_ko_entries.pKO>0)
 
         # export data
-        mt_ko_entries.export(out_prefix + '_ko_prob.tsv.gz')
+        mt_ko_entries.export(out_prefix + '_ko_prob.tsv.bgz')
 
     if export_ko_rsid:
         mt_ko_rsid = analysis.gene_csqs_knockout_builder(mt1)
-        mt_ko_rsid.export(out_prefix + '_knockouts.tsv.gz')
+        mt_ko_rsid.export(out_prefix + '_knockouts.tsv.bgz')
 
     if export_saige_vcf:
         out = analysis.gene_csqs_calc_pKO_pseudoSNP(mt1, mt2, chrom)
