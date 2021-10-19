@@ -41,14 +41,13 @@ def main(args):
         mt2 = mt2.filter_cols(hl.is_defined(ht_final_samples[mt2.col_key]))
    
     # save sample stats
-    mt1 = mt.annotate_cols(gq = hl.agg.stats(mt1.GQ), dp = hl.agg.stats(mt1.DP))
+    mt1 = mt1.annotate_cols(gq = hl.agg.stats(mt1.GQ), dp = hl.agg.stats(mt1.DP))
     mt1 = hl.sample_qc(mt1, name='sample_qc')
     mt1.cols().select('sample_qc', 'gq', 'dp').flatten().export(output=out_prefix + "_samples_phased.tsv.bgz")
  
-    mt2 = mt.annotate_cols(gq = hl.agg.stats(mt2.GQ), dp = hl.agg.stats(mt2.DP))
+    mt2 = mt2.annotate_cols(gq = hl.agg.stats(mt2.GQ), dp = hl.agg.stats(mt2.DP))
     mt2 = hl.sample_qc(mt2, name='sample_qc')
     mt2.cols().select('sample_qc', 'gq', 'dp').flatten().export(output=out_prefix + "_samples_unphased.tsv.bgz")
-
 
     # filter by final variants
     if final_variant_list:
@@ -100,11 +99,11 @@ def main(args):
     # write out variant stats
     mt1 = hl.variant_qc(mt1, name='variant_qc')
     ht1_rows_filter = mt1.rows()
-    ht1_rows_filter.select().write(out_prefix + "_variants_phased.ht", overwrite=True)
+    ht1_rows_filter.write(out_prefix + "_variants_phased.ht", overwrite=True)
  
     mt2 = hl.variant_qc(mt2, name='variant_qc')
     ht2_rows_filter = mt2.rows()
-    ht2_rows_filter.select().write(out_prefix + "_variants_unphased.ht", overwrite=True)
+    ht2_rows_filter.write(out_prefix + "_variants_unphased.ht", overwrite=True)
     
 
 if __name__=='__main__':

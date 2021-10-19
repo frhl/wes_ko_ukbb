@@ -17,8 +17,8 @@ source utils/hail_utils.sh
 
 # paths for hail script
 readonly out_dir="data/saige/grm/input/eur_ukbb"
-readonly out_prefix="${out_dir}/ukb_eur_wes_sparse_markers_autosomes"
-readonly hail_script="utils/subscripts/create_grm_input.py"
+readonly out_prefix="${out_dir}/ukb_wes_200k_sparse_autosomes"
+readonly hail_script="scripts/create_grm.py"
 readonly spark_dir="data/tmp/spark"
 readonly threads=$(( ${NSLOTS}-1 ))
 readonly createSparseGRM="/well/lindgren/flassen/software/dev/SAIGE/extdata/createSparseGRM.R"
@@ -38,7 +38,7 @@ if [ $( ls -1 ${out_prefix}.{bed,bim,fam} 2> /dev/null | wc -l ) -ne 3 ]; then
    --out_prefix ${out_prefix} \
    --subset_markers_by_kinship \
    --subset_samples_by_wes200k \
-   --subset_samples_by_ukbb_eur
+   --subset_samples_by_genet_eur
   conda deactivate
 else
   print_update "${out_prefix}.bed/bim/fam already exists. Skipping"
