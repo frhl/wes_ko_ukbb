@@ -27,10 +27,7 @@ def main(args):
     af_min     = (args.af_min)
     maf_max    = (args.maf_max)
     maf_min    = (args.maf_min)
-    hwe        = (args.hwe)
     missing    = (args.missing)
-    min_dp     = (args.min_dp)
-    min_gq     = (args.min_gq)
     
     # sample filtering options
     get_related = bool(args.get_related)
@@ -38,9 +35,6 @@ def main(args):
     get_europeans = bool(args.get_europeans)
 
     # output options
-    vep_filter = args.vep_filter
-    export_ko_dosage_matrix = args.export_ko_dosage_matrix
-    export_burden = args.export_burden
     export_ko_probability = args.export_ko_probability
     export_saige_vcf = args.export_saige_vcf
     export_ko_rsid = args.export_ko_rsid
@@ -51,11 +45,11 @@ def main(args):
     mt2 = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type)
    
     # additional filtering
-    if get_related and not get_unrelated:
+    if get_related:
         mt1 = qc.filter_to_unrelated(mt1, get_related = True)
         mt2 = qc.filter_to_unrelated(mt2, get_related = True)
 
-    if get_unrelated and not get_related:
+    if get_unrelated:
         mt1 = qc.filter_to_unrelated(mt1, get_related = False)
         mt2 = qc.filter_to_unrelated(mt2, get_related = False)
         
@@ -79,16 +73,13 @@ def main(args):
     if maf_min:
         mt1 = qc.filter_min_maf(mt1, float(maf_min))
 
-    if hwe:
-        mt1 = qc.filter_hwe(mt1, float(hwe))
-
     # required before doing worst_csq_by_gene_canonical
-    mt1 = mt1.explode_rows(mt1.vep.worst_csq_by_gene_canonical)
-    mt2 = mt2.explode_rows(mt2.vep.worst_csq_by_gene_canonical)
+    mt1 = mt1.explode_rows(mt1.consequence.vep.worst_csq_by_gene_canonical)
+    mt2 = mt2.explode_rows(mt2.consequence.vep.worst_csq_by_gene_canonical)
     
     # get VEP annotation and add to rows
-    by_gene_annotation1 = analysis.annotation_case_builder(mt1.vep.worst_csq_by_gene_canonical, mt1.dbnsfp, use_loftee = False)
-    by_gene_annotation2 = analysis.annotation_case_builder(mt2.vep.worst_csq_by_gene_canonical, mt2.dbnsfp, use_loftee = False)
+    by_gene_annotation1 = analysis.annotation_case_builder(mt1.consequence.vep.worst_csq_by_gene_canonical, mt1.consequence.dbnsfp, use_loftee = False)
+    by_gene_annotation2 = analysis.annotation_case_builder(mt2.consequence.vep.worst_csq_by_gene_canonical, mt2.consequence.dbnsfp, use_loftee = False)
     mt1 = mt1.annotate_rows(consequence_category = by_gene_annotation1)    
     mt2 = mt2.annotate_rows(consequence_category = by_gene_annotation2)    
 
@@ -136,10 +127,7 @@ if __name__=='__main__':
     parser.add_argument('--maf_max', default=None, help='Select all variants with a maf less than the indicated value')
     parser.add_argument('--af_min', default=None, help='Select all variants with a AF greater than the indicated value')
     parser.add_argument('--af_max', default=None, help='Select all variants with a AF less than the indicated value')
-    parser.add_argument('--hwe', default=None, help='Filter variants by HWE threshold')
     parser.add_argument('--missing', default=0.05, help='Filter variants by missingness threshold')
-    parser.add_argument('--min_dp', default=20, help='filter variants by minimum sequencing depth (DP)')
-    parser.add_argument('--min_gq', default=48, help='filter variants by genotype quality (GQ)')
     
     # sample filtering
     parser.add_argument('--get_related', action='store_true', help='Select all samples that are related')
@@ -149,10 +137,7 @@ if __name__=='__main__':
     # out 
     parser.add_argument('--export_ko_rsid', action='store_true', help='Exports the table with rsIDs involved in KOs.')
     parser.add_argument('--export_ko_probability', action='store_true', help='Exports the KO probability.')
-    parser.add_argument('--export_burden', action='store_true', help='Export burden variant count by gene and and individuals.')
     parser.add_argument('--export_saige_vcf', action='store_true', help='Export a "fake" VCF file that contains KO probabilities as DS field..')
-    parser.add_argument('--vep_filter', nargs='+', help='Filter consequence_category by mutations e.g., "damaging_missense" or "ptv"')
-    parser.add_argument('--export_ko_dosage_matrix', action='store_true', help='Generate a gene x sample matrix with KO status')
     
     args = parser.parse_args()
 

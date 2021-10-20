@@ -1442,3 +1442,4 @@ Use of uninitialized value in split at /well/lindgren/flassen/software/VEP/plugi
 Use of uninitialized value $number_of_exons in subtraction (-) at /well/lindgren/flassen/software/VEP/plugins_grch38/LoF.pm line 575, <__ANONIO__> line 1265001.
 Use of uninitialized value in split at /well/lindgren/flassen/software/VEP/plugins_grch38/LoF.pm line 562, <__ANONIO__> line 1265001.
 Use of uninitialized value $number_of_exons in subtraction (-) at /well/lindgren/flassen/software/VEP/plugins_grch38/LoF.pm line 575, <__ANONIO__> line 1265001.
+data/vep/full/ukb_wes_200k_full_vep_chr21.vcf already exists. Skipping... 

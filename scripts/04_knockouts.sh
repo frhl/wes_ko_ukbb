@@ -15,7 +15,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 5
 #$ -q short.qc@@short.hge
-#$ -t 15
+#$ -t 1
 
 set -o errexit
 set -o nounset
@@ -25,9 +25,9 @@ source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
 # directories
-readonly in_dir="data/mt_new"
+readonly in_dir="data/mt"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/knockouts/all/211019_test"
+readonly out_dir="derived/knockouts/all/211020"
 
 # hail script
 readonly hail_script="scripts/04_knockouts.py"
@@ -52,12 +52,9 @@ python3 "${hail_script}" \
     --input_phased_type "mt" \
     --input_unphased_type "mt" \
     --af_max 0.02 \
-    --missing 0.10 \
-    --min_dp 47.8 \
-    --min_gq 19.5 \
+    --missing 0.05 \
     --out_prefix ${out_prefix} \
     --export_saige_vcf \
-    --export_burden \
     --export_ko_probability \
     --export_ko_rsid \
 

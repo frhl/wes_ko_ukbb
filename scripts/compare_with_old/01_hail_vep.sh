@@ -23,7 +23,7 @@ readonly hail_script="scripts/01_hail_vep.py"
 
 # input paths
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 
-readonly in="${in_dir}/ukb_wes_hail_chr${chr}.vcf.gz"
+readonly in="${in_dir}/old_ukb_wes_hail_chr${chr}.vcf.bgz"
 readonly vep="${vep_dir}/ukb_wes_200k_full_vep_chr${chr}.vcf"
 
 # output path

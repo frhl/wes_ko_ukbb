@@ -17,22 +17,6 @@ OTHER_CSQS = ["mature_miRNA_variant", "5_prime_UTR_variant",
               "regulatory_region_ablation", "regulatory_region_amplification", "feature_elongation",
               "regulatory_region_variant", "feature_truncation", "intergenic_variant"]
 
-def variant_csqs_category_builder_legacy(mt):
-    r'''Create categories for downstream analysis'''
-    return mt.annotate_rows(vep = mt.vep.annotate(consequence_category = 
-        hl.case().when(hl.literal(set(PLOF_CSQS)).contains(mt.vep.worst_csq_by_gene_canonical.most_severe_consequence), "ptv")
-             .when(hl.literal(set(MISSENSE_CSQS)).contains(mt.vep.worst_csq_by_gene_canonical.most_severe_consequence) & 
-                   (~hl.is_defined(mt.dbnsfp.cadd_phred_score) | 
-                    ~hl.is_defined(mt.dbnsfp.revel_score)), "other_missense")                                   
-             .when(hl.literal(set(MISSENSE_CSQS)).contains(mt.vep.worst_csq_by_gene_canonical.most_severe_consequence) & 
-                   (mt.dbnsfp.cadd_phred_score >= 20) & 
-                   (mt.dbnsfp.revel_score >= 0.6), "damaging_missense") 
-             .when(hl.literal(set(MISSENSE_CSQS)).contains(mt.vep.worst_csq_by_gene_canonical.most_severe_consequence), "other_missense")
-             .when(hl.literal(set(SYNONYMOUS_CSQS)).contains(mt.vep.worst_csq_by_gene_canonical.most_severe_consequence), "synonymous")
-             .when(hl.literal(set(OTHER_CSQS)).contains(mt.vep.worst_csq_by_gene_canonical.most_severe_consequence), "non_coding")
-             .default("NA")))
-
-
 def annotation_case_builder(worst_csq_by_gene_canonical_expr, csq_dbnsfp_expr, use_loftee: bool = True):
     r'''Annotate consequence categories for downstream analysis
 
@@ -93,11 +77,6 @@ def annotate_dbnsfp(mt, vep_path):
 
     return(mt)
 
-#def filter_vep(mt, field, conds):
-#    r'''Filter VEP field by condition(s) '''
-#    mt = mt.filter_rows(hl.literal(set(conds)).contains(mt.vep[field]))
-#    return mt
-
 def count_urv_by_samples(mt):
     r'''Count up ultra rare variants by cols and cateogry
     
@@ -150,9 +129,9 @@ def gene_csqs_case_builder(in_mt):
     mt = annotate_phased_entries(mt)
     mt = mt.filter_entries(~mt.GT.is_hom_var())
     # create table for each strand and combine to gene
-    ht0 = (mt.group_rows_by(mt.vep.worst_csq_by_gene_canonical.gene_id).aggregate(s0 = hl.agg.any(mt.a0_alt)))
-    ht1 = (mt.group_rows_by(mt.vep.worst_csq_by_gene_canonical.gene_id).aggregate(s1 = hl.agg.any(mt.a1_alt)))
-    ht2 = (in_mt.group_rows_by(in_mt.vep.worst_csq_by_gene_canonical.gene_id).aggregate(hom_var = hl.agg.any(in_mt.GT.is_hom_var())))
+    ht0 = (mt.group_rows_by(mt.consequence.vep.worst_csq_by_gene_canonical.gene_id).aggregate(s0 = hl.agg.any(mt.a0_alt)))
+    ht1 = (mt.group_rows_by(mt.consequence.vep.worst_csq_by_gene_canonical.gene_id).aggregate(s1 = hl.agg.any(mt.a1_alt)))
+    ht2 = (in_mt.group_rows_by(in_mt.consequence.vep.worst_csq_by_gene_canonical.gene_id).aggregate(hom_var = hl.agg.any(in_mt.GT.is_hom_var())))
     # combine entries
     ht = ht0.annotate_entries(s1 = ht1[ht0.gene_id, ht0.s].s1)
     ht = ht.annotate_entries(hom_var = ht2[ht.gene_id, ht.s].hom_var)
@@ -175,15 +154,15 @@ def gene_csqs_dosage_builder(in_mt):
     2: two alternate allele on either strand in a locus (either as homozygous or compound heterozygous)
     '''
     # create one gene_id for each item in gene_id array
-    #in_mt = in_mt.explode_rows(in_mt.vep.worst_csq_by_gene_canonical)
+    #in_mt = in_mt.explode_rows(in_mt.consequence.vep.worst_csq_by_gene_canonical)
     # get all snps that are not homozygous
     mt = in_mt
     mt = annotate_phased_entries(mt)
     mt = mt.filter_entries(~mt.GT.is_hom_var())
     # create table for each strand and combine to gene
-    ht0 = (mt.group_rows_by(mt.vep.worst_csq_by_gene_canonical.gene_id).aggregate(s0 = hl.agg.any(mt.a0_alt)))
-    ht1 = (mt.group_rows_by(mt.vep.worst_csq_by_gene_canonical.gene_id).aggregate(s1 = hl.agg.any(mt.a1_alt)))
-    ht2 = (in_mt.group_rows_by(in_mt.vep.worst_csq_by_gene_canonical.gene_id).aggregate(hom_var = hl.agg.any(in_mt.GT.is_hom_var())))
+    ht0 = (mt.group_rows_by(mt.consequence.vep.worst_csq_by_gene_canonical.gene_id).aggregate(s0 = hl.agg.any(mt.a0_alt)))
+    ht1 = (mt.group_rows_by(mt.consequence.vep.worst_csq_by_gene_canonical.gene_id).aggregate(s1 = hl.agg.any(mt.a1_alt)))
+    ht2 = (in_mt.group_rows_by(in_mt.consequence.vep.worst_csq_by_gene_canonical.gene_id).aggregate(hom_var = hl.agg.any(in_mt.GT.is_hom_var())))
     # combine entries
     ht = ht0.annotate_entries(s1 = ht1[ht0.gene_id, ht0.s].s1)
     ht = ht.annotate_entries(hom_var = ht2[ht.gene_id, ht.s].hom_var)
@@ -267,7 +246,7 @@ def gene_strand_builder(mt, field = 'snpid'):
 
     # annotate entries with phased data
     mt = mt.annotate_entries(rsid_entry = mt[field])
-    mt = mt.annotate_rows(gene_id = mt.vep.worst_csq_by_gene_canonical.gene_id)
+    mt = mt.annotate_rows(gene_id = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id)
     mt = annotate_phased_entries(mt)
 
     # filter to each strand
@@ -295,14 +274,14 @@ def gene_csqs_knockout_builder(in_mt, keep = None):
 def gene_burden_annotations_per_sample(mt):
     r'''count non-ref genotypes per sample'''
     mt = mt.group_rows_by(
-        gene_id = mt.vep.worst_csq_by_gene_canonical.gene_id
+        gene_id = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
         ).aggregate(n = hl.agg.count_where(mt.GT.is_non_ref()))
     return mt
 
 def gene_burden_category_annotations_per_sample(mt):
     r'''count non-ref genotypes per consequence category per sample'''
     mt = mt.group_rows_by(
-        gene_id = mt.vep.worst_csq_by_gene_canonical.gene_id,
+        gene_id = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id,
         consequence_category = mt.vep.consequence_category
         ).aggregate(n = hl.agg.count_where(mt.GT.is_non_ref()))
     return mt
@@ -310,7 +289,7 @@ def gene_burden_category_annotations_per_sample(mt):
 def gene_burden_stats_per_sample(mt, gt_stats_expr):
     r'''count summary per gene per sample'''
     mt = mt.group_rows_by(
-        gene_id = mt.vep.worst_csq_by_gene_canonical.gene_id,
+        gene_id = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id,
         consequence_category = mt.vep.consequence_category
         ).aggregate(n = hl.agg.count_where(gt_stats_expr))
     return mt
