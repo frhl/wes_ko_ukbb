@@ -13,13 +13,13 @@ from ko_utils import analysis
 
 
 def summary_count_urv(mt):
-    annotation_by_variant = analysis.annotation_case_builder(mt.vep.worst_csq_for_variant_canonical, mt.dbnsfp)
+    annotation_by_variant = analysis.annotation_case_builder(mt.consequence.vep.worst_csq_for_variant_canonical, mt.consequence.dbnsfp)
     mt = mt.annotate_rows(consequence_category = annotation_by_variant)
     mt = analysis.count_urv_by_samples(mt)
     return mt.cols()
 
 def summary_count_homozygous_urv(mt):
-    annotation_by_variant = analysis.annotation_case_builder(mt.vep.worst_csq_for_variant_canonical, mt.dbnsfp)
+    annotation_by_variant = analysis.annotation_case_builder(mt.consequence.vep.worst_csq_for_variant_canonical, mt.consequence.dbnsfp)
     mt = mt.annotate_rows(consequence_category = annotation_by_variant)
     mt = analysis.count_homozygous_urv_by_samples(mt)
     return mt.cols()
@@ -52,7 +52,7 @@ def main(args):
 
     # filter by final samples
     if final_sample_list:
-        ht_final_samples = hl.import_table(final_sample_list, no_header=True, key='f0')
+        ht_final_samples = hl.import_table(final_sample_list, no_header=True, key='f0', delimiter=',')
         mt1 = mt1.filter_cols(hl.is_defined(ht_final_samples[mt1.col_key]))
         mt2 = mt2.filter_cols(hl.is_defined(ht_final_samples[mt2.col_key]))
         print(f'chr{chrom}: using final samples..')

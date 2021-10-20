@@ -35,13 +35,13 @@ def main(args):
 
     # filter by Duncan's final samples
     if final_sample_list:
-        ht_final_samples = hl.import_table(FINAL_SAMPLE_LIST, no_header=True, key='f0')
+        ht_final_samples = hl.import_table(final_sample_list, no_header=True, key='f0', delimiter=',')
         mt1 = mt1.filter_cols(hl.is_defined(ht_final_samples[mt1.col_key]))
         mt2 = mt2.filter_cols(hl.is_defined(ht_final_samples[mt2.col_key]))
    
     # filter by Ducan's final variants
     if final_variant_list:
-        ht_final_variants = hl.import_table(FINAL_VARIANT_LIST, types={'locus':hl.tlocus(reference_genome='GRCh38'), 'alleles':hl.tarray(hl.tstr)})
+        ht_final_variants = hl.import_table(final_variant_list, types={'locus':hl.tlocus(reference_genome='GRCh38'), 'alleles':hl.tarray(hl.tstr)})
         ht_final_variants = ht_final_variants.key_by(ht_final_variants.locus, ht_final_variants.alleles)
         mt1 = mt1.filter_rows(hl.is_defined(ht_final_variants[mt1.row_key]))
         mt2 = mt2.filter_rows(hl.is_defined(ht_final_variants[mt2.row_key]))
@@ -64,26 +64,6 @@ def main(args):
     mt1 = mt1.annotate_rows(consequence = consequence_annotations[mt1.row_key]) 
     mt2 = mt2.annotate_rows(consequence = consequence_annotations[mt2.row_key]) 
 
-    # Run VEP + gnomAD variant annotations
-    #mt1 = process_consequences(hl.vep(mt1, "utils/configs/vep_env.json"))
-    #mt2 = process_consequences(hl.vep(mt2, "utils/configs/vep_env.json"))
-    
-    # Annotate with REVEL+CADD scores
-    #mt1 = analysis.annotate_dbnsfp(mt1, vep_path)
-    #mt2 = analysis.annotate_dbnsfp(mt2, vep_path)
-   
-    # Annotate for each consequence
-    #mt1 = mt1.explode_rows(mt1.vep.worst_csq_by_gene_canonical)
-    #mt2 = mt2.explode_rows(mt2.vep.worst_csq_by_gene_canonical)
-
-    # annotate consequnece categories 
-    #mt1 = analysis.variant_csqs_category_builder(mt1)
-    #mt2 = analysis.variant_csqs_category_builder(mt2)
-        
-    # annotate Gene (In the future just use vep.worst_csq_by_gene_canonical downstream..) 
-    #mt1 = mt1.annotate_rows(vep = mt1.vep.annotate(Gene = mt1.vep.worst_csq_by_gene_canonical.gene_id))
-    #mt2 = mt2.annotate_rows(vep = mt2.vep.annotate(Gene = mt2.vep.worst_csq_by_gene_canonical.gene_id))
-    
     # By default add snpid id annotation
     mt1 = qc.annotate_snpid(mt1)
     mt2 = qc.annotate_snpid(mt2)
