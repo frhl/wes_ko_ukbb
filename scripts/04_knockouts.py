@@ -73,25 +73,20 @@ def main(args):
     if af_min:
         mt1 = qf.fiter_min_af(mt1, float(af_min))
 
-    # currently an error in these functions
-    #if maf_max:
-    #    mt1 = qc.filter_max_maf(mt1, float(maf_max))
+    if maf_max:
+        mt1 = qc.filter_max_maf(mt1, float(maf_max))
 
-    #if maf_min:
-    #    mt1 = qc.filter_min_maf(mt1, float(maf_min))
+    if maf_min:
+        mt1 = qc.filter_min_maf(mt1, float(maf_min))
 
     if hwe:
         mt1 = qc.filter_hwe(mt1, float(hwe))
 
-    # Annotate burden variant category
-    #by_variant_annotation1 = analysis.annotation_case_builder(mt1.vep.worst_csq_for_variant_canonical, mt1.dbnsfp, use_loftee = False)
-    #by_variant_annotation2 = analysis.annotation_case_builder(mt2.vep.worst_csq_for_variant_canonical, mt2.dbnsfp, use_loftee = False)
-    
     # required before doing worst_csq_by_gene_canonical
     mt1 = mt1.explode_rows(mt1.vep.worst_csq_by_gene_canonical)
     mt2 = mt2.explode_rows(mt2.vep.worst_csq_by_gene_canonical)
     
-    # create VEP annotation
+    # get VEP annotation and add to rows
     by_gene_annotation1 = analysis.annotation_case_builder(mt1.vep.worst_csq_by_gene_canonical, mt1.dbnsfp, use_loftee = False)
     by_gene_annotation2 = analysis.annotation_case_builder(mt2.vep.worst_csq_by_gene_canonical, mt2.dbnsfp, use_loftee = False)
     mt1 = mt1.annotate_rows(consequence_category = by_gene_annotation1)    
