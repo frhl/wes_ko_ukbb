@@ -53,7 +53,7 @@ dt <- setDT(do.call(rbind, lapply(ko_files, function(f){
 })))
 #write("## Done ##",stdout())
 
-total_samples=190000
+total_samples=175000
 total_genes=length(unique(protein_coding))
 # setup overall stats
 samples = unique(dt$s)

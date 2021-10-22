@@ -45,7 +45,7 @@ def main(args):
     if subset_samples_by_genet_eur or subset_samples_by_ukbb_eur:
         mt = qc.filter_to_european(mt, genetically_european = subset_samples_by_genet_eur)
     
-    n = count()
+    n = mt.count()
     print(f"Count after subsetting: {n}")
 
     hl.export_plink(mt, out_prefix, ind_id = mt.s)

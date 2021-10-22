@@ -8,7 +8,7 @@
 #$ -e logs/create_grm.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 10
-#$ -q long.qc@@long.hge
+#$ -q short.qc@@short.hge
 
 # -q short.qc
 
@@ -18,7 +18,7 @@ source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark"
 readonly out_dir="data/saige/grm/input"
-readonly out_prefix="${out_dir}/211020_ukb_wes_200k_sparse_autosomes"
+readonly out_prefix="${out_dir}/211022_ukb_wes_200k_sparse_autosomes"
 readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
 
 readonly hail_script="scripts/05_create_grm.py"
@@ -39,7 +39,6 @@ if [ $( ls -1 ${out_prefix}.{bed,bim,fam} 2> /dev/null | wc -l ) -ne 3 ]; then
    --final_sample_list ${final_sample_list} \
    --subset_markers_by_kinship \
    --subset_samples_by_wes200k \
-   --subset_samples_by_genet_eur \
    --add_rare_variants
   conda deactivate
 else
