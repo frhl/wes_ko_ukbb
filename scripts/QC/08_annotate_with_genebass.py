@@ -36,7 +36,7 @@ def main(args):
     
     # write file
     ht = mt.rows()
-    ht.flatten().export(out_prefix + '.tsv.bgz', overwrite = True)
+    ht.flatten().export(out_prefix + '.tsv.bgz')
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
