@@ -12,22 +12,22 @@ def flip_base(base: str) -> str:
                 .default(base))
 
 
-def liftover(mt: MatrixTable, from = 'GRCh37', to = 'GRCh38', drop_annotations = False) -> MatrixTable:
+def liftover(mt: MatrixTable, current = 'GRCh37', to = 'GRCh38', drop_annotations = False) -> MatrixTable:
     r""" Liftover variants from one build to another
 
     :param mt: a Matrixtable
-    :param from: the current build (either 'GRCh37' or 'GRCh38')
+    :param current: the current build (either 'GRCh37' or 'GRCh38')
     :param to: the desired build
     :param drop_annotations: boolean indicating whether old locus and alleles should be dropped. 
     """
     
     builds = ['GRCh37','GRCh38']
-    assert(from in builds)
+    assert(current in builds)
     assert(to in builds)    
 
     # setup liftover references
-    liftover_path = variants.get_liftover_chain_path(from,to)
-    rg_from = hl.get_reference(from)  
+    liftover_path = variants.get_liftover_chain_path(current,to)
+    rg_from = hl.get_reference(current)  
     rg_to = hl.get_reference(to)  
     rg_from.add_liftover(liftover_path, rg_to)
 
