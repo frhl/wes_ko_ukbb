@@ -45,14 +45,14 @@ print(files)
 
 pdf(paste0(args$out_prefix,'.pdf'), width = 9, height = 7)
 for (f in files){
-    print(paste('running',f))
-    d = zcat_fread(f)
-    d = expand_hail_list(d, name = 'variant_qc.AF')
-    p <- ggplot(dt, aes(x=variant_qc.AF2, y=gb_AF)) + 
+    print(paste0('reading',f))
+    d <- zcat_fread(f)
+    d <- expand_hail_list(d, name = 'variant_qc.AF')
+    d$variant_qc.AF2 <- as.numeric(d$variant_qc.AF2)
+    p <- ggplot(d, aes(x=variant_qc.AF2, y=gb_AF)) + 
     geom_bin2d(aes(fill=log10(..count..)), bins=40) + theme_classic() + 
     xlab("UK Biobank AF") + ylab("genebass AF") +
     ggtitle("UK Biobank pan-UKB AF vs. gnomAD AF after MAF matching", basename(f))
-    print(p)
     p <- p + scale_x_continuous(trans='log10') + scale_y_continuous(trans='log10')
     print(p)
 }
