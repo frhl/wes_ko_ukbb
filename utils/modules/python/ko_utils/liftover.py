@@ -26,7 +26,8 @@ def liftover(mt: MatrixTable, from_build = 'GRCh37', to_build = 'GRCh38', drop_a
     liftover_path = get_liftover_chain_path(from_build,to_build)
     rg_from = hl.get_reference(from_build)  
     rg_to = hl.get_reference(to_build)  
-    rg_from.add_liftover(liftover_path, rg_to)
+    if not rg_from.has_liftover(rg_to):
+        rg_from.add_liftover(liftover_path, rg_to)
 
     # do liftover and flip allele for negative strand
     mt = mt.annotate_rows(new_locus=hl.liftover(mt.locus, to, include_strand=True),old_locus=mt.locus)  
