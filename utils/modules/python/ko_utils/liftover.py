@@ -4,7 +4,7 @@ import hail as hl
 from hail.matrixtable import MatrixTable
 
 def flip_base(base: str) -> str:
-    """ flip bases for liftover 
+    r""" flip bases for liftover 
     :param base: a string that is is in ATGC
     """    
     return (hl.switch(base)
@@ -14,24 +14,8 @@ def flip_base(base: str) -> str:
                 .when('C','G')
                 .default(base))
 
-def get_liftover_chain_path(from_build, to_build):
-    """Returns path to liftover chain file
-    Files were downloaded from Hail's Google Cloud  bucket:
-        gsutil cp gs://hail-common/references/grch37_to_grch38.over.chain.gz ./
-        gsutil cp gs://hail-common/references/grch38_to_grch37.over.chain.gz ./
-    :param from_build: Build to liftover from
-    :param to_build: Build to liftover to
-    """
-    if from_build == to_build:
-        raise ValueError(f"from_build cannot equal to_build")
-    for arg, build in (("from_build", from_build), ("to_build", to_build)):
-        if build not in {"GRCh37", "GRCh38"}:
-            raise ValueError(f"`{arg}`={build} is invalid")
-    return f'{RESOURCES_DIR}/{from_build.lower()}_to_{to_build.lower()}.over.chain.gz'
-
-
 def liftover(mt: MatrixTable, from_build = 'GRCh37', to_build = 'GRCh38', drop_annotations = False) -> MatrixTable:
-    """ Liftover variants from one build to another
+    r""" Liftover variants from one build to another
     :param mt: a Matrixtable
     :param from_build: Build to liftover from (either 'GRCh37' or 'GRCh38')
     :param to_build: Build to liftover to
@@ -39,7 +23,7 @@ def liftover(mt: MatrixTable, from_build = 'GRCh37', to_build = 'GRCh38', drop_a
     """
     
     # setup liftover references
-    liftover_path = variants.get_liftover_chain_path(from_build,to_build)
+    liftover_path = get_liftover_chain_path(from_build,to_build)
     rg_from = hl.get_reference(from_build)  
     rg_to = hl.get_reference(to_build)  
     rg_from.add_liftover(liftover_path, rg_to)
