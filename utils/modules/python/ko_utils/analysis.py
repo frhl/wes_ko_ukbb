@@ -92,7 +92,34 @@ def count_urv_by_samples(mt):
                           n_URV_non_coding = hl.agg.count_where(mt.GT.is_non_ref() & (mt.consequence_category == "non_coding"))
                          )
 
-def count_homozygous_urv_by_samples(mt):
+def count_urv_by_gene(mt):
+    r'''Count up ultra rare variants by gene
+    
+    :param mt: a MatrixTable with the field "consequence_category"
+    '''
+    mt = mt.annotate_rows(n_coding_URV_SNP = hl.agg.count_where(mt.GT.is_non_ref() & hl.is_snp(mt.alleles[0], mt.alleles[1]) & (mt.consequence_category != "non_coding")),
+                          n_coding_URV_indel = hl.agg.count_where(mt.GT.is_non_ref() & hl.is_indel(mt.alleles[0], mt.alleles[1]) & (mt.consequence_category != "non_coding")),
+                          n_URV_PTV = hl.agg.count_where(mt.GT.is_non_ref() & (mt.consequence_category == "ptv")),
+                          n_URV_PTV_LC = hl.agg.count_where(mt.GT.is_non_ref() & (mt.consequence_category == "ptv_lc")),
+                          n_URV_damaging_missense = hl.agg.count_where(mt.GT.is_non_ref() & (mt.consequence_category == "damaging_missense")),
+                          n_URV_other_missense = hl.agg.count_where(mt.GT.is_non_ref() & (mt.consequence_category == "other_missense")),
+                          n_URV_synonymous = hl.agg.count_where(mt.GT.is_non_ref() & (mt.consequence_category == "synonymous")),
+                          n_URV_non_coding = hl.agg.count_where(mt.GT.is_non_ref() & (mt.consequence_category == "non_coding"))
+                         )
+
+    mt = mt.group_by(mt.consequence.vep.worst_csq_for_variant_canonical).
+            aggregate_rows(urv_counts = hl.struct(
+                coding_URV_SNP = hl.agg.sum(mt.n_coding_URV_SNP),
+                coding_URV_indel = hl.agg.sum(mt.n_coding_URV_INDEL),
+                URV_PTV = hl.agg.sum(mt.n_URV_PTV),
+                URV_PTV_LC = hl.agg.sum(mt.n_URV_PTV_LC)
+                ))
+                
+    return mt
+
+   
+
+    def count_homozygous_urv_by_samples(mt):
     r'''Count up homozygous variants by samples
     
     :param mt: a MatrixTable with the field "consequence_category"
