@@ -24,6 +24,7 @@ readonly hail_script="scripts/QC/08_annotate_with_genebass.py"
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 
 readonly in_file="${in_dir}/ukb_wes_200k_filtered_chr${chr}.mt"
 readonly final_variant_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list'
+readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
 
 # output path
 readonly out_prefix="${out_dir}/ukb_wes_200k_genebass_chr${chr}"
@@ -36,6 +37,7 @@ python3 "${hail_script}" \
      --input_path ${in_file}\
      --input_type "mt" \
      --final_variant_list ${final_variant_list}\
+     --final_sample_list ${final_sample_list}\
      --out_prefix ${out_prefix}
 
 

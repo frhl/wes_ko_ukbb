@@ -5,7 +5,7 @@
 #$ -o logs/plot_genebass.log
 #$ -e logs/plot_genebass.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 4
+#$ -pe shmem 1
 #$ -q short.qc@@short.hge
 
 
@@ -21,7 +21,7 @@ readonly out_dir="derived/variants"
 readonly rcode="scripts/QC/09_plot_genebass.R"
 
 # output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_genebass_AF"
+readonly out_prefix="${out_dir}/ukb_wes_200k_genebass_AF_noNA"
 
 # run 
 set_up_RSAIGE

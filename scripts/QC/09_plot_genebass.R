@@ -49,10 +49,13 @@ for (f in files){
     d <- zcat_fread(f)
     d <- expand_hail_list(d, name = 'variant_qc.AF')
     d$variant_qc.AF2 <- as.numeric(d$variant_qc.AF2)
+    #d$variant_qc.AF2[is.na(d$variant_qc.AF2)] <- 0
+    #d$gb_AF[is.na(d$gb_AF)] <- 0
     p <- ggplot(d, aes(x=variant_qc.AF2, y=gb_AF)) + 
     geom_bin2d(aes(fill=log10(..count..)), bins=40) + theme_classic() + 
     xlab("UK Biobank AF") + ylab("genebass AF") +
     ggtitle("UK Biobank pan-UKB AF vs. gnomAD AF after MAF matching", basename(f))
+    print(p)
     p <- p + scale_x_continuous(trans='log10') + scale_y_continuous(trans='log10')
     print(p)
 }

@@ -12,6 +12,7 @@ def main(args):
     input_type = args.input_type
     out_prefix = args.out_prefix
     final_variant_list = args.final_variant_list
+    final_sample_list = args.final_sample_list
 
     # setup flags
     hail_init.hail_bmrc_init_local('logs/hail/hail_format.log', 'GRCh38')
@@ -44,6 +45,7 @@ if __name__=='__main__':
     parser.add_argument('--input_path', default=None, help='Path to input')
     parser.add_argument('--input_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
     parser.add_argument('--final_variant_list', default=None, help='Path to hail table with final variants to be included')
+    parser.add_argument('--final_sample_list', default=None, help='Path to hail table with final variants to be included')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
 
 
