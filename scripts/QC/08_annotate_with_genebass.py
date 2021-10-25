@@ -24,6 +24,10 @@ def main(args):
         ht_final_variants = ht_final_variants.key_by(ht_final_variants.locus, ht_final_variants.alleles)
         mt = mt.filter_rows(hl.is_defined(ht_final_variants[mt.row_key]))
 
+    if final_sample_list:
+        ht_final_samples = hl.import_table(final_sample_list, no_header=True, key='f0', delimiter=',')
+        mt = mt.filter_cols(hl.is_defined(ht_final_samples[mt.col_key]))
+    
     # do variant QC
     mt = hl.variant_qc(mt, name = 'variant_qc')
 

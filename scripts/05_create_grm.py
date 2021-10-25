@@ -36,14 +36,14 @@ def main(args):
         mt = mt.filter_rows(hl.literal(rsids).contains(mt.rsid))
 
     # subset population by WES data samples
-    if subset_samples_by_wes200k:
-        path = genotypes.get_ukb_wes_200k_post_qc_path(chrom=22)
-        ids = qc.get_table(path, 'mt').s.collect()
-        mt = mt.filter_cols(hl.literal(ids).contains(mt.s))
+    #if subset_samples_by_wes200k:
+    #    path = genotypes.get_ukb_wes_200k_post_qc_path(chrom=22)
+    #    ids = qc.get_table(path, 'mt').s.collect()
+    #    mt = mt.filter_cols(hl.literal(ids).contains(mt.s))
     
     # get white british ancestry (k-means)
-    if subset_samples_by_genet_eur or subset_samples_by_ukbb_eur:
-        mt = qc.filter_to_european(mt, genetically_european = subset_samples_by_genet_eur)
+    #if subset_samples_by_genet_eur or subset_samples_by_ukbb_eur:
+    #    mt = qc.filter_to_european(mt, genetically_european = subset_samples_by_genet_eur)
     
     n = mt.count()
     print(f"Count after subsetting: {n}")

@@ -5,7 +5,7 @@
 #$ -o logs/annotate_with_genebass.log
 #$ -e logs/annotate_with_genebass.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 4
+#$ -pe shmem 2
 #$ -q short.qc@@short.hge
 #$ -t 1-22
 
@@ -27,7 +27,7 @@ readonly final_variant_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_q
 readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
 
 # output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_genebass_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_wes_200k_genebass_eur_chr${chr}"
 
 mkdir -p ${out_dir}
 set_up_hail
