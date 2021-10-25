@@ -1443,3 +1443,7 @@ Use of uninitialized value $number_of_exons in subtraction (-) at /well/lindgren
 Use of uninitialized value in split at /well/lindgren/flassen/software/VEP/plugins_grch38/LoF.pm line 562, <__ANONIO__> line 1265001.
 Use of uninitialized value $number_of_exons in subtraction (-) at /well/lindgren/flassen/software/VEP/plugins_grch38/LoF.pm line 575, <__ANONIO__> line 1265001.
 data/vep/full/ukb_wes_200k_full_vep_chr21.vcf already exists. Skipping... 
+spark_dir has not been set. Defaulting to /well/lindgren/flassen/spark/default.
+/var/spool/default/compe029/job_scripts/54968319: line 29: out_prefix: unbound variable
+spark_dir has not been set. Defaulting to /well/lindgren/flassen/spark/default.
+/var/spool/default/compe092/job_scripts/54968487: line 29: out_prefix: unbound variable

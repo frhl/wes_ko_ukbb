@@ -107,7 +107,7 @@ def count_homozygous_urv_by_samples(mt):
                           n_hom_URV_non_coding = hl.agg.count_where(mt.GT.is_hom_var() & (mt.consequence_category == "non_coding"))
                          )
 
-def count_urv_by_gene(mt):
+def count_urv_by_genes(mt):
     r''' Count up URVs by gene. Requires using the "count_urv_by_sample" function first.
     '''
     return (mt.group_rows_by(mt.consequence.vep.worst_csq_for_variant_canonical.gene_id).

@@ -51,26 +51,26 @@ def main(args):
     hl.export_plink(mt, out_prefix, ind_id = mt.s)
    
     # add rare variants for SAIGE 
-    if add_rare_variants:
-        
-        # get high quality rare variants
-        rsids = hl.literal('')
-        for c in range(1,24):
-            mfi = genotypes.get_ukb_imputed_v3_mfi(c)
-            mfi = mfi.filter((mfi.maf < 0.001) & 
-                     (mfi.maf > 0.000001) &
-                     (mfi.info == 1))
-            rsid = mfi.rsid
-            rsids += rsid
-        rsids = hl.set(rsids.collect())
-        # get genotype file and filter
-        mt2 = genotypes.get_ukb_imputed_v3_bgen(chroms, entry_fields = ['GT'])
-        mt2 = mt2.filter_cols(hl.set(mt.s.collect()).contains(mt.s))
-        mt2 = mt2.filter_rows(rsids.contains(mt2.rsid))
-        n = mt2.count()
-        print(f"added {n} rare variants.")
-        mt_out = mt.union_rows(mt2)
-        hl.export_plink(mt_out, out_prefix + "_rare", ind_id = mt_out.s) 
+    #if add_rare_variants:
+    #    
+    #    # get high quality rare variants
+    #    rsids = hl.literal('')
+    #    for c in range(1,24):
+    #        mfi = genotypes.get_ukb_imputed_v3_mfi(c)
+    #        mfi = mfi.filter((mfi.maf < 0.001) & 
+    #                 (mfi.maf > 0.000001) &
+    #                 (mfi.info == 1))
+    #        rsid = mfi.rsid
+    #        rsids += rsid
+    #    rsids = hl.set(rsids.collect())
+    #    # get genotype file and filter
+    #    mt2 = genotypes.get_ukb_imputed_v3_bgen(chroms, entry_fields = ['GT'])
+    #    mt2 = mt2.filter_cols(hl.set(mt.s.collect()).contains(mt.s))
+    #    mt2 = mt2.filter_rows(rsids.contains(mt2.rsid))
+    #    n = mt2.count()
+    #    print(f"added {n} rare variants.")
+    #    mt_out = mt.union_rows(mt2)
+    #    hl.export_plink(mt_out, out_prefix + "_rare", ind_id = mt_out.s) 
 
 
 if __name__=='__main__':
