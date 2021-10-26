@@ -15,3 +15,105 @@
 2021-10-25 15:34:53 WARN  Hail:43 - This Hail JAR was compiled for Spark 3.1.1, running with Spark 3.1.2.
   Compatibility is not guaranteed.
 2021-10-25 15:34:53 WARN  SparkConf:69 - Note that spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone/kubernetes and LOCAL_DIRS in YARN).
+Count after subsetting: (93183, 0)
+Generating GRM from plink files.. . (job id: 54967367.undefined, 10xshort.qc, Tue Oct 26 09:16:52 BST 2021)
+R version 3.6.1 (2019-07-05)
+Platform: x86_64-conda_cos6-linux-gnu (64-bit)
+Running under: CentOS Linux 7 (Core)
+
+Matrix products: default
+BLAS/LAPACK: /gpfs3/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/lib/R/lib/libRblas.so
+
+locale:
+[1] C
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] optparse_1.6.4 SAIGE_0.44.6.4
+
+loaded via a namespace (and not attached):
+[1] compiler_3.6.1     Matrix_1.2-17      Rcpp_1.0.1         getopt_1.20.3     
+[5] grid_3.6.1         RcppParallel_5.1.4 lattice_0.20-44   
+$plinkFile
+[1] "data/saige/grm/input/211025_ukb_wes_200k_sparse_autosomes"
+
+$nThreads
+[1] 4
+
+$memoryChunk
+[1] 2
+
+$outputPrefix
+[1] "data/saige/grm/input/211025_ukb_wes_200k_sparse_autosomes"
+
+$numRandomMarkerforSparseKin
+[1] 1000
+
+$relatednessCutoff
+[1] 0.125
+
+$isDiagofKinSetAsOne
+[1] FALSE
+
+$minMAFforGRM
+[1] 0.01
+
+$help
+[1] FALSE
+
+4  threads are set to be used  
+sparse GRM will be created
+Markers in the Plink file with MAF >=  0.01  will be used to construct GRM
+Count after subsetting: (93183, 0)
+Generating GRM from plink files.. . (job id: 54968354.undefined, 10xlong.qc, Tue Oct 26 11:31:49 BST 2021)
+R version 3.6.1 (2019-07-05)
+Platform: x86_64-conda_cos6-linux-gnu (64-bit)
+Running under: CentOS Linux 7 (Core)
+
+Matrix products: default
+BLAS/LAPACK: /gpfs3/well/lindgren/users/mmq446/conda/skylake/envs/RSAIGE/lib/R/lib/libRblas.so
+
+locale:
+[1] C
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] optparse_1.6.4 SAIGE_0.44.6.4
+
+loaded via a namespace (and not attached):
+[1] compiler_3.6.1     Matrix_1.2-17      Rcpp_1.0.1         getopt_1.20.3     
+[5] grid_3.6.1         RcppParallel_5.1.4 lattice_0.20-44   
+$plinkFile
+[1] "data/saige/grm/input/211025_longqc_ukb_wes_200k_sparse_autosomes"
+
+$nThreads
+[1] 4
+
+$memoryChunk
+[1] 2
+
+$outputPrefix
+[1] "data/saige/grm/input/211025_longqc_ukb_wes_200k_sparse_autosomes"
+
+$numRandomMarkerforSparseKin
+[1] 1000
+
+$relatednessCutoff
+[1] 0.125
+
+$isDiagofKinSetAsOne
+[1] FALSE
+
+$minMAFforGRM
+[1] 0.01
+
+$help
+[1] FALSE
+
+4  threads are set to be used  
+sparse GRM will be created
+Markers in the Plink file with MAF >=  0.01  will be used to construct GRM

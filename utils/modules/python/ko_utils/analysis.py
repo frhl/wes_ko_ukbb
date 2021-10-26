@@ -44,14 +44,14 @@ def annotation_case_builder(worst_csq_by_gene_canonical_expr, csq_dbnsfp_expr, u
     return case.or_missing()
 
 
-def annotate_dbnsfp(mt, vep_path):
+def annotate_dbnsfp(mt, vep_path, force = False):
     r'''Annotate matrix table with dbNSFP consequence from external VEP file.'''
     print(f'Annotating with VEP file: {vep_path}')
     
     # Open file containing VEP fields
     with open('data/vep/vep_fields.txt', 'r') as file:
         fields = file.read().strip().split(',')
-    ht = hl.import_vcf(vep_path).rename({'info':'vep'}) 
+    ht = hl.import_vcf(vep_path, force = force).rename({'info':'vep'}) 
     
     # Add VEP fields by iteration
     for i in range(len(fields)):
