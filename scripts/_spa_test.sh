@@ -39,9 +39,9 @@ spa_test() {
    print_update "starting SPA test for ${out}"
    set -x
    Rscript "${step2_SPAtests}"	\
-	 --vcfFile=${vcf} \
-	 --vcfFileIndex=${csi} \
-	 --vcfField="GT" \
+     --vcfFile=${vcf} \
+     --vcfFileIndex=${csi} \
+     --vcfField="DT" \
      --chrom=${chr} \
      --minMAF=0.00001 \
      --minMAC=1 \
@@ -50,8 +50,8 @@ spa_test() {
      --SAIGEOutputFile=${out} \
      --numLinesOutput=2 \
      --IsOutputAFinCaseCtrl=TRUE	\
-	 --IsOutputNinCaseCtrl=TRUE	\
-  	 --IsOutputHetHomCountsinCaseCtrl=TRUE \
+     --IsOutputNinCaseCtrl=TRUE	\
+     --IsOutputHetHomCountsinCaseCtrl=TRUE \
      --LOCO=FALSE
    set +x
    duration=${SECONDS}

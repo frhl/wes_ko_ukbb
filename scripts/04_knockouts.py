@@ -108,7 +108,6 @@ def main(args):
 
         if export_saige_vcf:
             out = analysis.gene_csqs_calc_pKO_pseudoSNP(mt1_subset, mt2_subset, chrom)
-            #out_vcf_prefix = out_prefix + "_" + category + "_ko"
             qc.export_table(out, out_prefix = out_prefix + "_" + category + "_ko", out_type = 'vcf')
 
 if __name__=='__main__':

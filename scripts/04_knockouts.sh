@@ -27,7 +27,7 @@ source utils/vcf_utils.sh
 # directories
 readonly in_dir="data/mt"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/knockouts/211028_af02"
+readonly out_dir="derived/knockouts/211029"
 
 # hail script
 readonly hail_script="scripts/04_knockouts.py"
@@ -38,7 +38,7 @@ readonly in_phased="${in_dir}/ukb_wes_200k_annotated_chr${chr}.mt"
 readonly in_unphased="${in_dir}/ukb_wes_200k_annotated_chr${chr}_singletons.mt"
 
 # output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_af02_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_wes_200k_af50_chr${chr}"
 readonly out="${out_prefix}.mt"
 
 # run hail
@@ -51,7 +51,7 @@ python3 "${hail_script}" \
     --input_unphased_path ${in_unphased} \
     --input_phased_type "mt" \
     --input_unphased_type "mt" \
-    --af_max 0.02 \
+    --af_max 0.50 \
     --missing 0.05 \
     --out_prefix ${out_prefix} \
     --export_saige_vcf \

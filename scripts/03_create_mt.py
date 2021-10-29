@@ -47,8 +47,8 @@ def main(args):
         mt2 = mt2.filter_rows(hl.is_defined(ht_final_variants[mt2.row_key]))
 
     # Add QC fields that has been removed during phasing to mt1
-    mt1 = mt1.annotate_entries(DP = mt2[(mt1.locus, mt1.alleles), mt1.s].DP)
-    mt1 = mt1.annotate_entries(GQ = mt2[(mt1.locus, mt1.alleles), mt1.s].GQ)
+    #mt1 = mt1.annotate_entries(DP = mt2[(mt1.locus, mt1.alleles), mt1.s].DP)
+    #mt1 = mt1.annotate_entries(GQ = mt2[(mt1.locus, mt1.alleles), mt1.s].GQ)
 
     # note: need to translate ids to combine later!
     mt1 = qc.annotate_european(mt1)
@@ -77,6 +77,12 @@ def main(args):
     # export files
     mt1.write(out_prefix + ".mt")
     mt2.write(out_prefix + "_singletons.mt")
+
+    # counts
+    n_mt1 = mt1.count()
+    n_mt2 = mt2.count()
+    print(f'chr{chrom}: phased data count: {n_mt1}')
+    print(f'chr{chrom}: unphased (singleton) data count: {n_mt2}')
 
 
 if __name__=='__main__':
