@@ -27,7 +27,7 @@ source utils/vcf_utils.sh
 # directories
 readonly in_dir="data/mt"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/knockouts/all/211020"
+readonly out_dir="derived/knockouts/211028_af02"
 
 # hail script
 readonly hail_script="scripts/04_knockouts.py"

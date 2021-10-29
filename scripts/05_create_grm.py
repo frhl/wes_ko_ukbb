@@ -8,25 +8,27 @@ from ko_utils import qc
 
 def main(args):
 
-    hail_init.hail_bmrc_init('logs/hail_grm.log', 'GRCh37')
-    
     # input variables
     chroms = args.chroms
     subset_markers_by_kinship = args.subset_markers_by_kinship
     out_prefix = args.out_prefix
-    add_rare_variants = args.add_rare_variants
     final_sample_list = args.final_sample_list
-    subset_samples_by_genet_eur = args.subset_samples_by_genet_eur
-    subset_samples_by_ukbb_eur = args.subset_samples_by_ukbb_eur
-    subset_samples_by_wes200k = args.subset_samples_by_wes200k   
-     
-    # combine multiple matrix tables
+    #subset_samples_by_genet_eur = args.subset_samples_by_genet_eur
+    #subset_samples_by_ukbb_eur = args.subset_samples_by_ukbb_eur
+    #subset_samples_by_wes200k = args.subset_samples_by_wes200k   
+    #add_rare_variants = args.add_rare_variants
+    
+    # setup session and grab imputed data 
+    hail_init.hail_bmrc_init_local('logs/hail/hail_format.log', 'GRCh37')
+    hl._set_flags(no_whole_stage_codegen='1') #
     mt = genotypes.get_ukb_imputed_v3_bgen(chroms)   
     
     # only keep final samples
     if final_sample_list:
          ht_final_samples = hl.import_table(final_sample_list, no_header=True, key='f0',delimiter = ',')
          mt = mt.filter_cols(hl.is_defined(ht_final_samples[mt.col_key]))
+         n = mt.count()
+         print(f"##### count after final_sample_list: {n}")
 
     # createse a sparse GRM
     if subset_markers_by_kinship:
@@ -34,9 +36,8 @@ def main(args):
         ht = ht.filter(ht.in_Relatedness == 1)
         rsids = ht.rs_id.collect()
         mt = mt.filter_rows(hl.literal(rsids).contains(mt.rsid))
-
-    n = mt.count()
-    print(f"Count after subsetting: {n}")
+        n = mt.count()
+        print(f"##### count after subsetting markers by kinship: {n}")
 
     hl.export_plink(mt, out_prefix, ind_id = mt.s)
    

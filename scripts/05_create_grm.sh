@@ -9,8 +9,8 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 10
 #$ -q long.qc@@long.hge
-
 # -q short.qc
+
 
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
@@ -18,7 +18,7 @@ source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark"
 readonly out_dir="data/saige/grm/input"
-readonly out_prefix="${out_dir}/211026_longqc_ukb_wes_200k_sparse_autosomes"
+readonly out_prefix="${out_dir}/211026_long_ukb_wes_200k_sparse_autosomes"
 readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
 
 readonly hail_script="scripts/05_create_grm.py"
@@ -38,10 +38,9 @@ if [ $( ls -1 ${out_prefix}.{bed,bim,fam} 2> /dev/null | wc -l ) -ne 3 ]; then
    --chroms ${chroms} \
    --out_prefix ${out_prefix} \
    --final_sample_list ${final_sample_list} \
-   --subset_markers_by_kinship \
-   --subset_samples_by_wes200k \
-   --add_rare_variants
+   --subset_markers_by_kinship
   conda deactivate
+  print_update "Hail finished writing."
 else
   print_update "${out_prefix}.bed/bim/fam already exists. Skipping"
 fi

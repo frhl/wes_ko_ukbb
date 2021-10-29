@@ -20,17 +20,17 @@ readonly step1_fitNULLGLMM="/well/lindgren/flassen/software/dev/SAIGE/extdata/st
 readonly step2_SPAtests="/well/lindgren/flassen/software/dev/SAIGE/extdata/step2_SPAtests.R"
 
 # directories
-readonly plink_dir="data/saige/grm/input/eur_ukbb"
-readonly grm_dir="data/saige/grm/input/eur_ukbb"
+readonly plink_dir="data/saige/grm/input"
+readonly grm_dir="data/saige/grm/input"
 readonly covar_dir="data/phenotypes"
 readonly pheno_dir="data/phenotypes"
-readonly out_dir="derived/saige/binary/step1"
+readonly out_dir="data/saige/output/binary/step1"
 
 # input path
 readonly chr=${SGE_TASK_ID}
-readonly grm_mtx="${grm_dir}/ukb_eur_wes_sparse_markers_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
-readonly grm_sam="${grm_dir}/ukb_eur_wes_sparse_markers_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt"
-readonly plink_file="${plink_dir}/ukb_eur_wes_sparse_markers_autosomes"
+readonly grm_mtx="${grm_dir}/211026_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+readonly grm_sam="${grm_mtx}.sampleIDs.txt"
+readonly plink_file="${plink_dir}/211026_long_ukb_wes_200k_sparse_autosomes"
 readonly pheno_file="${pheno_dir}/UKBB_WES200k_filtered_binary_phenotypes.tsv.gz"
 readonly covar_file="${covar_dir}/COVARS1.csv"
 readonly pheno_list="${pheno_dir}/UKBB_WES200k_binary_phenotypes_header.txt"

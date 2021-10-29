@@ -3,8 +3,8 @@
 #
 #$ -N _spa_test
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/step2_saige.log
-#$ -e logs/step2_saige.errors.log
+#$ -o logs/spa_test.log
+#$ -e logs/spa_test.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q lindgren.qe
@@ -21,6 +21,10 @@ readonly in_var=${5?Error: Missing arg4 (in_var)}
 readonly out_prefix=${6?Error: Missing arg5 (path prefix for saige output)}
 readonly chr=${SGE_TASK_ID}
 
+# subsitute each chromosome
+readonly vcf=$(echo ${in_vcf} | sed -e "s/CHR/${chr}/g")
+readonly csi=$(echo ${in_csi} | sed -e "s/CHR/${chr}/g")
+
 # SAIGE paths
 readonly threads=$(( ${NSLOTS}-1 ))
 readonly createSparseGRM="/well/lindgren/flassen/software/dev/SAIGE/extdata/createSparseGRM.R"
@@ -35,9 +39,9 @@ spa_test() {
    print_update "starting SPA test for ${out}"
    set -x
    Rscript "${step2_SPAtests}"	\
-	 --vcfFile=${in_vcf} \
-	 --vcfFileIndex=${in_csi} \
-	 --vcfField="DS" \
+	 --vcfFile=${vcf} \
+	 --vcfFileIndex=${csi} \
+	 --vcfField="GT" \
      --chrom=${chr} \
      --minMAF=0.00001 \
      --minMAC=1 \
