@@ -120,7 +120,7 @@ def filter_max_mac(mt, mac=None):
 def filter_min_mac(mt, mac=None):
     r'''Filter to variants to have mac gt {mac}'''
     if mac is not None:
-        mt = mt.filter_rows(hl.min(mt.info.AC) > mac)
+        mt = mt.filter_rows(hl.min(mt.info.AC) >= mac)
     return mt
 
 
