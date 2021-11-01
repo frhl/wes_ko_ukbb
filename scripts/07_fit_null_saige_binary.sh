@@ -5,9 +5,11 @@
 #$ -o logs/saige_null_binary.log
 #$ -e logs/saige_null_binary.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 8
+#$ -pe shmem 5
 #$ -q short.qe
 #$ -t 3-46
+
+# t in 3-46
 
 module purge
 source utils/bash_utils.sh
@@ -28,9 +30,10 @@ readonly out_dir="data/saige/output/binary/step1"
 
 # input path
 readonly chr=${SGE_TASK_ID}
-readonly grm_mtx="${grm_dir}/211026_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+readonly grm_mtx="${grm_dir}/211101_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
-readonly plink_file="${plink_dir}/211026_long_ukb_wes_200k_sparse_autosomes"
+readonly plink_file="${plink_dir}/211101_long_ukb_wes_200k_sparse_autosomes"
+#readonly pheno_file="${pheno_dir}/UKBB_WES200k_filtered_binary_phenotypes_with_imputed_genos.tsv.gz"
 readonly pheno_file="${pheno_dir}/UKBB_WES200k_filtered_binary_phenotypes.tsv.gz"
 readonly covar_file="${covar_dir}/COVARS1.csv"
 readonly pheno_list="${pheno_dir}/UKBB_WES200k_binary_phenotypes_header.txt"
