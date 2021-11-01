@@ -1,3 +1,5 @@
+# Compound Heterozygous pLOF pipeline
+
 | Script                            | Description                                   | Requires output from |
 | -                                 | -                                             | - |
 | `00_dbNSFP.sh` | 1. Run VEP with dbNSFP plugin and generate REVEL_score and CADD_phred annotations. </br> 2. Exported as vcf.  | N/A |
@@ -10,6 +12,8 @@
 | `07_fit_null_saige_binary.sh` | 1. use SAIGE to fit a null model for each binary phenotype | `06_create_grm.sh` |
 | `07_fit_null_saige_cts.sh` | 1. use SAIGE to fit a null model for each continuous phenotype | `06_create_grm.sh` |
 | `08_spa_test.sh` | 1. use SAIGE to fit a null model for each continuous phenotype. </br> 2. For each trait (based on SGE_TASK_ID index), `_spa_test.sh` will be called.  | `07_fit_null_saige_binary.sh` </br> `04_knockouts.sh` </br> `05_make_tabix.sh` |
+
+# Summary
 
 
 
