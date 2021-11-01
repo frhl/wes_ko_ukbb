@@ -18,12 +18,12 @@ source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark"
 readonly out_dir="data/saige/grm/input"
-readonly out_prefix="${out_dir}/211026_long_ukb_wes_200k_sparse_autosomes"
+readonly out_prefix="${out_dir}/211101_long_ukb_wes_200k_sparse_autosomes"
 readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
 
 # test
 
-readonly hail_script="scripts/05_create_grm.py"
+readonly hail_script="scripts/06_create_grm.py"
 readonly threads=$(( ${NSLOTS}-1 ))
 readonly createSparseGRM="/well/lindgren/flassen/software/dev/SAIGE/extdata/createSparseGRM.R"
 

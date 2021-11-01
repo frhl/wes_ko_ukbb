@@ -21,14 +21,13 @@ def main(args):
     # setup session and grab imputed data 
     hail_init.hail_bmrc_init_local('logs/hail/hail_format.log', 'GRCh37')
     hl._set_flags(no_whole_stage_codegen='1') #
-    mt = genotypes.get_ukb_imputed_v3_bgen(chroms)   
-    
+    #mt = genotypes.get_ukb_imputed_v3_bgen(chroms)   
+    mt = genotypes.get_ukb_genotypes_bed(chroms)
+
     # only keep final samples
     if final_sample_list:
          ht_final_samples = hl.import_table(final_sample_list, no_header=True, key='f0',delimiter = ',')
          mt = mt.filter_cols(hl.is_defined(ht_final_samples[mt.col_key]))
-         n = mt.count()
-         print(f"##### count after final_sample_list: {n}")
 
     # createse a sparse GRM
     if subset_markers_by_kinship:
@@ -36,9 +35,9 @@ def main(args):
         ht = ht.filter(ht.in_Relatedness == 1)
         rsids = ht.rs_id.collect()
         mt = mt.filter_rows(hl.literal(rsids).contains(mt.rsid))
-        n = mt.count()
-        print(f"##### count after subsetting markers by kinship: {n}")
 
+    n = mt.count()
+    print(f"Final count after merging data {n}")
     hl.export_plink(mt, out_prefix, ind_id = mt.s)
    
     # add rare variants for SAIGE 
