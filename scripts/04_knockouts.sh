@@ -15,7 +15,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 5
 #$ -q short.qc@@short.hge
-#$ -t 1-24
+#$ -t 16-17
 
 set -o errexit
 set -o nounset
@@ -27,7 +27,7 @@ source utils/vcf_utils.sh
 # directories
 readonly in_dir="data/mt"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/knockouts/211029"
+readonly out_dir="derived/knockouts/211101_test"
 
 # hail script
 readonly hail_script="scripts/04_knockouts.py"
@@ -54,9 +54,9 @@ python3 "${hail_script}" \
     --af_max 0.50 \
     --missing 0.05 \
     --out_prefix ${out_prefix} \
-    --export_saige_vcf \
-    --export_ko_probability \
-    --export_ko_rsid \
+    --export_saige_vcf
+    #--export_ko_probability \
+    #--export_ko_rsid \
 
 print_update "Finished running HAIL for chr${chr}" "${SECONDS}"
 
