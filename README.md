@@ -9,7 +9,7 @@
 | `06_create_grm.sh` | 1. Load all autosomes from ukbiobank imputed data autosomes and to variants in `/well/lindgren/UKBIOBANK/DATA/QC/ukb_snp_qc.txt` with `in_Relatedness==1`.  </br> 2. Perform subsets based Duncan's [QCed samples](https://github.com/astheeggeggs/SAIGE_gene_munging/tree/main/QC_scripts). </br> 3. Write plink files. </br>  4. use SAIGE to fit sparse genetic relatedness matrix  | N/A |
 | `07_fit_null_saige_binary.sh` | 1. use SAIGE to fit a null model for each binary phenotype | `06_create_grm.sh` |
 | `07_fit_null_saige_cts.sh` | 1. use SAIGE to fit a null model for each continuous phenotype | `06_create_grm.sh` |
-| `08_spa_test.sh` | 1. use SAIGE to fit a null model for each continuous phenotype | `07_fit_null_saige_binary.sh` </br> `04_knockouts.sh` </br> `05_make_tabix.sh` |
+| `08_spa_test.sh` | 1. use SAIGE to fit a null model for each continuous phenotype. </br> 2. For each trait (based on SGE_TASK_ID index), `_spa_test.sh` will be called.  | `07_fit_null_saige_binary.sh` </br> `04_knockouts.sh` </br> `05_make_tabix.sh` |
 
 
 
