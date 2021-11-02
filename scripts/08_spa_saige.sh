@@ -16,7 +16,7 @@ source utils/bash_utils.sh
 source utils/hail_utils.sh
 
 # directories
-readonly vcf_dir="derived/knockouts/211029"
+readonly vcf_dir="derived/knockouts/211102"
 readonly step1_dir="data/saige/output/binary/step1"
 readonly out_dir="data/saige/output/binary/step2"
 readonly pheno_dir="data/phenotypes"
@@ -42,7 +42,7 @@ readonly out_prefix="${out_dir}/ukb_wes_200k_${phenotype}"
 submit_spa_job() {
   #set -x
   qsub -N "spa_${phenotype}" \
-    -t 15-16 \
+    -t 21 \
     -q "short.qe" \
     -pe shmem 4 \
     ${spa_script} \

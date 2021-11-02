@@ -8,6 +8,7 @@ import os
 from gnomad.utils.vep import process_consequences
 from ukb_utils import hail_init
 from ukb_utils import genotypes
+from ukb_utils import samples
 from ko_utils import qc
 from ko_utils import analysis
 
@@ -33,6 +34,10 @@ def main(args):
     mt1 = qc.get_table(input_path=input_phased_path, input_type=input_phased_type) # 12788
     mt2 = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type) # 11867 (for singletons
 
+    # Remove withdrawn samples
+    mt1 = samples.remove_withdrawn(mt1)
+    mt2 = samples.remove_withdrawn(mt2)
+
     # filter by Duncan's final samples
     if final_sample_list:
         ht_final_samples = hl.import_table(final_sample_list, no_header=True, key='f0', delimiter=',')
@@ -45,10 +50,6 @@ def main(args):
         ht_final_variants = ht_final_variants.key_by(ht_final_variants.locus, ht_final_variants.alleles)
         mt1 = mt1.filter_rows(hl.is_defined(ht_final_variants[mt1.row_key]))
         mt2 = mt2.filter_rows(hl.is_defined(ht_final_variants[mt2.row_key]))
-
-    # Add QC fields that has been removed during phasing to mt1
-    #mt1 = mt1.annotate_entries(DP = mt2[(mt1.locus, mt1.alleles), mt1.s].DP)
-    #mt1 = mt1.annotate_entries(GQ = mt2[(mt1.locus, mt1.alleles), mt1.s].GQ)
 
     # note: need to translate ids to combine later!
     mt1 = qc.annotate_european(mt1)

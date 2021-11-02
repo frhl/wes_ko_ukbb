@@ -41,7 +41,7 @@ spa_test() {
    Rscript "${step2_SPAtests}"	\
      --vcfFile=${vcf} \
      --vcfFileIndex=${csi} \
-     --vcfField="DT" \
+     --vcfField="DS" \
      --chrom=${chr} \
      --minMAF=0.00001 \
      --minMAC=1 \

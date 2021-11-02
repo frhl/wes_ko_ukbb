@@ -8,6 +8,7 @@ import os
 from gnomad.utils.vep import process_consequences
 from ukb_utils import hail_init
 from ukb_utils import genotypes
+from ukb_utils import samples
 from ko_utils import qc
 from ko_utils import analysis
 
@@ -50,6 +51,10 @@ def main(args):
     mt1 = qc.get_table(input_path=input_phased_path, input_type=input_phased_type) # 12788
     mt2 = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type) # 11867 (for singletons)
 
+    # remove withdrawn samples
+    mt1 = samples.remove_withdrawn(mt1)
+    mt2 = samples.remove_withdrawn(mt2)
+
     # filter by final samples
     if final_sample_list:
         ht_final_samples = hl.import_table(final_sample_list, no_header=True, key='f0', delimiter=',')
@@ -66,32 +71,32 @@ def main(args):
         print(f'chr{chrom}: using final variants..')
     
     # annotate with gnomAD
-    #if input_gnomad_path:
-    #    gnomad_variants_ht = hl.import_vcf(input_gnomad_path, reference_genome ='GRCh38', force_bgz=True, array_elements_required=False).rows()
-    #    mt1 = mt1.annotate_rows(inGnomAD = hl.is_defined(gnomad_variants_ht[mt1.row_key]))
-    #    mt2 = mt2.annotate_rows(inGnomAD = hl.is_defined(gnomad_variants_ht[mt2.row_key]))
-    #    print(f'chr{chrom}: annotating with gnomAD..')
+    if input_gnomad_path:
+        gnomad_variants_ht = hl.import_vcf(input_gnomad_path, reference_genome ='GRCh38', force_bgz=True, array_elements_required=False).rows()
+        mt1 = mt1.annotate_rows(inGnomAD = hl.is_defined(gnomad_variants_ht[mt1.row_key]))
+        mt2 = mt2.annotate_rows(inGnomAD = hl.is_defined(gnomad_variants_ht[mt2.row_key]))
+        print(f'chr{chrom}: annotating with gnomAD..')
 
     # annotate with imputed data
-    #if input_imputed_path:
-    #    imputed = hl.read_table(input_imputed_path)
-    #    mt1 = mt1.annotate_rows(imputed_info = imputed[mt1.row_key].info) 
-    #    mt2 = mt2.annotate_rows(imputed_info = imputed[mt2.row_key].info)
-    #    print(f'chr{chrom}: annotating with imputed INFO score..')
+    if input_imputed_path:
+        imputed = hl.read_table(input_imputed_path)
+        mt1 = mt1.annotate_rows(imputed_info = imputed[mt1.row_key].info) 
+        mt2 = mt2.annotate_rows(imputed_info = imputed[mt2.row_key].info)
+        print(f'chr{chrom}: annotating with imputed INFO score..')
     
     # Add QC fields that has been removed during phasing to mt1
-    #mt1 = mt1.annotate_entries(DP = mt2[(mt1.locus, mt1.alleles), mt1.s].DP)
-    #mt1 = mt1.annotate_entries(GQ = mt2[(mt1.locus, mt1.alleles), mt1.s].GQ)
+    mt1 = mt1.annotate_entries(DP = mt2[(mt1.locus, mt1.alleles), mt1.s].DP)
+    mt1 = mt1.annotate_entries(GQ = mt2[(mt1.locus, mt1.alleles), mt1.s].GQ)
  
     # save sample stats
-    #print(f'chr{chrom}: Writing out sample stats to {out_prefix}_samples*') 
-    #mt1 = mt1.annotate_cols(gq = hl.agg.stats(mt1.GQ), dp = hl.agg.stats(mt1.DP))
-    #mt1 = hl.sample_qc(mt1, name='sample_qc')
-    #mt1.cols().select('sample_qc', 'gq', 'dp').flatten().export(output=out_prefix + "_samples_phased.tsv.bgz")
+    print(f'chr{chrom}: Writing out sample stats to {out_prefix}_samples*') 
+    mt1 = mt1.annotate_cols(gq = hl.agg.stats(mt1.GQ), dp = hl.agg.stats(mt1.DP))
+    mt1 = hl.sample_qc(mt1, name='sample_qc')
+    mt1.cols().select('sample_qc', 'gq', 'dp').flatten().export(output=out_prefix + "_samples_phased.tsv.bgz")
  
-    #mt2 = mt2.annotate_cols(gq = hl.agg.stats(mt2.GQ), dp = hl.agg.stats(mt2.DP))
-    #mt2 = hl.sample_qc(mt2, name='sample_qc')
-    #mt2.cols().select('sample_qc', 'gq', 'dp').flatten().export(output=out_prefix + "_samples_unphased.tsv.bgz")
+    mt2 = mt2.annotate_cols(gq = hl.agg.stats(mt2.GQ), dp = hl.agg.stats(mt2.DP))
+    mt2 = hl.sample_qc(mt2, name='sample_qc')
+    mt2.cols().select('sample_qc', 'gq', 'dp').flatten().export(output=out_prefix + "_samples_unphased.tsv.bgz")
     
     # add annotations from table
     consequence_annotations = hl.read_table(input_annotation_path)
@@ -99,14 +104,14 @@ def main(args):
     mt2 = mt2.annotate_rows(consequence = consequence_annotations[mt2.row_key]) 
     
     # write out variant stats
-    #print(f'chr{chrom}: Writing out variants stats to {out_prefix}_variants*')
-    #mt1 = hl.variant_qc(mt1, name='variant_qc')
-    #ht1_rows_filter = mt1.rows().select('variant_qc')
-    #ht1_rows_filter.write(out_prefix + "_variants_phased.ht", overwrite=True)
+    print(f'chr{chrom}: Writing out variants stats to {out_prefix}_variants*')
+    mt1 = hl.variant_qc(mt1, name='variant_qc')
+    ht1_rows_filter = mt1.rows().select('variant_qc')
+    ht1_rows_filter.write(out_prefix + "_variants_phased.ht", overwrite=True)
  
-    #mt2 = hl.variant_qc(mt2, name='variant_qc')
-    #ht2_rows_filter = mt2.rows().select('variant_qc')
-    #ht2_rows_filter.write(out_prefix + "_variants_unphased.ht", overwrite=True)
+    mt2 = hl.variant_qc(mt2, name='variant_qc')
+    ht2_rows_filter = mt2.rows().select('variant_qc')
+    ht2_rows_filter.write(out_prefix + "_variants_unphased.ht", overwrite=True)
 
     # annotate consequence category
     category_annotation_mt2 = analysis.annotation_case_builder(mt2.consequence.vep.worst_csq_for_variant_canonical, mt2.consequence.dbnsfp, use_loftee = False)
@@ -114,12 +119,12 @@ def main(args):
 
     # write out summary stats
     print(f"chr{chrom}: writing out variant summaries")
-    #summary_count_urv(mt1).export(out_prefix + "variants_summary_phased.tsv.bgz")
+    summary_count_urv(mt1).export(out_prefix + "variants_summary_phased.tsv.bgz")
     analysis.count_urv_by_genes(analysis.count_urv_by_samples(mt2)).entries().flatten().export(out_prefix + "variants_summary_unphased_TEST.tsv.bgz")
     
     # get homozygous stats
-    #summary_count_homozygous_urv(mt1).export(out_prefix + "variants_homozygous_summary_phased.tsv.bgz")
-    #summary_count_homozygous_urv(mt2).export(out_prefix + "variants_homozygous_summary_unphased.tsv.bgz")
+    summary_count_homozygous_urv(mt1).export(out_prefix + "variants_homozygous_summary_phased.tsv.bgz")
+    summary_count_homozygous_urv(mt2).export(out_prefix + "variants_homozygous_summary_unphased.tsv.bgz")
 
 
 if __name__=='__main__':

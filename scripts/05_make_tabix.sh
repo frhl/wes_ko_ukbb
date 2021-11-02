@@ -17,7 +17,7 @@ source utils/vcf_utils.sh
 
 module load BCFtools/1.12-GCC-10.3.0
 
-readonly in_dir="derived/knockouts/211029"
+readonly in_dir="derived/knockouts/211102"
 
 for i in "${in_dir}/"*.vcf.bgz; do
     [ -f "$i" ] || break
