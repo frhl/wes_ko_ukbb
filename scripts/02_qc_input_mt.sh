@@ -5,7 +5,7 @@
 #$ -o logs/qc_input_mt.log
 #$ -e logs/qc_input_mt.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 5
+#$ -pe shmem 5`
 #$ -q short.qc
 #$ -t 21
 
@@ -20,7 +20,7 @@ readonly in_dir_unphased="data/unphased/post-qc"
 readonly gnomad_dir="/well/lindgren/flassen/ressources/gnomad/gnomad_v2_liftover/exomes"
 readonly imputed_dir="/well/lindgren/UKBIOBANK/flassen/projects/ukb_compare/data/imputed/GRCh38"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="data/qc"
+readonly out_dir="data/qc/new"
 
 # hail script
 readonly hail_script="scripts/02_qc_input_mt.py"

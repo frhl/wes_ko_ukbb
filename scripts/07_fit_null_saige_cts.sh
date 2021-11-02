@@ -5,7 +5,7 @@
 #$ -o logs/saige_null_cts.log
 #$ -e logs/saige_null_cts.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 8
+#$ -pe shmem 5
 #$ -q short.qe
 #$ -t 1-40
 
@@ -28,11 +28,11 @@ readonly out_dir="data/saige/output/cts/step1"
 
 # input path
 readonly chr=${SGE_TASK_ID}
-readonly grm_mtx="${grm_dir}/211026_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
-readonly plink_file="${plink_dir}/211026_long_ukb_wes_200k_sparse_autosomes"
+readonly plink_file="${plink_dir}/211102_long_ukb_wes_200k_sparse_autosomes"
 readonly pheno_file="${pheno_dir}/UKBB_WES200k_filtered_cts_phenotypes.tsv.gz"
-readonly covar_file="${covar_dir}/COVARS1_BMI.csv"
+readonly covar_file="${covar_dir}/COVARS1.csv"
 readonly pheno_list="${pheno_dir}/UKBB_WES200k_cts_phenotypes_header.txt"
 
 # select covars and phenotype (0-42)
