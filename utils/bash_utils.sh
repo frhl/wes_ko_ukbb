@@ -104,6 +104,13 @@ set_up_RSAIGE() {
 }
 
 
+set_up_rpy() {
+  module load Anaconda3/2020.07
+  module load java/1.8.0_latest
+  source "/apps/eb/skylake/software/Anaconda3/2020.07/etc/profile.d/conda.sh"
+  conda activate rpy
+}
+
 #set_up_vep() {
 #  module load EnsEMBLCoreAPI/96.0-r20190601-foss-2019a-Perl-5.28.1 # required for LOFTEE
 #  module load VEP/95.0-foss-2018b-Perl-5.28.0 # required FOR VEP (NOTE: this steps throws some errors since the above module is already loaded. It works nonetheless.)

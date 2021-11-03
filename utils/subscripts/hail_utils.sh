@@ -1,1 +1,0 @@
-/well/lindgren/flassen/ressources/ukb/ukb_utils/bash/hail_utils.sh
