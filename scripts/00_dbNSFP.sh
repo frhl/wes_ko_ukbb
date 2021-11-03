@@ -2,6 +2,7 @@
 #
 # run vep to get dbNSFP annotations (currently not available through hail VEP)
 #
+#
 #$ -N dbNSFP
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/dbNSFP.log
