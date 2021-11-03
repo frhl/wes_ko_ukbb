@@ -20,7 +20,7 @@ source utils/hail_utils.sh
 readonly in_dir_phased="/well/lindgren/UKBIOBANK/nbaya/wes_200k/phase_ukb_wes/data/phased/non_singleton"
 readonly in_dir_unphased="data/unphased/post-qc"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="data/mt/new"
+readonly out_dir="data/mt"
 
 # hail script
 readonly hail_script="scripts/03_create_mt.py"

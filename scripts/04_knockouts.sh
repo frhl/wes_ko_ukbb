@@ -25,7 +25,7 @@ source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
 # directories
-readonly in_dir="data/mt/new"
+readonly in_dir="data/mt"
 readonly spark_dir="data/tmp/spark"
 readonly out_dir="derived/knockouts/211104"
 
