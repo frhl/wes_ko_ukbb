@@ -32,7 +32,7 @@ readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatedne
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
 readonly plink_file="${plink_dir}/211102_long_ukb_wes_200k_sparse_autosomes"
 readonly pheno_file="${pheno_dir}/UKBB_WES200k_filtered_binary_phenotypes.tsv.gz"
-readonly covar_file="${covar_dir}/COVARS1.csv"
+readonly covar_file="${covar_dir}/COVARS1_BMI.csv"
 readonly pheno_list="${pheno_dir}/UKBB_WES200k_binary_phenotypes_header.txt"
 
 # select covars and phenotype (0-42)
@@ -41,7 +41,7 @@ readonly covariates=$( cat ${covar_file} )
 readonly phenotype=$( cut -f${index} ${pheno_list} )
 
 # output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_${phenotype}"
+readonly out_prefix="${out_dir}/ukb_wes_200k_adjBMI_${phenotype}"
 
 # null model script
 fit_null() {

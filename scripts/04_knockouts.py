@@ -88,6 +88,8 @@ def main(args):
     categories = dict(
         ptv = ['ptv'],
         ptv_damaging_missense = ['ptv','damaging_missense'],
+        ptv_lc = ['ptv','ptv_lc'],
+        ptv_lc_damaging_missense = ['ptv','ptv_lc','damaging_missense'],
         synonymous = ['synonymous']
     )
 

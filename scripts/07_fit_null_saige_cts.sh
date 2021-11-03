@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 5
 #$ -q short.qe
-#$ -t 1-40
+#$ -t 1-42
 
 module purge
 source utils/bash_utils.sh
@@ -41,7 +41,7 @@ readonly covariates=$( cat ${covar_file} )
 readonly phenotype=$( cut -f${index} ${pheno_list} )
 
 # output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_BMIadj_${phenotype}"
+readonly out_prefix="${out_dir}/ukb_wes_200k_${phenotype}"
 
 # null model script
 fit_null() {

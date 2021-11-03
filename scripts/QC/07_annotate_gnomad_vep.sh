@@ -37,4 +37,3 @@ python3 "${hail_script}" \
      --input_type "vcf" \
      --out_prefix ${out_prefix}
 
-
