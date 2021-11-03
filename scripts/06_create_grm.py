@@ -43,6 +43,7 @@ if __name__=='__main__':
     parser.add_argument('--subset_samples_by_ukbb_eur', action='store_true', default = False, help='Subset samples to those that are european designated by UKBB.') 
     parser.add_argument('--add_rare_variants', action='store_true', help='Add rare variants to plink file (this is required for SAIGE-GENE+ analysis')
     parser.add_argument('--final_sample_list', default=None, help='Path to HailTable that contains the final samples included in the analysis.')
+    parser.add_argument('--phenotypes', default=None, help='Path to phenotype table that also includes sex.')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset (plink format)')
     args = parser.parse_args()
 

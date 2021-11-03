@@ -3,8 +3,8 @@
 #
 #$ -N prepare_spa_saige
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/prepare_spa_saige.log
-#$ -e logs/prepare_spa_saige.errors.log
+#$ -o logs/prepare_spa_saige_binary.log
+#$ -e logs/prepare_spa_saige_binary.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qe
