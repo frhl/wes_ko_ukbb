@@ -42,7 +42,7 @@ spa_test() {
      --vcfFile=${vcf} \
      --vcfFileIndex=${csi} \
      --vcfField="DS" \
-     --chrom=${chr} \
+     --chrom="chr${chr}" \
      --minMAF=0.00001 \
      --minMAC=1 \
      --GMMATmodelFile=${in_gmat} \

@@ -42,9 +42,9 @@ readonly out_prefix="${out_dir}/ukb_wes_200k_${phenotype}"
 submit_spa_job() {
   #set -x
   qsub -N "spa_${phenotype}" \
-    -t 21 \
+    -t 1-22 \
     -q "short.qe" \
-    -pe shmem 4 \
+    -pe shmem 1 \
     ${spa_script} \
     ${phenotype} \
     ${in_vcf} \

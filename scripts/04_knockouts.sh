@@ -15,7 +15,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 3
 #$ -q short.qc@@short.hge
-#$ -t 1-22
+#$ -t 1-24
 
 set -o errexit
 set -o nounset
@@ -25,9 +25,9 @@ source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
 # directories
-readonly in_dir="data/mt"
+readonly in_dir="data/mt/new"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/knockouts/211102"
+readonly out_dir="derived/knockouts/211103"
 
 # hail script
 readonly hail_script="scripts/04_knockouts.py"

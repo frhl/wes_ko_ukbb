@@ -71,32 +71,32 @@ def main(args):
         print(f'chr{chrom}: using final variants..')
     
     # annotate with gnomAD
-    if input_gnomad_path:
-        gnomad_variants_ht = hl.import_vcf(input_gnomad_path, reference_genome ='GRCh38', force_bgz=True, array_elements_required=False).rows()
-        mt1 = mt1.annotate_rows(inGnomAD = hl.is_defined(gnomad_variants_ht[mt1.row_key]))
-        mt2 = mt2.annotate_rows(inGnomAD = hl.is_defined(gnomad_variants_ht[mt2.row_key]))
-        print(f'chr{chrom}: annotating with gnomAD..')
+    #if input_gnomad_path:
+    #    gnomad_variants_ht = hl.import_vcf(input_gnomad_path, reference_genome ='GRCh38', force_bgz=True, array_elements_required=False).rows()
+    #    mt1 = mt1.annotate_rows(inGnomAD = hl.is_defined(gnomad_variants_ht[mt1.row_key]))
+    #    mt2 = mt2.annotate_rows(inGnomAD = hl.is_defined(gnomad_variants_ht[mt2.row_key]))
+    #    print(f'chr{chrom}: annotating with gnomAD..')
 
     # annotate with imputed data
-    if input_imputed_path:
-        imputed = hl.read_table(input_imputed_path)
-        mt1 = mt1.annotate_rows(imputed_info = imputed[mt1.row_key].info) 
-        mt2 = mt2.annotate_rows(imputed_info = imputed[mt2.row_key].info)
-        print(f'chr{chrom}: annotating with imputed INFO score..')
+    #if input_imputed_path:
+    #    imputed = hl.read_table(input_imputed_path)
+    #    mt1 = mt1.annotate_rows(imputed_info = imputed[mt1.row_key].info) 
+    #    mt2 = mt2.annotate_rows(imputed_info = imputed[mt2.row_key].info)
+    #    print(f'chr{chrom}: annotating with imputed INFO score..')
     
     # Add QC fields that has been removed during phasing to mt1
-    mt1 = mt1.annotate_entries(DP = mt2[(mt1.locus, mt1.alleles), mt1.s].DP)
-    mt1 = mt1.annotate_entries(GQ = mt2[(mt1.locus, mt1.alleles), mt1.s].GQ)
+    #mt1 = mt1.annotate_entries(DP = mt2[(mt1.locus, mt1.alleles), mt1.s].DP)
+    #mt1 = mt1.annotate_entries(GQ = mt2[(mt1.locus, mt1.alleles), mt1.s].GQ)
  
     # save sample stats
-    print(f'chr{chrom}: Writing out sample stats to {out_prefix}_samples*') 
-    mt1 = mt1.annotate_cols(gq = hl.agg.stats(mt1.GQ), dp = hl.agg.stats(mt1.DP))
-    mt1 = hl.sample_qc(mt1, name='sample_qc')
-    mt1.cols().select('sample_qc', 'gq', 'dp').flatten().export(output=out_prefix + "_samples_phased.tsv.bgz")
+    #print(f'chr{chrom}: Writing out sample stats to {out_prefix}_samples*') 
+    #mt1 = mt1.annotate_cols(gq = hl.agg.stats(mt1.GQ), dp = hl.agg.stats(mt1.DP))
+    #mt1 = hl.sample_qc(mt1, name='sample_qc')
+    #mt1.cols().select('sample_qc', 'gq', 'dp').flatten().export(output=out_prefix + "_samples_phased.tsv.bgz")
  
-    mt2 = mt2.annotate_cols(gq = hl.agg.stats(mt2.GQ), dp = hl.agg.stats(mt2.DP))
-    mt2 = hl.sample_qc(mt2, name='sample_qc')
-    mt2.cols().select('sample_qc', 'gq', 'dp').flatten().export(output=out_prefix + "_samples_unphased.tsv.bgz")
+    #mt2 = mt2.annotate_cols(gq = hl.agg.stats(mt2.GQ), dp = hl.agg.stats(mt2.DP))
+    #mt2 = hl.sample_qc(mt2, name='sample_qc')
+    #mt2.cols().select('sample_qc', 'gq', 'dp').flatten().export(output=out_prefix + "_samples_unphased.tsv.bgz")
     
     # add annotations from table
     consequence_annotations = hl.read_table(input_annotation_path)

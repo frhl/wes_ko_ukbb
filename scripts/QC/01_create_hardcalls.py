@@ -18,7 +18,7 @@ def main(args):
     # setup flags
     hail_init.hail_bmrc_init_local('logs/hail/hail_format.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
-    
+  
     # get tables
     mt = qc.get_table(input_path=input_path, input_type=input_type) 
 

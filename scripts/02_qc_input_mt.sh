@@ -5,7 +5,7 @@
 #$ -o logs/qc_input_mt.log
 #$ -e logs/qc_input_mt.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 5`
+#$ -pe shmem 5
 #$ -q short.qc
 #$ -t 21
 
