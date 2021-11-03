@@ -27,7 +27,7 @@ source utils/vcf_utils.sh
 # directories
 readonly in_dir="data/mt/new"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/knockouts/211103"
+readonly out_dir="derived/knockouts/211104"
 
 # hail script
 readonly hail_script="scripts/04_knockouts.py"
@@ -53,16 +53,13 @@ python3 "${hail_script}" \
     --input_unphased_type "mt" \
     --af_max 0.50 \
     --missing 0.05 \
+    --use_loftee \
     --out_prefix ${out_prefix} \
     --export_saige_vcf \
     --export_ko_probability \
     --export_ko_rsid \
 
 print_update "Finished running HAIL for chr${chr}" "${SECONDS}"
-
-# index with csi
-#module load BCFtools/1.12-GCC-10.3.0
-#make_tabix "${out_prefix}_ko.vcf.bgz" "csi"
 
 
 

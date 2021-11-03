@@ -119,12 +119,19 @@ def main(args):
 
     # write out summary stats
     print(f"chr{chrom}: writing out variant summaries")
-    summary_count_urv(mt1).export(out_prefix + "variants_summary_phased.tsv.bgz")
-    analysis.count_urv_by_genes(analysis.count_urv_by_samples(mt2)).entries().flatten().export(out_prefix + "variants_summary_unphased_TEST.tsv.bgz")
+    summary_count_urv(mt1).export(out_prefix + "_variants_summary_phased.tsv.bgz")
     
     # get homozygous stats
-    summary_count_homozygous_urv(mt1).export(out_prefix + "variants_homozygous_summary_phased.tsv.bgz")
-    summary_count_homozygous_urv(mt2).export(out_prefix + "variants_homozygous_summary_unphased.tsv.bgz")
+    summary_count_homozygous_urv(mt1).export(out_prefix + "_variants_homozygous_summary_phased.tsv.bgz")
+    summary_count_homozygous_urv(mt2).export(out_prefix + "_variants_homozygous_summary_unphased.tsv.bgz")
+
+    # explode rows by gene
+    mt1 = mt1.explode_rows(mt1.consequence.vep.worst_csq_by_gene_canonical)
+    mt2 = mt2.explode_rows(mt2.consequence.vep.worst_csq_by_gene_canonical)
+
+    # count URV by genes
+    analysis.count_urv_by_genes(mt1).entries().flatten().export(out_prefix + "_urv_by_genes_phased.tsv.bgz")
+    analysis.count_urv_by_genes(mt2).entries().flatten().export(out_prefix + "_urv_by_genes_unphased.tsv.bgz")
 
 
 if __name__=='__main__':

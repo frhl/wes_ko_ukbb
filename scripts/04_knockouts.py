@@ -28,7 +28,8 @@ def main(args):
     maf_max    = (args.maf_max)
     maf_min    = (args.maf_min)
     missing    = (args.missing)
-    
+    use_loftee = args.use_loftee
+
     # sample filtering options
     get_related = bool(args.get_related)
     get_unrelated = bool(args.get_unrelated)
@@ -78,8 +79,8 @@ def main(args):
     mt2 = mt2.explode_rows(mt2.consequence.vep.worst_csq_by_gene_canonical)
     
     # get VEP annotation and add to rows
-    by_gene_annotation1 = analysis.annotation_case_builder(mt1.consequence.vep.worst_csq_by_gene_canonical, mt1.consequence.dbnsfp, use_loftee = False)
-    by_gene_annotation2 = analysis.annotation_case_builder(mt2.consequence.vep.worst_csq_by_gene_canonical, mt2.consequence.dbnsfp, use_loftee = False)
+    by_gene_annotation1 = analysis.annotation_case_builder(mt1.consequence.vep.worst_csq_by_gene_canonical, mt1.consequence.dbnsfp, use_loftee = use_loftee)
+    by_gene_annotation2 = analysis.annotation_case_builder(mt2.consequence.vep.worst_csq_by_gene_canonical, mt2.consequence.dbnsfp, use_loftee = use_loftee)
     mt1 = mt1.annotate_rows(consequence_category = by_gene_annotation1)    
     mt2 = mt2.annotate_rows(consequence_category = by_gene_annotation2)    
 
@@ -109,7 +110,6 @@ def main(args):
         if export_saige_vcf:
             out = analysis.gene_csqs_calc_pKO_pseudoSNP(mt1_subset, mt2_subset, chrom)
             qc.export_table(out, out_prefix = out_prefix + "_" + category + "_ko", out_type = 'vcf')
-            # check missingness 
             undefined = out.aggregate_entries(hl.agg.sum(~hl.is_defined(out.DS)))
             n = out.count()
             print(f"chr{chrom}: undefined = {undefined}; variant/sample-count = {n}")
@@ -133,6 +133,7 @@ if __name__=='__main__':
     parser.add_argument('--af_min', default=None, help='Select all variants with a AF greater than the indicated value')
     parser.add_argument('--af_max', default=None, help='Select all variants with a AF less than the indicated value')
     parser.add_argument('--missing', default=0.05, help='Filter variants by missingness threshold')
+    parser.add_argument('--use_loftee', default=False, action='store_true', help='use LOFTEE to distinghiush between high confidence PTVs')
     
     # sample filtering
     parser.add_argument('--get_related', action='store_true', help='Select all samples that are related')

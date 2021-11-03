@@ -1,6 +1,6 @@
 # module purge
 # conda activate rpy
-# Rscript 02_knockouts.R --in_dir ../derived/knockouts/all/211013_ptv
+# Rscript 04_knockouts.R --in_dir derived/knockouts/all/211013_ptv --out_prefix derived/summary
 
 # setup paths and libs
 library(argparse)
@@ -8,21 +8,33 @@ library(data.table)
 library(ggplot2)
 library(dplyr)
 
-#setwd('/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/')
+setwd('/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/')
 
 # add arguments
 parser <- ArgumentParser()
 parser$add_argument("--in_dir", default=NULL, help = "What directory should files be loaded from?")
 parser$add_argument("--in_pattern", default = 'knockouts', help = "what string should the file contains?")
 parser$add_argument("--print_input", default= FALSE, help = "print the input files headers to the terminal")
+parser$add_argument("--out_prefix", default=NULL, help = "out prefix for files")
 args <- parser$parse_args()
 
+
+## helpers
 # read in .bgz files 
 zcat_fread <- function(path,...){
 	cmd = paste("zcat", path)
 	return(fread(cmd = cmd,...))
 }
 
+# process variants on each strand
+clean_hail_list <- function(x, comma_sub = ';') { 
+    x <- gsub('(\\[)|(\\])|(\\")','',x)
+    x <- gsub('\\,',comma_sub,x)
+    return(x)
+}
+
+
+## main
 # get directory to protein coding genes
 protein_coding <- fread('/well/lindgren/flassen/ressources/genesets/genesets/data/biomart/protein_coding_genes.tsv')
 protein_coding <- protein_coding$ensembl_gene_id[protein_coding$gene_biotype == 'protein_coding']
@@ -51,8 +63,9 @@ dt <- setDT(do.call(rbind, lapply(ko_files, function(f){
     if (args$print_input) print(head(dp))
     return(d)
 })))
-#write("## Done ##",stdout())
 
+
+# Summarize results
 total_samples=175000
 total_genes=length(unique(protein_coding))
 # setup overall stats
@@ -93,28 +106,26 @@ write(paste0(genes_ho,"/",total_genes, ' (',genes_pct_ho_ko,'%) of unique genes 
 write(paste0(genes_ch,"/",total_genes, " (",genes_pct_ch_ko,'%) of unique genes are involved in compound heterozygous KOs'),stdout())
 write(paste0(genes_knockout,"/", total_genes ," (", genes_pct_ko,'%) of unique genes are involed in KOs'),stdout())
 
+# Write tables of aggregated variants
+dt_out <- dt
+dt_out$phase1 <- clean_hail_list(dt_out$phase1)
+dt_out$phase2 <- clean_hail_list(dt_out$phase2)
 
-# what genes are affected
-#n_genes = length(unique(dt$gene_id[dt$knockout==1]))
-#genes = table(dt$gene_id[dt$knockout==1])
-#print(paste(n_genes,'genes are found in human knockouts'))
+# if phase is NA replace with "."
+dt_out$phase1[is.na(dt_out$phase1)] <- '.'
+dt_out$phase2[is.na(dt_out$phase2)] <- '.'
 
-## assessing genes involved in mendelian disorders
-# load OMIM
-#omim_mapping <- fread('/well/lindgren/flassen//ressources/genesets/genesets/data/omim/mim2gene.txt')
-#colnames(omim_mapping) <- c('MIM','entry','entrez','hgnc_symbol','gene_id')
-#omim_knockouts <- omim_mapping[omim_mapping$gene_id %in% dt$gene_id[dt$knockout==1]]
+# check if involved in OMIM
+omim <- fread('/well/lindgren/flassen//ressources/genesets/genesets/data/omim/211103_morbidmap_by_gene.txt')
+dt_out$in_omim <- dt_out$gene_id %in% omim$gene_id
 
-# relate to mendelian disorderes
-#mim_map <- fread('/well/lindgren/flassen//ressources/genesets/genesets/data/omim/morbidmap.txt')
-#colnames(mim_map) <- c('phenotype','gene_symbols','MIM','cyto_location')
-#omim_merge <- merge(mim_map, omim_knockouts)
+# map ensgid to hgnc_symbol
+hgnc_link <- fread('/well/lindgren/flassen//ressources/genesets/genesets/data/hgnc/211026_hgnc_ensgid_link.csv')
+dt_out <- merge(dt_out, hgnc_link, by.x = 'gene_id', by.y = 'ensgid', all.x = TRUE)
+dt_out <- cbind(dt_out[,c('s','gene_id','hgnc_symbol')], dt_out[,-c('s','gene_id','hgnc_symbol')])
 
-# count how many knockout genes are associated with a phenotype
-#print(paste(length(unique(omim_merge$gene_id)), 'genes associated with',length(unique(omim_merge$phenotype)),'phenotypes (OMIM)'))
-#print(paste(length(unique(omim_merge$gene_id)), 'genes associated with',length(unique(omim_merge$MIM)),'MIM numbers (OMIM)'))
+# write out table
+outfile = paste0(args$out_prefix, '.tsv.gz')
+fwrite(dt_out, outfile, sep = '\t', row.names = FALSE)
 
-# count how many samples are affected
-#ukbb_all_in_merge <- length(unique(dt$s[dt$knockout == 1 & dt$gene_id %in% omim_merge$gene_id]))
-#print(paste(ukbb_all_in_merge, 'WES samples (all) who have knockouts of OMIN genes'))
 
