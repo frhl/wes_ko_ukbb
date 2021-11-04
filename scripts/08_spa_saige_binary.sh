@@ -8,7 +8,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qe
-#$ -t 10
+#$ -t 1-42
 #$ -V
 
 module purge
@@ -16,7 +16,7 @@ source utils/bash_utils.sh
 source utils/hail_utils.sh
 
 # directories
-readonly vcf_dir="derived/knockouts/211102"
+readonly vcf_dir="derived/knockouts/211104"
 readonly step1_dir="data/saige/output/binary/step1"
 readonly out_dir="data/saige/output/binary/step2"
 readonly pheno_dir="data/phenotypes"
@@ -39,7 +39,7 @@ readonly in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
 submit_spa_job() 
 {
   qsub -N "spa_${phenotype}_${category}" \
-    -t 16 \
+    -t 1-22 \
     -q "short.qe" \
     -pe shmem 1 \
     "${spa_script}" \

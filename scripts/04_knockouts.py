@@ -79,6 +79,7 @@ def main(args):
     mt2 = mt2.explode_rows(mt2.consequence.vep.worst_csq_by_gene_canonical)
     
     # get VEP annotation and add to rows
+    print(f'use LOFTEE = {use_loftee}')
     by_gene_annotation1 = analysis.annotation_case_builder(mt1.consequence.vep.worst_csq_by_gene_canonical, mt1.consequence.dbnsfp, use_loftee = use_loftee)
     by_gene_annotation2 = analysis.annotation_case_builder(mt2.consequence.vep.worst_csq_by_gene_canonical, mt2.consequence.dbnsfp, use_loftee = use_loftee)
     mt1 = mt1.annotate_rows(consequence_category = by_gene_annotation1)    

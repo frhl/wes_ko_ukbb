@@ -114,12 +114,14 @@ def main(args):
     ht2_rows_filter.write(out_prefix + "_variants_unphased.ht", overwrite=True)
 
     # annotate consequence category
-    category_annotation_mt2 = analysis.annotation_case_builder(mt2.consequence.vep.worst_csq_for_variant_canonical, mt2.consequence.dbnsfp, use_loftee = False)
+    category_annotation_mt2 = analysis.annotation_case_builder(mt2.consequence.vep.worst_csq_for_variant_canonical, mt2.consequence.dbnsfp, use_loftee = True)
+    category_annotation_mt1 = analysis.annotation_case_builder(mt1.consequence.vep.worst_csq_for_variant_canonical, mt1.consequence.dbnsfp, use_loftee = True)
     mt2 = mt2.annotate_rows(consequence_category = category_annotation_mt2)
+    mt1 = mt1.annotate_rows(consequence_category = category_annotation_mt1)
 
     # write out summary stats
-    print(f"chr{chrom}: writing out variant summaries")
     summary_count_urv(mt1).export(out_prefix + "_variants_summary_phased.tsv.bgz")
+    summary_count_ur2(mt1).export(out_prefix + "_variants_summary_unphased.tsv.bgz")
     
     # get homozygous stats
     summary_count_homozygous_urv(mt1).export(out_prefix + "_variants_homozygous_summary_phased.tsv.bgz")

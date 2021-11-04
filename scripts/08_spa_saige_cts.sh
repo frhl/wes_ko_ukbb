@@ -8,7 +8,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qe
-#$ -t 18-19
+#$ -t 10
 #$ -V
 
 module purge
@@ -16,7 +16,7 @@ source utils/bash_utils.sh
 source utils/hail_utils.sh
 
 # directories
-readonly vcf_dir="derived/knockouts/211102"
+readonly vcf_dir="derived/knockouts/211104"
 readonly step1_dir="data/saige/output/cts/step1"
 readonly out_dir="data/saige/output/cts/step2"
 readonly pheno_dir="data/phenotypes"

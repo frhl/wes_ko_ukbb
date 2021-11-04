@@ -15,7 +15,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 3
 #$ -q short.qc@@short.hge
-#$ -t 1-24
+#$ -t 21
 
 set -o errexit
 set -o nounset
@@ -27,7 +27,7 @@ source utils/vcf_utils.sh
 # directories
 readonly in_dir="data/mt"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/knockouts/211104"
+readonly out_dir="derived/knockouts/test"
 
 # hail script
 readonly hail_script="scripts/04_knockouts.py"
