@@ -130,8 +130,10 @@ def main(args):
     mt2 = mt2.explode_rows(mt2.consequence.vep.worst_csq_by_gene_canonical)
 
     # count URV by genes
-    analysis.count_urv_by_genes(mt1).entries().flatten().export(out_prefix + "_urv_by_genes_phased.tsv.bgz")
-    analysis.count_urv_by_genes(mt2).entries().flatten().export(out_prefix + "_urv_by_genes_unphased.tsv.bgz")
+    mt1_genes = analysis.count_urv_by_genes(mt1, mt1.consequence.vep.worst_csq_for_variant_canonical.gene_id)
+    mt1_genes.entries().flatten().export(out_prefix + "_urv_by_genes_phased.tsv.bgz")
+    mt2_genes = analysis.count_urv_by_genes(mt2, mt2.consequence.vep.worst_csq_for_variant_canonical.gene_id)
+    mt2_genes.entries().flatten().export(out_prefix + "_urv_by_genes_unphased.tsv.bgz")
 
 
 if __name__=='__main__':

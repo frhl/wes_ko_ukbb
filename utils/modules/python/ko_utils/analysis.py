@@ -136,9 +136,9 @@ def count_homozygous_urv_by_samples(mt):
                           n_hom_URV_non_coding = hl.agg.count_where(mt.GT.is_hom_var() & (mt.consequence_category == "non_coding"))
                          )
 
-def count_urv_by_genes(mt):
+def count_urv_by_genes(mt, call_gene_expr):
     r''' Count up URVs by gene (as defined by vep.worst_csq_for_variant_canonical.gene_id) '''
-    return (mt.group_rows_by(mt.consequence.vep.worst_csq_for_variant_canonical.gene_id).
+    return (mt.group_rows_by(call_gene_expr).
             aggregate(gene = hl.struct(
                 n_coding_URV_SNP = hl.agg.count_where(mt.GT.is_non_ref() & hl.is_snp(mt.alleles[0], mt.alleles[1]) & (mt.consequence_category != "non_coding")),
                 n_coding_URV_indel = hl.agg.count_where(mt.GT.is_non_ref() & hl.is_indel(mt.alleles[0], mt.alleles[1]) & (mt.consequence_category != "non_coding")),
