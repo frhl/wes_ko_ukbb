@@ -8,7 +8,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qe
-#$ -t 36
+#$ -t 1-40
 #$ -V
 
 # use 37/38
@@ -40,7 +40,7 @@ readonly in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
 submit_spa_job() 
 {
   qsub -N "spa_${phenotype}_${category}" \
-    -t 21 \
+    -t 1-22 \
     -q "short.qe" \
     -pe shmem 1 \
     "${spa_script}" \
@@ -69,25 +69,4 @@ submit_spa_with_csqs "ptv_damaging_missense"
 submit_spa_with_csqs "synonymous"
 submit_spa_with_csqs "ptv_lc"
 submit_spa_with_csqs "ptv_lc_damaging_missense"
-
-
-# PTVs
-#category="ptv"
-#out_prefix="${out_dir}/${in_prefix}_${category}_${phenotype}"
-#in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${category}_ko.vcf.bgz"
-#submit_spa_job
-
-# PTVs + Damaging Missense
-#category="ptv_damaging_missense"
-#out_prefix="${out_dir}/${in_prefix}_${category}_${phenotype}"
-#in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${category}_ko.vcf.bgz"
-#submit_spa_job
-
-# Non-coding
-#category="synonymous"
-#out_prefix="${out_dir}/${in_prefix}_${category}_${phenotype}"
-#in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${category}_ko.vcf.bgz"
-#submit_spa_job
-
-print_update "Submitted SPA scripts for ${phenotype}"
 
