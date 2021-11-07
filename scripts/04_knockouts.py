@@ -31,6 +31,7 @@ def main(args):
     use_loftee = args.use_loftee
 
     # sample filtering options
+    sex = bool(args.sex)
     get_related = bool(args.get_related)
     get_unrelated = bool(args.get_unrelated)
     get_europeans = bool(args.get_europeans)
@@ -44,7 +45,11 @@ def main(args):
     hail_init.hail_bmrc_init('logs/hail/knockout.log', 'GRCh38')
     mt1 = qc.get_table(input_path=input_phased_path, input_type=input_phased_type) 
     mt2 = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type)
-   
+  
+    if sex:
+        mt1 = samples.filter_to_sex(mt, sex)
+        mt2 = samples.filter_to_sex(mt, sex)
+
     # additional filtering
     if get_related:
         mt1 = qc.filter_to_unrelated(mt1, get_related = True)
@@ -130,6 +135,7 @@ if __name__=='__main__':
     parser.add_argument('--chrom', default=None, help='Chromosome to be used') 
     
     # variant and entry filtering
+    parser.add_argument('--sex', default=None, help='Filter to sex')
     parser.add_argument('--maf_min', default=None, help='Select all variants with a maf greater than the indicated values')
     parser.add_argument('--maf_max', default=None, help='Select all variants with a maf less than the indicated value')
     parser.add_argument('--af_min', default=None, help='Select all variants with a AF greater than the indicated value')

@@ -121,7 +121,7 @@ def main(args):
 
     # write out summary stats
     summary_count_urv(mt1).export(out_prefix + "_variants_summary_phased.tsv.bgz")
-    summary_count_ur2(mt1).export(out_prefix + "_variants_summary_unphased.tsv.bgz")
+    summary_count_urv(mt1).export(out_prefix + "_variants_summary_unphased.tsv.bgz")
     
     # get homozygous stats
     summary_count_homozygous_urv(mt1).export(out_prefix + "_variants_homozygous_summary_phased.tsv.bgz")

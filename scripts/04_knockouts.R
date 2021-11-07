@@ -1,6 +1,7 @@
 # module purge
 # conda activate rpy
 # Rscript 04_knockouts.R --in_dir derived/knockouts/all/211013_ptv --out_prefix derived/summary
+# Rscript 04_knockouts.R --in_dir derived/knockouts/211104 --in_pattern ptv_damaging_missense_knockouts --out_prefix derived/summary
 
 # setup paths and libs
 library(argparse)
@@ -14,6 +15,8 @@ setwd('/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/')
 parser <- ArgumentParser()
 parser$add_argument("--in_dir", default=NULL, help = "What directory should files be loaded from?")
 parser$add_argument("--in_pattern", default = 'knockouts', help = "what string should the file contains?")
+parser$add_argument("--in_csq", default = '', help = "what consequence should we subset by")
+parser$add_argument("--in_ext", default = 'tsv.bgz', help = "what file extension is required")
 parser$add_argument("--print_input", default= FALSE, help = "print the input files headers to the terminal")
 parser$add_argument("--out_prefix", default=NULL, help = "out prefix for files")
 args <- parser$parse_args()
@@ -41,6 +44,10 @@ protein_coding <- protein_coding$ensembl_gene_id[protein_coding$gene_biotype == 
 
 # get knockouts
 ko_files = sort(list.files(args$in_dir, full.names = TRUE, pattern = args$in_pattern))
+ko_files = ko_files[grepl(args$in_csq, ko_files)]
+regex = paste0('*.',args$in_ext,'$')
+ko_files = ko_files[grepl(regex, ko_files)]
+
 if (length(ko_files) < 1) stop('No files were found in the specified directory (with the specified pattern)!')
 
 
@@ -73,7 +80,6 @@ samples = unique(dt$s)
 n_samples = length(samples)
 genes = unique(dt$gene_id)
 n_genes = length(genes)
-#print(paste(n_samples,'samples and',n_genes,'protein coding genes were loaded.'))
 
 # count categories
 knockouts = length(unique(dt[dt$knockout == 1]$s))
@@ -83,15 +89,21 @@ both = length(unique(dt[dt$knockout == 1 & dt$csqs == 'CH+HO']$s))
 n = length(unique(dt$s))
 col_all = c(n, homozygous, compound_heterozygous, knockouts)
 
+# count categories per individual
+sample_ko = dt[dt$knockout == 1]$s
+ko_per_individual = length(sample_ko) / length(unique(dt$s))
+print(ko_per_individual)
+
 # knockout stats by sample
 samples_pct_ho_ko = round(100*(homozygous / total_samples), 2)
 samples_pct_ch_ko = round(100*(compound_heterozygous / total_samples), 2)
 samples_pct_ch_ho_ko = round(100*(both / total_samples), 2)
+samples_pct_ko = round(100*(knockouts / total_samples), 2)
 write("\n### Knockouts by samples ###",stdout())
 write(paste0(homozygous,"/",total_samples, ' (',samples_pct_ho_ko,'%) of unqiue samples are homozygous KOs'), stdout())
 write(paste0(compound_heterozygous,"/",total_samples, " (",samples_pct_ch_ko,'%) of unique samples are compound heterozygous KOs'),stdout())
 write(paste0(both,"/", total_samples ," (", samples_pct_ch_ho_ko,'%) of unique samples are homozygous AND compound heterozygous KOs'),stdout())
-write(paste0(knockouts,"/", total_samples ," (", samples_pct_ch_ho_ko,'%) of unique samples are KOs'),stdout())
+write(paste0(knockouts,"/", total_samples ," (", samples_pct_ko,'%) of unique samples are KOs'),stdout())
 
 # knockout stats by gene
 genes_knockout = length(unique(dt$gene_id[dt$knockout == 1])) 
