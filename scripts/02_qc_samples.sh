@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 #
-#$ -N qc_input_mt
+#$ -N qc_samples
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/qc_input_mt.log
-#$ -e logs/qc_input_mt.errors.log
+#$ -o logs/qc_samples.log
+#$ -e logs/qc_samples.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 4
+#$ -pe shmem 5
 #$ -q short.qc
 #$ -t 1-24
 
@@ -23,16 +23,15 @@ readonly spark_dir="data/tmp/spark"
 readonly out_dir="data/qc"
 
 # hail script
-readonly hail_script="scripts/02_qc_input_mt.py"
+readonly hail_script="scripts/02_qc_samples.py"
 
 # input paths
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 
 readonly in_phased="${in_dir_phased}/ukb_wes_phased_non_singleton_chr${chr}-24xlong.qc-v4.2.2.vcf.gz"
 readonly in_unphased="${in_dir_unphased}/ukb_wes_200k_filtered_chr${chr}.mt"
-#readonly vep="${vep_dir}/ukb_wes_200k_full_vep_chr${chr}.vcf"
 readonly gnomad="${gnomad_dir}/gnomad.exomes.r2.1.1.sites.${chr}.liftover_grch38.vcf.bgz"
 readonly imputed="${imputed_dir}/ukb_imp_liftover_chr${chr}.mt"
-readonly annotation_table="data/vep/hail/ukb_wes_200k_chr${chr}_vep.ht"
+readonly annotation_table="data/vep/hail/new/ukb_wes_200k_chr${chr}_vep.ht"
 
 # get final samples / variants from Duncan
 readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
@@ -50,9 +49,7 @@ python3 "${hail_script}" \
      --input_unphased_path ${in_unphased} \
      --input_phased_type "vcf" \
      --input_unphased_type "mt" \
-     --input_gnomad_path ${gnomad}\
      --input_imputed_path ${imputed}\
-     --input_annotation_path ${annotation_table} \
      --final_sample_list ${final_sample_list} \
      --final_variant_list ${final_variant_list}\
      --out_prefix ${out_prefix}

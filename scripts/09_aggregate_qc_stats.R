@@ -10,10 +10,9 @@ library(ggplot2)
 setwd('/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/')
 
 # add arguments
-parser <- ArgumentParser()
-parser$add_argument("--in_dir", default=NULL, help = "What directory should files be loaded from?")
-parser$add_argument("--out_prefix", default=NULL, help = "out prefix for files")
-args <- parser$parse_args()
+#parser <- ArgumentParser()
+#parser$add_argument("--in_dir", default=NULL, help = "What directory should files be loaded from?")
+#args <- parser$parse_args()
 
 # read in .tsv.bgz files
 zcat <- function(path,...){
@@ -50,6 +49,21 @@ data_external <- do.call(rbind, lapply(files_external, function(file){
 }))
 print(data_external)
 write.table(data_external, 'derived/external_qc_comparison.txt', sep = '\t', quote = FALSE, row.names = FALSE)
+
+# Sample-level stats
+files_sample <- list.files('data/qc/',pattern = 'ukb_wes_200k_chr[0-9]+_variants_summary_phased.tsv.bgz', full.names = TRUE)
+d_sample <- do.call(rbind,lapply(files_sample, function(file) zcat(file)))
+d_sample_aggr <- aggregate(.~s, d_sample, sum)
+write.table(d_sample_aggr, 'derived/tables/ukb_phased_sample_level_urv_count.tsv', quote = FALSE, row.names = FALSE) 
+
+# Gene-level stats
+files_genes <- list.files('data/qc/',pattern = 'ukb_wes_200k_chr[0-9]+_urv_by_genes_phased.tsv.bgz', full.names = TRUE)
+d_genes <- do.call(rbind,lapply(files_genes, function(file) zcat(file)))
+d_genes$s <- NULL
+d_genes_aggr <- aggregate(.~gene_id, d_genes, sum)
+write.table(d_genes_aggr, 'derived/tables/ukb_phased_gene_level_urv_count.tsv', quote = FALSE, row.names = FALSE) 
+
+
 
 
 

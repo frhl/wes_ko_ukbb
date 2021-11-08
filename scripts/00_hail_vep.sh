@@ -19,7 +19,7 @@ readonly vep_dir="data/vep/full"
 readonly out_dir="data/vep/hail/new"
 
 # hail script
-readonly hail_script="scripts/01_hail_vep.py"
+readonly hail_script="scripts/00_hail_vep.py"
 
 # input paths
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 
