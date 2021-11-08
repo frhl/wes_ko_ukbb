@@ -13,6 +13,7 @@
         "--assembly", "GRCh38",
         "--dir_plugins", "/well/lindgren/flassen/software/VEP/plugins_grch38/",
         "--plugin", "dbNSFP,/well/lindgren/flassen/software/VEP/dbNSFP/GRCh38/dbNSFP4.1a_grch38.gz,REVEL_score,CADD_phred",
+       "--plugin", "LoF,loftee_path:/well/lindgren/flassen/software/VEP/plugins_grch38/,human_ancestor_fa:/well/lindgren/flassen/software/VEP/loftee_human_ancestor/GRCh38/human_ancestor.fa.gz,conservation_file:/well/lindgren/flassen/software/VEP/loftee_human_ancestor/GRCh38/loftee.sql,gerp_bigwig:/well/lindgren/flassen/software/VEP/loftee_human_ancestor/GRCh38/gerp_conservation_scores.homo_sapiens.GRCh38.bw",
         "-o", "STDOUT"
     ],
     "env": {
