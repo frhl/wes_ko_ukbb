@@ -18,95 +18,32 @@ OTHER_CSQS = ["mature_miRNA_variant", "5_prime_UTR_variant",
               "regulatory_region_variant", "feature_truncation", "intergenic_variant"]
 
 
-def annotation_case_builder(
-        worst_csq_by_gene_canonical_expr, csq_dbnsfp_expr, use_loftee: bool = True):
+def annotation_case_builder(worst_csq_expr, use_loftee: bool = True):
     r'''Annotate consequence categories for downstream analysis
     :param worst_csq_by_gene_canonical_expr: A struct that should contain "most_severe_consequence"
-    :param csq_dbnsfp_expr: a struct that should contain "revel_score" and "cadd_phred_score"
     :param use_loftee: if True will annotate PTVs as either high confidence (ptv) or low confidence (ptv_LC)
 
     '''
     case = hl.case(missing_false=True)
     if use_loftee:
         case = (case
-                .when(worst_csq_by_gene_canonical_expr.lof == 'HC', 'ptv')
-                .when(worst_csq_by_gene_canonical_expr.lof == 'LC', 'ptv_LC')
+                .when(worst_csq_expr.lof == 'HC', 'ptv')
+                .when(worst_csq_expr.lof == 'LC', 'ptv_LC')
                 )
     else:
         case = case.when(
             hl.set(PLOF_CSQS).contains(
                 worst_csq_by_gene_canonical_expr.most_severe_consequence),
             "ptv")
-    case = (case.when(hl.set(MISSENSE_CSQS).contains(worst_csq_by_gene_canonical_expr.most_severe_consequence) &
-                      (~hl.is_defined(csq_dbnsfp_expr.cadd_phred_score) | ~hl.is_defined(csq_dbnsfp_expr.revel_score)), "other_missense")
-                .when(hl.set(MISSENSE_CSQS).contains(worst_csq_by_gene_canonical_expr.most_severe_consequence) &
-                      (csq_dbnsfp_expr.cadd_phred_score >= 20) & (csq_dbnsfp_expr.revel_score >= 0.6), "damaging_missense")
-                .when(hl.set(MISSENSE_CSQS).contains(worst_csq_by_gene_canonical_expr.most_severe_consequence), "other_missense")
-                .when(hl.set(SYNONYMOUS_CSQS).contains(worst_csq_by_gene_canonical_expr.most_severe_consequence), "synonymous")
-                .when(hl.set(OTHER_CSQS).contains(worst_csq_by_gene_canonical_expr.most_severe_consequence), "non_coding")
+    case = (case.when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence) &
+                      (~hl.is_defined(worst_csq_expr.cadd_phred) | ~hl.is_defined(worst_csq_expr.revel_score)), "other_missense")
+                .when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence) &
+                      (worst_csq_expr.cadd_phred_score >= 20) & (worst_csq_expr.revel_score >= 0.6), "damaging_missense")
+                .when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence), "other_missense")
+                .when(hl.set(SYNONYMOUS_CSQS).contains(worst_csq_expr.most_severe_consequence), "synonymous")
+                .when(hl.set(OTHER_CSQS).contains(worst_csq_expr.most_severe_consequence), "non_coding")
             )
     return case.or_missing()
-
-
-def annotate_dbnsfp(mt, vep_path, force=False):
-    r'''Annotate matrix table with dbNSFP consequence from external VEP file.'''
-    print(f'Annotating with VEP file: {vep_path}')
-
-    # Open file containing VEP fields
-    with open('data/vep/vep_fields.txt', 'r') as file:
-        fields = file.read().strip().split(',')
-    ht = hl.import_vcf(vep_path, force=force).rename({'info': 'vep'})
-
-    # Add VEP fields by iteration
-    for i in range(len(fields)):
-        ht = ht.annotate_rows(
-            vep=ht.vep.annotate(
-                col=ht.vep.CSQ.map(lambda x: (x.split('\\|')[i]))[0]
-            ).rename({'col': f'{fields[i]}'})
-        )
-
-    # Extract various categories annotations and change type
-    ht = ht.annotate_rows(vep=ht.vep.annotate(
-        sift_pred=ht.vep.SIFT_pred.split('&')[0]))
-    ht = ht.annotate_rows(
-        vep=ht.vep.annotate(
-            polyphen2_hdiv_pred=ht.vep.Polyphen2_HDIV_pred.split('&')[0]))
-    ht = ht.annotate_rows(
-        vep=ht.vep.annotate(
-            polyphen2_hvar_pred=ht.vep.Polyphen2_HVAR_pred.split('&')[0]))
-    ht = ht.annotate_rows(
-        vep=ht.vep.annotate(
-            cadd_phred_score=hl.parse_float(
-                ht.vep.CADD_phred)))
-    ht = ht.annotate_rows(
-        vep=ht.vep.annotate(
-            revel_score=hl.parse_float(
-                ht.vep.REVEL_score)))
-
-    # annotate main table
-    mt = mt.annotate_rows(dbnsfp=hl.struct())
-    mt = mt.annotate_rows(
-        dbnsfp=mt.dbnsfp.annotate(
-            revel_score=ht.index_rows(
-                mt.locus,
-                mt.alleles).vep.revel_score))
-    mt = mt.annotate_rows(
-        dbnsfp=mt.dbnsfp.annotate(
-            cadd_phred_score=ht.index_rows(
-                mt.locus,
-                mt.alleles).vep.cadd_phred_score))
-    mt = mt.annotate_rows(
-        dbnsfp=mt.dbnsfp.annotate(
-            polyphen2_hdiv_pred=ht.index_rows(
-                mt.locus,
-                mt.alleles).vep.polyphen2_hdiv_pred))
-    mt = mt.annotate_rows(
-        dbnsfp=mt.dbnsfp.annotate(
-            polyphen2_hvar_pred=ht.index_rows(
-                mt.locus,
-                mt.alleles).vep.polyphen2_hvar_pred))
-
-    return(mt)
 
 def count_urv_by_samples(mt):
     r'''Count up ultra rare variants by cols and cateogry
