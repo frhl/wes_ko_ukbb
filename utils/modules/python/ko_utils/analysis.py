@@ -18,6 +18,36 @@ OTHER_CSQS = ["mature_miRNA_variant", "5_prime_UTR_variant",
               "regulatory_region_variant", "feature_truncation", "intergenic_variant"]
 
 
+
+def annotation_case_builder_legacy(
+        worst_csq_by_gene_canonical_expr, csq_dbnsfp_expr, use_loftee: bool = True):
+    r'''Annotate consequence categories for downstream analysis
+    :param worst_csq_by_gene_canonical_expr: A struct that should contain "most_severe_consequence"
+    :param csq_dbnsfp_expr: a struct that should contain "revel_score" and "cadd_phred_score"
+    :param use_loftee: if True will annotate PTVs as either high confidence (ptv) or low confidence (ptv_LC)
+    '''
+    case = hl.case(missing_false=True)
+    if use_loftee:
+        case = (case
+                .when(worst_csq_by_gene_canonical_expr.lof == 'HC', 'ptv')
+                .when(worst_csq_by_gene_canonical_expr.lof == 'LC', 'ptv_LC')
+                )
+    else:
+        case = case.when(
+            hl.set(PLOF_CSQS).contains(
+                worst_csq_by_gene_canonical_expr.most_severe_consequence),
+            "ptv")
+    case = (case.when(hl.set(MISSENSE_CSQS).contains(worst_csq_by_gene_canonical_expr.most_severe_consequence) &
+                      (~hl.is_defined(csq_dbnsfp_expr.cadd_phred_score) | ~hl.is_defined(csq_dbnsfp_expr.revel_score)), "other_missense")
+                .when(hl.set(MISSENSE_CSQS).contains(worst_csq_by_gene_canonical_expr.most_severe_consequence) &
+                      (csq_dbnsfp_expr.cadd_phred_score >= 20) & (csq_dbnsfp_expr.revel_score >= 0.6), "damaging_missense")
+                .when(hl.set(MISSENSE_CSQS).contains(worst_csq_by_gene_canonical_expr.most_severe_consequence), "other_missense")
+                .when(hl.set(SYNONYMOUS_CSQS).contains(worst_csq_by_gene_canonical_expr.most_severe_consequence), "synonymous")
+                .when(hl.set(OTHER_CSQS).contains(worst_csq_by_gene_canonical_expr.most_severe_consequence), "non_coding")
+            )
+    return case.or_missing()
+
+
 def annotation_case_builder(worst_csq_expr, use_loftee: bool = True):
     r'''Annotate consequence categories for downstream analysis
     :param worst_csq_by_gene_canonical_expr: A struct that should contain "most_severe_consequence"

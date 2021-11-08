@@ -86,19 +86,19 @@ def main(args):
     mt1_subset = mt1.filter_rows(hl.literal(set(items)).contains(mt1.consequence_category)) 
     mt2_subset = mt2.filter_rows(hl.literal(set(items)).contains(mt2.consequence_category))
 
-    outfile_ko_prob = out_prefix + "_" + category +'_ko_prob.tsv.bgz'
+    outfile_ko_prob = str(out_prefix) + "_" + str(category) +'_ko_prob.tsv.bgz'
     if export_ko_probability and not os.path.exists(outfile_ko_prob):
         mt_ko = analysis.gene_csqs_calc_pKO(mt1_subset, mt2_subset, 'dosage')
         mt_ko_entries = mt_ko.entries()
         mt_ko_entries = mt_ko_entries.filter(mt_ko_entries.pKO>0)
         mt_ko_entries.export(outfile_ko_prob)
 
-    outfile_ko_rsid = out_prefix + "_" + category + '_knockouts.tsv.bgz'
+    outfile_ko_rsid = str(out_prefix) + "_" + str(category) + '_knockouts.tsv.bgz'
     if export_ko_rsid and not os.path.exists(outfile_ko_rsid):
         mt_ko_rsid = analysis.gene_csqs_knockout_builder(mt1_subset)
         mt_ko_rsid.export(outfile_ko_rsid)
 
-    outfile_saige = out_prefix + "_" + category + "_ko.vcf.bgz"
+    outfile_saige = str(out_prefix) + "_" + str(category) + "_ko.vcf.bgz"
     if export_saige_vcf and not os.path.exists(outfile_saige):
         out = analysis.gene_csqs_calc_pKO_pseudoSNP(mt1_subset, mt2_subset, chrom)
         qc.export_table(out, out_prefix = out_prefix + "_" + category + "_ko", out_type = 'vcf')

@@ -44,7 +44,8 @@ readonly out_prefix="${out_dir}/ukb_wes_200k_af02_chrCHR"
 
 submit_knockout_job() 
 {
-  qsub -N "_knockout" \
+  name=$( echo ${1} | tr "," "_")
+  qsub -N "_ko_${name}" \
     -t 21 \
     -q "short.qe" \
     -pe shmem 3 \
@@ -59,31 +60,10 @@ submit_knockout_job()
 }
 
 
-# parallize jobs
+mkdir -p ${out_dir}
 submit_knockout_job "ptv,damaging_misssense"
-#submit_knockout_job "ptv"
-#submit_knockout_job "synonymous"
-
-# run hail
-#set_up_hail
-#set_up_pythonpath_legacy
-#mkdir -p ${out_dir}
-#python3 "${hail_script}" \
-#    --chrom ${chr} \
-#    --input_phased_path ${in_phased}\
-#    --input_unphased_path ${in_unphased} \
-#    --input_phased_type "mt" \
-#    --input_unphased_type "mt" \
-#    --af_max 0.02 \
-#    --missing 0.05 \
-#    --use_loftee \
-#    --out_prefix ${out_prefix} \
-#    --export_saige_vcf \
-#    --csqs_category "ptv" "damaging_missense"
-#    #--export_ko_probability \
-#    #--export_ko_rsid 
-#    #--export_saige_vcf
-#print_update "Finished running HAIL for chr${chr}" "${SECONDS}"
+submit_knockout_job "ptv"
+submit_knockout_job "synonymous"
 
 
 

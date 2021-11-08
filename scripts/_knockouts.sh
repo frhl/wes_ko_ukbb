@@ -3,8 +3,8 @@
 # note: this scripts is called from 04_knockouts.sh
 #
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/knockout_csqs.log
-#$ -e logs/knockout_csqs.errors.log
+#$ -o logs/_knockouts.log
+#$ -e logs/_knockouts.errors.log
 #$ -P lindgren.prjc
 #$ -q short.qc@@short.hge
 
@@ -42,9 +42,9 @@ python3 "${hail_script}" \
     --input_unphased_path ${unphased} \
     --input_phased_type ${in_phased_type} \
     --input_unphased_type ${in_unphased_type} \
-    --csqs_category ${in_category}
+    --csqs_category ${in_category} \
     --out_prefix ${out} \
-    --af_max 0.02 \
+    --af_max ${af_max} \
     --export_ko_probability \
     --export_saige_vcf \
     --use_loftee
