@@ -20,7 +20,7 @@ source utils/hail_utils.sh
 readonly in_dir_phased="/well/lindgren/UKBIOBANK/nbaya/wes_200k/phase_ukb_wes/data/phased/non_singleton"
 readonly in_dir_unphased="data/unphased/post-qc"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="data/mt"
+readonly out_dir="data/mt/new"
 
 # hail script
 readonly hail_script="scripts/03_create_mt.py"
@@ -29,7 +29,7 @@ readonly hail_script="scripts/03_create_mt.py"
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 
 readonly in_phased="${in_dir_phased}/ukb_wes_phased_non_singleton_chr${chr}-24xlong.qc-v4.2.2.vcf.gz"
 readonly in_unphased="${in_dir_unphased}/ukb_wes_200k_filtered_chr${chr}.mt"
-readonly annotation_table="data/vep/hail/ukb_wes_200k_chr${chr}_vep.ht"
+readonly annotation_table="data/vep/hail/new/ukb_wes_200k_chr${chr}_vep.ht"
 
 # output path
 readonly out_prefix="${out_dir}/ukb_wes_200k_annotated_chr${chr}"

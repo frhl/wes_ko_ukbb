@@ -3,6 +3,7 @@
 import hail as hl
 import argparse
 import pandas
+import os.path
 import os
 
 from gnomad.utils.vep import process_consequences
@@ -10,6 +11,11 @@ from ukb_utils import hail_init
 from ukb_utils import genotypes
 from ko_utils import qc
 from ko_utils import analysis
+
+
+class SplitArgs(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, values.split(','))
 
 def main(args):
     
@@ -29,6 +35,8 @@ def main(args):
     maf_min    = (args.maf_min)
     missing    = (args.missing)
     use_loftee = args.use_loftee
+    csqs_category = (args.csqs_category)
+    print(csqs_category)
 
     # sample filtering options
     sex = bool(args.sex)
@@ -50,19 +58,6 @@ def main(args):
         mt1 = samples.filter_to_sex(mt, sex)
         mt2 = samples.filter_to_sex(mt, sex)
 
-    # additional filtering
-    if get_related:
-        mt1 = qc.filter_to_unrelated(mt1, get_related = True)
-        mt2 = qc.filter_to_unrelated(mt2, get_related = True)
-
-    if get_unrelated:
-        mt1 = qc.filter_to_unrelated(mt1, get_related = False)
-        mt2 = qc.filter_to_unrelated(mt2, get_related = False)
-        
-    if get_europeans: 
-        mt1 = qc.filter_to_european(mt1)
-        mt2 = qc.filter_to_european(mt2)
-
     if missing:
         mt1 = qc.filter_min_missing(mt1, float(missing))
         mt2 = qc.filter_min_missing(mt2, float(missing))
@@ -73,53 +68,43 @@ def main(args):
     if af_min:
         mt1 = qf.fiter_min_af(mt1, float(af_min))
 
-    if maf_max:
-        mt1 = qc.filter_max_maf(mt1, float(maf_max))
-
-    if maf_min:
-        mt1 = qc.filter_min_maf(mt1, float(maf_min))
-
     # required before doing worst_csq_by_gene_canonical
     mt1 = mt1.explode_rows(mt1.consequence.vep.worst_csq_by_gene_canonical)
     mt2 = mt2.explode_rows(mt2.consequence.vep.worst_csq_by_gene_canonical)
     
     # get VEP annotation and add to rows
-    by_gene_annotation1 = analysis.annotation_case_builder(mt1.consequence.vep.worst_csq_by_gene_canonical, mt1.consequence.dbnsfp, use_loftee = use_loftee)
-    by_gene_annotation2 = analysis.annotation_case_builder(mt2.consequence.vep.worst_csq_by_gene_canonical, mt2.consequence.dbnsfp, use_loftee = use_loftee)
+    by_gene_annotation1 = analysis.annotation_case_builder_legacy(mt1.consequence.vep.worst_csq_by_gene_canonical, mt1.consequence.dbnsfp, use_loftee = use_loftee)
+    by_gene_annotation2 = analysis.annotation_case_builder_legacy(mt2.consequence.vep.worst_csq_by_gene_canonical, mt2.consequence.dbnsfp, use_loftee = use_loftee)
     mt1 = mt1.annotate_rows(consequence_category = by_gene_annotation1)    
     mt2 = mt2.annotate_rows(consequence_category = by_gene_annotation2)    
 
-    # iterate over the following consequence categories    
-    categories = dict(
-        ptv = ['ptv'],
-        ptv_damaging_missense = ['ptv','damaging_missense'],
-        ptv_lc = ['ptv','ptv_LC'],
-        ptv_lc_damaging_missense = ['ptv','ptv_LC','damaging_missense'],
-        synonymous = ['synonymous']
-    )
+    # get current category
+    category = "_".join(csqs_category)
+    items = csqs_category
 
-    for category, items in categories.items():
-        
-        print(f"chr{chrom}: evaluating '{category}' category")
-        mt1_subset = mt1.filter_rows(hl.literal(set(items)).contains(mt1.consequence_category)) 
-        mt2_subset = mt2.filter_rows(hl.literal(set(items)).contains(mt2.consequence_category))
+    print(f"chr{chrom}: evaluating '{category}' category")
+    mt1_subset = mt1.filter_rows(hl.literal(set(items)).contains(mt1.consequence_category)) 
+    mt2_subset = mt2.filter_rows(hl.literal(set(items)).contains(mt2.consequence_category))
 
-        if export_ko_probability:
-            mt_ko = analysis.gene_csqs_calc_pKO(mt1_subset, mt2_subset, 'dosage')
-            mt_ko_entries = mt_ko.entries()
-            mt_ko_entries = mt_ko_entries.filter(mt_ko_entries.pKO>0)
-            mt_ko_entries.export(out_prefix + "_" + category +'_ko_prob.tsv.bgz')
+    outfile_ko_prob = out_prefix + "_" + category +'_ko_prob.tsv.bgz'
+    if export_ko_probability and not os.path.exists(outfile_ko_prob):
+        mt_ko = analysis.gene_csqs_calc_pKO(mt1_subset, mt2_subset, 'dosage')
+        mt_ko_entries = mt_ko.entries()
+        mt_ko_entries = mt_ko_entries.filter(mt_ko_entries.pKO>0)
+        mt_ko_entries.export(outfile_ko_prob)
 
-        if export_ko_rsid:
-            mt_ko_rsid = analysis.gene_csqs_knockout_builder(mt1_subset)
-            mt_ko_rsid.export(out_prefix + "_" + category + '_knockouts.tsv.bgz')
+    outfile_ko_rsid = out_prefix + "_" + category + '_knockouts.tsv.bgz'
+    if export_ko_rsid and not os.path.exists(outfile_ko_rsid):
+        mt_ko_rsid = analysis.gene_csqs_knockout_builder(mt1_subset)
+        mt_ko_rsid.export(outfile_ko_rsid)
 
-        if export_saige_vcf:
-            out = analysis.gene_csqs_calc_pKO_pseudoSNP(mt1_subset, mt2_subset, chrom)
-            qc.export_table(out, out_prefix = out_prefix + "_" + category + "_ko", out_type = 'vcf')
-            undefined = out.aggregate_entries(hl.agg.sum(~hl.is_defined(out.DS)))
-            n = out.count()
-            print(f"chr{chrom}: undefined = {undefined}; variant/sample-count = {n}")
+    outfile_saige = out_prefix + "_" + category + "_ko.vcf.bgz"
+    if export_saige_vcf and not os.path.exists(outfile_saige):
+        out = analysis.gene_csqs_calc_pKO_pseudoSNP(mt1_subset, mt2_subset, chrom)
+        qc.export_table(out, out_prefix = out_prefix + "_" + category + "_ko", out_type = 'vcf')
+        undefined = out.aggregate_entries(hl.agg.sum(~hl.is_defined(out.DS)))
+        n = out.count()
+        print(f"chr{chrom}: undefined = {undefined}; variant/sample-count = {n}")
 
 
 if __name__=='__main__':
@@ -142,7 +127,8 @@ if __name__=='__main__':
     parser.add_argument('--af_max', default=None, help='Select all variants with a AF less than the indicated value')
     parser.add_argument('--missing', default=0.05, help='Filter variants by missingness threshold')
     parser.add_argument('--use_loftee', default=False, action='store_true', help='use LOFTEE to distinghiush between high confidence PTVs')
-    
+    parser.add_argument('--csqs_category', default=None, action=SplitArgs, help='What categories should be subsetted to?')
+ 
     # sample filtering
     parser.add_argument('--get_related', action='store_true', help='Select all samples that are related')
     parser.add_argument('--get_unrelated', action='store_true', help='Select all samples that are unrelated') 

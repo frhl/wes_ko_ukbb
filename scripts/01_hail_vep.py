@@ -25,7 +25,7 @@ def main(args):
     
     # get file and annotate
     mt = qc.get_table(input_path=input_path, input_type=input_type) # 12788
-    mt = process_consequences(hl.vep(mt, "utils/configs/vep_env.json"))
+    mt = process_consequences(hl.vep(mt, "utils/configs/vep_final.json"))
     mt = analysis.annotate_dbnsfp(mt, vep_path)
     ht = mt.rows()
     
