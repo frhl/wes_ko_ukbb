@@ -45,10 +45,10 @@ python3 "${hail_script}" \
     --csqs_category ${in_category} \
     --out_prefix ${out} \
     --af_max ${af_max} \
-    --export_ko_probability \
-    --export_saige_vcf \
-    --export_ko_rsid \
-    --use_loftee
+    --use_loftee \
+    --export_saige_vcf 
+    #--export_ko_rsid \
+    #--export_ko_probability \
 set +x
 print_update "Finished running HAIL for chr${chr}" "${SECONDS}"
 

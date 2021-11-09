@@ -74,8 +74,6 @@ def main(args):
     # get VEP annotation and add to rows
     by_gene_annotation1 = analysis.annotation_case_builder(mt1.consequence.vep.worst_csq_by_gene_canonical, use_loftee = use_loftee)
     by_gene_annotation2 = analysis.annotation_case_builder(mt2.consequence.vep.worst_csq_by_gene_canonical, use_loftee = use_loftee)
-    #by_gene_annotation2 = analysis.annotation_case_builder_legacy(mt2.consequence.vep.worst_csq_by_gene_canonical, mt2.consequence.dbnsfp, use_loftee = use_loftee)
-    #by_gene_annotation2 = analysis.annotation_case_builder_legacy(mt2.consequence.vep.worst_csq_by_gene_canonical, mt2.consequence.dbnsfp, use_loftee = use_loftee)
     mt1 = mt1.annotate_rows(consequence_category = by_gene_annotation1)    
     mt2 = mt2.annotate_rows(consequence_category = by_gene_annotation2)    
 
@@ -103,9 +101,9 @@ def main(args):
     if export_saige_vcf and not os.path.exists(outfile_saige):
         out = analysis.gene_csqs_calc_pKO_pseudoSNP(mt1_subset, mt2_subset, chrom)
         qc.export_table(out, out_prefix = out_prefix + "_" + category + "_ko", out_type = 'vcf')
-        undefined = out.aggregate_entries(hl.agg.sum(~hl.is_defined(out.DS)))
-        n = out.count()
-        print(f"chr{chrom}: undefined = {undefined}; variant/sample-count = {n}")
+        #undefined = out.aggregate_entries(hl.agg.sum(~hl.is_defined(out.DS)))
+        #n = out.count()
+        #print(f"chr{chrom}: undefined = {undefined}; variant/sample-count = {n}")
 
 
 if __name__=='__main__':

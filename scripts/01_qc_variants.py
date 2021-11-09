@@ -2,29 +2,11 @@
 
 import hail as hl
 import argparse
-import pandas
-import os
 
-from gnomad.utils.vep import process_consequences
 from ukb_utils import hail_init
-from ukb_utils import genotypes
 from ukb_utils import samples
 from ko_utils import qc
 from ko_utils import analysis
-
-
-def summary_count_urv(mt):
-    annotation_by_variant = analysis.annotation_case_builder(mt.consequence.vep.worst_csq_for_variant_canonical, mt.consequence.dbnsfp)
-    mt = mt.annotate_rows(consequence_category = annotation_by_variant)
-    mt = analysis.count_urv_by_samples(mt)
-    return mt.cols()
-
-def summary_count_homozygous_urv(mt):
-    annotation_by_variant = analysis.annotation_case_builder(mt.consequence.vep.worst_csq_for_variant_canonical, mt.consequence.dbnsfp)
-    mt = mt.annotate_rows(consequence_category = annotation_by_variant)
-    mt = analysis.count_homozygous_urv_by_samples(mt)
-    return mt.cols()
-
 
 def main(args):
     
@@ -39,7 +21,6 @@ def main(args):
     input_annotation_path = args.input_annotation_path
     out_prefix = args.out_prefix
     out_type   = args.out_type
-    vep_path   = args.vep_path
     final_variant_list = args.final_variant_list
     final_sample_list = args.final_sample_list    
 
@@ -50,80 +31,55 @@ def main(args):
     # get tables
     mt1 = qc.get_table(input_path=input_phased_path, input_type=input_phased_type) # 12788
     mt2 = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type) # 11867 (for singletons)
+    mt = qc.union_phased_with_unphased(mt1, mt2)
 
     # remove withdrawn samples
-    mt1 = samples.remove_withdrawn(mt1)
-    mt2 = samples.remove_withdrawn(mt2)
+    mt = samples.remove_withdrawn(mt)
 
     # filter by final samples
     if final_sample_list:
         ht_final_samples = hl.import_table(final_sample_list, no_header=True, key='f0', delimiter=',')
-        mt1 = mt1.filter_cols(hl.is_defined(ht_final_samples[mt1.col_key]))
-        mt2 = mt2.filter_cols(hl.is_defined(ht_final_samples[mt2.col_key]))
-        print(f'chr{chrom}: using final samples..')
+        mt = mt.filter_cols(hl.is_defined(ht_final_samples[mt.col_key]))
    
     # filter by final variants
     if final_variant_list:
         ht_final_variants = hl.import_table(final_variant_list, types={'locus':hl.tlocus(reference_genome='GRCh38'), 'alleles':hl.tarray(hl.tstr)})
         ht_final_variants = ht_final_variants.key_by(ht_final_variants.locus, ht_final_variants.alleles)
-        mt1 = mt1.filter_rows(hl.is_defined(ht_final_variants[mt1.row_key]))
-        mt2 = mt2.filter_rows(hl.is_defined(ht_final_variants[mt2.row_key]))
-        print(f'chr{chrom}: using final variants..')
+        mt = mt.filter_rows(hl.is_defined(ht_final_variants[mt.row_key]))
     
     # annotate with gnomAD
     if input_gnomad_path:
         gnomad_variants_ht = hl.import_vcf(input_gnomad_path, reference_genome ='GRCh38', force_bgz=True, array_elements_required=False).rows()
-        mt1 = mt1.annotate_rows(inGnomAD = hl.is_defined(gnomad_variants_ht[mt1.row_key]))
-        mt2 = mt2.annotate_rows(inGnomAD = hl.is_defined(gnomad_variants_ht[mt2.row_key]))
-        print(f'chr{chrom}: annotating with gnomAD..')
+        mt = mt.annotate_rows(in_gnomad = hl.is_defined(gnomad_variants_ht[mt.row_key]))
 
     # annotate with imputed data
     if input_imputed_path:
         imputed = hl.read_table(input_imputed_path)
-        mt1 = mt1.annotate_rows(imputed_info = imputed[mt1.row_key].info) 
-        mt2 = mt2.annotate_rows(imputed_info = imputed[mt2.row_key].info)
-        print(f'chr{chrom}: annotating with imputed INFO score..')
-    
+        mt = mt.annotate_rows(imputed_info = imputed[mt.row_key].info) 
+   
     # add annotations from table
     consequence_annotations = hl.read_table(input_annotation_path)
-    mt1 = mt1.annotate_rows(consequence = consequence_annotations[mt1.row_key]) 
-    mt2 = mt2.annotate_rows(consequence = consequence_annotations[mt2.row_key]) 
-    
-    # write out variant stats
-    #print(f'chr{chrom}: Writing out variants stats to {out_prefix}_variants*')
-    #mt1 = hl.variant_qc(mt1, name='variant_qc')
-    #ht1_rows_filter = mt1.rows()
-    #ht1_rows_filter.write(out_prefix + "_variants_phased.ht", overwrite=True)
-    #ht1_rows_filter.flatten().export(out_prefix + "_variants_phased.vcf.bgz")
+    mt = mt.annotate_rows(consequence = consequence_annotations[mt.row_key]) 
+   
+    # annotate entries with DP and DQ
+    mt = mt.annotate_entries(DP = mt2[(mt.locus, mt.alleles), mt.s].DP)
+    mt = mt.annotate_entries(GQ = mt2[(mt.locus, mt.alleles), mt.s].GQ)    
 
-    #mt2 = hl.variant_qc(mt2, name='variant_qc')
-    #ht2_rows_filter = mt2.rows()
-    #ht2_rows_filter.write(out_prefix + "_variants_unphased.ht", overwrite=True)
-    #ht2_rows_filter.flatten().export(out_prefix + "_variants_unphased.vcf.bgz")
-
+    # perform QC on phased data
+    mt = hl.variant_qc(mt, name='variant_qc')
+    mt_rows = mt.rows().select('variant_qc','imputed_info', 'in_gnomad')
+    mt_rows = mt_rows.annotate(worst_csq_for_variant_canonical = consequence_annotations[mt_rows.key].vep.worst_csq_for_variant_canonical)
+    mt_rows.write(out_prefix + "_variants_qc.ht", overwrite=True)
+    mt_rows.flatten().export(out_prefix + "_variants_qc.tsv.bgz")
+ 
     # annotate consequence category
-    category_annotation_mt2 = analysis.annotation_case_builder(mt2.consequence.vep.worst_csq_for_variant_canonical, use_loftee = True)
-    category_annotation_mt1 = analysis.annotation_case_builder(mt1.consequence.vep.worst_csq_for_variant_canonical, use_loftee = True)
-    mt2 = mt2.annotate_rows(consequence_category = category_annotation_mt2)
-    mt1 = mt1.annotate_rows(consequence_category = category_annotation_mt1)
+    category_annotations = analysis.annotation_case_builder(mt.consequence.vep.worst_csq_for_variant_canonical, use_loftee = True)
+    mt = mt.annotate_rows(consequence_category = category_annotations)
 
-    # write out summary stats
-    #summary_count_urv(mt1).export(out_prefix + "_variants_summary_phased.tsv.bgz")
-    #summary_count_urv(mt1).export(out_prefix + "_variants_summary_unphased.tsv.bgz")
-    
-    # get homozygous stats
-    #summary_count_homozygous_urv(mt1).export(out_prefix + "_variants_homozygous_summary_phased.tsv.bgz")
-    #summary_count_homozygous_urv(mt2).export(out_prefix + "_variants_homozygous_summary_unphased.tsv.bgz")
-
-    # explode rows by gene
-    mt1 = mt1.explode_rows(mt1.consequence.vep.worst_csq_by_gene_canonical)
-    mt2 = mt2.explode_rows(mt2.consequence.vep.worst_csq_by_gene_canonical)
-
-    # count URV by genes
-    mt1_genes = analysis.count_urv_by_genes(mt1, mt1.consequence.vep.worst_csq_for_variant_canonical.gene_id)
-    mt1_genes.entries().flatten().export(out_prefix + "_urv_by_genes_phased.tsv.bgz")
-    mt2_genes = analysis.count_urv_by_genes(mt2, mt2.consequence.vep.worst_csq_for_variant_canonical.gene_id)
-    mt2_genes.entries().flatten().export(out_prefix + "_urv_by_genes_unphased.tsv.bgz")
+    # count URVs by genes
+    mt = mt.explode_rows(mt.consequence.vep.worst_csq_by_gene_canonical)
+    mt_genes = analysis.count_urv_by_genes(mt, mt.consequence.vep.worst_csq_for_variant_canonical.gene_id)
+    mt_genes.entries().flatten().export(out_prefix + "_urv_by_genes.tsv.bgz")
 
 
 if __name__=='__main__':
@@ -140,7 +96,6 @@ if __name__=='__main__':
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Type of output dataset (options: mt, vcf, plink)')
     parser.add_argument('--chrom', default=None, help='Chromosome to be used')
-    parser.add_argument('--vep_path', default=None, help='path to a .vcf file containing annotated entries by locus and alleles')   
     parser.add_argument('--final_sample_list', default=None, help='Path to hail table with final samples to be included')
     parser.add_argument('--final_variant_list', default=None, help='Path to hail table with final variants to be included')     
 

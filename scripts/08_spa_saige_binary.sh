@@ -18,7 +18,7 @@ source utils/bash_utils.sh
 source utils/hail_utils.sh
 
 # directories
-readonly vcf_dir="derived/knockouts/211106"
+readonly vcf_dir="derived/knockouts/211110"
 readonly step1_dir="data/saige/output/combined/binary/step1"
 readonly out_dir="data/saige/output/combined/binary/step2"
 readonly pheno_dir="data/phenotypes"

@@ -2,12 +2,12 @@
 #
 #$ -N qc_samples
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/qc_samples.log
-#$ -e logs/qc_samples.errors.log
+#$ -o logs/test_qc_samples.log
+#$ -e logs/test_qc_samples.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 5
 #$ -q short.qc
-#$ -t 1-24
+#$ -t 21
 
 
 source utils/qsub_utils.sh
@@ -17,7 +17,7 @@ source utils/hail_utils.sh
 readonly in_dir_phased="/well/lindgren/UKBIOBANK/nbaya/wes_200k/phase_ukb_wes/data/phased/non_singleton"
 readonly in_dir_unphased="data/unphased/post-qc"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="data/qc"
+readonly out_dir="data/qc_new"
 
 # hail script
 readonly hail_script="scripts/02_qc_samples.py"
@@ -26,7 +26,7 @@ readonly hail_script="scripts/02_qc_samples.py"
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 
 readonly in_phased="${in_dir_phased}/ukb_wes_phased_non_singleton_chr${chr}-24xlong.qc-v4.2.2.vcf.gz"
 readonly in_unphased="${in_dir_unphased}/ukb_wes_200k_filtered_chr${chr}.mt"
-readonly annotation_table="data/vep/hail/new/ukb_wes_200k_chr${chr}_vep.ht"
+readonly annotation_table="data/vep/hail/ukb_wes_200k_chr${chr}_vep.ht"
 
 # get final samples / variants from Duncan
 readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
@@ -36,6 +36,7 @@ readonly final_variant_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_q
 readonly out_prefix="${out_dir}/ukb_wes_200k_chr${chr}"
 
 # run hail
+mkdir -p ${out_dir}
 set_up_hail
 set_up_pythonpath_legacy  
 python3 "${hail_script}" \

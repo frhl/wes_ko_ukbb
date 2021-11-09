@@ -16,7 +16,7 @@ source utils/hail_utils.sh
 readonly in_dir="data/unphased/post-qc"
 readonly spark_dir="data/tmp/spark"
 readonly vep_dir="data/vep/full"
-readonly out_dir="data/vep/hail/new"
+readonly out_dir="data/vep/hail"
 
 # hail script
 readonly hail_script="scripts/00_hail_vep.py"

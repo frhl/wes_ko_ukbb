@@ -89,6 +89,10 @@ def count_urv_by_samples(mt):
                           n_URV_non_coding = hl.agg.count_where(mt.GT.is_non_ref() & (mt.consequence_category == "non_coding"))
                          )
 
+
+
+
+
 def count_homozygous_urv_by_samples(mt):
     r'''Count up homozygous variants by samples    
     :param mt: a MatrixTable with the field "consequence_category"
