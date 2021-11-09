@@ -85,9 +85,9 @@ def main(args):
         print(f'chr{chrom}: annotating with imputed INFO score..')
     
     # add annotations from table
-    #consequence_annotations = hl.read_table(input_annotation_path)
-    #mt1 = mt1.annotate_rows(consequence = consequence_annotations[mt1.row_key]) 
-    #mt2 = mt2.annotate_rows(consequence = consequence_annotations[mt2.row_key]) 
+    consequence_annotations = hl.read_table(input_annotation_path)
+    mt1 = mt1.annotate_rows(consequence = consequence_annotations[mt1.row_key]) 
+    mt2 = mt2.annotate_rows(consequence = consequence_annotations[mt2.row_key]) 
     
     # write out variant stats
     #print(f'chr{chrom}: Writing out variants stats to {out_prefix}_variants*')
@@ -102,8 +102,8 @@ def main(args):
     #ht2_rows_filter.flatten().export(out_prefix + "_variants_unphased.vcf.bgz")
 
     # annotate consequence category
-    category_annotation_mt2 = analysis.annotation_case_builder(mt2.consequence.vep.worst_csq_for_variant_canonical, mt2.consequence.dbnsfp, use_loftee = True)
-    category_annotation_mt1 = analysis.annotation_case_builder(mt1.consequence.vep.worst_csq_for_variant_canonical, mt1.consequence.dbnsfp, use_loftee = True)
+    category_annotation_mt2 = analysis.annotation_case_builder(mt2.consequence.vep.worst_csq_for_variant_canonical, use_loftee = True)
+    category_annotation_mt1 = analysis.annotation_case_builder(mt1.consequence.vep.worst_csq_for_variant_canonical, use_loftee = True)
     mt2 = mt2.annotate_rows(consequence_category = category_annotation_mt2)
     mt1 = mt1.annotate_rows(consequence_category = category_annotation_mt1)
 
