@@ -2,13 +2,12 @@
 #
 #$ -N qc_variants
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/qc_variants.log
-#$ -e logs/qc_variants.errors.log
+#$ -o logs/test_qc_variants.log
+#$ -e logs/test_qc_variants.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 5
 #$ -q long.qc
-#$ -t 1-24
-
+#$ -t 22
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
@@ -16,7 +15,6 @@ source utils/hail_utils.sh
 # directories
 readonly in_dir_phased="/well/lindgren/UKBIOBANK/nbaya/wes_200k/phase_ukb_wes/data/phased/non_singleton"
 readonly in_dir_unphased="data/unphased/post-qc"
-#readonly vep_dir="data/vep/full"
 readonly gnomad_dir="/well/lindgren/flassen/ressources/gnomad/gnomad_v2_liftover/exomes"
 readonly imputed_dir="/well/lindgren/UKBIOBANK/flassen/projects/ukb_compare/data/imputed/GRCh38"
 readonly spark_dir="data/tmp/spark"

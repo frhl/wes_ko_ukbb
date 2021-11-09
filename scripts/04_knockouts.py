@@ -36,7 +36,6 @@ def main(args):
     missing    = (args.missing)
     use_loftee = args.use_loftee
     csqs_category = (args.csqs_category)
-    print(csqs_category)
 
     # sample filtering options
     sex = bool(args.sex)
@@ -73,8 +72,10 @@ def main(args):
     mt2 = mt2.explode_rows(mt2.consequence.vep.worst_csq_by_gene_canonical)
     
     # get VEP annotation and add to rows
-    by_gene_annotation1 = analysis.annotation_case_builder_legacy(mt1.consequence.vep.worst_csq_by_gene_canonical, mt1.consequence.dbnsfp, use_loftee = use_loftee)
-    by_gene_annotation2 = analysis.annotation_case_builder_legacy(mt2.consequence.vep.worst_csq_by_gene_canonical, mt2.consequence.dbnsfp, use_loftee = use_loftee)
+    by_gene_annotation1 = analysis.annotation_case_builder(mt1.consequence.vep.worst_csq_by_gene_canonical, use_loftee = use_loftee)
+    by_gene_annotation2 = analysis.annotation_case_builder(mt2.consequence.vep.worst_csq_by_gene_canonical, use_loftee = use_loftee)
+    #by_gene_annotation2 = analysis.annotation_case_builder_legacy(mt2.consequence.vep.worst_csq_by_gene_canonical, mt2.consequence.dbnsfp, use_loftee = use_loftee)
+    #by_gene_annotation2 = analysis.annotation_case_builder_legacy(mt2.consequence.vep.worst_csq_by_gene_canonical, mt2.consequence.dbnsfp, use_loftee = use_loftee)
     mt1 = mt1.annotate_rows(consequence_category = by_gene_annotation1)    
     mt2 = mt2.annotate_rows(consequence_category = by_gene_annotation2)    
 

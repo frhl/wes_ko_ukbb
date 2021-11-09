@@ -68,7 +68,7 @@ def annotation_case_builder(worst_csq_expr, use_loftee: bool = True):
     case = (case.when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence) &
                       (~hl.is_defined(worst_csq_expr.cadd_phred) | ~hl.is_defined(worst_csq_expr.revel_score)), "other_missense")
                 .when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence) &
-                      (worst_csq_expr.cadd_phred_score >= 20) & (worst_csq_expr.revel_score >= 0.6), "damaging_missense")
+                      (worst_csq_expr.cadd_phred >= 20) & (worst_csq_expr.revel_score >= 0.6), "damaging_missense")
                 .when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence), "other_missense")
                 .when(hl.set(SYNONYMOUS_CSQS).contains(worst_csq_expr.most_severe_consequence), "synonymous")
                 .when(hl.set(OTHER_CSQS).contains(worst_csq_expr.most_severe_consequence), "non_coding")

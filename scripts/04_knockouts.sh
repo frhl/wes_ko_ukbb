@@ -25,9 +25,9 @@ source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
 # directories
-readonly in_dir="data/mt"
+readonly in_dir="data/mt/new"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/knockouts/211108_test"
+readonly out_dir="derived/knockouts/211109"
 
 # input path
 readonly knockout_script="scripts/_knockouts.sh"
@@ -37,16 +37,16 @@ readonly in_phased_type="mt"
 readonly in_unphased_type="mt"
 
 # parameters
-readonly af_max=0.02
+readonly af_max=0.50
 
 # output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_af02_chrCHR"
+readonly out_prefix="${out_dir}/ukb_wes_200k_af50_chrCHR"
 
 submit_knockout_job() 
 {
   name=$( echo ${1} | tr "," "_")
   qsub -N "_ko_${name}" \
-    -t 21 \
+    -t 1-24 \
     -q "short.qe" \
     -pe shmem 3 \
     "${knockout_script}" \
@@ -61,9 +61,10 @@ submit_knockout_job()
 
 
 mkdir -p ${out_dir}
-submit_knockout_job "ptv,damaging_misssense"
+submit_knockout_job "ptv,damaging_missense"
 submit_knockout_job "ptv"
 submit_knockout_job "synonymous"
-
+submit_knockout_job "ptv,ptv_LC"
+submit_knockout_job "ptv,ptv_LC,damaging_missense"
 
 

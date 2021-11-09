@@ -19,7 +19,6 @@ def main(args):
     input_phased_type = args.input_phased_type
     input_unphased_path = args.input_unphased_path
     input_unphased_type = args.input_unphased_type
-    input_imputed_path = args.input_imputed_path
     out_prefix = args.out_prefix
     out_type   = args.out_type
     vep_path   = args.vep_path
@@ -51,10 +50,9 @@ def main(args):
         mt1 = mt1.filter_rows(hl.is_defined(ht_final_variants[mt1.row_key]))
   
     # annotate with imputed data
-    if input_imputed_path:
-        imputed = hl.read_table(input_imputed_path)
-        mt1 = mt1.annotate_cols(in_imputed = hl.is_defined(imputed[mt1.col_key].s)) 
-        mt2 = mt2.annotate_cols(in_imputed = hl.is_defined(imputed[mt2.col_key].s))
+    imp = genotypes.get_ukb_imputed_v3_bgen([chrom])
+    mt1 = mt1.annotate_cols(in_imputed = hl.is_defined(imp.cols()[mt1.s]))
+    mt2 = mt2.annotate_cols(in_imputed = hl.is_defined(imp.cols()[mt2.s]))
 
     # Add QC fields that has been removed during phasing to mt1
     mt1 = mt1.annotate_entries(DP = mt2[(mt1.locus, mt1.alleles), mt1.s].DP)
@@ -75,7 +73,6 @@ if __name__=='__main__':
     parser.add_argument('--input_phased_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
     parser.add_argument('--input_unphased_path', default=None, help='Path to input that contains singletons')
     parser.add_argument('--input_unphased_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
-    parser.add_argument('--input_imputed_path', default=None, help='Path to imputed data (GRCh38)')
     parser.add_argument('--input_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Type of output dataset (options: mt, vcf, plink)')

@@ -85,21 +85,21 @@ def main(args):
         print(f'chr{chrom}: annotating with imputed INFO score..')
     
     # add annotations from table
-    consequence_annotations = hl.read_table(input_annotation_path)
-    mt1 = mt1.annotate_rows(consequence = consequence_annotations[mt1.row_key]) 
-    mt2 = mt2.annotate_rows(consequence = consequence_annotations[mt2.row_key]) 
+    #consequence_annotations = hl.read_table(input_annotation_path)
+    #mt1 = mt1.annotate_rows(consequence = consequence_annotations[mt1.row_key]) 
+    #mt2 = mt2.annotate_rows(consequence = consequence_annotations[mt2.row_key]) 
     
     # write out variant stats
-    print(f'chr{chrom}: Writing out variants stats to {out_prefix}_variants*')
-    mt1 = hl.variant_qc(mt1, name='variant_qc')
-    ht1_rows_filter = mt1.rows().select('variant_qc')
-    ht1_rows_filter.write(out_prefix + "_variants_phased.ht", overwrite=True)
-    ht1_rows_filter.flatten().export(out_prefix + "_variants_phased.vcf.bgz")
+    #print(f'chr{chrom}: Writing out variants stats to {out_prefix}_variants*')
+    #mt1 = hl.variant_qc(mt1, name='variant_qc')
+    #ht1_rows_filter = mt1.rows()
+    #ht1_rows_filter.write(out_prefix + "_variants_phased.ht", overwrite=True)
+    #ht1_rows_filter.flatten().export(out_prefix + "_variants_phased.vcf.bgz")
 
-    mt2 = hl.variant_qc(mt2, name='variant_qc')
-    ht2_rows_filter = mt2.rows().select('variant_qc')
-    ht2_rows_filter.write(out_prefix + "_variants_unphased.ht", overwrite=True)
-    ht2_rows_filter.flatten().export(out_prefix + "_variants_unphased.vcf.bgz")
+    #mt2 = hl.variant_qc(mt2, name='variant_qc')
+    #ht2_rows_filter = mt2.rows()
+    #ht2_rows_filter.write(out_prefix + "_variants_unphased.ht", overwrite=True)
+    #ht2_rows_filter.flatten().export(out_prefix + "_variants_unphased.vcf.bgz")
 
     # annotate consequence category
     category_annotation_mt2 = analysis.annotation_case_builder(mt2.consequence.vep.worst_csq_for_variant_canonical, mt2.consequence.dbnsfp, use_loftee = True)
@@ -108,12 +108,12 @@ def main(args):
     mt1 = mt1.annotate_rows(consequence_category = category_annotation_mt1)
 
     # write out summary stats
-    summary_count_urv(mt1).export(out_prefix + "_variants_summary_phased.tsv.bgz")
-    summary_count_urv(mt1).export(out_prefix + "_variants_summary_unphased.tsv.bgz")
+    #summary_count_urv(mt1).export(out_prefix + "_variants_summary_phased.tsv.bgz")
+    #summary_count_urv(mt1).export(out_prefix + "_variants_summary_unphased.tsv.bgz")
     
     # get homozygous stats
-    summary_count_homozygous_urv(mt1).export(out_prefix + "_variants_homozygous_summary_phased.tsv.bgz")
-    summary_count_homozygous_urv(mt2).export(out_prefix + "_variants_homozygous_summary_unphased.tsv.bgz")
+    #summary_count_homozygous_urv(mt1).export(out_prefix + "_variants_homozygous_summary_phased.tsv.bgz")
+    #summary_count_homozygous_urv(mt2).export(out_prefix + "_variants_homozygous_summary_unphased.tsv.bgz")
 
     # explode rows by gene
     mt1 = mt1.explode_rows(mt1.consequence.vep.worst_csq_by_gene_canonical)
