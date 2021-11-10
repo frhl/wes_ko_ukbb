@@ -37,10 +37,10 @@ readonly in_phased_type="mt"
 readonly in_unphased_type="mt"
 
 # parameters
-readonly af_max=0.50
+readonly af_max=0.02
 
 # output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_af50_chrCHR"
+readonly out_prefix="${out_dir}/ukb_wes_200k_af02_chrCHR"
 
 submit_knockout_job() 
 {
@@ -48,7 +48,7 @@ submit_knockout_job()
   qsub -N "_ko_${name}" \
     -t 1-24 \
     -q "short.qe" \
-    -hold_Jid_ad 55231867 \
+    -hold_jid 55240353 \
     -pe shmem 3 \
     "${knockout_script}" \
     "${in_phased}" \

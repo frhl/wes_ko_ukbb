@@ -5,9 +5,9 @@
 #$ -o logs/test2_qc_variants.log
 #$ -e logs/test2_qc_variants.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 5
-#$ -q long.qc
-#$ -t 21
+#$ -pe shmem 10
+#$ -q long.qf
+#$ -t 1-22
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
@@ -18,7 +18,7 @@ readonly in_dir_unphased="data/unphased/post-qc"
 readonly gnomad_dir="/well/lindgren/flassen/ressources/gnomad/gnomad_v2_liftover/exomes"
 readonly imputed_dir="/well/lindgren/UKBIOBANK/flassen/projects/ukb_compare/data/imputed/GRCh38"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="data/qc_new"
+readonly out_dir="data/qc"
 
 # hail script
 readonly hail_script="scripts/01_qc_variants.py"
@@ -36,7 +36,7 @@ readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc
 readonly final_variant_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list'
 
 # output path
-readonly out_prefix="${out_dir}/TEST_ukb_wes_200k_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_wes_200k_chr${chr}"
 
 # run hail
 mkdir -p ${out_dir}
