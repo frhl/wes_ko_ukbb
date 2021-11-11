@@ -8,7 +8,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qe
-#$ -t 1-40
+#$ -t 1-11
 #$ -V
 
 # 12,18
@@ -67,6 +67,6 @@ submit_spa_with_csqs()
 submit_spa_with_csqs "ptv"
 submit_spa_with_csqs "ptv_damaging_missense"
 submit_spa_with_csqs "synonymous"
-submit_spa_with_csqs "ptv_lc"
-submit_spa_with_csqs "ptv_lc_damaging_missense"
+#submit_spa_with_csqs "ptv_lc"
+#submit_spa_with_csqs "ptv_lc_damaging_missense"
 

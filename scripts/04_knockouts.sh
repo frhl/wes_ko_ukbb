@@ -27,7 +27,7 @@ source utils/vcf_utils.sh
 # directories
 readonly in_dir="data/mt"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/knockouts/21110"
+readonly out_dir="derived/knockouts/211110"
 
 # input path
 readonly knockout_script="scripts/_knockouts.sh"
@@ -48,7 +48,6 @@ submit_knockout_job()
   qsub -N "_ko_${name}" \
     -t 1-24 \
     -q "short.qe" \
-    -hold_jid 55240353 \
     -pe shmem 3 \
     "${knockout_script}" \
     "${in_phased}" \
@@ -62,10 +61,10 @@ submit_knockout_job()
 
 
 mkdir -p ${out_dir}
-submit_knockout_job "ptv,damaging_missense"
-submit_knockout_job "ptv"
-submit_knockout_job "synonymous"
-#submit_knockout_job "ptv,ptv_LC"
-#submit_knockout_job "ptv,ptv_LC,damaging_missense"
+#submit_knockout_job "ptv,damaging_missense"
+#submit_knockout_job "ptv"
+#submit_knockout_job "synonymous"
+submit_knockout_job "ptv,ptv_LC"
+submit_knockout_job "ptv,ptv_LC,damaging_missense"
 
 

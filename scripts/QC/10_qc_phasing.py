@@ -60,11 +60,11 @@ def main(args):
     mt1_n_trios = mt1.count()[1]
     mt2_n_trios = mt2.count()[1]
     assert mt1_n_trios == mt2_n_trios
-    print(f"Filtering to {n_trios} trios")
+    print(f"Filtering to {mt1_n_trios} trios")
 
     # load pedigree
     fam_path = samples.get_fam_path(app_id=11867,wes_200k_only=False,relateds_only=False)
-    ped = hl.Pedigree.read(fam_path)
+    pedigree = hl.Pedigree.read(fam_path)
 
     # phase by transmission
     trio_dataset = hl.trio_matrix(mt2, pedigree, complete_trios=True)
@@ -80,11 +80,6 @@ def main(args):
     mt1.rows().select('switch_errors','switch_errors_count').export(out_prefix + ".tsv.bgz")
     SE = mt1.filter_rows(mt1.switch_errors > 0).count()
     print(f"Switch errors count: {SE}")
-
-    #phased_trio_dataset = phased_trio_dataset.annotate_entries(
-    #    GT_flip = phased_trio_dataset.proband_entry.PBT_GT != phased_trio_dataset.proband_entry.GT
-    #)
-    #result_mt = phased_trio_dataset.annotate_rows(switch_errors=hl.agg.sum(phased_trio_dataset.GT_flip))
 
 
 if __name__=='__main__':

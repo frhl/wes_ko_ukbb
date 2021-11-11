@@ -2,12 +2,12 @@
 #
 #$ -N qc_variants
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/test2_qc_variants.log
-#$ -e logs/test2_qc_variants.errors.log
+#$ -o logs/qc_variants.log
+#$ -e logs/qc_variants.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 10
-#$ -q long.qf
-#$ -t 1-22
+#$ -pe shmem 5
+#$ -q short.qc@@short.hge
+#$ -t 2,4
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh

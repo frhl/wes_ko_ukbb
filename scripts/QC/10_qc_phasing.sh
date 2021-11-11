@@ -6,8 +6,8 @@
 #$ -e logs/qc_phasing.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 5
-#$ -q short.qc
-#$ -t 21-22
+#$ -q short.qc@@short.hge
+#$ -t 20-21
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
@@ -18,7 +18,7 @@ readonly spark_dir="data/tmp/spark"
 readonly out_dir="data/qc"
 
 # hail script
-readonly hail_script="scripts/03_create_mt.py"
+readonly hail_script="scripts/QC/10_qc_phasing.py"
 
 # input path
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 

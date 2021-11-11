@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 5
 #$ -q short.qe
-#$ -t 1-40
+#$ -t 20
 
 module purge
 source utils/bash_utils.sh
@@ -26,13 +26,18 @@ readonly covar_dir="data/phenotypes"
 readonly pheno_dir="data/phenotypes"
 readonly out_dir="data/saige/output/combined/cts/step1"
 
+
+# sex specific: 211105_ukb_wes_200k_sparse_autosomes_females
+
 # input path
 readonly chr=${SGE_TASK_ID}
-readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+#readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+readonly grm_mtx="${grm_dir}/211105_ukb_wes_200k_sparse_autosomes_females_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+#readonly plink_file="${plink_dir}/211102_long_ukb_wes_200k_sparse_autosomes"
+readonly plink_file="${plink_dir}/211105_ukb_wes_200k_sparse_autosomes_females"
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
-readonly plink_file="${plink_dir}/211102_long_ukb_wes_200k_sparse_autosomes"
 readonly pheno_file="${pheno_dir}/UKBB_WES200k_filtered_cts_phenotypes.tsv.gz"
-readonly covar_file="${covar_dir}/COVARS1_BMI.csv"
+readonly covar_file="${covar_dir}/COVARS1.csv"
 readonly pheno_list="${pheno_dir}/UKBB_WES200k_cts_phenotypes_header.txt"
 
 # select covars and phenotype (0-42)
@@ -41,7 +46,7 @@ readonly covariates=$( cat ${covar_file} )
 readonly phenotype=$( cut -f${index} ${pheno_list} )
 
 # output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_adjBMI_${phenotype}"
+readonly out_prefix="${out_dir}/ukb_wes_200k_females_${phenotype}"
 
 # null model script
 fit_null() {

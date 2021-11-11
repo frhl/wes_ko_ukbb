@@ -5,9 +5,9 @@
 #$ -o logs/test_qc_samples.log
 #$ -e logs/test_qc_samples.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 20
-#$ -q long.qf
-#$ -t 1-22
+#$ -pe shmem 4
+#$ -q long.qc@@long.hge
+#$ -t 1-21
 
 
 source utils/qsub_utils.sh

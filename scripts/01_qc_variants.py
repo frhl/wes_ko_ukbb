@@ -75,6 +75,10 @@ def main(args):
     # annotate consequence category
     category_annotations = analysis.annotation_case_builder(mt.consequence.vep.worst_csq_for_variant_canonical, use_loftee = True)
     mt = mt.annotate_rows(consequence_category = category_annotations)
+    
+    # count URVs by samples 
+    mt_samples = count_urv_by_samples(mt)
+    mt_genes.entries().flatten().export(out_prefix + "_urv_by_samples.tsv.bgz")
 
     # count URVs by genes
     mt = mt.explode_rows(mt.consequence.vep.worst_csq_by_gene_canonical)

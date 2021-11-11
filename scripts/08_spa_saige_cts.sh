@@ -8,7 +8,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qe
-#$ -t 1-40
+#$ -t 30-35
 #$ -V
 
 # use 37/38
@@ -18,7 +18,7 @@ source utils/bash_utils.sh
 source utils/hail_utils.sh
 
 # directories
-readonly vcf_dir="derived/knockouts/211104"
+readonly vcf_dir="derived/knockouts/211110"
 readonly step1_dir="data/saige/output/combined/cts/step1"
 readonly out_dir="data/saige/output/combined/cts/step2"
 readonly pheno_dir="data/phenotypes"
@@ -67,6 +67,6 @@ submit_spa_with_csqs()
 submit_spa_with_csqs "ptv"
 submit_spa_with_csqs "ptv_damaging_missense"
 submit_spa_with_csqs "synonymous"
-submit_spa_with_csqs "ptv_lc"
-submit_spa_with_csqs "ptv_lc_damaging_missense"
+#submit_spa_with_csqs "ptv_lc"
+#submit_spa_with_csqs "ptv_lc_damaging_missense"
 
