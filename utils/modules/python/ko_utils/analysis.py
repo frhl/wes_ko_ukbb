@@ -17,37 +17,6 @@ OTHER_CSQS = ["mature_miRNA_variant", "5_prime_UTR_variant",
               "regulatory_region_ablation", "regulatory_region_amplification", "feature_elongation",
               "regulatory_region_variant", "feature_truncation", "intergenic_variant"]
 
-
-
-def annotation_case_builder_legacy(
-        worst_csq_by_gene_canonical_expr, csq_dbnsfp_expr, use_loftee: bool = True):
-    r'''Annotate consequence categories for downstream analysis
-    :param worst_csq_by_gene_canonical_expr: A struct that should contain "most_severe_consequence"
-    :param csq_dbnsfp_expr: a struct that should contain "revel_score" and "cadd_phred_score"
-    :param use_loftee: if True will annotate PTVs as either high confidence (ptv) or low confidence (ptv_LC)
-    '''
-    case = hl.case(missing_false=True)
-    if use_loftee:
-        case = (case
-                .when(worst_csq_by_gene_canonical_expr.lof == 'HC', 'ptv')
-                .when(worst_csq_by_gene_canonical_expr.lof == 'LC', 'ptv_LC')
-                )
-    else:
-        case = case.when(
-            hl.set(PLOF_CSQS).contains(
-                worst_csq_by_gene_canonical_expr.most_severe_consequence),
-            "ptv")
-    case = (case.when(hl.set(MISSENSE_CSQS).contains(worst_csq_by_gene_canonical_expr.most_severe_consequence) &
-                      (~hl.is_defined(csq_dbnsfp_expr.cadd_phred_score) | ~hl.is_defined(csq_dbnsfp_expr.revel_score)), "other_missense")
-                .when(hl.set(MISSENSE_CSQS).contains(worst_csq_by_gene_canonical_expr.most_severe_consequence) &
-                      (csq_dbnsfp_expr.cadd_phred_score >= 20) & (csq_dbnsfp_expr.revel_score >= 0.6), "damaging_missense")
-                .when(hl.set(MISSENSE_CSQS).contains(worst_csq_by_gene_canonical_expr.most_severe_consequence), "other_missense")
-                .when(hl.set(SYNONYMOUS_CSQS).contains(worst_csq_by_gene_canonical_expr.most_severe_consequence), "synonymous")
-                .when(hl.set(OTHER_CSQS).contains(worst_csq_by_gene_canonical_expr.most_severe_consequence), "non_coding")
-            )
-    return case.or_missing()
-
-
 def annotation_case_builder(worst_csq_expr, use_loftee: bool = True):
     r'''Annotate consequence categories for downstream analysis
     :param worst_csq_by_gene_canonical_expr: A struct that should contain "most_severe_consequence"
@@ -89,24 +58,6 @@ def count_urv_by_samples(mt):
                           n_URV_non_coding = hl.agg.count_where(mt.GT.is_non_ref() & (mt.consequence_category == "non_coding"))
                          )
 
-
-
-
-
-def count_homozygous_urv_by_samples(mt):
-    r'''Count up homozygous variants by samples    
-    :param mt: a MatrixTable with the field "consequence_category"
-    '''
-    return mt.annotate_cols(n_hom_coding_URV_SNP = hl.agg.count_where(mt.GT.is_hom_var() & hl.is_snp(mt.alleles[0], mt.alleles[1]) & (mt.consequence_category != "non_coding")),
-                          n_hom_coding_URV_indel = hl.agg.count_where(mt.GT.is_hom_var() & hl.is_indel(mt.alleles[0], mt.alleles[1]) & (mt.consequence_category != "non_coding")),
-                          n_hom_URV_PTV = hl.agg.count_where(mt.GT.is_hom_var() & (mt.consequence_category == "ptv")),
-                          n_hom_URV_PTV_LC = hl.agg.count_where(mt.GT.is_hom_var() & (mt.consequence_category == "ptv_lc")),
-                          n_hom_URV_damaging_missense = hl.agg.count_where(mt.GT.is_hom_var() & (mt.consequence_category == "damaging_missense")),
-                          n_hom_URV_other_missense = hl.agg.count_where(mt.GT.is_hom_var() & (mt.consequence_category == "other_missense")),
-                          n_hom_URV_synonymous = hl.agg.count_where(mt.GT.is_hom_var() & (mt.consequence_category == "synonymous")),
-                          n_hom_URV_non_coding = hl.agg.count_where(mt.GT.is_hom_var() & (mt.consequence_category == "non_coding"))
-                         )
-
 def count_urv_by_genes(mt, call_gene_expr):
     r''' Count up URVs by gene (as defined by vep.worst_csq_for_variant_canonical.gene_id) '''
     return (mt.group_rows_by(call_gene_expr).
@@ -122,8 +73,6 @@ def count_urv_by_genes(mt, call_gene_expr):
             )      
         )
     )
-
-
 
 def annotate_phased_entries(mt):
     r'''Annotates alleles that have the alternate allele on either first or second strand.'''
@@ -291,7 +240,7 @@ def gene_csqs_calc_pKO_pseudoSNP(mt1, mt2, chrom):
 def gene_strand_builder(mt, field='snpid'):
     ''' Build a summary table of samples, genes and variants.
     Returns hail table that contains genes, samples, variants, knockout status
-    stratified by what strand a variant fall onto.
+    stratified by what strand/haplotype a variant fall onto.
     :param mt: MatrixTable with row field 'vep.worst_csq_by_gene_canonical.gene_id'
     :param field: String for row field that is found in the MatrixTable
     '''
