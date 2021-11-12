@@ -24,6 +24,7 @@ def main(args):
     out_prefix = args.out_prefix
     out_type   = args.out_type
     vep_path   = args.vep_path
+    chrom   = args.chrom
     
     # setup flags
     hail_init.hail_bmrc_init_local('logs/hail/hail_format.log', 'GRCh38')
@@ -60,26 +61,32 @@ def main(args):
     mt1_n_trios = mt1.count()[1]
     mt2_n_trios = mt2.count()[1]
     assert mt1_n_trios == mt2_n_trios
-    print(f"Filtering to {mt1_n_trios} trios")
+    print(f"chr{chrom}: Filtering to {mt1_n_trios} trios")
 
     # load pedigree
     fam_path = samples.get_fam_path(app_id=11867,wes_200k_only=False,relateds_only=False)
     pedigree = hl.Pedigree.read(fam_path)
+    print(f'chr{chrom}: loaded pedigree')
 
     # phase by transmission
     trio_dataset = hl.trio_matrix(mt2, pedigree, complete_trios=True)
     phased_trio_dataset = hl.experimental.phase_trio_matrix_by_transmission(trio_dataset)
-    
+    print(f'chr{chrom}: phased trios')
+
+    phased_trio_dataset.write(out_prefix + '.mt')
+    print(f'chr{chrom}: writing trios')
+
     # annotate shapeit4 GTs with GTs phased by transmission
     mt1 = mt1.annotate_entries(PBT_GT=phased_trio_dataset[mt1.row_key, mt1.col_key].proband_entry.PBT_GT)
     mt1 = mt1.filter_entries(hl.is_defined(mt1.PBT_GT))
     mt1 = mt1.annotate_rows(switch_errors_count=hl.agg.sum(mt1.PBT_GT != mt1.GT))
     mt1 = mt1.annotate_rows(switch_errors=hl.agg.fraction(mt1.PBT_GT != mt1.GT))
+    print('chr{chrom}: annotated rows')
 
     # write to file
     mt1.rows().select('switch_errors','switch_errors_count').export(out_prefix + ".tsv.bgz")
     SE = mt1.filter_rows(mt1.switch_errors > 0).count()
-    print(f"Switch errors count: {SE}")
+    print(f"chr{chrom}: Rows with switch errors count: {SE}")
 
 
 if __name__=='__main__':

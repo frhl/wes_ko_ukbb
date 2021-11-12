@@ -5,9 +5,9 @@
 #$ -o logs/qc_phasing.log
 #$ -e logs/qc_phasing.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 5
+#$ -pe shmem 10
 #$ -q short.qc@@short.hge
-#$ -t 20-21
+#$ -t 19
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh

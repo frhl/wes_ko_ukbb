@@ -27,7 +27,7 @@ source utils/vcf_utils.sh
 # directories
 readonly in_dir="data/mt"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/knockouts/211110"
+readonly out_dir="derived/knockouts/211111"
 
 # input path
 readonly knockout_script="scripts/_knockouts.sh"
@@ -37,16 +37,18 @@ readonly in_phased_type="mt"
 readonly in_unphased_type="mt"
 
 # parameters
-readonly af_max=0.02
+readonly af_max=""
+readonly maf_max=0.50
+readonly maf_min=0
 
 # output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_af02_chrCHR"
+readonly out_prefix="${out_dir}/ukb_wes_200k_maf00_50_chrCHR"
 
 submit_knockout_job() 
 {
   name=$( echo ${1} | tr "," "_")
   qsub -N "_ko_${name}" \
-    -t 1-24 \
+    -t 1-22 \
     -q "short.qe" \
     -pe shmem 3 \
     "${knockout_script}" \
@@ -55,15 +57,17 @@ submit_knockout_job()
     "${in_unphased}" \
     "${in_unphased_type}" \
     "${af_max}" \
+    "${maf_max}" \
+    "${maf_min}" \
     "${1}" \
     "${out_prefix}"
 }
 
 
 mkdir -p ${out_dir}
-#submit_knockout_job "ptv,damaging_missense"
-#submit_knockout_job "ptv"
-#submit_knockout_job "synonymous"
+submit_knockout_job "ptv,damaging_missense"
+submit_knockout_job "ptv"
+submit_knockout_job "synonymous"
 submit_knockout_job "ptv,ptv_LC"
 submit_knockout_job "ptv,ptv_LC,damaging_missense"
 

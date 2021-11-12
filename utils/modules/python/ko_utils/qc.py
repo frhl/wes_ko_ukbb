@@ -90,15 +90,13 @@ def filter_min_maf(mt, maf=None):
     mt = mt.filter_rows(maf_expr)
     return mt
 
-
-def filter_maf(mt, min_maf=None, max_maf=None):
+def filter_maf(mt, min_maf=0, max_maf=0.5):
     r'''Filter to variants based on a certain min/max MAF threshold'''
-    if min_maf is not None:
-        mt = mt.filter_rows(filter_min_maf(mt, min_maf))
-    if max_maf is not None:
-        mt = mt.filter_rows(filter_max_maf(mt, max_maf))
-    return mt
-
+    assert min_maf >= 0
+    assert max_maf <= 0.5
+    maf_expr = ((mt.info.AF > min_maf) & (mt.info.AF < (1 - min_maf)))
+    maf_expr = maf_expr & ((mt.info.AF < max_maf) | (mt.info.AF > (1 - max_maf)))
+    return mt.filter_rows(maf_expr)
 
 def filter_max_mac(mt, mac=None):
     r'''Filter to variants to have maf less than {maf}'''

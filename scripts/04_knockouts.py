@@ -63,10 +63,23 @@ def main(args):
     
     if af_max:
         mt1 = qc.filter_max_af(mt1, float(af_max))
+        mt2 = qc.filter_max_af(mt2, float(af_max))
 
     if af_min:
         mt1 = qf.fiter_min_af(mt1, float(af_min))
+        mt2 = qf.fiter_min_af(mt2, float(af_min))
 
+    if maf_max and maf_min:
+        mt1 = qc.filter_maf(mt1, 
+                max_maf = float(maf_max),
+                min_maf = float(maf_min))
+        mt2 = qc.filter_maf(mt2, 
+                max_maf = float(maf_max),
+                min_maf= float(maf_min))
+        n1 = mt1.count()
+        n2 = mt2.count()
+        print(f"Filtering on maf_max={maf_max} and maf_min={maf_min}, resulting in {n1} and {n2}")
+    
     # required before doing worst_csq_by_gene_canonical
     mt1 = mt1.explode_rows(mt1.consequence.vep.worst_csq_by_gene_canonical)
     mt2 = mt2.explode_rows(mt2.consequence.vep.worst_csq_by_gene_canonical)

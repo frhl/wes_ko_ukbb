@@ -3,12 +3,10 @@
 # note: this scripts is called from 04_knockouts.sh
 #
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_knockouts.log
-#$ -e logs/_knockouts.errors.log
+#$ -o logs/_knockouts1.log
+#$ -e logs/_knockouts1.errors.log
 #$ -P lindgren.prjc
 #$ -q short.qc@@short.hge
-
-
 
 set -o errexit
 set -o nounset
@@ -25,8 +23,10 @@ readonly in_phased_type=${2?Error: Missing arg2 (in_phased_type)}
 readonly in_unphased=${3?Error: Missing arg3 (in_unphased)}
 readonly in_unphased_type=${4?Error: Missing arg4 (in_unphased_type)}
 readonly af_max=${5?Error: Missing arg5 (af_max)}
-readonly in_category=${6?Error: Missing arg6 (in_category)}
-readonly out_prefix=${7?Error: Missing arg7 (path prefix for saige output)}
+readonly maf_max=${6?Error: Missing arg6 (maf_max)}
+readonly maf_min=${7?Error: Missing arg7 (maf_min)}
+readonly in_category=${8?Error: Missing arg8 (in_category)}
+readonly out_prefix=${9?Error: Missing arg9 (path prefix for saige output)}
 
 readonly chr=${SGE_TASK_ID}
 readonly phased=$(echo ${in_phased} | sed -e "s/CHR/${chr}/g")
@@ -44,11 +44,12 @@ python3 "${hail_script}" \
     --input_unphased_type ${in_unphased_type} \
     --csqs_category ${in_category} \
     --out_prefix ${out} \
-    --af_max ${af_max} \
+    --maf_max ${maf_max} \
+    --maf_min ${maf_min} \
     --use_loftee \
-    --export_ko_rsid \
-    --export_ko_probability \
     --export_saige_vcf 
+    #--export_ko_rsid \
+    #--export_ko_probability \
 set +x
 print_update "Finished running HAIL for chr${chr}" "${SECONDS}"
 

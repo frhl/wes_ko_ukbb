@@ -8,7 +8,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qe
-#$ -t 30-35
+#$ -t 1-45
 #$ -V
 
 # use 37/38
@@ -18,16 +18,16 @@ source utils/bash_utils.sh
 source utils/hail_utils.sh
 
 # directories
-readonly vcf_dir="derived/knockouts/211110"
+readonly vcf_dir="derived/knockouts/211111"
 readonly step1_dir="data/saige/output/combined/cts/step1"
-readonly out_dir="data/saige/output/combined/cts/step2"
+readonly out_dir="data/saige/output/combined/cts/step2/211111"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
 
 # input path (note chromosome is substituted in _spa_test.sh)
 readonly pheno_list="${pheno_dir}/UKBB_WES200k_cts_phenotypes_header.txt"
 readonly spa_script="scripts/_spa_test.sh"
-readonly in_prefix="ukb_wes_200k_af50"
+readonly in_prefix="ukb_wes_200k_maf00_50"
 
 # select phenotype (1-42)
 readonly index=${SGE_TASK_ID}
@@ -36,6 +36,9 @@ readonly phenotype=$( cut -f${index} ${pheno_list} )
 # setup input phenotypes
 readonly in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
 readonly in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
+
+# make directories
+mkdir -p ${out_dir}
 
 submit_spa_job() 
 {

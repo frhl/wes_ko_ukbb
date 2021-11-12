@@ -24,7 +24,7 @@ readonly plink_dir="data/saige/grm/input"
 readonly grm_dir="data/saige/grm/input"
 readonly covar_dir="data/phenotypes"
 readonly pheno_dir="data/phenotypes"
-readonly out_dir="data/saige/output/combined/cts/step1"
+readonly out_dir="data/saige/output/females/cts/step1"
 
 
 # sex specific: 211105_ukb_wes_200k_sparse_autosomes_females
@@ -37,6 +37,7 @@ readonly grm_mtx="${grm_dir}/211105_ukb_wes_200k_sparse_autosomes_females_relate
 readonly plink_file="${plink_dir}/211105_ukb_wes_200k_sparse_autosomes_females"
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
 readonly pheno_file="${pheno_dir}/UKBB_WES200k_filtered_cts_phenotypes.tsv.gz"
+#readonly pheno_file="${pheno_dir}/UKBB_WES200k_filtered_cts_phenotypes_females.tsv.gz"
 readonly covar_file="${covar_dir}/COVARS1.csv"
 readonly pheno_list="${pheno_dir}/UKBB_WES200k_cts_phenotypes_header.txt"
 
