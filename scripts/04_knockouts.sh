@@ -39,10 +39,10 @@ readonly in_unphased_type="mt"
 # parameters
 readonly af_max=""
 readonly maf_max=0.50
-readonly maf_min=0
+readonly maf_min=0.01
 
 # output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_maf00_50_chrCHR"
+readonly out_prefix="${out_dir}/ukb_wes_200k_maf01_50_chrCHR"
 
 submit_knockout_job() 
 {

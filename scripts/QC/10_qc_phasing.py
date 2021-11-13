@@ -78,7 +78,10 @@ def main(args):
 
     # annotate shapeit4 GTs with GTs phased by transmission
     mt1 = mt1.annotate_entries(PBT_GT=phased_trio_dataset[mt1.row_key, mt1.col_key].proband_entry.PBT_GT)
+    print(f'chr{chrom}: annot PBT')
+    
     mt1 = mt1.filter_entries(hl.is_defined(mt1.PBT_GT))
+    print(f'chr{chrom}: is dfiend')
     mt1 = mt1.annotate_rows(switch_errors_count=hl.agg.sum(mt1.PBT_GT != mt1.GT))
     mt1 = mt1.annotate_rows(switch_errors=hl.agg.fraction(mt1.PBT_GT != mt1.GT))
     print('chr{chrom}: annotated rows')

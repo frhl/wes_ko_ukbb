@@ -47,9 +47,9 @@ python3 "${hail_script}" \
     --maf_max ${maf_max} \
     --maf_min ${maf_min} \
     --use_loftee \
-    --export_saige_vcf 
-    #--export_ko_rsid \
-    #--export_ko_probability \
+    --export_ko_rsid \
+    --export_ko_probability
+    #--export_saige_vci\ 
 set +x
 print_update "Finished running HAIL for chr${chr}" "${SECONDS}"
 
