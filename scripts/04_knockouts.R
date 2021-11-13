@@ -140,4 +140,18 @@ dt_out <- cbind(dt_out[,c('s','gene_id','hgnc_symbol')], dt_out[,-c('s','gene_id
 outfile = paste0(args$out_prefix, '.tsv.gz')
 fwrite(dt_out, outfile, sep = '\t', row.names = FALSE)
 
+# Write out unique genes involved in OMIM
+genes_knockout_omim = length(unique(dt$gene_id[dt$knockout == 1 & dt$gene_id %in% dt_out$gene_id])) 
+genes_ho_omim = length(unique(dt$gene_id[dt$csqs == 'HO' & dt$gene_id %in% dt_out$gene_id])) 
+genes_ch_omim = length(unique(dt$gene_id[dt$csqs == "CH" & dt$gene_id %in% dt_out$gene_id])) 
+genes_omim_pct_ho_ko = round(100*(genes_ho_omim / total_genes), 2)
+genes_omim_pct_ch_ko = round(100*(genes_ch_omim / total_genes), 2)
+genes_omim_pct_ko = round(100*(genes_knockout_omim / total_genes), 2)
+
+write("\n### Knockouts by OMIM Genes ###",stdout())
+write(paste0(genes_ho_omim,"/",total_genes, ' (',genes_omim_pct_ho_ko,'%) of unique genes are involved in homozygous OMIM KOs'), stdout())
+write(paste0(genes_ch_omim,"/",total_genes, " (",genes_omim_pct_ch_ko,'%) of unique genes are involved in compound heterozygous OMIM KOs'),stdout())
+write(paste0(genes_knockout_omim,"/", total_genes ," (", genes_omom_pct_ko,'%) of unique genes are involed in OMIM KOs'),stdout())
+
+
 

@@ -14,7 +14,7 @@
 #$ -e logs/submit_knockout.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q short.qc@@short.hge
+#$ -q short.qf
 #$ -V
 
 #set -o errexit
@@ -38,19 +38,19 @@ readonly in_unphased_type="mt"
 
 # parameters
 readonly af_max=""
-readonly maf_max=0.50
-readonly maf_min=0.01
+readonly maf_max=0.01
+readonly maf_min=0
 
 # output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_maf01_50_chrCHR"
+readonly out_prefix="${out_dir}/ukb_wes_200k_maf00_01_chrCHR"
 
 submit_knockout_job() 
 {
   name=$( echo ${1} | tr "," "_")
   qsub -N "_ko_${name}" \
     -t 1-22 \
-    -q "short.qe" \
-    -pe shmem 3 \
+    -q "short.qf" \
+    -pe shmem 10 \
     "${knockout_script}" \
     "${in_phased}" \
     "${in_phased_type}" \

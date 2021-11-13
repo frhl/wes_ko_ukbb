@@ -27,7 +27,7 @@ readonly spark_dir="data/tmp/spark"
 # input path (note chromosome is substituted in _spa_test.sh)
 readonly pheno_list="${pheno_dir}/UKBB_WES200k_cts_phenotypes_header.txt"
 readonly spa_script="scripts/_spa_test.sh"
-readonly in_prefix="ukb_wes_200k_maf00_50"
+readonly in_prefix="ukb_wes_200k_maf01_50"
 
 # select phenotype (1-42)
 readonly index=${SGE_TASK_ID}
