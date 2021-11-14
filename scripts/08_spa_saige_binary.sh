@@ -68,9 +68,9 @@ submit_spa_with_csqs()
 }
 
 # submit jobs
-submit_spa_with_csqs "ptv"
-submit_spa_with_csqs "ptv_damaging_missense"
-submit_spa_with_csqs "synonymous"
-#submit_spa_with_csqs "ptv_lc"
-#submit_spa_with_csqs "ptv_lc_damaging_missense"
+#submit_spa_with_csqs "ptv"
+#submit_spa_with_csqs "ptv_damaging_missense"
+#submit_spa_with_csqs "synonymous"
+submit_spa_with_csqs "ptv_lc"
+submit_spa_with_csqs "ptv_lc_damaging_missense"
 

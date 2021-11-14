@@ -49,8 +49,8 @@ submit_knockout_job()
   name=$( echo ${1} | tr "," "_")
   qsub -N "_ko_${name}" \
     -t 1-22 \
-    -q "short.qf" \
-    -pe shmem 10 \
+    -q "short.qa" \
+    -pe shmem 2 \
     "${knockout_script}" \
     "${in_phased}" \
     "${in_phased_type}" \

@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
-#$ -N qc_phasing
+#$ -N phase_trios
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/qc_phasing.log
-#$ -e logs/qc_phasing.errors.log
+#$ -o logs/phase_trios.log
+#$ -e logs/phase_trios.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 10
-#$ -q short.qc@@short.hge
-#$ -t 1-22
+#$ -pe shmem 4
+#$ -q short.qa
+#$ -t 21
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
@@ -31,7 +31,7 @@ readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc
 readonly final_variant_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list'
 
 # output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_switch_errors_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_wes_200k_phased_trios_chr${chr}"
 
 # run hail
 set_up_hail

@@ -6,7 +6,9 @@
 #$ -o logs/_knockouts1.log
 #$ -e logs/_knockouts1.errors.log
 #$ -P lindgren.prjc
-#$ -q short.qc@@short.hge
+#$ -q short.qa
+
+# -q short.qc@@short.hge
 
 set -o errexit
 set -o nounset

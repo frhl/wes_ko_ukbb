@@ -21,7 +21,8 @@ readonly spark_dir="data/tmp/spark"
 readonly out_dir="data/qc"
 
 # hail script
-readonly hail_script="scripts/01_qc_variants.py"
+#readonly hail_script="scripts/01_qc_variants.py"
+readonly hail_script="scripts/01_qc_unphased_variants.py"
 
 # input paths
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 
@@ -36,7 +37,7 @@ readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc
 readonly final_variant_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list'
 
 # output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_wes_200k_unphased_chr${chr}"
 
 # run hail
 mkdir -p ${out_dir}
