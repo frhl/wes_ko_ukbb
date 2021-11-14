@@ -18,7 +18,7 @@ readonly spark_dir="data/tmp/spark"
 readonly out_dir="data/qc"
 
 # hail script
-readonly hail_script="scripts/QC/10_qc_phasing.py"
+readonly hail_script="scripts/QC/10_phase_trios.py"
 
 # input path
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 

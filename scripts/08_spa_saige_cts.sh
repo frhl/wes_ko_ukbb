@@ -27,7 +27,7 @@ readonly spark_dir="data/tmp/spark"
 # input path (note chromosome is substituted in _spa_test.sh)
 readonly pheno_list="${pheno_dir}/UKBB_WES200k_cts_phenotypes_header.txt"
 readonly spa_script="scripts/_spa_test.sh"
-readonly in_prefix="ukb_wes_200k_maf01_50"
+readonly in_prefix="ukb_wes_200k_maf00_01"
 
 # select phenotype (1-42)
 readonly index=${SGE_TASK_ID}
@@ -67,9 +67,9 @@ submit_spa_with_csqs()
 }
 
 # submit jobs
-submit_spa_with_csqs "ptv"
-submit_spa_with_csqs "ptv_damaging_missense"
-submit_spa_with_csqs "synonymous"
-#submit_spa_with_csqs "ptv_lc"
-#submit_spa_with_csqs "ptv_lc_damaging_missense"
+#submit_spa_with_csqs "ptv"
+#submit_spa_with_csqs "ptv_damaging_missense"
+#submit_spa_with_csqs "synonymous"
+submit_spa_with_csqs "ptv_LC"
+submit_spa_with_csqs "ptv_LC_damaging_missense"
 
