@@ -87,14 +87,14 @@ def main(args):
     
     #mt = mt.filter_entries(hl.is_defined(mt1.PBT_GT))
     #print(f'chr{chrom}: is dfiend')
-    #mt1 = mt1.annotate_rows(switch_errors_count=hl.agg.sum(mt1.PBT_GT != mt1.GT))
-    #mt = mt.annotate_rows(switch_errors=hl.agg.fraction(mt.proband_entry.PBT_GT != mt.GT))
-    #print('chr{chrom}: annotated rows')
+    mt = mt.annotate_rows(switch_errors_count=hl.agg.sum(mt.proband_entry.PBT_GT != mt.proband_entry.GT))
+    mt = mt.annotate_rows(switch_errors=hl.agg.fraction(mt.proband_entry.PBT_GT != mt.proband_entry.GT))
+    print('chr{chrom}: annotated rows')
 
     # write to file
-    #mt.rows().select('switch_errors','switch_errors_count').export(out_prefix + ".tsv.bgz")
-    #SE = mt.filter_rows(mt1.switch_errors > 0).count()
-    #print(f"chr{chrom}: Rows with switch errors count: {SE}")
+    mt.rows().select('switch_errors','switch_errors_count').export(out_prefix + ".tsv.bgz")
+    SE = mt.filter_rows(mt.switch_errors > 0).count()
+    print(f"chr{chrom}: Rows with switch errors count: {SE}")
 
 
 if __name__=='__main__':

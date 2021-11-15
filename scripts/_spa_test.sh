@@ -60,7 +60,7 @@ spa_test() {
 
 if [ ! -f ${out}* ]; then
    set_up_RSAIGE
-   #rm ${out}*
+   rm ${out}*
    spa_test
 else
    print_update "${out} already exists. Skipping." | tee /dev/stderr
