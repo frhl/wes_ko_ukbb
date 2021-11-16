@@ -39,10 +39,13 @@ for (phenotype in unique(pheno_binary)){
             dts <- load_saige_bundle(saige_binary, maf, mutation, phenotype)
             kos <- load_knockout_bundle(knockouts, maf, mutation)
             mrg <- merge(dts, kos, by = 'gene_id', all.x = TRUE)
-            mrg$phenotype <- phenotype
-            mrg$maf <- maf 
-            mrg$mutation <- mutation
-            outlist[[id]] <- mrg
+            if (nrow(kos) > 0 & nrow(dts) > 0){
+		mrg$phenotype <- phenotype
+		mrg$maf <- maf 
+		mrg$mutation <- mutation
+		outlist[[id]] <- mrg
+	    } else {
+		print(paste0('skipping',phenotype))
         }
     }   
     combined <- as.data.table(do.call(rbind, outlist))
