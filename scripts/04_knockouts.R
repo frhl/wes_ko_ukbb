@@ -35,6 +35,7 @@ clean_hail_list <- function(x, comma_sub = ';') {
     return(x)
 }
 
+'%nin%' <- function(x, y) return(!(x %in% y))
 
 ## main
 # get directory to protein coding genes
@@ -70,6 +71,22 @@ dt <- setDT(do.call(rbind, lapply(ko_files, function(f){
     return(d)
 })))
 
+
+# check most common genes
+common_genes <- data.table(table(dt$gene_id[dt$knockout])) 
+colnames(common_genes) <- c('gene_id','N')
+common_genes <- common_genes[order(common_genes$N),]
+common_genes <- common_genes[common_genes$N > 500,]
+print(common_genes)
+#mrg <- merge(common_genes, dt)[,c('gene_id','phase1','phase2','csqs')]
+#mrg <- mrg[!duplicated(mrg)]
+#print(mrg)
+
+
+# exclude genes based on super common variants
+excluded <- c('ENSG00000214943', 'ENSG00000137700')
+genes_keep <- dt$gene_id %nin% excluded
+
 # Summarize results
 total_samples=176929
 total_genes=length(unique(protein_coding))
@@ -80,17 +97,18 @@ genes = unique(dt$gene_id)
 n_genes = length(genes)
 
 # count categories
-knockouts = length(unique(dt[dt$knockout == 1]$s))
-homozygous = length(unique(dt[dt$knockout == 1 & dt$csqs == 'HO']$s))
-compound_heterozygous = length(unique(dt[dt$knockout == 1 & dt$csqs == 'CH']$s))
-both = length(unique(dt[dt$knockout == 1 & dt$csqs == 'CH+HO']$s))
+
+knockouts = length(unique(dt[dt$knockout == 1 & genes_keep]$s))
+homozygous = length(unique(dt[dt$knockout == 1 & dt$csqs == 'HO' & genes_keep]$s))
+compound_heterozygous = length(unique(dt[dt$knockout == 1 & dt$csqs == 'CH' & genes_keep]$s))
+both = length(unique(dt[dt$knockout == 1 & dt$csqs == 'CH+HO' & genes_keep]$s))
 n = length(unique(dt$s))
 col_all = c(n, homozygous, compound_heterozygous, knockouts)
 
 # count categories per individual
-sample_ko = dt[dt$knockout == 1]$s
+sample_ko = dt[dt$knockout == 1 & genes_keep]$s
 ko_per_individual = length(sample_ko) / length(unique(dt$s))
-print(ko_per_individual)
+#print(ko_per_individual)
 
 # knockout stats by sample
 samples_pct_ho_ko = round(100*(homozygous / total_samples), 2)

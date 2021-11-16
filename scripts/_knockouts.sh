@@ -3,8 +3,8 @@
 # note: this scripts is called from 04_knockouts.sh
 #
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_knockouts1.log
-#$ -e logs/_knockouts1.errors.log
+#$ -o logs/_knockouts.log
+#$ -e logs/_knockouts.errors.log
 #$ -P lindgren.prjc
 #$ -q short.qa
 
@@ -24,12 +24,13 @@ readonly in_phased=${1?Error: Missing arg1 (in_phased)}
 readonly in_phased_type=${2?Error: Missing arg2 (in_phased_type)}
 readonly in_unphased=${3?Error: Missing arg3 (in_unphased)}
 readonly in_unphased_type=${4?Error: Missing arg4 (in_unphased_type)}
-readonly af_max=${5?Error: Missing arg5 (af_max)}
-readonly maf_max=${6?Error: Missing arg6 (maf_max)}
-readonly maf_min=${7?Error: Missing arg7 (maf_min)}
-readonly in_category=${8?Error: Missing arg8 (in_category)}
-readonly in_sex=${9?Error: Missing arg9 (in_sex)}
-readonly out_prefix=${10?Error: Missing arg10 (path prefix for saige output)}
+readonly af_min=${5?Error: Missing arg5 (af_max)}
+readonly af_max=${6?Error: Missing arg6 (af_max)}
+readonly maf_max=${7?Error: Missing arg7 (maf_max)}
+readonly maf_min=${8?Error: Missing arg8 (maf_min)}
+readonly in_category=${9?Error: Missing arg9 (in_category)}
+readonly in_sex=${10?Error: Missing arg10 (in_sex)}
+readonly out_prefix=${11?Error: Missing arg11 (path prefix for saige output)}
 
 readonly chr=${SGE_TASK_ID}
 readonly phased=$(echo ${in_phased} | sed -e "s/CHR/${chr}/g")
@@ -47,8 +48,8 @@ python3 "${hail_script}" \
     --input_unphased_type ${in_unphased_type} \
     --csqs_category ${in_category} \
     --out_prefix ${out} \
-    --maf_max ${maf_max} \
-    --maf_min ${maf_min} \
+    --af_min ${af_min} \
+    --af_max ${af_max} \
     --sex ${in_sex}\
     --use_loftee \
     --export_ko_rsid \
@@ -58,6 +59,8 @@ set +x
 print_update "Finished running HAIL for chr${chr}" "${SECONDS}"
 
 
+    #--maf_max ${maf_max} \
+    #--maf_min ${maf_min} \
 
 
 
