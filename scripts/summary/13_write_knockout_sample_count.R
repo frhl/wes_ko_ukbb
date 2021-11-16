@@ -32,7 +32,7 @@ for (mutation in mutations){
 	dt00_50 <- load_knockout_bundle(files, '00_50',mutation)
 	colnames(dt00_50)[2:4] <- paste0('00_50.',colnames(dt00_50)[2:4])
 	mrg <- merge(merge(dt00_01, dt01_50), dt00_50)
-	outfile <- paste0(args$out_prefix, '_gene_knockout_by_maf_count_',mutation,'.tsv.bgz')
+	outfile <- paste0(args$out_prefix, '_gene_knockout_by_maf_count_',mutation,'.tsv.gz')
 	print(paste('writing',outfile))
 	fwrite(mrg, outfile, quote = FALSE, sep = '\t', row.names = FALSE)
 }
@@ -41,7 +41,7 @@ for (mutation in mutations){
 for (mutation in mutations){
 	for (maf in mafs){
 		dt <- get_knockout_sample_counts(files, maf, mutation)
-		outfile <- paste0(args$out_prefix, '_knockout_alleles_in_maf', maf, '_',mutation,'.tsv.bgz')
+		outfile <- paste0(args$out_prefix, '_knockout_alleles_in_maf', maf, '_',mutation,'.tsv.gz')
 		print(paste('writing',outfile))
 		fwrite(dt, outfile, quote = FALSE, sep = '\t', row.names = FALSE)
 	}

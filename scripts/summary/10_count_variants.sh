@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N aggregate_qc_tables
+#$ -N count_variants
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/aggregate_qc_tables.log
-#$ -e logs/aggregate_qc_tables.errors.log
+#$ -o logs/count_variants.log
+#$ -e logs/count_variants.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc@@short.hge
@@ -18,7 +18,7 @@ readonly spark_dir="data/tmp/spark"
 readonly out_dir="derived/tables/worst_csq_for_variant_canonical"
 
 # hail script
-readonly hail_script="scripts/10_aggregate_qc_tables.py"
+readonly hail_script="scripts/summary/10_count_variants.py"
 
 # input paths
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 

@@ -52,7 +52,7 @@ def main(args):
     
     ht_cat_singletons = ht.filter(ht.variant_qc.AC[1] == 1)
     ht_cat_singletons = ht_singletons.group_by(
-        ht_singletons.consequence_category).aggregate(
+        ht_cat_singletons.consequence_category).aggregate(
         n=hl.agg.count())
 
     ht_cat_all.flatten().export(out_prefix + '_category.tsv')
