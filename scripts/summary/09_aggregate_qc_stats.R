@@ -41,27 +41,27 @@ summarize_external_db <- function(d, as_pct = TRUE){
 
 
 # read in external files
-files_external <- sort(list.files('data/variants/',pattern = 'ukb_wes_200k_external_qc_chr[0-9]+.tsv.bgz', full.names = TRUE))
-data_external <- do.call(rbind, lapply(files_external, function(file){
-   d <- zcat(file)
-   d <- summarize_external_db(d)
-   return(d)
-}))
-print(data_external)
-write.table(data_external, 'derived/external_qc_comparison.txt', sep = '\t', quote = FALSE, row.names = FALSE)
+#files_external <- sort(list.files('data/variants/',pattern = 'ukb_wes_200k_external_qc_chr[0-9]+.tsv.bgz', full.names = TRUE))
+#data_external <- do.call(rbind, lapply(files_external, function(file){
+#   d <- zcat(file)
+#   d <- summarize_external_db(d)
+#   return(d)
+#}))
+#print(data_external)
+#write.table(data_external, 'derived/external_qc_comparison.txt', sep = '\t', quote = FALSE, row.names = FALSE)
 
 # Sample-level stats
-files_sample <- list.files('data/qc/',pattern = 'ukb_wes_200k_chr[0-9]+_variants_summary_phased.tsv.bgz', full.names = TRUE)
-d_sample <- do.call(rbind,lapply(files_sample, function(file) zcat(file)))
-d_sample_aggr <- aggregate(.~s, d_sample, sum)
-write.table(d_sample_aggr, 'derived/tables/ukb_phased_sample_level_urv_count.tsv', quote = FALSE, row.names = FALSE) 
+#files_sample <- list.files('data/qc/',pattern = 'ukb_wes_200k_chr[0-9]+_variants_summary_phased.tsv.bgz', full.names = TRUE)
+#d_sample <- do.call(rbind,lapply(files_sample, function(file) zcat(file)))
+#d_sample_aggr <- aggregate(.~s, d_sample, sum)
+#write.table(d_sample_aggr, 'derived/tables/ukb_phased_sample_level_urv_count.tsv', quote = FALSE, row.names = FALSE) 
 
 # Gene-level stats
-files_genes <- list.files('data/qc/',pattern = 'ukb_wes_200k_chr[0-9]+_urv_by_genes_phased.tsv.bgz', full.names = TRUE)
-d_genes <- do.call(rbind,lapply(files_genes, function(file) zcat(file)))
-d_genes$s <- NULL
-d_genes_aggr <- aggregate(.~gene_id, d_genes, sum)
-write.table(d_genes_aggr, 'derived/tables/ukb_phased_gene_level_urv_count.tsv', quote = FALSE, row.names = FALSE) 
+#files_genes <- list.files('data/qc/',pattern = 'ukb_wes_200k_chr[0-9]+_urv_by_genes_phased.tsv.bgz', full.names = TRUE)
+#d_genes <- do.call(rbind,lapply(files_genes, function(file) zcat(file)))
+#d_genes$s <- NULL
+#d_genes_aggr <- aggregate(.~gene_id, d_genes, sum)
+#write.table(d_genes_aggr, 'derived/tables/ukb_phased_gene_level_urv_count.tsv', quote = FALSE, row.names = FALSE) 
 
 
 

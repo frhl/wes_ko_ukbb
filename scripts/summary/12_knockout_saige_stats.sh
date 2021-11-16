@@ -1,3 +1,5 @@
+Rscript "${rscript}" \
+     --out_prefix ${out_prefix}
 #!/usr/bin/env bash
 #
 #$ -N knockout_saige_stats

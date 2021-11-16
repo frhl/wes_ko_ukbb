@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc@@short.hge
-#$ -t 21
+#$ -t 1-22
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
@@ -17,7 +17,7 @@ readonly spark_dir="data/tmp/spark"
 readonly out_dir="data/genes"
 
 # hail script
-readonly hail_script="scripts/01_gene_map.py"
+readonly hail_script="scripts/summary/01_gene_map.py"
 
 # input paths
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 
