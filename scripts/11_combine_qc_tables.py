@@ -22,7 +22,7 @@ def main(args):
 
     # load qc table and annotate
     hts = list()
-    for CHR in range(1,22):
+    for CHR in range(21,22):
 
         # get paths
         QC_PATH  = "data/qc_old/ukb_wes_200k_chr" + str(CHR) + "_variants_unphased.ht"
@@ -37,7 +37,7 @@ def main(args):
         annotations = analysis.annotation_case_builder(ht.worst_csq_for_variant_canonical, use_loftee=True)
         ht = ht.annotate(consequence_category=annotations)
 
-        hts += ht
+        hts.append(ht)
 
     # combine all rows
     ht = hts[0].union(*hts[1:])

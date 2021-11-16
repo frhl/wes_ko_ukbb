@@ -72,23 +72,16 @@ def main(args):
     trio_dataset = hl.trio_matrix(mt2, pedigree, complete_trios=True)
     n = trio_dataset.count()
     print(f"trio count {n}")
+    
     mt = hl.experimental.phase_trio_matrix_by_transmission(trio_dataset)
     n = mt.count()
     print(f'chr{chrom}: phased trios with count of {n}')
 
-    #phased_trio_dataset.write(out_prefix + '.mt')
-    #print(f'chr{chrom}: writing trios')
-
     # annotate shapeit4 GTs with GTs phased by transmission
-    #mt = mt.annotate_entries(GT_shapeit4 = mt1[mt.row_key, mt.col_key].GT)
+    mt = mt.annotate_entries(GT_shapeit4 = mt1[mt.row_key, mt.col_key].GT)
     
-    #mt1 = mt1.annotate_entries(PBT_GT=phased_trio_dataset[mt1.row_key, mt1.col_key].proband_entry.PBT_GT)
-    #print(f'chr{chrom}: annot PBT')
-    
-    #mt = mt.filter_entries(hl.is_defined(mt1.PBT_GT))
-    #print(f'chr{chrom}: is dfiend')
-    mt = mt.annotate_rows(switch_errors_count=hl.agg.sum(mt.proband_entry.PBT_GT != mt.proband_entry.GT))
-    mt = mt.annotate_rows(switch_errors=hl.agg.fraction(mt.proband_entry.PBT_GT != mt.proband_entry.GT))
+    mt = mt.annotate_rows(switch_errors_count=hl.agg.sum(mt.proband_entry.PBT_GT != mt.GT_shapeit4))
+    mt = mt.annotate_rows(switch_errors=hl.agg.fraction(mt.proband_entry.PBT_GT != mt.GT_shapeit4))
     print('chr{chrom}: annotated rows')
 
     # write to file

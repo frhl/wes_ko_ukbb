@@ -1,7 +1,6 @@
 # module purge
 # conda activate rpy
-# Rscript 04_knockouts.R --in_dir derived/knockouts/all/211013_ptv --out_prefix derived/summary
-# Rscript 04_knockouts.R --in_dir derived/knockouts/211104 --in_pattern ptv_damaging_missense_knockouts --out_prefix derived/summary
+# Rscript 04_knockouts.R --in_dir derived/knockouts/211111 --in_pattern maf00_50 --in_csq ptv_damaging_missense_knockouts --out_prefix derived/summary
 
 # setup paths and libs
 library(argparse)
@@ -71,9 +70,8 @@ dt <- setDT(do.call(rbind, lapply(ko_files, function(f){
     return(d)
 })))
 
-
 # Summarize results
-total_samples=175000
+total_samples=176929
 total_genes=length(unique(protein_coding))
 # setup overall stats
 samples = unique(dt$s)
@@ -119,31 +117,32 @@ write(paste0(genes_ch,"/",total_genes, " (",genes_pct_ch_ko,'%) of unique genes 
 write(paste0(genes_knockout,"/", total_genes ," (", genes_pct_ko,'%) of unique genes are involed in KOs'),stdout())
 
 # Write tables of aggregated variants
-dt_out <- dt
-dt_out$phase1 <- clean_hail_list(dt_out$phase1)
-dt_out$phase2 <- clean_hail_list(dt_out$phase2)
+dt$phase1 <- clean_hail_list(dt$phase1)
+dt$phase2 <- clean_hail_list(dt$phase2)
 
 # if phase is NA replace with "."
-dt_out$phase1[is.na(dt_out$phase1)] <- '.'
-dt_out$phase2[is.na(dt_out$phase2)] <- '.'
+dt$phase1[is.na(dt$phase1)] <- '.'
+dt$phase2[is.na(dt$phase2)] <- '.'
 
 # check if involved in OMIM
 omim <- fread('/well/lindgren/flassen//ressources/genesets/genesets/data/omim/211103_morbidmap_by_gene.txt')
-dt_out$in_omim <- dt_out$gene_id %in% omim$gene_id
 
 # map ensgid to hgnc_symbol
 hgnc_link <- fread('/well/lindgren/flassen//ressources/genesets/genesets/data/hgnc/211026_hgnc_ensgid_link.csv')
-dt_out <- merge(dt_out, hgnc_link, by.x = 'gene_id', by.y = 'ensgid', all.x = TRUE)
-dt_out <- cbind(dt_out[,c('s','gene_id','hgnc_symbol')], dt_out[,-c('s','gene_id','hgnc_symbol')])
+dt$in_omim <- dt$gene_id %in% omim$ensgid
+dt <- merge(dt, hgnc_link, by.x = 'gene_id', by.y = 'ensgid', all.x = TRUE)
+dt <- cbind(dt[,c('s','gene_id','hgnc_symbol')], dt[,-c('s','gene_id','hgnc_symbol')])
 
 # write out table
 outfile = paste0(args$out_prefix, '.tsv.gz')
-fwrite(dt_out, outfile, sep = '\t', row.names = FALSE)
+fwrite(dt, outfile, sep = '\t', row.names = FALSE)
 
 # Write out unique genes involved in OMIM
-genes_knockout_omim = length(unique(dt$gene_id[dt$knockout == 1 & dt$gene_id %in% dt_out$gene_id])) 
-genes_ho_omim = length(unique(dt$gene_id[dt$csqs == 'HO' & dt$gene_id %in% dt_out$gene_id])) 
-genes_ch_omim = length(unique(dt$gene_id[dt$csqs == "CH" & dt$gene_id %in% dt_out$gene_id])) 
+genes_omim <- omim$ensgid
+genes_knockout_omim = length(unique(dt$gene_id[dt$knockout == 1 & dt$gene_id %in% genes_omim])) 
+genes_ho_omim = length(unique(dt$gene_id[dt$csqs == 'HO' & dt$gene_id %in% genes_omim])) 
+genes_ch_omim = length(unique(dt$gene_id[dt$csqs == "CH" & dt$gene_id %in% genes_omim])) 
+
 genes_omim_pct_ho_ko = round(100*(genes_ho_omim / total_genes), 2)
 genes_omim_pct_ch_ko = round(100*(genes_ch_omim / total_genes), 2)
 genes_omim_pct_ko = round(100*(genes_knockout_omim / total_genes), 2)
@@ -151,7 +150,7 @@ genes_omim_pct_ko = round(100*(genes_knockout_omim / total_genes), 2)
 write("\n### Knockouts by OMIM Genes ###",stdout())
 write(paste0(genes_ho_omim,"/",total_genes, ' (',genes_omim_pct_ho_ko,'%) of unique genes are involved in homozygous OMIM KOs'), stdout())
 write(paste0(genes_ch_omim,"/",total_genes, " (",genes_omim_pct_ch_ko,'%) of unique genes are involved in compound heterozygous OMIM KOs'),stdout())
-write(paste0(genes_knockout_omim,"/", total_genes ," (", genes_omom_pct_ko,'%) of unique genes are involed in OMIM KOs'),stdout())
+write(paste0(genes_knockout_omim,"/", total_genes ," (", genes_omim_pct_ko,'%) of unique genes are involed in OMIM KOs'),stdout())
 
 
 

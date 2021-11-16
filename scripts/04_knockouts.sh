@@ -27,7 +27,7 @@ source utils/vcf_utils.sh
 # directories
 readonly in_dir="data/mt"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/knockouts/211111"
+readonly out_dir="derived/knockouts/211115"
 
 # input path
 readonly knockout_script="scripts/_knockouts.sh"
@@ -40,9 +40,10 @@ readonly in_unphased_type="mt"
 readonly af_max=""
 readonly maf_max=0.01
 readonly maf_min=0
+readonly sex='females'
 
 # output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_maf00_01_chrCHR"
+readonly out_prefix="${out_dir}/ukb_wes_200k_females_maf00_01_chrCHR"
 
 submit_knockout_job() 
 {
@@ -60,6 +61,7 @@ submit_knockout_job()
     "${maf_max}" \
     "${maf_min}" \
     "${1}" \
+    "${sex}"\
     "${out_prefix}"
 }
 
@@ -68,7 +70,7 @@ mkdir -p ${out_dir}
 submit_knockout_job "ptv,damaging_missense"
 submit_knockout_job "ptv"
 submit_knockout_job "synonymous"
-submit_knockout_job "ptv,ptv_LC"
-submit_knockout_job "ptv,ptv_LC,damaging_missense"
+#submit_knockout_job "ptv,ptv_LC"
+#submit_knockout_job "ptv,ptv_LC,damaging_missense"
 
 

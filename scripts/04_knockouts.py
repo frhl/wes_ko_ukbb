@@ -9,6 +9,7 @@ import os
 from gnomad.utils.vep import process_consequences
 from ukb_utils import hail_init
 from ukb_utils import genotypes
+from ukb_utils import samples
 from ko_utils import qc
 from ko_utils import analysis
 
@@ -38,7 +39,7 @@ def main(args):
     csqs_category = (args.csqs_category)
 
     # sample filtering options
-    sex = bool(args.sex)
+    sex = args.sex
     get_related = bool(args.get_related)
     get_unrelated = bool(args.get_unrelated)
     get_europeans = bool(args.get_europeans)
@@ -54,8 +55,9 @@ def main(args):
     mt2 = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type)
   
     if sex:
-        mt1 = samples.filter_to_sex(mt, sex)
-        mt2 = samples.filter_to_sex(mt, sex)
+        if sex not in 'both':
+            mt1 = samples.filter_to_sex(mt1, sex)
+            mt2 = samples.filter_to_sex(mt2, sex)
 
     if missing:
         mt1 = qc.filter_min_missing(mt1, float(missing))
@@ -132,7 +134,7 @@ if __name__=='__main__':
     parser.add_argument('--chrom', default=None, help='Chromosome to be used') 
     
     # variant and entry filtering
-    parser.add_argument('--sex', default=None, help='Filter to sex')
+    parser.add_argument('--sex', default=None, help='Filter to sex (males or females)')
     parser.add_argument('--maf_min', default=None, help='Select all variants with a maf greater than the indicated values')
     parser.add_argument('--maf_max', default=None, help='Select all variants with a maf less than the indicated value')
     parser.add_argument('--af_min', default=None, help='Select all variants with a AF greater than the indicated value')

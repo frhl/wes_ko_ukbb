@@ -5,9 +5,9 @@
 #$ -o logs/phase_trios.log
 #$ -e logs/phase_trios.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 4
+#$ -pe shmem 8
 #$ -q short.qa
-#$ -t 22
+#$ -t 21
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
@@ -31,7 +31,7 @@ readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc
 readonly final_variant_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list'
 
 # output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_phased_trios_chr${chr}"
+readonly out_prefix="${out_dir}/test_ukb_wes_200k_phased_trios_chr${chr}"
 
 # run hail
 set_up_hail
