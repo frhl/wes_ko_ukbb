@@ -37,10 +37,10 @@ readonly in_phased_type="mt"
 readonly in_unphased_type="mt"
 
 # parameters
-readonly af_min=0
-readonly af_max=0.01
-readonly maf_max=""
-readonly maf_min=""
+#readonly af_min=0
+#readonly af_max=0.01
+readonly maf_max=0.01
+readonly maf_min=0
 readonly sex='both'
 
 # output path

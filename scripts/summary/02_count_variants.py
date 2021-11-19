@@ -37,7 +37,7 @@ def main(args):
     ht_all = ht.group_by(
         ht.worst_csq_for_variant_canonical.most_severe_consequence).aggregate(
         n=hl.agg.count())
-    ht_singletons = ht.filter(ht.variant_qc.AC[1] == 1)
+    ht_singletons = ht.filter((ht.variant_qc.AC[1] == 1) | (ht.variant_qc.AC[0] == 1) )
     ht_singletons = ht_singletons.group_by(
         ht_singletons.worst_csq_for_variant_canonical.most_severe_consequence).aggregate(
         n=hl.agg.count())
@@ -50,13 +50,13 @@ def main(args):
         ht.consequence_category).aggregate(
         n=hl.agg.count())
     
-    ht_cat_singletons = ht.filter(ht.variant_qc.AC[1] == 1)
-    ht_cat_singletons = ht_singletons.group_by(
+    ht_cat_singletons = ht.filter((ht.variant_qc.AC[1] == 1) | (ht.variant_qc.AC[0] == 1))
+    ht_cat_singletons = ht_cat_singletons.group_by(
         ht_cat_singletons.consequence_category).aggregate(
         n=hl.agg.count())
 
     ht_cat_all.flatten().export(out_prefix + '_category.tsv')
-    ht_cat_singletons.flatten().export(out_prefix + 'category_singletons.tsv')
+    ht_cat_singletons.flatten().export(out_prefix + '_category_singletons.tsv')
 
 
 if __name__ == '__main__':

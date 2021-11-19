@@ -48,8 +48,8 @@ python3 "${hail_script}" \
     --input_unphased_type ${in_unphased_type} \
     --csqs_category ${in_category} \
     --out_prefix ${out} \
-    --af_min ${af_min} \
-    --af_max ${af_max} \
+    --maf_min ${maf_min} \
+    --maf_max ${maf_max} \
     --sex ${in_sex}\
     --use_loftee \
     --export_ko_rsid \
@@ -58,9 +58,6 @@ python3 "${hail_script}" \
 set +x
 print_update "Finished running HAIL for chr${chr}" "${SECONDS}"
 
-
-    #--maf_max ${maf_max} \
-    #--maf_min ${maf_min} \
 
 
 

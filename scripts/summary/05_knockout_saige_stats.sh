@@ -19,7 +19,7 @@ source utils/bash_utils.sh
 readonly out_dir="derived/tables/assoc"
 readonly out_prefix="${out_dir}/ukb_wes200k"
 
-readonly rscript="scripts/12_knockout_saige_stats.R"
+readonly rscript="scripts/05_knockout_saige_stats.R"
 
 mkdir -p ${out_dir}
 set_up_rpy

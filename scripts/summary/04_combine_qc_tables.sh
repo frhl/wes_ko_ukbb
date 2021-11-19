@@ -16,7 +16,7 @@ readonly spark_dir="data/tmp/spark"
 readonly out_dir="derived/tables/worst_csq_for_variant_canonical"
 
 # hail script
-readonly hail_script="scripts/11_combine_qc_tables.py"
+readonly hail_script="scripts/04_combine_qc_tables.py"
 
 # output path
 readonly out_prefix="${out_dir}/ukb_wes_200k_unphased"

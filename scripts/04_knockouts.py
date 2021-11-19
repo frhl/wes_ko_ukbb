@@ -81,7 +81,8 @@ def main(args):
         n1 = mt1.count()
         n2 = mt2.count()
         print(f"Filtering on maf_max={maf_max} and maf_min={maf_min}, resulting in {n1} and {n2}")
-    
+   
+
     # required before doing worst_csq_by_gene_canonical
     mt1 = mt1.explode_rows(mt1.consequence.vep.worst_csq_by_gene_canonical)
     mt2 = mt2.explode_rows(mt2.consequence.vep.worst_csq_by_gene_canonical)

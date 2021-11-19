@@ -18,7 +18,7 @@ readonly spark_dir="data/tmp/spark"
 readonly out_dir="derived/tables/worst_csq_for_variant_canonical"
 
 # hail script
-readonly hail_script="scripts/summary/10_count_variants.py"
+readonly hail_script="scripts/summary/02_count_variants.py"
 
 # input paths
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 

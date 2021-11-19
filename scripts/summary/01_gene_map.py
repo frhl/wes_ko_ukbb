@@ -33,7 +33,7 @@ def main(args):
     gene_map_ht = hl.read_table(gene_map_path)
     gene_map_ht = analysis.post_process_gene_map_ht(gene_map_ht)
     gene_map_ht.write(gene_map_processed_path, overwrite=True)   
-    gene_map_ht = hl.read_table(genemap_processed_path)
+    gene_map_ht = hl.read_table(gene_map_processed_path)
 
     groups="ptv,damaging_missense|ptv_LC,ptv|damaging_missense|ptv_LC,ptv|damaging_missense,damaging_missense,other_missense,synonymous"
     # Create a distinct file for each annotation
