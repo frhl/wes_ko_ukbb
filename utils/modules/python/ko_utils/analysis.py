@@ -17,96 +17,32 @@ OTHER_CSQS = ["mature_miRNA_variant", "5_prime_UTR_variant",
               "regulatory_region_ablation", "regulatory_region_amplification", "feature_elongation",
               "regulatory_region_variant", "feature_truncation", "intergenic_variant"]
 
-
-def annotation_case_builder(
-        worst_csq_by_gene_canonical_expr, csq_dbnsfp_expr, use_loftee: bool = True):
+def annotation_case_builder(worst_csq_expr, use_loftee: bool = True):
     r'''Annotate consequence categories for downstream analysis
     :param worst_csq_by_gene_canonical_expr: A struct that should contain "most_severe_consequence"
-    :param csq_dbnsfp_expr: a struct that should contain "revel_score" and "cadd_phred_score"
     :param use_loftee: if True will annotate PTVs as either high confidence (ptv) or low confidence (ptv_LC)
 
     '''
     case = hl.case(missing_false=True)
     if use_loftee:
         case = (case
-                .when(worst_csq_by_gene_canonical_expr.lof == 'HC', 'ptv')
-                .when(worst_csq_by_gene_canonical_expr.lof == 'LC', 'ptv_LC')
+                .when(worst_csq_expr.lof == 'HC', 'ptv')
+                .when(worst_csq_expr.lof == 'LC', 'ptv_LC')
                 )
     else:
         case = case.when(
             hl.set(PLOF_CSQS).contains(
                 worst_csq_by_gene_canonical_expr.most_severe_consequence),
             "ptv")
-    case = (case.when(hl.set(MISSENSE_CSQS).contains(worst_csq_by_gene_canonical_expr.most_severe_consequence) &
-                      (~hl.is_defined(csq_dbnsfp_expr.cadd_phred_score) | ~hl.is_defined(csq_dbnsfp_expr.revel_score)), "other_missense")
-                .when(hl.set(MISSENSE_CSQS).contains(worst_csq_by_gene_canonical_expr.most_severe_consequence) &
-                      (csq_dbnsfp_expr.cadd_phred_score >= 20) & (csq_dbnsfp_expr.revel_score >= 0.6), "damaging_missense")
-                .when(hl.set(MISSENSE_CSQS).contains(worst_csq_by_gene_canonical_expr.most_severe_consequence), "other_missense")
-                .when(hl.set(SYNONYMOUS_CSQS).contains(worst_csq_by_gene_canonical_expr.most_severe_consequence), "synonymous")
-                .when(hl.set(OTHER_CSQS).contains(worst_csq_by_gene_canonical_expr.most_severe_consequence), "non_coding")
+    case = (case.when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence) &
+                      (~hl.is_defined(worst_csq_expr.cadd_phred) | ~hl.is_defined(worst_csq_expr.revel_score)), "other_missense")
+                .when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence) &
+                      (worst_csq_expr.cadd_phred >= 20) & (worst_csq_expr.revel_score >= 0.6), "damaging_missense")
+                .when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence), "other_missense")
+                .when(hl.set(SYNONYMOUS_CSQS).contains(worst_csq_expr.most_severe_consequence), "synonymous")
+                .when(hl.set(OTHER_CSQS).contains(worst_csq_expr.most_severe_consequence), "non_coding")
             )
     return case.or_missing()
-
-
-def annotate_dbnsfp(mt, vep_path, force=False):
-    r'''Annotate matrix table with dbNSFP consequence from external VEP file.'''
-    print(f'Annotating with VEP file: {vep_path}')
-
-    # Open file containing VEP fields
-    with open('data/vep/vep_fields.txt', 'r') as file:
-        fields = file.read().strip().split(',')
-    ht = hl.import_vcf(vep_path, force=force).rename({'info': 'vep'})
-
-    # Add VEP fields by iteration
-    for i in range(len(fields)):
-        ht = ht.annotate_rows(
-            vep=ht.vep.annotate(
-                col=ht.vep.CSQ.map(lambda x: (x.split('\\|')[i]))[0]
-            ).rename({'col': f'{fields[i]}'})
-        )
-
-    # Extract various categories annotations and change type
-    ht = ht.annotate_rows(vep=ht.vep.annotate(
-        sift_pred=ht.vep.SIFT_pred.split('&')[0]))
-    ht = ht.annotate_rows(
-        vep=ht.vep.annotate(
-            polyphen2_hdiv_pred=ht.vep.Polyphen2_HDIV_pred.split('&')[0]))
-    ht = ht.annotate_rows(
-        vep=ht.vep.annotate(
-            polyphen2_hvar_pred=ht.vep.Polyphen2_HVAR_pred.split('&')[0]))
-    ht = ht.annotate_rows(
-        vep=ht.vep.annotate(
-            cadd_phred_score=hl.parse_float(
-                ht.vep.CADD_phred)))
-    ht = ht.annotate_rows(
-        vep=ht.vep.annotate(
-            revel_score=hl.parse_float(
-                ht.vep.REVEL_score)))
-
-    # annotate main table
-    mt = mt.annotate_rows(dbnsfp=hl.struct())
-    mt = mt.annotate_rows(
-        dbnsfp=mt.dbnsfp.annotate(
-            revel_score=ht.index_rows(
-                mt.locus,
-                mt.alleles).vep.revel_score))
-    mt = mt.annotate_rows(
-        dbnsfp=mt.dbnsfp.annotate(
-            cadd_phred_score=ht.index_rows(
-                mt.locus,
-                mt.alleles).vep.cadd_phred_score))
-    mt = mt.annotate_rows(
-        dbnsfp=mt.dbnsfp.annotate(
-            polyphen2_hdiv_pred=ht.index_rows(
-                mt.locus,
-                mt.alleles).vep.polyphen2_hdiv_pred))
-    mt = mt.annotate_rows(
-        dbnsfp=mt.dbnsfp.annotate(
-            polyphen2_hvar_pred=ht.index_rows(
-                mt.locus,
-                mt.alleles).vep.polyphen2_hvar_pred))
-
-    return(mt)
 
 def count_urv_by_samples(mt):
     r'''Count up ultra rare variants by cols and cateogry
@@ -122,28 +58,14 @@ def count_urv_by_samples(mt):
                           n_URV_non_coding = hl.agg.count_where(mt.GT.is_non_ref() & (mt.consequence_category == "non_coding"))
                          )
 
-def count_homozygous_urv_by_samples(mt):
-    r'''Count up homozygous variants by samples    
-    :param mt: a MatrixTable with the field "consequence_category"
-    '''
-    return mt.annotate_cols(n_hom_coding_URV_SNP = hl.agg.count_where(mt.GT.is_hom_var() & hl.is_snp(mt.alleles[0], mt.alleles[1]) & (mt.consequence_category != "non_coding")),
-                          n_hom_coding_URV_indel = hl.agg.count_where(mt.GT.is_hom_var() & hl.is_indel(mt.alleles[0], mt.alleles[1]) & (mt.consequence_category != "non_coding")),
-                          n_hom_URV_PTV = hl.agg.count_where(mt.GT.is_hom_var() & (mt.consequence_category == "ptv")),
-                          n_hom_URV_PTV_LC = hl.agg.count_where(mt.GT.is_hom_var() & (mt.consequence_category == "ptv_lc")),
-                          n_hom_URV_damaging_missense = hl.agg.count_where(mt.GT.is_hom_var() & (mt.consequence_category == "damaging_missense")),
-                          n_hom_URV_other_missense = hl.agg.count_where(mt.GT.is_hom_var() & (mt.consequence_category == "other_missense")),
-                          n_hom_URV_synonymous = hl.agg.count_where(mt.GT.is_hom_var() & (mt.consequence_category == "synonymous")),
-                          n_hom_URV_non_coding = hl.agg.count_where(mt.GT.is_hom_var() & (mt.consequence_category == "non_coding"))
-                         )
-
-def count_urv_by_genes(mt):
+def count_urv_by_genes(mt, call_gene_expr):
     r''' Count up URVs by gene (as defined by vep.worst_csq_for_variant_canonical.gene_id) '''
-    return (mt.group_rows_by(mt.consequence.vep.worst_csq_for_variant_canonical.gene_id).
+    return (mt.group_rows_by(call_gene_expr).
             aggregate(gene = hl.struct(
                 n_coding_URV_SNP = hl.agg.count_where(mt.GT.is_non_ref() & hl.is_snp(mt.alleles[0], mt.alleles[1]) & (mt.consequence_category != "non_coding")),
                 n_coding_URV_indel = hl.agg.count_where(mt.GT.is_non_ref() & hl.is_indel(mt.alleles[0], mt.alleles[1]) & (mt.consequence_category != "non_coding")),
                 n_URV_PTV = hl.agg.count_where(mt.GT.is_non_ref() & (mt.consequence_category == "ptv")),
-                n_URV_PTV_LC = hl.agg.count_where(mt.GT.is_non_ref() & (mt.consequence_category == "ptv_lc")),
+                n_URV_PTV_LC = hl.agg.count_where(mt.GT.is_non_ref() & (mt.consequence_category == "ptv_LC")),
                 n_URV_damaging_missense = hl.agg.count_where(mt.GT.is_non_ref() & (mt.consequence_category == "damaging_missense")),
                 n_URV_other_missense = hl.agg.count_where(mt.GT.is_non_ref() & (mt.consequence_category == "other_missense")),
                 n_URV_synonymous = hl.agg.count_where(mt.GT.is_non_ref() & (mt.consequence_category == "synonymous")),
@@ -151,8 +73,6 @@ def count_urv_by_genes(mt):
             )      
         )
     )
-
-
 
 def annotate_phased_entries(mt):
     r'''Annotates alleles that have the alternate allele on either first or second strand.'''
@@ -320,7 +240,7 @@ def gene_csqs_calc_pKO_pseudoSNP(mt1, mt2, chrom):
 def gene_strand_builder(mt, field='snpid'):
     ''' Build a summary table of samples, genes and variants.
     Returns hail table that contains genes, samples, variants, knockout status
-    stratified by what strand a variant fall onto.
+    stratified by what strand/haplotype a variant fall onto.
     :param mt: MatrixTable with row field 'vep.worst_csq_by_gene_canonical.gene_id'
     :param field: String for row field that is found in the MatrixTable
     '''
@@ -418,3 +338,58 @@ def mac_category_case_builder(call_stats_expr):
             .when(call_stats_expr.AC <= 100000, 100000)
             .when(call_stats_expr.AC <= 1000000, 1000000)
             .default(0))
+
+def create_gene_map_ht(ht, check_gene_contigs=False):
+    #from gnomad.utils.vep import process_consequences
+    #ht = process_consequences(ht)
+    ht = ht.explode(ht.vep.worst_csq_by_gene_canonical)
+    ht = ht.annotate(
+        variant_id=ht.locus.contig + ':' + hl.str(ht.locus.position) + '_' + ht.alleles[0] + '/' + ht.alleles[1],
+        annotation=annotation_case_builder(ht.vep.worst_csq_by_gene_canonical)
+        )
+    if check_gene_contigs:
+        gene_contigs = ht.group_by(
+            gene_id=ht.vep.worst_csq_by_gene_canonical.gene_id,
+            gene_symbol=ht.vep.worst_csq_by_gene_canonical.gene_symbol,
+        ).aggregate(
+            contigs=hl.agg.collect_as_set(ht.locus.contig)
+        )
+        assert gene_contigs.all(hl.len(gene_contigs.contigs) == 1)
+
+    gene_map_ht = ht.group_by(
+        gene_id=ht.vep.worst_csq_by_gene_canonical.gene_id,
+        gene_symbol=ht.vep.worst_csq_by_gene_canonical.gene_symbol,
+    ).partition_hint(100).aggregate(
+        interval=hl.interval(
+            start=hl.locus(hl.agg.take(ht.locus.contig, 1)[0], hl.agg.min(ht.locus.position)),
+            end=hl.locus(hl.agg.take(ht.locus.contig, 1)[0], hl.agg.max(ht.locus.position))
+        ),
+        variants=hl.agg.group_by(ht.annotation, hl.agg.collect(ht.variant_id)),
+    )
+    return gene_map_ht
+
+
+def post_process_gene_map_ht(gene_ht):
+    groups = ['pLoF', 'damaging_missense|LC', 'pLoF|damaging_missense|LC', 'pLoF|damaging_missense',  'damaging_missense', 'other_missense', 'synonymous']
+    variant_groups = hl.map(lambda group: group.split('\\|').flatmap(lambda csq: gene_ht.variants.get(csq)), groups)
+    gene_ht = gene_ht.transmute(
+        variant_groups=hl.zip(groups, variant_groups)
+    ).explode('variant_groups')
+    gene_ht = gene_ht.transmute(annotation=gene_ht.variant_groups[0], variants=hl.sorted(gene_ht.variant_groups[1]))
+    gene_ht = gene_ht.key_by(start=gene_ht.interval.start)
+    return gene_ht.filter(hl.len(gene_ht.variants) > 0)
+
+def count_variants(vep_ht_path, vep_vcf_path):
+    from gnomad.utils.vep import process_consequences
+    ht = hl.read_table(vep_ht_path)
+    ht = process_consequences(ht)
+    ht = ht.explode(ht.vep.worst_csq_by_gene_canonical)
+    ht = ht.annotate(
+        variant_id=ht.locus.contig + ':' + hl.str(ht.locus.position) + '_' + ht.alleles[0] + '/' + ht.alleles[1],
+        annotation=annotation_case_builder(ht.vep.worst_csq_by_gene_canonical)
+        )
+    ht = ht.filter(hl.literal({'ptv', 'ptv_LC', 'damaging_missense', 'other_missense', 'synonymous'}).contains(ht.annotation))
+    print(ht.count())
+
+
+

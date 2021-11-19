@@ -43,7 +43,7 @@ def main(args):
         ht_final_samples = hl.import_table(final_sample_list, no_header=True, key='f0', delimiter=',')
         mt1 = mt1.filter_cols(hl.is_defined(ht_final_samples[mt1.col_key]))
         mt2 = mt2.filter_cols(hl.is_defined(ht_final_samples[mt2.col_key]))
-   
+
     # filter by Ducan's final variants
     if final_variant_list:
         ht_final_variants = hl.import_table(final_variant_list, types={'locus':hl.tlocus(reference_genome='GRCh38'), 'alleles':hl.tarray(hl.tstr)})

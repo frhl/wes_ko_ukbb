@@ -36,7 +36,7 @@ readonly out="${out_prefix}_chr${chr}"
 
 spa_test() {
    SECONDS=0
-   print_update "starting SPA test for ${out}"
+   print_update "SAIGE-SPA: Writing '${out}' using '${vcf}'"
    set -x
    Rscript "${step2_SPAtests}"	\
      --vcfFile=${vcf} \
@@ -59,9 +59,8 @@ spa_test() {
 }
 
 if [ ! -f ${out}* ]; then
-   echo "pre rsaige"
    set_up_RSAIGE
-   echo "post rsaige"
+   rm ${out}*
    spa_test
 else
    print_update "${out} already exists. Skipping." | tee /dev/stderr

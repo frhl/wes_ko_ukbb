@@ -4,16 +4,6 @@ import hail as hl
 import os
 
 
-def hail_init(chrom=None, log_prefix='wes_analysis'):
-    r'''Initialize Hail '''
-    assert chrom in range(1, 23), 'only autosomes allowed'
-    n_slots = os.environ.get('NSLOTS', 1)
-    chr_suffix = '' if chr is None else f'_chr{chrom}'
-    WD = '/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb'
-    hl.init(log=f'{WD}/logs/hail-{log_prefix}{chr_suffix}.log',
-            default_reference='GRCh38',
-            master=f'local[{n_slots}]')
-
 
 def get_table(input_path, input_type, calc_info=True, cache=False):
     r'''Import mt/vcf/plink tables '''
@@ -100,15 +90,13 @@ def filter_min_maf(mt, maf=None):
     mt = mt.filter_rows(maf_expr)
     return mt
 
-
-def filter_maf(mt, min_maf=None, max_maf=None):
+def filter_maf(mt, min_maf=0, max_maf=0.5):
     r'''Filter to variants based on a certain min/max MAF threshold'''
-    if min_maf is not None:
-        mt = mt.filter_rows(filter_min_maf(mt, min_maf))
-    if max_maf is not None:
-        mt = mt.filter_rows(filter_max_maf(mt, max_maf))
-    return mt
-
+    assert min_maf >= 0
+    assert max_maf <= 0.5
+    maf_expr = ((mt.info.AF > min_maf) & (mt.info.AF < (1 - min_maf)))
+    maf_expr = maf_expr & ((mt.info.AF < max_maf) | (mt.info.AF > (1 - max_maf)))
+    return mt.filter_rows(maf_expr)
 
 def filter_max_mac(mt, mac=None):
     r'''Filter to variants to have maf less than {maf}'''
@@ -367,3 +355,38 @@ def is_phased(mt):
                              (mt.GT == hl.parse_call('1|1'))
                              )
     return mt.aggregate_entries(hl.agg.any(mt.phased))
+
+def union_phased_with_unphased(mt_phased, mt_unphased):
+    r'''Union rows of phased haplotypes with unphased singetons. 
+    
+    Union the rows of phased haplotypes with unphased singletons. Only
+    overlapping entries will be kept. Only samples defined in mt_phased
+    will be kept.
+    
+    :param mt_phased: a phased matrix table with info.AC row
+    :param mt_unphased: a phased matrix_table with info row.
+    '''
+    
+    # Filter to singletons
+    mt_unphased = mt_unphased.filter_rows(mt_unphased.info.AC == 1)
+    
+    # drop rows not required
+    mt_phased = mt_phased.drop('info')
+    mt_unphased = mt_unphased.drop('info')
+    
+    # subset to overlapping entries
+    overlapping_entries = list(set(mt_phased.entry) & set(mt_unphased.entry))
+    mt_unphased = mt_unphased.select_entries(*overlapping_entries)
+    mt_phased = mt_phased.select_entries(*overlapping_entries)
+    
+    # subset to overlapping samples (assuming unphased is larger)
+    defined_in_phased = hl.is_defined(mt_phased.cols()[mt_unphased.s])
+    mt_unphased = mt_unphased.filter_cols(defined_in_phased)
+    
+    # keep track of which variants were phased
+    mt_unphased = mt_unphased.annotate_rows(phased=0)
+    mt_phased = mt_phased.annotate_rows(phased=1)
+    
+    return mt_phased.union_rows(mt_unphased)
+
+

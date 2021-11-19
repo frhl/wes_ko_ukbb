@@ -23,9 +23,8 @@ def main(args):
     mt = qc.get_table(input_path=input_path, input_type=input_type)
 
     # subset to rows
-    mt = hl.vep(mt, 'utils/configs/vep_env.json')
+    mt = hl.vep(mt, 'utils/configs/vep_final.json')
     mt = process_consequences(mt)
-    mt = analysis.annotate_dbnsfp(mt, vep_path) 
     mt = mt.explode_rows(mt.vep.worst_csq_by_gene_canonical)
     mt = analysis.variant_csqs_category_builder(mt)
     ht = mt.rows()

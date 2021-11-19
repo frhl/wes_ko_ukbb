@@ -31,6 +31,10 @@ readonly in_phased="${in_dir_phased}/ukb_wes_phased_non_singleton_chr${chr}-24xl
 readonly in_unphased="${in_dir_unphased}/ukb_wes_200k_filtered_chr${chr}.mt"
 readonly annotation_table="data/vep/hail/ukb_wes_200k_chr${chr}_vep.ht"
 
+# get final samples / variants from Duncan
+readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
+readonly final_variant_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list'
+
 # output path
 readonly out_prefix="${out_dir}/ukb_wes_200k_annotated_chr${chr}"
 readonly out="${out_prefix}.mt"
@@ -47,6 +51,8 @@ if [ ! -f "${out}/_SUCCESS" ]; then
      --input_phased_type "vcf" \
      --input_unphased_type "mt" \
      --input_annotation_path ${annotation_table}\
+     --final_sample_list ${final_sample_list} \
+     --final_variant_list ${final_variant_list}\
      --out_prefix ${out_prefix}
 else
   print_update "file ${out} already exists. Skipping!"

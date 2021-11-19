@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 5
 #$ -q short.qe
-#$ -t 1-46
+#$ -t 12,18
 
 module purge
 source utils/bash_utils.sh
@@ -24,7 +24,7 @@ readonly plink_dir="data/saige/grm/input"
 readonly grm_dir="data/saige/grm/input"
 readonly covar_dir="data/phenotypes"
 readonly pheno_dir="data/phenotypes"
-readonly out_dir="data/saige/output/binary/step1"
+readonly out_dir="data/saige/output/combined/binary/step1"
 
 # input path
 readonly chr=${SGE_TASK_ID}
