@@ -56,12 +56,12 @@ def main(args):
     trios = ht.filter((ht.PAT != '0') & (ht.MAT != '0'))
 
     # Filter the two matrix tables to the trios defined
-    mt1 = mt1.filter_cols(hl.is_defined(trios[mt1.s].FID))
-    mt2 = mt2.filter_cols(hl.is_defined(trios[mt2.s].FID))
-    mt1_n_trios = mt1.count()[1]
-    mt2_n_trios = mt2.count()[1]
-    assert mt1_n_trios == mt2_n_trios
-    print(f"chr{chrom}: Filtering to {mt1_n_trios} trios")
+    #mt1 = mt1.filter_cols(hl.is_defined(trios[mt1.s].FID))
+    #mt2 = mt2.filter_cols(hl.is_defined(trios[mt2.s].FID))
+    #imt1_n_trios = mt1.count()[1]
+    #mt2_n_trios = mt2.count()[1]
+    #assert mt1_n_trios == mt2_n_trios
+    #print(f"chr{chrom}: Filtering to {mt1_n_trios} trios")
 
     # load pedigree
     fam_path = samples.get_fam_path(app_id=11867,wes_200k_only=False,relateds_only=False) # Files with True does not exist
@@ -69,9 +69,13 @@ def main(args):
     print(f'chr{chrom}: loaded pedigree')
 
     # phase by transmission
-    trio_dataset = hl.trio_matrix(mt2, pedigree, complete_trios=True)
-    n = trio_dataset.count()
-    print(f"trio count {n}")
+    trio_dataset_mt2 = hl.trio_matrix(mt2, pedigree, complete_trios=True)
+    n = trio_dataset_mt2.count()
+    print(f"trio count {n} (mt2)")
+    
+    trio_dataset_mt1 = hl.trio_matrix(mt1, pedigree, complete_trios=True)
+    n = trio_dataset_mt1.count()
+    print(f"trio count {n} (mt1)")
     
     mt = hl.experimental.phase_trio_matrix_by_transmission(trio_dataset)
     n = mt.count()
@@ -82,7 +86,7 @@ def main(args):
     
     mt = mt.annotate_rows(switch_errors_count=hl.agg.sum(mt.proband_entry.PBT_GT != mt.GT_shapeit4))
     mt = mt.annotate_rows(switch_errors=hl.agg.fraction(mt.proband_entry.PBT_GT != mt.GT_shapeit4))
-    print('chr{chrom}: annotated rows')
+    #print('chr{chrom}: annotated rows')
 
     # write to file
     mt.rows().select('switch_errors','switch_errors_count').export(out_prefix + ".tsv.bgz")
