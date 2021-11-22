@@ -2,12 +2,12 @@
 #
 #$ -N qc_samples
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/test_qc_samples.log
-#$ -e logs/test_qc_samples.errors.log
+#$ -o logs/qc_samples.log
+#$ -e logs/qc_samples.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 8
+#$ -pe shmem 5
 #$ -q long.qc@@long.hge
-#$ -t 1,19
+#$ -t 1-22
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
@@ -16,11 +16,11 @@ source utils/hail_utils.sh
 readonly in_dir_phased="/well/lindgren/UKBIOBANK/nbaya/wes_200k/phase_ukb_wes/data/phased/non_singleton"
 readonly in_dir_unphased="data/unphased/post-qc"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="data/qc"
+readonly out_dir="data/samples"
 
 # hail script
-readonly hail_script="scripts/02_qc_samples.py"
-#readonly hail_script="scripts/02_qc_unphased_samples.py"
+#readonly hail_script="scripts/02_qc_samples.py"
+readonly hail_script="scripts/02_qc_unphased_samples.py"
 
 # input paths
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 
@@ -33,7 +33,7 @@ readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc
 readonly final_variant_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list'
 
 # output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_wes_200k_unphased_chr${chr}"
 
 # run hail
 mkdir -p ${out_dir}

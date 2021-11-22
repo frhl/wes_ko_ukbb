@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
-#$ -N qc_sam_variants
+#$ -N qc_variants
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/qc_sam_variants.log
-#$ -e logs/qc_sam_variants.errors.log
+#$ -o logs/qc_variants.log
+#$ -e logs/qc_variants.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 6
+#$ -pe shmem 5
 #$ -q long.qc@@long.hge
-#$ -t 2,4
+#$ -t 1-22
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
@@ -18,11 +18,11 @@ readonly in_dir_unphased="data/unphased/post-qc"
 readonly gnomad_dir="/well/lindgren/flassen/ressources/gnomad/gnomad_v2_liftover/exomes"
 readonly imputed_dir="/well/lindgren/UKBIOBANK/flassen/projects/ukb_compare/data/imputed/GRCh38"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="data/qc_old"
+readonly out_dir="data/variants"
 
 # hail script
-readonly hail_script="scripts/01_qc_variants.py"
-#readonly hail_script="scripts/01_qc_unphased_variants.py"
+#readonly hail_script="scripts/01_qc_variants.py"
+readonly hail_script="scripts/01_qc_unphased_variants.py"
 
 # input paths
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 

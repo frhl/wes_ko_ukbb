@@ -23,15 +23,19 @@ def main(args):
     out_type   = args.out_type
     final_variant_list = args.final_variant_list
     final_sample_list = args.final_sample_list    
+    combine_datasets = args.combine_datasets
 
     # setup flags
     hail_init.hail_bmrc_init_local('logs/hail/hail_format.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
     
     # get tables
-    mt1 = qc.get_table(input_path=input_phased_path, input_type=input_phased_type) # 12788
-    mt2 = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type) # 11867 (for singletons)
-    mt = qc.union_phased_with_unphased(mt1, mt2)
+    if combine_datasets:
+        mt1 = qc.get_table(input_path=input_phased_path, input_type=input_phased_type) 
+        mt2 = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type) 
+        mt = qc.union_phased_with_unphased(mt1, mt2)
+    else:
+        mt = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type)
 
     # remove withdrawn samples
     mt = samples.remove_withdrawn(mt)
@@ -54,18 +58,13 @@ def main(args):
 
     # annotate with imputed data
     if input_imputed_path:
-        #imputed = hl.read_table(input_imputed_path)
-        #mt = mt.annotate_rows(imputed_info = imputed[mt.row_key].info) 
-        mt = mt.annotate_rows(imputed_info = "NA")
+        imputed = hl.read_table(input_imputed_path)
+        mt = mt.annotate_rows(imputed_info = imputed[mt.row_key].info) 
 
     # add annotations from table
     consequence_annotations = hl.read_table(input_annotation_path)
     mt = mt.annotate_rows(consequence = consequence_annotations[mt.row_key]) 
    
-    # annotate entries with DP and DQ
-    mt = mt.annotate_entries(DP = mt2[(mt.locus, mt.alleles), mt.s].DP)
-    mt = mt.annotate_entries(GQ = mt2[(mt.locus, mt.alleles), mt.s].GQ)    
-
     # perform QC on phased data
     mt = hl.variant_qc(mt, name='variant_qc')
     mt_rows = mt.rows().select('variant_qc','imputed_info', 'in_gnomad')
@@ -82,10 +81,9 @@ def main(args):
     mt_samples.entries().flatten().export(out_prefix + "_urv_by_samples.tsv.bgz")
 
     # count URVs by genes
-    #mt = mt.explode_rows(mt.consequence.vep.worst_csq_by_gene_canonical)
-    #mt_genes = analysis.count_urv_by_genes(mt, mt.consequence.vep.worst_csq_for_variant_canonical.gene_id)
-    #mt_genes.entries().flatten().export(out_prefix + "_urv_by_genes.tsv.bgz")
-
+    mt = mt.explode_rows(mt.consequence.vep.worst_csq_by_gene_canonical)
+    mt_genes = analysis.count_urv_by_genes(mt, mt.consequence.vep.worst_csq_for_variant_canonical.gene_id)
+    mt_genes.entries().flatten().export(out_prefix + "_urv_by_genes.tsv.bgz")
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
@@ -103,6 +101,8 @@ if __name__=='__main__':
     parser.add_argument('--chrom', default=None, help='Chromosome to be used')
     parser.add_argument('--final_sample_list', default=None, help='Path to hail table with final samples to be included')
     parser.add_argument('--final_variant_list', default=None, help='Path to hail table with final variants to be included')     
+    parser.add_argument('--combine_datasets', action='store_true', default=False, help='Combine phased data and unphased singletons into a single matrix table')     
+
 
     args = parser.parse_args()
 
