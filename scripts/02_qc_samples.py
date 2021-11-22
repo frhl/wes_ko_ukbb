@@ -54,7 +54,8 @@ def main(args):
  
     mt = mt.annotate_cols(gq = hl.agg.stats(mt.GQ), dp = hl.agg.stats(mt.DP))
     mt = hl.sample_qc(mt, name='sample_qc')
-    mt.cols().flatten().export(output=out_prefix + "_samples.tsv.bgz")
+    mt.cols().select('sample_qc','in_imputed').write(out_prefix + "_samples.ht", overwrite = True)
+    mt.cols().flatten().export(out_prefix + "_samples.tsv.bgz")
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()

@@ -54,8 +54,14 @@ def main(args):
     # annotate with gnomAD
     if input_gnomad_path:
         gnomad_variants_ht = hl.import_vcf(input_gnomad_path, reference_genome ='GRCh38', force_bgz=True, array_elements_required=False).rows()
-        mt = mt.annotate_rows(in_gnomad = hl.is_defined(gnomad_variants_ht[mt.row_key]))
-
+        mt = mt.annotate_rows(in_gnomad = hl.is_defined(gnomad_variants_ht[mt.row_key])) 
+    
+    # annotate with genebass
+    if True:
+        path = '/well/lindgren/UKBIOBANK/nbaya/resources/ukbb-exome-public/variant_results.mt'
+        gb = hl.read_matrix_table(path)
+        mt = mt.annotate_rows(in_genebass = hl.is_defined(gb.rows()[(mt.locus, mt.alleles)]))
+    
     # annotate with imputed data
     if input_imputed_path:
         imputed = hl.read_table(input_imputed_path)
@@ -65,7 +71,7 @@ def main(args):
     consequence_annotations = hl.read_table(input_annotation_path)
     mt = mt.annotate_rows(consequence = consequence_annotations[mt.row_key]) 
    
-    # perform QC on phased data
+    # get QC metrics
     mt = hl.variant_qc(mt, name='variant_qc')
     mt_rows = mt.rows().select('variant_qc','imputed_info', 'in_gnomad')
     mt_rows = mt_rows.annotate(worst_csq_for_variant_canonical = consequence_annotations[mt_rows.key].vep.worst_csq_for_variant_canonical)
@@ -73,17 +79,17 @@ def main(args):
     mt_rows.flatten().export(out_prefix + "_variants_qc.tsv.bgz")
  
     # annotate consequence category
-    category_annotations = analysis.annotation_case_builder(mt.consequence.vep.worst_csq_for_variant_canonical, use_loftee = True)
-    mt = mt.annotate_rows(consequence_category = category_annotations)
+    #category_annotations = analysis.annotation_case_builder(mt.consequence.vep.worst_csq_for_variant_canonical, use_loftee = True)
+    #mt = mt.annotate_rows(consequence_category = category_annotations)
     
     # count URVs by samples 
-    mt_samples = analysis.count_urv_by_samples(mt)
-    mt_samples.entries().flatten().export(out_prefix + "_urv_by_samples.tsv.bgz")
+    #mt_samples = analysis.count_urv_by_samples(mt)
+    #mt_samples.entries().flatten().export(out_prefix + "_urv_by_samples.tsv.bgz")
 
     # count URVs by genes
-    mt = mt.explode_rows(mt.consequence.vep.worst_csq_by_gene_canonical)
-    mt_genes = analysis.count_urv_by_genes(mt, mt.consequence.vep.worst_csq_for_variant_canonical.gene_id)
-    mt_genes.entries().flatten().export(out_prefix + "_urv_by_genes.tsv.bgz")
+    #mt = mt.explode_rows(mt.consequence.vep.worst_csq_by_gene_canonical)
+    #mt_genes = analysis.count_urv_by_genes(mt, mt.consequence.vep.worst_csq_for_variant_canonical.gene_id)
+    #mt_genes.entries().flatten().export(out_prefix + "_urv_by_genes.tsv.bgz")
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
