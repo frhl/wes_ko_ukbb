@@ -5,9 +5,9 @@
 #$ -o logs/qc_sam_variants.log
 #$ -e logs/qc_sam_variants.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 4
-#$ -q short.qc@@short.hge
-#$ -t 1-22
+#$ -pe shmem 6
+#$ -q long.qc@@long.hge
+#$ -t 2,4
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
@@ -18,11 +18,11 @@ readonly in_dir_unphased="data/unphased/post-qc"
 readonly gnomad_dir="/well/lindgren/flassen/ressources/gnomad/gnomad_v2_liftover/exomes"
 readonly imputed_dir="/well/lindgren/UKBIOBANK/flassen/projects/ukb_compare/data/imputed/GRCh38"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="data/qc"
+readonly out_dir="data/qc_old"
 
 # hail script
-#readonly hail_script="scripts/01_qc_variants.py"
-readonly hail_script="scripts/01_qc_unphased_variants.py"
+readonly hail_script="scripts/01_qc_variants.py"
+#readonly hail_script="scripts/01_qc_unphased_variants.py"
 
 # input paths
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 

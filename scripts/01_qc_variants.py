@@ -48,15 +48,15 @@ def main(args):
         mt = mt.filter_rows(hl.is_defined(ht_final_variants[mt.row_key]))
     
     # annotate with gnomAD
-    #if input_gnomad_path:
-    #    gnomad_variants_ht = hl.import_vcf(input_gnomad_path, reference_genome ='GRCh38', force_bgz=True, array_elements_required=False).rows()
-    #    mt = mt.annotate_rows(in_gnomad = hl.is_defined(gnomad_variants_ht[mt.row_key]))
+    if input_gnomad_path:
+        gnomad_variants_ht = hl.import_vcf(input_gnomad_path, reference_genome ='GRCh38', force_bgz=True, array_elements_required=False).rows()
+        mt = mt.annotate_rows(in_gnomad = hl.is_defined(gnomad_variants_ht[mt.row_key]))
 
     # annotate with imputed data
-    #if input_imputed_path:
-    #    #imputed = hl.read_table(input_imputed_path)
-    #    #mt = mt.annotate_rows(imputed_info = imputed[mt.row_key].info) 
-    #    mt = mt.annotate_rows(imputed_info = NA)
+    if input_imputed_path:
+        #imputed = hl.read_table(input_imputed_path)
+        #mt = mt.annotate_rows(imputed_info = imputed[mt.row_key].info) 
+        mt = mt.annotate_rows(imputed_info = "NA")
 
     # add annotations from table
     consequence_annotations = hl.read_table(input_annotation_path)
@@ -67,11 +67,11 @@ def main(args):
     mt = mt.annotate_entries(GQ = mt2[(mt.locus, mt.alleles), mt.s].GQ)    
 
     # perform QC on phased data
-    #mt = hl.variant_qc(mt, name='variant_qc')
-    #mt_rows = mt.rows().select('variant_qc','imputed_info', 'in_gnomad')
-    #mt_rows = mt_rows.annotate(worst_csq_for_variant_canonical = consequence_annotations[mt_rows.key].vep.worst_csq_for_variant_canonical)
-    #mt_rows.write(out_prefix + "_variants_qc.ht", overwrite=True)
-    #mt_rows.flatten().export(out_prefix + "_variants_qc.tsv.bgz")
+    mt = hl.variant_qc(mt, name='variant_qc')
+    mt_rows = mt.rows().select('variant_qc','imputed_info', 'in_gnomad')
+    mt_rows = mt_rows.annotate(worst_csq_for_variant_canonical = consequence_annotations[mt_rows.key].vep.worst_csq_for_variant_canonical)
+    mt_rows.write(out_prefix + "_variants_qc.ht", overwrite=True)
+    mt_rows.flatten().export(out_prefix + "_variants_qc.tsv.bgz")
  
     # annotate consequence category
     category_annotations = analysis.annotation_case_builder(mt.consequence.vep.worst_csq_for_variant_canonical, use_loftee = True)

@@ -11,41 +11,70 @@ devtools::load_all('/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/uti
 
 setwd('/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/')
 
+
 # add arguments
 parser <- ArgumentParser()
-parser$add_argument("--out_prefix", default=NULL, help = "Where should the result be written to?")
+parser$add_argument("--out_prefix", default='derived/tables/worst_csq_for_variant_canonical/summary', help = "Dest dir")
 args <- parser$parse_args()
 
+# Get count of worst consequence for each variant
+files <- list.files('derived/tables/worst_csq_for_variant_canonical/', pattern = 'ukb_wes_200k_unphased_chr[0-9]+_category\\.tsv', full.names = TRUE)
+files_singletons <- list.files('derived/tables/worst_csq_for_variant_canonical/', pattern = 'ukb_wes_200k_unphased_chr[0-9]+_category_singletons\\.tsv', full.names = TRUE)
+print(files)
 
-files <- list.files('derived/knockouts/211111/', full.names = TRUE)
-stopifnot(dir.exists(dirname(args$out_prefix)))
-mutations <- c('ptv','ptv_damaging_missense','synonymous')
-mafs <- c('00_01','01_50','00_50')
+# Aggregate each category across chromosomes
+d1 <- aggregate(n ~ consequence_category, data = do.call(rbind,lapply(files, fread)), FUN = sum)
+d2 <- aggregate(n ~ consequence_category, data = do.call(rbind,lapply(files_singletons, fread)), FUN = sum)
 
-# Count number of knockouts stratified by the three Maf thresholds
-for (mutation in mutations){
+# combine the two datasets
+d <- cbind(d1, d2[,2])
+colnames(d) <- c('category','n','singletons')
+d$total <- d$n + d$singletons
 
-	dt00_01 <- load_knockout_bundle(files, '00_01',mutation)
-	colnames(dt00_01)[2:4] <- paste0('00_01.',colnames(dt00_01)[2:4])
-	dt01_50 <- load_knockout_bundle(files, '01_50',mutation)
-	colnames(dt01_50)[2:4] <- paste0('01_50.',colnames(dt01_50)[2:4])
-	dt00_50 <- load_knockout_bundle(files, '00_50',mutation)
-	colnames(dt00_50)[2:4] <- paste0('00_50.',colnames(dt00_50)[2:4])
-	mrg <- merge(merge(dt00_01, dt01_50, all = TRUE), dt00_50, all = TRUE)
-	mrg[is.na(mrg)] <- 0
-	outfile <- paste0(args$out_prefix, '_gene_knockout_by_maf_count_',mutation,'.tsv.gz')
-	print(paste('writing',outfile))
-	fwrite(mrg, outfile, quote = FALSE, sep = '\t', row.names = FALSE)
-}
+# make it look nice
+d$singletons_pct <- round((d$singletons / d$total)*100, 2)
 
-# write out alllele specific mutations and count them by number of individuals carrying them
-for (mutation in mutations){
-	for (maf in mafs){
-		dt <- get_knockout_sample_counts(files, maf, mutation)
-		outfile <- paste0(args$out_prefix, '_knockout_alleles_in_maf', maf, '_',mutation,'.tsv.gz')
-		print(paste('writing',outfile))
-		fwrite(dt, outfile, quote = FALSE, sep = '\t', row.names = FALSE)
-	}
-}
+d_out <- data.frame(
+    category = d$category,
+    total = formatC(d$total, format = "f", big.mark = ",", drop0trailing = TRUE),
+    singletons = paste0(d$singletons_pct, '%')
+)
+
+# Write table
+rownames(d_out) <- NULL
+d_out <- d_out[rev(order(d$total)),]
+print(d_out)
+
+outfile = paste0(args$out_prefix, '_.tsv')
+fwrite(d_out, outfile, quote = FALSE, row.names = FALSE, sep = '\t')
+
+## repeat but for each variant category ##
+files <- list.files('derived/tables/worst_csq_for_variant_canonical/', pattern = 'ukb_wes_200k_unphased_chr[0-9]+.tsv', full.names = TRUE)
+files_singletons <- list.files('derived/tables/worst_csq_for_variant_canonical/', pattern = 'ukb_wes_200k_unphased_chr[0-9]+_singletons.tsv', full.names = TRUE)
+
+# aggregate by consequence
+d1 <- aggregate(n ~ most_severe_consequence, data = do.call(rbind,lapply(files, fread)), FUN = sum)
+d2 <- aggregate(n ~ most_severe_consequence, data = do.call(rbind,lapply(files_singletons, fread)), FUN = sum)
+
+# combine the two datasets
+d <- cbind(d1, d2[,2])
+colnames(d) <- c('category','n','singletons')
+d$total <- d$n + d$singletons
+d$singletons_pct <- round((d$singletons / d$total)*100, 2)
+d_out <- data.frame(
+    category = d$category,
+    total = formatC(d$total, format = "f", big.mark = ",", drop0trailing = TRUE),
+    singletons = paste0(d$singletons_pct, '%')
+)
+rownames(d_out) <- NULL
+d_out <- d_out[rev(order(d$total)),]
+print(d_out)
+
+outfile = paste0(args$out_prefix, '_vep_category.tsv')
+fwrite(d_out, outfile, quote = FALSE, row.names = FALSE, sep = '\t')
+
+
+
+
 
 

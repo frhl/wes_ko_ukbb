@@ -53,37 +53,57 @@ def main(args):
     all_errors, per_fam, per_sample, per_variant = hl.mendel_errors(mt['GT'], pedigree)
     mt = mt.annotate_rows(mendel=per_variant[mt.locus, mt.alleles])
     
-    all_errors.export(out_prefix + '_direct_all_errors.tsv.gz')
-    per_variant.export(out_prefix + '_direct_per_variant.tsv.gz')
+    #all_errors.export(out_prefix + '_direct_all_errors.tsv.gz')
+    #per_variant.export(out_prefix + '_direct_per_variant.tsv.gz')
     
     # Annotate with consequence
     consequence_annotations = hl.read_table(input_annotation_path)
     mt = mt.annotate_rows(consequence = consequence_annotations[mt.row_key]) 
     annotation = analysis.annotation_case_builder(mt.consequence.vep.worst_csq_for_variant_canonical, use_loftee = True)
-    mt = mt.annotate_rows(consequence_category = annotation) 
-
-    # write out results
-    mt_result_all = (mt.group_rows_by(mt.consequence_category).
-            aggregate(variant = hl.struct(
-                n_is_non_ref = hl.agg.count_where(mt.GT.is_non_ref()),
-                n_mendel_errors = hl.agg.sum(mt.mendel.errors),
-            )
+    
+    mt = mt.annotate_rows(csq_category = annotation) 
+    mt = mt.annotate_rows(csq_variant = mt.consequence.vep.worst_csq_for_variant_canonical.most_severe_consequence)
+    
+    mt = mt.annotate_rows(
+        count = hl.struct(
+            coding_snp = hl.agg.count_where(mt.GT.is_non_ref() & hl.is_snp(mt.alleles[0], mt.alleles[1])),
+            coding_indel = hl.agg.count_where(mt.GT.is_non_ref() & hl.is_indel(mt.alleles[0], mt.alleles[1]))
         )
-    )
+    ) 
+    
+    # flatten and write
+    mt_result = mt.select_rows('count','mendel', 'csq_category')
+    mt_result.rows().flatten().export(out_prefix + "_mendel_cat.tsv.gz")
 
-    mt_result_all.entries().flatten().export(out_prefix + "_mendel_all.tsv.bgz")
+    #mt_result_all = (mt.group_rows_by(mt.consequence.vep.worst_csq_for_variant_canonical.most_severe_consequence).
+    #        aggregate(hl.agg.sum(mt.mendel.errors)))
+     
+
+
+
+    #mt_result_all.describe()
+    
+    #mt_result_all = (mt.group_rows_by(mt.consequence.vep.worst_csq_for_variant_canonical.most_severe_consequence).
+    #        aggregate(variant = hl.struct(
+    #            n_is_non_ref = hl.agg.count_where(mt.GT.is_non_ref()),
+    #            n_mendel_errors = hl.agg.sum(mt.mendel.errors),
+    #        )
+    #    )
+    #)
+
+    #mt_result_all.export(out_prefix + "_mendel_test_all.tsv.bgz")
 
     # write out only for singletons
-    mt = mt.filter_rows(mt.info.AC[1] == 1)
-    mt_result_singletons = (mt.group_rows_by(mt.consequence_category).
-            aggregate(variant = hl.struct(
-                n_is_non_ref_singletons = hl.agg.count_where(mt.GT.is_non_ref()),
-                n_mendel_errors_singletons = hl.agg.sum(mt.mendel.errors),
-            )
-        )
-    )
+    #mt = mt.filter_rows(mt.info.AC == 1)
+    #mt_result_singletons = (mt.group_rows_by(mt.consequence.vep.worst_csq_for_variant_canonical.most_severe_consequence).
+    #        aggregate(variant = hl.struct(
+    #            n_is_non_ref_singletons = hl.agg.count_where(mt.GT.is_non_ref()),
+    #            n_mendel_errors_singletons = hl.agg.sum(mt.mendel.errors),
+    #        )
+    #    )
+    #)
        
-    mt_result_singletons.entries().flatten().export(out_prefix + "_mendel_singletons.tsv.bgz")
+    #mt_result_singletons.entries().flatten().export(out_prefix + "_mendel_singletons.tsv.bgz")
 
 
 if __name__=='__main__':

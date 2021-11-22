@@ -77,7 +77,7 @@ def main(args):
     n = trio_dataset_mt1.count()
     print(f"trio count {n} (mt1)")
     
-    mt = hl.experimental.phase_trio_matrix_by_transmission(trio_dataset)
+    mt = hl.experimental.phase_trio_matrix_by_transmission(trio_dataset_mt2)
     n = mt.count()
     print(f'chr{chrom}: phased trios with count of {n}')
 
