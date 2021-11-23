@@ -60,27 +60,28 @@ def main(args):
     pedigree = hl.Pedigree.read(fam_path)
     print(f'chr{chrom}: loaded pedigree')
 
-    # phase by transmission
-    trio_dataset_mt2 = hl.trio_matrix(mt2, pedigree, complete_trios=True)
-    n = trio_dataset_mt2.count()
+    # setup trip matriax
+    trio_dataset = hl.trio_matrix(mt2, pedigree, complete_trios=True)
+    n = trio_dataset.count()
     print(f"trio count {n} (mt2)")
     
-    trio_dataset_mt1 = hl.trio_matrix(mt1, pedigree, complete_trios=True)
-    n = trio_dataset_mt1.count()
-    print(f"trio count {n} (mt1)")
-    
-    mt = hl.experimental.phase_trio_matrix_by_transmission(trio_dataset_mt2)
+    # do variant QC on trio matrix
+    trio_dataset = hl.variant_qc(trio_dataset, name='variant_qc')
+
+    # phase by transmission
+    mt = hl.experimental.phase_trio_matrix_by_transmission(trio_dataset)
     n = mt.count()
     print(f'chr{chrom}: phased trios with count of {n}')
-
+    
     # annotate shapeit4 GTs with GTs phased by transmission
     mt = mt.annotate_entries(GT_shapeit4 = mt1[mt.row_key, mt.col_key].GT)
     mt = mt.annotate_rows(switch_errors_count=hl.agg.sum(mt.proband_entry.PBT_GT != mt.GT_shapeit4))
+    mt = mt.annotate_rows(switch_errors_count_where=hl.agg.count_where(mt.proband_entry.PBT_GT != mt.GT_shapeit4))
     mt = mt.annotate_rows(switch_errors=hl.agg.fraction(mt.proband_entry.PBT_GT != mt.GT_shapeit4))
 
     # write to file
-    mt.rows().select('switch_errors','switch_errors_count').export(out_prefix + ".tsv.bgz")
-    mt.rows().select('switch_errors','switch_errors_count').write(out_prefix + ".ht")
+    mt.rows().select('switch_errors','switch_errors_count','switch_errors_count_where','variant_qc').export(out_prefix + ".tsv.bgz")
+    mt.rows().select('switch_errors','switch_errors_count','switch_errors_count_where','variant_qc').write(out_prefix + ".ht")
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
