@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
-#$ -N test_mendel_trios
+#$ -N mendel_trios
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/test_mendel_trios.log
-#$ -e logs/test_mendel_trios.errors.log
+#$ -o logs/mendel_trios.log
+#$ -e logs/mendel_trios.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qa
-#$ -t 21
+#$ -t 1-22
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
