@@ -70,7 +70,6 @@ submit_knockout_job()
 
 mkdir -p ${out_dir}
 submit_knockout_job "ptv,damaging_missense"
-submit_knockout_job "damaging_missense"
 submit_knockout_job "ptv"
 submit_knockout_job "synonymous"
 #submit_knockout_job "ptv,ptv_LC"
