@@ -66,13 +66,17 @@ def main(args):
     print(f"trio count {n} (mt2)")
     
     # do variant QC on trio matrix
-    trio_dataset = hl.variant_qc(trio_dataset, name='variant_qc')
+    #trio_dataset = hl.variant_qc(trio_dataset, name='variant_qc')
 
     # phase by transmission
     mt = hl.experimental.phase_trio_matrix_by_transmission(trio_dataset)
     n = mt.count()
     print(f'chr{chrom}: phased trios with count of {n}')
     
+    # get call stats
+    info_field = 'info'
+    mt = mt.annotate_rows(**{info_field: hl.agg.call_stats(mt.proband_entry.PBT_GT, mt.alleles)})
+
     # annotate shapeit4 GTs with GTs phased by transmission
     mt = mt.annotate_entries(GT_shapeit4 = mt1[mt.row_key, mt.col_key].GT)
     mt = mt.annotate_rows(switch_errors_count=hl.agg.sum(mt.proband_entry.PBT_GT != mt.GT_shapeit4))
@@ -80,8 +84,8 @@ def main(args):
     mt = mt.annotate_rows(switch_errors=hl.agg.fraction(mt.proband_entry.PBT_GT != mt.GT_shapeit4))
 
     # write to file
-    mt.rows().select('switch_errors','switch_errors_count','switch_errors_count_where','variant_qc').export(out_prefix + ".tsv.bgz")
-    mt.rows().select('switch_errors','switch_errors_count','switch_errors_count_where','variant_qc').write(out_prefix + ".ht")
+    mt.rows().select('switch_errors','switch_errors_count','switch_errors_count_where','info').export(out_prefix + ".tsv.bgz")
+    mt.rows().select('switch_errors','switch_errors_count','switch_errors_count_where','info').write(out_prefix + ".ht")
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()

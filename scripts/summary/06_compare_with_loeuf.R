@@ -112,5 +112,71 @@ ggsave(filename = paste0(outfile,'.pdf'), plt_hist, height = 8, width = 17)
 fwrite(dt[!is.na(dt$decile_plot),], paste0(outfile,'.tsv'), row.names = FALSE, sep = '\t')
 
 
+## repeat but for probabilistic knockouts
+ko_prob <- list.files('derived/knockouts/211111/', full.names = TRUE, pattern = 'ko_prob')
 
+# get probabilities
+pdt <- setDT(load_knockout_prob_bundle(ko_prob, '00_01','ptv_damaging_missense'))
+pdt <- pdt[pdt$singletons > 0 & pdt$pKO != 1]
+
+# count samples with knockouts in genes
+pdt <- setDT(aggregate(s ~ gene_id + pKO,data = pdt, FUN = length))
+colnames(pdt) <- c('gene','pKO','samples')
+pdt$mutation <- 'CH'
+pdt <- pdt[rev(order(pdt$samples)),]
+
+# merge with hgnc bridge
+pdt <- merge(pdt, hgnc_bridge, by = 'gene', all.x = TRUE)
+
+# merge with LOEUF
+pdt <- merge(pdt, constraints[,c('gene','decile_plot')], by.x = 'hgnc_symbol', by.y = 'gene', all.x = TRUE)
+
+# label genes with most samples in each group
+genes_ok <- na.omit(unlist(lapply(unique(pdt$decile_plot), function(x){
+    d <- pdt[pdt$decile_plot %in% x,]
+    d <- d[rev(order(d$samples)),]
+    d <- head(d$hgnc_symbol, 3)
+    return(d)
+})))
+
+# only keep the ones with pKO < 1
+pdt$label <- ''
+pdt$label[pdt$hgnc_symbol %in% genes_ok] <-  pdt$hgnc_symbol[pdt$hgnc_symbol %in% genes_ok]
+pdt <- pdt[pdt$pKO < 1,]
+
+# plot the probabilistic knockouts
+pdt <- pdt[!is.na(pdt$decile_plot),]
+plt_jitter_prob <- ggplot(pdt %>% arrange(pKO), aes(x=decile_plot, y=samples, color=pKO, label=label)) +
+    geom_jitter_rast(position = pos, size = 3) +
+    scale_color_gradient(low='grey',high='red') +
+        geom_text_repel(
+        color = 'black', 
+        position = pos, 
+        hjust = "outward", 
+        direction = "y",
+        max.overlaps = 50,
+        min.segment.length = unit(0.25, 'lines')
+    ) + 
+    xlab('LOEUF Decile') +
+    ylab('Samples (n)') +
+    ggtitle('Probabilistic knockouts by LOEUF deciles')
+
+# plot hist
+plt_hist_prob <- ggplot(pdt, aes(x=decile_plot, y=samples, fill=mutation, label=gene)) +
+    geom_bar(stat='identity') + 
+    xlab('LOEUF Decile') +
+    ylab('Samples (n)') +
+    ggtitle('Probabilistic knockouts by LOEUF decile')
+
+# save jitter
+outfile <- paste0(args$out_prefix, '_jitter_prob_', TITLE) 
+write(paste('saving to', outfile),stdout())
+ggsave(filename = paste0(outfile,'.pdf'), plt_jitter_prob, height = 8, width = 17)
+fwrite(pdt[!is.na(pdt$decile_plot),], paste0(outfile,'.tsv'), row.names = FALSE, sep = '\t')
+
+# save hist
+outfile <- paste0(args$out_prefix, '_hist_prob_', TITLE) 
+write(paste('saving to', outfile),stdout())
+ggsave(filename = paste0(outfile,'.pdf'), plt_hist_prob, height = 8, width = 17)
+fwrite(pdt[!is.na(pdt$decile_plot),], paste0(outfile,'.tsv'), row.names = FALSE, sep = '\t')
 
