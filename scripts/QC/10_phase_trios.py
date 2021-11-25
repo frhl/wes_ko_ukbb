@@ -65,9 +65,6 @@ def main(args):
     n = trio_dataset.count()
     print(f"trio count {n} (mt2)")
     
-    # do variant QC on trio matrix
-    #trio_dataset = hl.variant_qc(trio_dataset, name='variant_qc')
-
     # phase by transmission
     mt = hl.experimental.phase_trio_matrix_by_transmission(trio_dataset)
     n = mt.count()
@@ -77,15 +74,27 @@ def main(args):
     info_field = 'info'
     mt = mt.annotate_rows(**{info_field: hl.agg.call_stats(mt.proband_entry.PBT_GT, mt.alleles)})
 
-    # annotate shapeit4 GTs with GTs phased by transmission
+    # annotate shapeit4 GTs with GTs phased by transmission and filter to hets
     mt = mt.annotate_entries(GT_shapeit4 = mt1[mt.row_key, mt.col_key].GT)
-    mt = mt.annotate_rows(switch_errors_count=hl.agg.sum(mt.proband_entry.PBT_GT != mt.GT_shapeit4))
-    mt = mt.annotate_rows(switch_errors_count_where=hl.agg.count_where(mt.proband_entry.PBT_GT != mt.GT_shapeit4))
-    mt = mt.annotate_rows(switch_errors=hl.agg.fraction(mt.proband_entry.PBT_GT != mt.GT_shapeit4))
+    mt = mt.filter_entries(GT_shapeit4.is_het_ref())
+    mt = mt.filter_entries(mt.proband_entry.PBT_GT.is_het_ref())
 
-    # write to file
-    mt.rows().select('switch_errors','switch_errors_count','switch_errors_count_where','info').export(out_prefix + ".tsv.bgz")
-    mt.rows().select('switch_errors','switch_errors_count','switch_errors_count_where','info').write(out_prefix + ".ht")
+    # annotate switch errors
+    mt = mt.annotate_rows(errors_sum=hl.agg.sum(mt.proband_entry.PBT_GT != mt.GT_shapeit4))
+    mt = mt.annotate_rows(hets_sum=hl.agg.sum(mt.proband_entry.PBT_GT.is_het_ref()))
+    mt = mt.annotate_rows(switch_errors=(mt.errors_sum / mt.hets_sum))
+    #mt = mt.annotate_rows(switch_errors=hl.agg.fraction(mt.proband_entry.PBT_GT != mt.GT_shapeit4))
+
+    # write to hail table
+    mt.rows().select('errors_sum','hets_sum','switch_errors','info').write(out_prefix + ".ht")
+
+    # write to tab-seperated files
+    mt = mt.annotate_rows(AC1 = mt.info.AC[0])
+    mt = mt.annotate_rows(AC2 = mt.info.AC[1])
+    mt = mt.annotate_rows(AF1 = mt.info.AF[0])
+    mt = mt.annotate_rows(AF2 = mt.info.AF[1])
+    mt.rows().select('errors_sum','hets_sum','switch_errors','AC1','AC2','AF1','AF2').export(out_prefix + ".tsv.bgz")
+
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()

@@ -15,7 +15,7 @@ source utils/hail_utils.sh
 readonly in_dir_phased="/well/lindgren/UKBIOBANK/nbaya/wes_200k/phase_ukb_wes/data/phased/non_singleton"
 readonly in_dir_unphased="data/unphased/post-qc"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="data/qc"
+readonly out_dir="data/mendel"
 
 # hail script
 readonly hail_script="scripts/QC/10_phase_trios.py"
@@ -31,7 +31,7 @@ readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc
 readonly final_variant_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list'
 
 # output path
-readonly out_prefix="${out_dir}/211123_test_ukb_wes_200k_phased_trios_chr${chr}"
+readonly out_prefix="${out_dir}/211125_test_ukb_wes_200k_phasing_errors_chr${chr}"
 
 # run hail
 set_up_hail
