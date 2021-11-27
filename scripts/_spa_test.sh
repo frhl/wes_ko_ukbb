@@ -43,14 +43,14 @@ spa_test() {
      --vcfFileIndex=${csi} \
      --vcfField="DS" \
      --chrom="chr${chr}" \
-     --minMAF=0.00001 \
-     --minMAC=1 \
+     --minMAF=0.0000001 \
+     --minMAC=3 \
      --GMMATmodelFile=${in_gmat} \
      --varianceRatioFile=${in_var} \
      --SAIGEOutputFile=${out} \
      --numLinesOutput=2 \
-     --IsOutputAFinCaseCtrl=TRUE	\
-     --IsOutputNinCaseCtrl=TRUE	\
+     --IsOutputAFinCaseCtrl=TRUE \
+     --IsOutputNinCaseCtrl=TRUE \
      --IsOutputHetHomCountsinCaseCtrl=TRUE \
      --LOCO=FALSE
    set +x
