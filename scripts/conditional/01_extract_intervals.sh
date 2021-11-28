@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 #
+# Extract genetic coordinates for significant genes in primary analysis.
 #
 #$ -N extract_intervals
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
@@ -13,20 +14,33 @@
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
 
-readonly rscript="scripts/conditional/01_extract_intervals.R"
-readonly in_dir="derived/tables/saige/"
-readonly in_prefix="211111"
 readonly out_dir="derived/tables/gene_intervals"
-readonly out_prefix="${out_dir}/211111_wes200k_saige_wes"
+readonly in_dir="derived/tables/saige"
+readonly pheno_dir="data/phenotypes"
 
-# run r-code
+readonly phenotypes_binary="${pheno_dir}/UKBB_WES200k_binary_phenotypes_header.txt"
+readonly phenotypes_cts="${pheno_dir}/UKBB_WES200k_cts_phenotypes_header.txt"
+
+readonly rscript="scripts/conditional/01_extract_intervals.R"
+
+readonly out_prefix_binary="${out_dir}/211111_wes200k_saige_binary_wes"
+readonly out_prefix_cts="${out_dir}/211111_wes200k_saige_cts_wes"
+
 mkdir -p ${out_dir}
 set_up_rpy
+
+# binary traits
 Rscript "${rscript}" \
-  --in_dir ${in_dir} \
-  --in_prefix ${in_prefix} \
-  --out_prefix ${out_prefix}
+  --in_dir "${in_dir}" \
+  --in_prefix "211111" \
+  --in_phenotypes "${phenotypes_binary}" \
+  --out_prefix "${out_prefix_binary}"
 
-
+# cts traits
+Rscript "${rscript}" \
+  --in_dir "${in_dir}" \
+  --in_prefix "211111" \
+  --in_phenotypes "${phenotypes_cts}" \
+  --out_prefix "${out_prefix_cts}"
 
 
