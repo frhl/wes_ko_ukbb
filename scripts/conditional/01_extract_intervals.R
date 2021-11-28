@@ -17,13 +17,13 @@ parser$add_argument("--in_dir", default=NULL, help = "in directory")
 parser$add_argument("--in_prefix", default=NULL, help = "prefix of files to be loaded")
 args <- parser$parse_args()
 
-# get geneomic coordinates
+# get geneomic coordinates and max contig length
+contig_lens <- fread('/well/lindgren/flassen/ressources/genesets/genesets/data/hail/contigs/GRCh38_lengths.txt')
 positions <- fread('/well/lindgren/flassen/ressources/genesets/genesets/data/biomart/211124_ensgid_to_grch38_pos.tsv.gz')
 colnames(positions)[1] <- 'gene_id'
+positions <- merge(positions, contig_lens, all.x = TRUE, by.x = 'chromosome_name', by.y = 'chromosome')
 
 # Extract intervals
-#in_dir = 'derived/tables/saige'
-#in_prefix = '211111'
 in_dir = args$in_dir
 in_prefix = args$in_prefix
 out_prefix = args$out_prefix
@@ -36,7 +36,7 @@ stopifnot(length(files) > 0)
 phenotypes <- unlist(strsplit(readLines('data/phenotypes/UKBB_WES200k_binary_phenotypes_header.txt'), split = '\t'))
 mutations <- c('ptv','ptv_damaging_missense','synonymous')
 mafs <- c('00_01')
-padding=500000
+padding=0
 
 gene_list <- list()
 
@@ -53,8 +53,6 @@ for (maf in mafs){
                
                 # read in the file and subset by FDR 
                 x <- files[bool_id]
-                print('####')
-                print(x)
                 dt <- fread(x)
                 dt <- dt[dt$FDR <= 0.1,]
 
@@ -67,10 +65,9 @@ for (maf in mafs){
                         maf = maf,
                         mutation = mutation,
                         phenotype = phenotype, 
-                        padding_added = padding,
                         contig = mrg$chromosome_name,
-                        start = max(0, mrg$start_position-padding),
-                        end = mrg$end_position+padding
+                        start = mrg$start_position,
+                        end = mrg$end_position
                     )
                     gene_list[[id]] <- out
 
