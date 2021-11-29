@@ -19,6 +19,7 @@ readonly out_dir="data/mendel"
 
 # hail script
 readonly hail_script="scripts/QC/10_phase_trios.py"
+readonly r_script="scripts/QC/10_phase_trios.R"
 
 # input path
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 
@@ -33,7 +34,7 @@ readonly final_variant_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_q
 # output path
 readonly out_prefix="${out_dir}/211125_test_ukb_wes_200k_phasing_errors_chr${chr}"
 
-# run hail
+# run hail and get Switch errors
 set_up_hail
 set_up_pythonpath_legacy  
 python3 "${hail_script}" \
@@ -46,9 +47,14 @@ python3 "${hail_script}" \
      --final_sample_list ${final_sample_list} \
      --final_variant_list ${final_variant_list}\
      --out_prefix ${out_prefix}
-
+conda deactivate
 print_update "Finished running HAIL for chr${chr}" "${SECONDS}"
 
+# Calculate binominal confidence intervals
+#set_up_rpy
+#Rscript "${r_script}" \
+#    --in_file "${out_prefix}.tsv.gz"
+#    --out_file "${out_prefix}_conf.tsv.gz"
 
 
 
