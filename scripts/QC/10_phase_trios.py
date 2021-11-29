@@ -52,23 +52,20 @@ def main(args):
         mt2 = mt2.filter_rows(hl.is_defined(ht_final_variants[mt2.row_key]))
 
     # get trios only
-    ht = samples.get_fam(app_id=11867, wes_200k_only=False)
-    trios = ht.filter((ht.PAT != '0') & (ht.MAT != '0'))
+    #ht = samples.get_fam(app_id=11867, wes_200k_only=False)
+    #trios = ht.filter((ht.PAT != '0') & (ht.MAT != '0'))
 
+    # remove singletons since these can't be phased.
+    mt1 = qc.filter_min_mac(mt1, 2)
+    mt2 = qc.filter_min_mac(mt2, 2)
+    
     # load pedigree
     fam_path = samples.get_fam_path(app_id=11867,wes_200k_only=False,relateds_only=False) # Files with True does not exist
     pedigree = hl.Pedigree.read(fam_path)
-    print(f'chr{chrom}: loaded pedigree')
 
     # setup trip matriax
     trio_dataset = hl.trio_matrix(mt2, pedigree, complete_trios=True)
-    n = trio_dataset.count()
-    print(f"trio count {n} (mt2)")
-    
-    # phase by transmission
     mt = hl.experimental.phase_trio_matrix_by_transmission(trio_dataset)
-    n = mt.count()
-    print(f'chr{chrom}: phased trios with count of {n}')
     
     # get call stats
     info_field = 'info'
@@ -76,7 +73,7 @@ def main(args):
 
     # annotate shapeit4 GTs with GTs phased by transmission and filter to hets
     mt = mt.annotate_entries(GT_shapeit4 = mt1[mt.row_key, mt.col_key].GT)
-    mt = mt.filter_entries(GT_shapeit4.is_het_ref())
+    mt = mt.filter_entries(mt.GT_shapeit4.is_het_ref())
     mt = mt.filter_entries(mt.proband_entry.PBT_GT.is_het_ref())
 
     # annotate switch errors
@@ -116,3 +113,4 @@ if __name__=='__main__':
     main(args)
 
 
+    # remove singletons since these can't be phased.
