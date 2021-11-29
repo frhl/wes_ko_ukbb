@@ -51,10 +51,6 @@ def main(args):
         mt1 = mt1.filter_rows(hl.is_defined(ht_final_variants[mt1.row_key]))
         mt2 = mt2.filter_rows(hl.is_defined(ht_final_variants[mt2.row_key]))
 
-    # get trios only
-    #ht = samples.get_fam(app_id=11867, wes_200k_only=False)
-    #trios = ht.filter((ht.PAT != '0') & (ht.MAT != '0'))
-
     # remove singletons since these can't be phased.
     mt1 = qc.filter_min_mac(mt1, 2)
     mt2 = qc.filter_min_mac(mt2, 2)
@@ -80,7 +76,6 @@ def main(args):
     mt = mt.annotate_rows(errors_sum=hl.agg.sum(mt.proband_entry.PBT_GT != mt.GT_shapeit4))
     mt = mt.annotate_rows(hets_sum=hl.agg.sum(mt.proband_entry.PBT_GT.is_het_ref()))
     mt = mt.annotate_rows(switch_errors=(mt.errors_sum / mt.hets_sum))
-    #mt = mt.annotate_rows(switch_errors=hl.agg.fraction(mt.proband_entry.PBT_GT != mt.GT_shapeit4))
 
     # write to hail table
     mt.rows().select('errors_sum','hets_sum','switch_errors','info').write(out_prefix + ".ht")
