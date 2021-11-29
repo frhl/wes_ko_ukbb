@@ -11,6 +11,8 @@
 #$ -q short.qc
 #$ -t 3
 
+module load BCFtools/1.12-GCC-10.3.0
+
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
@@ -38,7 +40,8 @@ python3 "${hail_script}" \
    --gene_table ${gene_table} \
    --final_sample_list ${final_sample_list} \
    --out_prefix ${out_prefix} 
-
 print_update "Hail finished writing."
+make_tabix "${out_prefix}.vcf.bgz" "csi"
+
 
 
