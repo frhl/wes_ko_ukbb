@@ -43,8 +43,8 @@ def main(args):
         start_with_padding = hl.max(hl.array([ht.start - padding, 1])))
     ht = ht.drop(ht.ranges)
 
-    ht = ht.annotate(start_valid = hl.is_valid_locus(ht.contig, ht.start, reference_genome))
-    ht = ht.annotate(end_valid = hl.is_valid_locus(ht.contig, ht.end, reference_genome))
+    ht = ht.annotate(start_valid = hl.is_valid_locus(ht.contig, ht.start_with_padding, reference_genome))
+    ht = ht.annotate(end_valid = hl.is_valid_locus(ht.contig, ht.end_with_padding, reference_genome))
     ht = ht.annotate(valid_intervals = ht.start_valid & ht.end_valid)
 
     defined_coords = hl.is_defined(ht.valid_intervals)
@@ -54,9 +54,8 @@ def main(args):
     ht = ht.filter(defined_coords)
     invalid_intervals = ht.filter(~ht.valid_intervals).count()
     assert invalid_intervals == 0, 'Some of the supplied intervals are outside current chromosome contig'
-    ht = ht.annotate(intervals = hl.locus_interval(ht.contig, ht.start, ht.end, True, True, reference_genome=reference_genome))
-    ht.show()
-    ht.describe()
+    ht = ht.annotate(intervals = hl.locus_interval(ht.contig, ht.start_with_padding, ht.end_with_padding, True, True, reference_genome=reference_genome))
+    print(ht.show())
 
     # get genotypes
     chromosomes = [x.replace('chr','') for x in list(set(ht.contig.collect()))]
@@ -84,10 +83,10 @@ def main(args):
     # filter to variants in the the genomic regions across all chromosomes
     hail_intervals = ht.intervals.collect()
     print(hail_intervals)
-    #mt = hl.filter_intervals(mt, hail_intervals)
-    ht = ht.select('intervals').key_by('intervals')
-    mt = mt.annotate_rows(capture_region = hl.is_defined(ht[mt.locus]))
-    mt = mt.filter_rows(mt.capture_region)
+    mt = hl.filter_intervals(mt, hail_intervals)
+    #ht = ht.select('intervals').key_by('intervals')
+    #mt = mt.annotate_rows(capture_region = hl.is_defined(ht[mt.locus]))
+    #mt = mt.filter_rows(mt.capture_region)
 
     n = mt.count()
     print(f'filtered genotypes to {n} variants/samples. Writing to VCF..')
