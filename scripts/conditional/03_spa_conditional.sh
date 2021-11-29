@@ -18,25 +18,25 @@ readonly in_vcf=${2?Error: Missing arg2 (in_vcf)}
 readonly in_csi=${3?Error: Missing arg2 (in_csi)}
 readonly in_gmat=${4?Error: Missing arg3 (in_gmat)} 
 readonly in_var=${5?Error: Missing arg4 (in_var)} 
-readonly out_prefix=${6?Error: Missing arg5 (path prefix for saige output)}
-readonly chr=${SGE_TASK_ID}
+readonly out=${6?Error: Missing arg5 (path prefix for saige output)}
+
+readonly out_tmp="${out}_"
+
+iter=0
+max_iter=10
+P_cutoff=0.001
 
 # subsitute each chromosome
-readonly vcf=$(echo ${in_vcf} | sed -e "s/CHR/${chr}/g")
-readonly csi=$(echo ${in_csi} | sed -e "s/CHR/${chr}/g")
+#readonly vcf=$(echo ${in_vcf} | sed -e "s/CHR/${chr}/g")
+#readonly csi=$(echo ${in_csi} | sed -e "s/CHR/${chr}/g")
 
 # SAIGE paths
-#readonly threads=$(( ${NSLOTS}-1 ))
-#readonly createSparseGRM="/well/lindgren/flassen/software/dev/SAIGE/extdata/createSparseGRM.R"
-#readonly step1_fitNULLGLMM="/well/lindgren/flassen/software/dev/SAIGE/extdata/step1_fitNULLGLMM.R"
 readonly step2_SPAtests="/well/lindgren/flassen/software/dev/SAIGE/extdata/step2_SPAtests.R"
-
-# out prefix
-readonly out="${out_prefix}_chr${chr}"
 
 spa_test() {
    SECONDS=0
    print_update "SAIGE-SPA: Writing '${out}' using '${vcf}'"
+   rm ${out_tmp}
    set -x
    Rscript "${step2_SPAtests}"  \
      --vcfFile=${vcf} \
@@ -47,7 +47,7 @@ spa_test() {
      --minMAC=3 \
      --GMMATmodelFile=${in_gmat} \
      --varianceRatioFile=${in_var} \
-     --SAIGEOutputFile=${out} \
+     --SAIGEOutputFile=${out_tmp} \
      --numLinesOutput=2 \
      --IsOutputAFinCaseCtrl=TRUE \
      --IsOutputNinCaseCtrl=TRUE \
@@ -60,7 +60,7 @@ spa_test() {
 }
 
 get_spa_marker() {
-  echo $( cat ${out} | \
+  echo $( cat ${out_tmp} | \
     awk -v P="${P_cutoff}" '$13 < P' | \
     sort -k 13,13 | \
     cut -d" " -f3 | \
@@ -69,22 +69,17 @@ get_spa_marker() {
 
 
 set_up_RSAIGE
-iter=0
-max_iter=10
-P_cutoff=0.01
 
 markers=""
 marker=$( get_spa_marker )
-while [ ! -z ${marker} ]; do 
-  
-  rm ${out}
+while [ ! -z ${marker} ]; do  
   markers+=",${marker}"
   spa_test "${markers}"
   marker=$( get_spa_marker )
   echo "${markers}" 
   iter=`expr $iter + 1`
   if [ $iter -gt $max_iter ]; then
-    echo "Loop reached max iterations."
+    echo "Exiting loop..."
     break
   fi
 
