@@ -60,34 +60,34 @@ spa_test() {
 }
 
 get_spa_marker() {
-  
-  markers=$( cat ${out} | \
+  echo $( cat ${out} | \
     awk -v P="${P_cutoff}" '$13 < P' | \
     sort -k 13,13 | \
     cut -d" " -f3 | \
     head -n1)
-    
-  #tr "\n" "," | sed '$s/,$//'
-
- echo $markers
-
 }
 
 
 set_up_RSAIGE
-ITER=0
-MAX_ITER=10
+iter=0
+max_iter=10
+P_cutoff=0.01
 
-
-markers=get_spa_markers
-
-
-while [ ${n_variants} -gt 0 ]; do 
-  spa_test ${variants}
-  ITER=`expr $ITER + 1`
-  if [ $ITER -gt $MAX_ITER ]; then
+markers=""
+marker=$( get_spa_marker )
+while [ ! -z ${marker} ]; do 
+  
+  rm ${out}
+  markers+=",${marker}"
+  spa_test "${markers}"
+  marker=$( get_spa_marker )
+  echo "${markers}" 
+  iter=`expr $iter + 1`
+  if [ $iter -gt $max_iter ]; then
+    echo "Loop reached max iterations."
     break
   fi
+
 done 
 
 
