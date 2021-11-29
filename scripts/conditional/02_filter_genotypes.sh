@@ -34,7 +34,7 @@ set_up_pythonpath_legacy
 mkdir -p ${out_dir}
 python3 "${hail_script}" \
    --phenotype ${phenotype} \
-   --padding 500000 \
+   --padding 1000000 \
    --gene_table ${gene_table} \
    --final_sample_list ${final_sample_list} \
    --out_prefix ${out_prefix} 

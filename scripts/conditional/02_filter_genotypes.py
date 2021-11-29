@@ -46,7 +46,7 @@ def main(args):
     ht = ht.annotate(start_valid = hl.is_valid_locus(ht.contig, ht.start, reference_genome))
     ht = ht.annotate(end_valid = hl.is_valid_locus(ht.contig, ht.end, reference_genome))
     ht = ht.annotate(valid_intervals = ht.start_valid & ht.end_valid)
-    
+
     defined_coords = hl.is_defined(ht.valid_intervals)
     n_drop = ht.filter(~defined_coords).count()
     if n_drop > 0:
@@ -55,6 +55,8 @@ def main(args):
     invalid_intervals = ht.filter(~ht.valid_intervals).count()
     assert invalid_intervals == 0, 'Some of the supplied intervals are outside current chromosome contig'
     ht = ht.annotate(intervals = hl.locus_interval(ht.contig, ht.start, ht.end, True, True, reference_genome=reference_genome))
+    ht.show()
+    ht.describe()
 
     # get genotypes
     chromosomes = [x.replace('chr','') for x in list(set(ht.contig.collect()))]
@@ -68,7 +70,7 @@ def main(args):
 
     # filter variants based on missingness
     mt = qc.filter_min_missing(mt, 0.10)
-
+    
     # filter to common variants
     mt = mt.annotate_rows(info = mt.info.annotate(AC = mt.info.AC[1]))
     mt = mt.annotate_rows(info = mt.info.annotate(AF = mt.info.AF[1]))
@@ -76,12 +78,20 @@ def main(args):
 
     # perform liftover to GRCh38
     mt = variants.liftover(mt)
-
+    n = mt.count()
+    print(f"liftover counts: {n}")
+    
     # filter to variants in the the genomic regions across all chromosomes
-    mt = hl.filter_intervals(mt, ht.intervals.collect())
+    hail_intervals = ht.intervals.collect()
+    print(hail_intervals)
+    #mt = hl.filter_intervals(mt, hail_intervals)
+    ht = ht.select('intervals').key_by('intervals')
+    mt = mt.annotate_rows(capture_region = hl.is_defined(ht[mt.locus]))
+    mt = mt.filter_rows(mt.capture_region)
+
     n = mt.count()
     print(f'filtered genotypes to {n} variants/samples. Writing to VCF..')
-    hl.export_vcf(mt, out_prefix + 'tsv.bgz')
+    hl.export_vcf(mt, out_prefix + '.vcf.bgz')
 
 if __name__=='__main__':
 
