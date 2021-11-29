@@ -9,7 +9,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 4
 #$ -q short.qc
-#$ -t 3
+#$ -t 2-4
 
 module load BCFtools/1.12-GCC-10.3.0
 
@@ -29,7 +29,8 @@ readonly hail_script="scripts/conditional/02_filter_genotypes.py"
 readonly index=${SGE_TASK_ID}
 readonly phenotype=$( cut -f${index} ${pheno_list} )
 
-readonly out_prefix="${out_dir}/211111_ukb_wes200k_sig_genes_genotype_regions"
+#readonly out_prefix="${out_dir}/211111_ukb_wes200k_sig_genes_genotype_regions"
+readonly out_prefix="${out_dir}/211111_genetic_intervals_${phenotype}"
 
 set_up_hail
 set_up_pythonpath_legacy
