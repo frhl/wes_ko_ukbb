@@ -12,28 +12,30 @@
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
+# Directories
+readonly in_dir="data/conditional/common"
+readonly out_dir="data/conditional/common"
+readonly pheno_dir="data/phenotypes"
 
-readonly out_dir=""
-readonly out=""
-
-# select phenotype (1-42)
+# setup phenotype
+readonly pheno_list="${pheno_dir}/UKBB_WES200k_binary_phenotypes_header.txt"
 readonly index=${SGE_TASK_ID}
 readonly phenotype=$( cut -f${index} ${pheno_list} )
 
-# get common variant files
-readonly in_dir="data/conditional/common"
-readonly vcf="${in_dir}/211111_genetic_intervals_${phenotype}.vcf.bgz"
-readonly csi="${vcf}.csi"
-
-# setup input phenotypes
+# saige null model
 readonly in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
 readonly in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
 
-# conditional parameters
-readonly max_iter=10
-readonly P_cutoff=0.001
+# in/out files 
+readonly vcf="${in_dir}/211111_genetic_intervals_${phenotype}.vcf.bgz"
+readonly csi="${vcf}.csi"
+readonly out="211111_significant_variants_${phenotype}.txt"
+readonly out_tmp="${out}.tmp"
 
-# SAIGE paths
+# loop params
+readonly max_iter=10
+readonly P_cutoff=0.00001
+
 readonly step2_SPAtests="/well/lindgren/flassen/software/dev/SAIGE/extdata/step2_SPAtests.R"
 
 spa_test() {
@@ -73,7 +75,7 @@ get_spa_marker() {
 
 
 
-iter=0
+iter=1
 marker=$( get_spa_marker )
 set_up_RSAIGE
 while [ ! -z ${marker} ]; do  
@@ -88,7 +90,7 @@ while [ ! -z ${marker} ]; do
   fi
 
   # perform SPA conditioning on current markers 
-  spa_test "${markers}" "${iter}"
+  #spa_test "${markers}" "${iter}"
 
   # update marker
   marker=$( get_spa_marker )
