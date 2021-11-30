@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 5
 #$ -q long.qc@@long.hga
-#$ -t 21
+#$ -t 20
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
@@ -19,7 +19,7 @@ readonly out_dir="data/mendel"
 
 # hail script
 readonly hail_script="scripts/QC/10_phase_trios.py"
-readonly r_script="scripts/QC/10_phase_trios.R"
+readonly rscript="scripts/QC/10_phase_trios.R"
 
 # input path
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 
@@ -51,10 +51,10 @@ conda deactivate
 print_update "Finished running HAIL for chr${chr}" "${SECONDS}"
 
 # Calculate binominal confidence intervals
-#set_up_rpy
-#Rscript "${r_script}" \
-#    --in_file "${out_prefix}.tsv.gz"
-#    --out_file "${out_prefix}_conf.tsv.gz"
+set_up_rpy
+Rscript "${rscript}" \
+    --in_file "${out_prefix}.tsv.gz"
+    --out_file "${out_prefix}_conf.tsv.gz"
 
 
 
