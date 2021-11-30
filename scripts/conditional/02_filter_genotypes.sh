@@ -13,7 +13,7 @@
 
 module load BCFtools/1.12-GCC-10.3.0
 
-source utils/bash_utils.sh
+source utils/vcf_utils.sh
 source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark"
