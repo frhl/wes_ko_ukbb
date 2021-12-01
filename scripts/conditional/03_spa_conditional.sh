@@ -39,33 +39,62 @@ readonly P_cutoff=0.0001
 
 readonly step2_SPAtests="/well/lindgren/flassen/software/dev/SAIGE/extdata/step2_SPAtests.R"
 
+
+spa_test() {
+  set -x
+  Rscript "${step2_SPAtests}"  \
+    --vcfFile=${vcf} \
+    --vcfFileIndex=${csi} \
+    --vcfField="GT" \
+    --chrom="chr${chr}" \
+    --minMAF=0.0000001 \
+    --minMAC=1 \
+    --GMMATmodelFile=${in_gmat} \
+    --varianceRatioFile=${in_var} \
+    --SAIGEOutputFile=${prefix_chr} \
+    --numLinesOutput=2 \
+    --IsOutputAFinCaseCtrl=TRUE \
+    --IsOutputNinCaseCtrl=TRUE \
+    --IsOutputHetHomCountsinCaseCtrl=TRUE \
+    --LOCO=FALSE
+  set +x
+}
+
 spa_conditional_test() {
+  set -x
+  Rscript "${step2_SPAtests}"  \
+    --vcfFile=${vcf} \
+    --vcfFileIndex=${csi} \
+    --vcfField="GT" \
+    --chrom="chr${chr}" \
+    --minMAF=0.0000001 \
+    --minMAC=1 \
+    --GMMATmodelFile=${in_gmat} \
+    --varianceRatioFile=${in_var} \
+    --SAIGEOutputFile=${prefix_chr} \
+    --numLinesOutput=2 \
+    --IsOutputAFinCaseCtrl=TRUE \
+    --IsOutputNinCaseCtrl=TRUE \
+    --IsOutputHetHomCountsinCaseCtrl=TRUE \
+    --LOCO=FALSE \
+    --condition ${marker_list}
+  set +x
+}
+
+spa_chromosome_loop() {
    SECONDS=0
-   for chr in {1..22}; do
+   echo "testing with '${marker_list}'"
+   for chr in {7..8}; do
       local prefix_chr="${prefix_iter}_chr${chr}"
-      set -x
-      Rscript "${step2_SPAtests}"  \
-        --vcfFile=${vcf} \
-        --vcfFileIndex=${csi} \
-        --vcfField="GT" \
-        --chrom="chr${chr}" \
-        --minMAF=0.0000001 \
-        --minMAC=1 \
-        --GMMATmodelFile=${in_gmat} \
-        --varianceRatioFile=${in_var} \
-        --SAIGEOutputFile=${prefix_chr} \
-        --numLinesOutput=2 \
-        --IsOutputAFinCaseCtrl=TRUE \
-        --IsOutputNinCaseCtrl=TRUE \
-        --IsOutputHetHomCountsinCaseCtrl=TRUE \
-        --LOCO=FALSE \
-        --condition "${marker_list}"
-      set +x
+      if [ -z ${marker_list} ]; then
+          spa_test
+      else 
+          spa_conditional_test
+      fi
    done 
    duration=${SECONDS}
    print_update "done - SPA condition on ${marker_list} (${duration})"
 }
-
 
 get_sig_marker() {
   echo $( cat "${prefix_iter}.txt" | \
@@ -88,9 +117,9 @@ do
     true $(( i++ ))
     
     prefix_iter="${out_prefix}_i${i}"
-    spa_conditional_test 
-    cat "${prefix_iter}*" > "${out_iter}.txt"
-    rm "${prefix_iter}_chr*"
+    spa_chromosome_loop 
+    cat "${prefix_iter}_chr"* > "${prefix_iter}.txt"
+    rm  "${prefix_iter}_chr"*
     marker=$(get_sig_marker)
 
     echo "echo ${marker}"
@@ -108,38 +137,6 @@ do
     echo "markers: ${marker_list}"
 
 done
-
-
-
-#iter=1
-#marker=$( get_spa_marker )
-#set_up_RSAIGE
-#while [ ! -z ${marker} ]; do  
-#  
-#  iter=`expr $iter + 1`
-#  
-#  # Keep track of variants
-#  if [ -z ${markers} ]; do
-#    markers="${marker}"
-#  else
-#    markers+=",${marker}"
-#  fi
-#
-#  # perform SPA conditioning on current markers 
-#  #spa_test "${markers}" "${iter}"
-#
-#  # update marker
-#  marker=$( get_spa_marker )
-# 
-#  echo "${markers}" 
-#  if [ $iter -gt $max_iter ]; then
-#    echo "Exiting loop..."
-#    break
-#  fi
-#done 
-
-
-
 
 
 
