@@ -36,64 +36,52 @@ readonly out_tmp="${out}.tmp"
 
 # loop params
 readonly P_cutoff=0.0001
-
 readonly step2_SPAtests="/well/lindgren/flassen/software/dev/SAIGE/extdata/step2_SPAtests.R"
 
-
-spa_test() {
-  set -x
-  Rscript "${step2_SPAtests}"  \
-    --vcfFile=${vcf} \
-    --vcfFileIndex=${csi} \
-    --vcfField="GT" \
-    --chrom="chr${chr}" \
-    --minMAF=0.0000001 \
-    --minMAC=1 \
-    --GMMATmodelFile=${in_gmat} \
-    --varianceRatioFile=${in_var} \
-    --SAIGEOutputFile=${prefix_chr} \
-    --numLinesOutput=2 \
-    --IsOutputAFinCaseCtrl=TRUE \
-    --IsOutputNinCaseCtrl=TRUE \
-    --IsOutputHetHomCountsinCaseCtrl=TRUE \
-    --LOCO=FALSE
-  set +x
-}
-
-spa_conditional_test() {
-  set -x
-  Rscript "${step2_SPAtests}"  \
-    --vcfFile=${vcf} \
-    --vcfFileIndex=${csi} \
-    --vcfField="GT" \
-    --chrom="chr${chr}" \
-    --minMAF=0.0000001 \
-    --minMAC=1 \
-    --GMMATmodelFile=${in_gmat} \
-    --varianceRatioFile=${in_var} \
-    --SAIGEOutputFile=${prefix_chr} \
-    --numLinesOutput=2 \
-    --IsOutputAFinCaseCtrl=TRUE \
-    --IsOutputNinCaseCtrl=TRUE \
-    --IsOutputHetHomCountsinCaseCtrl=TRUE \
-    --LOCO=FALSE \
-    --condition ${marker_list}
-  set +x
-}
+#spa_test() {
+#  set -x
+#  Rscript "${step2_SPAtests}"  \
+#    --vcfFile=${vcf} \
+#    --vcfFileIndex=${csi} \
+#    --vcfField="GT" \
+#    --chrom="chr${chr}" \
+#    --minMAF=0.0000001 \
+#    --minMAC=1 \
+#    --GMMATmodelFile=${in_gmat} \
+#    --varianceRatioFile=${in_var} \
+#    --SAIGEOutputFile=${prefix_chr} \
+#    --numLinesOutput=2 \
+#    --IsOutputAFinCaseCtrl=TRUE \
+#    --IsOutputNinCaseCtrl=TRUE \
+#    --IsOutputHetHomCountsinCaseCtrl=TRUE \
+#    --LOCO=FALSE \
+#    ${1:+--condition "$1"}
+#  set +x
+#}
 
 spa_chromosome_loop() {
-   SECONDS=0
-   echo "testing with '${marker_list}'"
+   printf 'Markers %s\n' "$1"
    for chr in {7..8}; do
       local prefix_chr="${prefix_iter}_chr${chr}"
-      if [ -z ${marker_list} ]; then
-          spa_test
-      else 
-          spa_conditional_test
-      fi
+      set -x
+      Rscript "${step2_SPAtests}"  \
+        --vcfFile=${vcf} \
+        --vcfFileIndex=${csi} \
+        --vcfField="GT" \
+        --chrom="chr${chr}" \
+        --minMAF=0.0000001 \
+        --minMAC=1 \
+        --GMMATmodelFile=${in_gmat} \
+        --varianceRatioFile=${in_var} \
+        --SAIGEOutputFile=${prefix_chr} \
+        --numLinesOutput=2 \
+        --IsOutputAFinCaseCtrl=TRUE \
+        --IsOutputNinCaseCtrl=TRUE \
+        --IsOutputHetHomCountsinCaseCtrl=TRUE \
+        --LOCO=FALSE \
+        ${1:+--condition "$1"}
+      set +x
    done 
-   duration=${SECONDS}
-   print_update "done - SPA condition on ${marker_list} (${duration})"
 }
 
 get_sig_marker() {
@@ -117,9 +105,9 @@ do
     true $(( i++ ))
     
     prefix_iter="${out_prefix}_i${i}"
-    spa_chromosome_loop 
-    cat "${prefix_iter}_chr"* > "${prefix_iter}.txt"
-    rm  "${prefix_iter}_chr"*
+    spa_chromosome_loop ${marker_list}
+    #cat "${prefix_iter}_chr"* > "${prefix_iter}.txt"
+    #rm  "${prefix_iter}_chr"*
     marker=$(get_sig_marker)
 
     echo "echo ${marker}"
