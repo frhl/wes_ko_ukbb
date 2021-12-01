@@ -62,24 +62,32 @@ def main(args):
     # setup trip matriax
     trio_dataset = hl.trio_matrix(mt2, pedigree, complete_trios=True)
     mt = hl.experimental.phase_trio_matrix_by_transmission(trio_dataset)
-    
+    mt = hl.experimental.explode_trio_matrix(mt)
+
     # get call stats
     info_field = 'info'
-    mt = mt.annotate_rows(**{info_field: hl.agg.call_stats(mt.proband_entry.PBT_GT, mt.alleles)})
+    mt = mt.annotate_rows(**{info_field: hl.agg.call_stats(mt.PBT_GT, mt.alleles)})
 
     # annotate shapeit4 GTs with GTs phased by transmission and filter to hets
     mt = mt.annotate_entries(GT_shapeit4 = mt1[mt.row_key, mt.col_key].GT)
+    mt = mt.filter_entries(hl.is_defined(mt.PBT.GT) & hl.is_defined(mt.GT_shapeit4))
     mt = mt.filter_entries(mt.GT_shapeit4.is_het_ref())
-    mt = mt.filter_entries(mt.proband_entry.PBT_GT.is_het_ref())
+    mt = mt.filter_entries(mt.PBT_GT.is_het_ref())
 
     # annotate switch errors
-    mt = mt.annotate_rows(errors_sum=hl.agg.sum(mt.proband_entry.PBT_GT != mt.GT_shapeit4))
-    mt = mt.annotate_rows(hets_sum=hl.agg.sum(mt.proband_entry.PBT_GT.is_het_ref()))
+    mt = mt.annotate_rows(errors_sum=hl.agg.sum(mt.PBT_GT != mt.GT_shapeit4))
+    mt = mt.annotate_rows(hets_sum=hl.agg.sum(mt.PBT_GT.is_het_ref()))
     mt = mt.annotate_rows(switch_errors=(mt.errors_sum / mt.hets_sum))
 
     # write to hail table
-    mt.rows().select('errors_sum','hets_sum','switch_errors','info').write(out_prefix + ".ht")
+    #mt.rows().select('errors_sum','hets_sum','switch_errors','info').write(out_prefix + ".ht")
+    
+    out = mt.select_entries(mt.PBT_GT, mt.GT, mt.GT_shapeit4)
+    out = out.drop(out.qual, out.filters)
+    out.entries().flatten().export(out_prefix + '_full.txt.bgz')
 
+    mt.write(out_prefix + ".mt")
+    
     # write to tab-seperated files
     mt = mt.annotate_rows(AC1 = mt.info.AC[0])
     mt = mt.annotate_rows(AC2 = mt.info.AC[1])
