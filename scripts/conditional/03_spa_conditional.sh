@@ -23,22 +23,13 @@ readonly pheno_list="${pheno_dir}/UKBB_WES200k_binary_phenotypes_header.txt"
 readonly index=${SGE_TASK_ID}
 readonly phenotype=$( cut -f${index} ${pheno_list} )
 
-# saige null model
+# saige parameters
 readonly in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
 readonly in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
-
-# in/out files 
-#readonly vcf="${in_dir}/211111_genetic_intervals_${phenotype}.vcf.bgz"
-#readonly out_prefix="${out_dir}/211111_significant_variants_${phenotype}"
 readonly step2_SPAtests="/well/lindgren/flassen/software/dev/SAIGE/extdata/step2_SPAtests.R"
 
-# loop params
-
-spa_loop() {
-   printf 'VCF %s' "$1"
-   printf 'Markers %s' "$2"
-   printf 'Prefix %s' "$3"
-   for chr in {1..22}; do
+spa_chr_loop() {
+   for chr in {6..7}; do
       local prefix_chr="${3}_chr${chr}"
       set -x
       Rscript "${step2_SPAtests}"  \
@@ -50,7 +41,7 @@ spa_loop() {
         --minMAC=1 \
         --GMMATmodelFile=${in_gmat} \
         --varianceRatioFile=${in_var} \
-        --SAIGEOutputFile=${3} \
+        --SAIGEOutputFile=${prefix_chr} \
         --numLinesOutput=2 \
         --IsOutputAFinCaseCtrl=TRUE \
         --IsOutputNinCaseCtrl=TRUE \
@@ -59,27 +50,29 @@ spa_loop() {
         ${2:+--condition "$2"}
       set +x
    done 
+   printf 'Markers "%s"\n' "$2"
+   printf 'VCF "%s"\n' "$1"
+   printf 'Prefix "%s"\n' "$3"
 }
 
-spa_conditional() {
+conditional_analysis() {
   vcf=${1}
   out_prefix=${2}
-  local i=0
-  local max=5
-  local marker_list=""
+  i=0
+  max=5
+  marker_list=""
   while [ $i -lt $max ]; do
       
-      printf 'Iteration: %s' "$i"
-      printf 'Markers: %s' "$marker_list"
+      printf 'Iteration: "%s"\n' "$i"
       true $(( i++ ))
       
-      local prefix_iter="${out_prefix}_i${i}"
-      local prefix_iter_chr="prefix_iter_chr"
-      local markers_combined="${prefix_iter}.txt"
+      prefix_iter="${out_prefix}_i${i}"
+      prefix_iter_chr="prefix_iter_chr"
+      markers_combined="${prefix_iter}.txt"
 
-      spa_loop ${vcf} ${marker_list} ${prefix_iter}
-      cat ${prefix_iter_chr}* > ${markers_combined}
-      rm  ${prefix_iter_chr}*
+      spa_chr_loop "${vcf}" "${marker_list}" "${prefix_iter}"
+      cat "${prefix_iter_chr}"* > ${markers_combined}
+      #rm  "${prefix_iter_chr}"*
       
       marker=$( cat "${markers_combined}" | \
         awk -v P="${P_cutoff}" '$13 < P' | \
@@ -101,14 +94,14 @@ spa_conditional() {
 }
 
 # loop params
-readonly P_cutoff=0.0001
 set_up_RSAIGE
+readonly P_cutoff=0.0001
 mkdir -p ${out_dir}
 
 annotation="synonymous"
 vcf="${in_dir}/211111_intervals_${annotation}_${phenotype}.vcf.bgz"
 out_prefix="${out_dir}/211111_spa_conditional_${annotation}_${phenotype}"
-spa_conditional ${vcf} ${out_prefix}
+conditional_analysis ${vcf} ${out_prefix}
 
 
 
