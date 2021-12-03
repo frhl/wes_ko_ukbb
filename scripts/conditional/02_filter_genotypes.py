@@ -112,7 +112,7 @@ def main(args):
 
     n = mt.count()
     print(f'filtered genotypes to {n} variants/samples. Writing to VCF..')
-    hl.export_vcf(mt, out_prefix + '_' + str(annotation) + '.vcf.bgz')
+    hl.export_vcf(mt, out_prefix + '.vcf.bgz')
 
 
 if __name__ == '__main__':
