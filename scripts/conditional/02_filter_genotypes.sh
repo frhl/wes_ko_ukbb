@@ -29,20 +29,28 @@ readonly hail_script="scripts/conditional/02_filter_genotypes.py"
 readonly index=${SGE_TASK_ID}
 readonly phenotype=$( cut -f${index} ${pheno_list} )
 
-#readonly out_prefix="${out_dir}/211111_ukb_wes200k_sig_genes_genotype_regions"
-readonly out_prefix="${out_dir}/211111_genetic_intervals_${phenotype}"
-
 set_up_hail
 set_up_pythonpath_legacy
 mkdir -p ${out_dir}
-python3 "${hail_script}" \
-   --phenotype ${phenotype} \
-   --padding 1000000 \
-   --gene_table ${gene_table} \
-   --final_sample_list ${final_sample_list} \
-   --out_prefix ${out_prefix} 
-print_update "Hail finished writing."
-make_tabix "${out_prefix}.vcf.bgz" "csi"
+
+filter_genotypes() {
+  annotation=${1}
+  out_prefix=${2}
+  python3 "${hail_script}" \
+     --phenotype ${phenotype} \
+     --annotation ${annotation} \
+     --padding 1000000 \
+     --gene_table ${gene_table} \
+     --final_sample_list ${final_sample_list} \
+     --out_prefix ${out_prefix} 
+  print_update "Hail finished writing."
+  make_tabix "${out_prefix}.vcf.bgz" "csi"
+}
+
+
+annotation='synonymous'
+out_prefix="${out_dir}/211111_intervals_${annotation}_${phenotype}"
+filter_genotypes ${annotation} ${out_prefix}
 
 
 

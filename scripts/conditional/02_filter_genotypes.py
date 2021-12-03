@@ -15,6 +15,7 @@ def main(args):
     gene_table = args.gene_table
     final_sample_list = args.final_sample_list
     phenotype = args.phenotype
+    annotation = args.annotation
     padding = int(args.padding)
 
     reference_genome = 'GRCh38'
@@ -36,12 +37,14 @@ def main(args):
             'contig_length': hl.tint})
     ht = ht.annotate(contig=hl.delimit(['chr', ht.contig], ''))
 
-    # filter phenotype and damaging mutations
-    ht = ht.filter(ht.phenotype == phenotype)
-    #ht = ht.filter(ht.mutation != "synonymous")
+    # filter phenotype and damaging
+    if phenotype:
+        ht = ht.filter(ht.phenotype == phenotype)
+    if annotation:
+        ht = ht.filter(ht.mutation == annotation)
     n_phenos = ht.count()
     if n_phenos == 0:
-        raise ValueError(str(phenotype) + " is not in gene table")
+        raise ValueError(str(phenotype) + "/" + str(annotation) +  " is not in gene table")
 
     # annotate regions with padding
     ht = ht.annotate(ranges=hl.array([ht.start, ht.end]))
@@ -84,7 +87,7 @@ def main(args):
             True,
             reference_genome=reference_genome))
 
-    # get UKB genotype calls
+    # Get chromosomes
     chromosomes = [x.replace('chr', '') for x in list(set(ht.contig.collect()))]
     mt = genotypes.get_ukb_genotypes_bed(chromosomes)
     mt = mt.annotate_rows(**{'info': hl.agg.call_stats(mt.GT, mt.alleles)})
@@ -97,28 +100,19 @@ def main(args):
 
     # filter variants based on missingness
     mt = qc.filter_min_missing(mt, 0.10)
-
-    # filter to common variants
     mt = mt.annotate_rows(info=mt.info.annotate(AC=mt.info.AC[1]))
     mt = mt.annotate_rows(info=mt.info.annotate(AF=mt.info.AF[1]))
     mt = qc.filter_min_maf(mt, 0.01)
 
-    # perform liftover to GRCh38
+    # perform liftover to GRCh38 and filter to intervals
     mt = variants.liftover(mt)
-    n = mt.count()
-    print(f"liftover counts: {n}")
-
-    # filter to variants in the the genomic regions across all chromosomes
     hail_intervals = ht.intervals.collect()
-    print(hail_intervals)
     mt = hl.filter_intervals(mt, hail_intervals)
-    #ht = ht.select('intervals').key_by('intervals')
-    #mt = mt.annotate_rows(capture_region = hl.is_defined(ht[mt.locus]))
-    #mt = mt.filter_rows(mt.capture_region)
+    print(hail_intervals)
 
     n = mt.count()
     print(f'filtered genotypes to {n} variants/samples. Writing to VCF..')
-    hl.export_vcf(mt, out_prefix + '.vcf.bgz')
+    hl.export_vcf(mt, out_prefix + '_' + str(m) + '.vcf.bgz')
 
 
 if __name__ == '__main__':
@@ -128,6 +122,7 @@ if __name__ == '__main__':
     parser.add_argument('--final_sample_list', default=None, help='Path to HailTable that contains the final samples included in the analysis.')
     parser.add_argument('--gene_table', default=None, help='Path to HailTable that contains the significant genes from primary analysis.')
     parser.add_argument('--phenotype', default=None, help='Path to phenotype table that also includes sex.')
+    parser.add_argument('--annotation', default=None, help='String. What mutation subset should be applied?')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset (plink format)')
     args = parser.parse_args()
 
