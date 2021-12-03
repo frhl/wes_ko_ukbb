@@ -48,7 +48,7 @@ filter_genotypes() {
 }
 
 
-#annotation='ptv'
+annotation='ptv'
 out_prefix="${out_dir}/211111_intervals_${annotation}_${phenotype}"
 filter_genotypes ${annotation} ${out_prefix}
 
@@ -56,9 +56,9 @@ annotation='ptv_damaging_missense'
 out_prefix="${out_dir}/211111_intervals_${annotation}_${phenotype}"
 filter_genotypes ${annotation} ${out_prefix}
 
-#annotation='synonymous'
-#out_prefix="${out_dir}/211111_intervals_${annotation}_${phenotype}"
-#filter_genotypes ${annotation} ${out_prefix}
+annotation='synonymous'
+out_prefix="${out_dir}/211111_intervals_${annotation}_${phenotype}"
+filter_genotypes ${annotation} ${out_prefix}
 
 
 
