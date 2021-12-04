@@ -59,43 +59,58 @@ conditional_analysis() {
   vcf=${1}
   out_prefix=${2}
   i=0
-  max=5
+  max=2
   marker_list=""
   while [ $i -lt $max ]; do
       
-      >&2 echo "Iteration: ${i}\n"
       true $(( i++ ))
       
+      >&2 echo "Iteration: ${i}"
+      >&2 echo "Condtioning marker: ${current_marker}"
+      >&2 echo "Condtioning marker list: ${marker_list}"
+      
+      # setup prefixes for temporary files
       prefix_iter="${out_prefix}_i${i}"
       prefix_iter_chr="${prefix_iter}_chr"
       markers_combined="${prefix_iter}.txt"
+      markers_out="${out_prefix}_conditioning_markers.txt"
 
+      # Run saddle point approximation using condtioning markers
       spa_chr_loop "${vcf}" "${marker_list}" "${prefix_iter}"
       cat "${prefix_iter_chr}"* > ${markers_combined}
       rm  "${prefix_iter_chr}"*
       
-      marker=$( cat "${markers_combined}" | \
+      current_marker=$( cat "${markers_combined}" | \
         awk -v P="${P_cutoff}" '$13 < P' | \
         sort -k 13,13 | \
         cut -d" " -f3 | \
         head -n1)
 
-      >&2 echo "Condtioning marker: ${marker}"
-      >&2 echo "Condtioning marker list: ${marker_list}"
+      # Save top marker within P-value threshold
+      #cat "${markers_combined}" | \
+      #  awk -v P="${P_cutoff}" '$13 < P' | \
+      #  sort -k 13,13 | \
+      #  head -n1 > "${markers_out}" 
+      
+      # select current marker
+      #current_marker=$( tail -n1 ${markers_out} | cut -f1)
+      #marker_list=$( cat ${marker_out} | cut -f1 | tr "\n" "," )
+      #echo ${marker_out} | cut -f1 | tr "\n" ","
 
-      if [ -z ${marker} ]; then
+
+      if [ -z ${current_marker} ]; then
           echo "Ended loop after ${i} iterations with markers: ${marker_list}"
           break    
       fi    
       
-      if [ -z ${marker_list} ]; then
-          markers_list=${marker}
-      else
-          marker_list+=",${marker}"        
-      fi
+      #if [ -z ${marker_list} ]; then
+      #    markers_list=${current_marker}
+      #else
+      #    marker_list+=",${current_marker}"        
+      #fi
       
-      ${marker_list} > "${out_prefix}_conditioning_variants.txt" 
-      
+      ${marker_list} > "${out_prefix}_conditioning_variants.txt"
+
   done
 }
 
