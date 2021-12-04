@@ -50,9 +50,9 @@ spa_chr_loop() {
         ${2:+--condition "$2"}
       set +x
    done 
-   printf 'Markers "%s"\n' "$2"
-   printf 'VCF "%s"\n' "$1"
-   printf 'Prefix "%s"\n' "$3"
+   >&2 echo "Markers: ${2}"
+   >&2 echo "VCF: ${1}"
+   >&2 echo "Prefix: ${3}"
 }
 
 conditional_analysis() {
@@ -63,7 +63,7 @@ conditional_analysis() {
   marker_list=""
   while [ $i -lt $max ]; do
       
-      printf 'Iteration: "%s"\n' "$i"
+      >&2 echo "Iteration: ${i}\n"
       true $(( i++ ))
       
       prefix_iter="${out_prefix}_i${i}"
@@ -72,7 +72,7 @@ conditional_analysis() {
 
       spa_chr_loop "${vcf}" "${marker_list}" "${prefix_iter}"
       cat "${prefix_iter_chr}"* > ${markers_combined}
-      #rm  "${prefix_iter_chr}"*
+      rm  "${prefix_iter_chr}"*
       
       marker=$( cat "${markers_combined}" | \
         awk -v P="${P_cutoff}" '$13 < P' | \
@@ -80,15 +80,21 @@ conditional_analysis() {
         cut -d" " -f3 | \
         head -n1)
 
+      >&2 echo "Condtioning marker: ${marker}"
+      >&2 echo "Condtioning marker list: ${marker_list}"
+
       if [ -z ${marker} ]; then
+          echo "Ended loop after ${i} iterations with markers: ${marker_list}"
           break    
       fi    
       
       if [ -z ${marker_list} ]; then
-          markers=${marker}
+          markers_list=${marker}
       else
           marker_list+=",${marker}"        
-      fi        
+      fi
+      
+      ${marker_list} > "${out_prefix}_conditioning_variants.txt" 
       
   done
 }
