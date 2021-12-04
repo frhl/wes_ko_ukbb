@@ -67,7 +67,7 @@ conditional_analysis() {
       true $(( i++ ))
       
       prefix_iter="${out_prefix}_i${i}"
-      prefix_iter_chr="prefix_iter_chr"
+      prefix_iter_chr="${prefix_iter}_chr"
       markers_combined="${prefix_iter}.txt"
 
       spa_chr_loop "${vcf}" "${marker_list}" "${prefix_iter}"
