@@ -5,11 +5,12 @@
 #$ -o logs/refphase.log
 #$ -e logs/refphase.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 5
-#$ -q short.qc@@short.hge
+#$ -pe shmem 24
+#$ -q long.qc@@long.hga
 #$ -t 21
 
 source utils/qsub_utils.sh
+source utils/bash_utils.sh
 
 readonly in_dir="data/unphased/post-qc/"
 readonly out_dir="data/phased/test-phasing"
@@ -24,13 +25,17 @@ readonly gmap="/well/lindgren/flassen/software/SHAPEIT4/b38.gmap/chr${chr}.b38.g
 
 mkdir -p ${out_dir}
 module load SHAPEIT4/4.2.0-foss-2019b
+SECONDS=0
 shapeit4.2 \
   --input ${in_file} \
   --map ${gmap} \
   --region "chr${chr}" \
-  --thread 20 \
+  --thread $(( ${NSLOTS}-1 )) \
   --reference ${ref} \
-  --output ${out_file}
+  --output ${out_file} \
+  --sequencing \
+  && print_update "Finished phasing variants for chr${chr}, out: ${out}" "${SECONDS}" \
+  || raise_error "$( print_update "Phasing common variants failed for chr${chr}" ${SECONDS} )"
 
 
 
