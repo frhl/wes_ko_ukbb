@@ -7,7 +7,7 @@
 #$ -e logs/spa_conditional.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q short.qc
+#$ -q short.qc@@short.hge
 #$ -t 3
 
 source utils/bash_utils.sh
@@ -29,7 +29,7 @@ readonly in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
 readonly step2_SPAtests="/well/lindgren/flassen/software/dev/SAIGE/extdata/step2_SPAtests.R"
 
 spa_chr_loop() {
-   for chr in {6..7}; do
+   for chr in {5..6}; do
       local prefix_chr="${3}_chr${chr}"
       set -x
       Rscript "${step2_SPAtests}"  \
@@ -37,7 +37,7 @@ spa_chr_loop() {
         --vcfFileIndex="${1}.csi" \
         --vcfField="GT" \
         --chrom="chr${chr}" \
-        --minMAF=0.0000001 \
+        --minMAF=0.000001 \
         --minMAC=1 \
         --GMMATmodelFile=${in_gmat} \
         --varianceRatioFile=${in_var} \
@@ -58,6 +58,9 @@ spa_chr_loop() {
 conditional_analysis() {
   vcf=${1}
   out_prefix=${2}
+  markers_conditional="${out_prefix}_conditioning_markers.txt"
+  rm ${markers_conditional}
+  
   i=0
   max=2
   marker_list=""
@@ -73,7 +76,6 @@ conditional_analysis() {
       prefix_iter="${out_prefix}_i${i}"
       prefix_iter_chr="${prefix_iter}_chr"
       markers_combined="${prefix_iter}.txt"
-      markers_out="${out_prefix}_conditioning_markers.txt"
 
       # Run saddle point approximation using condtioning markers
       spa_chr_loop "${vcf}" "${marker_list}" "${prefix_iter}"
@@ -84,42 +86,27 @@ conditional_analysis() {
       cat "${markers_combined}" | \
         awk -v P="${P_cutoff}" '$13 < P' | \
         sort -k 13,13 | \
-        head -n1 > "${markers_out}" 
-      
+        head -n1 >> "${markers_conditional}" 
+
       # select current marker
       old_marker=${current_marker}
-      current_marker=$( tail -n1 ${markers_out} | cut -d" " -f1)
+      current_marker=$( tail -n1 ${markers_conditional} | awk '{print $1":"$2"_"$4"/"$5}')
       >&2 echo "old_marker=${old_marker}"
       >&2 echo "current_marker=${current_marker}"
       if [[ "${current_marker}" != "${old_marker}" ]]; then
-        marker_list=$( cat ${marker_out} | cut -f1 | tr "\n" "," )
+        marker_list=$( cat ${markers_conditional} | cut -d" " -f3 | tr "\n" "," | sed 's/,$//' )
         >&2 echo "New marker found '${current_marker}. Repeating loop with ${marker_list}'"
       else
         >&2 echo "Ended loop after ${i} iterations with markers: ${marker_list}"
         break    
       fi
 
-      marker_list=$( cat ${marker_out} | cut -f1 | tr "\n" "," )
-      echo ${marker_out} | cut -f1 | tr "\n" ","
-
-
-      #if [ -z ${current_marker} ]; then
-      ##fi    
-      
-      #if [ -z ${marker_list} ]; then
-      #    markers_list=${current_marker}
-      #else
-      #    marker_list+=",${current_marker}"        
-      #fi
-      
-      #${marker_list} > "${out_prefix}_conditioning_variants.txt"
-
   done
 }
 
 # loop params
 set_up_RSAIGE
-readonly P_cutoff=0.0001
+readonly P_cutoff=0.0005
 mkdir -p ${out_dir}
 
 annotation="synonymous"
