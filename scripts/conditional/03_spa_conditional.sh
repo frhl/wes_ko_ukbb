@@ -80,28 +80,31 @@ conditional_analysis() {
       cat "${prefix_iter_chr}"* > ${markers_combined}
       rm  "${prefix_iter_chr}"*
       
-      current_marker=$( cat "${markers_combined}" | \
+      # Save top marker within P-value threshold
+      cat "${markers_combined}" | \
         awk -v P="${P_cutoff}" '$13 < P' | \
         sort -k 13,13 | \
-        cut -d" " -f3 | \
-        head -n1)
-
-      # Save top marker within P-value threshold
-      #cat "${markers_combined}" | \
-      #  awk -v P="${P_cutoff}" '$13 < P' | \
-      #  sort -k 13,13 | \
-      #  head -n1 > "${markers_out}" 
+        head -n1 > "${markers_out}" 
       
       # select current marker
-      #current_marker=$( tail -n1 ${markers_out} | cut -f1)
-      #marker_list=$( cat ${marker_out} | cut -f1 | tr "\n" "," )
-      #echo ${marker_out} | cut -f1 | tr "\n" ","
+      old_marker=${current_marker}
+      current_marker=$( tail -n1 ${markers_out} | cut -d" " -f1)
+      >&2 echo "old_marker=${old_marker}"
+      >&2 echo "current_marker=${current_marker}"
+      if [[ "${current_marker}" != "${old_marker}" ]]; then
+        marker_list=$( cat ${marker_out} | cut -f1 | tr "\n" "," )
+        >&2 echo "New marker found '${current_marker}. Repeating loop with ${marker_list}'"
+      else
+        >&2 echo "Ended loop after ${i} iterations with markers: ${marker_list}"
+        break    
+      fi
+
+      marker_list=$( cat ${marker_out} | cut -f1 | tr "\n" "," )
+      echo ${marker_out} | cut -f1 | tr "\n" ","
 
 
-      if [ -z ${current_marker} ]; then
-          echo "Ended loop after ${i} iterations with markers: ${marker_list}"
-          break    
-      fi    
+      #if [ -z ${current_marker} ]; then
+      ##fi    
       
       #if [ -z ${marker_list} ]; then
       #    markers_list=${current_marker}
@@ -109,7 +112,7 @@ conditional_analysis() {
       #    marker_list+=",${current_marker}"        
       #fi
       
-      ${marker_list} > "${out_prefix}_conditioning_variants.txt"
+      #${marker_list} > "${out_prefix}_conditioning_variants.txt"
 
   done
 }

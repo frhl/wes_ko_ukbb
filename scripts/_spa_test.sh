@@ -44,7 +44,7 @@ spa_test() {
      --vcfField="DS" \
      --chrom="chr${chr}" \
      --minMAF=0.0000001 \
-     --minMAC=3 \
+     --minMAC=1 \
      --GMMATmodelFile=${in_gmat} \
      --varianceRatioFile=${in_var} \
      --SAIGEOutputFile=${out} \

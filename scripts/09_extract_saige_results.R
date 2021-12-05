@@ -63,6 +63,7 @@ for (maf in mafs){
         if (length(knockout_files) > 0){
                 
             # read in knockout results and add meta data
+            write(paste0('loading knockouts', knockout_files[1]), stdout())
             ko_dt <- setDT(do.call(rbind, lapply(knockout_files, zcat)))
             ko_dt$csqs_category <- mutation
             ko_dt$maf <- maf
@@ -120,6 +121,7 @@ for (maf in mafs){
             if (length(saige_files) > 0){
                 
                 # read in saige results and add meta data
+                write(paste('loading saige files',saige_files[1]),stdout())
                 saige_dt <-  setDT(do.call(rbind, lapply(saige_files, fread)))
                 saige_dt$phenotype <- phenotype
                 saige_dt$csqs_category <- mutation
@@ -132,7 +134,8 @@ for (maf in mafs){
                 saige_dt$pvalue.expected <- seq(1, n)/(n + 1)
                 saige_dt$clower = -log10(qbeta(p = (1 - ribbon_p) / 2, shape2 = n:1, shape1 = 1:n))
                 saige_dt$cupper = -log10(qbeta(p = (1 + ribbon_p) / 2, shape2 = n:1, shape1 = 1:n))
-                
+                saige_dt$FDR <- stats::p.adjust(saige_dt$pvalue.observed, method = 'fdr')
+
                 # rename certain columns
                 colnames(saige_dt)[colnames(saige_dt)=='SNPID'] <- 'gene_id'
                 
@@ -161,6 +164,7 @@ for (maf in mafs){
     
 }
 
+write('all loops ran successfully!', stdout())
 
 
 
