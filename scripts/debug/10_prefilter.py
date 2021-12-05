@@ -21,7 +21,7 @@ def main(args):
     mt = qc.get_table(input_path=input_path, input_type=input_type) # 12788
     if min_maf is not None:
         mt = qc.filter_min_maf(mt, 0.001)
-    hl.export_vcf(mt, out_prefix + '.vcf.bfz')
+    hl.export_vcf(mt, out_prefix + '.vcf.bgz')
 
 if __name__=='__main__':
     

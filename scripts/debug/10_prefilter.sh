@@ -34,7 +34,7 @@ python3 "${hail_script}" \
    --min_maf 0.001 \
    --out_prefix ${out_prefix} 
 print_update "Hail finished writing."
-make_tabix "${out_prefix}.vcf.bgz" "csi"
+make_tabix "${out_prefix}.vcf.bgz" "tbi"
 
 
 
