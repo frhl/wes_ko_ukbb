@@ -27,7 +27,7 @@ source utils/vcf_utils.sh
 # directories
 readonly in_dir="data/mt"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/knockouts/211116"
+readonly out_dir="derived/knockouts/211206"
 
 # input path
 readonly knockout_script="scripts/_knockouts.sh"
@@ -37,42 +37,46 @@ readonly in_phased_type="mt"
 readonly in_unphased_type="mt"
 
 # parameters
-#readonly af_min=0
-#readonly af_max=0.01
-readonly maf_max=0.01
-readonly maf_min=0
-readonly sex='both'
+readonly af_max="blah"
+readonly af_min="lae"
+readonly maf_max="arg_maf_max"
+readonly maf_min="arg_maf_min"
+readonly sex="arg_sex"
 
 # output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_females_maf00_01_chrCHR"
+readonly out_prefix="${out_dir}/ukb_wes_200k_maf00_01_chrCHR"
 
 submit_knockout_job() 
 {
   name=$( echo ${1} | tr "," "_")
+  set -x
   qsub -N "_ko_${name}" \
-    -t 1-22 \
+    -t 21 \
     -q "short.qa" \
     -pe shmem 2 \
-    "${knockout_script}" \
-    "${in_phased}" \
-    "${in_phased_type}" \
-    "${in_unphased}" \
-    "${in_unphased_type}" \
-    "${af_min}" \
-    "${af_max}" \
-    "${maf_max}" \
-    "${maf_min}" \
-    "${1}" \
+    "${knockout_script}"\
+    "${in_phased}"\
+    "${in_phased_type}"\
+    "${in_unphased}"\
+    "${in_unphased_type}"\
+    "${af_min}"\
+    "${af_max}"\
+    "${maf_max}"\ 
+    "${maf_min}"\ 
+    "${1}"\ 
     "${sex}"\
     "${out_prefix}"
+  set +x
 }
 
 
 mkdir -p ${out_dir}
 submit_knockout_job "ptv,damaging_missense"
-submit_knockout_job "damaging_missense"
-submit_knockout_job "ptv"
-submit_knockout_job "synonymous"
+#submit_knockout_job 0 0.01 "ptv,damaging_missense"
+
+#submit_knockout_job "damaging_missense"
+#submit_knockout_job "ptv"
+#submit_knockout_job "synonymous"
 #submit_knockout_job "ptv,ptv_LC"
 #submit_knockout_job "ptv,ptv_LC,damaging_missense"
 
