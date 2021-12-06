@@ -82,11 +82,10 @@ def main(args):
     # write to hail table
     #mt.rows().select('errors_sum','hets_sum','switch_errors','info').write(out_prefix + ".ht")
     
-    out = mt.select_entries(mt.PBT_GT, mt.GT, mt.GT_shapeit4)
-    out = out.drop(out.qual, out.filters)
-    out.entries().flatten().export(out_prefix + '_full.txt.bgz')
+    #out = mt.select_entries(mt.PBT_GT, mt.GT, mt.GT_shapeit4)
+    #out = out.drop(out.qual, out.filters)
+    #out.entries().flatten().export(out_prefix + '_full.txt.bgz')
 
-    mt.write(out_prefix + ".mt")
     
     # write to tab-seperated files
     mt = mt.annotate_rows(AC1 = mt.info.AC[0])
@@ -95,6 +94,7 @@ def main(args):
     mt = mt.annotate_rows(AF2 = mt.info.AF[1])
     mt.rows().select('errors_sum','hets_sum','switch_errors','AC1','AC2','AF1','AF2').export(out_prefix + ".tsv.bgz")
 
+    mt.write(out_prefix + ".mt")
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()

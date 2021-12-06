@@ -9,10 +9,11 @@
 #$ -q long.qc@@long.hga
 #$ -t 21
 
-source utils/qsub_utils.sh
+source utils/bash_utils.sh
 source utils/hail_utils.sh
 
-readonly in_dir_phased="/well/lindgren/UKBIOBANK/nbaya/wes_200k/phase_ukb_wes/data/phased/non_singleton"
+#readonly in_dir_phased="/well/lindgren/UKBIOBANK/nbaya/wes_200k/phase_ukb_wes/data/phased/non_singleton"
+readonly in_dir_phased="data/phased/test-phasing"
 readonly in_dir_unphased="data/unphased/post-qc"
 readonly spark_dir="data/tmp/spark"
 readonly out_dir="data/mendel"
@@ -23,7 +24,8 @@ readonly rscript="scripts/QC/10_phase_trios.R"
 
 # input path
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 
-readonly in_phased="${in_dir_phased}/ukb_wes_phased_non_singleton_chr${chr}-24xlong.qc-v4.2.2.vcf.gz"
+#readonly in_phased="${in_dir_phased}/ukb_wes_phased_non_singleton_chr${chr}-24xlong.qc-v4.2.2.vcf.gz"
+readonly in_phased="${in_dir_phased}/ukb_wes_200k_refphased_chr${chr}.vcf.gz"
 readonly in_unphased="${in_dir_unphased}/ukb_wes_200k_filtered_chr${chr}.mt"
 readonly annotation_table="data/vep/hail/ukb_wes_200k_chr${chr}_vep.ht"
 
@@ -32,11 +34,11 @@ readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc
 readonly final_variant_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list'
 
 # output path
-readonly out_prefix="${out_dir}/211125_test_ukb_wes_200k_phasing_errors_chr${chr}"
+readonly out_prefix="${out_dir}/211206_test_ukb_wes_refphase_200k_phasing_errors_chr${chr}"
 
 # run hail and get Switch errors
 set_up_hail
-set_up_pythonpath_legacy  
+set_up_pythonpath_legacy
 python3 "${hail_script}" \
      --chrom ${chr} \
      --input_phased_path ${in_phased}\
