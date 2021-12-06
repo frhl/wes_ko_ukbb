@@ -61,9 +61,10 @@ conditional_analysis() {
   markers_conditional="${out_prefix}_conditioning_markers.txt"
   rm ${markers_conditional}
   
-  i=0
+  i=0 #
   max=2
-  marker_list=""
+  marker_list="" # markers for SAIGE
+  rsid_list="" # do not include rsids in next iteration
   while [ $i -lt $max ]; do
       
       true $(( i++ ))
@@ -86,15 +87,25 @@ conditional_analysis() {
       cat "${markers_combined}" | \
         awk -v P="${P_cutoff}" '$13 < P' | \
         sort -k 13,13 | \
+        grep -v -E '${rsid_list}' | \
         head -n1 >> "${markers_conditional}" 
 
       # select current marker
       old_marker=${current_marker}
       current_marker=$( tail -n1 ${markers_conditional} | awk '{print $1":"$2"_"$4"/"$5}')
+      current_rsid=$( tail -n1 ${markers_conditional} | cut -d" " -f3)
       >&2 echo "old_marker=${old_marker}"
       >&2 echo "current_marker=${current_marker}"
+      >&2 echo "rsid_list=${rsid_list}"
+
       if [[ "${current_marker}" != "${old_marker}" ]]; then
-        marker_list=$( cat ${markers_conditional} | cut -d" " -f3 | tr "\n" "," | sed 's/,$//' )
+        if [[ "${marker_list}" == "" ]]; then
+          marker_list="${current_marker}"
+          rsid_list="(${current_rsid})"
+        else 
+          marker_list="${marker_list},${current_marker}" 
+          rsid_list="${marker_list}|(${current_marker})" 
+        fi
         >&2 echo "New marker found '${current_marker}. Repeating loop with ${marker_list}'"
       else
         >&2 echo "Ended loop after ${i} iterations with markers: ${marker_list}"
@@ -106,7 +117,7 @@ conditional_analysis() {
 
 # loop params
 set_up_RSAIGE
-readonly P_cutoff=0.0005
+readonly P_cutoff=0.01
 mkdir -p ${out_dir}
 
 annotation="synonymous"
