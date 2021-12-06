@@ -21,7 +21,7 @@ readonly out_dir="data/phased/test-phasing"
 
 readonly chr="${SGE_TASK_ID}"
 readonly in_file="${in_dir}/ukb_wes_200k_filtered_chr${chr}.vcf.bgz"
-readonly out_prefix="${out_dir}/ukb_wes_200k_filtered_maf0001_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_wes_200k_filtered_maf001_chr${chr}"
 readonly hail_script="scripts/debug/10_prefilter.py"
 
 set_up_hail
@@ -31,7 +31,7 @@ mkdir -p ${out_dir}
 python3 "${hail_script}" \
    --input_path ${in_file} \
    --input_type "vcf" \
-   --min_maf 0.001 \
+   --min_maf 0.01 \
    --out_prefix ${out_prefix} 
 print_update "Hail finished writing."
 make_tabix "${out_prefix}.vcf.bgz" "tbi"

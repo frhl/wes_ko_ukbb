@@ -26,7 +26,7 @@ readonly ref="${ref_dir}/ALL.chr${chr}.phase3_shapeit2_mvncall_integrated_v5.201
 readonly gmap="/well/lindgren/flassen/software/SHAPEIT4/b38.gmap/chr${chr}.b38.gmap.gz"
 
 mkdir -p ${out_dir}
-module load SHAPEIT4/4.2.0-foss-2019b
+module load SHAPEIT4/4.2.2-foss-2021a
 SECONDS=0
 shapeit4.2 \
   --input ${in_file} \
