@@ -70,7 +70,7 @@ def main(args):
 
     # annotate shapeit4 GTs with GTs phased by transmission and filter to hets
     mt = mt.annotate_entries(GT_shapeit4 = mt1[mt.row_key, mt.col_key].GT)
-    mt = mt.filter_entries(hl.is_defined(mt.PBT.GT) & hl.is_defined(mt.GT_shapeit4))
+    mt = mt.filter_entries(hl.is_defined(mt.PBT_GT) & hl.is_defined(mt.GT_shapeit4))
     mt = mt.filter_entries(mt.GT_shapeit4.is_het_ref())
     mt = mt.filter_entries(mt.PBT_GT.is_het_ref())
 

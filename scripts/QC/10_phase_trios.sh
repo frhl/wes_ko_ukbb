@@ -55,7 +55,7 @@ print_update "Finished running HAIL for chr${chr}" "${SECONDS}"
 # Calculate binominal confidence intervals
 set_up_rpy
 Rscript "${rscript}" \
-    --in_file "${out_prefix}.tsv.gz"
+    --in_file "${out_prefix}.tsv.gz"\
     --out_file "${out_prefix}_conf.tsv.gz"
 
 
