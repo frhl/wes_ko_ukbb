@@ -113,14 +113,11 @@ def main(args):
         mt_ko_rsid = analysis.gene_csqs_knockout_builder(mt1_subset)
         mt_ko_rsid.export(outfile_ko_rsid)
 
-    outfile_saige = str(out_prefix) + "_" + str(category) + "_ko.vcf.bgz"
+    #outfile_saige = str(out_prefix) + "_" + str(category) + "_ko"
     if export_saige_vcf and not os.path.exists(outfile_saige):
         out = analysis.gene_csqs_calc_pKO_pseudoSNP(mt1_subset, mt2_subset, chrom)
         qc.export_table(out, out_prefix = out_prefix + "_" + category + "_ko", out_type = 'vcf')
-        #undefined = out.aggregate_entries(hl.agg.sum(~hl.is_defined(out.DS)))
-        #n = out.count()
-        #print(f"chr{chrom}: undefined = {undefined}; variant/sample-count = {n}")
-
+        out.write(out_prefix + "_" + category + "_ko.mt")
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
