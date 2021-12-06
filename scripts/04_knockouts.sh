@@ -45,7 +45,7 @@ readonly prefix="${out_dir}/ukb_wes_200k"
 
 submit_knockout_job() 
 {
-  out_prefix="${prefix}_maf${1}_${2}_${3}_chrCHR"
+  out_prefix="${prefix}_maf${1}_${2}_${3:+_${3}}chrCHR"
   qsub_name=$( echo ${4} | tr "," "_")
   set -x
   qsub -N "_ko_${qsub_name}" \
@@ -69,6 +69,9 @@ submit_knockout_job()
 
 mkdir -p ${out_dir}
 submit_knockout_job 0 0.01 "" "ptv,damaging_missense"
+#submit_knockout_job 0 0.01 "" "ptv"
+#submit_knockout_job 0 0.01 "" "synonymous"
+#submit_knockout_job 0 0.01 "" "ptv,ptv_LC"
 
 #submit_knockout_job "damaging_missense"
 #submit_knockout_job "ptv"
