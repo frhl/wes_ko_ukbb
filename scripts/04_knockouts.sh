@@ -17,8 +17,8 @@
 #$ -q short.qf
 #$ -V
 
-#set -o errexit
-#set -o nounset
+set -o errexit
+set -o nounset
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
@@ -36,43 +36,39 @@ readonly in_unphased="${in_dir}/ukb_wes_200k_annotated_chrCHR_singletons.mt"
 readonly in_phased_type="mt"
 readonly in_unphased_type="mt"
 
-# parameters
-readonly af_max="blah"
-readonly af_min="lae"
-readonly maf_max="arg_maf_max"
-readonly maf_min="arg_maf_min"
-readonly sex="arg_sex"
+# parameters required
+readonly af_min=""
+readonly af_max=""
 
 # output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_maf00_01_chrCHR"
+readonly prefix="${out_dir}/ukb_wes_200k"
 
 submit_knockout_job() 
 {
-  name=$( echo ${1} | tr "," "_")
+  out_prefix="${prefix}_maf${1}_${2}_${3}_chrCHR"
+  qsub_name=$( echo ${4} | tr "," "_")
   set -x
-  qsub -N "_ko_${name}" \
+  qsub -N "_ko_${qsub_name}" \
     -t 21 \
     -q "short.qa" \
     -pe shmem 2 \
-    "${knockout_script}"\
-    "${in_phased}"\
-    "${in_phased_type}"\
-    "${in_unphased}"\
-    "${in_unphased_type}"\
-    "${af_min}"\
-    "${af_max}"\
-    "${maf_max}"\ 
-    "${maf_min}"\ 
-    "${1}"\ 
-    "${sex}"\
+    "${knockout_script}" \
+    "${in_phased}" \
+    "${in_phased_type}" \
+    "${in_unphased}" \
+    "${in_unphased_type}" \
+    "${af_min}" \
+    "${af_max}" \
+    "${1}" \
+    "${2}" \
+    "${3}" \
+    "${4}"\
     "${out_prefix}"
   set +x
 }
 
-
 mkdir -p ${out_dir}
-submit_knockout_job "ptv,damaging_missense"
-#submit_knockout_job 0 0.01 "ptv,damaging_missense"
+submit_knockout_job 0 0.01 "" "ptv,damaging_missense"
 
 #submit_knockout_job "damaging_missense"
 #submit_knockout_job "ptv"
