@@ -62,13 +62,12 @@ conditional_analysis() {
   rm ${markers_conditional}
   
   i=0 #
-  max=2
+  max=5
   marker_list="" # markers for SAIGE
-  rsid_list="" # do not include rsids in next iteration
+  rsid_list="NULL" # do not include rsids in next iteration
   while [ $i -lt $max ]; do
       
       true $(( i++ ))
-      
       >&2 echo "Iteration: ${i}"
       >&2 echo "Condtioning marker: ${current_marker}"
       >&2 echo "Condtioning marker list: ${marker_list}"
@@ -87,7 +86,7 @@ conditional_analysis() {
       cat "${markers_combined}" | \
         awk -v P="${P_cutoff}" '$13 < P' | \
         sort -k 13,13 | \
-        grep -v -E '${rsid_list}' | \
+        grep -v -E ${rsid_list} | \
         head -n1 >> "${markers_conditional}" 
 
       # select current marker
@@ -104,13 +103,14 @@ conditional_analysis() {
           rsid_list="(${current_rsid})"
         else 
           marker_list="${marker_list},${current_marker}" 
-          rsid_list="${marker_list}|(${current_marker})" 
+          rsid_list="${rsid_list}|(${current_rsid})" 
         fi
         >&2 echo "New marker found '${current_marker}. Repeating loop with ${marker_list}'"
       else
         >&2 echo "Ended loop after ${i} iterations with markers: ${marker_list}"
         break    
       fi
+      
 
   done
 }
