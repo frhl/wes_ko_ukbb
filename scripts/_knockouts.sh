@@ -26,10 +26,10 @@ readonly in_unphased=${3?Error: Missing arg3 (in_unphased)}
 readonly in_unphased_type=${4?Error: Missing arg4 (in_unphased_type)}
 readonly af_min=${5?Error: Missing arg5 (af_max)}
 readonly af_max=${6?Error: Missing arg6 (af_max)}
-readonly maf_max=${7?Error: Missing arg7 (maf_max)}
-readonly maf_min=${8?Error: Missing arg8 (maf_min)}
-readonly in_category=${9?Error: Missing arg9 (in_category)}
-readonly in_sex=${10?Error: Missing arg10 (in_sex)}
+readonly maf_min=${7?Error: Missing arg7 (maf_min)}
+readonly maf_max=${8?Error: Missing arg8 (maf_max)}
+readonly in_sex=${9?Error: Missing arg9 (in_sex)}
+readonly in_category=${10?Error: Missing arg10 (in_category)}
 readonly out_prefix=${11?Error: Missing arg11 (path prefix for saige output)}
 
 readonly chr=${SGE_TASK_ID}
@@ -48,13 +48,17 @@ python3 "${hail_script}" \
     --input_unphased_type ${in_unphased_type} \
     --csqs_category ${in_category} \
     --out_prefix ${out} \
-    --maf_min ${maf_min} \
-    --maf_max ${maf_max} \
-    --sex ${in_sex}\
+    ${af_min:+--af_min "$af_min"} \
+    ${af_max:+--af_min "$af_max"} \
+    ${maf_max:+--maf_max "$maf_max"} \
+    ${maf_min:+--maf_min "$maf_min"} \
+    ${in_sex:+--sex "$in_sex"} \
     --use_loftee \
     --export_ko_rsid \
     --export_ko_probability \
     --export_saige_vcf
+ 
+
 set +x
 print_update "Finished running HAIL for chr${chr}" "${SECONDS}"
 
