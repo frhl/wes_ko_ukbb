@@ -37,6 +37,7 @@ readonly final_variant_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_q
 readonly out_prefix="${out_dir}/211206_test_ukb_wes_refphase_200k_phasing_errors_chr${chr}"
 
 # run hail and get Switch errors
+# run hail and get trios for both dataset
 set_up_hail
 set_up_pythonpath_legacy
 python3 "${hail_script}" \
@@ -52,11 +53,12 @@ python3 "${hail_script}" \
 conda deactivate
 print_update "Finished running HAIL for chr${chr}" "${SECONDS}"
 
+
 # Calculate binominal confidence intervals
-set_up_rpy
-Rscript "${rscript}" \
-    --in_file "${out_prefix}.tsv.gz"\
-    --out_file "${out_prefix}_conf.tsv.gz"
+#set_up_rpy
+#Rscript "${rscript}" \
+#    --in_file "${out_prefix}.tsv.gz"\
+#    --out_file "${out_prefix}_conf.tsv.gz"
 
 
 
