@@ -52,6 +52,6 @@ d$p.value_new = unlist(ifelse(conditioning, list(d$p.value_cond), list(d$p.value
 # save combined table
 d <- d[order(d$p.value_new)]
 outfile = paste0(args$prefix, '.txt')
-fwrite(d, outfile, quote = FALSE, row.names = FALSE)
+fwrite(d, outfile, quote = FALSE, row.names = FALSE, sep = ' ')
 
 
