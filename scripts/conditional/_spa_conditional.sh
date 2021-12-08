@@ -27,7 +27,7 @@ readonly step2_SPAtests="/well/lindgren/flassen/software/dev/SAIGE/extdata/step2
 readonly rscript="scripts/conditional/03_spa_conditional.R"
 
 spa_chr_loop() {
-   for chr in {5..6}; do
+   for chr in {1..22}; do
       local prefix_chr="${3}_chr${chr}"
       set -x
       Rscript "${step2_SPAtests}"  \
