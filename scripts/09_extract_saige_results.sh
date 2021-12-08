@@ -20,8 +20,16 @@ readonly out_prefix="${out_dir}/211111_wes200k_saige_merge"
 # run r-code
 mkdir -p ${out_dir}
 set_up_rpy
+
+# run for binary traits
 Rscript "${rscript}"\
-  --out_prefix ${out_prefix}
+  --out_prefix ${out_prefix}\
+  --in_phenotypes "binary"
+
+# run for continious traits
+Rscript "${rscript}"\
+  --out_prefix ${out_prefix}\
+  --in_phenotypes "cts"
 
 
 

@@ -14,9 +14,11 @@ devtools::load_all('/well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb/uti
 # add arguments
 parser <- ArgumentParser()
 parser$add_argument("--out_prefix", default=NULL, help = "Where should the results be written?")
+parser$add_argument("--in_phenotypes", default=NULL, help = "Phenotypes")
 args <- parser$parse_args()
 
-## paramters
+stopifnot(args$in_phenotypes %in% c('binary','cts'))
+stopifnot(dir.exists(dirname(args$out_prefix)))
 
 # knockout counts
 knockouts <- list.files('derived/knockouts/211111/', full.names = TRUE)
@@ -36,10 +38,18 @@ mutations <- c('ptv','ptv_damaging_missense','synonymous')
 mafs <- c('00_01','01_50','00_50')
 
 # current params selected
-phenotypes = pheno_binary
 mafs = '00_01' # sometimes eerors out with too high MAF
 ribbon_p=0.95
 out_prefix = args$out_prefix
+
+if (args$in_phenotypes == 'binary'){
+    phenotypes = pheno_binary
+    saige_file = saige_binary
+} else {
+    phenotypes = pheno_cts
+    saige_file = saige_cts
+}
+
 
 #out_prefix <- 'derived/tables/saige/211111_wes200k_saige_merge'
 
@@ -103,8 +113,7 @@ for (maf in mafs){
             # combine haplotypes by gene
             combined <- genes_haplotypes
             combined$knockout_alleles <- paste0(combined$hap1, '+', combined$hap2)
-            combined <- aggregate(knockout_alleles ~ gene_id, data = combined, FUN = function(x) paste(x, collapse = '; '))                     
-                                      
+            combined <- aggregate(knockout_alleles ~ gene_id, data = combined, FUN = function(x) paste(x, collapse = '; '))
         }
         
         for (phenotype in phenotypes){
@@ -113,10 +122,10 @@ for (maf in mafs){
 
             # Get the right saige files
             pheno_mutation = paste0(mutation, '_', phenotype)
-            bool_maf = grepl(maf, saige_binary)
-            bool_pheno = grepl(phenotype, saige_binary)
-            bool_mutation = grepl(pheno_mutation, saige_binary)
-            saige_files <- saige_binary[bool_pheno & bool_mutation & bool_maf]
+            bool_maf = grepl(maf, saige_file)
+            bool_pheno = grepl(phenotype, saige_file)
+            bool_mutation = grepl(pheno_mutation, saige_file)
+            saige_files <- saige_file[bool_pheno & bool_mutation & bool_maf]
             
             if (length(saige_files) > 0){
                 
