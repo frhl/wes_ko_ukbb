@@ -32,6 +32,7 @@ print(bool)
 if (!all(conds %in% colnames(d))){
     ndf = data.table(Tstat_cond = NA, p.value_cond = NA, varT_cond = NA, BETA_cond = NA, SE_cond = NA)
     d <- cbind(d, ndf)
+    print("Adding columns")
 }
 
 print(colnames(d))
@@ -43,8 +44,17 @@ d <- cbind(
     d[,conds, with = FALSE]
 )
 
+# Check rows
+nrows = nrow(d)
+na_values = sum(is.na(d$p.value_cond) & is.na(d$p.value))
+if (na_values > 0){
+    print(paste0(sum(is.na(d$p.value_cond)),"/", nrows," conditional P-values are NAs."))
+    print(paste0(sum(is.na(d$p.value)),"/", nrows, " regular P-values are NAs."))
+    stop('NAs found among P-values!')
+}
+
 # Select P-value
-conditioning = all(is.na(d$p.value.cond)) & all(is.na(d$p.value))
+conditioning = as.logical(sum(is.na(d$p.value.cond)) == 0)
 write(paste0('Conditioning markers included: ', conditioning),stdout())
 d$Tstat_new = unlist(ifelse(conditioning, list(d$Tstat_cond), list(d$Tstat)))
 d$p.value_new = unlist(ifelse(conditioning, list(d$p.value_cond), list(d$p.value)))
