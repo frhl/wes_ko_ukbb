@@ -61,16 +61,16 @@ conditional_analysis() {
   out_prefix=${2}
   markers_conditional="${out_prefix}_conditioning_markers.txt"
   rm ${markers_conditional}
-  
+ 
   i=0 #
-  max=3
+  max=10
   marker_list="" # markers for SAIGE
   while [ $i -lt $max ]; do
 
       true $(( i++ ))
-      >&2 echo "Iteration: ${i}"
-      >&2 echo "Condtioning marker: ${current_marker}"
-      >&2 echo "Condtioning marker list: ${marker_list}"
+      >&2 echo "[Iteration ${i}]: Beginning new iteration.."
+      >&2 echo "[Iteration ${i}]: Current condtioning marker: ${current_marker}"
+      >&2 echo "[Iteration ${i}]: Current condtioning marker list: ${marker_list}"
 
       # setup prefixes for temporary files
       prefix_iter="${out_prefix}_i${i}"
@@ -80,26 +80,17 @@ conditional_analysis() {
       # Run saddle point approximation using condtioning markers
       spa_chr_loop "${vcf}" "${marker_list}" "${prefix_iter}"
       Rscript "${rscript}" --prefix ${prefix_iter}
-      
-      #cat "${prefix_iter_chr}"* > ${markers_combined}
-      #rm  "${prefix_iter_chr}"*
+      rm  "${prefix_iter_chr}"*
 
       # Save top marker within P-value threshold
       cat "${markers_combined}" | \
         awk -v P="${P_cutoff}" '$32 < P' | \
-        sort -k 32,32 | \
         head -n1 >> "${markers_conditional}" 
 
       # select current marker
       old_marker=${current_marker}
       current_marker=$( tail -n1 ${markers_conditional} | awk '{print $1":"$2"_"$4"/"$5}')
-      current_rsid=$( tail -n1 ${markers_conditional} | cut -d" " -f3)
-      spa_p=$( tail -n1 ${markers_conditional} | cut -d" " -f32)
-      #cond_p=$( tail -n1 ${markers_conditional} | cut -d" " -f32)
-
-      >&2 echo "old_marker=${old_marker}"
-      >&2 echo "current_marker=${current_marker}"
-      >&2 echo "rsid_list=${rsid_list}"
+      current_p=$( tail -n1 ${markers_conditional} | cut -d" " -f32)
 
       if [[ "${current_marker}" != "${old_marker}" ]]; then
         if [[ "${marker_list}" == "" ]]; then
@@ -107,10 +98,10 @@ conditional_analysis() {
         else 
           marker_list="${marker_list},${current_marker}" 
         fi
-        >&2 echo "New marker found '${current_marker} (P-value=${current_p}). Repeating loop with ${marker_list}'"
+        >&2 echo "[Iteration ${i}]: New marker found '${current_marker} (P-value=${current_p}). Conditioning on ${marker_list}'"
       else
-        >&2 echo "No other markers passing sig threshold (P-value<${P_cutoff}). Ended loop after ${i} iterations with markers: ${marker_list}"
-        break    
+        >&2 echo "[Iteration ${i}]: No other markers passing sig threshold (P-value<${P_cutoff}). Ended loop with markers: ${marker_list}"
+        break
       fi
     
   done
@@ -118,7 +109,7 @@ conditional_analysis() {
 
 # loop params
 set_up_RSAIGE
-readonly P_cutoff=0.0001
+readonly P_cutoff=0.1
 mkdir -p ${out_dir}
 
 annotation="synonymous"
