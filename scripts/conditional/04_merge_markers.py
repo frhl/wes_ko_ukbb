@@ -10,7 +10,7 @@ from ko_utils import qc
 
 
 def main(args):
-
+   
     input_vcf = args.input_vcf
     input_markers = args.input_markers
     out_prefix = args.out_prefix
@@ -24,20 +24,26 @@ def main(args):
     # load table of genes that are significant in primary analysis
     ht = hl.import_table(input_markers)
 
-    # load knockout VCF
-    mt = hl.import_vcf(input_vcf)
+    # table of variants to condition on
+    ht = ht.annotate(variant = hl.delimit([ht.f0, ht.f1, ht.f3, ht.f4], ':'))
+    ht = ht.key_by(**hl.parse_variant(ht.variant, reference_genome = 'GRCh37'))
 
-    # Subset to conditioning markers
-    geno = genotypes.get_ukb_genotypes_bed(AUTOSOMES)
-    geno = geno.filter_cols(hl.is_defined(geno[mt.row_key].s))
-    geno = variants.liftover(geno)
-    geno = geno.filter_rows(hl.is_defined(geno[ht.key]))
-    n = geno.count()
-    print(f'Filtered to {n} genotyped variants. Merging..')
+    # get genotype for selected variants
+    chromosomes = [x.replace('chr', '') for x in list(set(ht.locus.contig.collect()))]
+    mtc = genotypes.get_ukb_imputed_v3_bgen(chromosomes)
+    mtc = variants.liftover(mtc)
+    mtc = mtc.filter_rows(hl.is_defined(ht[mtc.row_key]))
+    mtc = mtc.annotate_entries(DS = mtc.GT.n_alt_alleles())
+
+    # load knockout file
+    mt = hl.import_vcf(input_vcf)
     
-    #mt.union_rows(geno)
+    # order mtc and mt
+
     
-    hl.export_vcf(mt, out_prefix + '.vcf.bgz')
+    
+    
+    #hl.export_vcf(mt, out_prefix + '.vcf.bgz')
 
 
 if __name__ == '__main__':
