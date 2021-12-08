@@ -1,121 +1,58 @@
 #!/usr/bin/env bash
 #
 #
-#$ -N spa_conditional
+#$ -N submit_spa_conditional
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/spa_conditional.log
-#$ -e logs/spa_conditional.errors.log
+#$ -o logs/submit_spa_conditional.log
+#$ -e logs/submit_spa_conditional.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q short.qc@@short.hge
-#$ -t 3
+#$ -q test.qc
+#$ -V
 
-source utils/bash_utils.sh
+set -o errexit
+set -o nounset
 
-# Directories
 readonly in_dir="data/conditional/common"
 readonly out_dir="data/conditional/common"
 readonly pheno_dir="data/phenotypes"
 readonly step1_dir="data/saige/output/combined/binary/step1"
 
-# setup phenotype
 readonly pheno_list="${pheno_dir}/UKBB_WES200k_binary_phenotypes_header.txt"
 readonly index=${SGE_TASK_ID}
 readonly phenotype=$( cut -f${index} ${pheno_list} )
 
-# saige parameters
+readonly spa_script="scripts/conditional/_spa_conditional.sh"
 readonly in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
 readonly in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
-readonly step2_SPAtests="/well/lindgren/flassen/software/dev/SAIGE/extdata/step2_SPAtests.R"
-readonly rscript="scripts/conditional/03_spa_conditional.R"
-
-spa_chr_loop() {
-   for chr in {5..6}; do
-      local prefix_chr="${3}_chr${chr}"
-      set -x
-      Rscript "${step2_SPAtests}"  \
-        --vcfFile=${1} \
-        --vcfFileIndex="${1}.csi" \
-        --vcfField="GT" \
-        --chrom="chr${chr}" \
-        --minMAF=0.000001 \
-        --minMAC=1 \
-        --GMMATmodelFile=${in_gmat} \
-        --varianceRatioFile=${in_var} \
-        --SAIGEOutputFile=${prefix_chr} \
-        --numLinesOutput=2 \
-        --IsOutputAFinCaseCtrl=TRUE \
-        --IsOutputNinCaseCtrl=TRUE \
-        --IsOutputHetHomCountsinCaseCtrl=TRUE \
-        --LOCO=FALSE \
-        ${2:+--condition "$2"}
-      set +x
-   done
-   >&2 echo "Markers: ${2}"
-   >&2 echo "VCF: ${1}"
-   >&2 echo "Prefix: ${3}"
-}
-
-conditional_analysis() {
-  vcf=${1}
-  out_prefix=${2}
-  markers_conditional="${out_prefix}_conditioning_markers.txt"
-  rm ${markers_conditional}
- 
-  i=0 #
-  max=10
-  marker_list="" # markers for SAIGE
-  while [ $i -lt $max ]; do
-
-      true $(( i++ ))
-      >&2 echo "[Iteration ${i}]: Beginning new iteration.."
-      >&2 echo "[Iteration ${i}]: Current condtioning marker: ${current_marker}"
-      >&2 echo "[Iteration ${i}]: Current condtioning marker list: ${marker_list}"
-
-      # setup prefixes for temporary files
-      prefix_iter="${out_prefix}_i${i}"
-      prefix_iter_chr="${prefix_iter}_chr"
-      markers_combined="${prefix_iter}.txt"
-
-      # Run saddle point approximation using condtioning markers
-      spa_chr_loop "${vcf}" "${marker_list}" "${prefix_iter}"
-      Rscript "${rscript}" --prefix ${prefix_iter}
-      rm  "${prefix_iter_chr}"*
-
-      # Save top marker within P-value threshold
-      cat "${markers_combined}" | \
-        awk -v P="${P_cutoff}" '$32 < P' | \
-        head -n1 >> "${markers_conditional}" 
-
-      # select current marker
-      old_marker=${current_marker}
-      current_marker=$( tail -n1 ${markers_conditional} | awk '{print $1":"$2"_"$4"/"$5}')
-      current_p=$( tail -n1 ${markers_conditional} | cut -d" " -f32)
-
-      if [[ "${current_marker}" != "${old_marker}" ]]; then
-        if [[ "${marker_list}" == "" ]]; then
-          marker_list="${current_marker}"
-        else 
-          marker_list="${marker_list},${current_marker}" 
-        fi
-        >&2 echo "[Iteration ${i}]: New marker found '${current_marker} (P-value=${current_p}). Conditioning on ${marker_list}'"
-      else
-        >&2 echo "[Iteration ${i}]: No other markers passing sig threshold (P-value<${P_cutoff}). Ended loop with markers: ${marker_list}"
-        break
-      fi
-    
-  done
-}
-
-# loop params
-set_up_RSAIGE
 readonly P_cutoff=0.0001
-mkdir -p ${out_dir}
+
+submit_spa_cond_job() 
+{
+  set -x
+  qsub -N "_spa_cond_${3}" \
+    -t 21 \
+    -q "short.qc@@short.hge" \
+    -pe shmem 1 \
+    "${spa_script}" \
+    "${in_dir}" \
+    "${out_dir}" \
+    "${pheno_dir}" \
+    "${step1_dir}" \
+    "${pheno_list}" \
+    "${in_gmat}" \
+    "${in_var}" \
+    "${1}" \
+    "${2}" \
+    "${P_cutoff}" \
+  set +x
+}
+
 
 annotation="synonymous"
 vcf="${in_dir}/211111_intervals_${annotation}_${phenotype}.vcf.bgz"
 out_prefix="${out_dir}/211111_spa_conditional_${annotation}_${phenotype}"
-conditional_analysis ${vcf} ${out_prefix}
+submit_spa_cond_job ${vcf} ${out_prefix} ${annotation}
 
 
 
