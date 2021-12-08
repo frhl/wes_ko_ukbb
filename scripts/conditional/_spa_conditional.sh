@@ -4,28 +4,27 @@
 #$ -N _spa_conditional
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/spa_conditional.log
-#$ -e logs/spa_conditonal.errors.log
+#$ -e logs/spa_conditional.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q lindgren.qe
 
 source utils/bash_utils.sh
 
-readonly in_dir=${1?Error: Missing arg1 (in dir)}
-readonly out_dir=${2?Error: Missing arg2 (out_dir)}
-readonly pheno_dir=${3?Error: Missing arg3 (pheno_dir)}
-readonly step1_dir=${4?Error: Missing arg4 (step1_dir)}
-readonly pheno_list=${5?Error: Missing arg5 (pheno_dir)}
-readonly in_gmat=${6?Error: Missing arg6 (in_gmat)}
-readonly in_var=${7?Error: Missing arg7 (in_var)}
-readonly step2_SPAtests=${8?Error: Missing arg8 (step2_SPAtests)}
-readonly vcf=${9?Error: Missing arg9 (vcf)}
-readonly out_prefix=${10?Error: Missing arg10 (vcf)}
+#readonly in_dir=${1?Error: Missing arg1 (in dir)}
+#readonly out_dir=${2?Error: Missing arg2 (out_dir)}
+#readonly pheno_dir=${3?Error: Missing arg3 (pheno_dir)}
+#readonly step1_dir=${4?Error: Missing arg4 (step1_dir)}
+#readonly pheno_list=${1?Error: Missing arg1 (pheno_dir)}
+readonly in_gmat=${1?Error: Missing arg2 (in_gmat)}
+readonly in_var=${2?Error: Missing arg3 (in_var)}
+readonly vcf=${3?Error: Missing arg4 (vcf)}
+readonly out_prefix=${4?Error: Missing arg5 (out_prefix)}
+readonly P_cutoff=${5?Error: Missing arg6 (P_cutoff)}
+readonly max_iter=${6?Error: Missing arg7 (max_iter)}
 
+readonly step2_SPAtests="/well/lindgren/flassen/software/dev/SAIGE/extdata/step2_SPAtests.R"
 readonly rscript="scripts/conditional/03_spa_conditional.R"
-readonly index=${SGE_TASK_ID}
-readonly phenotype=$( cut -f${index} ${pheno_list} )
-
 
 spa_chr_loop() {
    for chr in {5..6}; do
@@ -55,15 +54,13 @@ spa_chr_loop() {
 }
 
 conditional_analysis() {
-  vcf=${1}
-  out_prefix=${2}
   markers_conditional="${out_prefix}_conditioning_markers.txt"
   rm ${markers_conditional}
 
   i=0 #
-  max=10
+  #max=10
   marker_list="" # markers for SAIGE
-  while [ $i -lt $max ]; do
+  while [ $i -lt $max_iter ]; do
 
       true $(( i++ ))
       >&2 echo "[Iteration ${i}]: Beginning new iteration.."
@@ -106,5 +103,7 @@ conditional_analysis() {
 }
 
 # Run analysis
+set_up_RSAIGE
+mkdir -p ${out_dir}
 conditional_analysis ${vcf} ${out_prefix}
 

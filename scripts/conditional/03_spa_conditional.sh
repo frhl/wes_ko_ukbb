@@ -8,6 +8,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
+#$ -t 3
 #$ -V
 
 set -o errexit
@@ -22,32 +23,40 @@ readonly pheno_list="${pheno_dir}/UKBB_WES200k_binary_phenotypes_header.txt"
 readonly index=${SGE_TASK_ID}
 readonly phenotype=$( cut -f${index} ${pheno_list} )
 
-readonly spa_script="scripts/conditional/_spa_conditional.sh"
 readonly in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
 readonly in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
+
+readonly max_iter=10
 readonly P_cutoff=0.0001
+readonly spa_script="scripts/conditional/_spa_conditional.sh"
 
 submit_spa_cond_job() 
 {
   set -x
   qsub -N "_spa_cond_${3}" \
-    -t 21 \
     -q "short.qc@@short.hge" \
+    -t "${SGE_TASK_ID}" \
     -pe shmem 1 \
     "${spa_script}" \
-    "${in_dir}" \
-    "${out_dir}" \
-    "${pheno_dir}" \
-    "${step1_dir}" \
-    "${pheno_list}" \
     "${in_gmat}" \
     "${in_var}" \
     "${1}" \
     "${2}" \
     "${P_cutoff}" \
+    "${max_iter}"
   set +x
 }
 
+# submit scripts
+annotation="ptv"
+vcf="${in_dir}/211111_intervals_${annotation}_${phenotype}.vcf.bgz"
+out_prefix="${out_dir}/211111_spa_conditional_${annotation}_${phenotype}"
+submit_spa_cond_job ${vcf} ${out_prefix} ${annotation}
+
+annotation="ptv_damaging_missense"
+vcf="${in_dir}/211111_intervals_${annotation}_${phenotype}.vcf.bgz"
+out_prefix="${out_dir}/211111_spa_conditional_${annotation}_${phenotype}"
+submit_spa_cond_job ${vcf} ${out_prefix} ${annotation}
 
 annotation="synonymous"
 vcf="${in_dir}/211111_intervals_${annotation}_${phenotype}.vcf.bgz"

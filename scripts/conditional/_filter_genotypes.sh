@@ -42,7 +42,6 @@ filter_genotypes() {
 }
 
 # run analysis
-mkdir -p ${out_dir}
 set_up_hail
 set_up_pythonpath_legacy
 filter_genotypes
