@@ -39,6 +39,8 @@ filter_genotypes() {
   python3 "${hail_script}" \
      --phenotype ${phenotype} \
      --annotation ${annotation} \
+     --min_maf 0.01 \
+     --min_info 0.80 \
      --padding 1000000 \
      --gene_table ${gene_table} \
      --final_sample_list ${final_sample_list} \
@@ -48,16 +50,16 @@ filter_genotypes() {
 }
 
 
-annotation='ptv'
-out_prefix="${out_dir}/211111_intervals_${annotation}_${phenotype}"
-filter_genotypes ${annotation} ${out_prefix}
+#annotation='ptv'
+#out_prefix="${out_dir}/211111_intervals_${annotation}_${phenotype}"
+#filter_genotypes ${annotation} ${out_prefix}
 
-annotation='ptv_damaging_missense'
-out_prefix="${out_dir}/211111_intervals_${annotation}_${phenotype}"
-filter_genotypes ${annotation} ${out_prefix}
+#annotation='ptv_damaging_missense'
+#out_prefix="${out_dir}/211111_intervals_${annotation}_${phenotype}"
+#filter_genotypes ${annotation} ${out_prefix}
 
 annotation='synonymous'
-out_prefix="${out_dir}/211111_intervals_${annotation}_${phenotype}"
+out_prefix="${out_dir}/211111_test_intervals_${annotation}_${phenotype}"
 filter_genotypes ${annotation} ${out_prefix}
 
 

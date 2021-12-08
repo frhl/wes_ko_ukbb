@@ -15,6 +15,8 @@ def main(args):
     gene_table = args.gene_table
     final_sample_list = args.final_sample_list
     phenotype = args.phenotype
+    min_info = float(args.min_info)
+    min_maf = float(args.min_maf)
     annotation = args.annotation
     padding = int(args.padding)
 
@@ -87,9 +89,30 @@ def main(args):
             True,
             reference_genome=reference_genome))
 
+    
     # Get chromosomes
     chromosomes = [x.replace('chr', '') for x in list(set(ht.contig.collect()))]
-    mt = genotypes.get_ukb_genotypes_bed(chromosomes)
+    
+    # Get imputation scores
+    hts = list()
+    for chrom in chromosomes:
+        ht = genotypes.get_ukb_imputed_v3_mfi(chrom)
+        ht = ht.annotate(chrom = chrom)
+        hts.append(ht)
+    #hts = [genotypes.get_ukb_imputed_v3_mfi(chrom) for chrom in chromosomes]
+    ht = hts[0].union(*hts[1:])
+    ht = ht.annotate(ref = hl.if_else(ht.f6 == ht.a1, ht.a2, ht.a1))
+    ht = ht.annotate(variant = hl.delimit([hl.str(ht.chrom), hl.str(ht.position), ht.ref, ht.f6], ':'))
+    ht = ht.key_by(**hl.parse_variant(ht.variant,  reference_genome= 'GRCh37'))
+    ht = ht.filter(ht.info >= min_info)
+    
+    # get imputed genotypes
+    mt = genotypes.get_ukb_imputed_v3_bgen(chromosomes)
+    mt = mt.filter_rows(hl.is_defined(ht[mt.row_key]))
+    n = mt.count()
+    print(f"Loaded {n} variants/samples")
+
+    #mt = genotypes.get_ukb_genotypes_bed(chromosomes)
     mt = mt.annotate_rows(**{'info': hl.agg.call_stats(mt.GT, mt.alleles)})
 
     # filter samples
@@ -102,7 +125,7 @@ def main(args):
     mt = qc.filter_min_missing(mt, 0.10)
     mt = mt.annotate_rows(info=mt.info.annotate(AC=mt.info.AC[1]))
     mt = mt.annotate_rows(info=mt.info.annotate(AF=mt.info.AF[1]))
-    mt = qc.filter_min_maf(mt, 0.01)
+    mt = qc.filter_min_maf(mt, min_maf)
 
     # perform liftover to GRCh38 and filter to intervals
     mt = variants.liftover(mt)
@@ -122,6 +145,8 @@ if __name__ == '__main__':
     parser.add_argument('--final_sample_list', default=None, help='Path to HailTable that contains the final samples included in the analysis.')
     parser.add_argument('--gene_table', default=None, help='Path to HailTable that contains the significant genes from primary analysis.')
     parser.add_argument('--phenotype', default=None, help='Path to phenotype table that also includes sex.')
+    parser.add_argument('--min_maf', default=0.01, help='What min_maf threshold should be used?')
+    parser.add_argument('--min_info', default=0.8, help='What info threshold should be used?')
     parser.add_argument('--annotation', default=None, help='String. What mutation subset should be applied?')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset (plink format)')
     args = parser.parse_args()
