@@ -94,21 +94,21 @@ def main(args):
     chromosomes = [x.replace('chr', '') for x in list(set(ht.contig.collect()))]
     
     # Get imputation scores
-    hts = list()
+    mfis = list()
     for chrom in chromosomes:
-        ht = genotypes.get_ukb_imputed_v3_mfi(chrom)
-        ht = ht.annotate(chrom = chrom)
-        hts.append(ht)
+        mfi = genotypes.get_ukb_imputed_v3_mfi(chrom)
+        mfi = mfi.annotate(chrom = chrom)
+        mfis.append(mfi)
     #hts = [genotypes.get_ukb_imputed_v3_mfi(chrom) for chrom in chromosomes]
-    ht = hts[0].union(*hts[1:])
-    ht = ht.annotate(ref = hl.if_else(ht.f6 == ht.a1, ht.a2, ht.a1))
-    ht = ht.annotate(variant = hl.delimit([hl.str(ht.chrom), hl.str(ht.position), ht.ref, ht.f6], ':'))
-    ht = ht.key_by(**hl.parse_variant(ht.variant,  reference_genome= 'GRCh37'))
-    ht = ht.filter(ht.info >= min_info)
+    mfi = mfis[0].union(*mfis[1:])
+    mfi = mfi.annotate(ref = hl.if_else(mfi.f6 == mfi.a1, mfi.a2, mfi.a1))
+    mfi = mfi.annotate(variant = hl.delimit([hl.str(mfi.chrom), hl.str(mfi.position), mfi.ref, mfi.f6], ':'))
+    mfi = mfi.key_by(**hl.parse_variant(mfi.variant,  reference_genome= 'GRCh37'))
+    mfi = mfi.filter(mfi.info >= min_info)
     
     # get imputed genotypes
     mt = genotypes.get_ukb_imputed_v3_bgen(chromosomes)
-    mt = mt.filter_rows(hl.is_defined(ht[mt.row_key]))
+    mt = mt.filter_rows(hl.is_defined(mfi[mt.row_key]))
     n = mt.count()
     print(f"Loaded {n} variants/samples")
 
