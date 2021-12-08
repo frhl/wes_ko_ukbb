@@ -27,7 +27,7 @@ readonly in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
 readonly in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
 
 readonly max_iter=10
-readonly P_cutoff=0.0001
+readonly P_cutoff=0.01
 readonly spa_script="scripts/conditional/_spa_conditional.sh"
 
 mkdir -p ${out_dir}
@@ -63,7 +63,7 @@ submit_spa_cond_job()
 
 annotation="synonymous"
 vcf="${in_dir}/211111_intervals_${annotation}_${phenotype}.vcf.bgz"
-out_prefix="${out_dir}/211111_spa_conditional_${annotation}_${phenotype}"
+out_prefix="${out_dir}/211111_TEST_P_spa_conditional_${annotation}_${phenotype}"
 submit_spa_cond_job ${vcf} ${out_prefix} ${annotation}
 
 
