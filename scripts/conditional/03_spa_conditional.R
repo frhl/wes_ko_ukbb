@@ -20,14 +20,9 @@ print(files_chr)
 
 # combine into single table
 d <- do.call(rbind, lapply(files_chr, fread))
-print(prefix)
-print(head(d))
-print(colnames(d))
 
 # if cond_p col does not exist, add empty columns
 conds = c('Tstat_cond','p.value_cond','varT_cond','BETA_cond','SE_cond')
-bool = conds %in% colnames(d)
-print(bool)
 
 if (!all(conds %in% colnames(d))){
     ndf = data.table(Tstat_cond = NA, p.value_cond = NA, varT_cond = NA, BETA_cond = NA, SE_cond = NA)
@@ -35,14 +30,13 @@ if (!all(conds %in% colnames(d))){
     print("Adding columns")
 }
 
-print(colnames(d))
-bool = conds %in% colnames(d)
-print(bool)
 # re-organize columns in table (relevant for interations>1)
 d <- cbind(
     d[,-conds, with = FALSE],
     d[,conds, with = FALSE]
 )
+
+print(head(d))
 
 # Check rows
 nrows = nrow(d)
@@ -54,7 +48,9 @@ if (na_values > 0){
 }
 
 # Select P-value
-conditioning = as.logical(sum(is.na(d$p.value.cond)) == 0)
+#print(head(d$p.value_cond))
+#print(sum(!is.na(d$p.value_cond)))
+conditioning = as.logical(sum(!is.na(d$p.value_cond)) > 0)
 write(paste0('Conditioning markers included: ', conditioning),stdout())
 d$Tstat_new = unlist(ifelse(conditioning, list(d$Tstat_cond), list(d$Tstat)))
 d$p.value_new = unlist(ifelse(conditioning, list(d$p.value_cond), list(d$p.value)))

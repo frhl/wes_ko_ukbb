@@ -30,6 +30,8 @@ readonly max_iter=10
 readonly P_cutoff=0.0001
 readonly spa_script="scripts/conditional/_spa_conditional.sh"
 
+mkdir -p ${out_dir}
+
 submit_spa_cond_job() 
 {
   set -x
@@ -47,16 +49,17 @@ submit_spa_cond_job()
   set +x
 }
 
-# submit scripts
-annotation="ptv"
-vcf="${in_dir}/211111_intervals_${annotation}_${phenotype}.vcf.bgz"
-out_prefix="${out_dir}/211111_spa_conditional_${annotation}_${phenotype}"
-submit_spa_cond_job ${vcf} ${out_prefix} ${annotation}
 
-annotation="ptv_damaging_missense"
-vcf="${in_dir}/211111_intervals_${annotation}_${phenotype}.vcf.bgz"
-out_prefix="${out_dir}/211111_spa_conditional_${annotation}_${phenotype}"
-submit_spa_cond_job ${vcf} ${out_prefix} ${annotation}
+# submit scripts
+#annotation="ptv"
+#vcf="${in_dir}/211111_intervals_${annotation}_${phenotype}.vcf.bgz"
+#out_prefix="${out_dir}/211111_spa_conditional_${annotation}_${phenotype}"
+#submit_spa_cond_job ${vcf} ${out_prefix} ${annotation}
+
+#annotation="ptv_damaging_missense"
+#vcf="${in_dir}/211111_intervals_${annotation}_${phenotype}.vcf.bgz"
+#out_prefix="${out_dir}/211111_spa_conditional_${annotation}_${phenotype}"
+#submit_spa_cond_job ${vcf} ${out_prefix} ${annotation}
 
 annotation="synonymous"
 vcf="${in_dir}/211111_intervals_${annotation}_${phenotype}.vcf.bgz"
