@@ -104,6 +104,5 @@ conditional_analysis() {
 
 # Run analysis
 set_up_RSAIGE
-mkdir -p ${out_dir}
 conditional_analysis ${vcf} ${out_prefix}
 
