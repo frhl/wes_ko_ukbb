@@ -2,7 +2,7 @@
 #
 # extract genotypes in regions near genes that are significant in primary analysis
 #
-#$ -N filter_genotypes
+#$ -N submit_filter_genotypes
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/submit_filter_genotypes.log
 #$ -e logs/submit_filter_genotypes.errors.log
@@ -54,18 +54,17 @@ submit_filter_genotypes_job() {
   set +x
 }
 
-#annotation='ptv'
-#out_prefix="${out_dir}/211111_intervals_${annotation}_${phenotype}"
-#filter_genotypes ${annotation} ${out_prefix}
-
-#annotation='ptv_damaging_missense'
-#out_prefix="${out_dir}/211111_intervals_${annotation}_${phenotype}"
-#filter_genotypes ${annotation} ${out_prefix}
-
-annotation='synonymous'
-out_prefix="${out_dir}/211111_test2_intervals_${annotation}_${phenotype}"
+annotation='ptv'
+out_prefix="${out_dir}/211111_intervals_${annotation}_${phenotype}"
 submit_filter_genotypes_job ${annotation} ${out_prefix}
-#filter_genotypes ${annotation} ${out_prefix}
+
+annotation='ptv_damaging_missense'
+out_prefix="${out_dir}/211111_intervals_${annotation}_${phenotype}"
+submit_filter_genotypes_job ${annotation} ${out_prefix}
+
+#annotation='synonymous'
+#out_prefix="${out_dir}/211111_intervals_${annotation}_${phenotype}"
+#submit_filter_genotypes_job ${annotation} ${out_prefix}
 
 
 
