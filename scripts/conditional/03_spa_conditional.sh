@@ -109,7 +109,7 @@ conditional_analysis() {
 
 # loop params
 set_up_RSAIGE
-readonly P_cutoff=0.1
+readonly P_cutoff=0.0001
 mkdir -p ${out_dir}
 
 annotation="synonymous"

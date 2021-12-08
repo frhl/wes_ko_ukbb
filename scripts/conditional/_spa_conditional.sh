@@ -1,54 +1,42 @@
 #!/usr/bin/env bash
 #
 #
-#$ -N spa_conditional
+#$ -N _spa_conditional
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/spa_conditional.log
-#$ -e logs/spa_conditional.errors.log
+#$ -e logs/spa_conditonal.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q short.qc
-#$ -t 3
+#$ -q lindgren.qe
 
 source utils/bash_utils.sh
 
-# Directories
-readonly in_dir="data/conditional/common"
-readonly out_dir="data/conditional/common"
-readonly pheno_dir="data/phenotypes"
-readonly step1_dir="data/saige/output/combined/binary/step1"
+readonly in_dir=${1?Error: Missing arg1 (in dir)}
+readonly out_dir=${2?Error: Missing arg2 (out_dir)}
+readonly pheno_dir=${3?Error: Missing arg3 (pheno_dir)}
+readonly step1_dir=${4?Error: Missing arg4 (step1_dir)}
+readonly pheno_list=${5?Error: Missing arg5 (pheno_dir)}
+readonly in_gmat=${6?Error: Missing arg6 (in_gmat)}
+readonly in_var=${7?Error: Missing arg7 (in_var)}
+readonly step2_SPAtests=${8?Error: Missing arg8 (step2_SPAtests)}
+readonly vcf=${9?Error: Missing arg9 (vcf)}
+readonly out_prefix=${10?Error: Missing arg10 (vcf)}
 
-# setup phenotype
-readonly pheno_list="${pheno_dir}/UKBB_WES200k_binary_phenotypes_header.txt"
+readonly rscript="scripts/conditional/03_spa_conditional.R"
 readonly index=${SGE_TASK_ID}
 readonly phenotype=$( cut -f${index} ${pheno_list} )
 
-# saige null model
-readonly in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
-readonly in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
 
-# in/out files 
-readonly vcf="${in_dir}/211111_genetic_intervals_${phenotype}.vcf.bgz"
-readonly csi="${vcf}.csi"
-readonly out="${out_dir}/211111_significant_variants_${phenotype}.txt"
-readonly out_prefix="${out_dir}/211111_significant_variants_${phenotype}"
-readonly out_tmp="${out}.tmp"
-
-# loop params
-readonly P_cutoff=0.0001
-readonly step2_SPAtests="/well/lindgren/flassen/software/dev/SAIGE/extdata/step2_SPAtests.R"
-
-spa_loop() {
-   printf 'Markers %s\n' "$1"
-   for chr in {1..22}; do
-      local prefix_chr="${prefix_iter}_chr${chr}"
+spa_chr_loop() {
+   for chr in {5..6}; do
+      local prefix_chr="${3}_chr${chr}"
       set -x
       Rscript "${step2_SPAtests}"  \
-        --vcfFile=${vcf} \
-        --vcfFileIndex=${csi} \
+        --vcfFile=${1} \
+        --vcfFileIndex="${1}.csi" \
         --vcfField="GT" \
         --chrom="chr${chr}" \
-        --minMAF=0.0000001 \
+        --minMAF=0.000001 \
         --minMAC=1 \
         --GMMATmodelFile=${in_gmat} \
         --varianceRatioFile=${in_var} \
@@ -58,56 +46,65 @@ spa_loop() {
         --IsOutputNinCaseCtrl=TRUE \
         --IsOutputHetHomCountsinCaseCtrl=TRUE \
         --LOCO=FALSE \
-        ${1:+--condition "$1"}
+        ${2:+--condition "$2"}
       set +x
-   done 
+   done
+   >&2 echo "Markers: ${2}"
+   >&2 echo "VCF: ${1}"
+   >&2 echo "Prefix: ${3}"
 }
 
-get_sig_marker() {
-  echo $( cat "${prefix_iter}.txt" | \
-    awk -v P="${P_cutoff}" '$13 < P' | \
-    sort -k 13,13 | \
-    cut -d" " -f3 | \
-    head -n1)
-}
+conditional_analysis() {
+  vcf=${1}
+  out_prefix=${2}
+  markers_conditional="${out_prefix}_conditioning_markers.txt"
+  rm ${markers_conditional}
 
-
-
-run_conditional_spa() { 
-  local i=0
-  local max=5
-  local marker_list=""
+  i=0 #
+  max=10
+  marker_list="" # markers for SAIGE
   while [ $i -lt $max ]; do
-      
-      printf 'Iteration %s\n' "$i"
+
       true $(( i++ ))
-      
-      # run SPA using current marker
+      >&2 echo "[Iteration ${i}]: Beginning new iteration.."
+      >&2 echo "[Iteration ${i}]: Current condtioning marker: ${current_marker}"
+      >&2 echo "[Iteration ${i}]: Current condtioning marker list: ${marker_list}"
+
+      # setup prefixes for temporary files
       prefix_iter="${out_prefix}_i${i}"
-      spa_loop ${marker_list}
-      
-      # Combine into single file
-      cat "${prefix_iter}_chr"* > "${prefix_iter}.txt"
-      #rm  "${prefix_iter}_chr"*
-      
-      # get next significant marker
-      marker=$(get_sig_marker)
-      
-      echo "echo ${marker}"
-      if [ ! -z ${marker} ]; then
-          if [ -z ${marker_list} ]; then
-              markers=${marker}
-          else
-              marker_list+=",${marker}"        
-          fi        
+      prefix_iter_chr="${prefix_iter}_chr"
+      markers_combined="${prefix_iter}.txt"
+
+      # Run saddle point approximation using condtioning markers
+      spa_chr_loop "${vcf}" "${marker_list}" "${prefix_iter}"
+      Rscript "${rscript}" --prefix ${prefix_iter}
+      rm  "${prefix_iter_chr}"*
+
+      # Save top marker within P-value threshold
+      cat "${markers_combined}" | \
+        awk -v P="${P_cutoff}" '$32 < P' | \
+        head -n1 >> "${markers_conditional}"
+
+      # select current marker
+      old_marker=${current_marker}
+      current_marker=$( tail -n1 ${markers_conditional} | awk '{print $1":"$2"_"$4"/"$5}')
+      current_p=$( tail -n1 ${markers_conditional} | cut -d" " -f32)
+
+      if [[ "${current_marker}" != "${old_marker}" ]]; then
+        if [[ "${marker_list}" == "" ]]; then
+          marker_list="${current_marker}"
+        else
+          marker_list="${marker_list},${current_marker}"
+        fi
+        >&2 echo "[Iteration ${i}]: New marker found '${current_marker} (P-value=${current_p}). Conditioning on ${marker_list}'"
       else
-          echo "ending loop with markers: ${marker_list}"
-          break    
-      fi    
-      echo "markers: ${marker_list}"
+        >&2 echo "[Iteration ${i}]: No other markers passing sig threshold (P-value<${P_cutoff}). Ended loop with markers: ${marker_list}"
+        break
+      fi
 
   done
 }
-  
 
+# Run analysis
+conditional_analysis ${vcf} ${out_prefix}
 

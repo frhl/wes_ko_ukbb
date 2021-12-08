@@ -40,7 +40,6 @@ merge_markers() {
 }
 
 
-
 annotation='synonymous'
 out_prefix="${out_dir}/211111_intervals_${annotation}_${phenotype}"
 merge_markers ${annotation} ${out_prefix}
