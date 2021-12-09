@@ -62,6 +62,16 @@ def main(args):
         # order imp and mt
         hl.export_vcf(mt, out_prefix + '.vcf.bgz')
 
+        # write file with conditoning markers.
+        locus = hl.delimit([imp.locus.contig, hl.str(imp.locus.position)],':')
+        alleles = hl.delimit([imp.alleles[0],imp.alleles[1]],'/')
+        variant = hl.delimit([locus, alleles],'_')
+        saige_variants = ",".join(variant.collect()) 
+        
+        with open(out_prefix + ".cond_markers", 'a') as outfile:
+            outfile.write(saige_variants)
+    else:
+        print(f"File '${input_markers}' does not contain any markers for chromosome '{chrom}'. Exiting.."
 
 if __name__ == '__main__':
 
