@@ -16,10 +16,10 @@ set -o nounset
 
 readonly in_dir="data/conditional/common/filter_genotypes"
 readonly pheno_dir="data/phenotypes"
-readonly step1_dir="data/saige/output/combined/binary/step1"
+readonly step1_dir="data/saige/output/combined/cts/step1"
 readonly out_dir="data/conditional/common/spa_conditional"
 
-readonly pheno_list="${pheno_dir}/UKBB_WES200k_binary_phenotypes_header.txt"
+readonly pheno_list="${pheno_dir}/UKBB_WES200k_cts_phenotypes_header.txt"
 readonly index=${SGE_TASK_ID}
 readonly phenotype=$( cut -f${index} ${pheno_list} )
 
@@ -27,7 +27,7 @@ readonly in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
 readonly in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
 
 readonly max_iter=10
-readonly P_cutoff=0.01
+readonly P_cutoff=0.0001
 readonly spa_script="scripts/conditional/_spa_conditional.sh"
 
 mkdir -p ${out_dir}

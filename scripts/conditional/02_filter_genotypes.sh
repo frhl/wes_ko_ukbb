@@ -8,7 +8,7 @@
 #$ -e logs/submit_filter_genotypes.errors.log
 #$ -P lindgren.prjc
 #$ -q test.qc
-#$ -t 
+#$ -t 2-44 
 #$ -V
 
 set -o errexit
@@ -19,7 +19,7 @@ source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark"
 readonly pheno_dir="data/phenotypes"
-readonly gene_dir="data/conditional/common/gene_intervals"
+readonly gene_dir="data/conditional/common/extract_intervals"
 readonly out_dir="data/conditional/common/filter_genotypes"
 
 readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'

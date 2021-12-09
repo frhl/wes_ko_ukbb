@@ -16,7 +16,7 @@ source utils/bash_utils.sh
 
 readonly in_dir="derived/tables/saige"
 readonly pheno_dir="data/phenotypes"
-readonly out_dir="data/conditional/common/gene_intervals"
+readonly out_dir="data/conditional/common/extract_intervals"
 
 readonly phenotypes_binary="${pheno_dir}/UKBB_WES200k_binary_phenotypes_header.txt"
 readonly phenotypes_cts="${pheno_dir}/UKBB_WES200k_cts_phenotypes_header.txt"

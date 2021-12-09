@@ -27,36 +27,40 @@ def main(args):
     # table of variants to condition on
     ht = ht.annotate(variant = hl.delimit([ht.f0, ht.f1, ht.f3, ht.f4], ':'))
     ht = ht.key_by(**hl.parse_variant(ht.variant, reference_genome = 'GRCh37'))
+    ht = ht.filter(hl.literal(chrom).contains(ht.locus.contig))
+    rows = ht.count()[0]
 
-    # get genotype for selected variants
-    chromosomes = [x.replace('chr', '') for x in list(set(ht.locus.contig.collect()))]
-    imp = genotypes.get_ukb_imputed_v3_bgen(chromosomes)
-    imp = variants.liftover(imp)
-    imp = imp.filter_rows(hl.is_defined(ht[imp.row_key]))
-    imp = imp.annotate_entries(DS = imp.dosage)
-    imp = imp.drop('varid','new_locus','new_alleles','old_locus')
-    imp = imp.select_entries(imp.DS)
+    if rows > 0:
 
-    # load knockout file
-    wes = hl.read_matrix_table(input_mt)
-    n_before = wes.count()
-    print(f"Pre-merging variants/samples {n_before}")
+        # get genotype for selected variants
+        chromosomes = [x.replace('chr', '') for x in list(set(ht.locus.contig.collect()))]
+        imp = genotypes.get_ukb_imputed_v3_bgen(chromosomes)
+        imp = variants.liftover(imp)
+        imp = imp.filter_rows(hl.is_defined(ht[imp.row_key]))
+        imp = imp.annotate_entries(DS = imp.dosage)
+        imp = imp.drop('varid','new_locus','new_alleles','old_locus')
+        imp = imp.select_entries(imp.DS)
 
-    # Get intersecting individuals
-    wes_sids = wes.s.collect()
-    imp_sids = imp.s.collect()
-    overlap = list(set(wes_sids) & set(imp_sids))[1:5]
-    wes = wes.filter_cols(hl.literal(set(overlap)).contains(wes.s))
-    imp = imp.filter_cols(hl.literal(set(overlap)).contains(imp.s))
+        # load knockout file
+        wes = hl.read_matrix_table(input_mt)
+        n_before = wes.count()
+        print(f"Pre-merging variants/samples {n_before}")
 
-    # combine the variants
-    imp = tables.order_cols(imp, wes)
-    mt = imp.union_rows(wes)
-    n_after = mt.count()
-    print(f"Pre-merging variants/samples {n_after}")
+        # Get intersecting individuals
+        wes_sids = wes.s.collect()
+        imp_sids = imp.s.collect()
+        overlap = list(set(wes_sids) & set(imp_sids))[1:5]
+        wes = wes.filter_cols(hl.literal(set(overlap)).contains(wes.s))
+        imp = imp.filter_cols(hl.literal(set(overlap)).contains(imp.s))
 
-    # order imp and mt
-    hl.export_vcf(mt, out_prefix + '.vcf.bgz')
+        # combine the variants
+        imp = tables.order_cols(imp, wes)
+        mt = imp.union_rows(wes)
+        n_after = mt.count()
+        print(f"Pre-merging variants/samples {n_after}")
+
+        # order imp and mt
+        hl.export_vcf(mt, out_prefix + '.vcf.bgz')
 
 
 if __name__ == '__main__':
