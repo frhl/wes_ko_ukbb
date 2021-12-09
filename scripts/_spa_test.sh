@@ -15,10 +15,11 @@ source utils/hail_utils.sh
 # arguments
 readonly phenotype=${1?Error: Missing arg1 (phenotype)}
 readonly in_vcf=${2?Error: Missing arg2 (in_vcf)}
-readonly in_csi=${3?Error: Missing arg2 (in_csi)}
-readonly in_gmat=${4?Error: Missing arg3 (in_gmat)} 
-readonly in_var=${5?Error: Missing arg4 (in_var)} 
-readonly out_prefix=${6?Error: Missing arg5 (path prefix for saige output)}
+readonly in_csi=${3?Error: Missing arg3 (in_csi)}
+readonly in_gmat=${4?Error: Missing arg4 (in_gmat)} 
+readonly in_var=${5?Error: Missing arg5 (in_var)} 
+readonly out_prefix=${6?Error: Missing arg6 (path prefix for saige output)}
+readonly conditioning=${7?Error: Missing arg7 (path prefix for saige output)}
 readonly chr=${SGE_TASK_ID}
 
 # subsitute each chromosome
@@ -52,7 +53,8 @@ spa_test() {
      --IsOutputAFinCaseCtrl=TRUE \
      --IsOutputNinCaseCtrl=TRUE \
      --IsOutputHetHomCountsinCaseCtrl=TRUE \
-     --LOCO=FALSE
+     --LOCO=FALSE\
+     ${conditioning:+--conditioning "$conditioning"}
    set +x
    duration=${SECONDS}
    	print_update "Finished SPA test for ${out} at ${duration}"
