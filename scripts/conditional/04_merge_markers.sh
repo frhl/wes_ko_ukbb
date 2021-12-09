@@ -14,12 +14,13 @@ source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark"
 readonly marker_dir=""
-readonly vcf_dir=""
+readonly mt_dir=""
 readonly out_dir="data/conditional/common"
 
-readonly hail_script="scripts/conditional/02_filter_genotypes.py"
-readonly vcf="${vcf_dir}/"
+readonly mt="${mt_dir}/"
 readonly markers="${marker_dir}/"
+
+readonly merge_script="scripts/condotional/_merge_markers.sh"
 
 readonly out_prefix="${out_dir}/"
 
@@ -27,16 +28,18 @@ set_up_hail
 set_up_pythonpath_legacy
 mkdir -p ${out_dir}
 
-merge_markers() {
-  SECONDS=0
-  local vcf=${1}
-  local markers=${2}
-  local out_prefix=${3}
-  python3 "${hail_script}" \
-     --vcf ${vcf} \
-     --markers ${markers} \
-     --out_prefix ${out_prefix} \ 
-  print_update "Hail finished writing VCFs in ${SECONDS}"
+submit_merge_markers_job() 
+{
+  set -x
+  qsub -N "_ko_${qsub_name}" \
+    -t 6 \
+    -q "short.qa" \
+    -pe shmem 2 \
+    "${merge_script}" \
+    "${mt}" \
+    "${marker_table}" \
+    "${out_prefix}"
+  set +x
 }
 
 
