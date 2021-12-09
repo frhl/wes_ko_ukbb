@@ -13,15 +13,23 @@ module load BCFtools/1.12-GCC-10.3.0
 source utils/vcf_utils.sh
 source utils/hail_utils.sh
 
-readonly mt=${1?Error: Missing arg1 (in dir)}
-readonly marker_table=${2?Error: Missing arg2 (in dir)}
-readonly out_prefix=${3?Error: Missing arg3 (in dir)}
+readonly arg_mt=${1?Error: Missing arg1 (in dir)}
+readonly arg_marker_table=${2?Error: Missing arg2 (in dir)}
+readonly arg_out_prefix=${3?Error: Missing arg3 (in dir)}
 
 readonly chr="${SGE_TASK_ID}"
 readonly spark_dir="data/tmp/spark"
 readonly hail_script="scripts/conditional/04_merge_markers.py"
 
-merge_marker() {
+sub_chr () {
+  echo ${1} | sed -e "s/CHR/${chr}/g"
+}
+
+readonly mt=$(sub_chr ${in_mt})
+readonly marker_table=$(sub_chr ${arg_marker_table})
+readonly out_prefix=$(sub_chr ${arg_out_prefix})
+
+merge_markers() {
   SECONDS=0
   python3 "${hail_script}" \
      --mt ${mt} \
@@ -31,8 +39,9 @@ merge_marker() {
   print_update "Hail finished writing VCFs in ${SECONDS}"
 }
 
+# run analysis
 set_up_hail
 set_up_pythonpath_legacy
-filter_mergers
+merge_markers
 
 

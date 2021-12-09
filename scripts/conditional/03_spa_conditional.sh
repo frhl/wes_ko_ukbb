@@ -14,10 +14,10 @@
 set -o errexit
 set -o nounset
 
-readonly in_dir="data/conditional/common"
-readonly out_dir="data/conditional/common"
+readonly in_dir="data/conditional/common/filter_genotypes"
 readonly pheno_dir="data/phenotypes"
 readonly step1_dir="data/saige/output/combined/binary/step1"
+readonly out_dir="data/conditional/common/spa_conditional"
 
 readonly pheno_list="${pheno_dir}/UKBB_WES200k_binary_phenotypes_header.txt"
 readonly index=${SGE_TASK_ID}

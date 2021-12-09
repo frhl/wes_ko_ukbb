@@ -12,17 +12,16 @@
 source utils/vcf_utils.sh
 source utils/hail_utils.sh
 
-readonly spark_dir="data/tmp/spark"
-readonly marker_dir=""
-readonly mt_dir=""
-readonly out_dir="data/conditional/common"
+readonly mt_dir="derived/knockouts/211206"
+readonly marker_dir="data/conditional/common/spa_conditional"
+readonly out_dir="data/conditional/common/merge_markers"
 
-readonly mt="${mt_dir}/"
-readonly markers="${marker_dir}/"
+readonly pheno_dir="data/phenotypes"
+readonly pheno_list="${pheno_dir}/UKBB_WES200k_binary_phenotypes_header.txt"
+readonly index=${SGE_TASK_ID}
+readonly phenotype=$( cut -f${index} ${pheno_list} )
 
 readonly merge_script="scripts/condotional/_merge_markers.sh"
-
-readonly out_prefix="${out_dir}/"
 
 set_up_hail
 set_up_pythonpath_legacy
@@ -31,21 +30,23 @@ mkdir -p ${out_dir}
 submit_merge_markers_job() 
 {
   set -x
-  qsub -N "_ko_${qsub_name}" \
+  qsub -N "_merge_markers}" \
     -t 6 \
     -q "short.qa" \
     -pe shmem 2 \
     "${merge_script}" \
-    "${mt}" \
-    "${marker_table}" \
-    "${out_prefix}"
+    "${1}" \
+    "${2}" \
+    "${3}"
   set +x
 }
 
 
-annotation='synonymous'
-out_prefix="${out_dir}/211111_intervals_${annotation}_${phenotype}"
-merge_markers ${annotation} ${out_prefix}
+annotation='ptv_damaging_missense'
+mt="${mt_dir}/ukb_wes_200k_maf0_0.01_chrCHR_${annotation}_ko.mt"
+markers_table="${marker_dir}/211111_TEST_P_spa_conditional_${annotation}_${phenotype}_conditioning_markers.txt"
+out_prefix="${out_dir}/211111_${annotation}_${phenotype}_merged"
+merge_markers ${mt} ${markers_table} ${out_prefix}
 
 
 
