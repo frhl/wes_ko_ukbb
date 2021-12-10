@@ -22,13 +22,13 @@ def main(args):
     hl._set_flags(no_whole_stage_codegen='1')
 
     # load table of genes that are significant in primary analysis
-    ht = hl.import_table(input_markers)
+    ht = hl.import_table(input_markers, no_header = True, delimiter = ' ')
 
     # table of variants to condition on
     ht = ht.annotate(variant = hl.delimit([ht.f0, ht.f1, ht.f3, ht.f4], ':'))
-    ht = ht.key_by(**hl.parse_variant(ht.variant, reference_genome = 'GRCh37'))
+    ht = ht.key_by(**hl.parse_variant(ht.variant, reference_genome = 'GRCh38'))
     ht = ht.filter(hl.literal(chrom).contains(ht.locus.contig))
-    rows = ht.count()[0]
+    rows = int(ht.count())
 
     if rows > 0:
 

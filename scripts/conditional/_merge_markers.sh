@@ -2,10 +2,10 @@
 ##
 #$ -N _merge_markers
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_merge_markers.log
-#$ -e logs/_merge_markers.errors.log
+#$ -o logs/merge_markers.log
+#$ -e logs/merge_markers.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 1
+#$ -pe shmem 9
 #$ -q short.qc
 
 module load BCFtools/1.12-GCC-10.3.0
@@ -25,17 +25,20 @@ sub_chr () {
   echo ${1} | sed -e "s/CHR/${chr}/g"
 }
 
-readonly mt=$(sub_chr ${in_mt})
+readonly mt=$(sub_chr ${arg_mt})
 readonly marker_table=$(sub_chr ${arg_marker_table})
 readonly out_prefix=$(sub_chr ${arg_out_prefix})
 
+
 merge_markers() {
   SECONDS=0
+  set -x
   python3 "${hail_script}" \
-     --mt ${mt} \
-     --chrom ${chr} \
-     --input_markers ${marker_table} \
-     --out_prefix ${out_prefix} \
+     --input_mt "${mt}" \
+     --chrom "chr${chr}" \
+     --input_markers "${marker_table}" \
+     --out_prefix "${out_prefix}"
+  set +x
   print_update "Hail finished writing VCFs in ${SECONDS}"
 }
 

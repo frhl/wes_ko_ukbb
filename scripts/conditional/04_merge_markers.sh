@@ -18,7 +18,7 @@ readonly marker_dir="data/conditional/common/spa_conditional"
 readonly out_dir="data/conditional/common/merge_markers"
 
 readonly pheno_dir="data/phenotypes"
-readonly pheno_list="${pheno_dir}/UKBB_WES200k_binary_phenotypes_header.txt"
+readonly pheno_list="${pheno_dir}/UKBB_WES200k_cts_phenotypes_header.txt"
 readonly index=${SGE_TASK_ID}
 readonly phenotype=$( cut -f${index} ${pheno_list} )
 
@@ -28,18 +28,20 @@ mkdir -p ${out_dir}
 
 submit_merge_markers_job() 
 {
-  [ -f ${1} ] || >&2 echo "File '${1}' (MatrixTable) does not exist."
-  [ -f ${2} ] || >&2 echo "File '${2}' (Markers) does not exist."
-  set -x
-  qsub -N "_merge_markers}" \
-    -t 6 \
-    -q "short.qa" \
-    -pe shmem 2 \
-    "${merge_script}" \
-    "${1}" \
-    "${2}" \
-    "${3}"
-  set +x
+  if [ -f ${2} ]; then
+    set -x
+    qsub -N "_merge_markers}" \
+      -t 9 \
+      -q "short.qa" \
+      -pe shmem 2 \
+      "${merge_script}" \
+      "${1}" \
+      "${2}" \
+      "${3}"
+    set +x
+  else
+    echo >&2 "Conditioning markers file '${2}' does not exist."
+  fi
 }
 
 
