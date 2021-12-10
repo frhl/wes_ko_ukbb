@@ -2,12 +2,13 @@
 #
 #$ -N merge_markers
 #$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/merge_markers.log
-#$ -e logs/merge_markers.errors.log
+#$ -o logs/submit_merge_markers.log
+#$ -e logs/submit_merge_markers.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 4
-#$ -q short.qc
-#$ -t 3
+#$ -pe shmem 1
+#$ -q test.qc
+#$ -t 37
+#$ -V
 
 source utils/vcf_utils.sh
 source utils/hail_utils.sh
@@ -21,10 +22,8 @@ readonly pheno_list="${pheno_dir}/UKBB_WES200k_binary_phenotypes_header.txt"
 readonly index=${SGE_TASK_ID}
 readonly phenotype=$( cut -f${index} ${pheno_list} )
 
-readonly merge_script="scripts/condotional/_merge_markers.sh"
+readonly merge_script="scripts/conditional/_merge_markers.sh"
 
-set_up_hail
-set_up_pythonpath_legacy
 mkdir -p ${out_dir}
 
 submit_merge_markers_job() 
@@ -46,9 +45,9 @@ submit_merge_markers_job()
 
 annotation='ptv_damaging_missense'
 mt="${mt_dir}/ukb_wes_200k_maf0_0.01_chrCHR_${annotation}_ko.mt"
-markers_table="${marker_dir}/211111_TEST_P_spa_conditional_${annotation}_${phenotype}_conditioning_markers.txt"
+markers_table="${marker_dir}/211111_spa_conditional_${annotation}_${phenotype}_conditioning_markers.txt"
 out_prefix="${out_dir}/211111_${annotation}_${phenotype}_merged"
-merge_markers ${mt} ${markers_table} ${out_prefix}
+submit_merge_markers_job ${mt} ${markers_table} ${out_prefix}
 
 
 
