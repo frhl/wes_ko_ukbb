@@ -36,7 +36,7 @@ d <- cbind(
     d[,conds, with = FALSE]
 )
 
-print(head(d))
+#print(head(d))
 
 # Check rows
 nrows = nrow(d)
@@ -57,7 +57,9 @@ d$p.value_new = unlist(ifelse(conditioning, list(d$p.value_cond), list(d$p.value
 
 # save combined table
 d <- d[order(d$p.value_new)]
+print(head(d))
+print(paste('cols:',ncol(d)))
 outfile = paste0(args$prefix, '.txt')
-fwrite(d, outfile, quote = FALSE, row.names = FALSE, sep = ' ')
+fwrite(d, outfile, quote = FALSE, row.names = FALSE, sep = ' ', na = NA)
 
 

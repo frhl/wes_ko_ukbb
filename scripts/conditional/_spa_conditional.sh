@@ -27,7 +27,7 @@ readonly step2_SPAtests="/well/lindgren/flassen/software/dev/SAIGE/extdata/step2
 readonly rscript="scripts/conditional/03_spa_conditional.R"
 
 spa_chr_loop() {
-   for chr in {1..22}; do
+   for chr in {9..10}; do
       local prefix_chr="${3}_chr${chr}"
       set -x
       Rscript "${step2_SPAtests}"  \
@@ -75,17 +75,18 @@ conditional_analysis() {
       # Run saddle point approximation using condtioning markers
       spa_chr_loop "${vcf}" "${marker_list}" "${prefix_iter}"
       Rscript "${rscript}" --prefix ${prefix_iter}
-      rm  "${prefix_iter_chr}"*
+
+      #rm  "${prefix_iter_chr}"*
 
       # Save top marker within P-value threshold
       cat "${markers_combined}" | \
-        awk -v P="${P_cutoff}" '$32 < P' | \
+        awk -v P="${P_cutoff}" '$22 < P' | \
         head -n1 >> "${markers_conditional}"
 
       # select current marker
       old_marker=${current_marker}
       current_marker=$( tail -n1 ${markers_conditional} | awk '{print $1":"$2"_"$4"/"$5}')
-      current_p=$( tail -n1 ${markers_conditional} | cut -d" " -f32)
+      current_p=$( tail -n1 ${markers_conditional} | cut -d" " -f22)
 
       if [[ "${current_marker}" != "${old_marker}" ]]; then
         if [[ "${marker_list}" == "" ]]; then
