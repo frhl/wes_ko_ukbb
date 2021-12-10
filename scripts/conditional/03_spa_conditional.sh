@@ -26,8 +26,8 @@ readonly phenotype=$( cut -f${index} ${pheno_list} )
 readonly in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
 readonly in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
 
-readonly max_iter=5
-readonly P_cutoff=0.0001
+readonly max_iter=10
+readonly P_cutoff=0.00001
 readonly spa_script="scripts/conditional/_spa_conditional.sh"
 
 mkdir -p ${out_dir}
