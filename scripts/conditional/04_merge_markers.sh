@@ -29,6 +29,8 @@ mkdir -p ${out_dir}
 
 submit_merge_markers_job() 
 {
+  [ -f ${1} ] || >&2 echo "File '${1}' (MatrixTable) does not exist."
+  [ -f ${2} ] || >&2 echo "File '${2}' (Markers) does not exist."
   set -x
   qsub -N "_merge_markers}" \
     -t 6 \

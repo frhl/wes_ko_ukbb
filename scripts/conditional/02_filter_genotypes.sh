@@ -8,7 +8,7 @@
 #$ -e logs/submit_filter_genotypes.errors.log
 #$ -P lindgren.prjc
 #$ -q test.qc
-#$ -t 2-44 
+#$ -t 1-44 
 #$ -V
 
 set -o errexit

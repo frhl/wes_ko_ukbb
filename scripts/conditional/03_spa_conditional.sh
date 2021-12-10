@@ -8,7 +8,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 3
+#$ -t 1-44
 #$ -V
 
 set -o errexit
@@ -34,19 +34,23 @@ mkdir -p ${out_dir}
 
 submit_spa_cond_job() 
 {
-  set -x
-  qsub -N "_spa_cond_${3}" \
-    -q "short.qc@@short.hge" \
-    -t "${SGE_TASK_ID}" \
-    -pe shmem 1 \
-    "${spa_script}" \
-    "${in_gmat}" \
-    "${in_var}" \
-    "${1}" \
-    "${2}" \
-    "${P_cutoff}" \
-    "${max_iter}"
-  set +x
+  if [ -f ${1} ]; then
+    set -x
+    qsub -N "_spa_cond_${3}" \
+      -q "short.qc@@short.hge" \
+      -t "${SGE_TASK_ID}" \
+      -pe shmem 1 \
+      "${spa_script}" \
+      "${in_gmat}" \
+      "${in_var}" \
+      "${1}" \
+      "${2}" \
+      "${P_cutoff}" \
+      "${max_iter}"
+    set +x
+  else
+    >&2 echo "file '${1}' does not exist. Exiting." 
+  fi
 }
 
 
@@ -56,15 +60,15 @@ submit_spa_cond_job()
 #out_prefix="${out_dir}/211111_spa_conditional_${annotation}_${phenotype}"
 #submit_spa_cond_job ${vcf} ${out_prefix} ${annotation}
 
-#annotation="ptv_damaging_missense"
-#vcf="${in_dir}/211111_intervals_${annotation}_${phenotype}.vcf.bgz"
-#out_prefix="${out_dir}/211111_spa_conditional_${annotation}_${phenotype}"
-#submit_spa_cond_job ${vcf} ${out_prefix} ${annotation}
-
-annotation="synonymous"
+annotation="ptv_damaging_missense"
 vcf="${in_dir}/211111_intervals_${annotation}_${phenotype}.vcf.bgz"
-out_prefix="${out_dir}/211111_TEST_P_spa_conditional_${annotation}_${phenotype}"
+out_prefix="${out_dir}/211111_spa_conditional_${annotation}_${phenotype}"
 submit_spa_cond_job ${vcf} ${out_prefix} ${annotation}
+
+#annotation="synonymous"
+#vcf="${in_dir}/211111_intervals_${annotation}_${phenotype}.vcf.bgz"
+#out_prefix="${out_dir}/211111_TEST_P_spa_conditional_${annotation}_${phenotype}"
+#submit_spa_cond_job ${vcf} ${out_prefix} ${annotation}
 
 
 
