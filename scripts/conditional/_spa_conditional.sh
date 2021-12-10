@@ -27,7 +27,7 @@ readonly step2_SPAtests="/well/lindgren/flassen/software/dev/SAIGE/extdata/step2
 readonly rscript="scripts/conditional/03_spa_conditional.R"
 
 spa_chr_loop() {
-   for chr in {9..10}; do
+   for chr in {1..22}; do
       local prefix_chr="${3}_chr${chr}"
       set -x
       Rscript "${step2_SPAtests}"  \
@@ -75,8 +75,7 @@ conditional_analysis() {
       # Run saddle point approximation using condtioning markers
       spa_chr_loop "${vcf}" "${marker_list}" "${prefix_iter}"
       Rscript "${rscript}" --prefix ${prefix_iter}
-
-      #rm  "${prefix_iter_chr}"*
+      rm  "${prefix_iter_chr}"*
 
       # Save top marker within P-value threshold
       cat "${markers_combined}" | \
