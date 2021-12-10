@@ -71,7 +71,7 @@ def main(args):
         with open(out_prefix + ".cond_markers", 'a') as outfile:
             outfile.write(saige_variants)
     else:
-        print(f"File '${input_markers}' does not contain any markers for chromosome '{chrom}'. Exiting.."
+        print(f"File '${input_markers}' does not contain any markers for chromosome '{chrom}'. Exiting..")
 
 if __name__ == '__main__':
 
