@@ -43,6 +43,7 @@ def main(args):
 
         # load knockout file
         wes = hl.read_matrix_table(input_mt)
+        wes = wes.drop('eur')
         n_before = wes.count()
         print(f"Pre-merging variants/samples {n_before}")
 
@@ -52,6 +53,9 @@ def main(args):
         overlap = list(set(wes_sids) & set(imp_sids))[1:5]
         wes = wes.filter_cols(hl.literal(set(overlap)).contains(wes.s))
         imp = imp.filter_cols(hl.literal(set(overlap)).contains(imp.s))
+        
+        #print(wes.describe())
+        #print(imp.describe())
 
         # combine the variants
         imp = tables.order_cols(imp, wes)

@@ -11,23 +11,23 @@
 #$ -t 1-40
 #$ -V
 
-# 12,18
 
 module purge
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
-# directories
 readonly vcf_dir="derived/knockouts/211111"
 readonly step1_dir="data/saige/output/combined/binary/step1"
 readonly out_dir="data/saige/output/combined/binary/step2/211111"
+readonly marker_dir="data/conditional/common/merge_markers"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
 
-# input path (note chromosome is substituted in _spa_test.sh)
 readonly pheno_list="${pheno_dir}/UKBB_WES200k_binary_phenotypes_header.txt"
 readonly spa_script="scripts/_spa_test.sh"
+
 readonly in_prefix="ukb_wes_200k_maf00_01"
+readonly conditioning="${marker_dir}/"
 
 # select phenotype (1-42)
 readonly index=${SGE_TASK_ID}
@@ -40,8 +40,6 @@ readonly in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
 # make directories
 mkdir -p ${out_dir}
 
-
-# output
 submit_spa_job() 
 {
   qsub -N "spa_${phenotype}_${category}" \
