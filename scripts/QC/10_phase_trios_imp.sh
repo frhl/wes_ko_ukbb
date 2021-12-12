@@ -14,7 +14,8 @@ source utils/hail_utils.sh
 module load VCFtools/0.1.16-GCC-8.3.0
 
 #readonly in_dir_phased="/well/lindgren/UKBIOBANK/nbaya/wes_200k/phase_ukb_wes/data/phased/non_singleton"
-readonly in_dir_phased="data/phased/test-phasing"
+readonly in_dir_phased="/well/lindgren/UKBIOBANK/nbaya/phase_ukb_imputed/data/phased/non_singleton/ukb_imp_phased_non_singleton_chr16/prs80000_pro20000_mprs100000/complete"
+#readonly in_dir_phased="data/phased/test-phasing"
 readonly in_dir_unphased="data/unphased/post-qc"
 readonly spark_dir="data/tmp/spark"
 readonly out_dir="data/mendel"
@@ -25,6 +26,7 @@ readonly rscript="scripts/QC/10_phase_trios.R"
 
 # input path
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 
+readonly in_phased="${in_dir_phased}/3of7.vcf.gz"
 #readonly in_phased="${in_dir_phased}/ukb_wes_phased_non_singleton_chr${chr}-24xlong.qc-v4.2.2.vcf.gz"
 #readonly in_phased="${in_dir_phased}/ukb_wes_200k_refphased_chr${chr}.vcf.gz"
 readonly in_phased="${in_dir_phased}/ukb_wes_200k_all_phased_chr${chr}.vcf.gz"
@@ -36,7 +38,7 @@ readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc
 readonly final_variant_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list'
 
 # output path
-readonly out_prefix="${out_dir}/211212_ukb_wes_trios_all_phased_chr${chr}"
+readonly out_prefix="${out_dir}/211212_ukb_wes_trios_imputed_3of7_chr${chr}"
 
 # run hail and get Switch errors
 # run hail and get trios for both dataset

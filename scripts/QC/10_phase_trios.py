@@ -55,29 +55,51 @@ def main(args):
     mt1 = qc.filter_min_mac(mt1, 2)
     mt2 = qc.filter_min_mac(mt2, 2)
     
+    # remove invariant sites
+    mt1 = mt1.filter_rows(hl.agg.stats(mt1.GT.n_alt_alleles()).stdev == 0, keep=False)
+    mt2 = mt2.filter_rows(hl.agg.stats(mt2.GT.n_alt_alleles()).stdev == 0, keep=False)
+
     # load pedigree
     fam_path = samples.get_fam_path(app_id=11867,wes_200k_only=False,relateds_only=False) # Files with True does not exist
     pedigree = hl.Pedigree.read(fam_path)
+    
+    # Remove invariant sites
 
-    # setup trip matriax
+
+    # setup trip matrix
     trio_dataset = hl.trio_matrix(mt2, pedigree, complete_trios=True)
     mt = hl.experimental.phase_trio_matrix_by_transmission(trio_dataset)
     mt = hl.experimental.explode_trio_matrix(mt)
+   
+    # clean up trio file
+    mt = mt.drop('source_trio')
+    mt = mt.select_entries('PBT_GT')
+    mt = mt.annotate_entries(GT = mt.PBT_GT)
+    mt = mt.select_entries('GT')
+    mt = mt.drop('info')
+
+    # Write VCF of trios with PBT_GT only
+    sids = mt.s.collect()
+    hl.export_vcf(mt, out_prefix + "_transmission.vcf")
+
+    # shapeit4 phased data
+    mt1 = mt1.filter_cols(hl.literal(set(sids)).contains(mt1.s))
+    hl.export_vcf(mt1, out_prefix + "_estimation.vcf")
 
     # get call stats
-    info_field = 'info'
-    mt = mt.annotate_rows(**{info_field: hl.agg.call_stats(mt.PBT_GT, mt.alleles)})
+    #info_field = 'info'
+    #mt = mt.annotate_rows(**{info_field: hl.agg.call_stats(mt.PBT_GT, mt.alleles)})
 
     # annotate shapeit4 GTs with GTs phased by transmission and filter to hets
-    mt = mt.annotate_entries(GT_shapeit4 = mt1[mt.row_key, mt.col_key].GT)
-    mt = mt.filter_entries(hl.is_defined(mt.PBT_GT) & hl.is_defined(mt.GT_shapeit4))
-    mt = mt.filter_entries(mt.GT_shapeit4.is_het_ref())
-    mt = mt.filter_entries(mt.PBT_GT.is_het_ref())
+    #mt = mt.annotate_entries(GT_shapeit4 = mt1[mt.row_key, mt.col_key].GT)
+    #mt = mt.filter_entries(hl.is_defined(mt.PBT_GT) & hl.is_defined(mt.GT_shapeit4))
+    #mt = mt.filter_entries(mt.GT_shapeit4.is_het_ref())
+    #mt = mt.filter_entries(mt.PBT_GT.is_het_ref())
 
     # annotate switch errors
-    mt = mt.annotate_rows(errors_sum=hl.agg.sum(mt.PBT_GT != mt.GT_shapeit4))
-    mt = mt.annotate_rows(hets_sum=hl.agg.sum(mt.PBT_GT.is_het_ref()))
-    mt = mt.annotate_rows(switch_errors=(mt.errors_sum / mt.hets_sum))
+    #mt = mt.annotate_rows(errors_sum=hl.agg.sum(mt.PBT_GT != mt.GT_shapeit4))
+    #mt = mt.annotate_rows(hets_sum=hl.agg.sum(mt.PBT_GT.is_het_ref()))
+    #mt = mt.annotate_rows(switch_errors=(mt.errors_sum / mt.hets_sum))
 
     # write to hail table
     #mt.rows().select('errors_sum','hets_sum','switch_errors','info').write(out_prefix + ".ht")
@@ -88,15 +110,16 @@ def main(args):
 
     
     # write to tab-seperated files
-    mt = mt.annotate_rows(AC1 = mt.info.AC[0])
-    mt = mt.annotate_rows(AC2 = mt.info.AC[1])
-    mt = mt.annotate_rows(AF1 = mt.info.AF[0])
-    mt = mt.annotate_rows(AF2 = mt.info.AF[1])
-    mt.rows().select('errors_sum','hets_sum','switch_errors','AC1','AC2','AF1','AF2').export(out_prefix + ".tsv.bgz")
+    #mt = mt.annotate_rows(AC1 = mt.info.AC[0])
+    #mt = mt.annotate_rows(AC2 = mt.info.AC[1])
+    #mt = mt.annotate_rows(AF1 = mt.info.AF[0])
+    #mt = mt.annotate_rows(AF2 = mt.info.AF[1])
+    #mt.rows().select('errors_sum','hets_sum','switch_errors','AC1','AC2','AF1','AF2').export(out_prefix + ".tsv.bgz")
 
-    mt.write(out_prefix + ".mt")
+    #mt.write(out_prefix + ".mt")
 
 if __name__=='__main__':
+
     parser = argparse.ArgumentParser()
     # initial params
     parser.add_argument('--input_phased_path', default=None, help='Path to input')
