@@ -49,7 +49,7 @@ submit_knockout_job()
   qsub_name=$( echo ${4} | tr "," "_")
   set -x
   qsub -N "_ko_${qsub_name}" \
-    -t 21 \
+    -t 1-22 \
     -q "short.qa" \
     -pe shmem 2 \
     "${knockout_script}" \

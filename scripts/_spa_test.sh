@@ -19,12 +19,13 @@ readonly in_csi=${3?Error: Missing arg3 (in_csi)}
 readonly in_gmat=${4?Error: Missing arg4 (in_gmat)} 
 readonly in_var=${5?Error: Missing arg5 (in_var)} 
 readonly out_prefix=${6?Error: Missing arg6 (path prefix for saige output)}
-readonly conditioning=${7?Error: Missing arg7 (path prefix for saige output)}
+readonly in_markers=${7?Error: Missing arg7 (Optional file with conditioning markers)}
 readonly chr=${SGE_TASK_ID}
 
 # subsitute each chromosome
 readonly vcf=$(echo ${in_vcf} | sed -e "s/CHR/${chr}/g")
 readonly csi=$(echo ${in_csi} | sed -e "s/CHR/${chr}/g")
+readonly markers=$(cat $(echo ${in_markers} | sed -e "s/CHR/${chr}/g"))
 
 # SAIGE paths
 readonly threads=$(( ${NSLOTS}-1 ))
@@ -54,7 +55,7 @@ spa_test() {
      --IsOutputNinCaseCtrl=TRUE \
      --IsOutputHetHomCountsinCaseCtrl=TRUE \
      --LOCO=FALSE\
-     ${conditioning:+--conditioning "$conditioning"}
+     ${markers:+--conditioning "$markers"}
    set +x
    duration=${SECONDS}
    	print_update "Finished SPA test for ${out} at ${duration}"
