@@ -48,7 +48,7 @@ submit_merge_markers_job()
 annotation='ptv_damaging_missense'
 mt="${mt_dir}/ukb_wes_200k_maf0_0.01_chrCHR_${annotation}_ko.mt"
 markers_table="${marker_dir}/211111_spa_conditional_${annotation}_${phenotype}_conditioning_markers.txt"
-out_prefix="${out_dir}/211111_${annotation}_${phenotype}_merged"
+out_prefix="${out_dir}/211111_${annotation}_${phenotype}_merged_chrCHR"
 submit_merge_markers_job ${mt} ${markers_table} ${out_prefix}
 
 
