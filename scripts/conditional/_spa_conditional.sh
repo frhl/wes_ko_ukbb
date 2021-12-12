@@ -58,7 +58,6 @@ conditional_analysis() {
   rm ${markers_conditional}
 
   i=0 #
-  #max=10
   marker_list="" # markers for SAIGE
   while [ $i -lt $max_iter ]; do
 

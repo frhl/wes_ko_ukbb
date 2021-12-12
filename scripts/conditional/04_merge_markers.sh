@@ -10,8 +10,8 @@
 #$ -t 37
 #$ -V
 
-source utils/vcf_utils.sh
-source utils/hail_utils.sh
+set -o errexit
+set -o nounset
 
 readonly mt_dir="derived/knockouts/211206"
 readonly marker_dir="data/conditional/common/spa_conditional"

@@ -39,6 +39,7 @@ merge_markers() {
      --input_markers "${marker_table}" \
      --out_prefix "${out_prefix}"
   set +x
+  make_tabix "${out_prefix}.vcf.bgz" "csi"
   print_update "Hail finished writing VCFs in ${SECONDS}"
 }
 

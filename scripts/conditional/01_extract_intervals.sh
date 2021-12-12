@@ -10,6 +10,8 @@
 #$ -pe shmem 2
 #$ -q short.qc
 
+set -o errexit
+set -o nounset
 
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
