@@ -7,19 +7,19 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 24
 #$ -q long.qc@@long.hga
-#$ -t 21
+#$ -t 1-4
 
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
 
-#readonly in_dir="data/unphased/post-qc"
-readonly in_dir="data/phased/test-phasing"
+readonly in_dir="data/unphased/post-qc"
+#readonly in_dir="data/phased/test-phasing"
 readonly out_dir="data/phased/test-phasing"
 readonly ref_dir="/well/lindgren/flassen/ressources/panels/liftover_reference_panel/data/liftover"
 
 readonly chr="${SGE_TASK_ID}"
-#readonly in_file="${in_dir}/ukb_wes_200k_filtered_chr${chr}.vcf.bgz"
-readonly in_file="${in_dir}/ukb_wes_200k_filtered_maf0001_chr${chr}.vcf.bgz"
+readonly in_file="${in_dir}/ukb_wes_200k_filtered_chr${chr}.vcf.bgz"
+#readonly in_file="${in_dir}/ukb_wes_200k_filtered_maf0001_chr${chr}.vcf.bgz"
 readonly out_file="${out_dir}/ukb_wes_200k_all_phased_chr${chr}.vcf.gz"
 
 readonly ref="${ref_dir}/ALL.chr${chr}.phase3_shapeit2_mvncall_integrated_v5.20130502.genotypes.vcf.bgz"
