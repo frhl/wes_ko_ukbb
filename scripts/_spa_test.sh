@@ -55,7 +55,7 @@ spa_test() {
      --IsOutputNinCaseCtrl=TRUE \
      --IsOutputHetHomCountsinCaseCtrl=TRUE \
      --LOCO=FALSE\
-     ${markers:+--conditioning "$markers"}
+     ${markers:+--condition "$markers"}
    set +x
    duration=${SECONDS}
    	print_update "Finished SPA test for ${out} at ${duration}"
