@@ -50,7 +50,7 @@ def main(args):
         # Get intersecting individuals
         wes_sids = wes.s.collect()
         imp_sids = imp.s.collect()
-        overlap = list(set(wes_sids) & set(imp_sids))[1:5]
+        overlap = list(set(wes_sids) & set(imp_sids))
         wes = wes.filter_cols(hl.literal(set(overlap)).contains(wes.s))
         imp = imp.filter_cols(hl.literal(set(overlap)).contains(imp.s))
         
