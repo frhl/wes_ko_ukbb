@@ -57,9 +57,9 @@ submit_spa_conditional_job()
 submit_spa_with_csqs()
 {
   category=${1?Error: Missing arg1 (consequence)}
-  in_vcf="${vcf_dir}/${in_prefix}_${category}_${phenotype}_chrCHR.vcf.bgz"
+  in_vcf="${vcf_dir}/${in_prefix}_${category}_${phenotype}_merged_chrCHR.vcf.bgz"
   out_prefix="${out_dir}/${in_prefix}_${category}_${phenotype}"
-  file_markers="${vcf_dir}/${in_prefix}_${category}_${phenotype}_chrCHR.cond_markers"
+  file_markers="${vcf_dir}/${in_prefix}_${category}_${phenotype}_merged_chrCHR.cond_markers"
   print_update "Submitting conditional SPA for ${phenotype} [${category}]."
   submit_spa_conditional_job
 }

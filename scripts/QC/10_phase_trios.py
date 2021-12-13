@@ -8,6 +8,7 @@ import os
 from gnomad.utils.vep import process_consequences
 from ukb_utils import hail_init
 from ukb_utils import samples
+from ukb_utils import variants
 from ko_utils import qc
 from ko_utils import analysis
 
@@ -37,6 +38,7 @@ def main(args):
     # Remove withdrawn samples
     mt1 = samples.remove_withdrawn(mt1)
     mt2 = samples.remove_withdrawn(mt2)
+    #mt2 = variants.liftover(mt2)
 
     # filter by Duncan's final samples
     if final_sample_list:

@@ -54,9 +54,6 @@ def main(args):
         wes = wes.filter_cols(hl.literal(set(overlap)).contains(wes.s))
         imp = imp.filter_cols(hl.literal(set(overlap)).contains(imp.s))
         
-        #print(wes.describe())
-        #print(imp.describe())
-
         # combine the variants
         imp = tables.order_cols(imp, wes)
         mt = imp.union_rows(wes)

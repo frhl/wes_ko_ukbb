@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+#
+#$ -N submit_spa_null
+#$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
+#$ -o logs/submit_spa_null.log
+#$ -e logs/submit_spa_null.errors.log
+#$ -P lindgren.prjc
+#$ -pe shmem 1
+#$ -q test.qc
+#$ -t 12
+#$ -V
+
+module purge
+source utils/bash_utils.sh
+source utils/hail_utils.sh
+
+readonly plink_dir="data/saige/grm/input"
+readonly grm_dir="data/saige/grm/input"
+readonly covar_dir="data/phenotypes"
+readonly pheno_dir="data/phenotypes"
+
+readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+readonly grm_sam="${grm_mtx}.sampleIDs.txt"
+readonly plink_file="${plink_dir}/211102_long_ukb_wes_200k_sparse_autosomes"
+readonly covar_file="${covar_dir}/COVARS1.csv"
+readonly covariates=$( cat ${covar_file} )
+
+readonly spa_null_script="scripts/_spa_null.sh"
+
+fit_binary_traits() {
+  
+  local trait_type="binary"
+  local pheno_file="${pheno_dir}/UKBB_WES200k_filtered_binary_phenotypes.tsv.gz"
+  local pheno_list="${pheno_dir}/UKBB_WES200k_binary_phenotypes_header.txt"
+  local out_dir="data/saige/output/combined/binary/test"
+  local phenotype=$( cut -f${SGE_TASK_ID} ${pheno_list} )
+  local out_prefix="${out_dir}/ukb_wes_200k_${phenotype}"
+  submit_spa_null
+
+}
+
+fit_cts_traits() {
+  
+  local trait_type="cts"
+  local pheno_file="${pheno_dir}/UKBB_WES200k_filtered_cts_phenotypes.tsv.gz"
+  local pheno_list="${pheno_dir}/UKBB_WES200k_cts_phenotypes_header.txt"
+  local out_dir="data/saige/output/combined/cts/test"
+  local phenotype=$( cut -f${SGE_TASK_ID} ${pheno_list} )
+  local out_prefix="${out_dir}/ukb_wes_200k_${phenotype}"
+  submit_spa_null
+
+}
+
+submit_spa_null() {
+  mkdir -p ${out_dir}
+  set -x
+  qsub -N "spa_${phenotype}" \
+    -t ${SGE_TASK_ID} \
+    -q "short.qe" \
+    -pe shmem 3 \
+    "${spa_null_script}" \
+    "${plink_file}" \
+    "${pheno_file}" \
+    "${phenotype}" \
+    "${covariates}" \
+    "${trait_type}" \
+    "${grm_mtx}" \
+    "${grm_sam}" \
+    "${out_prefix}"
+  set +x
+}
+
+fit_binary_traits
+
+
+
+
+
+
