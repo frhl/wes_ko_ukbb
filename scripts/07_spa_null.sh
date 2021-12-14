@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-3
+#$ -t 1-2
 #$ -V
 
 module purge
@@ -41,7 +41,7 @@ fit_binary_traits() {
 
 fit_cts_traits() {
    
-  local trait_type="cts"
+  local trait_type="quantitative"
   local out_dir="data/saige/output/combined/cts/step1"
   local pheno_list="${pheno_dir}/curated_phenotypes_cts_header.tsv"
   local phenotype=$( cut -f${SGE_TASK_ID} ${pheno_list} )
