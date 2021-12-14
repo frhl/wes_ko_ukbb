@@ -26,8 +26,7 @@ readonly threads=$(( ${NSLOTS}-1 ))
 
 # null model script
 fit_null() {
-   >&2 echo "${out_prefix}"
-   if [ ! -f "${out_prefix}*" ]; then
+   if [ ! -f "${out_prefix}.rda" ]; then
      SECONDS=0
      set -x
      Rscript "${step1_fitNULLGLMM}" \
@@ -35,7 +34,7 @@ fit_null() {
        --phenoFile="${pheno_file}" \
        --phenoCol="${phenotype}" \
        --covarColList=${covariates} \
-       --sampleIDColinphenoFile="ID" \
+       --sampleIDColinphenoFile="eid" \
        --traitType="${trait_type}" \
        --invNormalize=TRUE \
        --outputPrefix="${out_prefix}" \
@@ -52,7 +51,7 @@ fit_null() {
      duration=${SECONDS}
      print_update "Finished fitting null model for ${phenotype}" "$duration"
    else
-     print_update "Warning: Null model at ${out_prefix} already exists. Skipping."
+     >&2 echo "Warning: Null model at ${out_prefix} already exists. Skipping!"
    fi
  }
 
