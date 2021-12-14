@@ -17,13 +17,13 @@ source utils/bash_utils.sh
 
 # directories
 readonly vcf_dir="derived/knockouts/211111"
-readonly step1_dir="data/saige/output/combined/binary/step1"
-readonly out_dir="data/saige/output/combined/binary/step2/211111"
+#readonly step1_dir="data/saige/output/combined/binary/step1"
+#readonly out_dir="data/saige/output/combined/binary/step2/"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
 
 # input path (note chromosome is substituted in _spa_test.sh)
-readonly pheno_list="${pheno_dir}/UKBB_WES200k_binary_phenotypes_header.txt"
+#readonly pheno_list="${pheno_dir}/UKBB_WES200k_binary_phenotypes_header.txt"
 readonly spa_script="scripts/_spa_test.sh"
 readonly in_prefix="ukb_wes_200k_maf00_01"
 
@@ -31,16 +31,33 @@ readonly in_prefix="ukb_wes_200k_maf00_01"
 readonly phenotype=$( cut -f${SGE_TASK_ID} ${pheno_list} )
 
 # setup input phenotypes
-readonly in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
-readonly in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
-
 # make directories
 mkdir -p ${out_dir}
 
+submit_spa_binary_with_csqs() {
+  
+  local annotation="${1?Error: Missing arg1 (annotation)}"
+  local trait_type="binary"
+  local step1_dir="data/saige/output/combined/binary/step1"
+  local out_dir="data/saige/output/combined/binary/step2"
+  local pheno_list="${pheno_dir}/curated_phenotypes_binary_header.tsv"
+  local phenotype=$( cut -f${SGE_TASK_ID} ${pheno_list} )
+  
+}
 
-# output
-submit_spa_job() 
-{
+submit_spa_with_csqs() {
+  
+  local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
+  local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
+  local category=${1?Error: Missing arg1 (consequence)}
+  local out_prefix="${out_dir}/${in_prefix}_${category}_${phenotype}"
+  local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${category}_ko.vcf.bgz"
+  print_update "Submitting SPA for ${phenotype} [${category}]"
+  submit_spa_job
+}
+
+submit_spa_job() {
+  set -x
   qsub -N "spa_${phenotype}_${category}" \
     -t 1-22 \
     -q "short.qe" \
@@ -52,22 +69,14 @@ submit_spa_job()
     "${in_gmat}" \
     "${in_var}" \
     "${out_prefix}"
+  set +x
 }
 
-# submit job with specific consequence
-submit_spa_with_csqs()
-{
-  category=${1?Error: Missing arg1 (consequence)}
-  out_prefix="${out_dir}/${in_prefix}_${category}_${phenotype}"
-  in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${category}_ko.vcf.bgz"
-  print_update "Submitting SPA for ${phenotype} [${category}]"
-  submit_spa_job
-}
 
 # submit jobs
-#submit_spa_with_csqs "ptv"
+submit_spa_binary_with_csqs "ptv"
 #submit_spa_with_csqs "ptv_damaging_missense"
 #submit_spa_with_csqs "synonymous"
-submit_spa_with_csqs "ptv_ptv_LC"
-submit_spa_with_csqs "ptv_ptv_LC_damaging_missense"
+#submit_spa_with_csqs "ptv_ptv_LC"
+#submit_spa_with_csqs "ptv_ptv_LC_damaging_missense"
 
