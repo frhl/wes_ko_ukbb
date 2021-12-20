@@ -12,28 +12,24 @@
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
-# arguments
 readonly phenotype=${1?Error: Missing arg1 (phenotype)}
 readonly in_vcf=${2?Error: Missing arg2 (in_vcf)}
 readonly in_csi=${3?Error: Missing arg3 (in_csi)}
 readonly in_gmat=${4?Error: Missing arg4 (in_gmat)} 
 readonly in_var=${5?Error: Missing arg5 (in_var)} 
 readonly out_prefix=${6?Error: Missing arg6 (path prefix for saige output)}
-readonly in_markers=${7?Error: Missing arg7 (Optional file with conditioning markers)}
+readonly in_markers=${7} # optional conditioning markers
 readonly chr=${SGE_TASK_ID}
 
-# subsitute each chromosome
 readonly vcf=$(echo ${in_vcf} | sed -e "s/CHR/${chr}/g")
 readonly csi=$(echo ${in_csi} | sed -e "s/CHR/${chr}/g")
 readonly markers=$(cat $(echo ${in_markers} | sed -e "s/CHR/${chr}/g"))
 
-# SAIGE paths
 readonly threads=$(( ${NSLOTS}-1 ))
 readonly createSparseGRM="/well/lindgren/flassen/software/dev/SAIGE/extdata/createSparseGRM.R"
 readonly step1_fitNULLGLMM="/well/lindgren/flassen/software/dev/SAIGE/extdata/step1_fitNULLGLMM.R"
 readonly step2_SPAtests="/well/lindgren/flassen/software/dev/SAIGE/extdata/step2_SPAtests.R"
 
-# out prefix
 readonly out="${out_prefix}_chr${chr}"
 
 spa_test() {

@@ -69,7 +69,7 @@ submit_spa_null() {
   set +x
 }
 
-
+# Fit null model for binary/cts traits
 fit_binary_traits
 fit_cts_traits
 
