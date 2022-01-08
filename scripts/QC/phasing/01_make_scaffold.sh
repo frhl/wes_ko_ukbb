@@ -5,7 +5,7 @@
 #$ -o logs/make_scaffold.log
 #$ -e logs/make_scaffold.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 1
+#$ -pe shmem 3
 #$ -q short.qc@@short.hga
 #$ -t 21
 

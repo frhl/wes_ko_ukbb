@@ -9,7 +9,7 @@ from ko_utils import qc
 from ko_utils import analysis
 
 def main(args):
-    
+
     # parser
     chrom = args.chrom
     input_phased_path = args.input_phased_path
