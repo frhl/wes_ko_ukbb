@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ##
 #$ -N _merge_markers
-#$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/merge_markers.log
 #$ -e logs/merge_markers.errors.log
 #$ -P lindgren.prjc

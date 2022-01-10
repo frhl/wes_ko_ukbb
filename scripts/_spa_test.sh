@@ -2,7 +2,7 @@
 #
 #
 #$ -N _spa_test
-#$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/spa_test.log
 #$ -e logs/spa_test.errors.log
 #$ -P lindgren.prjc

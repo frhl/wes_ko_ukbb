@@ -11,7 +11,7 @@ from ko_utils import qc
 from ko_utils import analysis
 
 def main(args):
-    
+
     # parser
     chrom = args.chrom
     input_path = args.input_path
@@ -22,12 +22,12 @@ def main(args):
     # setup flags
     hail_init.hail_bmrc_init_local('logs/hail/hail_format.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
-    
+
     # get file and annotate
     mt = qc.get_table(input_path=input_path, input_type=input_type) # 12788
     mt = process_consequences(hl.vep(mt, "utils/configs/vep_final.json"))
     ht = mt.rows()
-    
+
     # write out VEP hail table
     ht.write(out_prefix + "_vep.ht", overwrite=True)
 
@@ -36,11 +36,13 @@ if __name__=='__main__':
     # initial params
     parser.add_argument('--input_path', default=None, help='Path to input')
     parser.add_argument('--input_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
-    parser.add_argument('--vep_path', default=None, help='Path to dbNSFP annotations') 
+    parser.add_argument('--vep_path', default=None, help='Path to dbNSFP annotations')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--chrom', default=None, help='Chromosome to be used')
 
     args = parser.parse_args()
 
     main(args)
+
+
 

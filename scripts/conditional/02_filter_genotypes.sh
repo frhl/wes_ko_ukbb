@@ -3,7 +3,7 @@
 # extract genotypes in regions near genes that are significant in primary analysis
 #
 #$ -N submit_filter_genotypes
-#$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/submit_filter_genotypes.log
 #$ -e logs/submit_filter_genotypes.errors.log
 #$ -P lindgren.prjc

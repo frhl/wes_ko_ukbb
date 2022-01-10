@@ -9,7 +9,7 @@
 # 4) A ko probability matrix with the above + variants involved in KO.
 #
 #$ -N knockout
-#$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/submit_knockout.log
 #$ -e logs/submit_knockout.errors.log
 #$ -P lindgren.prjc

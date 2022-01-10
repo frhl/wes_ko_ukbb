@@ -2,7 +2,7 @@
 #
 #
 #$ -N tabix
-#$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/tabix.log
 #$ -e logs/tabix.errors.log
 #$ -P lindgren.prjc

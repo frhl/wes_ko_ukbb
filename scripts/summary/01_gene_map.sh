@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #$ -N gene_map
-#$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/gene_map.log
 #$ -e logs/gene_map.errors.log
 #$ -P lindgren.prjc

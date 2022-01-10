@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #$ -N create_mt
-#$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/create_mt.log
 #$ -e logs/create_mt.errors.log
 #$ -P lindgren.prjc

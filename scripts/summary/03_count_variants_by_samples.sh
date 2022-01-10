@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #$ -N count_variants_by_samples
-#$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/count_variants_by_samples.log
 #$ -e logs/count_variants_by_samples.errors.log
 #$ -P lindgren.prjc

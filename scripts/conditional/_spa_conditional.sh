@@ -2,7 +2,7 @@
 #
 #
 #$ -N _spa_conditional
-#$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/spa_conditional.log
 #$ -e logs/spa_conditional.errors.log
 #$ -P lindgren.prjc

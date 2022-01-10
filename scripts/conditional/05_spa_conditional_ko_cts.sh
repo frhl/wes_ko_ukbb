@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #$ -N submit_spa_conditional_ko_cts 
-#$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/submit_spa_conditional_ko_cts.log
 #$ -e logs/submit_spa_conditional_ko_cts.errors.log
 #$ -P lindgren.prjc

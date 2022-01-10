@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #$ -N _spa_null
-#$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/spa_null.log
 #$ -e logs/spa_null.errors.log
 #$ -P lindgren.prjc

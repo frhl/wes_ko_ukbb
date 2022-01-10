@@ -2,7 +2,7 @@
 #
 # note: this scripts is called from 04_knockouts.sh
 #
-#$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/_knockouts.log
 #$ -e logs/_knockouts.errors.log
 #$ -P lindgren.prjc

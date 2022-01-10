@@ -3,7 +3,7 @@
 # Create sparse genetic relatedness matrix using genotyped/imputed data.
 #
 #$ -N create_grm
-#$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/create_grm.log
 #$ -e logs/create_grm.errors.log
 #$ -P lindgren.prjc

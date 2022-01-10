@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #$ -N initial_sample_qc
-#$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/initial_sample_qc.log
 #$ -e logs/initial_sample_qc.errors.log
 #$ -P lindgren.prjc

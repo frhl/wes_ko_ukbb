@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #$ -N hail_vep
-#$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/hail_vep.log
 #$ -e logs/hail_vep.errors.log
 #$ -P lindgren.prjc

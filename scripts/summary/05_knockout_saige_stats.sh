@@ -1,9 +1,7 @@
-Rscript "${rscript}" \
-     --out_prefix ${out_prefix}
 #!/usr/bin/env bash
 #
 #$ -N knockout_saige_stats
-#$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/knockout_saige_stats.log
 #$ -e logs/knockout_saige_stats.errors.log
 #$ -P lindgren.prjc
