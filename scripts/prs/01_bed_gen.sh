@@ -5,9 +5,9 @@
 #$ -o logs/bed_gen.log
 #$ -e logs/bed_gen.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qc@@short.hga
-#$ -t 21
+#$ -pe shmem 7
+#$ -q long.qc@@long.hga
+#$ -t 19-22
 #$ -V
 
 source utils/qsub_utils.sh
