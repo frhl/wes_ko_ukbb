@@ -1,7 +1,9 @@
 # Strategy for PRS
-1. Hail script that can write out pre-imputed genotypes as .bed/.bgen files
-2. Estimate per-predictor heritabilities using 
-3.  
+1. Hail script to export file of sparse gentotypes for calculating kinship
+2. bash script to run LDAK to calcualte kinship
+3. Hail script that can write out pre-imputed genotypes as .bed/.bgen files
+4. Single predictor analysis using genotypes (3) kinship matrix (2) and phenotypes in plink format
+5. Estimate per-predictor heritabilities using  
 
 
 
