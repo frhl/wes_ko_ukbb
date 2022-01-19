@@ -7,9 +7,10 @@
 #$ -o logs/merge_markers.log
 #$ -e logs/merge_markers.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qc
-# -q long.qc@@long.hge
+#$ -pe shmem 10
+#$ -q long.qc@@long.hge
+$ -q short.qc
+
 
 
 source utils/qsub_utils.sh
@@ -18,29 +19,26 @@ source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark"
 readonly out_dir="data/prs/kinship/markers"
-readonly out_prefix="${out_dir}/ukb_imp_500k_sparse_autosomes"
-readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
+readonly out_prefix="${out_dir}/ukb_imp_eur_500k_sparse_autosomes"
 
-readonly hail_script="scripts/06_create_grm.py"
+readonly hail_script="scripts/prs/01_merge_markers.py"
 readonly threads=$(( ${NSLOTS}-1 ))
-readonly createSparseGRM="/well/lindgren/flassen/software/dev/SAIGE/extdata/createSparseGRM.R"
 
 # Generate a sequence of chromosomes to be included
 chroms=$( seq 1 22 | tr '\n' ' ' )
-#chroms=21
 
-# combine markers from UKBB imputed data
 if [ $( ls -1 ${out_prefix}.{bed,bim,fam} 2> /dev/null | wc -l ) -ne 3 ]; then
+  START=${SECONDS}
   set_up_hail
   set_up_pythonpath_legacy
   mkdir -p ${out_dir}
   python3 "${hail_script}" \
    --chroms ${chroms} \
    --out_prefix ${out_prefix} \
-   --final_sample_list ${final_sample_list} \
-   --subset_markers_by_kinship \
-  conda deactivate
-  print_update "Hail finished writing."
+   --ancestry "eur" \
+   --subset_markers_by_kinship
+  DURATION=$(( ${SECONDS}-${START} ))
+  print_update "Hail finished writing after ${DURATION}"
 else
   print_update "${out_prefix}.bed/bim/fam already exists. Skipping"
 fi
