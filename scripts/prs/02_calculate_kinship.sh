@@ -5,8 +5,8 @@
 #$ -o logs/calculate_kinship.log
 #$ -e logs/calculate_kinship.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qa@@short.hga
+#$ -pe shmem 20
+#$ -q long.qc@@long.hga
 #$ -t 21
 #$ -V
 
@@ -21,29 +21,33 @@ readonly in_file="${in_dir}/211102_long_ukb_wes_200k_sparse_autosomes"
 readonly out_thin="${out_dir}/thin"
 readonly out_kins="${out_dir}/kins"
 
-readonly sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
-
 mkdir -p ${out_dir}
 
 
 # thinning predictors
-set -x
-${ldak} \
-  --thin "${out_thin}" \
-  --bfile "${in_file}" \
-  --window-prune .98 \
-  --window-kb 100
-set +x
+if [ ! -f "${out_thin}.weights" ]; then
+  set -x
+  ${ldak} \
+    --thin "${out_thin}" \
+    --bfile "${in_file}" \
+    --window-prune .98 \
+    --window-kb 100
+  set +x
+  awk < "${out_thin}.in" '{print $1, 1}' > "${out_thin}.weights"
+else
+  echo "${out_thin}.weights file found. Skipping thinning."
+fi
 
-# generate weights file
-awk < "${out_thin}.in" '{print $1, 1}' > "${out_thin}.weights"
-
-
-#bash ${ldak} \
-#  --calc-kins "${out}" \
-#  --bfile "${in_file}" \
-#  -ignore-weights YES \
-#  --power -1
+# calc kinship matrix assuming LDAK-thin model
+if [ ! -f ${out_kins} ]; then
+  set -x 
+  ${ldak} \
+    --calc-kins-direct "${out_kins}" \
+    --bfile "${in_file}" \
+    --weights "${out_thin}.weights" \
+    --power -0.25
+  set +x
+fi
 
 #bash ${ldak} \
 #  --cut-kins "${out}" \
