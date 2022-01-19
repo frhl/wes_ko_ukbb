@@ -27,25 +27,25 @@ mkdir -p ${out_dir}
 
 
 # thinning predictors
-set -x 
+set -x
 ${ldak} \
   --thin "${out_thin}" \
   --bfile "${in_file}" \
   --window-prune .98 \
-  --window-kb 100 \
+  --window-kb 100
 set +x
 
 # generate weights file
 awk < "${out_thin}.in" '{print $1, 1}' > "${out_thin}.weights"
 
 
-#${ldak} \
+#bash ${ldak} \
 #  --calc-kins "${out}" \
 #  --bfile "${in_file}" \
 #  -ignore-weights YES \
 #  --power -1
 
-#${ldak} \
+#bash ${ldak} \
 #  --cut-kins "${out}" \
 #  --partition-length "500000" \
 #  --bfile "${in_file}"
@@ -58,8 +58,4 @@ awk < "${out_thin}.in" '{print $1, 1}' > "${out_thin}.weights"
 
 #bash "${ldak}" \
 #  --join-kins ${out_dir}
-
-
-
-
 
