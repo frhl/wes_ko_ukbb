@@ -14,7 +14,7 @@ source utils/qsub_utils.sh
 source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
-readonly hail_script="scripts/prs/01_bed_gen.py"
+readonly hail_script="scripts/prs/00_bed_gen.py"
 readonly spark_dir="data/tmp/spark"
 
 readonly chr=$( get_chr ${SGE_TASK_ID} )

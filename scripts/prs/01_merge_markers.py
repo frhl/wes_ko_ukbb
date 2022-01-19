@@ -13,6 +13,7 @@ def main(args):
     subset_markers_by_kinship = args.subset_markers_by_kinship
     out_prefix = args.out_prefix
     final_sample_list = args.final_sample_list
+    ancestry = args.ancestry
     sex = args.sex
 
     hail_init.hail_bmrc_init_local('logs/hail/hail_format.log', 'GRCh37')
@@ -26,6 +27,9 @@ def main(args):
     if final_sample_list:
          ht_final_samples = hl.import_table(final_sample_list, no_header=True, key='f0',delimiter = ',')
          mt = mt.filter_cols(hl.is_defined(ht_final_samples[mt.col_key]))
+    
+    if ancestry:
+        mt = samples.filter_ukb_to_ancestry(mt, ancestry)
 
     if subset_markers_by_kinship:
         ht = hl.import_table('/well/lindgren/UKBIOBANK/DATA/QC/ukb_snp_qc.txt', impute = True, delimiter = ' ')
@@ -46,6 +50,7 @@ if __name__=='__main__':
     parser.add_argument('--subset_samples_by_genet_eur', action='store_true', help='Subset samples to those that are genetically european.') 
     parser.add_argument('--subset_samples_by_ukbb_eur', action='store_true', default = False, help='Subset samples to those that are european designated by UKBB.') 
     parser.add_argument('--add_rare_variants', action='store_true', help='Add rare variants to plink file (this is required for SAIGE-GENE+ analysis')
+    parser.add_argument('--ancestry', default=None, help='either "all" or "eur" ancestry')
     parser.add_argument('--final_sample_list', default=None, help='Path to HailTable that contains the final samples included in the analysis.')
     parser.add_argument('--sex', default=None, help='Only include "females" or "males".')
     parser.add_argument('--phenotypes', default=None, help='Path to phenotype table that also includes sex.')

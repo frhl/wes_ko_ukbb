@@ -2,10 +2,10 @@
 #
 # Create sparse genetic relatedness matrix using genotyped/imputed data.
 #
-#$ -N subset_grm_markers
+#$ -N merge_markers
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/subset_grm_markers.log
-#$ -e logs/subset_grm_markers.errors.log
+#$ -o logs/merge_markers.log
+#$ -e logs/merge_markers.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
