@@ -56,12 +56,13 @@ def main(args):
     
     covariates = covariates.split(',')
     if set(list(mt.pheno)) >= set(covariates):
-        covariates.insert(0, 1)
+        covariates = [mt.pheno[x] for x in covariates]
+        covariates.insert(0, 1) 
         if response in list(mt.pheno):
             if mt.pheno[response].dtype == hl.dtype('float64'):
                 reg = hl.linear_regression_rows(
-                        x=mt.pheno[response],
-                        y=mt.GT.n_alt_alleles(),
+                        y=mt.pheno[response],
+                        x=mt.GT.n_alt_alleles(),
                         covariates=covariates
                         )
             elif mt.pheno[response].dtype == hl.dtype('bool'):
