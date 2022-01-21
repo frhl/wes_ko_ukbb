@@ -83,7 +83,7 @@ def main(args):
         raise TypeError("Some or all covariates are not in phenotype file!")
 
     print("Writing out file")
-    reg.flatten().export(out_prefix + ".txt.bgz")
+    reg.flatten().export(out_prefix + ".txt.gz")
 
 
 

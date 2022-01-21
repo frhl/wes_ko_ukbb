@@ -5,10 +5,14 @@
 #$ -o logs/summary_statistics.log
 #$ -e logs/summary_statistics.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 1
+#$ -pe shmem 10
 #$ -q short.qc
-#$ -t 1
+#$ -t 34
 #$ -V
+
+# 1 - 33 contains non-residuals
+# 34 - 103 contains residuals
+
 
 module purge
 source utils/bash_utils.sh
@@ -26,10 +30,10 @@ readonly pheno_file="${pheno_dir}/curated_phenotypes.tsv"
 readonly pheno_list="${pheno_dir}/curated_phenotypes_cts_header.tsv"
 readonly phenotype=$( cut -f${SGE_TASK_ID} ${pheno_list} )
 
-readonly out_prefix="${out_dir}/test_ukb_imp_500k_${phenotype}"
+readonly out_prefix="${out_dir}/ukb_imp_500k_${phenotype}"
 
-#readonly chr=$( seq 1 22 | tr '\n' ' ' )
-readonly chr="21"
+readonly chr=$( seq 1 22 | tr '\n' ' ' )
+#readonly chr="21"
 
 mkdir -p ${out_dir}
 
@@ -40,7 +44,7 @@ export LD_PRELOAD=/apps/eb/skylake/software/OpenBLAS/0.3.8-GCC-9.2.0/lib/libopen
 set -x
 python3 "${hail_script}" \
    --chrom "${chr}" \
-   --dataset "calls" \
+   --dataset "imp" \
    --phenotypes ${pheno_file} \
    --response ${phenotype} \
    --covariates ${covariates} \
