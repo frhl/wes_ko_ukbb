@@ -26,6 +26,9 @@ def main(args):
     hail_init.hail_bmrc_init_local('logs/hail/hail_format.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
     
+    #print(chrom)
+    chrom = chrom.strip().split(' ')
+    print(chrom)
     if dataset in "imp":
         mt = genotypes.get_ukb_imputed_v3_bgen(chroms=chrom)
         if min_info:
@@ -79,14 +82,15 @@ def main(args):
     else:    
         raise TypeError("Some or all covariates are not in phenotype file!")
 
-    reg.flatten.export(out_prefix + ".txt.gz")
+    print("Writing out file")
+    reg.flatten().export(out_prefix + ".txt.bgz")
 
 
 
 if __name__=='__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--chrom', default=None, nargs='+', help='chromosomes to be parsed.')
+    parser.add_argument('--chrom', default=None, help='chromosomes to be parsed.')
     parser.add_argument('--min_info', default=None, help='minimum info score (only imputed data)')
     parser.add_argument('--liftover', default=None, action='store_true', help='perform liftover')
     parser.add_argument('--extract_samples', default=None, help='Subset to sample IDs in file')

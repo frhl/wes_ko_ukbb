@@ -26,19 +26,21 @@ readonly pheno_file="${pheno_dir}/curated_phenotypes.tsv"
 readonly pheno_list="${pheno_dir}/curated_phenotypes_cts_header.tsv"
 readonly phenotype=$( cut -f${SGE_TASK_ID} ${pheno_list} )
 
-readonly out_prefix="${out_dir}/ukb_imp_500k_${phenotype}"
+readonly out_prefix="${out_dir}/test_ukb_imp_500k_${phenotype}"
 
-#readonly chroms=$( seq 1 22 | tr '\n' ' ' )
+#readonly chr=$( seq 1 22 | tr '\n' ' ' )
 readonly chr="21"
 
 mkdir -p ${out_dir}
 
 set_up_hail
 set_up_pythonpath_legacy
+module load OpenBLAS/0.3.8-GCC-9.2.0
+export LD_PRELOAD=/apps/eb/skylake/software/OpenBLAS/0.3.8-GCC-9.2.0/lib/libopenblas.so
 set -x
 python3 "${hail_script}" \
    --chrom "${chr}" \
-   --dataset "imp" \
+   --dataset "calls" \
    --phenotypes ${pheno_file} \
    --response ${phenotype} \
    --covariates ${covariates} \
