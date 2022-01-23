@@ -42,7 +42,7 @@ submit_sumstat_job()
   local prefix="${out_prefix}_chrCHR"
   set -x
   qsub -N "_${phenotype}_sumstat" \
-    -t 21 \
+    -t 22 \
     -q short.qc@@short.hga \
     -pe shmem 1 \
     "${bash_script}" \
