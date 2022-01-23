@@ -4,11 +4,8 @@
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/_summary_statistics.log
 #$ -e logs/_summary_statistics.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
 #$ -V
 
-module purge
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 

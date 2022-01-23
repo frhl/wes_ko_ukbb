@@ -6,7 +6,7 @@
 #$ -e logs/summary_statistics.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q test.qc
+#$ -q short.qc@@short.hga
 #$ -t 34
 #$ -V
 
@@ -20,6 +20,7 @@ source utils/hail_utils.sh
 readonly pheno_dir="data/phenotypes"
 readonly out_dir="data/prs/sumstat"
 
+readonly bash_script="scripts/prs/_summary_statistics.sh"
 readonly hail_script="scripts/prs/01_summary_statistics.py"
 
 readonly covar_file="${pheno_dir}/covars1.csv"
@@ -40,10 +41,11 @@ submit_sumstat_job()
   mkdir -p ${out_dir}
   local prefix="${out_prefix}_chrCHR"
   set -x
-  qsub -N "_${out_prefix}" \
+  qsub -N "_${phenotype}_sumstat" \
     -t 21 \
-    -q "short.qc" \
+    -q short.qc@@short.hga \
     -pe shmem 1 \
+    "${bash_script}" \
     "${hail_script}" \
     "${dataset}" \
     "${pheno_file}" \
