@@ -17,8 +17,6 @@ module purge
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
-
-readonly hap_dir="/well/lindgren/flassen/ressources/hapmap"
 readonly pheno_dir="data/phenotypes"
 readonly out_dir="data/prs/sumstat"
 
@@ -28,16 +26,15 @@ readonly hail_script="scripts/prs/01_summary_statistics.py"
 readonly covar_file="${pheno_dir}/covars1.csv"
 readonly covariates=$( cat ${covar_file} )
 
-readonly hap_file="${hap_dir}/weights.l2.ldscore.liftover.ht"
 readonly pheno_file="${pheno_dir}/curated_phenotypes.tsv" 
 readonly pheno_list="${pheno_dir}/curated_phenotypes_cts_header.tsv"
 readonly phenotype=$( cut -f${SGE_TASK_ID} ${pheno_list} )
 
-readonly out_prefix="${out_dir}/ukb_hapmap_500k_${phenotype}"
+readonly out_prefix="${out_dir}/ukb_imp_500k_${phenotype}"
 
 readonly dataset="imp"
 readonly liftover="yes"
-readonly min_info="0"
+readonly min_info="0.80"
 
 submit_sumstat_job()
 {
@@ -45,7 +42,7 @@ submit_sumstat_job()
   local prefix="${out_prefix}_chrCHR"
   set -x
   qsub -N "_${phenotype}_sumstat" \
-    -t 21 \
+    -t 22 \
     -q short.qc@@short.hga \
     -pe shmem 1 \
     "${bash_script}" \
@@ -57,7 +54,6 @@ submit_sumstat_job()
     "${covariates}" \
     "${min_info}" \
     "${prefix}" \
-    "${hap_file}" \
     "${liftover}"
   set +x
 }

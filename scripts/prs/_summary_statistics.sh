@@ -17,7 +17,8 @@ readonly response=${5?Error: Missing arg5 (response)}
 readonly covariates=${6?Error: Missing arg6 (covariates)}
 readonly min_info=${7?Error: Missing arg7 (min_info)}
 readonly prefix=${8?Error: Missing arg8 (out_prefix)}
-readonly liftover=${9}
+readonly hapmap=${9?Error: Missing arg9 (hapmap)}
+readonly liftover=${10}
 
 readonly chr=${SGE_TASK_ID}
 readonly out_prefix=$(echo ${prefix} | sed -e "s/CHR/${chr}/g")
@@ -33,6 +34,7 @@ python3 "${hail_script}" \
    --phenotypes ${pheno_file} \
    --response ${phenotype} \
    --covariates ${covariates} \
+   --hapmap ${hapmap} \
    ${liftover:+--liftover} \
    ${min_info:+--min_info "${min_info}" } \
    --out_prefix "${out_prefix}"

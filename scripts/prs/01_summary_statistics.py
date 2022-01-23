@@ -21,6 +21,7 @@ def main(args):
     response = args.response
     covariates = args.covariates
     phenotypes = args.phenotypes
+    hapmap = args.hapmap
     out_prefix = args.out_prefix
 
     hail_init.hail_bmrc_init_local('logs/hail/hail_format.log', 'GRCh38')
@@ -47,6 +48,11 @@ def main(args):
     if liftover:
         mt = variants.liftover(mt, from_build='GRCh37', to_build='GRCh38', drop_annotations=True)
    
+    if hapmap:
+        ht = hl.read_table(hapmap)
+        ht = ht.key_by('locus_grch38')
+        mt = mt.filter_rows(hl.is_defined(ht[mt.locus]))
+
     if phenotypes:
         ht = hl.import_table(phenotypes,
                      types={'eid': hl.tstr},
@@ -98,6 +104,7 @@ if __name__=='__main__':
     parser.add_argument('--response', default=None, help='Response variable')
     parser.add_argument('--covariates', default=None, help='list of covariates')
     parser.add_argument('--phenotypes', default=None, help='File path to phenotypes.')
+    parser.add_argument('--hapmap', default=None, help='Path to HapMap SNPs')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     args = parser.parse_args()
 
