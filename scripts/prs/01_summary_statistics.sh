@@ -5,14 +5,13 @@
 #$ -o logs/summary_statistics.log
 #$ -e logs/summary_statistics.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 10
-#$ -q short.qc
+#$ -pe shmem 1
+#$ -q test.qc
 #$ -t 34
 #$ -V
 
 # 1 - 33 contains non-residuals
 # 34 - 103 contains residuals
-
 
 module purge
 source utils/bash_utils.sh
@@ -32,25 +31,30 @@ readonly phenotype=$( cut -f${SGE_TASK_ID} ${pheno_list} )
 
 readonly out_prefix="${out_dir}/ukb_imp_500k_${phenotype}"
 
-readonly chr=$( seq 1 22 | tr '\n' ' ' )
-#readonly chr="21"
+readonly dataset="imp"
+readonly liftover="yes"
+readonly min_info="0.80"
 
-mkdir -p ${out_dir}
+submit_sumstat_job()
+{
+  mkdir -p ${out_dir}
+  local prefix="${out_prefix}_chrCHR"
+  set -x
+  qsub -N "_${out_prefix}" \
+    -t 21 \
+    -q "short.qc" \
+    -pe shmem 1 \
+    "${hail_script}" \
+    "${dataset}" \
+    "${pheno_file}" \
+    "${phenotype}" \
+    "${response}" \
+    "${covariates}" \
+    "${min_info}" \
+    "${prefix}" \
+    "${liftover}"
+  set +x
+}
 
-set_up_hail
-set_up_pythonpath_legacy
-module load OpenBLAS/0.3.8-GCC-9.2.0
-export LD_PRELOAD=/apps/eb/skylake/software/OpenBLAS/0.3.8-GCC-9.2.0/lib/libopenblas.so
-set -x
-python3 "${hail_script}" \
-   --chrom "${chr}" \
-   --dataset "imp" \
-   --phenotypes ${pheno_file} \
-   --response ${phenotype} \
-   --covariates ${covariates} \
-   --liftover \
-   --min_info 0.80 \
-   --out_prefix "${out_prefix}"
-set +x
-
+submit_sumstat_job
 
