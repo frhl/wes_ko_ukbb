@@ -20,6 +20,7 @@ def main(args):
     liftover = args.liftover
     hapmap = args.hapmap
     ancestry = args.ancestry
+    dbsnp = args.dbsnp
     out_prefix = args.out_prefix
     out_type = args.out_type
 
@@ -52,6 +53,10 @@ def main(args):
     if liftover:
         mt = variants.liftover(mt, from_build='GRCh37', to_build='GRCh38', drop_annotations=True)
     
+    if dbsnp:
+        ht = variants.get_dbsnp_table(version=155, build='GRCh38')
+        mt = mt.annotate_rows(rsid = ht.rows()[mt.row_key].rsid)
+
     qc.export_table(mt, out_prefix, out_type)
 
 
@@ -61,10 +66,12 @@ if __name__=='__main__':
     parser.add_argument('--chrom', default=None, help='chromosome')
     parser.add_argument('--min_info', default=None, help='minimum info score (only imputed data)')
     parser.add_argument('--liftover', default=None, action='store_true', help='perform liftover')
+    parser.add_argument('--dbsnp', default=None, action='store_true', help='Annotate rsids.')
     parser.add_argument('--extract_samples', default=None, help='Subset to sample IDs in file')
     parser.add_argument('--dataset', default=None, help='Either "imp" or "calls".')
     parser.add_argument('--ancestry', default=None, help='Either "eur" or "all".')
     parser.add_argument('--hapmap', default=None, help='Path to hapmap file')
+    parser.add_argument('--dbnsp', default=None, help='Annotate variants with dbnsp')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Either "mt", "vcf" or "plink"')
     args = parser.parse_args()

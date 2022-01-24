@@ -19,7 +19,7 @@ readonly spark_dir="data/tmp/spark"
 readonly hap_dir="/well/lindgren/flassen/ressources/hapmap"
 
 readonly chr=$( get_chr ${SGE_TASK_ID} )
-readonly out_dir="data/prs/imp"
+readonly out_dir="data/prs/hapmap"
 readonly out_prefix="${out_dir}/ukb_hapmap_500k_eur_chr${chr}"
 readonly hap_file="${hap_dir}/weights.l2.ldscore.liftover.ht"
 
@@ -36,10 +36,11 @@ if [ ! -f "${out_prefix}*" ]; then
      --chrom "${chr}" \
      --dataset "imp" \
      --extract_samples ${sample_list} \
-     --liftover \
      --hapmap ${hap_file} \
-     --out_type "plink" \
-     --out_prefix "${out_prefix}"
+     --liftover \
+     --dbsnp \
+     --out_prefix "${out_prefix}" \
+     --out_type "plink" 
   set +x
 else
   print_update "file ${out} already exists. Skipping!"
