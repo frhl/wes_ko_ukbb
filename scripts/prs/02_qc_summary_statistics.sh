@@ -30,33 +30,9 @@ readonly pheno_file="${pheno_dir}/curated_phenotypes.tsv"
 readonly pheno_list="${pheno_dir}/curated_phenotypes_cts_header.tsv"
 readonly phenotype=$( cut -f${SGE_TASK_ID} ${pheno_list} )
 
-readonly out_prefix="${out_dir}/ukb_imp_500k_${phenotype}"
+readonly out_prefix="${out_dir}/ukb_hapmap_500k_${phenotype}"
 
-readonly dataset="imp"
-readonly liftover="yes"
-readonly min_info="0.80"
 
-submit_sumstat_job()
-{
-  mkdir -p ${out_dir}
-  local prefix="${out_prefix}_chrCHR"
-  set -x
-  qsub -N "_${phenotype}_sumstat" \
-    -t 22 \
-    -q short.qc@@short.hga \
-    -pe shmem 1 \
-    "${bash_script}" \
-    "${hail_script}" \
-    "${dataset}" \
-    "${pheno_file}" \
-    "${phenotype}" \
-    "${response}" \
-    "${covariates}" \
-    "${min_info}" \
-    "${prefix}" \
-    "${liftover}"
-  set +x
-}
 
-submit_sumstat_job
+
 

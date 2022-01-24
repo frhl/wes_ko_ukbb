@@ -18,6 +18,8 @@ def main(args):
     extract_samples = args.extract_samples
     min_info = args.min_info
     liftover = args.liftover
+    hapmap = args.hapmap
+    ancestry = args.ancestry
     out_prefix = args.out_prefix
     out_type = args.out_type
 
@@ -39,6 +41,14 @@ def main(args):
         ht_samples = hl.import_table(extract_samples, no_header=True, key='f0', delimiter=',')
         mt = mt.filter_cols(hl.is_defined(ht_samples[mt.col_key]))
     
+    if ancestry:
+        mt = samples.filter_ukb_to_ancestry(mt, ancestry)
+
+    if hapmap:
+        ht = hl.read_table(hapmap)
+        ht = ht.key_by('locus_grch37')
+        mt = mt.filter_rows(hl.is_defined(ht[mt.locus])) 
+
     if liftover:
         mt = variants.liftover(mt, from_build='GRCh37', to_build='GRCh38', drop_annotations=True)
     
@@ -53,6 +63,8 @@ if __name__=='__main__':
     parser.add_argument('--liftover', default=None, action='store_true', help='perform liftover')
     parser.add_argument('--extract_samples', default=None, help='Subset to sample IDs in file')
     parser.add_argument('--dataset', default=None, help='Either "imp" or "calls".')
+    parser.add_argument('--ancestry', default=None, help='Either "eur" or "all".')
+    parser.add_argument('--hapmap', default=None, help='Path to hapmap file')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Either "mt", "vcf" or "plink"')
     args = parser.parse_args()
