@@ -24,23 +24,19 @@ source utils/qsub_utils.sh
 source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
-# directories
 readonly in_dir="data/mt"
 readonly spark_dir="data/tmp/spark"
 readonly out_dir="derived/knockouts/211206"
 
-# input path
 readonly knockout_script="scripts/_knockouts.sh"
 readonly in_phased="${in_dir}/ukb_wes_200k_annotated_chrCHR.mt"
 readonly in_unphased="${in_dir}/ukb_wes_200k_annotated_chrCHR_singletons.mt"
 readonly in_phased_type="mt"
 readonly in_unphased_type="mt"
 
-# parameters required
 readonly af_min=""
 readonly af_max=""
 
-# output path
 readonly prefix="${out_dir}/ukb_wes_200k"
 
 submit_knockout_job() 

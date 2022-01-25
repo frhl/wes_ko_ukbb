@@ -2,16 +2,12 @@
 
 import hail as hl
 import argparse
-import pandas
-import os.path
-import os
 
-from gnomad.utils.vep import process_consequences
 from ukb_utils import hail_init
-from ukb_utils import genotypes
 from ukb_utils import samples
-from ko_utils import qc
-from ko_utils import analysis
+from ko_utils import variants as va
+from ko_utils import io
+from ko_utils import ko
 
 
 class SplitArgs(argparse.Action):
@@ -21,103 +17,111 @@ class SplitArgs(argparse.Action):
 def main(args):
     
     # parser
-    input_phased_path = args.input_phased_path
-    input_phased_type = args.input_phased_type
-    input_unphased_path = args.input_unphased_path
-    input_unphased_type = args.input_unphased_type
+    input_path = args.input_path
+    input_type = args.input_type
     out_prefix = args.out_prefix
     out_type   = args.out_type
     
     # variant filters
-    chrom      = int(args.chrom)
-    af_max     = (args.af_max)
-    af_min     = (args.af_min)
-    maf_max    = (args.maf_max)
-    maf_min    = (args.maf_min)
-    missing    = (args.missing)
+    chrom = int(args.chrom)
+    af_max = (args.af_max)
+    af_min = (args.af_min)
+    maf_max = (args.maf_max)
+    maf_min = (args.maf_min)
+    missing = (args.missing)
     use_loftee = args.use_loftee
     csqs_category = (args.csqs_category)
 
     # sample filtering options
     sex = args.sex
-    get_related = bool(args.get_related)
-    get_unrelated = bool(args.get_unrelated)
-    get_europeans = bool(args.get_europeans)
-
-    # output options
-    export_ko_probability = args.export_ko_probability
-    export_saige_vcf = args.export_saige_vcf
-    export_ko_rsid = args.export_ko_rsid
 
     # run parser
     hail_init.hail_bmrc_init('logs/hail/knockout.log', 'GRCh38')
-    mt1 = qc.get_table(input_path=input_phased_path, input_type=input_phased_type) 
-    mt2 = qc.get_table(input_path=input_unphased_path, input_type=input_unphased_type)
+    mt = io.import_table(
+            input_path=input_path,
+            input_type=input_type
+            ) 
   
     if sex:
         if sex not in 'both':
-            mt1 = samples.filter_to_sex(mt1, sex)
-            mt2 = samples.filter_to_sex(mt2, sex)
+            mt = samples.filter_to_sex(mt, sex)
 
     if missing:
-        mt1 = qc.filter_min_missing(mt1, float(missing))
-        mt2 = qc.filter_min_missing(mt2, float(missing))
+        mt = va.filter_min_missing(mt, float(missing))
     
     if af_max:
-        mt1 = qc.filter_max_af(mt1, float(af_max))
-        mt2 = qc.filter_max_af(mt2, float(af_max))
+        mt = va.filter_max_af(mt, float(af_max))
 
     if af_min:
-        mt1 = qf.fiter_min_af(mt1, float(af_min))
-        mt2 = qf.fiter_min_af(mt2, float(af_min))
+        mt = va.fiter_min_af(mt, float(af_min))
 
     if maf_max and maf_min:
-        mt1 = qc.filter_maf(mt1, 
+        mt = va.filter_maf(mt, 
                 max_maf = float(maf_max),
                 min_maf = float(maf_min))
-        mt2 = qc.filter_maf(mt2, 
-                max_maf = float(maf_max),
-                min_maf= float(maf_min))
-        n1 = mt1.count()
-        n2 = mt2.count()
-        print(f"Filtering on maf_max={maf_max} and maf_min={maf_min}, resulting in {n1} and {n2}")
-   
+        n = mt.count()
+        print(f"${n} samples remaining after filtering on maf_max={maf_max} and maf_min={maf_min}")
+  
+    # Build variant annotation
+    csq_expr = mt.consequence.vep.worst_csq_by_gene_canonical 
+    mt = mt.explode_rows(csq_expr)
+    mt = mt.annotate_rows(
+        consequence_cateogory=ko.csqs_case_builder(
+                worst_csq_expr=csq_expr,
+                use_loftee=use_loftee)
+        )    
 
-    # required before doing worst_csq_by_gene_canonical
-    mt1 = mt1.explode_rows(mt1.consequence.vep.worst_csq_by_gene_canonical)
-    mt2 = mt2.explode_rows(mt2.consequence.vep.worst_csq_by_gene_canonical)
-    
-    # get VEP annotation and add to rows
-    by_gene_annotation1 = analysis.annotation_case_builder(mt1.consequence.vep.worst_csq_by_gene_canonical, use_loftee = use_loftee)
-    by_gene_annotation2 = analysis.annotation_case_builder(mt2.consequence.vep.worst_csq_by_gene_canonical, use_loftee = use_loftee)
-    mt1 = mt1.annotate_rows(consequence_category = by_gene_annotation1)    
-    mt2 = mt2.annotate_rows(consequence_category = by_gene_annotation2)    
-
-    # get current category
+    # subset to current csqs category
     category = "_".join(csqs_category)
     items = csqs_category
-
+    mt = mt.filter_rows(hl.literal(set(items)).contains(mt.consequence_category)) 
     print(f"chr{chrom}: evaluating '{category}' category")
-    mt1_subset = mt1.filter_rows(hl.literal(set(items)).contains(mt1.consequence_category)) 
-    mt2_subset = mt2.filter_rows(hl.literal(set(items)).contains(mt2.consequence_category))
+    
+    # convert to gene x sample matrix
+    mt_gene=(mt.group_rows_by(csq_expr.gene_id)
+            .aggregate(
+                gts=hl.agg.collect(mt.GT),
+                varid=hl.agg.collect(mt.varid),
+                rsid=hl.agg.collect(mt.rsid)
+                )
+           ) 
+     
+    # determine genes that are knocked out
+    mt_gene = ko.sum_gts_entries(mt_gene)
+    expr_pko = ko.calc_prob_ko(mt_gene.hom_alt, mt_gene.phased, mt_gene.unphased)
+    expr_ko = ko.annotate_knockout(mt_gene.hom_alt, expr_pko)
+    mt_gene = mt_gene.annotate_entries(
+            pKO = expr_pko,
+            knockout = expr_ko
+            )
 
-    outfile_ko_prob = str(out_prefix) + "_" + str(category) +'_ko_prob.tsv.bgz'
-    if export_ko_probability and not os.path.exists(outfile_ko_prob):
-        mt_ko = analysis.gene_csqs_calc_pKO(mt1_subset, mt2_subset, 'dosage')
-        mt_ko_entries = mt_ko.entries()
-        mt_ko_entries = mt_ko_entries.filter(mt_ko_entries.pKO>0)
-        mt_ko_entries.export(outfile_ko_prob)
+    # convert to dosage and write vcf
+    outfile_dosage = str(out_prefix) + "_" + str(category) + ".vcf.bgz"
+    mt_vcf = mt_gene.annotate_entries(DS=mt_gene.pKO * 2)
+    mt_vcf.select_entries(mt.DS).export(outfile_dosage)
 
-    outfile_ko_rsid = str(out_prefix) + "_" + str(category) + '_knockouts.tsv.bgz'
-    if export_ko_rsid and not os.path.exists(outfile_ko_rsid):
-        mt_ko_rsid = analysis.gene_csqs_knockout_builder(mt1_subset)
-        mt_ko_rsid.export(outfile_ko_rsid)
+    # Write to table 
+    outfile_table = str(out_prefix) + "_" + str(category) + ".txt.gz"
+    mt_gene.filter_entries(mt_gene.pKO >0).entries().flatten().export(outfile_table) 
 
-    outfile_saige = str(out_prefix) + "_" + str(category) + "_ko"
-    if export_saige_vcf and not os.path.exists(outfile_saige):
-        out = analysis.gene_csqs_calc_pKO_pseudoSNP(mt1_subset, mt2_subset, chrom)
-        qc.export_table(out, out_prefix = out_prefix + "_" + category + "_ko", out_type = 'vcf')
-        out.write(out_prefix + "_" + category + "_ko.mt")
+
+    #outfile_ko_prob = str(out_prefix) + "_" + str(category) +'_ko_prob.tsv.bgz'
+    #if export_ko_probability and not os.path.exists(outfile_ko_prob):
+    #    mt_ko = analysis.gene_csqs_calc_pKO(mt1_subset, mt2_subset, 'dosage')
+    #    mt_ko_entries = mt_ko.entries()
+    #    mt_ko_entries = mt_ko_entries.filter(mt_ko_entries.pKO>0)
+    #    mt_ko_entries.export(outfile_ko_prob)
+
+    #outfile_ko_rsid = str(out_prefix) + "_" + str(category) + '_knockouts.tsv.bgz'
+    #if export_ko_rsid and not os.path.exists(outfile_ko_rsid):
+    #    mt_ko_rsid = analysis.gene_csqs_knockout_builder(mt1_subset)
+    #    mt_ko_rsid.export(outfile_ko_rsid)
+
+    #outfile_saige = str(out_prefix) + "_" + str(category) + "_ko"
+    #if export_saige_vcf and not os.path.exists(outfile_saige):
+    #    out = analysis.gene_csqs_calc_pKO_pseudoSNP(mt1_subset, mt2_subset, chrom)
+    #    qc.export_table(out, out_prefix = out_prefix + "_" + category + "_ko", out_type = 'vcf')
+    #    out.write(out_prefix + "_" + category + "_ko.mt")
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
