@@ -61,10 +61,9 @@ def main(args):
   
     # Build variant annotation
     mt = mt.explode_rows(mt.consequence.vep.worst_csq_by_gene_canonical)
-    csq_expr = mt.consequence.vep.worst_csq_by_gene_canonical 
     mt = mt.annotate_rows(
-        consequence_cateogory=ko.csqs_case_builder(
-                worst_csq_expr=csq_expr,
+        consequence_category=ko.csqs_case_builder(
+                worst_csq_expr=mt.consequence.vep.worst_csq_by_gene_canonical,
                 use_loftee=use_loftee)
         )    
 
@@ -75,14 +74,14 @@ def main(args):
     print(f"chr{chrom}: evaluating '{category}' category")
     
     # convert to gene x sample matrix
-    mt_gene = (mt.group_rows_by(csq_expr.gene_id)
+    mt_gene = (mt.group_rows_by(mt.consequence.vep.worst_csq_by_gene_canonical.gene_id)
             .aggregate(
                 gts=hl.agg.collect(mt.GT),
                 varid=hl.agg.collect(mt.varid),
                 rsid=hl.agg.collect(mt.rsid)
                 )
-           ) 
-     
+           )
+
     # determine genes that are knocked out
     mt_gene = ko.sum_gts_entries(mt_gene)
     expr_pko = ko.calc_prob_ko(mt_gene.hom_alt, mt_gene.phased, mt_gene.unphased)
@@ -94,10 +93,14 @@ def main(args):
 
     # convert to dosage and write vcf
     csq_prefix = str(out_prefix) + "_" + str(category)
-    mt_vcf = mt_gene.annotate_entries(DS=mt_gene.pKO * 2)
-    mt_vcf = mt_vcf.select_entries(mt.DS)
-    print(mt_vcf.describe())
-    io.export_table(mt_vcf, out_type)
+    mt_vcf = mt_gene.annotate_entries(
+            DS=mt_gene.pKO * 2)
+    mt_vcf = mt_vcf.annotate_rows(
+            locus=hl.parse_locus('chr' + str(chrom) + ':1'),
+            alleles=hl.literal(['.', '.']))
+    mt_vcf = mt_vcf.key_rows_by(mt_vcf.locus, mt_vcf.alleles)
+    mt_vcf = mt_vcf.select_entries(mt_vcf.DS)
+    io.export_table(mt_vcf, csq_prefix, out_type)
 
     # Write to table
     mt_gene.filter_entries(mt_gene.pKO > 0).entries().flatten().export(csq_prefix + "tsv.gz") 

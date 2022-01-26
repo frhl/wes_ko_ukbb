@@ -50,7 +50,7 @@ submit_knockout_job()
   local qsub_name=$( echo ${csq} | tr "," "_")
   
   set -x
-  qsub -N "_ko_${qsub_name}" \
+  qsub -N "_${qsub_name}" \
     -t 21 \
     -q "short.qa" \
     -pe shmem 1 \
