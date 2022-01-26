@@ -22,6 +22,8 @@ readonly chr=${SGE_TASK_ID}
 readonly input_path_chr=$(echo ${input_path} | sed -e "s/CHR/${chr}/g")
 readonly out_prefix_chr=$(echo ${prefix} | sed -e "s/CHR/${chr}/g")
 
+readonly spark_dir="data/tmp/spark"
+
 set_up_hail
 set_up_pythonpath_legacy
 module load OpenBLAS/0.3.8-GCC-9.2.0 # required for linear regression
