@@ -11,19 +11,23 @@ source utils/bash_utils.sh
 readonly prefix=${1?Error: Missing arg1 (prefix)}
 readonly out=${2?Error: Missing arg2 (out)}
 
-# Create header
 file=$(echo ${prefix} | sed -e "s/CHR//g")
-zcat ${file}* | tail -n+2 > ${out}
 
-# Create remaining content
-for chr in {1..22}; do
-   file=$(echo ${prefix} | sed -e "s/CHR/${chr}/g")
-   zcat "${file}.txt.gz" | tail -n +2  >> ${out}
-   echo "concatenating ${file} to ${out}.."
-done
-gzip ${out}
+readonly files="${file}[0-9]\+\.txt\.gz"
+readonly n=$(wc -l ${files})
+readonly N=21
 
-
+if (( $(echo "$n > $N" | bc -l) )); then
+  zcat ${file}* | tail -n+2 > ${out}
+  for chr in {1..22}; do
+     file=$(echo ${prefix} | sed -e "s/CHR/${chr}/g")
+     zcat "${file}.txt.gz" | tail -n +2  >> ${out}
+     echo "concatenating ${file} to ${out}.."
+  done
+  gzip ${out}
+else
+  >&2 echo "Some chromosomes are missing for ${file}!"
+fi
 
 
 

@@ -26,15 +26,18 @@ set_up_hail
 set_up_pythonpath_legacy
 module load OpenBLAS/0.3.8-GCC-9.2.0 # required for linear regression
 export LD_PRELOAD=/apps/eb/skylake/software/OpenBLAS/0.3.8-GCC-9.2.0/lib/libopenblas.so # required for linear regression
-set -x
-python3 "${hail_script}" \
-   --chrom "${chr}" \
-   --input_path "${input_path_chr}" \
-   --input_type "${input_type}" \
-   --phenotypes "${pheno_file}" \
-   --response "${phenotype}" \
-   --covariates "${covariates}" \
-   --out_prefix "${out_prefix_chr}"
-set +x
-
+if [ ! -f "${out_prefix_chr}.txt.gz" ]; then
+  set -x
+  python3 "${hail_script}" \
+     --chrom "${chr}" \
+     --input_path "${input_path_chr}" \
+     --input_type "${input_type}" \
+     --phenotypes "${pheno_file}" \
+     --response "${phenotype}" \
+     --covariates "${covariates}" \
+     --out_prefix "${out_prefix_chr}"
+  set +x
+else
+  echo "Note: ${out_prefix_chr} already exists!"
+fi
 

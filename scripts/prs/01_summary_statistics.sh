@@ -23,6 +23,7 @@ readonly out_dir="data/prs/sumstat"
 
 readonly bash_script="scripts/prs/_summary_statistics.sh"
 readonly hail_script="scripts/prs/01_summary_statistics.py"
+readonly merge_script="scripts/prs/_summary_statistics_merge.sh"
 
 readonly covar_file="${pheno_dir}/covars1.csv"
 readonly covariates=$( cat ${covar_file} )
@@ -34,15 +35,14 @@ readonly pheno_list="${pheno_dir}/curated_phenotypes_cts_header.tsv"
 readonly phenotype=$( cut -f${SGE_TASK_ID} ${pheno_list} )
 
 readonly out_prefix="${out_dir}/ukb_hapmap_500k_eur_${phenotype}"
-
+readonly prefix="${out_prefix}_chrCHR"
 
 submit_sumstat_job()
 {
   mkdir -p ${out_dir}
-  local prefix="${out_prefix}_chrCHR"
   set -x
   qsub -N "_${phenotype}_sumstat" \
-    -t 1-22 \
+    -t 4 \
     -q short.qc@@short.hge \
     -pe shmem 1 \
     "${bash_script}" \
@@ -57,5 +57,20 @@ submit_sumstat_job()
   set +x
 }
 
+submit_merge_job()
+{
+  set -x
+  qsub -N "_mrg_${phenotype}" \
+    -q short.qc@@short.hge \
+    -pe shmem 1 \
+    -hold_jid "_${phenotype}_sumstat" \
+    "${merge_script}" \
+    "${prefix}" \
+    "${out_prefix}.txt.gz"
+  set +x
+
+}
+
 submit_sumstat_job
+submit_merge_job
 
