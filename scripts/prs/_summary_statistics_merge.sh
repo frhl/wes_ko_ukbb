@@ -13,8 +13,10 @@ readonly out=${2?Error: Missing arg2 (out)}
 
 file=$(echo ${prefix} | sed -e "s/CHR//g")
 
-readonly files="${file}[0-9]\+\.txt\.gz"
-readonly n=$(wc -l ${files})
+#x=$(ls -l data/prs/sumstat | grep 'ukb_hapmap_500k_eur_Alanine_aminotransferase_residual_chr[0-9]\+\.txt\.gz' | wc -l)
+
+readonly files='${file}[0-9]\+\.txt\.gz'
+readonly n=$(ls -l ${files} | grep ${files} | wc -l)
 readonly N=21
 
 if (( $(echo "$n > $N" | bc -l) )); then
