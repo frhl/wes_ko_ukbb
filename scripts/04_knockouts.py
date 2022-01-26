@@ -34,6 +34,7 @@ def main(args):
 
     # run parser
     hail_init.hail_bmrc_init('logs/hail/knockout.log', 'GRCh38')
+    hl._set_flags(no_whole_stage_codegen='1') 
     mt = io.import_table(
             input_path=input_path,
             input_type=input_type
@@ -93,14 +94,23 @@ def main(args):
 
     # convert to dosage and write vcf
     csq_prefix = str(out_prefix) + "_" + str(category)
+    
     mt_vcf = mt_gene.annotate_entries(
-            DS=mt_gene.pKO * 2)
+            DS=mt_gene.pKO * 2
+            )
+
+    mt_vcf = mt_vcf.select_entries(mt_vcf.DS)
+    
     mt_vcf = mt_vcf.annotate_rows(
             locus=hl.parse_locus('chr' + str(chrom) + ':1'),
-            alleles=hl.literal(['.', '.']))
+            alleles=hl.literal(['X', 'Y']),
+            rsid=mt_vcf.gene_id
+            )
+
     mt_vcf = mt_vcf.key_rows_by(mt_vcf.locus, mt_vcf.alleles)
-    mt_vcf = mt_vcf.select_entries(mt_vcf.DS)
-    io.export_table(mt_vcf, csq_prefix, out_type)
+    mt_vcf = mt_vcf.drop('gene_id')
+    hl.export_vcf(mt_vcf, csq_prefix + '.vcf.bgz')
+    #io.export_table(mt_vcf, csq_prefix, out_type)
 
     # Write to table
     mt_gene.filter_entries(mt_gene.pKO > 0).entries().flatten().export(csq_prefix + "tsv.gz") 
