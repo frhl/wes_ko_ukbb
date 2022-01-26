@@ -60,8 +60,8 @@ def main(args):
         print(f"${n} samples remaining after filtering on maf_max={maf_max} and maf_min={maf_min}")
   
     # Build variant annotation
+    mt = mt.explode_rows(mt.consequence.vep.worst_csq_by_gene_canonical)
     csq_expr = mt.consequence.vep.worst_csq_by_gene_canonical 
-    mt = mt.explode_rows(csq_expr)
     mt = mt.annotate_rows(
         consequence_cateogory=ko.csqs_case_builder(
                 worst_csq_expr=csq_expr,
