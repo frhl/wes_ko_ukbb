@@ -5,6 +5,7 @@ import hail as hl
 
 def import_table(input_path, input_type, calc_info=True, cache=False):
     r'''Import mt/vcf/plink tables '''
+    assert input_type in ['mt','vcf','plink']
     if input_type == 'mt':
         mt = hl.read_matrix_table(input_path)
     elif input_type == 'vcf':
@@ -134,5 +135,49 @@ def get_vcf_metadata(info_fields_to_drop=[],
     for f in format_fields_to_drop:
         metadata['format'].pop(f)
     return metadata
+
+def rbind_matrix_tables(mt1: hl.MatrixTable, mt2: hl.MatrixTable, 
+                verbose: bool = True):
+    r'''rowbind two matrix tables. 
+
+    Note: if the samples are not ordered you will need
+    to call ukb_utils::tables::order_cols on the MatrixTables
+    before running this function.
+    
+    :param mt1: A MatrixTable (e.g. with phased entries)
+    :param mt2: A MatrixTable (e.g. with unphased entries)
+    '''
+    
+    
+    mt1 = mt1.drop('info')
+    mt2 = mt2.drop('info')
+
+    overlap = set(mt1.row) & set(mt2.row)
+    overlap = overlap - set(list(mt1.row_key))
+    mt1 = mt1.select_rows(*overlap)
+    mt2 = mt2.select_rows(*overlap)
+    if verbose:
+        print(f"Note: {overlap} row field(s) kept.")
+     
+    overlap = list(set(mt1.entry) & set(mt2.entry))
+    mt1 = mt1.select_entries(*overlap)
+    mt2 = mt2.select_entries(*overlap)
+    if verbose:
+        print(f"Note: {overlap} entry fields kept.")
+
+    s1 = mt1.s.collect()
+    s2 = mt2.s.collect()
+    overlap = list(set(s1) & set(s2))
+    mt1 = mt1.filter_cols(hl.literal(overlap).contains(mt1.s))
+    mt2 = mt2.filter_cols(hl.literal(overlap).contains(mt2.s))
+    if verbose:
+        n = len(overlap)
+        n_max = max(len(s1), len(s2))
+        pct = (n / n_max)*100
+        print(f"Note: {n}/{n_max} ({pct:.2f}%) overlapping samples kept.")
+
+    return mt1.union_rows(mt2)
+
+
 
 
