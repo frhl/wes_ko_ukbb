@@ -10,8 +10,8 @@
 #
 #$ -N knockout
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/submit_knockout.log
-#$ -e logs/submit_knockout.errors.log
+#$ -o logs/knockouts.log
+#$ -e logs/knockouts.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qf
@@ -26,40 +26,45 @@ source utils/vcf_utils.sh
 
 readonly in_dir="data/mt"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/knockouts/211206"
+readonly out_dir="derived/knockouts/220126"
 
 readonly knockout_script="scripts/_knockouts.sh"
-readonly in_phased="${in_dir}/ukb_wes_200k_annotated_chrCHR.mt"
-readonly in_unphased="${in_dir}/ukb_wes_200k_annotated_chrCHR_singletons.mt"
-readonly in_phased_type="mt"
-readonly in_unphased_type="mt"
+readonly input_path="${in_dir}/ukb_wes_200k_merged_chrCHR.mt"
+readonly input_type="mt"
 
 readonly af_min=""
 readonly af_max=""
 
-readonly prefix="${out_dir}/ukb_wes_200k"
+readonly out_prefix="${out_dir}/ukb_wes_200k"
+readonly out_type="vcf"
 
 submit_knockout_job() 
 {
-  out_prefix="${prefix}_maf${1}_${2}_${3:+_${3}}chrCHR"
-  qsub_name=$( echo ${4} | tr "," "_")
+  
+  local maf_lb=${1}
+  local maf_ub=${2}
+  local sex=${3}
+  local csq=${4}
+
+  local prefix="${out_prefix}_maf${maf_lb}_${maf_ub}_${sex:+_${sex}}chrCHR"
+  local qsub_name=$( echo ${csq} | tr "," "_")
+  
   set -x
   qsub -N "_ko_${qsub_name}" \
-    -t 1-22 \
+    -t 21 \
     -q "short.qa" \
-    -pe shmem 2 \
+    -pe shmem 1 \
     "${knockout_script}" \
-    "${in_phased}" \
-    "${in_phased_type}" \
-    "${in_unphased}" \
-    "${in_unphased_type}" \
+    "${input_path}" \
+    "${input_type}" \
     "${af_min}" \
     "${af_max}" \
-    "${1}" \
-    "${2}" \
-    "${3}" \
-    "${4}"\
-    "${out_prefix}"
+    "${maf_lb}" \
+    "${maf_ub}" \
+    "${sex}" \
+    "${csq}" \
+    "${prefix}" \
+    "${out_type}"
   set +x
 }
 

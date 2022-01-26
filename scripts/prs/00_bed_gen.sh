@@ -5,7 +5,7 @@
 #$ -o logs/bed_gen.log
 #$ -e logs/bed_gen.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 2
+#$ -pe shmem 3
 #$ -q short.qc@@short.hge
 #$ -t 1-22
 #$ -V
@@ -15,7 +15,7 @@ source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
 readonly hail_script="scripts/prs/00_bed_gen.py"
-readonly spark_dir="data/tmp/spark"
+readonly spark_dir="data/tmp/spark_dir"
 readonly hap_dir="/well/lindgren/flassen/ressources/hapmap"
 
 readonly chr=$( get_chr ${SGE_TASK_ID} )
@@ -28,7 +28,7 @@ readonly sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/
 mkdir -p ${spark_dir}
 mkdir -p ${out_dir}
 
-if [ ! -f "${out_prefix}*" ]; then
+if [ ! -f "${out_prefix}.bed" ]; then
   set_up_hail
   set_up_pythonpath_legacy
   set -x

@@ -19,7 +19,8 @@ readonly covariates=${7?Error: Missing arg6 (covariates)}
 readonly prefix=${8?Error: Missing arg8 (out_prefix)}
 
 readonly chr=${SGE_TASK_ID}
-readonly out_prefix=$(echo ${prefix} | sed -e "s/CHR/${chr}/g")
+readonly input_path_chr=$(echo ${input_path} | sed -e "s/CHR/${chr}/g")
+readonly out_prefix_chr=$(echo ${prefix} | sed -e "s/CHR/${chr}/g")
 
 set_up_hail
 set_up_pythonpath_legacy
@@ -28,12 +29,12 @@ export LD_PRELOAD=/apps/eb/skylake/software/OpenBLAS/0.3.8-GCC-9.2.0/lib/libopen
 set -x
 python3 "${hail_script}" \
    --chrom "${chr}" \
-   --input_path "${input_path}" \
-   --input_path "${input_type}" \
+   --input_path "${input_path_chr}" \
+   --input_type "${input_type}" \
    --phenotypes "${pheno_file}" \
    --response "${phenotype}" \
    --covariates "${covariates}" \
-   --out_prefix "${out_prefix}"
+   --out_prefix "${out_prefix_chr}"
 set +x
 
 

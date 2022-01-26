@@ -71,7 +71,6 @@ if __name__=='__main__':
     parser.add_argument('--dataset', default=None, help='Either "imp" or "calls".')
     parser.add_argument('--ancestry', default=None, help='Either "eur" or "all".')
     parser.add_argument('--hapmap', default=None, help='Path to hapmap file')
-    parser.add_argument('--dbnsp', default=None, help='Annotate variants with dbnsp')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Either "mt", "vcf" or "plink"')
     args = parser.parse_args()

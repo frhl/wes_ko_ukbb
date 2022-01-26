@@ -88,7 +88,7 @@ def main(args):
         raise TypeError("Some or all covariates are not in phenotype file!")
 
     # get AFs
-    mt = qc.recalc_info(mt)
+    #mt = qc.recalc_info(mt) # already being done in qc.get_table
     reg = reg.annotate(
         AN = mt.rows()[reg.key].info.AN,
         AC = mt.rows()[reg.key].info.AC,
