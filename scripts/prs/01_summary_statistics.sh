@@ -6,7 +6,7 @@
 #$ -e logs/summary_statistics.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q short.qc@@short.hge
+#$ -q short.qc@@short.hga
 #$ -t 34
 #$ -V
 
@@ -66,6 +66,7 @@ submit_merge_job()
     -hold_jid "_${phenotype}_sumstat" \
     "${merge_script}" \
     "${prefix}" \
+    "${out_dir}" \
     "${out_prefix}.txt.gz"
   set +x
 
