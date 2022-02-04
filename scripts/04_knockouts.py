@@ -77,9 +77,9 @@ def main(args):
     # convert to gene x sample matrix
     mt_gene = (mt.group_rows_by(mt.consequence.vep.worst_csq_by_gene_canonical.gene_id)
             .aggregate(
-                gts=hl.agg.collect(mt.GT),
-                varid=hl.agg.collect(mt.varid),
-                rsid=hl.agg.collect(mt.rsid)
+                gts=hl.agg.collect(mt.GT)
+                #varid=hl.agg.collect(mt.varid),
+                #rsid=hl.agg.collect(mt.rsid)
                 )
            )
 
@@ -95,21 +95,23 @@ def main(args):
     # convert to dosage and write vcf
     csq_prefix = str(out_prefix) + "_" + str(category)
     
-    mt_vcf = mt_gene.annotate_entries(
-            DS=mt_gene.pKO * 2
-            )
+    # works!
 
-    mt_vcf = mt_vcf.select_entries(mt_vcf.DS)
+    #mt_vcf = mt_gene.annotate_entries(
+    #        DS=mt_gene.pKO * 2
+    #        )
+
+   # mt_vcf = mt_vcf.select_entries(mt_vcf.DS)
     
-    mt_vcf = mt_vcf.annotate_rows(
-            locus=hl.parse_locus('chr' + str(chrom) + ':1'),
-            alleles=hl.literal(['X', 'Y']),
-            rsid=mt_vcf.gene_id
-            )
+    #mt_vcf = mt_vcf.annotate_rows(
+    #        locus=hl.parse_locus('chr' + str(chrom) + ':1'),
+    #        alleles=hl.literal(['X', 'Y']),
+    #        rsid=mt_vcf.gene_id
+    #        )
 
-    mt_vcf = mt_vcf.key_rows_by(mt_vcf.locus, mt_vcf.alleles)
-    mt_vcf = mt_vcf.drop('gene_id')
-    hl.export_vcf(mt_vcf, csq_prefix + '.vcf.bgz')
+    #mt_vcf = mt_vcf.key_rows_by(mt_vcf.locus, mt_vcf.alleles)
+    #mt_vcf = mt_vcf.drop('gene_id')
+    #hl.export_vcf(mt_vcf, csq_prefix + '.vcf.bgz')
     #io.export_table(mt_vcf, csq_prefix, out_type)
 
     # Write to table
