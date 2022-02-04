@@ -52,8 +52,8 @@ submit_knockout_job()
   set -x
   qsub -N "_${qsub_name}" \
     -t 21 \
-    -q "short.qa" \
-    -pe shmem 1 \
+    -q "short.qc" \
+    -pe shmem 2 \
     "${knockout_script}" \
     "${input_path}" \
     "${input_type}" \
