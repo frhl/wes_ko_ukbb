@@ -22,6 +22,7 @@ def main(args):
     ancestry = args.ancestry
     dbsnp = args.dbsnp
     random_samples = args.random_samples
+    min_maf = args.min_maf
     out_prefix = args.out_prefix
     out_type = args.out_type
 
@@ -52,12 +53,15 @@ def main(args):
         mt = samples.filter_ukb_to_ancestry(mt, ancestry)
     
     if random_samples:
-        mt = choose_col_subset(mt, int(ramdom_samples), seed = 42)
+        mt = samples.choose_col_subset(mt, int(random_samples), seed = 42)
     
     if hapmap:
         ht = hl.read_table(hapmap)
         ht = ht.key_by('locus_grch37')
         mt = mt.filter_rows(hl.is_defined(ht[mt.locus])) 
+    
+    if min_maf:
+        mt = mt.filter_rows(variants.get_maf_expr(mt) > float(min_maf))
 
     if liftover:
         mt = variants.liftover(mt, from_build='GRCh37', to_build='GRCh38', drop_annotations=True)
@@ -81,6 +85,7 @@ if __name__=='__main__':
     parser.add_argument('--ancestry', default=None, help='Either "eur" or "all".')
     parser.add_argument('--hapmap', default=None, help='Path to hapmap file')
     parser.add_argument('--random_samples', default=None, help='Subset to random samples')
+    parser.add_argument('--min_maf', default=None, help='Subset to variants based on minimum MAF')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Either "mt", "vcf" or "plink"')
     args = parser.parse_args()

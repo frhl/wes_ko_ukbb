@@ -2,8 +2,8 @@
 #
 #$ -N ld_matrix_gen
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/bed_gen.log
-#$ -e logs/bed_gen.errors.log
+#$ -o logs/ld_matrix_gen.log
+#$ -e logs/ld_matrix_gen.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 5
 #$ -q short.qc@@short.hge
@@ -37,6 +37,7 @@ if [ ! -f "${out_prefix}.bed" ]; then
      --extract_samples "${sample_list}" \
      --random_samples 10000 \
      --hapmap "${hap_file}" \
+     --min_maf 0.005 \
      --liftover \
      --dbsnp \
      --out_prefix "${out_prefix}" \

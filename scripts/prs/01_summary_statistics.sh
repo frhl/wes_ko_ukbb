@@ -38,13 +38,15 @@ readonly phenotype_cts=$( cut -f${SGE_TASK_ID} ${pheno_list_cts} )
 readonly pheno_list_binary="${pheno_dir}/curated_phenotypes_binary_header.tsv"
 readonly phenotype_binary=$( cut -f${SGE_TASK_ID} ${pheno_list_binary} )
 
-readonly out_prefix="${out_dir}/ukb_hapmap_500k_eur_${phenotype}"
-readonly prefix="${out_prefix}_chrCHR"
+#readonly out_prefix="${out_dir}/ukb_hapmap_500k_eur_${phenotype}"
+#readonly prefix="${out_prefix}_chrCHR"
 
 submit_sumstat_job()
 {
   mkdir -p ${out_dir}
-  local phenotype=${1}
+  local phenotype="${1}"
+  local out_prefix="${out_dir}/ukb_hapmap_500k_eur_${phenotype}"
+  local prefix="${out_prefix}_chrCHR"
   set -x
   qsub -N "_${phenotype}_sumstat" \
     -t 1-22 \
@@ -56,7 +58,6 @@ submit_sumstat_job()
     "${input_type}" \
     "${pheno_file}" \
     "${phenotype}" \
-    "${response}" \
     "${covariates}" \
     "${prefix}"
   set +x
