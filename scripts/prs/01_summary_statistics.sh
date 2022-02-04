@@ -7,9 +7,10 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc@@short.hga
-#$ -t 34
+#$ -t 2
 #$ -V
 
+# cts
 # 1 - 33 contains non-residuals
 # 34 - 103 contains residuals
 
@@ -31,8 +32,11 @@ readonly covariates=$( cat ${covar_file} )
 readonly input_type="plink"
 readonly input_path="${in_dir}/ukb_hapmap_500k_eur_chrCHR"
 readonly pheno_file="${pheno_dir}/curated_phenotypes.tsv" 
-readonly pheno_list="${pheno_dir}/curated_phenotypes_cts_header.tsv"
-readonly phenotype=$( cut -f${SGE_TASK_ID} ${pheno_list} )
+
+readonly pheno_list_cts="${pheno_dir}/curated_phenotypes_cts_header.tsv"
+readonly phenotype_cts=$( cut -f${SGE_TASK_ID} ${pheno_list_cts} )
+readonly pheno_list_binary="${pheno_dir}/curated_phenotypes_binary_header.tsv"
+readonly phenotype_binary=$( cut -f${SGE_TASK_ID} ${pheno_list_binary} )
 
 readonly out_prefix="${out_dir}/ukb_hapmap_500k_eur_${phenotype}"
 readonly prefix="${out_prefix}_chrCHR"
@@ -40,9 +44,10 @@ readonly prefix="${out_prefix}_chrCHR"
 submit_sumstat_job()
 {
   mkdir -p ${out_dir}
+  local phenotype=${1}
   set -x
   qsub -N "_${phenotype}_sumstat" \
-    -t 4 \
+    -t 1-22 \
     -q short.qc@@short.hge \
     -pe shmem 1 \
     "${bash_script}" \
@@ -55,6 +60,7 @@ submit_sumstat_job()
     "${covariates}" \
     "${prefix}"
   set +x
+  submit_merge_job
 }
 
 submit_merge_job()
@@ -72,6 +78,7 @@ submit_merge_job()
 
 }
 
-submit_sumstat_job
-submit_merge_job
+submit_sumstat_job "${phenotype_binary}"
+
+
 

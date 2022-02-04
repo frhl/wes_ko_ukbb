@@ -21,30 +21,39 @@ def main(args):
     hapmap = args.hapmap
     ancestry = args.ancestry
     dbsnp = args.dbsnp
+    random_samples = args.random_samples
     out_prefix = args.out_prefix
     out_type = args.out_type
 
     hail_init.hail_bmrc_init_local('logs/hail/hail_format.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
-    
+   
+    if chrom in "AUTOSOMES":
+        chrom = list(map(str, range(1, 23)))
+    else:
+        chrom = [chrom]
+        
     if dataset in "imp":
-        mt = genotypes.get_ukb_imputed_v3_bgen(chroms=[chrom])
+        mt = genotypes.get_ukb_imputed_v3_bgen(chroms=chrom)
         if min_info:
-            ht = genotypes.get_ukb_parsed_imputed_v3_mfi(chroms=[chrom])
+            ht = genotypes.get_ukb_parsed_imputed_v3_mfi(chroms=chrom)
             mt = mt.annotate_rows(info_score = ht[(mt.locus, mt.alleles)].info)
             mt = mt.filter_rows(mt.info_score >= float(min_info))
     elif dataset in "calls":
-        mt = genotypes.get_ukb_genotypes_bed(chroms=[chrom])
+        mt = genotypes.get_ukb_genotypes_bed(chroms=chrom)
     else:
         raise TypeError(f"{dataset} is not 'imp' or 'calls'")
     
     if extract_samples:
         ht_samples = hl.import_table(extract_samples, no_header=True, key='f0', delimiter=',')
         mt = mt.filter_cols(hl.is_defined(ht_samples[mt.col_key]))
-    
+   
     if ancestry:
         mt = samples.filter_ukb_to_ancestry(mt, ancestry)
-
+    
+    if random_samples:
+        mt = choose_col_subset(mt, int(ramdom_samples), seed = 42)
+    
     if hapmap:
         ht = hl.read_table(hapmap)
         ht = ht.key_by('locus_grch37')
@@ -71,6 +80,7 @@ if __name__=='__main__':
     parser.add_argument('--dataset', default=None, help='Either "imp" or "calls".')
     parser.add_argument('--ancestry', default=None, help='Either "eur" or "all".')
     parser.add_argument('--hapmap', default=None, help='Path to hapmap file')
+    parser.add_argument('--random_samples', default=None, help='Subset to random samples')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Either "mt", "vcf" or "plink"')
     args = parser.parse_args()
