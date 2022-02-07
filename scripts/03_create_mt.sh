@@ -5,9 +5,9 @@
 #$ -o logs/create_mt.log
 #$ -e logs/create_mt.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 5
-#$ -q short.qc@@short.hge
-#$ -t 1-21
+#$ -pe shmem 3
+#$ -q long.qc@@long.hga
+#$ -t 1-22
 
 set -o errexit
 set -o nounset

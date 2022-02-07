@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 3
+#$ -t 1-80
 #$ -V
 
 module purge
@@ -36,9 +36,10 @@ fit_binary_traits() {
   local out_dir="data/saige/output/combined/binary/step1"
   local pheno_list="${pheno_dir}/curated_phenotypes_binary_header.tsv"
   local phenotype=$( cut -f${SGE_TASK_ID} ${pheno_list} )
-  local out_prefix="${out_dir}/ukb_wes_200k_${phenotype}"
-  submit_spa_null
-
+  if [[ ! -z ${phenotype} ]]; then
+    local out_prefix="${out_dir}/ukb_wes_200k_${phenotype}"
+    submit_spa_null
+  fi
 }
 
 fit_cts_traits() {
@@ -46,14 +47,15 @@ fit_cts_traits() {
   local out_dir="data/saige/output/combined/cts/step1"
   local pheno_list="${pheno_dir}/curated_phenotypes_cts_header.tsv"
   local phenotype=$( cut -f${SGE_TASK_ID} ${pheno_list} )
-  local out_prefix="${out_dir}/ukb_wes_200k_${phenotype}"
-  submit_spa_null
-
+  if [[ ! -z ${phenotype} ]]; then
+    local out_prefix="${out_dir}/ukb_wes_200k_${phenotype}"
+    submit_spa_null
+  fi
 }
 
 submit_spa_null() {
   mkdir -p ${out_dir}
-  if [ ! -f ${out_prefix}* ]; then
+  if [ ! -f "${out_prefix}.rda" ]; then
     set -x
     qsub -N "spa_${phenotype}" \
       -t "${SGE_TASK_ID}" \

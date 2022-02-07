@@ -22,7 +22,8 @@ readonly spark_dir="data/tmp/spark"
 readonly spa_script="scripts/_spa_test.sh"
 readonly in_prefix="ukb_wes_200k_maf00_01"
 
-mkdir -p ${out_dir}
+readonly queue="short.qe"
+readonly nslots=3
 
 submit_spa_binary_with_csqs() {
   
@@ -58,11 +59,12 @@ submit_spa_with_csqs() {
 }
 
 submit_spa_job() {
+  mkdir -p ${out_dir}
   set -x
   qsub -N "spa_${phenotype}_${category}" \
     -t 1-22 \
-    -q "short.qe" \
-    -pe shmem 1 \
+    -q "${queue}" \
+    -pe shmem ${nslots} \
     "${spa_script}" \
     "${phenotype}" \
     "${in_vcf}" \
