@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 3-50
+#$ -t 3
 #$ -V
 
 module purge
@@ -25,11 +25,13 @@ readonly plink_file="${plink_dir}/211102_long_ukb_wes_200k_sparse_autosomes"
 readonly covar_file="${covar_dir}/covars1.csv"
 readonly covariates=$( cat ${covar_file} )
 readonly pheno_file="${pheno_dir}/curated_phenotypes.tsv"
-  
+ 
 readonly spa_null_script="scripts/_spa_null.sh"
 
+readonly queue="short.qe"
+readonly nslots=3
+
 fit_binary_traits() {
-   
   local trait_type="binary"
   local out_dir="data/saige/output/combined/binary/step1"
   local pheno_list="${pheno_dir}/curated_phenotypes_binary_header.tsv"
@@ -40,7 +42,6 @@ fit_binary_traits() {
 }
 
 fit_cts_traits() {
-   
   local trait_type="quantitative"
   local out_dir="data/saige/output/combined/cts/step1"
   local pheno_list="${pheno_dir}/curated_phenotypes_cts_header.tsv"
@@ -52,21 +53,25 @@ fit_cts_traits() {
 
 submit_spa_null() {
   mkdir -p ${out_dir}
-  set -x
-  qsub -N "spa_${phenotype}" \
-    -t ${SGE_TASK_ID} \
-    -q "short.qe" \
-    -pe shmem 3 \
-    "${spa_null_script}" \
-    "${plink_file}" \
-    "${pheno_file}" \
-    "${phenotype}" \
-    "${covariates}" \
-    "${trait_type}" \
-    "${grm_mtx}" \
-    "${grm_sam}" \
-    "${out_prefix}"
-  set +x
+  if [ ! -f ${out_prefix}* ]; then
+    set -x
+    qsub -N "spa_${phenotype}" \
+      -t "${SGE_TASK_ID}" \
+      -q "${queue}" \
+      -pe shmem ${nslots} \
+      "${spa_null_script}" \
+      "${plink_file}" \
+      "${pheno_file}" \
+      "${phenotype}" \
+      "${covariates}" \
+      "${trait_type}" \
+      "${grm_mtx}" \
+      "${grm_sam}" \
+      "${out_prefix}"
+    set +x
+  else
+    >&2 echo "${out_prefix} already exists. Skipping.."
+  fi
 }
 
 # Fit null model for binary/cts traits
