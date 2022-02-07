@@ -6,7 +6,7 @@
 #$ -e logs/ld_matrix_gen.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 5
-#$ -q short.qc@@short.hge
+#$ -q long.qc@@long.hge
 #$ -V
 
 source utils/qsub_utils.sh
@@ -19,7 +19,7 @@ readonly hap_dir="/well/lindgren/flassen/ressources/hapmap"
 
 readonly chr=$( get_chr ${SGE_TASK_ID} )
 readonly out_dir="data/prs/hapmap"
-readonly out_prefix="${out_dir}/ukb_hapmap_rand_10k_eur"
+readonly out_prefix="${out_dir}/long_ukb_hapmap_rand_10k_eur"
 readonly hap_file="${hap_dir}/weights.l2.ldscore.liftover.ht"
 
 readonly sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
