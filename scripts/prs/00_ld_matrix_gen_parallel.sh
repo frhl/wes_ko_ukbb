@@ -41,6 +41,7 @@ if [ ! -f "${out_prefix}.bed" ]; then
      --min_maf 0.005 \
      --liftover \
      --dbsnp \
+     --only_valid_contigs \
      --out_prefix "${out_prefix}" \
      --out_type "plink" 
   set +x

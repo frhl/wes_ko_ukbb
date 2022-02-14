@@ -23,6 +23,7 @@ def main(args):
     dbsnp = args.dbsnp
     random_samples = args.random_samples
     min_maf = args.min_maf
+    only_valid_contigs = args.only_valid_contigs
     out_prefix = args.out_prefix
     out_type = args.out_type
 
@@ -75,6 +76,11 @@ def main(args):
         mt = mt.annotate_rows(rsid = ht.rows()[mt.row_key].rsid)
         print("Finished annotating with dbsnp")
 
+    if only_valid_contigs:
+        chroms = [f'chr{x}' for x in range(1,23)]
+        chroms.append('chrX')
+        filter_expr = hl.literal(set(chroms)).contains(mt.locus.contig)
+        mt = mt.filter_rows(filter_expr)
 
     qc.export_table(mt, out_prefix, out_type)
 
@@ -91,6 +97,7 @@ if __name__=='__main__':
     parser.add_argument('--ancestry', default=None, help='Either "eur" or "all".')
     parser.add_argument('--hapmap', default=None, help='Path to hapmap file')
     parser.add_argument('--random_samples', default=None, help='Subset to random samples')
+    parser.add_argument('--only_valid_contigs', default=None, help='Subset variants only normal contigs chr1..22x')
     parser.add_argument('--min_maf', default=None, help='Subset to variants based on minimum MAF')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Either "mt", "vcf" or "plink"')
