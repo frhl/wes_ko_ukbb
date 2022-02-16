@@ -24,16 +24,9 @@ main <- function(args){
   tmp <- tempfile(tmpdir = "data/tmp/tmp-data")
   on.exit(file.remove(paste0(tmp, ".sbk")), add = TRUE)
 
-  # Initialize variables for storing the LD score and LD matrix
-  corr <- NULL
-  ld <- NULL
-
-  # We want to know the ordering of samples in the bed file 
-  fam.order <- NULL
-
   # preprocess the bed file (only need to do once for each data set) and attach 
   if (!file.exists.ext(path_ld_bed, '.bk')) snp_readBed(path_ld_bed)
-  basename <- tools::file_path_sans_ext(path_bed)
+  basename <- tools::file_path_sans_ext(path_ld_bed)
   rds <- paste0(basename,'.rds')
   obj.bigSNP <- snp_attach(rds)
 
@@ -66,7 +59,7 @@ main <- function(args){
   write(paste0(100*(1-round(matches,5)),'% of LD panel variants are in genetic map (hapmap).'),stdout())
    
   # calculate correlation between variants (LD panel)
-  # Note: this function MUST start at chr1 (see first IF STATEMENT)
+  # Note: this function MUST start at chr1 (GRCh38)
   # Note: Currently this only works for GRCh38. Changes "Chr" downstream.
   chrs <- paste0("chr",1:22)
   stopifnot(all(unique(info_snp$chr) %in% chrs))
@@ -94,7 +87,6 @@ main <- function(args){
   
   # We assume the fam order is the same across different chromosomes
   fam.order <- as.data.table(obj.bigSNP$fam)
-  # Rename fam order
   setnames(fam.order,
           c("family.ID", "sample.ID"),
           c("FID", "IID"))
@@ -108,99 +100,122 @@ main <- function(args){
                       blocks = NULL)
   h2_est <- ldsc[["h2"]]
   print(h2_est)
+  
+
+  # Load samples that we want to predict from
+  pred_basename <- tools::file_path_sans_ext(path_bed)
+  pred_rds <- paste0(basename,'.rds')
+  pred.bigSNP <- snp_attach(pred_rds)
+  pred_genotype <- obj.bigSNP$genotypes
+
+  # For testing performance
+  n_test = 500
+  set.seed(42)
+  ind.val <- sample(nrow(G), n_test)
+  ind.test <- setdiff(rows_along(G), ind.val)
+
+  if (model %in% 'inf'){
+    beta_inf <- snp_ldpred2_inf(corr, df_beta, h2 = h2_est)
+    pred_inf <- big_prodVec(G, beta_inf, ind.row = ind.test, ind.col = df_beta[["_NUM_ID_"]])
+    cor(pred_inf, y[ind.test])
+
+
+  } else {
+    stop(paste0(model, 'has not been implemented!'))
+  }
 
   # calculate NULL R2
   # Reformat the phenotype file such that y is of the same order as the 
   
   # sample ordering in the genotype file
-  y <- pheno[fam.order, on = c("FID", "IID")]
+  #y <- pheno[fam.order, on = c("FID", "IID")]
 
   # Calculate the null R2
-  null_model <- as.formula(paste0(args$response, "~", gsub(',','+', args$covars)))
-  if (args$response_type == 'cts'){
-    summary <- lm(null_model, data = y)
-    null.r2 <- null.model$r.squared
-  } else if (args$response_type == 'binary'){
-    summary <- glm(null_model, data = y, family=binomial)
-    null.r2 <- fmsb::NagelkerkeR2(null.model)
-  } else {
-    stop('response type must be either "binary" or "cts"')
-  }
+  #null_model <- as.formula(paste0(args$response, "~", gsub(',','+', args$covars)))
+  #if (args$response_type == 'cts'){
+  #  summary <- lm(null_model, data = y)
+  #  null.r2 <- null.model$r.squared
+  #} else if (args$response_type == 'binary'){
+  #  summary <- glm(null_model, data = y, family=binomial)
+  #  null.r2 <- fmsb::NagelkerkeR2(null.model)
+  #} else {
+  #  stop('response type must be either "binary" or "cts"')
+  #}
 
   # Read in full dataset (all samples) for PRS calculation
-  pred_obj.bigSNP <- snp_attach(args$path_bed)
-  pred_obj.bigSNP$map <- pred_obj.bigSNP$map[pred_obj.bigSNP$map$chr %in% autosomes,]
-  genotype <- pred_obj.bigSNP$genotypes
-  ind.test <- 1:nrow(genotype)
+  #pred_obj.bigSNP <- snp_attach(args$path_bed)
+  #pred_obj.bigSNP$map <- pred_obj.bigSNP$map[pred_obj.bigSNP$map$chr %in% autosomes,]
+  #genotype <- pred_obj.bigSNP$genotypes
+  #ind.test <- 1:nrow(genotype)
 
   # obtain (genome wide) model PRS
-  if (args$model in 'auto'){
-    
-    # Get adjusted beta from the auto model
-    multi_auto <- snp_ldpred2_auto(
-        corr,
-        df_beta,
-        h2_init = h2_est,
-        vec_p_init = seq_log(1e-4, 0.9, length.out = NCORES),
-        ncores = NCORES
-    )
-    beta_auto <- sapply(multi_auto, function(auto)  auto$beta_est)
-
-    # calculate PRS for all samples
-    pred_auto <-
-        big_prodMat(genotype,
-                    beta_auto,
-                    ind.row = ind.test,
-                    ind.col = info_snp$`_NUM_ID_`)
-    # scale the PRS generated from AUTO
-    pred_scaled <- apply(pred_auto, 2, sd)
-    final_beta_auto <-
-        rowMeans(beta_auto[,
-                    abs(pred_scaled -
-                        median(pred_scaled)) <
-                        3 * mad(pred_scaled)])
-    pred_auto <-
-        big_prodVec(genotype,
-            final_beta_auto,
-            ind.row = ind.test,
-            ind.col = info_snp$`_NUM_ID_`)
-    
-    pred_final <- pred_auto
-
-    } else if (args$model in 'grid'){
-      
-      # Prepare data for grid model
-      p_seq <- signif(seq_log(1e-4, 1, length.out = 17), 2)
-      h2_seq <- round(h2_est * c(0.7, 1, 1.4), 4)
-      grid.param <-
-          expand.grid(p = p_seq,
-                  h2 = h2_seq,
-                  sparse = c(FALSE, TRUE))
-      
-      # Get adjusted beta from grid model
-      beta_grid <- snp_ldpred2_grid(corr, df_beta, grid.param, ncores = NCORES)
-
-      pred_grid <- big_prodMat(genotype, 
-                            beta_grid, 
-                            ind.col = info_snp$`_NUM_ID_`)
-      
-      pred_final <- pred_grid
-
-    } else if (args$model in 'inf'){
-      beta_inf <- snp_ldpred2_inf(corr, df_beta, h2 = h2_est)
-      pred_inf <- big_prodVec(genotype,
-                            beta_inf,
-                            ind.row = ind.test,
-                            ind.col = info_snp$`_NUM_ID_`)
-
-      pred_final <- pred_inf
-
-    } else {
-     stop('current "model" must be either "auto", "grid" or "inf".')
-   }
+  #if (args$model in 'auto'){
+  #  
+  #  # Get adjusted beta from the auto model
+  #  multi_auto <- snp_ldpred2_auto(
+  #      corr,
+  #      df_beta,
+  #      h2_init = h2_est,
+  #      vec_p_init = seq_log(1e-4, 0.9, length.out = NCORES),
+  #      ncores = NCORES
+  #  )
+  #  beta_auto <- sapply(multi_auto, function(auto)  auto$beta_est)
+  #
+  #  # calculate PRS for all samples
+  #  pred_auto <-
+  #      big_prodMat(genotype,
+  #                  beta_auto,
+  #                  ind.row = ind.test,
+  #                  ind.col = info_snp$`_NUM_ID_`)
+  #  # scale the PRS generated from AUTO
+  #  pred_scaled <- apply(pred_auto, 2, sd)
+  #  final_beta_auto <-
+  #      rowMeans(beta_auto[,
+  #                  abs(pred_scaled -
+  #                      median(pred_scaled)) <
+  #                      3 * mad(pred_scaled)])
+  #  pred_auto <-
+  #      big_prodVec(genotype,
+  #          final_beta_auto,
+  #          ind.row = ind.test,
+  #          ind.col = info_snp$`_NUM_ID_`)
+  #  
+  #  pred_final <- pred_auto
+  #
+  #    } else if (args$model in 'grid'){
+  #    
+  #    # Prepare data for grid model
+  #    p_seq <- signif(seq_log(1e-4, 1, length.out = 17), 2)
+  #    h2_seq <- round(h2_est * c(0.7, 1, 1.4), 4)
+  #    grid.param <-
+  #        expand.grid(p = p_seq,
+  #                h2 = h2_seq,
+  #                sparse = c(FALSE, TRUE))
+  #    
+  #    # Get adjusted beta from grid model
+  #    beta_grid <- snp_ldpred2_grid(corr, df_beta, grid.param, ncores = NCORES)
+  #
+  #    pred_grid <- big_prodMat(genotype, 
+  #                          beta_grid, 
+  #                          ind.col = info_snp$`_NUM_ID_`)
+  #    
+  #    pred_final <- pred_grid
+  #
+  #  } else if (args$model in 'inf'){
+  #    beta_inf <- snp_ldpred2_inf(corr, df_beta, h2 = h2_est)
+  #    pred_inf <- big_prodVec(genotype,
+  #                          beta_inf,
+  #                          ind.row = ind.test,
+  #                          ind.col = info_snp$`_NUM_ID_`)
+  #
+  #    pred_final <- pred_inf
+  #
+  #  } else {
+  #   stop('current "model" must be either "auto", "grid" or "inf".')
+  # }
   
-   print(str(pred_final))
-   print(head(pred_final))       
+  print(str(pred_final))
+  print(head(pred_final))       
  
 
 }
