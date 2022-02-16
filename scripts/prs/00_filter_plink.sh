@@ -18,8 +18,8 @@ readonly hail_script="scripts/prs/00_filter_plink.py"
 readonly spark_dir="data/tmp/spark_dir"
 
 readonly chr=$( get_chr ${SGE_TASK_ID} )
-readonly in_dir="data/prs/hapmap/ld/old/chr7_and_8"
-readonly input_prefix="${out_dir}/short_ukb_hapmap_rand_10k_eur_chr${chr}"
+readonly input_dir="data/prs/hapmap/ld/old/chr7_and_8"
+readonly input_prefix="${input_dir}/short_ukb_hapmap_rand_10k_eur_chr${chr}"
 readonly out_dir="data/prs/hapmap/ld"
 readonly out_prefix="${out_dir}/short_ukb_hapmap_rand_10k_eur_chr${chr}"
 
