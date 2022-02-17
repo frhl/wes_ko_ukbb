@@ -5,9 +5,9 @@
 #$ -o logs/ld_matrix_gen.log
 #$ -e logs/ld_matrix_gen.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 4
+#$ -pe shmem 3
 #$ -q long.qc@@long.hga
-#$ -t 22
+#$ -t 1-22
 #$ -V
 
 source utils/qsub_utils.sh
@@ -40,7 +40,7 @@ if [ ! -f "${out_prefix}.bed" ]; then
      --filter_missing 0.05 \
      --random_samples 10000 \
      --hapmap "${hap_file}" \
-     --min_maf 0.005 \
+     --min_maf 0.01 \
      --liftover \
      --dbsnp \
      --only_valid_contigs \
