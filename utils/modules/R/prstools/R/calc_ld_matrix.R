@@ -8,7 +8,7 @@
 #' @export
 
 
-calc_ld_matrix <- function(G, POS2, info_snp, chrs = 1:22, ncores = 1){
+calc_ld_matrix <- function(G, POS2, info_snp, chrs = 1:22, ncores = 1, tmp){
     
     chrs <- paste0("chr",chrs)
     for (chr in chrs) {
