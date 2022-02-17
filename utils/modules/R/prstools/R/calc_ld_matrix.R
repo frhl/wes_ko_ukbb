@@ -12,7 +12,7 @@ calc_ld_matrix <- function(G, POS2, info_snp, chrs = 1:22, ncores = 1){
     
     chrs <- paste0("chr",chrs)
     for (chr in chrs) {
-        write(paste('Evaluating',chr,'..'),stdout())
+        write(paste('Calculating LD for',chr,'..'),stderr())
         ind.chr <- which(info_snp$chr == chr)
         ind.chr2 <- info_snp$`_NUM_ID_`[ind.chr]
         stopifnot(length(ind.chr) > 0)

@@ -9,6 +9,7 @@ read_hail_sumstat <- function(path){
   stopifnot(file.exists(path))
 
   sumstats <- bigreadr::fread2(path)
+  colnames(sumstats)[colnames(sumstats)=="n_total"] <- 'n' # tmp fix
   # make artificial rsid
   sumstats$rsid <-
       apply(
@@ -28,7 +29,7 @@ read_hail_sumstat <- function(path){
 
   # calculate MAF
   sumstats$MAF <- unlist(lapply(sumstats$AF, function(af) min(af, 1-af)))
-
+ 
   sumstats <-
       data.table(
           chr = sumstats$chr,

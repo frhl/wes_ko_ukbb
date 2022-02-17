@@ -6,6 +6,7 @@
 load_bigsnp_from_bed <- function(bed, verbose = TRUE){
     
     # Read from bed/bim/fam, it generates .bk and .rds files.
+    write(paste("loading",bed,".."), stderr())
     if (!file.exists.ext(bed, '.bk')) snp_readBed(bed)
     basename <- tools::file_path_sans_ext(bed)
     rds <- paste0(basename,'.rds')
