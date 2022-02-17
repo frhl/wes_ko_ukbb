@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc@@short.hga
-#$ -t 2
+#$ -t 1-2
 #$ -V
 
 # cts
@@ -20,7 +20,7 @@ source utils/hail_utils.sh
 
 readonly in_dir="data/prs/hapmap"
 readonly pheno_dir="data/phenotypes"
-readonly out_dir="data/prs/sumstat"
+readonly out_dir="data/prs/sumstat/new_n"
 
 readonly bash_script="scripts/prs/_summary_statistics.sh"
 readonly hail_script="scripts/prs/01_summary_statistics.py"

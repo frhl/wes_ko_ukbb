@@ -5,9 +5,9 @@
 #$ -o logs/ld_matrix_gen_parallel.log
 #$ -e logs/ld_matrix_gen_parallel.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 2
-#$ -q short.qc@@short.hge
-#$ -t 1-22
+#$ -pe shmem 4
+#$ -q long.qc@@long.hga
+#$ -t 7-8
 #$ -V
 
 source utils/qsub_utils.sh
