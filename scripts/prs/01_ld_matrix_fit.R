@@ -1,235 +1,90 @@
 
+# details: https://privefl.github.io/bigsnpr-extdoc/polygenic-scores-pgs.html
 
-library(bigsnpr)
-library(data.table)
-library(argparse)
-library(fmsb)
-#options(bigstatsr.check.parallel.blas = FALSE)
-#options(default.nproc.blas = NULL)
-
-# load helpers (some functions required an active internet connection, 
-# these have been re-written to rely on locally available data)
-source('utils/modules/R/bigsnpr_helpers.R')
+# wrote a package that contain all dependencies for runnign LDpred2
+# and combining various functions into easy to use pipelines. Note,
+# that this will also load libraries, e.g. bigsnpr, bigassert
+devtools::load_all('utils/modules/R/prstools')
 
 
 main <- function(args){
 
-  stopifnot(file.exists(args$path_bed))
-  stopifnot(file.exists(args$path_ld_bed))
+  stopifnot(file.exists(args$path_bed_pred))
+  stopifnot(file.exists(args$path_bed_ld))
   stopifnot(file.exists(args$path_sumstat))
-  stopifnot(file.exists(args$path_pheno))
 
-  ## copied from https://choishingwan.github.io/PRS-Tutorial/ldpred/
+  # setup parallel environment
   NCORES <- nb_cores()
   tmp <- tempfile(tmpdir = "data/tmp/tmp-data")
   on.exit(file.remove(paste0(tmp, ".sbk")), add = TRUE)
 
-  # preprocess the bed file (only need to do once for each data set) and attach 
-  if (!file.exists.ext(path_ld_bed, '.bk')) snp_readBed(path_ld_bed)
-  basename <- tools::file_path_sans_ext(path_ld_bed)
-  rds <- paste0(basename,'.rds')
-  obj.bigSNP <- snp_attach(rds)
+  # load data required for setting up LD-matrix 
+  ld_data <- load_bigsnp_from_bed(args$path_ld_bed)
 
-  # extract the SNP information from the genotype
-  map <- obj.bigSNP$map[-3]
-  names(map) <- c("chr", "rsid", "pos", "a1", "a0")
-
-  # remove non-autosomes (e.g. chr8_KI270821v1_alt)
-  autosomes <- paste0('chr',1:22)
-  obj.bigSNP$map <- obj.bigSNP$map[obj.bigSNP$map$chr %in% autosomes,]
-
-  # read summary statistics file for SNP matching
-  sumstats <- read_hail_sumtat(path_sumstat)
-
-  # perform SNP matching
-  info_snp <- bigsnpr::snp_match(sumstats, map, strand_flip = FALSE)
-
-  # Assign the genotype to a variable for easier downstream analysis
-  genotype <- obj.bigSNP$genotypes
-
-  # Rename the data structures
-  CHR <- as.numeric(gsub('chr','',map$chr))
-  POS <- map$pos
-
-  # get the CM information from hapmap SNPs
-  POS2 <- snp_asGeneticPosLocal(CHR, POS, mapdir = "data/prs/1000-genomes-genetic-maps",genetic_map = 'hapmap')
-
-  # check for sufficient overlap
-  matches <- sum(POS2==0)/length(POS2) # hapmap has many less missing variants than omni
-  write(paste0(100*(1-round(matches,5)),'% of LD panel variants are in genetic map (hapmap).'),stdout())
-   
-  # calculate correlation between variants (LD panel)
-  # Note: this function MUST start at chr1 (GRCh38)
-  # Note: Currently this only works for GRCh38. Changes "Chr" downstream.
-  chrs <- paste0("chr",1:22)
-  stopifnot(all(unique(info_snp$chr) %in% chrs))
-  for (chr in chrs) {
-      # Extract SNPs that are included in the chromosome
-      ind.chr <- which(info_snp$chr == chr)
-      ind.chr2 <- info_snp$`_NUM_ID_`[ind.chr]
-      stopifnot(length(ind.chr) > 0)
-      # Calculate the LD
-      corr0 <- snp_cor(
-              genotype,
-              ind.col = ind.chr2,
-              ncores = NCORES,
-              infos.pos = POS2[ind.chr2],
-              size = 3 / 1000
-          )
-      if (chr == "chr1") {
-          ld <- Matrix::colSums(corr0^2)
-          corr <- as_SFBM(corr0, tmp)
-      } else {
-          ld <- c(ld, Matrix::colSums(corr0^2))
-          corr$add_columns(corr0, nrow(corr))
-      }
-  }
+  # load summary statistics
+  sumstats <- read_hail_sumstat(args$path_sumstat)
   
-  # We assume the fam order is the same across different chromosomes
-  fam.order <- as.data.table(obj.bigSNP$fam)
-  setnames(fam.order,
-          c("family.ID", "sample.ID"),
-          c("FID", "IID"))
-
-  # perform LD-score regression
-  df_beta <- info_snp[,c("beta", "beta_se", "n_eff", "_NUM_ID_")]
-  ldsc <- snp_ldsc(   ld, 
-                      length(ld), 
-                      chi2 = (df_beta$beta / df_beta$beta_se)^2,
-                      sample_size = df_beta$n_eff, 
-                      blocks = NULL)
-  h2_est <- ldsc[["h2"]]
-  print(h2_est)
-  
-
-  # Load samples that we want to predict from
-  pred_basename <- tools::file_path_sans_ext(path_bed)
-  pred_rds <- paste0(basename,'.rds')
-  pred.bigSNP <- snp_attach(pred_rds)
-  pred_genotype <- obj.bigSNP$genotypes
-
-  # For testing performance
-  n_test = 500
-  set.seed(42)
-  ind.val <- sample(nrow(G), n_test)
-  ind.test <- setdiff(rows_along(G), ind.val)
-
-  if (model %in% 'inf'){
-    beta_inf <- snp_ldpred2_inf(corr, df_beta, h2 = h2_est)
-    pred_inf <- big_prodVec(G, beta_inf, ind.row = ind.test, ind.col = df_beta[["_NUM_ID_"]])
-    cor(pred_inf, y[ind.test])
-
-
-  } else {
-    stop(paste0(model, 'has not been implemented!'))
-  }
-
-  # calculate NULL R2
-  # Reformat the phenotype file such that y is of the same order as the 
-  
-  # sample ordering in the genotype file
-  #y <- pheno[fam.order, on = c("FID", "IID")]
-
-  # Calculate the null R2
-  #null_model <- as.formula(paste0(args$response, "~", gsub(',','+', args$covars)))
-  #if (args$response_type == 'cts'){
-  #  summary <- lm(null_model, data = y)
-  #  null.r2 <- null.model$r.squared
-  #} else if (args$response_type == 'binary'){
-  #  summary <- glm(null_model, data = y, family=binomial)
-  #  null.r2 <- fmsb::NagelkerkeR2(null.model)
-  #} else {
-  #  stop('response type must be either "binary" or "cts"')
-  #}
-
-  # Read in full dataset (all samples) for PRS calculation
-  #pred_obj.bigSNP <- snp_attach(args$path_bed)
-  #pred_obj.bigSNP$map <- pred_obj.bigSNP$map[pred_obj.bigSNP$map$chr %in% autosomes,]
-  #genotype <- pred_obj.bigSNP$genotypes
-  #ind.test <- 1:nrow(genotype)
-
-  # obtain (genome wide) model PRS
-  #if (args$model in 'auto'){
-  #  
-  #  # Get adjusted beta from the auto model
-  #  multi_auto <- snp_ldpred2_auto(
-  #      corr,
-  #      df_beta,
-  #      h2_init = h2_est,
-  #      vec_p_init = seq_log(1e-4, 0.9, length.out = NCORES),
-  #      ncores = NCORES
-  #  )
-  #  beta_auto <- sapply(multi_auto, function(auto)  auto$beta_est)
-  #
-  #  # calculate PRS for all samples
-  #  pred_auto <-
-  #      big_prodMat(genotype,
-  #                  beta_auto,
-  #                  ind.row = ind.test,
-  #                  ind.col = info_snp$`_NUM_ID_`)
-  #  # scale the PRS generated from AUTO
-  #  pred_scaled <- apply(pred_auto, 2, sd)
-  #  final_beta_auto <-
-  #      rowMeans(beta_auto[,
-  #                  abs(pred_scaled -
-  #                      median(pred_scaled)) <
-  #                      3 * mad(pred_scaled)])
-  #  pred_auto <-
-  #      big_prodVec(genotype,
-  #          final_beta_auto,
-  #          ind.row = ind.test,
-  #          ind.col = info_snp$`_NUM_ID_`)
-  #  
-  #  pred_final <- pred_auto
-  #
-  #    } else if (args$model in 'grid'){
-  #    
-  #    # Prepare data for grid model
-  #    p_seq <- signif(seq_log(1e-4, 1, length.out = 17), 2)
-  #    h2_seq <- round(h2_est * c(0.7, 1, 1.4), 4)
-  #    grid.param <-
-  #        expand.grid(p = p_seq,
-  #                h2 = h2_seq,
-  #                sparse = c(FALSE, TRUE))
-  #    
-  #    # Get adjusted beta from grid model
-  #    beta_grid <- snp_ldpred2_grid(corr, df_beta, grid.param, ncores = NCORES)
-  #
-  #    pred_grid <- big_prodMat(genotype, 
-  #                          beta_grid, 
-  #                          ind.col = info_snp$`_NUM_ID_`)
-  #    
-  #    pred_final <- pred_grid
-  #
-  #  } else if (args$model in 'inf'){
-  #    beta_inf <- snp_ldpred2_inf(corr, df_beta, h2 = h2_est)
-  #    pred_inf <- big_prodVec(genotype,
-  #                          beta_inf,
-  #                          ind.row = ind.test,
-  #                          ind.col = info_snp$`_NUM_ID_`)
-  #
-  #    pred_final <- pred_inf
-  #
-  #  } else {
-  #   stop('current "model" must be either "auto", "grid" or "inf".')
-  # }
-  
-  print(str(pred_final))
-  print(head(pred_final))       
+  # match summary stats and LD data
+  info_snp <- snp_match(sumstats, ld_data$map, join_by_pos = TRUE, strand_flip = FALSE)
  
+  # QC summary statistics based on LD reference
+  qc <- qc_binary_sumstat(ld_data$G, info_snp)
+  beta_cols <- c("beta", "beta_se", "n_eff", "_NUM_ID_")
+  well_behaved_snps <- (!qc$is_bad)
+  df_beta <- info_snp[well_behaved_snps, beta_cols]
 
+  # get ld matrix. Note, that we need 60gb of memory to keep 
+  # all the hapmap variants in memory
+  snp <- calc_ld_matrix(ld_data$G, ld_data$POS2, info_snp, chrs = 1:22, 
+                        ncores = NCORES)
+
+  # perform ld regression
+  ldsc <- with(df_beta, snp_ldsc(snp$ld, length(snp$ld), chi2 = (beta / beta_se)^2,
+                                 sample_size = df_beta$n_eff, blocks = NULL))  
+  ldsc_h2_est <- ldsc[["h2"]]
+  
+  # Load new data for prediction
+  pred <- load_bigsnp_from_bed(args$path_bed_pred)
+
+  # ldpred2 inf model
+  beta_inf <- snp_ldpred2_inf(snp$corr, df_beta, ldsc_h2_est)
+  final_pred_inf <- big_prodVec(pred$G, beta_inf, ind.col = df_beta$`_NUM_ID_`)  
+  
+  # ldpred2 auto model
+  multi_auto <- snp_ldpred2_auto(
+    corr, df_beta, h2_init = ldsc_h2_est,
+    vec_p_init = seq_log(1e-4, 0.5, 30),
+    ncores = NCORES)  
+
+  # quality controls on chains
+  beta_auto <- sapply(multi_auto, function(auto) auto$beta_est)
+  pred_auto <- big_prodMat(G, beta_auto, ind.col = df_beta[["_NUM_ID_"]],
+                           ncores = NCORES)
+  sc <- apply(pred_auto, 2, sd)
+  keep <- abs(sc - median(sc)) < 3 * mad(sc)
+  final_beta_auto <- rowMeans(beta_auto[, keep])
+
+  final_pred_auto <- big_prodVec(G, final_beta_auto,
+                               ind.col = df_beta[["_NUM_ID_"]],
+                               ncores = NCORES)
+  # save results
+  results <- data.table(
+    sid = NA, 
+    fid = NA,
+    pred_auto = final_pred_auto,
+    pred_inf = final_red_inf
+    )
+
+  #out_prefix <- tools::fil
+  fwrite(resuts, file = paste0(out_prefix,".txt.gz"), sep = '\t')
+  
 }
 
 # add arguments
 parser <- ArgumentParser()
-parser$add_argument("--path_bed", default=NULL, required = TRUE, help = "Path for plink file (bed)")
+parser$add_argument("--path_bed_pred", default=NULL, required = TRUE, help = "Path for plink file (bed)")
 parser$add_argument("--path_sumstat", default=NULL, required = TRUE, help = "Path to a summary statistics file with matching SNPs")
-parser$add_argument("--path_ld_bed", default=NULL, required = TRUE, help = "Path to .bed file used for calculating LD panel")
-parser$add_argument("--path_pheno", default=NULL, required = TRUE, help = "Path to files with phenotypes")
-parser$add_argument("--covars", default=NULL, required = TRUE, help = "covariates as a string seperated by comma(s).")
-parser$add_argument("--response", default=NULL, required = TRUE, help = "Name of response (which is also in phenotype file)")
-parser$add_argument("--response_type", default=NULL, required = TRUE, help = "Either 'binary' or 'cts'")
-parser$add_argument("--model", default=NULL, required = TRUE, help = "Must be 'auto', 'grid' or 'inf'.")
+parser$add_argument("--path_bed_ld", default=NULL, required = TRUE, help = "Path to .bed file used for calculating LD panel")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()
 

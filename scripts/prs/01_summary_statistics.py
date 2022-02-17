@@ -80,6 +80,10 @@ def main(args):
                         x=mt.GT.n_alt_alleles(),
                         covariates=covariates
                         )
+                # get effective sample size
+                n_total = mt.aggregate_cols(hl.agg.sum(hl.is_defined(mt.pheno[response])))
+                n_cases = mt.aggregate_cols(hl.agg.sum(mt.pheno[response] == 1))
+                reg = reg.annotate(n=n_total, n_cases=n_cases)
             else:
                 raise TypeError("Response variable is not a float64 or boolean!")
         else:
