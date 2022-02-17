@@ -3,7 +3,7 @@
 import hail as hl
 import argparse
 
-from ko_utils import qc
+from ko_utils import io
 from ukb_utils import hail_init
 from ukb_utils import genotypes
 from ukb_utils import variants
@@ -21,6 +21,8 @@ def main(args):
     hapmap = args.hapmap
     ancestry = args.ancestry
     dbsnp = args.dbsnp
+    filter_missing = args.filter_missing
+    exclude_related = args.exclude_related
     random_samples = args.random_samples
     min_maf = args.min_maf
     only_valid_contigs = args.only_valid_contigs
@@ -49,10 +51,14 @@ def main(args):
     if extract_samples:
         ht_samples = hl.import_table(extract_samples, no_header=True, key='f0', delimiter=',')
         mt = mt.filter_cols(hl.is_defined(ht_samples[mt.col_key]))
-   
+  
+    if exclude_related:
+        related = samples.get_ukb_is_related_using_kinship_expr(mt)
+        mt = mt.filter_cols(~related) 
+
     if ancestry:
         mt = samples.filter_ukb_to_ancestry(mt, ancestry)
-    
+
     if random_samples:
         mt = samples.choose_col_subset(mt, int(random_samples), seed = 42)
         print("Finished selecting random samples") 
@@ -63,6 +69,10 @@ def main(args):
         mt = mt.filter_rows(hl.is_defined(ht[mt.locus]))
         print("Finished filter variants by hapmap SNPs")
     
+    if filter_missing:
+        missing = hl.agg.mean(hl.is_missing(mt.GT)) <= float(filter_missing)
+        mt = mt.filter_rows(missing)
+
     if min_maf:
         mt = mt.filter_rows(variants.get_maf_expr(mt) > float(min_maf))
         print("Finished subsetting by MAF")
@@ -82,7 +92,7 @@ def main(args):
         filter_expr = hl.literal(set(chroms)).contains(mt.locus.contig)
         mt = mt.filter_rows(filter_expr)
 
-    qc.export_table(mt, out_prefix, out_type)
+    io.export_table(mt, out_prefix, out_type)
 
 
 if __name__=='__main__':
@@ -92,6 +102,8 @@ if __name__=='__main__':
     parser.add_argument('--min_info', default=None, help='minimum info score (only imputed data)')
     parser.add_argument('--liftover', default=None, action='store_true', help='perform liftover')
     parser.add_argument('--dbsnp', default=None, action='store_true', help='Annotate rsids.')
+    parser.add_argument('--exclude_related', default=None, action='store_true', help='Exclude any related individuals.')
+    parser.add_argument('--filter_missing', default=None, help='Filter to variants with lt value in genotype missingness.')
     parser.add_argument('--extract_samples', default=None, help='Subset to sample IDs in file')
     parser.add_argument('--dataset', default=None, help='Either "imp" or "calls".')
     parser.add_argument('--ancestry', default=None, help='Either "eur" or "all".')

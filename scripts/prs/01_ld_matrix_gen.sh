@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
-#$ -N ld_matrix_gen_parallel
+#$ -N ld_matrix_gen
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/ld_matrix_gen_parallel.log
-#$ -e logs/ld_matrix_gen_parallel.errors.log
+#$ -o logs/ld_matrix_gen.log
+#$ -e logs/ld_matrix_gen.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 4
 #$ -q long.qc@@long.hga
-#$ -t 7-8
+#$ -t 22
 #$ -V
 
 source utils/qsub_utils.sh
@@ -19,7 +19,7 @@ readonly spark_dir="data/tmp/spark_dir"
 readonly hap_dir="/well/lindgren/flassen/ressources/hapmap"
 
 readonly chr=$( get_chr ${SGE_TASK_ID} )
-readonly out_dir="data/prs/hapmap/ld"
+readonly out_dir="data/prs/hapmap/ld/new_ld"
 readonly out_prefix="${out_dir}/short_ukb_hapmap_rand_10k_eur_chr${chr}"
 readonly hap_file="${hap_dir}/weights.l2.ldscore.liftover.ht"
 
@@ -36,6 +36,8 @@ if [ ! -f "${out_prefix}.bed" ]; then
      --chrom "${chr}" \
      --dataset "imp" \
      --extract_samples "${sample_list}" \
+     --exclude_related \
+     --filter_missing 0.05 \
      --random_samples 10000 \
      --hapmap "${hap_file}" \
      --min_maf 0.005 \

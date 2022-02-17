@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1
+#$ -t 2
 #$ -V
 
 source utils/bash_utils.sh
@@ -17,12 +17,10 @@ readonly bash_script="scripts/prs/_prs.sh"
 readonly rscript="scripts/prs/05_prs.R"
 
 readonly pred_dir="data/prs/hapmap"
-readonly ld_matrix_dir="data/prs/hapmap/ld"
+readonly ld_dir="data/prs/hapmap/ld"
 readonly sumstat_dir="data/prs/sumstat"
 readonly pheno_dir="data/phenotypes"
-readonly out_dir="data/prs/hapmad/ld"
-
-readonly pred="${pred_dir}/ukb_hapmap_500k_eur_chrCHR.bed"
+readonly out_dir="data/prs/scores"
 
 readonly pheno_list_cts="${pheno_dir}/curated_phenotypes_cts_header.tsv"
 readonly phenotype_cts=$( cut -f${SGE_TASK_ID} ${pheno_list_cts} )
@@ -33,9 +31,12 @@ mkdir -p ${out_dir}
 
 calc_prs_by_chrom()
 { 
-  local ld_matrix="${ld_matrix_dir}/ukb_eur_ld_10k_${1}.rds"
-  local sumstat="${sumstat_dir}/ukb_hapmap_500k_eur_${1}_combined.txt.gz"
-  local out_prefix="${out_dir}/ukb_eur_prs_${1}_chrCHR"
+  export OPENBLAS_NUM_THREADS=1 # avoid two levels of parallelization
+  local phenotype=${1}
+  local pred="${pred_dir}/ukb_hapmap_500k_eur_chrCHR.bed"
+  local ld="${ld_dir}/short_ukb_hapmap_rand_10k_eur_chrCHR.bed"
+  local sumstat="${sumstat_dir}/ukb_hapmap_500k_eur_${phenotype}_chrCHR.txt.gz"
+  local out_prefix="${out_dir}/ukb_eur_prs_${phenotype}_chrCHR"
   set -x
   qsub -N "_prs_${phenotype}" \
     -t 21 \
@@ -43,7 +44,7 @@ calc_prs_by_chrom()
     -pe shmem 1 \
     "${bash_script}" \
     "${rscript}" \
-    "${ld_matrix}" \
+    "${ld}" \
     "${sumstat}" \
     "${pred}" \
     "${out_prefix}"

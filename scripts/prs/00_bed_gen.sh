@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 3
 #$ -q short.qc@@short.hge
-#$ -t 1-22
+#$ -t 22
 #$ -V
 
 source utils/qsub_utils.sh
@@ -19,7 +19,7 @@ readonly spark_dir="data/tmp/spark_dir"
 readonly hap_dir="/well/lindgren/flassen/ressources/hapmap"
 
 readonly chr=$( get_chr ${SGE_TASK_ID} )
-readonly out_dir="data/prs/hapmap"
+readonly out_dir="data/prs/hapmap/ukb_500k"
 readonly out_prefix="${out_dir}/ukb_hapmap_500k_eur_chr${chr}"
 readonly hap_file="${hap_dir}/weights.l2.ldscore.liftover.ht"
 
@@ -35,8 +35,9 @@ if [ ! -f "${out_prefix}.bed" ]; then
   python3 "${hail_script}" \
      --chrom "${chr}" \
      --dataset "imp" \
-     --extract_samples ${sample_list} \
+     --ancestry "eur" \
      --hapmap ${hap_file} \
+     --filter_missing 0.05 \
      --liftover \
      --dbsnp \
      --out_prefix "${out_prefix}" \
