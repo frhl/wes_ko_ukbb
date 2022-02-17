@@ -18,7 +18,7 @@ readonly rscript="scripts/prs/04_ld_matrix_fit.R"
 readonly bed_dir="data/prs/hapmap/ld"
 readonly pheno_dir="data/phenotypes"
 readonly sumstat_dir="data/prs/sumstat"
-readonly out_dir="data/prs/hapmap/ld"
+readonly out_dir="data/prs/hapmap/ld/corr"
 
 readonly bed_file="${bed_dir}/short_merged_ukb_hapmap_rand_10k_eur.bed"
 readonly pheno_file="${pheno_dir}/curated_phenotypes.tsv"

@@ -20,8 +20,9 @@ main <- function(args){
   bigparallelr::assert_cores(NCORES)
   
   # required for LD matrix fitting
-  tmp <- tempfile(tmpdir = "data/tmp/tmp-data")
-  on.exit(file.remove(paste0(tmp, ".sbk")), add = TRUE)
+  sfbm_path <- paste0(args$out_prefix,'.sbk')
+  #tmp <- tempfile(tmpdir = "data/tmp/tmp-data")
+  #on.exit(file.remove(paste0(tmp, ".sbk")), add = TRUE)
 
   # load data required for setting up LD-matrix 
   ld_data <- load_bigsnp_from_bed(args$path_bed_ld)
@@ -31,21 +32,26 @@ main <- function(args){
   
   # match summary stats and LD data
   info_snp <- snp_match(sumstats, ld_data$map, join_by_pos = TRUE, strand_flip = FALSE)
- 
-  # QC summary statistics based on LD reference
-  qc <- qc_binary_sumstat(ld_data$G, info_snp, ncores = 1)
-  beta_cols <- c("beta", "beta_se", "n_eff", "_NUM_ID_")
+   
+  #QC summary statistics based on LD reference
+  qc <- qc_binary_sumstat(ld_data$G, info_snp, NCORES)
   well_behaved_snps <- (!qc$is_bad)
-  df_beta <- info_snp[well_behaved_snps, beta_cols]
+  df_beta <- info_snp[well_behaved_snps, ] 
 
   # get ld matrix. Note, that we need 60gb of memory to keep 
   # all the hapmap variants in memory
   write("Fitting ld matrix..", stdout())
-  snp <- calc_ld_matrix(ld_data$G, ld_data$POS2, info_snp, chrs = 1:22, 
-                        ncores = NCORES, tmp = tmp)
+  snp_corr <- calc_ld_matrix(
+                  ld_data$G, 
+                  ld_data$POS2, 
+                  info_snp, 
+                  chrs = 1:22, 
+                  ncores = NCORES, 
+                  sfbm_file = sfbm_path)
 
+  # save with link to sfbm file
   outfile = paste0(args$out_prefix, ".rda")
-  saveRDS(snp, file = outfile, compress = "xz")
+  saveRDS(snp_corr, file = outfile, compress = "xz")
 
 }
 
