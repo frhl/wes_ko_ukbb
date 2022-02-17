@@ -23,7 +23,7 @@ readonly pheno_dir="data/phenotypes"
 readonly out_dir="data/prs/sumstat/new_n"
 
 readonly bash_script="scripts/prs/_summary_statistics.sh"
-readonly hail_script="scripts/prs/01_summary_statistics.py"
+readonly hail_script="scripts/prs/03_summary_statistics.py"
 readonly merge_script="scripts/prs/_summary_statistics_merge.sh"
 
 readonly covar_file="${pheno_dir}/covars1.csv"
