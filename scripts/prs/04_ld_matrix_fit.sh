@@ -18,9 +18,9 @@ readonly rscript="scripts/prs/04_ld_matrix_fit.R"
 readonly bed_dir="data/prs/hapmap/ld"
 readonly pheno_dir="data/phenotypes"
 readonly sumstat_dir="data/prs/sumstat"
-readonly out_dir="data/prs/hapmad/ld"
+readonly out_dir="data/prs/hapmap/ld"
 
-readonly bed="${plink_dir}/short_merged_ukb_hapmap_rand_10k_eur.bed"
+readonly bed_file="${bed_dir}/short_merged_ukb_hapmap_rand_10k_eur.bed"
 readonly pheno_file="${pheno_dir}/curated_phenotypes.tsv"
 
 readonly pheno_list_cts="${pheno_dir}/curated_phenotypes_cts_header.tsv"
@@ -28,18 +28,17 @@ readonly phenotype_cts=$( cut -f${SGE_TASK_ID} ${pheno_list_cts} )
 readonly pheno_list_binary="${pheno_dir}/curated_phenotypes_binary_header.tsv"
 readonly phenotype_binary=$( cut -f${SGE_TASK_ID} ${pheno_list_binary} )
 
-readonly out_prefix="${out_dir}/ukb_eur_ld_10k_${phenotype}"
-
 mkdir -p ${out_dir}
 
 fit_ld_matrix() 
 {
-  local sumstat="${sumstat_dir}/ukb_hapmap_500k_eur_${1}_combined.txt.gz"
+  local sumstat_file="${sumstat_dir}/ukb_hapmap_500k_eur_${1}.txt.gz"
+  local out_prefix="${out_dir}/ukb_eur_ld_10k_${1}"
   set_up_rpy
   set -x
   Rscript "${rscript}" \
-   --path_bed_ld "${bed}" \
-   --path_sumstat ${sumstat} \
+   --path_bed_ld "${bed_file}" \
+   --path_sumstat ${sumstat_file} \
    --out_prefix ${out_prefix}
   set +x
 }

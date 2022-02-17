@@ -10,7 +10,7 @@ library(argparse)
 
 main <- function(args){
 
-  stopifnot(file.exists(args$path_bed_pred))
+  print(args)
   stopifnot(file.exists(args$path_bed_ld))
   stopifnot(file.exists(args$path_sumstat))
 
@@ -20,7 +20,7 @@ main <- function(args){
   on.exit(file.remove(paste0(tmp, ".sbk")), add = TRUE)
 
   # load data required for setting up LD-matrix 
-  ld_data <- load_bigsnp_from_bed(args$path_ld_bed)
+  ld_data <- load_bigsnp_from_bed(args$path_bed_ld)
 
   # load summary statistics
   sumstats <- read_hail_sumstat(args$path_sumstat)
