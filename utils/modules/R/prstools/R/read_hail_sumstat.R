@@ -1,9 +1,10 @@
 #' @title read hail summary statistics
 #' @param path string file to summary statistics generated with HAIL
+#' @param remove_failed boolean. remove SNPs with NAs in betas?
 #' @return data.table of ldpred2 ready summary statistics
 #' @export
 
-read_hail_sumstat <- function(path){
+read_hail_sumstat <- function(path, remove_failed = TRUE){
   # Read summary statistics and format to reference
   # from hail to ldpred2 matching coluns.
   stopifnot(file.exists(path))
@@ -48,9 +49,11 @@ read_hail_sumstat <- function(path){
     # remove SNPs that did not converge and thus has NAs in beta values.
     convergence <- !is.na(sumstats$beta)
     n_unconverged <- sum(!convergence)
-    if (n_unconverged > 0){
+    n <- length(convergence)
+    if (n_unconverged > 0 & remove_failed){
         sumstats <- sumstats[convergence,]  
-        write(paste("Removed", n_unconverged, "variants that did not converge"),stderr())
+        write(paste("[Summary statistics]: Removed", n_unconverged,
+                    "of", n,"variants that did not converge"),stderr())
     }
 
     return(sumstats)
