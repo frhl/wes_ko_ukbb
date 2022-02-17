@@ -44,6 +44,14 @@ read_hail_sumstat <- function(path){
           INFO = NA,
           MAF = sumstats$MAF
       )
+    
+    # remove SNPs that did not converge and thus has NAs in beta values.
+    convergence <- !is.na(sumstats$beta)
+    n_unconverged <- sum(!convergence)
+    if (n_unconverged > 0){
+        sumstats <- sumstats[convergence,]  
+        write(paste("Removed", n_unconverged, "variants that did not converge"),stderr())
+    }
 
     return(sumstats)
 }
