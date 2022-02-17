@@ -28,7 +28,7 @@ load_bigsnp_from_bed <- function(bed, verbose = TRUE){
     POS2 <- snp_as_genetic_position(CHR, POS, mapdir = "data/prs/1000-genomes-genetic-maps",genetic_map = 'hapmap')
     if (verbose){
         matches <- sum(POS2==0)/length(POS2) # hapmap has many less missing variants than omni
-        write(paste0(100*(1-round(matches,5)),'% of variants are in genetic map (hapmap).'),stdout())
+        write(paste0(100*(1-round(matches,5)),'% of variants are in genetic map (hapmap).'),stderr())
     }
     return(invisible(list(G = G, POS = POS, POS2 = POS2, map = map, fam = big_snp$fam)))
 }
