@@ -30,8 +30,11 @@ readonly phenotype_binary=$( cut -f${SGE_TASK_ID} ${pheno_list_binary} )
 
 mkdir -p ${out_dir}
 
+
 fit_ld_matrix() 
 {
+  SECONDS=0
+  export OPENBLAS_NUM_THREADS=1 # avoid two levels of parallelization
   local sumstat_file="${sumstat_dir}/ukb_hapmap_500k_eur_${1}.txt.gz"
   local out_prefix="${out_dir}/ukb_eur_ld_10k_${1}"
   set_up_rpy
@@ -41,6 +44,7 @@ fit_ld_matrix()
    --path_sumstat ${sumstat_file} \
    --out_prefix ${out_prefix}
   set +x
+  log_runtime ${SECONDS}
 }
 
 fit_ld_matrix ${phenotype_binary}

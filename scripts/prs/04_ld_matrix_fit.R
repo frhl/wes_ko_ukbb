@@ -1,5 +1,6 @@
 
 # details: https://privefl.github.io/bigsnpr-extdoc/polygenic-scores-pgs.html
+# issues with parallel: https://github.com/privefl/bigstatsr/issues/90
 
 # wrote a package that contain all dependencies for runnign LDpred2
 # and combining various functions into easy to use pipelines. Note,
@@ -15,9 +16,8 @@ main <- function(args){
   stopifnot(file.exists(args$path_sumstat))
 
   # setup parallel environment
-  NCORES <- nb_cores()
-  tmp <- tempfile(tmpdir = "data/tmp/tmp-data")
-  on.exit(file.remove(paste0(tmp, ".sbk")), add = TRUE)
+  NCORES <- max(1, nb_cores())
+  bigparallelr::assert_cores(NCORES)
 
   # load data required for setting up LD-matrix 
   ld_data <- load_bigsnp_from_bed(args$path_bed_ld)
@@ -29,7 +29,7 @@ main <- function(args){
   info_snp <- snp_match(sumstats, ld_data$map, join_by_pos = TRUE, strand_flip = FALSE)
  
   # QC summary statistics based on LD reference
-  qc <- qc_binary_sumstat(ld_data$G, info_snp, NCORES)
+  qc <- qc_binary_sumstat(ld_data$G, info_snp, ncores = 1)
   beta_cols <- c("beta", "beta_se", "n_eff", "_NUM_ID_")
   well_behaved_snps <- (!qc$is_bad)
   df_beta <- info_snp[well_behaved_snps, beta_cols]
