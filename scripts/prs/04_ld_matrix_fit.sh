@@ -5,8 +5,8 @@
 #$ -o logs/ld_matrix_fit.log
 #$ -e logs/ld_matrix_fit.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 4
-#$ -q short.qc@@short.hge
+#$ -pe shmem 10
+#$ -q short.qc@@short.hga
 #$ -t 2
 #$ -V
 

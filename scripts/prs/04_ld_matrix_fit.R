@@ -18,6 +18,10 @@ main <- function(args){
   # setup parallel environment
   NCORES <- max(1, nb_cores())
   bigparallelr::assert_cores(NCORES)
+  
+  # required for LD matrix fitting
+  tmp <- tempfile(tmpdir = "data/tmp/tmp-data")
+  on.exit(file.remove(paste0(tmp, ".sbk")), add = TRUE)
 
   # load data required for setting up LD-matrix 
   ld_data <- load_bigsnp_from_bed(args$path_bed_ld)
@@ -36,9 +40,9 @@ main <- function(args){
 
   # get ld matrix. Note, that we need 60gb of memory to keep 
   # all the hapmap variants in memory
-  print("fitting ld matrix..")
+  write("Fitting ld matrix..", stdout())
   snp <- calc_ld_matrix(ld_data$G, ld_data$POS2, info_snp, chrs = 1:22, 
-                        ncores = NCORES)
+                        ncores = NCORES, tmp = tmp)
 
   outfile = paste0(args$out_prefix, ".rda")
   saveRDS(snp, file = outfile, compress = "xz")

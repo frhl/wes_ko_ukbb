@@ -5,38 +5,37 @@
 # and combining various functions into easy to use pipelines. Note,
 # that this will also load libraries, e.g. bigsnpr, bigassert
 devtools::load_all('utils/modules/R/prstools')
-
+library(argparse)
 
 main <- function(args){
 
+  print(args)
   stopifnot(file.exists(args$path_bed_pred))
-  stopifnot(file.exists(args$path_bed_ld))
+  stopifnot(file.exists(args$path_ld_matrix))
   stopifnot(file.exists(args$path_sumstat))
 
   # setup parallel environment
-  NCORES <- nb_cores()
-  tmp <- tempfile(tmpdir = "data/tmp/tmp-data")
-  on.exit(file.remove(paste0(tmp, ".sbk")), add = TRUE)
+  NCORES <- max(1, nb_cores())
+  bigparallelr::assert_cores(NCORES)
 
   # load data required for setting up LD-matrix 
-  ld_data <- load_bigsnp_from_bed(args$path_ld_bed)
+  pred_data <- load_bigsnp_from_bed(args$path_bed_bed)
 
   # load summary statistics
   sumstats <- read_hail_sumstat(args$path_sumstat)
   
-  # match summary stats and LD data
-  info_snp <- snp_match(sumstats, ld_data$map, join_by_pos = TRUE, strand_flip = FALSE)
+  # match summary stats with input data
+  info_snp <- snp_match(sumstats, pred_data$map, join_by_pos = TRUE, strand_flip = FALSE)
  
-  # QC summary statistics based on LD reference
-  qc <- qc_binary_sumstat(ld_data$G, info_snp)
+  # QC summary statistics based on input reference
+  qc <- qc_binary_sumstat(ld_data$G, info_snp, NCORES)
   beta_cols <- c("beta", "beta_se", "n_eff", "_NUM_ID_")
   well_behaved_snps <- (!qc$is_bad)
   df_beta <- info_snp[well_behaved_snps, beta_cols]
 
   # get ld matrix. Note, that we need 60gb of memory to keep 
   # all the hapmap variants in memory
-  snp <- calc_ld_matrix(ld_data$G, ld_data$POS2, info_snp, chrs = 1:22, 
-                        ncores = NCORES)
+  snp <- readRDS(args$path_ld_matrix)
 
   # perform ld regression
   ldsc <- with(df_beta, snp_ldsc(snp$ld, length(snp$ld), chi2 = (beta / beta_se)^2,
@@ -69,13 +68,12 @@ main <- function(args){
                                ncores = NCORES)
   # save results
   results <- data.table(
-    sid = NA, 
-    fid = NA,
+    sid = pred_data$fam$sample.ID, 
+    fid = pred_data$fam$sample.ID,
     pred_auto = final_pred_auto,
     pred_inf = final_red_inf
     )
 
-  #out_prefix <- tools::fil
   fwrite(resuts, file = paste0(out_prefix,".txt.gz"), sep = '\t')
   
 }
@@ -84,7 +82,7 @@ main <- function(args){
 parser <- ArgumentParser()
 parser$add_argument("--path_bed_pred", default=NULL, required = TRUE, help = "Path for plink file (bed)")
 parser$add_argument("--path_sumstat", default=NULL, required = TRUE, help = "Path to a summary statistics file with matching SNPs")
-parser$add_argument("--path_bed_ld", default=NULL, required = TRUE, help = "Path to .bed file used for calculating LD panel")
+parser$add_argument("--path_ld_matrix", default=NULL, required = TRUE, help = "Path to LD matrix (.rda / .rda file)")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()
 
