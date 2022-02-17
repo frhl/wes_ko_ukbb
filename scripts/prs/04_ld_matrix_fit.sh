@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+#
+#$ -N ld_matrix_fit
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#$ -o logs/ld_matrix_fit.log
+#$ -e logs/ld_matrix_fit.errors.log
+#$ -P lindgren.prjc
+#$ -pe shmem 4
+#$ -q short.qc@@short.hge
+#$ -t 2
+#$ -V
+
+source utils/bash_utils.sh
+source utils/qsub_utils.sh
+
+readonly rscript="scripts/prs/04_ld_matrix_fit.R"
+
+readonly bed_dir="data/prs/hapmap/ld"
+readonly pheno_dir="data/phenotypes"
+readonly sumstat_dir="data/prs/sumstat"
+readonly out_dir="data/prs/hapmad/ld"
+
+readonly bed="${plink_dir}/short_merged_ukb_hapmap_rand_10k_eur.bed"
+readonly pheno_file="${pheno_dir}/curated_phenotypes.tsv"
+
+readonly pheno_list_cts="${pheno_dir}/curated_phenotypes_cts_header.tsv"
+readonly phenotype_cts=$( cut -f${SGE_TASK_ID} ${pheno_list_cts} )
+readonly pheno_list_binary="${pheno_dir}/curated_phenotypes_binary_header.tsv"
+readonly phenotype_binary=$( cut -f${SGE_TASK_ID} ${pheno_list_binary} )
+
+readonly out_prefix="${out_dir}/ukb_eur_ld_10k_${phenotype}"
+
+mkdir -p ${out_dir}
+
+fit_ld_matrix() 
+{
+  local sumstat="${sumstat_dir}/ukb_hapmap_500k_eur_${1}_combined.txt.gz"
+  set_up_rpy
+  set -x
+  Rscript "${rscript}" \
+   --path_bed_ld "${bed}" \
+   --path_sumstat ${sumstat} \
+   --out_prefix ${out_prefix}
+  set +x
+}
+
+fit_ld_matrix ${phenotype_binary}
+
+
+
