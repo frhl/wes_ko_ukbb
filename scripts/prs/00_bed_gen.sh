@@ -6,8 +6,8 @@
 #$ -e logs/bed_gen.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 3
-#$ -q short.qc@@short.hge
-#$ -t 22
+#$ -q long.qc@@long.hge
+#$ -t 1-22
 #$ -V
 
 source utils/qsub_utils.sh
@@ -38,6 +38,8 @@ if [ ! -f "${out_prefix}.bed" ]; then
      --ancestry "eur" \
      --hapmap ${hap_file} \
      --filter_missing 0.05 \
+     --exclude_related \
+     --min_maf 0.01 \
      --liftover \
      --dbsnp \
      --out_prefix "${out_prefix}" \
