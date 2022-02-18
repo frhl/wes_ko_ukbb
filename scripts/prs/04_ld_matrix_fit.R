@@ -20,7 +20,7 @@ main <- function(args){
   bigparallelr::assert_cores(NCORES)
   
   # required for LD matrix fitting
-  sfbm_path <- paste0(args$out_prefix,'.sbk')
+  #sfbm_path <- paste0(args$out_prefix,'.sbk')
   #tmp <- tempfile(tmpdir = "data/tmp/tmp-data")
   #on.exit(file.remove(paste0(tmp, ".sbk")), add = TRUE)
 
@@ -37,6 +37,8 @@ main <- function(args){
   qc <- qc_binary_sumstat(ld_data$G, info_snp, NCORES)
   well_behaved_snps <- (!qc$is_bad)
   df_beta <- info_snp[well_behaved_snps, ] 
+  outfile_beta <- paste0(args$out_prefix, "_betas.txt.gz")
+  fwrite(df_beta, outfile_beta, sep = '\t')
 
   # get ld matrix. Note, that we need 60gb of memory to keep 
   # all the hapmap variants in memory
@@ -44,10 +46,10 @@ main <- function(args){
   snp_corr <- calc_ld_matrix(
                   ld_data$G, 
                   ld_data$POS2, 
-                  info_snp, 
+                  df_beta, 
                   chrs = 1:22, 
                   ncores = NCORES, 
-                  sfbm_file = sfbm_path)
+                  sfbm_file = args$out_prefix)
 
   # save with link to sfbm file
   outfile = paste0(args$out_prefix, ".rda")
@@ -63,12 +65,5 @@ parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where
 args <- parser$parse_args()
 
 main(args)
-
-
-
-
-
-
-
 
 

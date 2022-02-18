@@ -27,31 +27,6 @@ def main(args):
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
     
     mt = qc.get_table(input_path, input_type)
-    #else:
-    #    chrom = chrom.strip().split(' ')
-    #    if dataset in "imp":
-    #        mt = genotypes.get_ukb_imputed_v3_bgen(chroms=chrom)
-    #        if min_info:
-    #            ht = genotypes.get_ukb_parsed_imputed_v3_mfi(chroms=chrom)
-    #            mt = mt.annotate_rows(info_score = ht[(mt.locus, mt.alleles)].info)
-    #            mt = mt.filter_rows(mt.info_score >= float(min_info))
-    #    elif dataset in "calls":
-    #        mt = genotypes.get_ukb_genotypes_bed(chroms=chrom)
-    #    else:
-    #        raise TypeError(f"{dataset} is not 'imp' or 'calls'")
-    #    
-    #if extract_samples:
-    #    ht_samples = hl.import_table(extract_samples, no_header=True, key='f0', delimiter=',')
-    #    mt = mt.filter_cols(hl.is_defined(ht_samples[mt.col_key]))
-    # 
-    # if liftover:
-    #     mt = variants.liftover(mt, from_build='GRCh37', to_build='GRCh38', drop_annotations=True)
-    # 
-    #if hapmap:
-    #    ht = hl.read_table(hapmap)
-    #    ht = ht.key_by('locus_grch38')
-    #    mt = mt.filter_rows(hl.is_defined(ht[mt.locus]))
-    #
     if phenotypes:
         ht = hl.import_table(phenotypes,
                      types={'eid': hl.tstr},

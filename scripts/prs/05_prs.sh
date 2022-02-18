@@ -34,9 +34,9 @@ calc_prs_by_chrom()
   export OPENBLAS_NUM_THREADS=1 # avoid two levels of parallelization
   local phenotype=${1}
   local pred="${pred_dir}/ukb_hapmap_500k_eur_chrCHR.bed"
-  local ld="${ld_dir}/short_ukb_hapmap_rand_10k_eur_chrCHR.bed"
-  local sumstat="${sumstat_dir}/ukb_hapmap_500k_eur_${phenotype}_chrCHR.txt.gz"
-  local out_prefix="${out_dir}/ukb_eur_prs_${phenotype}_chrCHR"
+  local ld="${ld_dir}/ukb_eur_ld_10k_${phenotype}.rda"
+  local sumstat="${sumstat_dir}/ukb_hapmap_500k_eur_${phenotype}.txt.gz"
+  local out_prefix="${out_dir}/test_ukb_eur_prs_${phenotype}_chrCHR"
   set -x
   qsub -N "_prs_${phenotype}" \
     -t 21 \

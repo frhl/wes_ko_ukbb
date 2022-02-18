@@ -25,10 +25,11 @@ set_up_rpy
 set -x
 Rscript "${r_script}" \
     --chrom "${chr}" \
+    --corr_size "3e-3" \
     --path_bed_pred "${pred_chr}" \
     --path_ld_matrix "${ld_matrix_chr}" \
     --path_sumstat "${sumstat_chr}" \
-    --out_prefix "${out_prefix_chr}"
+    --out_prefix "${out_prefix_chr} "
 set +x
 #else
 #  echo "Note: ${out_prefix_chr} already exists!"
