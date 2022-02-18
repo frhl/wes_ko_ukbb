@@ -40,8 +40,8 @@ fit_ld_matrix()
   set_up_rpy
   set -x
   Rscript "${rscript}" \
-   --path_bed_ld "${bed_file}" \
-   --path_sumstat ${sumstat_file} \
+   --bed "${bed_file}" \
+   --gwas ${sumstat_file} \
    --out_prefix ${out_prefix}
   set +x
   log_runtime ${SECONDS}

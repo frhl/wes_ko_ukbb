@@ -12,23 +12,18 @@ library(argparse)
 main <- function(args){
 
   print(args)
-  stopifnot(file.exists(args$path_bed_ld))
-  stopifnot(file.exists(args$path_sumstat))
+  stopifnot(file.exists(args$bed))
+  stopifnot(file.exists(args$gwas))
 
   # setup parallel environment
   NCORES <- max(1, nb_cores())
   bigparallelr::assert_cores(NCORES)
   
-  # required for LD matrix fitting
-  #sfbm_path <- paste0(args$out_prefix,'.sbk')
-  #tmp <- tempfile(tmpdir = "data/tmp/tmp-data")
-  #on.exit(file.remove(paste0(tmp, ".sbk")), add = TRUE)
-
   # load data required for setting up LD-matrix 
-  ld_data <- load_bigsnp_from_bed(args$path_bed_ld)
+  ld_data <- load_bigsnp_from_bed(args$bed)
 
   # load summary statistics
-  sumstats <- read_hail_sumstat(args$path_sumstat)
+  sumstats <- read_hail_sumstat(args$gwas)
   
   # match summary stats and LD data
   info_snp <- snp_match(sumstats, ld_data$map, join_by_pos = TRUE, strand_flip = FALSE)
@@ -59,8 +54,8 @@ main <- function(args){
 
 # add arguments
 parser <- ArgumentParser()
-parser$add_argument("--path_sumstat", default=NULL, required = TRUE, help = "Path to a summary statistics file with matching SNPs")
-parser$add_argument("--path_bed_ld", default=NULL, required = TRUE, help = "Path to .bed file used for calculating LD panel")
+parser$add_argument("--gwas", default=NULL, required = TRUE, help = "Path to a summary statistics file with matching SNPs")
+parser$add_argument("--bed", default=NULL, required = TRUE, help = "Path to .bed file used for calculating LD panel")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()
 

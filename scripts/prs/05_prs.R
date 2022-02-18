@@ -9,6 +9,7 @@ library(argparse)
 
 main <- function(args){
 
+  print(args)
   stopifnot(file.exists(args$pred))
   stopifnot(file.exists(args$ld_matrix))
   stopifnot(file.exists(args$gwas)) 
@@ -39,7 +40,7 @@ main <- function(args){
   ldsc_int_est <- ldsc[['int']] 
 
   # Load new data for prediction
-  pred <- load_bigsnp_from_bed(args$path_bed_pred)
+  pred <- load_bigsnp_from_bed(args$pred)
   genotypes <- pred$G
 
   # ldpred2 inf model

@@ -17,8 +17,8 @@ readonly bash_script="scripts/prs/_prs.sh"
 readonly rscript="scripts/prs/05_prs.R"
 
 readonly pred_dir="data/prs/hapmap"
-readonly ld_dir="data/prs/hapmap/ld"
-readonly sumstat_dir="data/prs/sumstat"
+readonly gwas_dir="data/prs/hapmap/ld/corr"
+readonly ld_dir="data/prs/hapmap/ld/corr"
 readonly pheno_dir="data/phenotypes"
 readonly out_dir="data/prs/scores"
 
@@ -29,14 +29,16 @@ readonly phenotype_binary=$( cut -f${SGE_TASK_ID} ${pheno_list_binary} )
 
 mkdir -p ${out_dir}
 
+export OPENBLAS_NUM_THREADS=1 # avoid two levels of parallelization
+
 calc_prs_by_chrom()
 { 
-  export OPENBLAS_NUM_THREADS=1 # avoid two levels of parallelization
   local phenotype=${1}
   local pred="${pred_dir}/ukb_hapmap_500k_eur_chrCHR.bed"
-  local ld="${ld_dir}/ukb_eur_ld_10k_${phenotype}.rda"
-  local sumstat="${sumstat_dir}/ukb_hapmap_500k_eur_${phenotype}.txt.gz"
-  local out_prefix="${out_dir}/test_ukb_eur_prs_${phenotype}_chrCHR"
+  local prefix="${gwas_dir}/ukb_eu_10k_ld_${phenotype}"
+  local gwas="${prefix}_betas.txt.gz"
+  local ld_matrix="${prefix}.rda"
+  local out_prefix="${out_dir}/prs_${phenotype}_chrCHR"
   set -x
   qsub -N "_prs_${phenotype}" \
     -t 21 \
@@ -44,9 +46,9 @@ calc_prs_by_chrom()
     -pe shmem 1 \
     "${bash_script}" \
     "${rscript}" \
-    "${ld}" \
-    "${sumstat}" \
+    "${gwas}" \
     "${pred}" \
+    "${ld_matrix}" \
     "${out_prefix}"
   set +x 
 }
