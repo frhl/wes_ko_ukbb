@@ -20,7 +20,10 @@ main <- function(args){
   # Load LD matrix and qced betas
   snp <- readRDS(args$ld_matrix)
   gwas <- fread(args$gwas)
- 
+  
+  # check that LD and GWAS data was generated simultanously
+  stopifnot(length(snp$ld) == nrow(gwas))
+
   # perform LD regressio
   chi2 <- (gwas$beta / gwas$beta_se)^2
   ldsc <- with(gwas, 
