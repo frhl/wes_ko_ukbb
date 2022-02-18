@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N _summary_statistics
+#$ -N _gwas
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_summary_statistics.log
-#$ -e logs/_summary_statistics.errors.log
+#$ -o logs/_gwas.log
+#$ -e logs/_gwas.errors.log
 #$ -V
 
 source utils/bash_utils.sh

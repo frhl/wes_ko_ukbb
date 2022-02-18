@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N ld_matrix_gen
+#$ -N sample_bed
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/ld_matrix_gen.log
-#$ -e logs/ld_matrix_gen.errors.log
+#$ -o logs/sample_bed.log
+#$ -e logs/sample_bed.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 3
 #$ -q long.qc@@long.hga

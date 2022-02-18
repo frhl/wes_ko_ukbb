@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N summary_statistics
+#$ -N gwas
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/summary_statistics.log
-#$ -e logs/summary_statistics.errors.log
+#$ -o logs/gwas.log
+#$ -e logs/gwas.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc@@short.hga
@@ -22,9 +22,9 @@ readonly in_dir="data/prs/hapmap"
 readonly pheno_dir="data/phenotypes"
 readonly out_dir="data/prs/sumstat/new_n"
 
-readonly bash_script="scripts/prs/_summary_statistics.sh"
-readonly hail_script="scripts/prs/03_summary_statistics.py"
-readonly merge_script="scripts/prs/_summary_statistics_merge.sh"
+readonly bash_script="scripts/prs/_gwas.sh"
+readonly hail_script="scripts/prs/03_gwas.py"
+readonly merge_script="scripts/prs/_gwas_merge.sh"
 
 readonly covar_file="${pheno_dir}/covars1.csv"
 readonly covariates=$( cat ${covar_file} )
@@ -38,10 +38,7 @@ readonly phenotype_cts=$( cut -f${SGE_TASK_ID} ${pheno_list_cts} )
 readonly pheno_list_binary="${pheno_dir}/curated_phenotypes_binary_header.tsv"
 readonly phenotype_binary=$( cut -f${SGE_TASK_ID} ${pheno_list_binary} )
 
-#readonly out_prefix="${out_dir}/ukb_hapmap_500k_eur_${phenotype}"
-#readonly prefix="${out_prefix}_chrCHR"
-
-submit_sumstat_job()
+submit_gwas_job()
 {
   mkdir -p ${out_dir}
   local phenotype="${1}"

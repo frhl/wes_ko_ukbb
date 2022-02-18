@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N ld_matrix_merge
+#$ -N merge_bed
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/ld_matrix_merge.log
-#$ -e logs/ld_matrix_merge.errors.log
+#$ -o logs/merge_bed.log
+#$ -e logs/merge_bed.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 6
 #$ -q short.qc@@short.hge
@@ -19,7 +19,7 @@ readonly in_prefix="${in_dir}/short_ukb_hapmap_rand_10k_eur_chr"
 readonly out_dir="data/prs/hapmap/ld"
 readonly out_prefix="${out_dir}/short_merged_ukb_hapmap_rand_10k_eur"
 
-readonly hail_script="scripts/prs/00_ld_matrix_merge.py"
+readonly hail_script="scripts/prs/02_merge_bed.py"
 readonly spark_dir="data/tmp/spark_dir"
 
 mkdir -p ${out_dir}
