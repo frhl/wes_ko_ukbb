@@ -19,15 +19,15 @@ readonly pred_chr=$(echo ${pred} | sed -e "s/CHR/${chr}/g")
 readonly out_prefix_chr=$(echo ${prefix} | sed -e "s/CHR/${chr}/g")
 
 set_up_rpy
-#if [ ! -f "${out_prefix_chr}.txt.gz" ]; then
-set -x
-Rscript "${r_script}" \
-    --gwas "${gwas}" \
-    --pred "${pred_chr}" \
-    --ld_matrix "${ld_matrix}" \
-    --out_prefix "${out_prefix_chr} "
-set +x
-#else
-#  echo "Note: ${out_prefix_chr} already exists!"
-#fi
+if [ ! -f "${out_prefix_chr}.txt.gz" ]; then
+  set -x
+  Rscript "${r_script}" \
+      --gwas "${gwas}" \
+      --pred "${pred_chr}" \
+      --ld_matrix "${ld_matrix}" \
+      --out_prefix "${out_prefix_chr}"
+  set +x
+else
+  echo "Note: ${out_prefix_chr} already exists. Skipping.."
+fi
 

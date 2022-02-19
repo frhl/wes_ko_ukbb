@@ -13,10 +13,10 @@ source utils/qsub_utils.sh
 source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
-readonly in_dir="data/prs/hapmap/ld"
+readonly in_dir="data/prs/hapmap/ld/new_ld"
 readonly in_prefix="${in_dir}/short_ukb_hapmap_rand_10k_eur_chr"
 
-readonly out_dir="data/prs/hapmap/ld"
+readonly out_dir="data/prs/hapmap/ld/new_ld"
 readonly out_prefix="${out_dir}/short_merged_ukb_hapmap_rand_10k_eur"
 
 readonly hail_script="scripts/prs/02_merge_bed.py"

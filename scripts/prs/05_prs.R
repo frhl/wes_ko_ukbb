@@ -24,6 +24,11 @@ main <- function(args){
   
   # check that LD and GWAS data was generated simultanously
   stopifnot(length(snp$ld) == nrow(gwas))
+  
+  # LD-score gives an estimate of h2 for a SNP which we can multiply 
+  # by the total number of SNPs. Thus we are better off amalgamating all
+  # the SNPs and running that through ldsc and thus avoiding extratpolating
+  # that the average h2 explained by snps on chrN extends to all chromosomes 
 
   # perform LD regressio
   chi2 <- (gwas$beta / gwas$beta_se)^2
@@ -99,8 +104,8 @@ main <- function(args){
     prs = final_pred_inf$prs
     )
 
-  fwrite(PGS, file = paste0(out_prefix,".txt.gz"), sep = '\t')
-  fwrite(model, file = paste0(out_prefix,".model"), sep = '\t')
+  fwrite(PGS, file = paste0(args$out_prefix,".txt.gz"), sep = '\t')
+  fwrite(model, file = paste0(args$out_prefix,".model"), sep = '\t')
   
 }
 

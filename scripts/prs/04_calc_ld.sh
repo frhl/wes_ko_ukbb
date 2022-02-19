@@ -5,9 +5,8 @@
 #$ -o logs/calc_ld.log
 #$ -e logs/cal_ld.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 10
+#$ -pe shmem 1
 #$ -q short.qc@@short.hga
-#$ -t 2
 #$ -V
 
 source utils/bash_utils.sh
@@ -41,8 +40,8 @@ fit_ld_matrix()
   set -x
   Rscript "${rscript}" \
    --bed "${bed_file}" \
-   --gwas ${sumstat_file} \
-   --out_prefix ${out_prefix}
+   --gwas "${sumstat_file}" \
+   --out_prefix "${out_prefix}"
   set +x
   log_runtime ${SECONDS}
 }
