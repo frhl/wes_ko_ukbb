@@ -45,54 +45,58 @@ main <- function(args){
 
   # ldpred2 inf model
   beta_inf <- snp_ldpred2_inf(snp$corr, gwas, ldsc_h2_est)
-  final_pred_inf <- big_prodVec(
-     genotypes, 
-     beta_inf, 
-     ind.col = gwas$`_NUM_ID_`)  
+  final_pred_inf <- predict_prs(
+       obj = pred,
+       gwas = gwas,
+       effects = beta_inf,
+       ncores = NCORES)
+
+  #final_pred_inf <- big_prodVec(
+  #   genotypes, 
+  #   beta_inf, 
+  #   ind.col = gwas$`_NUM_ID_`)  
   
   # ldpred2 auto model
-  multi_auto <- snp_ldpred2_auto(
-     snp$corr, 
-     gwas, 
-     h2_init = ldsc_h2_est,
-     vec_p_init = seq_log(1e-4, 0.5, 30),
-     ncores = NCORES)  
+  #multi_auto <- snp_ldpred2_auto(
+  #   snp$corr, 
+  #   gwas, 
+  #   h2_init = ldsc_h2_est,
+  #   vec_p_init = seq_log(1e-4, 0.5, 30),
+  #   ncores = NCORES)  
   
   # run first estimates
-  beta_auto <- sapply(multi_auto, function(auto) auto$beta_est)
-  pred_auto <- big_prodMat(
-      genotypes, 
-      beta_auto, 
-      ind.col = gwas[["_NUM_ID_"]],
-      ncores = NCORES)
+  #beta_auto <- sapply(multi_auto, function(auto) auto$beta_est)
+  #pred_auto <- big_prodMat(
+  #    genotypes, 
+  #    beta_auto, 
+  #    ind.col = gwas[["_NUM_ID_"]],
+  #    ncores = NCORES)
   
   # quality controls on chains
-  sc <- apply(pred_auto, 2, sd)
-  keep <- abs(sc - median(sc)) < 3 * mad(sc)
-  final_beta_auto <- rowMeans(beta_auto[, keep])
+  #sc <- apply(pred_auto, 2, sd)
+  #keep <- abs(sc - median(sc)) < 3 * mad(sc)
+  #final_beta_auto <- rowMeans(beta_auto[, keep])
 
   # run final estimates
-  final_pred_auto <- big_prodVec(
-      genotypes, final_beta_auto,
-      ind.col = gwas[["_NUM_ID_"]],
-      ncores = NCORES)
+    
+  #final_pred_auto <- big_prodVec(
+  #    genotypes, final_beta_auto,
+  #    ind.col = gwas[["_NUM_ID_"]],
+  #    ncores = NCORES)
 
   # save parameters 
   model <- data.table(
-     n_samples = nrow(gwas$n),
+     n_samples = unique(gwas$n),
      n_snps = nrow(gwas),
-     ld_est_size_limit = corr_size,   
      ldsc_h2_est = ldsc_h2_est,
      ldsc_int_est = ldsc_int_est,
-     inflation = calc_inflation(betas$P)
+     inflation = calc_inflation(gwas$P)
      )
   
   # save results
   PGS <- data.table(
-    sid = pred$fam$sample.ID, 
-    fid = pred$fam$sample.ID,
-    pred_auto = final_pred_auto,
-    pred_inf = final_red_inf
+    sid = final_pred_inf$sid, 
+    prs = final_pred_inf$prs
     )
 
   fwrite(PGS, file = paste0(out_prefix,".txt.gz"), sep = '\t')

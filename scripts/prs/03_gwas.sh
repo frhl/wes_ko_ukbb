@@ -18,9 +18,9 @@ module purge
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
-readonly in_dir="data/prs/hapmap"
+readonly in_dir="data/prs/hapmap/ukb_500k"
 readonly pheno_dir="data/phenotypes"
-readonly out_dir="data/prs/sumstat/new_n"
+readonly out_dir="data/prs/sumstat/new_gwas"
 
 readonly bash_script="scripts/prs/_gwas.sh"
 readonly hail_script="scripts/prs/03_gwas.py"
@@ -76,7 +76,7 @@ submit_merge_job()
 
 }
 
-submit_sumstat_job "${phenotype_binary}"
+submit_gwas_job "${phenotype_binary}"
 
 
 
