@@ -18,7 +18,7 @@ readonly bed_dir="data/prs/hapmap/ld/unrel_eur_10k"
 readonly bed_file="${bed_dir}/short_merged_ukb_hapmap_rand_10k_eur.bed"
 
 readonly out_dir="data/prs/hapmap/ld/matrix"
-readonly out_prefix="${out_dir}/ld_matrix_unrel_eur"
+readonly out_prefix="${out_dir}/ld_matrix"
 
 mkdir -p ${out_dir}
 

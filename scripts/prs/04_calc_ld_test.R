@@ -36,7 +36,8 @@ main <- function(args){
               size = 3/1000
           )
       saveRDS(corr0, paste0(args$out_prefix, "_",chr,".rda"), compress = "xz")
-      fwrite(ld_data$map[ind.chr, ], paste0(args$out_prefix, "_",chr,'txt.gz'))
+      fwrite(ld_data$map[ind.chr, ], paste0(args$out_prefix, "_",chr,'.txt.gz'))
+
       #if (chr == "chr1") {
       #    ld <- Matrix::colSums(corr0^2)
       #    corr <- as_SFBM(corr0, args$out_prefix)
