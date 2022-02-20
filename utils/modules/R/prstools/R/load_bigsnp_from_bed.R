@@ -6,9 +6,13 @@
 load_bigsnp_from_bed <- function(bed, verbose = TRUE){
     
     # Read from bed/bim/fam, it generates .bk and .rds files.
+    #tmp <- tempfile(tmpdir = "data/tmp/tmp-data")
+    #on.exit(file.remove(paste0(tmp, ".sbk")), add = TRUE)
+    
     if (!file.exists.ext(bed, '.bk')) snp_readBed(bed)
     basename <- tools::file_path_sans_ext(bed)
     rds <- paste0(basename,'.rds')
+    if (!file.exists(rds)) stop(paste(rds, "was not found? Check snp_readBED?"))
     big_snp <- snp_attach(rds)
 
     # extract the SNP information from the genotype
@@ -30,7 +34,7 @@ load_bigsnp_from_bed <- function(bed, verbose = TRUE){
         matches <- sum(POS2==0)/length(POS2) # hapmap has many less missing variants than omni
         write(paste0(100*(1-round(matches,5)),'% of variants are in genetic map (hapmap).'),stderr())
     }
-    return(invisible(list(G = G, POS = POS, POS2 = POS2, map = map, fam = big_snp$fam)))
+    return(invisible(list(G = G, POS = POS, POS2 = POS2, map = map, fam = big_snp$fam, bigsnp = big_snp)))
 }
 
 

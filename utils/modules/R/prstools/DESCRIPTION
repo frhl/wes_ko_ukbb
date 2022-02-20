@@ -19,8 +19,13 @@ Suggests:
     testthat (>= 2.1.0)
 RoxygenNote: 7.1.2
 Collate:
+    'calc_inflation.R'
     'calc_ld_matrix.R'
+    'calc_single_ld_matrix.R'
+    'get_ldpred_marker.R'
     'load_bigsnp_from_bed.R'
     'misc.R'
+    'predict_prs.R'
     'read_hail_sumstat.R'
+    'qc_binary_sumstat'
     'snp_as_genetic_position.R'
