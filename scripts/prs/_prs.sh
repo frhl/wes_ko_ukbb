@@ -11,8 +11,9 @@ source utils/bash_utils.sh
 readonly r_script=${1?Error: Missing arg1 (r_script)}
 readonly gwas=${2?Error: Missing arg2 (sumstat)}
 readonly pred=${3?Error: Missing arg3 (prediction file)}
-readonly ld_matrix=${4?Error: Missing arg2 (ld_matrix)}
-readonly prefix=${5?Error: Missing arg8 (prefix)}
+readonly ld_bed=${4?Error: Missing arg2 (ld_matrix)}
+readonly ld_dir=${5?Error: Missing arg2 (ld_matrix)}
+readonly prefix=${6?Error: Missing arg8 (prefix)}
 
 readonly chr="${SGE_TASK_ID}"
 readonly pred_chr=$(echo ${pred} | sed -e "s/CHR/${chr}/g")
@@ -24,7 +25,8 @@ if [ ! -f "${out_prefix_chr}.txt.gz" ]; then
   Rscript "${r_script}" \
       --gwas "${gwas}" \
       --pred "${pred_chr}" \
-      --ld_matrix "${ld_matrix}" \
+      --ld_bed "${ld_bed}" \
+      --ld_dir "${ld_dir}" \
       --out_prefix "${out_prefix_chr}"
   set +x
 else

@@ -11,17 +11,27 @@ main <- function(args){
 
   print(args)
   stopifnot(file.exists(args$pred))
-  stopifnot(file.exists(args$ld_matrix))
   stopifnot(file.exists(args$gwas)) 
+  stopifnot(file.exists(args$ld_bed))
+  stopifnot(dir.exists(args$ld_dir))
 
   # setup parallel environment
   NCORES <- max(1, nb_cores())
   bigparallelr::assert_cores(NCORES)
   
-  # Load LD matrix and qced betas
-  snp <- readRDS(args$ld_matrix)
+  # Load LD matrix and summary statistics
+  ld_data <- load_bigsnp_from_bed(args$ld_bed)
   gwas <- fread(args$gwas)
   
+  # qc summary statistics
+  qc <- qc_binary_sumstat(ld_data$G, info_snp, NCORES)
+  well_behaved_snps <- (!qc$is_bad)
+  gwas <- info_snp[well_behaved_snps, ]
+  gwas$marker <- get_ldpred_marker(gwas)
+
+  # Get LD matrix for final SNPs
+  snp <- get_ld_matrix(gwas, ld_dir = args$ld_dir)
+
   # check that LD and GWAS data was generated simultanously
   stopifnot(length(snp$ld) == nrow(gwas))
   
@@ -113,7 +123,8 @@ main <- function(args){
 parser <- ArgumentParser()
 parser$add_argument("--gwas", default=NULL, required = TRUE, help = "Path to QCed SNPs")
 parser$add_argument("--pred", default=NULL, required = TRUE, help = "Path to plink (bed) for PGS prediction")
-parser$add_argument("--ld_matrix", default=NULL, required = TRUE, help = "Path to LD matrix (.rda / .rda file)")
+parser$add_argument("--ld_bed", default=NULL, required = TRUE, help = "Path to plink file (bed) used to design LD-matrix")
+parser$add_argument("--ld_dir", default=NULL, required = TRUE, help = "Path to directory with pre-calcualted SNP correlations and LD (.rds files)")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()
 

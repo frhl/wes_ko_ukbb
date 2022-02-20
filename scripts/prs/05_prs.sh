@@ -16,11 +16,14 @@ source utils/qsub_utils.sh
 readonly bash_script="scripts/prs/_prs.sh"
 readonly rscript="scripts/prs/05_prs.R"
 
-readonly pred_dir="data/prs/hapmap"
-readonly gwas_dir="data/prs/hapmap/ld/corr"
-readonly ld_dir="data/prs/hapmap/ld/corr"
+readonly pred_dir="data/prs/hapmap/ukb_500k"
+readonly gwas_dir="data/prs/sumstat"
+readonly bed_dir="data/prs/hapmap/ld/unrel_eur_10k"
+readonly ld_dir="data/prs/hapmap/ld/matrix"
 readonly pheno_dir="data/phenotypes"
-readonly out_dir="data/prs/scores"
+readonly out_dir="data/prs/scores/test2"
+
+readonly ld_bed="${bed_dir}/short_merged_ukb_hapmap_rand_10k_eur.bed"
 
 readonly pheno_list_cts="${pheno_dir}/curated_phenotypes_cts_header.tsv"
 readonly phenotype_cts=$( cut -f${SGE_TASK_ID} ${pheno_list_cts} )
@@ -35,20 +38,19 @@ calc_prs_by_chrom()
 { 
   local phenotype=${1}
   local pred="${pred_dir}/ukb_hapmap_500k_eur_chrCHR.bed"
-  local prefix="${gwas_dir}/ukb_eu_10k_ld_${phenotype}"
-  local gwas="${prefix}_betas.txt.gz"
-  local ld_matrix="${prefix}.rda"
+  local gwas="${gwas_dir}/ukb_hapmap_500k_eur_${phenotype}.txt.gz"
   local out_prefix="${out_dir}/prs_${phenotype}_chrCHR"
   set -x
   qsub -N "_prs_${phenotype}" \
-    -t 7 \
+    -t 21 \
     -q short.qc@@short.hge \
     -pe shmem 1 \
     "${bash_script}" \
     "${rscript}" \
     "${gwas}" \
     "${pred}" \
-    "${ld_matrix}" \
+    "${ld_bed}" \
+    "${ld_dir}" \
     "${out_prefix}"
   set +x 
 }
