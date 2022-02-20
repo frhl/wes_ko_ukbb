@@ -14,11 +14,11 @@ source utils/qsub_utils.sh
 
 readonly rscript="scripts/prs/04_calc_ld_test.R"
 
-readonly bed_dir="data/prs/hapmap/ld"
+readonly bed_dir="data/prs/hapmap/ld/unrel_eur_10k"
 readonly bed_file="${bed_dir}/short_merged_ukb_hapmap_rand_10k_eur.bed"
 
-readonly out_dir="data/prs/hapmap/ld/corr"
-readonly out_prefix="${out_dir}/ld_matrix"
+readonly out_dir="data/prs/hapmap/ld/matrix"
+readonly out_prefix="${out_dir}/ld_matrix_unrel_eur"
 
 mkdir -p ${out_dir}
 

@@ -37,13 +37,13 @@ main <- function(args){
           )
       saveRDS(corr0, paste0(args$out_prefix, "_",chr,".rda"), compress = "xz")
       fwrite(ld_data$map[ind.chr, ], paste0(args$out_prefix, "_",chr,'txt.gz'))
-      if (chr == "chr1") {
-          ld <- Matrix::colSums(corr0^2)
-          corr <- as_SFBM(corr0, args$out_prefix)
-      } else {
-          ld <- c(ld, Matrix::colSums(corr0^2))
-          corr$add_columns(corr0, nrow(corr))
-      }
+      #if (chr == "chr1") {
+      #    ld <- Matrix::colSums(corr0^2)
+      #    corr <- as_SFBM(corr0, args$out_prefix)
+      #} else {
+      #    ld <- c(ld, Matrix::colSums(corr0^2))
+      #    corr$add_columns(corr0, nrow(corr))
+      #}
   }  
  
   snp_corr <- (list(ld = ld, corr = corr))

@@ -5,19 +5,20 @@
 #$ -o logs/calc_ld.log
 #$ -e logs/cal_ld.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 1
+#$ -pe shmem 5
 #$ -q short.qc@@short.hga
+#$ -t 2
 #$ -V
 
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
-readonly rscript="scripts/prs/04_cald_ld.R"
+readonly rscript="scripts/prs/04_calc_ld.R"
 
-readonly bed_dir="data/prs/hapmap/ld"
+readonly bed_dir="data/prs/hapmap/ld/unrel_eur_10k"
 readonly pheno_dir="data/phenotypes"
 readonly sumstat_dir="data/prs/sumstat"
-readonly out_dir="data/prs/hapmap/ld/corr"
+readonly out_dir="data/prs/hapmap/ld/matrix"
 
 readonly bed_file="${bed_dir}/short_merged_ukb_hapmap_rand_10k_eur.bed"
 readonly pheno_file="${pheno_dir}/curated_phenotypes.tsv"
@@ -35,7 +36,7 @@ fit_ld_matrix()
 {
   SECONDS=0
   local sumstat_file="${sumstat_dir}/ukb_hapmap_500k_eur_${1}.txt.gz"
-  local out_prefix="${out_dir}/ldpred2_${1}"
+  local out_prefix="${out_dir}/ldpred2_ld_${1}"
   set_up_rpy
   set -x
   Rscript "${rscript}" \
