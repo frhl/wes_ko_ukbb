@@ -3,7 +3,7 @@
 #$ -N calc_ld
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/calc_ld.log
-#$ -e logs/cal_ld.errors.log
+#$ -e logs/calc_ld.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 5
 #$ -q short.qc@@short.hga

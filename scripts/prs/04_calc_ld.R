@@ -34,7 +34,8 @@ main <- function(args){
   df_beta <- info_snp[well_behaved_snps, ] 
   outfile_beta <- paste0(args$out_prefix, "_betas.txt.gz")
   fwrite(df_beta, outfile_beta, sep = '\t')
-
+ 
+  print("test")
   # get ld matrix. Note, that we need 60gb of memory to keep 
   # all the hapmap variants in memory
   write("Fitting ld matrix..", stdout())
