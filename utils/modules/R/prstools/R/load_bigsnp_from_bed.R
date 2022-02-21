@@ -9,10 +9,20 @@ load_bigsnp_from_bed <- function(bed, verbose = TRUE){
     #tmp <- tempfile(tmpdir = "data/tmp/tmp-data")
     #on.exit(file.remove(paste0(tmp, ".sbk")), add = TRUE)
     
+
     if (!file.exists.ext(bed, '.bk')) snp_readBed(bed)
     basename <- tools::file_path_sans_ext(bed)
     rds <- paste0(basename,'.rds')
-    if (!file.exists(rds)) stop(paste(rds, "was not found? Check snp_readBED?"))
+    
+    # if the bk file exists but not the rds, then re-read SNP
+    if (!file.exists(rds)) {
+       write("rds file not available. Retrying snp_readBED", stderr())
+       bk <- paste0(basename, ".bk")
+       unlink(bk)
+       snp_readBed(bed)
+    }
+    
+    # attach to the file to current session
     big_snp <- snp_attach(rds)
 
     # extract the SNP information from the genotype

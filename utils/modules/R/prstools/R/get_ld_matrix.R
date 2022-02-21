@@ -5,15 +5,15 @@
 #' @param sfbm_file where should the LD-matrix backing file be stored?
 #' @export
 
-calc_ld_matrix2 <- function(info_snp, chrs = 1:22, sfbm_file = tempfile(), ld_dir = "data/prs/hapmap/ld/matrix"){
+get_ld_matrix <- function(info_snp, chrs = 1:22, sfbm_file = tempfile(), ld_dir = "data/prs/hapmap/ld/matrix", verbose = FALSE){
 
     chrs <- paste0("chr",chrs)
     first_chr <- chrs[1]
     for (chr in chrs) {
-        write(paste0("Retriving LD for chrom ",chr),stderr())
-        
+        start_time <- Sys.time()
+
         # paths to ld-matrix
-        path_rds <- file.path(ld_dir, paste0("ld_matrix_",chr,".rda"))
+        path_rds <- file.path(ld_dir, paste0("ld_matrix_",chr,".rds"))
         path_map <- file.path(ld_dir, paste0("ld_matrix_",chr,".txt.gz"))
         
         # retrieve correlation matrix
@@ -37,6 +37,10 @@ calc_ld_matrix2 <- function(info_snp, chrs = 1:22, sfbm_file = tempfile(), ld_di
             corr$add_columns(corr0, nrow(corr))
             outmap <- rbind(outmap, matched_map)
         }
+        
+        end_time <- Sys.time()
+        elapsed <- round(end_time - start_time,1) 
+        if (verbose) write(paste0("Retrived LD for ",chr," [",elapsed,"s]"),stdout())
     }
     return(list(ld = ld, corr = corr, map = outmap))
 }

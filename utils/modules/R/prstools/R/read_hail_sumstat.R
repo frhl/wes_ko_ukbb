@@ -4,10 +4,11 @@
 #' @return data.table of ldpred2 ready summary statistics
 #' @export
 
-read_hail_sumstat <- function(path, remove_failed = TRUE){
+read_hail_sumstat <- function(path, trait, remove_failed = TRUE){
   # Read summary statistics and format to reference
   # from hail to ldpred2 matching coluns.
   stopifnot(file.exists(path))
+  stopifnot(trait %in% c("binary", "cts"))
 
   sumstats <- bigreadr::fread2(path)
   colnames(sumstats)[colnames(sumstats)=="n_total"] <- 'n' # tmp fix
@@ -31,6 +32,16 @@ read_hail_sumstat <- function(path, remove_failed = TRUE){
   # calculate MAF
   sumstats$MAF <- unlist(lapply(sumstats$AF, function(af) min(af, 1-af)))
  
+  if (trait %in% "binary"){
+     n_case <- as.numeric(unique(sumstats$n_cases))
+     n_control <- as.numeric(unique(sumstats$n) - n_case)
+     stopifnot(length(c(n_case, n_control)) == 2)
+     n_eff_final <- 4 / ((1 / n_control) + (1 / n_case))
+  } else {
+     n_eff_final <- sumstats$n
+  }
+  
+  # re-create clean summary stat matrix 
   sumstats <-
       data.table(
           chr = sumstats$chr,
@@ -38,7 +49,7 @@ read_hail_sumstat <- function(path, remove_failed = TRUE){
           rsid = sumstats$rsid,
           a1 = sumstats$a1,
           a0 = sumstats$a0,
-          n_eff = sumstats$n,
+          n_eff = n_eff_final,
           beta_se = sumstats$standard_error,
           p = sumstats$p_value,
           beta = sumstats$beta,
@@ -46,6 +57,7 @@ read_hail_sumstat <- function(path, remove_failed = TRUE){
           MAF = sumstats$MAF
       )
     
+   
     # remove SNPs that did not converge and thus has NAs in beta values.
     convergence <- !is.na(sumstats$beta)
     n_unconverged <- sum(!convergence)

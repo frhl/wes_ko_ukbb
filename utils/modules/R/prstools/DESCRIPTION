@@ -27,5 +27,5 @@ Collate:
     'misc.R'
     'predict_prs.R'
     'read_hail_sumstat.R'
-    'qc_binary_sumstat'
+    'qc_binary_sumstat.R'
     'snp_as_genetic_position.R'
