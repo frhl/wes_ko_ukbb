@@ -26,11 +26,17 @@ load_bigsnp_from_bed <- function(bed, verbose = TRUE){
     big_snp <- snp_attach(rds)
 
     # extract the SNP information from the genotype
+    autosomes <- paste0('chr',1:22)
     map <- big_snp$map[-3]
     names(map) <- c("chr", "rsid", "pos", "a1", "a0")
+    
+    #  check for odd chromsome contigs (usually remnants of liftover)
+    odd_contig <- unique(map$chr[!map$chr %in% autosomes])
+    odd_contig <- paste0(odd_contig, collapse = '|')
+    warning(paste0("non standard chromosome contig excluded: ", odd_contig))
 
-    # remove non-autosomes (e.g. chr8_KI270821v1_alt)
-    autosomes <- paste0('chr',1:22)
+    # remove non-standard chromosome contigs
+    map <- map[map$chr %in% autosomes,]
     big_snp$map <- big_snp$map[big_snp$map$chr %in% autosomes,]
     G <- big_snp$genotypes
 
