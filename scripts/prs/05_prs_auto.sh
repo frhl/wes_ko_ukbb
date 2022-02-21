@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N prs
+#$ -N prs_auto
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/prs.log
-#$ -e logs/prs.errors.log
+#$ -o logs/prs_auto.log
+#$ -e logs/prs_auto.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
@@ -32,7 +32,7 @@ readonly pheno_list_binary="${pheno_dir}/curated_phenotypes_binary_header.tsv"
 readonly phenotype_binary=$( cut -f${SGE_TASK_ID} ${pheno_list_binary} )
 
 # what ldpred2 method should be used ("auto" or "inf")
-readonly method="inf"
+readonly method="auto"
 
 # what trait is being considered? This affects how n_eff is 
 # calculated. Should be either "binary" or "cts"
@@ -47,9 +47,9 @@ calc_prs_by_chrom()
   local phenotype=${1}
   local pred="${pred_dir}/ukb_hapmap_500k_eur_chrCHR.bed"
   local gwas="${gwas_dir}/ukb_hapmap_500k_eur_${phenotype}.txt.gz"
-  local out_prefix="${out_dir}/prs_inf_${phenotype}_chrCHR"
+  local out_prefix="${out_dir}/prs_auto_${phenotype}_chrCHR"
   set -x
-  qsub -N "_prs_${phenotype}" \
+  qsub -N "_prs_a_${phenotype}" \
     -t 21 \
     -q short.qc@@short.hga \
     -pe shmem 2 \

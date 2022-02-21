@@ -35,11 +35,13 @@ main <- function(args){
   gwas$marker <- get_ldpred_marker(gwas)
 
   # Get LD matrix for final SNPs
-  snp <- get_ld_matrix(gwas, ld_dir = args$ld_dir)
+  snp <- get_single_ld_matrix(gwas, chr = args$chrom, ld_dir = args$ld_dir)
  
   # match GWAS with snp-map
   indicies <- na.omit(match(snp$map$marker, gwas$marker))
   gwas <- gwas[indicies,]
+
+  print(nrow(gwas))
 
   # check that LD-matrix markers and gwas markers have overlap
   # Check that ordering of markers are actually matching
@@ -148,6 +150,7 @@ main <- function(args){
 # add arguments
 parser <- ArgumentParser()
 parser$add_argument("--method", default=NULL, required = TRUE, help = "either 'inf' or 'auto'")
+parser$add_argument("--chrom", default=NULL, required = TRUE, help = "what chromosome")
 parser$add_argument("--trait", default=NULL, required = TRUE, help = "either 'binary' or 'cts'")
 parser$add_argument("--gwas", default=NULL, required = TRUE, help = "Path to QCed SNPs")
 parser$add_argument("--pred", default=NULL, required = TRUE, help = "Path to plink (bed) for PGS prediction")

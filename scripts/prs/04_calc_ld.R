@@ -13,7 +13,6 @@ main <- function(args){
 
   print(args)
   stopifnot(file.exists(args$bed))
-  stopifnot(file.exists(args$gwas))
 
   # setup parallel environment
   NCORES <- max(1, nb_cores())
@@ -21,42 +20,50 @@ main <- function(args){
   
   # load data required for setting up LD-matrix 
   ld_data <- load_bigsnp_from_bed(args$bed)
+  POS2 = ld_data$POS2
+  G = ld_data$G
 
-  # load summary statistics
-  sumstats <- read_hail_sumstat(args$gwas)
-  
-  # match summary stats and LD data
-  info_snp <- snp_match(sumstats, ld_data$map, join_by_pos = TRUE, strand_flip = FALSE)
-   
-  #QC summary statistics based on LD reference
-  qc <- qc_binary_sumstat(ld_data$G, info_snp, NCORES)
-  well_behaved_snps <- (!qc$is_bad)
-  df_beta <- info_snp[well_behaved_snps, ] 
-  outfile_beta <- paste0(args$out_prefix, "_betas.txt.gz")
-  fwrite(df_beta, outfile_beta, sep = '\t')
+  chrs <- paste0("chr",1:22)
+  for (chr in chrs) {
+      write(paste('Calculating LD for',chr,'..'),stderr())
+      ind.chr <- which(ld_data$map$chr == chr)
+      stopifnot(length(ind.chr) > 0)
+      corr0 <- snp_cor(
+              G,
+              ind.col = ind.chr,
+              ncores = NCORES,
+              infos.pos = POS2[ind.chr],
+              size = 3/1000
+          )
+      if (!is.null(args$compress)){
+        saveRDS(corr0, paste0(args$out_prefix, "_",chr,".rda"), compress = args$compress)
+      } else {
+        saveRDS(corr0, paste0(args$out_prefix, "_",chr,".rds"))
+      }
+      
+      fwrite(ld_data$map[ind.chr, ], paste0(args$out_prefix, "_",chr,'.txt.gz'))
+
+      #if (chr == "chr1") {
+      #    ld <- Matrix::colSums(corr0^2)
+      #    corr <- as_SFBM(corr0, args$out_prefix)
+      #} else {
+      #    ld <- c(ld, Matrix::colSums(corr0^2))
+      #    corr$add_columns(corr0, nrow(corr))
+      #}
+  }  
  
-  print("test")
-  # get ld matrix. Note, that we need 60gb of memory to keep 
-  # all the hapmap variants in memory
-  write("Fitting ld matrix..", stdout())
-  snp_corr <- calc_ld_matrix(
-                  ld_data$G, 
-                  ld_data$POS2, 
-                  df_beta, 
-                  chrs = 1:22, 
-                  ncores = NCORES, 
-                  sfbm_file = args$out_prefix)
+  snp_corr <- (list(ld = ld, corr = corr))
 
   # save with link to sfbm file
-  outfile = paste0(args$out_prefix, ".rda")
-  saveRDS(snp_corr, file = outfile, compress = "xz")
+  #saveRDS(snp_corr, file = paste0(args$out_prefix, ".rda"), compress = "xz")
+  #fwrite(ld_data$map, paste0(args$out_prefix, ".txt.gz"))
 
 }
 
 # add arguments
 parser <- ArgumentParser()
-parser$add_argument("--gwas", default=NULL, required = TRUE, help = "Path to a summary statistics file with matching SNPs")
 parser$add_argument("--bed", default=NULL, required = TRUE, help = "Path to .bed file used for calculating LD panel")
+parser$add_argument("--compress", default=NULL, help = "what type of compression should be applied?")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()
 

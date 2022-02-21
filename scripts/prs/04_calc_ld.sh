@@ -7,26 +7,18 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 5
 #$ -q short.qc@@short.hga
-#$ -t 2
 #$ -V
 
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
-readonly rscript="scripts/prs/04_calc_ld.R"
+readonly rscript="scripts/prs/04_calc_ld_test_unwrap.R"
 
 readonly bed_dir="data/prs/hapmap/ld/unrel_eur_10k"
-readonly pheno_dir="data/phenotypes"
-readonly sumstat_dir="data/prs/sumstat"
-readonly out_dir="data/prs/hapmap/ld/matrix"
-
 readonly bed_file="${bed_dir}/short_merged_ukb_hapmap_rand_10k_eur.bed"
-readonly pheno_file="${pheno_dir}/curated_phenotypes.tsv"
 
-readonly pheno_list_cts="${pheno_dir}/curated_phenotypes_cts_header.tsv"
-readonly phenotype_cts=$( cut -f${SGE_TASK_ID} ${pheno_list_cts} )
-readonly pheno_list_binary="${pheno_dir}/curated_phenotypes_binary_header.tsv"
-readonly phenotype_binary=$( cut -f${SGE_TASK_ID} ${pheno_list_binary} )
+readonly out_dir="data/prs/hapmap/ld/matrix"
+readonly out_prefix="${out_dir}/ld_matrix"
 
 mkdir -p ${out_dir}
 
@@ -35,13 +27,10 @@ export OPENBLAS_NUM_THREADS=1 # avoid two levels of parallelization
 fit_ld_matrix() 
 {
   SECONDS=0
-  local sumstat_file="${sumstat_dir}/ukb_hapmap_500k_eur_${1}.txt.gz"
-  local out_prefix="${out_dir}/ldpred2_ld_${1}"
   set_up_rpy
   set -x
   Rscript "${rscript}" \
    --bed "${bed_file}" \
-   --gwas "${sumstat_file}" \
    --out_prefix "${out_prefix}"
   set +x
   log_runtime ${SECONDS}

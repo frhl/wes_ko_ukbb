@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N prs
+#$ -N prs_by_chrom
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/prs.log
-#$ -e logs/prs.errors.log
+#$ -o logs/prs_by_chrom.log
+#$ -e logs/prs_by_chrom.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
@@ -13,15 +13,15 @@
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
-readonly bash_script="scripts/prs/_prs.sh"
-readonly rscript="scripts/prs/05_prs.R"
+readonly bash_script="scripts/prs/_prs_by_chrom.sh"
+readonly rscript="scripts/prs/05_prs_by_chrom.R"
 
 readonly pred_dir="data/prs/hapmap/ukb_500k"
 readonly gwas_dir="data/prs/sumstat"
 readonly bed_dir="data/prs/hapmap/ld/unrel_eur_10k"
 readonly ld_dir="data/prs/hapmap/ld/matrix"
 readonly pheno_dir="data/phenotypes"
-readonly out_dir="data/prs/scores/test2"
+readonly out_dir="data/prs/scores/by_chrom"
 
 readonly ld_bed="${bed_dir}/short_merged_ukb_hapmap_rand_10k_eur.bed"
 
@@ -49,7 +49,7 @@ calc_prs_by_chrom()
   local gwas="${gwas_dir}/ukb_hapmap_500k_eur_${phenotype}.txt.gz"
   local out_prefix="${out_dir}/prs_inf_${phenotype}_chrCHR"
   set -x
-  qsub -N "_prs_${phenotype}" \
+  qsub -N "_prs_c_${phenotype}" \
     -t 21 \
     -q short.qc@@short.hga \
     -pe shmem 2 \
