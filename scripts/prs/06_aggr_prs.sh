@@ -11,16 +11,32 @@
 #$ -V
 
 source utils/bash_utils.sh
-source utils/qsub_utils.sh
 
-readonly rscript="scripts/prs/06_aggr_prs.sh"
+readonly rscript="scripts/prs/06_aggr_prs.R"
+
+readonly in_dir="data/prs/scores"
 
 readonly pheno_dir="data/phenotypes"
-readonly out_dir="data/prs/scores/test2"
+readonly phenos="${pheno_dir}/curated_phenotypes_header.tsv"
 
-readonly pheno_list_cts="${pheno_dir}/curated_phenotypes_cts_header.tsv"
-readonly phenotype_cts=$( cut -f${SGE_TASK_ID} ${pheno_list_cts} )
-readonly pheno_list_binary="${pheno_dir}/curated_phenotypes_binary_header.tsv"
-readonly phenotype_binary=$( cut -f${SGE_TASK_ID} ${pheno_list_binary} )
+readonly out_dir="data/prs/scores/test"
+readonly out_prefix="${out_dir}/ukb_500k_pgs"
+
+mkdir -p ${out_dir}
+
+aggregate_pgs()
+{ 
+  set_up_rpy
+  set -x
+  Rscript "${rscript}" \
+   --path_phenos "${phenos}" \
+   --in_dir "${in_dir}" \
+   --out_prefix "${out_prefix}" 
+  set +x
+}
+
+aggregate_pgs
+
+
 
 
