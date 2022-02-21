@@ -12,7 +12,7 @@
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
-readonly rscript="scripts/prs/04_calc_ld_test.R"
+readonly rscript="scripts/prs/04_calc_ld_test_unwrap.R"
 
 readonly bed_dir="data/prs/hapmap/ld/unrel_eur_10k"
 readonly bed_file="${bed_dir}/short_merged_ukb_hapmap_rand_10k_eur.bed"

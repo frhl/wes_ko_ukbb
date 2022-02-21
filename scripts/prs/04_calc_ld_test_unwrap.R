@@ -12,37 +12,33 @@ library(argparse)
 main <- function(args){
 
   print(args)
-  stopifnot(file.exists(args$bed))
+  #stopifnot(file.exists(args$bed))
 
   # setup parallel environment
   NCORES <- max(1, nb_cores())
   bigparallelr::assert_cores(NCORES)
   
   # load data required for setting up LD-matrix 
-  ld_data <- load_bigsnp_from_bed(args$bed)
-  POS2 = ld_data$POS2
-  G = ld_data$G
+  #ld_data <- load_bigsnp_from_bed(args$bed)
+  #POS2 = ld_data$POS2
+  #G = ld_data$G
 
   chrs <- paste0("chr",1:22)
   for (chr in chrs) {
       write(paste('Calculating LD for',chr,'..'),stderr())
-      ind.chr <- which(ld_data$map$chr == chr)
-      stopifnot(length(ind.chr) > 0)
-      corr0 <- snp_cor(
-              G,
-              ind.col = ind.chr,
-              ncores = NCORES,
-              infos.pos = POS2[ind.chr],
-              size = 3/1000
-          )
-      if (!is.null(args$compress)){
-        saveRDS(corr0, paste0(args$out_prefix, "_",chr,".rda"), compress = args$compress)
-      } else {
-        saveRDS(corr0, paste0(args$out_prefix, "_",chr,".rds"))
-      }
+      #ind.chr <- which(ld_data$map$chr == chr)
+      #stopifnot(length(ind.chr) > 0)
+      #corr0 <- snp_cor(
+      #        G,
+      #        ind.col = ind.chr,
+      #        ncores = NCORES,
+      #        infos.pos = POS2[ind.chr],
+      #        size = 3/1000
+      #    )
       
-      fwrite(ld_data$map[ind.chr, ], paste0(args$out_prefix, "_",chr,'.txt.gz'))
-
+      rds <- readRDS(paste0(args$out_prefix, "_",chr,".rda"))
+      saveRDS(rds, paste0(args$out_prefix, "_",chr,".rds"))
+      
       #if (chr == "chr1") {
       #    ld <- Matrix::colSums(corr0^2)
       #    corr <- as_SFBM(corr0, args$out_prefix)
