@@ -22,6 +22,7 @@ main <- function(args){
   
   # Load LD matrix and summary statistics
   gwas <- read_hail_sumstat(args$gwas, trait = args$trait)
+  gwas <- gwas[gwas$chr %in% args$chrom, ]
   ld_data <- load_bigsnp_from_bed(args$ld_bed)
   pred <- load_bigsnp_from_bed(args$pred)
   

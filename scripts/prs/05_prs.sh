@@ -21,7 +21,7 @@ readonly gwas_dir="data/prs/sumstat"
 readonly bed_dir="data/prs/hapmap/ld/unrel_eur_10k"
 readonly ld_dir="data/prs/hapmap/ld/matrix"
 readonly pheno_dir="data/phenotypes"
-readonly out_dir="data/prs/scores/test2"
+readonly out_dir="data/prs/scores/genome_wide"
 
 readonly ld_bed="${bed_dir}/short_merged_ukb_hapmap_rand_10k_eur.bed"
 
@@ -50,9 +50,9 @@ calc_prs_by_chrom()
   local out_prefix="${out_dir}/prs_inf_${phenotype}_chrCHR"
   set -x
   qsub -N "_prs_${phenotype}" \
-    -t 21 \
+    -t 1-22 \
     -q short.qc@@short.hga \
-    -pe shmem 2 \
+    -pe shmem 1 \
     "${bash_script}" \
     "${rscript}" \
     "${gwas}" \

@@ -50,7 +50,7 @@ calc_prs_by_chrom()
   local out_prefix="${out_dir}/prs_inf_${phenotype}_chrCHR"
   set -x
   qsub -N "_prs_c_${phenotype}" \
-    -t 21 \
+    -t 1-22 \
     -q short.qc@@short.hga \
     -pe shmem 2 \
     "${bash_script}" \

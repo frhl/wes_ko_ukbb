@@ -25,7 +25,7 @@ set_up_rpy
 if [ ! -f "${out_prefix_chr}.txt.gz" ]; then
   set -x
   Rscript "${r_script}" \
-      --chrom "${chr}" \
+      --chrom "chr${chr}" \
       --gwas "${gwas}" \
       --pred "${pred_chr}" \
       --ld_bed "${ld_bed}" \
