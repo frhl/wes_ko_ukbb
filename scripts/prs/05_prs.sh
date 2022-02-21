@@ -25,10 +25,18 @@ readonly out_dir="data/prs/scores/test2"
 
 readonly ld_bed="${bed_dir}/short_merged_ukb_hapmap_rand_10k_eur.bed"
 
+# setup paths to phenotypes
 readonly pheno_list_cts="${pheno_dir}/curated_phenotypes_cts_header.tsv"
 readonly phenotype_cts=$( cut -f${SGE_TASK_ID} ${pheno_list_cts} )
 readonly pheno_list_binary="${pheno_dir}/curated_phenotypes_binary_header.tsv"
 readonly phenotype_binary=$( cut -f${SGE_TASK_ID} ${pheno_list_binary} )
+
+# what ldpred2 method should be used ("auto" or "inf")
+readonly method="inf"
+
+# what trait is being considered? This affects how n_eff is 
+# calculated. Should be either "binary" or "cts"
+readonly trait="binary"
 
 mkdir -p ${out_dir}
 
@@ -42,8 +50,8 @@ calc_prs_by_chrom()
   local out_prefix="${out_dir}/prs_${phenotype}_chrCHR"
   set -x
   qsub -N "_prs_${phenotype}" \
-    -t 21 \
-    -q short.qc@@short.hge \
+    -t 8 \
+    -q short.qc@@short.hga \
     -pe shmem 1 \
     "${bash_script}" \
     "${rscript}" \
@@ -51,6 +59,8 @@ calc_prs_by_chrom()
     "${pred}" \
     "${ld_bed}" \
     "${ld_dir}" \
+    "${method}" \
+    "${trait}" \
     "${out_prefix}"
   set +x 
 }
