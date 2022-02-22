@@ -11,7 +11,6 @@ main <- function(args){
 
   stopifnot(file.exists(args$pred))
   stopifnot(file.exists(args$ldsc))
-  stopifnot(file.exists(args$ld_bed))
   stopifnot(dir.exists(args$ld_dir))
   stopifnot(args$method %in% c('inf', 'auto'))
 
@@ -29,10 +28,12 @@ main <- function(args){
   N_total <- nrow(gwas)
   N_chr <- sum(gwas$chr == args$chr)
   h2_init <- h2 * (N_chr / N_total)
+  
+  # check estimates
+  stopifnot(h2_init > 0)
+  stopifnot(!is.null(gwas)) 
 
-  # match summary stats and LD data
-  #ld_data <- load_bigsnp_from_bed(args$ld_bed)
-  #info_snp <- snp_match(gwas, ldsc$map, join_by_pos = TRUE, strand_flip = FALSE)
+  # get SNP correlations and LD
   snp <- get_single_ld_matrix(gwas, chr = args$chrom, ld_dir = args$ld_dir)
  
   # match GWAS with snp-correlation map
@@ -44,17 +45,20 @@ main <- function(args){
   stopifnot(all(gwas$marker %in% snp$map$marker))
   stopifnot(all(snp$map$marker %in% gwas$marker)) 
   stopifnot(sum(gwas$marker == snp$map$marker) / nrow(gwas) == 1)
-   
-  # load data to be used for prediction 
+  
+   # load data to be used for prediction 
   pred <- load_bigsnp_from_bed(args$pred)
   pred <- match_bigsnp_with_gwas(pred, gwas)
-  
+  genotypes <- pred$genotypes  
+  indicies <- pred$gwas_indcies
+
   if (args$method %in% "inf"){
 
     beta_inf <- snp_ldpred2_inf(snp$corr, gwas, h2_init)
+    beta_inf <- beta_inf[indicies], 
     final_pred_inf <- big_prodVec(
-          pred$genotypes, 
-          beta_inf[pred$gwas_indicies], 
+          genotypes, 
+          beta_inf
           ncores = ncores)  
     final_pred <- final_pred_inf
 
@@ -71,12 +75,12 @@ main <- function(args){
      # get estimates with indicies corresponding to pred genotypes
      write("Get estimates for beta_auto..", stderr())
      beta_auto <- sapply(multi_auto, function(auto){
-          auto$beta_est[pred$gwas_indicies]})
+          auto$beta_est[indicies]})
      
      # perform matrix multiplication
      write("Performing mat mul..", stderr())
      pred_auto <- big_prodMat(
-        pred$genotypes,
+        genotypes,
         beta_auto,
         ncores = NCORES)
 
@@ -89,7 +93,7 @@ main <- function(args){
      # get final predicton
      write("Getting final prediction..", stderr())
      final_pred_auto <- big_prodVec(
-       pred$genotypes, 
+       genotypes, 
        final_beta_auto,
        ncores = NCORES)
 
