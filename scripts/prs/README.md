@@ -1,6 +1,22 @@
 # Polygenic Risk Scoring using LDpred2
+
+## Overview
 | Script                            | Description                                   | Requires output from |
 | -                                 | -                                             | - |
-| `00_bed_gen.sh` | 1. Load imputed genotypes or regular non-imputed genotypes. </br> 2. Subset to white brish europeans (based on Duncan's) QC. </br> 3.  </br> 3. Liftover to GRCh38 if needed. </br> 4. Write plink (.bed) output files.  | N/A |
-| `01_summary_statistics.sh`| 1. Load imputed genotype or non-imputed genotypes. </br> 2. Subset to defined samples. </br> 3. Liftover to GRCh38 if needed. </br> 4. Load binary or continious phenotypes and covariates. </br> 5. Perform GWAS (Linear/logistic regression) on phenotype parallized by chromosome..|
+| `00_bed_gen.sh` | 1. Load imputed genotypes or regular non-imputed genotypes. </br> 2. Subset to white-british europeans (Based on Duncan's QC) and Subset to unrelated individuals. </br> 3. Subset to HapMap3 SNPS with MAF >= 1% and filter out any genotypes with missigness > 5%. Also annotate with dbSNP. Liftover to GRCh38 </br> 4. Write plink (.bed)  output files.  | N/A |
+| `01_sample_bed.sh` | 1. Load imputed genotypes or regular non-imputed genotypes. </br> 2. Subset to white-british europeans (Based on Duncan's QC) and subset to unrelated individuals. Randomly sample 10.000 individuals. </br> 3. Subset to HapMap3 SNPS with MAF >= 1% and filter out any genotypes with missigness > 5%. Also annotate with dbSNP. Liftover to GRCh38. </br> 4. Write plink (.bed)  output files.  | N/A |
+| `02_merge_bed.sh` | 1. load plink (.bed) for all chromosomes available. </br> 2. Merge all chromosomes and write new combined plink (.bed) file.  | `01_sample_bed.sh` |
+
+| `03_gwas.sh`| 1. Load unrelated white British samples. </br> 2. Load binary or continious phenotypes and covariates. </br> 3. Do Linear or logistic (wald) regression on the phenotypes to generate summary statistics. </br> 4. Submits merge script that will aggregate resulting GWAS into a single file. </br> 5. Write out summary statistics. | `00_bed_gen.sh` |
+| `04_calc_ld.sh`| 1. Load plink (bed) containing 10.000 unrelated samples.  </br> 2. Calculate SNP-wise correlations for each chromosome. </br> 3. Save resulting correlation in an RDS-file.   | `01_sample_bed.sh` |
+| `05_ldsc.sh`| 1. Load plink (bed) containing 10.000 unrelated samples. Also load GWAS and RDS file containing SNP-wise correlations. </br> 2. Perform [quality control](https://privefl.github.io/bigsnpr/articles/LDpred2.html) on SNPs from GWAS. </br> 3. For each chromosome, open RDS file containg SNP-wise correlations. Create a sparse matrix file on the fly and calculate Linkage Disequilibrium (LD) for SNPs in GWAS that passed QC. </br> 4. Ensure that SNPs in GWAS, LD-matrix and correlation matrix has been aligned. </br> 5. run LDSC and obtain (genome-wide) heritability estimate for trait.  </br> 6. Save RDS-file with heritability estimate, QCed GWAS SNPs, and mapping file to SNPs used for LD-correlations (equivalent to GWAS file).     | `01_sample_bed.sh`, `03_gwas.sh` and `04_calc_ld.sh` |
+| `06_prs.sh` | 1. Open full set of samples in plink (.bed) file. </br> 2. open RDS-file containing genome-wide h2 estimate. Partition the estimate with h2 * (n_chr/n_total) and use this as the initial estimate for heritability downstream. </br> 3. Open SNP-correlation matrix for current chromosome. </br> 4. Obtain polygenic risk scores with *LDPred2* using either the [infinitesimal](https://privefl.github.io/bigsnpr/reference/LDpred2.html) or [auto](https://privefl.github.io/bigsnpr/reference/LDpred2.html) mode.          | `05_ldsc.sh` and `00_bed_gen.sh`  |
+| `07_aggr_prs.sh`| 1. Aggregate all PRS into a single file keyed by sample id.  | `06_prs.sh` |
+
+
+## references
+
+[Florian Privé, Julyan Arbel, Bjarni J Vilhjálmsson, LDpred2: better, faster, stronger, Bioinformatics, Volume 36, Issue 22-23, 1 December 2020, Pages 5424–5431](https://academic.oup.com/bioinformatics/article/36/22-23/5424/6039173)
+
+
 
