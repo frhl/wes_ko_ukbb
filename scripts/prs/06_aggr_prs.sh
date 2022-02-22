@@ -14,13 +14,13 @@ source utils/bash_utils.sh
 
 readonly rscript="scripts/prs/06_aggr_prs.R"
 
-readonly in_dir="data/prs/scores"
+readonly in_dir="data/prs/scores/by_chrom"
 
 readonly pheno_dir="data/phenotypes"
 readonly phenos="${pheno_dir}/curated_phenotypes_header.tsv"
 
-readonly out_dir="data/prs/scores/test"
-readonly out_prefix="${out_dir}/ukb_500k_pgs"
+readonly out_dir="data/prs/scores/by_chrom"
+readonly out_prefix="${out_dir}/ukb_by_chrom_500k_pgs"
 
 mkdir -p ${out_dir}
 
