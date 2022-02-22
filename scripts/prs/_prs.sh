@@ -12,9 +12,8 @@ readonly r_script=${1?Error: Missing arg1 (r_script)}
 readonly pred=${2?Error: Missing arg3 (prediction file)}
 readonly ldsc=${3?Error: Missing arg2 (ld_matrix)}
 readonly ld_dir=${4?Error: Missing arg2 (ld_matrix)}
-readonly ld_bed=${5?Error: Missing arg2 (ld_matrix)}
-readonly method=${6?Error: Missing arg2 (ld_matrix)}
-readonly prefix=${7?Error: Missing arg8 (prefix)}
+readonly method=${5?Error: Missing arg2 (ld_matrix)}
+readonly prefix=${6?Error: Missing arg8 (prefix)}
 
 readonly chr="${SGE_TASK_ID}"
 readonly pred_chr=$(echo ${pred} | sed -e "s/CHR/${chr}/g")
@@ -28,7 +27,6 @@ if [ ! -f "${out_prefix_chr}.txt.gz" ]; then
       --pred "${pred_chr}" \
       --ldsc "${ldsc}" \
       --ld_dir "${ld_dir}" \
-      --ld_bed "${ld_bed}" \
       --method "${method}" \
       --out_prefix "${out_prefix_chr}"
   set +x
