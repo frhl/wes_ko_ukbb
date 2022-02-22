@@ -76,29 +76,31 @@ main <- function(args){
         ncores = NCORES)
 
      # save data chains
-     multi_auto_file <- paste0(args$out_prefix,'_chains.rda')
-     #saveRDS(multi_auto_file, multi_auto, compress = 'xz')
+     multi_auto_path <- paste0(args$out_prefix,'_chains.rda')
+     saveRDS(multi_auto, multi_auto_path, compress = 'xz')
 
      # get estimates with indicies corresponding to pred genotypes
-     write("Get estimates for beta_auto..", stderr())
      beta_auto <- sapply(multi_auto, function(auto){
           auto$beta_est})
      
      # perform matrix multiplication
-     write("Performing mat mul..", stderr())
      pred_auto <- big_prodMat(
         genotypes,
         beta_auto,
         ncores = NCORES)
 
      # quality controls on chains
-     write("Quality control om chains..", stderr())
-     sc <- apply(pred_auto, 2, sd)
+     na_rows <- rowSums(is.na(pred_auto)) > 0 
+     if (any(na_rows)) {
+        na_rows_pct <- round(100*(na_rows / nrow(pred_auto)), 2)
+        write(paste0(na_rows_pct,"% of chain rows contains NAs"), stderr())
+     }
+     
+     sc <- apply(pred_auto, 2, sd, na.rm = TRUE)
      keep <- abs(sc - median(sc)) < 3 * mad(sc)
-     final_beta_auto <- rowMeans(beta_auto[, keep]) 
+     final_beta_auto <- rowMeans(beta_auto[, keep], na.rm = TRUE) 
      
      # get final predicton
-     write("Getting final prediction..", stderr())
      final_pred_auto <- big_prodVec(
        genotypes, 
        final_beta_auto,
