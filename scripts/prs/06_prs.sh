@@ -39,7 +39,7 @@ submit_ldpred2()
   local out_prefix="${out_dir}/prs_${method}_${phenotype}_chrCHR"
   set -x
   qsub -N "_prs_${phenotype}" \
-    -t 1-22 \
+    -t 21 \
     -q short.qc@@short.hge \
     -pe shmem "${cores}" \
     "${bash_script}" \

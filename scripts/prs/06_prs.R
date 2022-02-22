@@ -92,7 +92,7 @@ main <- function(args){
      # quality controls on chains
      na_rows <- rowSums(is.na(pred_auto)) > 0 
      if (any(na_rows)) {
-        na_rows_pct <- round(100*(na_rows / nrow(pred_auto)), 2)
+        na_rows_pct <- round(100*(sum(na_rows) / nrow(pred_auto)), 2)
         write(paste0(na_rows_pct,"% of chain rows contains NAs"), stderr())
      }
      
