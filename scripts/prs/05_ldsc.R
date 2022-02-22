@@ -9,11 +9,9 @@ library(argparse)
 
 main <- function(args){
 
-  stopifnot(file.exists(args$pred))
   stopifnot(file.exists(args$gwas)) 
   stopifnot(file.exists(args$ld_bed))
   stopifnot(dir.exists(args$ld_dir))
-  stopifnot(args$method %in% c('inf', 'auto'))
   stopifnot(args$trait %in% c('binary', 'cts'))
 
   # setup parallel environment
@@ -23,7 +21,6 @@ main <- function(args){
   # Load LD matrix and summary statistics
   gwas <- read_hail_sumstat(args$gwas, trait = args$trait)
   ld_data <- load_bigsnp_from_bed(args$ld_bed)
-  pred <- load_bigsnp_from_bed(args$pred)
   
   # match summary stats and LD data
   info_snp <- snp_match(gwas, ld_data$map, join_by_pos = TRUE, strand_flip = FALSE)
@@ -35,7 +32,7 @@ main <- function(args){
   gwas$marker <- get_ldpred_marker(gwas)
 
   # Get LD matrix for final SNPs
-  snp <- get_ld_matrix(gwas, ld_dir = args$ld_dir)
+  snp <- get_ld_matrix(gwas, ld_dir = args$ld_dir, verbose = TRUE)
  
   # match GWAS with snp-map
   indicies <- na.omit(match(snp$map$marker, gwas$marker))
@@ -63,94 +60,23 @@ main <- function(args){
                    blocks = NULL)
                )  
   
-  ldsc_h2_est <- ldsc[["h2"]]
-  ldsc_int_est <- ldsc[['int']] 
+  # what SNPS are used
+  ldsc_out <- list(  
+    h2_est = ldsc[["h2"]],
+    int_est = ldsc[['int']],
+    ld_map = snp$map,
+    gwas = gwas
+  ) 
 
-  if (args$method %in% "inf"){
-  
-    beta_inf <- snp_ldpred2_inf(snp$corr, gwas, ldsc_h2_est)
-    final_pred_inf <- predict_prs(
-       obj = pred,
-       gwas = gwas,
-       effects = beta_inf,
-       ncores = NCORES)
-
-    final_pred <- final_pred_inf
-
-  } else if (args$method %in% "auto") {
-
-   write("Running multi_auto", stderr())
-   multi_auto <- snp_ldpred2_auto(
-      snp$corr,
-      gwas,
-      h2_init = ldsc_h2_est,
-      vec_p_init = seq_log(1e-4, 0.5, 30),
-      ncores = NCORES)
-    
-   print(str(multi_auto))
-
-   # match prediction genotypes with gwas
-   write("matching pred & gwas..", stderr())
-   pred_match <- match_bigsnp_with_gwas(pred, gwas)
-   
-   # get estimates with indicies corresponding to pred genotypes
-   write("Get estimates for beta_auto..", stderr())
-   beta_auto <- sapply(multi_auto, function(auto){
-        auto$beta_est[pred_match$gwas_indicies]})
-   
-   # perform matrix multiplication
-   write("Performing mat mul..", stderr())
-   pred_auto <- big_prodMat(
-      pred_match$genotypes,
-      beta_auto,
-      ncores = NCORES)
-
-   # quality controls on chains
-   write("Quality control om chains..", stderr())
-   sc <- apply(pred_auto, 2, sd)
-   keep <- abs(sc - median(sc)) < 3 * mad(sc)
-   final_beta_auto <- rowMeans(beta_auto[, keep]) 
-   
-   # get final predicton
-   write("Getting final prediction..", stderr())
-   final_pred_auto <- big_prodVec(
-     pred_match$genotypes, 
-     final_beta_auto,
-     ncores = NCORES)
-
-   final_pred <- final_pred_auto
-   final_pred$sid <- pred_match$sid
-  }
-
-  # save parameters 
-  model <- data.table(
-     method = args$method,
-     n_samples = unique(gwas$n),
-     n_eff = unique(gwas$n_eff),
-     n_snps = nrow(gwas),
-     ldsc_h2_est = ldsc_h2_est,
-     ldsc_int_est = ldsc_int_est,
-     inflation = calc_inflation(gwas$P)
-     )
-  
-  # save results
-  PGS <- data.table(
-    sid = final_pred$sid, 
-    prs = final_pred$prs
-    )
-
-  write(paste0(args$pred, ".. done! Writing to ", args$out_prefix, ".txt.gz"), stdout())
-  fwrite(PGS, file = paste0(args$out_prefix,".txt.gz"), sep = '\t')
-  fwrite(model, file = paste0(args$out_prefix,".model"), sep = '\t')
+  #write(paste0(args$pred, ".. done! Writing to ", args$out_prefix, ".rds"), stdout())
+  saveRDS(ldsc_out, paste0(args$out_prefix,".rds"))
   
 }
 
 # add arguments
 parser <- ArgumentParser()
-parser$add_argument("--method", default=NULL, required = TRUE, help = "either 'inf' or 'auto'")
 parser$add_argument("--trait", default=NULL, required = TRUE, help = "either 'binary' or 'cts'")
 parser$add_argument("--gwas", default=NULL, required = TRUE, help = "Path to QCed SNPs")
-parser$add_argument("--pred", default=NULL, required = TRUE, help = "Path to plink (bed) for PGS prediction")
 parser$add_argument("--ld_bed", default=NULL, required = TRUE, help = "Path to plink file (bed) used to design LD-matrix")
 parser$add_argument("--ld_dir", default=NULL, required = TRUE, help = "Path to directory with pre-calcualted SNP correlations and LD (.rds files)")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")

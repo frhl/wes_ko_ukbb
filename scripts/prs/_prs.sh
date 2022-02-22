@@ -2,20 +2,19 @@
 #
 #$ -N _prs_test
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_prs_test.log
-#$ -e logs/_prs_test.errors.log
+#$ -o logs/_prs.log
+#$ -e logs/_prs.errors.log
 #$ -V
 
 source utils/bash_utils.sh
 
 readonly r_script=${1?Error: Missing arg1 (r_script)}
-readonly gwas=${2?Error: Missing arg2 (sumstat)}
-readonly pred=${3?Error: Missing arg3 (prediction file)}
-readonly ld_bed=${4?Error: Missing arg2 (ld_matrix)}
-readonly ld_dir=${5?Error: Missing arg2 (ld_matrix)}
+readonly pred=${2?Error: Missing arg3 (prediction file)}
+readonly ldsc=${3?Error: Missing arg2 (ld_matrix)}
+readonly ld_dir=${4?Error: Missing arg2 (ld_matrix)}
+readonly ld_bed=${5?Error: Missing arg2 (ld_matrix)}
 readonly method=${6?Error: Missing arg2 (ld_matrix)}
-readonly trait=${7?Error: Missing arg2 (ld_matrix)}
-readonly prefix=${8?Error: Missing arg8 (prefix)}
+readonly prefix=${7?Error: Missing arg8 (prefix)}
 
 readonly chr="${SGE_TASK_ID}"
 readonly pred_chr=$(echo ${pred} | sed -e "s/CHR/${chr}/g")
@@ -25,12 +24,12 @@ set_up_rpy
 if [ ! -f "${out_prefix_chr}.txt.gz" ]; then
   set -x
   Rscript "${r_script}" \
-      --gwas "${gwas}" \
+      --chrom "chr${chr}" \
       --pred "${pred_chr}" \
-      --ld_bed "${ld_bed}" \
+      --ldsc "${ldsc}" \
       --ld_dir "${ld_dir}" \
+      --ld_bed "${ld_bed}" \
       --method "${method}" \
-      --trait "${trait}" \
       --out_prefix "${out_prefix_chr}"
   set +x
 else

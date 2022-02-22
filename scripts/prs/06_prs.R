@@ -1,0 +1,144 @@
+
+# details: https://privefl.github.io/bigsnpr-extdoc/polygenic-scores-pgs.html
+
+# wrote a package that contain all dependencies for runnign LDpred2
+# and combining various functions into easy to use pipelines. Note,
+# that this will also load libraries, e.g. bigsnpr, bigassert
+devtools::load_all('utils/modules/R/prstools')
+library(argparse)
+
+main <- function(args){
+
+  stopifnot(file.exists(args$pred))
+  stopifnot(file.exists(args$ldsc))
+  stopifnot(file.exists(args$ld_bed))
+  stopifnot(dir.exists(args$ld_dir))
+  stopifnot(args$method %in% c('inf', 'auto'))
+
+  # setup parallel environment
+  NCORES <- max(1, nb_cores())
+  bigparallelr::assert_cores(NCORES)
+ 
+ 
+  # laod ldsc and qced GWAS
+  ldsc <- readRDS(args$ldsc)
+  gwas <- ldsc$gwas
+  h2 <- ldsc$h2_est
+
+  # Estimate h2 chromosome-wide
+  N_total <- nrow(gwas)
+  N_chr <- sum(gwas$chr == args$chr)
+  h2_init <- h2 * (N_chr / N_total)
+
+  # match summary stats and LD data
+  #ld_data <- load_bigsnp_from_bed(args$ld_bed)
+  #info_snp <- snp_match(gwas, ldsc$map, join_by_pos = TRUE, strand_flip = FALSE)
+  snp <- get_single_ld_matrix(gwas, chr = args$chrom, ld_dir = args$ld_dir)
+ 
+  # match GWAS with snp-correlation map
+  indicies <- na.omit(match(snp$map$marker, gwas$marker))
+  gwas <- gwas[indicies,]
+
+  # check that LD-matrix markers and gwas markers have overlap
+  # Check that ordering of markers are actually matching
+  stopifnot(all(gwas$marker %in% snp$map$marker))
+  stopifnot(all(snp$map$marker %in% gwas$marker)) 
+  stopifnot(sum(gwas$marker == snp$map$marker) / nrow(gwas) == 1)
+   
+  # load data to be used for prediction 
+  pred <- load_bigsnp_from_bed(args$pred)
+  pred <- match_bigsnp_with_gwas(pred, gwas)
+  
+  if (args$method %in% "inf"){
+
+    beta_inf <- snp_ldpred2_inf(snp$corr, gwas, h2_init)
+    final_pred_inf <- big_prodVec(
+          pred$genotypes, 
+          beta_inf[pred$gwas_indicies], 
+          ncores = ncores)  
+    final_pred <- final_pred_inf
+
+  } else if (args$method %in% "auto") {
+
+     write("Running multi_auto", stderr())
+     multi_auto <- snp_ldpred2_auto(
+        corr = snp$corr,
+        df_beta = gwas,
+        h2_init = h2_init,
+        vec_p_init = 0.001, #seq_log(1e-4, 0.5, 30),
+        ncores = NCORES)
+
+     # get estimates with indicies corresponding to pred genotypes
+     write("Get estimates for beta_auto..", stderr())
+     beta_auto <- sapply(multi_auto, function(auto){
+          auto$beta_est[pred$gwas_indicies]})
+     
+     # perform matrix multiplication
+     write("Performing mat mul..", stderr())
+     pred_auto <- big_prodMat(
+        pred$genotypes,
+        beta_auto,
+        ncores = NCORES)
+
+     # quality controls on chains
+     write("Quality control om chains..", stderr())
+     sc <- apply(pred_auto, 2, sd)
+     keep <- abs(sc - median(sc)) < 3 * mad(sc)
+     final_beta_auto <- rowMeans(beta_auto[, keep]) 
+     
+     # get final predicton
+     write("Getting final prediction..", stderr())
+     final_pred_auto <- big_prodVec(
+       pred$genotypes, 
+       final_beta_auto,
+       ncores = NCORES)
+
+     final_pred <- final_pred_auto
+    }
+
+  final_pred$sid <- pred$sid
+  
+  # save parameters 
+  model <- data.table(
+     method = args$method,
+     n_samples = unique(gwas$n),
+     n_eff = unique(gwas$n_eff),
+     n_snps = nrow(gwas),
+     ldsc_h2_genome_wide_est = ldsc_h2_est,
+     h2_init_est = h2_init_est,
+     inflation = calc_inflation(gwas$P)
+     )
+  
+  # save results
+  PGS <- data.table(
+    sid = final_pred$sid, 
+    prs = final_pred$prs
+    )
+
+  write(paste0(args$pred, ".. done! Writing to ", args$out_prefix, ".txt.gz"), stdout())
+  fwrite(PGS, file = paste0(args$out_prefix,".txt.gz"), sep = '\t')
+  fwrite(model, file = paste0(args$out_prefix,".model"), sep = '\t')
+  
+}
+
+# add arguments
+parser <- ArgumentParser()
+parser$add_argument("--chrom", default=NULL, required = TRUE, help = "chromosome input")
+parser$add_argument("--method", default=NULL, required = TRUE, help = "either 'inf' or 'auto'")
+parser$add_argument("--pred", default=NULL, required = TRUE, help = "Path to plink (bed) for PGS prediction")
+parser$add_argument("--ldsc", default=NULL, required = TRUE, help = ".rds object containing QCed GWAS and ldsc heritability estimates")
+parser$add_argument("--ld_dir", default=NULL, required = TRUE, help = "Path to directory with pre-calcualted SNP correlations and LD (.rds files)")
+parser$add_argument("--ld_bed", default=NULL, required = TRUE, help = "Path to plink file (bed) used to design LD-matrix")
+parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
+args <- parser$parse_args()
+
+main(args)
+
+
+
+
+
+
+
+
+

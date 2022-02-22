@@ -12,7 +12,7 @@
 
 source utils/bash_utils.sh
 
-readonly rscript="scripts/prs/06_aggr_prs.R"
+readonly rscript="scripts/prs/07_aggr_prs.R"
 
 readonly in_dir="data/prs/scores/by_chrom"
 

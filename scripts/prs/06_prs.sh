@@ -14,29 +14,23 @@ source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
 readonly bash_script="scripts/prs/_prs.sh"
-readonly rscript="scripts/prs/05_prs.R"
+readonly rscript="scripts/prs/06_prs.R"
 
-readonly pred_dir="data/prs/hapmap/ukb_500k"
-readonly gwas_dir="data/prs/sumstat"
-readonly bed_dir="data/prs/hapmap/ld/unrel_eur_10k"
+readonly ldsc_dir="data/prs/ldsc"
 readonly ld_dir="data/prs/hapmap/ld/matrix"
+readonly pred_dir="data/prs/hapmap/ukb_500k"
 readonly pheno_dir="data/phenotypes"
-readonly out_dir="data/prs/scores/genome_wide"
+readonly out_dir="data/prs/scores/test"
 
+readonly bed_dir="data/prs/hapmap/ld/unrel_eur_10k"
 readonly ld_bed="${bed_dir}/short_merged_ukb_hapmap_rand_10k_eur.bed"
 
-# setup paths to phenotypes
 readonly pheno_list_cts="${pheno_dir}/curated_phenotypes_cts_header.tsv"
 readonly phenotype_cts=$( cut -f${SGE_TASK_ID} ${pheno_list_cts} )
 readonly pheno_list_binary="${pheno_dir}/curated_phenotypes_binary_header.tsv"
 readonly phenotype_binary=$( cut -f${SGE_TASK_ID} ${pheno_list_binary} )
 
-# what ldpred2 method should be used ("auto" or "inf")
 readonly method="inf"
-
-# what trait is being considered? This affects how n_eff is 
-# calculated. Should be either "binary" or "cts"
-readonly trait="binary"
 
 mkdir -p ${out_dir}
 
@@ -46,21 +40,20 @@ calc_prs_by_chrom()
 { 
   local phenotype=${1}
   local pred="${pred_dir}/ukb_hapmap_500k_eur_chrCHR.bed"
-  local gwas="${gwas_dir}/ukb_hapmap_500k_eur_${phenotype}.txt.gz"
+  local ldsc="${ldsc_dir}/ldsc_${phenotype}.rds"
   local out_prefix="${out_dir}/prs_inf_${phenotype}_chrCHR"
   set -x
   qsub -N "_prs_${phenotype}" \
-    -t 1-22 \
+    -t 21 \
     -q short.qc@@short.hga \
     -pe shmem 1 \
     "${bash_script}" \
     "${rscript}" \
-    "${gwas}" \
     "${pred}" \
-    "${ld_bed}" \
+    "${ldsc}" \
     "${ld_dir}" \
+    "${ld_bed}" \
     "${method}" \
-    "${trait}" \
     "${out_prefix}"
   set +x 
 }
