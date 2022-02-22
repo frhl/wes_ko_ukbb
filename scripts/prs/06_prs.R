@@ -17,8 +17,9 @@ main <- function(args){
   # setup parallel environment
   NCORES <- max(1, nb_cores())
   bigparallelr::assert_cores(NCORES)
- 
- 
+  msg <- paste0("Running ldpred2 with ",NCORES," cores [",Sys.time(),"]") 
+  write(msg,stdout())
+
   # laod ldsc and qced GWAS
   ldsc <- readRDS(args$ldsc)
   gwas <- ldsc$gwas
@@ -71,13 +72,13 @@ main <- function(args){
         corr = snp$corr,
         df_beta = gwas,
         h2_init = h2_init,
-        vec_p_init = seq_log(1e-4, 0.5, 30),
+        vec_p_init = 0.1, #seq_log(1e-4, 0.5, 30),
         verbose = TRUE,
         ncores = NCORES)
 
      # save data chains
      multi_auto_file <- paste0(args$out_prefix,'_chains.rda')
-     saveRDS(multi_auto_file, multi_auto, compress = 'xz')
+     #saveRDS(multi_auto_file, multi_auto, compress = 'xz')
 
      # get estimates with indicies corresponding to pred genotypes
      write("Get estimates for beta_auto..", stderr())
@@ -107,7 +108,6 @@ main <- function(args){
      final_pred <- final_pred_auto
     }
 
-  final_pred$sid <- pred$sid
   
   # save parameters 
   model <- data.table(
@@ -123,7 +123,7 @@ main <- function(args){
   # save results
   PGS <- data.table(
     sid = pred$sid, 
-    prs = final_pred$prs
+    prs = final_pred
     )
 
   write(paste0(args$pred, ".. done! Writing to ", args$out_prefix, ".txt.gz"), stdout())

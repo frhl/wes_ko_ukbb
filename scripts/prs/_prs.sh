@@ -7,6 +7,7 @@
 #$ -V
 
 source utils/bash_utils.sh
+source utils/qsub_utils.sh
 
 readonly r_script=${1?Error: Missing arg1 (r_script)}
 readonly pred=${2?Error: Missing arg3 (prediction file)}
@@ -19,8 +20,11 @@ readonly chr="${SGE_TASK_ID}"
 readonly pred_chr=$(echo ${pred} | sed -e "s/CHR/${chr}/g")
 readonly out_prefix_chr=$(echo ${prefix} | sed -e "s/CHR/${chr}/g")
 
+export OPENBLAS_NUM_THREADS=1 # avoid two levels of parallelization
+
 set_up_rpy
 if [ ! -f "${out_prefix_chr}.txt.gz" ]; then
+  duration=SECONDS
   set -x
   Rscript "${r_script}" \
       --chrom "chr${chr}" \
@@ -30,6 +34,7 @@ if [ ! -f "${out_prefix_chr}.txt.gz" ]; then
       --method "${method}" \
       --out_prefix "${out_prefix_chr}"
   set +x
+  log_runtime $duration
 else
   echo "Note: ${out_prefix_chr} already exists. Skipping.."
 fi

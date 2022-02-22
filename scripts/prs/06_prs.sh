@@ -27,23 +27,21 @@ readonly phenotype_cts=$( cut -f${SGE_TASK_ID} ${pheno_list_cts} )
 readonly pheno_list_binary="${pheno_dir}/curated_phenotypes_binary_header.tsv"
 readonly phenotype_binary=$( cut -f${SGE_TASK_ID} ${pheno_list_binary} )
 
-readonly method="inf"
-
 mkdir -p ${out_dir}
 
-export OPENBLAS_NUM_THREADS=1 # avoid two levels of parallelization
-
-calc_prs_by_chrom()
+submit_ldpred2()
 { 
-  local phenotype=${1}
+  local method=${1}
+  local cores=${2}
+  local phenotype=${3}
   local pred="${pred_dir}/ukb_hapmap_500k_eur_chrCHR.bed"
   local ldsc="${ldsc_dir}/ldsc_${phenotype}.rds"
-  local out_prefix="${out_dir}/prs_inf_${phenotype}_chrCHR"
+  local out_prefix="${out_dir}/prs_${method}_${phenotype}_chrCHR"
   set -x
   qsub -N "_prs_${phenotype}" \
     -t 1-22 \
-    -q short.qc@@short.hga \
-    -pe shmem 1 \
+    -q short.qc@@short.hge \
+    -pe shmem "${cores}" \
     "${bash_script}" \
     "${rscript}" \
     "${pred}" \
@@ -54,5 +52,6 @@ calc_prs_by_chrom()
   set +x 
 }
 
-calc_prs_by_chrom ${phenotype_binary}
+submit_ldpred2 "auto" "6" "${phenotype_binary}"
+#submit_ldpred2 "inf" "1" "${phenotype_binary}"
 
