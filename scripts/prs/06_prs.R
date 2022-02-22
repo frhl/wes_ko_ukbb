@@ -72,8 +72,7 @@ main <- function(args){
         corr = snp$corr,
         df_beta = gwas,
         h2_init = h2_init,
-        vec_p_init = 0.1, #seq_log(1e-4, 0.5, 30),
-        verbose = TRUE,
+        vec_p_init = seq_log(1e-4, 0.5, 30),
         ncores = NCORES)
 
      # save data chains
@@ -83,7 +82,7 @@ main <- function(args){
      # get estimates with indicies corresponding to pred genotypes
      write("Get estimates for beta_auto..", stderr())
      beta_auto <- sapply(multi_auto, function(auto){
-          auto$beta_est[indicies]})
+          auto$beta_est})
      
      # perform matrix multiplication
      write("Performing mat mul..", stderr())
