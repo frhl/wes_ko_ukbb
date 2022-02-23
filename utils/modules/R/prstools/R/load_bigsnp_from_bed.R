@@ -32,8 +32,10 @@ load_bigsnp_from_bed <- function(bed, verbose = TRUE){
     
     #  check for odd chromsome contigs (usually remnants of liftover)
     odd_contig <- unique(map$chr[!map$chr %in% autosomes])
-    odd_contig <- paste0(odd_contig, collapse = '|')
-    warning(paste0("non standard chromosome contig excluded: ", odd_contig))
+    if (length(odd_contig) > 0){
+        odd_contig <- paste0(odd_contig, collapse = '|')
+        warning(paste0("non standard chromosome contig excluded: ", odd_contig))
+    }
 
     # remove non-standard chromosome contigs
     map <- map[map$chr %in% autosomes,]

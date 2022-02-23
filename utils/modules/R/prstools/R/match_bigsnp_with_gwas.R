@@ -5,10 +5,7 @@
 #' @param ncores how many cores should be used.
 #' @export
 
-match_genotype_with_gwas <- function(obj, gwas, ind_row = NULL, ncores = 1){
-
-    # assume that effect index correspond to gwas index
-    stopifnot(length(effects) == nrow(gwas))
+match_bigsnp_with_gwas <- function(obj, gwas, ind_row = NULL, ncores = 1){
 
     # add indexes used for later subsetting
     bed_map <- obj$map
@@ -32,9 +29,6 @@ match_genotype_with_gwas <- function(obj, gwas, ind_row = NULL, ncores = 1){
     # check that all positions match
     stopifnot(all(gwas_matched$pos == bed_map$pos))
 
-    # get subset of effects corresponding to bed_map
-    matched_effects <- effects[indicies]
-
     # subset bigsnp to get the right genotypes
     samples <- obj$bigsnp$fam$sample.ID
     if (is.null(ind_row)) ind_row <- 1:length(samples)
@@ -43,7 +37,7 @@ match_genotype_with_gwas <- function(obj, gwas, ind_row = NULL, ncores = 1){
     genotypes <- subsetted_bigsnp$genotypes
     stopifnot(dim(genotypes)[2] == nrow(gwas_matched))
 
-    return(list(G = genotypes, map = gwas_matched, sid =  samples[ind_row], gwas_indicies = indicies))
+    return(list(genotypes = genotypes, map = gwas_matched, sid =  samples[ind_row], gwas_indicies = indicies))
 }
 
 
