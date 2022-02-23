@@ -26,7 +26,7 @@ main <- function(args){
   info_snp <- snp_match(gwas, ld_data$map, join_by_pos = TRUE, strand_flip = FALSE)
 
   # qc summary statistics
-  qc <- qc_binary_sumstat(ld_data$G, info_snp, NCORES)
+  qc <- qc_sumstat(ld_data$G, info_snp, trait = args$trait, ncores = NCORES)
   well_behaved_snps <- (!qc$is_bad)
   gwas <- info_snp[well_behaved_snps, ]
   gwas$marker <- get_ldpred_marker(gwas)

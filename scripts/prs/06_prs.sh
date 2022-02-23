@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 2
+#$ -t 1-34
 #$ -V
 
 source utils/bash_utils.sh
@@ -20,7 +20,7 @@ readonly ldsc_dir="data/prs/ldsc"
 readonly pred_dir="data/prs/hapmap/ukb_500k"
 readonly ld_dir="data/prs/hapmap/ld/matrix"
 readonly pheno_dir="data/phenotypes"
-readonly out_dir="data/prs/scores/test"
+readonly out_dir="data/prs/scores/inf"
 
 readonly pheno_list_cts="${pheno_dir}/curated_phenotypes_cts_header.tsv"
 readonly phenotype_cts=$( cut -f${SGE_TASK_ID} ${pheno_list_cts} )
@@ -39,7 +39,7 @@ submit_ldpred2()
   local out_prefix="${out_dir}/prs_${method}_${phenotype}_chrCHR"
   set -x
   qsub -N "_prs_${phenotype}" \
-    -t 21 \
+    -t 1-22 \
     -q short.qc@@short.hge \
     -pe shmem "${cores}" \
     "${bash_script}" \
@@ -52,6 +52,7 @@ submit_ldpred2()
   set +x 
 }
 
-submit_ldpred2 "auto" "6" "${phenotype_binary}"
-#submit_ldpred2 "inf" "1" "${phenotype_binary}"
+
+#submit_ldpred2 "auto" "6" "${phenotype_binary}"
+submit_ldpred2 "inf" "1" "${phenotype_binary}"
 

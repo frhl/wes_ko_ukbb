@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc@@short.hga
-#$ -t 1-3
+#$ -t 1
 #$ -V
 
 # cts
@@ -20,7 +20,6 @@ source utils/hail_utils.sh
 
 readonly in_dir="data/prs/hapmap/ukb_500k"
 readonly pheno_dir="data/phenotypes"
-readonly out_dir="data/prs/sumstat/new_gwas"
 
 readonly bash_script="scripts/prs/_gwas.sh"
 readonly hail_script="scripts/prs/03_gwas.py"
@@ -40,10 +39,11 @@ readonly phenotype_binary=$( cut -f${SGE_TASK_ID} ${pheno_list_binary} )
 
 submit_gwas_job()
 {
-  mkdir -p ${out_dir}
-  local phenotype="${1}"
+  local out_dir="${1}"
+  local phenotype="${2}"
   local out_prefix="${out_dir}/ukb_hapmap_500k_eur_${phenotype}"
   local prefix="${out_prefix}_chrCHR"
+  mkdir -p ${out_dir}
   set -x
   qsub -N "_${phenotype}_sumstat" \
     -t 1-22 \
@@ -76,7 +76,8 @@ submit_merge_job()
 
 }
 
-submit_gwas_job "${phenotype_binary}"
+#submit_gwas_job "data/prs/sumstat/binary/by_chrom" "${phenotype_binary}"
+submit_gwas_job "data/prs/sumstat/cts/by_chrom" "${phenotype_cts}"
 
 
 

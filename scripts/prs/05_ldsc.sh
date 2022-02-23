@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 1-2
+#$ -t 1-3
 #$ -V
 
 source utils/bash_utils.sh
@@ -15,9 +15,9 @@ source utils/qsub_utils.sh
 
 readonly rscript="scripts/prs/05_ldsc.R"
 
-readonly gwas_dir="data/prs/sumstat/old"
+readonly gwas_dir="data/prs/sumstat/cts/combined"
 readonly bed_dir="data/prs/hapmap/ld/unrel_eur_10k"
-readonly out_dir="data/prs/ldsc/updated_vars"
+readonly out_dir="data/prs/ldsc"
 
 readonly ld_bed="${bed_dir}/short_merged_ukb_hapmap_rand_10k_eur.bed"
 readonly ld_dir="data/prs/hapmap/ld/matrix"
@@ -52,5 +52,6 @@ estimate_heritability(){
   fi
 }
 
-estimate_heritability "${phenotype_binary}" "binary"
+#estimate_heritability "${phenotype_binary}" "binary"
+estimate_heritability "${phenotype_cts}" "cts"
 
