@@ -1,5 +1,11 @@
 # Polygenic Risk Scoring using LDpred2
 
+Todo:
+* Make holdout set
+* QC phenotypes, only including binary phenotypes which has >1250 cases.
+* retain enforcing MAF > 1%, just add this extra restriction
+* Dan Howrigan used was 25/(2 x min(cases, controls)) see [this](http://www.nealelab.is/blog/2017/9/11/details-and-considerations-of-the-uk-biobank-gwas).
+
 ## Overview
 | Script                            | Description                                   | Requires output from |
 | -                                 | -                                             | - |

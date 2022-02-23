@@ -6,19 +6,16 @@ import argparse
 from ko_utils import qc
 from ukb_utils import hail_init
 from ukb_utils import genotypes
-
+from ukb_utils import variants
 
 def main(args):
 
     # parser
     input_path = args.input_path
     input_type = args.input_type
-    #dataset = args.dataset
-    #extract_samples = args.extract_samples
-    #min_info = args.min_info
-    #liftover = args.liftover
-    #hapmap = args.hapmap
+    adjust_maf_by_case_control = args.adjust_maf_by_case_control
     response = args.response
+    min_cases = args.min_cases
     covariates = args.covariates
     phenotypes = args.phenotypes
     out_prefix = args.out_prefix
@@ -27,6 +24,7 @@ def main(args):
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
     
     mt = qc.get_table(input_path, input_type)
+   
     if phenotypes:
         ht = hl.import_table(phenotypes,
                      types={'eid': hl.tstr},
@@ -36,19 +34,26 @@ def main(args):
         mt = mt.annotate_cols(pheno=ht[mt.s])
     else:
         raise ValueError("param 'phenotypes' is not set! ")
-    
+
     covariates = covariates.split(',')
     if set(list(mt.pheno)) >= set(covariates):
         covariates = [mt.pheno[x] for x in covariates]
         covariates.insert(0, 1) 
         if response in list(mt.pheno):
             if mt.pheno[response].dtype == hl.dtype('float64'):
-                reg = hl.linear_regression_rows(
+               reg = hl.linear_regression_rows(
                         y=mt.pheno[response],
                         x=mt.GT.n_alt_alleles(),
                         covariates=covariates
                         )
             elif mt.pheno[response].dtype == hl.dtype('bool'):
+                cases = mt.aggregate_cols(hl.agg.sum(mt.pheno[response] == 1))
+                controls = mt.aggregate_cols(hl.agg.sum(mt.pheno[response] == 0))
+                if cases < int(min_cases):
+                     raise ValueError(str(cases) + " cases found! Expected +" + str(min_cases))
+                if adjust_maf_by_case_control:
+                     min_maf = 25/(2 * hl.min([cases, controls]))
+                     mt = mt.filter_rows(variants.get_maf_expr(mt) > float(min_maf))
                 reg = hl.logistic_regression_rows(
                         test='wald',
                         y=mt.pheno[response],
@@ -69,16 +74,16 @@ def main(args):
     # get AFs
     #mt = qc.recalc_info(mt) # already being done in qc.get_table
     reg = reg.annotate(
-        AN = mt.rows()[reg.key].info.AN,
-        AC = mt.rows()[reg.key].info.AC,
-        AF = mt.rows()[reg.key].info.AF
+        AN=mt.rows()[reg.key].info.AN,
+        AC=mt.rows()[reg.key].info.AC,
+        AF=mt.rows()[reg.key].info.AF
     )
     
     # Get individual alleles
     reg = reg.annotate(
-        a0 = reg.alleles[0],
-        a1 = reg.alleles[1]
-    )    
+        a0=reg.alleles[0],
+        a1=reg.alleles[1]
+    )
 
     reg.flatten().export(out_prefix + ".txt.gz")
 
@@ -90,7 +95,8 @@ if __name__=='__main__':
     parser.add_argument('--chrom', default=None, help='chromosomes to be parsed.')
     parser.add_argument('--input_path', default=None, help='Path to input.')
     parser.add_argument('--input_type', default=None, help='Input type (vcf/mt/plink).')
-    #parser.add_argument('--min_info', default=None, help='minimum info score (only imputed data)')
+    parser.add_argument('--min_cases', default=1, help='Minimum number of cases allowed for binary traits.')
+    parser.add_argument('--adjust_maf_by_case_control', default=None, action='store_true', help='Perform further subsets on MAF based on case/controls')
     #parser.add_argument('--liftover', default=None, action='store_true', help='perform liftover')
     #parser.add_argument('--extract_samples', default=None, help='Subset to sample IDs in file')
     #parser.add_argument('--hapmap', default=None, help='Path to HapMap SNPs')

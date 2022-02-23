@@ -15,7 +15,8 @@ readonly input_type=${3?Error: Missing arg2 (input_type)}
 readonly pheno_file=${4?Error: Missing arg3 (pheno_file)}
 readonly phenotype=${5?Error: Missing arg4 (phenotype)}
 readonly covariates=${6?Error: Missing arg6 (covariates)}
-readonly prefix=${7?Error: Missing arg8 (out_prefix)}
+readonly min_cases=${7?Error: Missing arg6 (covariates)}
+readonly prefix=${8?Error: Missing arg8 (out_prefix)}
 
 readonly chr=${SGE_TASK_ID}
 readonly input_path_chr=$(echo ${input_path} | sed -e "s/CHR/${chr}/g")
@@ -34,6 +35,7 @@ if [ ! -f "${out_prefix_chr}.txt.gz" ]; then
      --input_path "${input_path_chr}" \
      --input_type "${input_type}" \
      --phenotypes "${pheno_file}" \
+     --min_cases "${min_cases}" \
      --response "${phenotype}" \
      --covariates "${covariates}" \
      --out_prefix "${out_prefix_chr}"

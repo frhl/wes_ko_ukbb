@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc@@short.hga
-#$ -t 1
+#$ -t 16
 #$ -V
 
 # cts
@@ -37,6 +37,8 @@ readonly phenotype_cts=$( cut -f${SGE_TASK_ID} ${pheno_list_cts} )
 readonly pheno_list_binary="${pheno_dir}/curated_phenotypes_binary_header.tsv"
 readonly phenotype_binary=$( cut -f${SGE_TASK_ID} ${pheno_list_binary} )
 
+readonly min_cases=1250
+
 submit_gwas_job()
 {
   local out_dir="${1}"
@@ -46,7 +48,7 @@ submit_gwas_job()
   mkdir -p ${out_dir}
   set -x
   qsub -N "_${phenotype}_sumstat" \
-    -t 1-22 \
+    -t 21 \
     -q short.qc@@short.hge \
     -pe shmem 1 \
     "${bash_script}" \
@@ -56,6 +58,7 @@ submit_gwas_job()
     "${pheno_file}" \
     "${phenotype}" \
     "${covariates}" \
+    "${min_cases}" \
     "${prefix}"
   set +x
   submit_merge_job
@@ -76,8 +79,8 @@ submit_merge_job()
 
 }
 
-#submit_gwas_job "data/prs/sumstat/binary/by_chrom" "${phenotype_binary}"
-submit_gwas_job "data/prs/sumstat/cts/by_chrom" "${phenotype_cts}"
+submit_gwas_job "data/prs/sumstat/binary/test" "${phenotype_binary}"
+#submit_gwas_job "data/prs/sumstat/cts/by_chrom" "${phenotype_cts}"
 
 
 
