@@ -20,8 +20,8 @@
 
 ## references
 
-* [Florian Privé, Julyan Arbel, Bjarni J Vilhjálmsson, LDpred2: better, faster, stronger, Bioinformatics, Volume 36, Issue 22-23, 1 December 2020, Pages 5424–5431](https://academic.oup.com/bioinformatics/article/36/22-23/5424/6039173)
-* [Vilhjálmsson BJ, Yang J, Finucane HK, et al. Modeling Linkage Disequilibrium Increases Accuracy of Polygenic Risk Scores. Am J Hum Genet 2015](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4596916/
+* [Florian Privé, Julyan Arbel, Bjarni J Vilhjálmsson, LDpred2: better, faster, stronger, Bioinformatics, Volume 36, Issue 22-2 2020](https://academic.oup.com/bioinformatics/article/36/22-23/5424/6039173)
+* [Vilhjálmsson BJ, Yang J, Finucane HK, et al. Modeling Linkage Disequilibrium Increases Accuracy of Polygenic Risk Scores. Am J Hum Genet 2015](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4596916/)
 
 
 
