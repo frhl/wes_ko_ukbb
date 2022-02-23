@@ -13,8 +13,8 @@ qc_sumstat <- function(G, info_snp, n_eff, trait, ncores = 1){
       sd_ss <- with(info_snp, 2 / sqrt(n_eff * beta_se^2 + beta^2))
     } else {
       # estimate sd(y) from summary statistics
-      sd_y <- min(sqrt(0.5) * info_snp$beta_se^2 * n) 
-      sd_ss <- with(info_snp, sd_y / sqrt(n * beta_se^2 + beta^2))
+      sd_y <- min(with(info_snp, sqrt(0.5) * beta_se^2 * n_eff)) 
+      sd_ss <- with(info_snp, sd_y / sqrt(n_eff * beta_se^2 + beta^2))
     }
     is_bad_sd <-
       sd_ss < (0.5 * sd_val) | sd_ss > (sd_val + 0.1) | sd_ss < 0.1 | sd_val < 0.05
