@@ -2,8 +2,7 @@
 
 Todo:
 * Make holdout set
-* retain enforcing MAF > 1%, just add this extra restriction
-* Dan Howrigan used was 25/(2 x min(cases, controls)) see [this](http://www.nealelab.is/blog/2017/9/11/details-and-considerations-of-the-uk-biobank-gwas).
+* Dan Howrigan used was 25/(2 x min(cases, controls)) 
 
 ## Overview
 | Script                            | Description                                   | Requires output from |
@@ -22,16 +21,12 @@ Todo:
 
 * [LDpred2 tutorial](https://privefl.github.io/bigsnpr/articles/LDpred2.html) by Florian Privé
 * [Anoter PRS tutorial](https://privefl.github.io/bigsnpr-extdoc/polygenic-scores-pgs.html) by Florian
+* [Details and considerations](http://www.nealelab.is/blog/2017/9/11/details-and-considerations-of-the-uk-biobank-gwas) when conducting gwas in UK Biobank
 
 
 ## references
 
 * [Florian Privé, Julyan Arbel, Bjarni J Vilhjálmsson, LDpred2: better, faster, stronger, Bioinformatics, Volume 36, Issue 22-2 2020](https://academic.oup.com/bioinformatics/article/36/22-23/5424/6039173)
 * [Vilhjálmsson BJ, Yang J, Finucane HK, et al. Modeling Linkage Disequilibrium Increases Accuracy of Polygenic Risk Scores. Am J Hum Genet 2015](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4596916/)
-
-
-
-
-
 
 

@@ -16,6 +16,8 @@ def main(args):
     chrom = args.chrom
     dataset = args.dataset
     extract_samples = args.extract_samples
+    exclude_samples = args.exclude_samples
+    write_samples = args.write_samples
     min_info = args.min_info
     liftover = args.liftover
     hapmap = args.hapmap
@@ -51,6 +53,10 @@ def main(args):
     if extract_samples:
         ht_samples = hl.import_table(extract_samples, no_header=True, key='f0', delimiter=',')
         mt = mt.filter_cols(hl.is_defined(ht_samples[mt.col_key]))
+    
+    if exclude_samples:
+        ht_samples = hl.import_table(exclude_samples, no_header=True, key='f0', delimiter=',')
+        mt = mt.filter_cols(~hl.is_defined(ht_samples[mt.col_key]))
   
     if exclude_related:
         related = samples.get_ukb_is_related_using_kinship_expr(mt)
@@ -91,8 +97,12 @@ def main(args):
         chroms.append('chrX')
         filter_expr = hl.literal(set(chroms)).contains(mt.locus.contig)
         mt = mt.filter_rows(filter_expr)
+    
+    if write_samples and out_prefix:
+        mt.cols().write(out_prefix + "_samples.ht")
 
-    io.export_table(mt, out_prefix, out_type)
+    if out_type and out_prefix:
+        io.export_table(mt, out_prefix, out_type)
 
 
 if __name__=='__main__':
@@ -104,7 +114,9 @@ if __name__=='__main__':
     parser.add_argument('--dbsnp', default=None, action='store_true', help='Annotate rsids.')
     parser.add_argument('--exclude_related', default=None, action='store_true', help='Exclude any related individuals.')
     parser.add_argument('--filter_missing', default=None, help='Filter to variants with lt value in genotype missingness.')
-    parser.add_argument('--extract_samples', default=None, help='Subset to sample IDs in file')
+    parser.add_argument('--extract_samples', default=None, help='Subset to sample IDs in MatrixTable')
+    parser.add_argument('--exclude_samples', default=None, help='Exclude sample IDs from MatrixTable')
+    parser.add_argument('--write_samples', default=None, action='store_true', help='Write hail table cols of subsetted dataset')
     parser.add_argument('--dataset', default=None, help='Either "imp" or "calls".')
     parser.add_argument('--ancestry', default=None, help='Either "eur" or "all".')
     parser.add_argument('--hapmap', default=None, help='Path to hapmap file')

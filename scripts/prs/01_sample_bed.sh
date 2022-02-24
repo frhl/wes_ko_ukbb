@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 3
 #$ -q long.qc@@long.hga
-#$ -t 1-22
+#$ -t 21
 #$ -V
 
 source utils/qsub_utils.sh
@@ -39,13 +39,14 @@ if [ ! -f "${out_prefix}.bed" ]; then
      --exclude_related \
      --filter_missing 0.05 \
      --random_samples 10000 \
+     --write_samples \
      --hapmap "${hap_file}" \
      --min_maf 0.01 \
      --liftover \
      --dbsnp \
      --only_valid_contigs \
-     --out_prefix "${out_prefix}" \
-     --out_type "plink" 
+     --out_prefix "${out_prefix}"
+     #--out_type "plink" 
   set +x
 else
   print_update "file ${out} already exists. Skipping!"
