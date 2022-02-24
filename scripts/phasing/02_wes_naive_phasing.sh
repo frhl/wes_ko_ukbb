@@ -42,6 +42,7 @@ if [ ! -f "${out_file}" ]; then
     && print_update "Finished phasing variants for chr${chr}, out: ${out}" "${SECONDS}" \
     || raise_error "$( print_update "Phasing variants failed for chr${chr}" ${SECONDS} )"
   module purge
+  log_runtime ${SECONDS}
 fi
 
 module load BCFtools/1.12-GCC-10.3.0
