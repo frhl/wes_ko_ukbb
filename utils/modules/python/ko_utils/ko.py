@@ -46,6 +46,21 @@ def csqs_case_builder(worst_csq_expr: hl.StringExpression, use_loftee: bool = Tr
     return case.or_missing()
 
 
+def set_to_phased_call(gt):
+    """ Set an unphased genotype call to phased genotype 
+    
+    :param gt: genotype call to be converted
+    """
+    assert str(gt.dtype) == 'call'
+    return((hl.case()
+    .when(gt == hl.parse_call("1/0"), hl.parse_call("1|0"))
+    .when(gt == hl.parse_call("0/1"), hl.parse_call("0|1"))
+    .when(gt == hl.parse_call("1/1"), hl.parse_call("1|1"))
+    .when(gt == hl.parse_call("0/0"), hl.parse_call("0|0"))
+    .or_missing()))
+
+
+
 def is_phased(gt: hl.call):
     """is a call phased
     

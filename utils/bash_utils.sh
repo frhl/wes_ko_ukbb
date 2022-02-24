@@ -33,6 +33,8 @@ print_update() {
   set -o nounset
 }
 
+
+
 #vcf_check() {
 #  if [ ! -f $1 ]; then # check that VCF exists
 #    raise_error "$1 does not exist"

@@ -50,7 +50,7 @@ def filter_min_mac(mt, mac=None):
     return mt
 
 
-def filter_min_missing(mt, value=0.05):
+def filter_missing(mt, value=0.05):
     r'''Filter variants to have less than {value} in genotype missigness"'''
     assert value >= 0 and value < 1
     missing = hl.agg.mean(hl.is_missing(mt.GT)) <= value
