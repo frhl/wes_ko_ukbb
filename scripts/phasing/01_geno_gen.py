@@ -22,6 +22,7 @@ def main(args):
     chrom = args.chrom
     dataset = args.dataset
     convert_sample_id = args.convert_sample_id
+    extract_samples = args.extract_samples
     min_info = args.min_info
     liftover = args.liftover
     min_mac = args.min_mac
@@ -46,6 +47,9 @@ def main(args):
 
     if convert_sample_id:
         mt = samples.convert_sample_ids(mt, 12788, 11867)
+    if extract_samples:
+        ht_samples = hl.import_table(extract_samples, no_header=True, key='f0', delimiter=',')
+        mt = mt.filter_cols(hl.is_defined(ht_samples[mt.col_key])) 
     if liftover:
         mt = variants.liftover(mt, from_build='GRCh37', to_build='GRCh38', drop_annotations=True)
 
@@ -109,6 +113,7 @@ if __name__=='__main__':
     parser.add_argument('--ancestry', default=None, help='filter to specific ancestry')
     parser.add_argument('--convert_sample_id', default=None, action='store_true', help='convert to lindgren sample id')
     parser.add_argument('--dataset', default=None, help='Either "imp" or "calls".')
+    parser.add_argument('--extract_samples', default=None, help='HailTable with samples to be extracted.')
     parser.add_argument('--min_mac', default=None, help='Filter to MAC >= value')
     parser.add_argument('--missing', default=None, help='Filter to variants to have le value in genotype missingness')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')

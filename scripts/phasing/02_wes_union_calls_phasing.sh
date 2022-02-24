@@ -13,8 +13,8 @@ source utils/qsub_utils.sh
 source utils/vcf_utils.sh
 source utils/bash_utils.sh
 
-readonly in_dir="data/unphased/wes/wes_union_calls"
-readonly out_dir="data/phased/wes/wes_union_calls"
+readonly in_dir="data/unphased/wes_union_calls"
+readonly out_dir="data/phased/wes_union_calls"
 readonly ref_dir="/well/lindgren/flassen/ressources/panels/liftover_reference_panel/data/liftover"
 readonly fam_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 #readonly scaffold_dir="data/phased/calls/naive"

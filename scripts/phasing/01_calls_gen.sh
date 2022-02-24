@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc
-#$ -t 1-22
+#$ -t 21
 #$ -V
 
 source utils/qsub_utils.sh
@@ -20,8 +20,10 @@ readonly hail_script="scripts/phasing/01_geno_gen.py"
 
 readonly chr=$( get_chr ${SGE_TASK_ID} )
 readonly out_dir="data/unphased/calls"
-readonly out_prefix="${out_dir}/ukb_prefilter_calls_500k_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_prefilter_calls_200k_chr${chr}"
 readonly out_type="vcf"
+
+readonly sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
 
 mkdir -p ${spark_dir}
 mkdir -p ${out_dir}
@@ -35,6 +37,7 @@ if [ ! -f "$( get_hail_ext ${out_prefix} ${out_type})" ]; then
      --chrom "${chr}" \
      --out_prefix "${out_prefix}" \
      --out_type "${out_type}" \
+     --extract_samples "${sample_list}" \
      --liftover \
      --min_mac 2 \
      --missing 0.05 \

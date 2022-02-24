@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc@@short.hga
-#$ -t 1-22
+#$ -t 20-22
 #$ -V
 
 source utils/qsub_utils.sh
@@ -23,7 +23,7 @@ readonly in_file="${in_dir}/ukb_wes_200k_filtered_chr${chr}.mt"
 readonly in_type="mt"
 
 readonly out_dir="data/unphased/wes_union_calls"
-readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
 readonly out_type="vcf"
 
 mkdir -p ${spark_dir}
@@ -41,7 +41,6 @@ if [ ! -f "${out_prefix}.vcf.bgz" ]; then
      --out_type "${out_type}" \
      --min_mac 2 \
      --missing 0.05 \
-     --ancestry "eur" \
      --dataset "calls" \
      --liftover
   set +x
@@ -49,8 +48,9 @@ if [ ! -f "${out_prefix}.vcf.bgz" ]; then
 else
   print_update "file ${out} already exists. Skipping!"
 fi
+#--ancestry "eur" \
 
-module purge
+  module purge
 module load BCFtools/1.12-GCC-10.3.0
 make_tabix "${out_prefix}.vcf.bgz" "tbi"
 
