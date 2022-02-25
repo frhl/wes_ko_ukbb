@@ -6,8 +6,10 @@
 #$ -e logs/wes_union_calls_phasing.errors.log
 #$ -P lindgren.prjc
 #$ -q long.qc@@long.hga
-#$ -pe shmem 16
+#$ -pe shmem 20
 #$ -t 21
+
+# note, shmem 16 is not enough for chrom 21.
 
 source utils/qsub_utils.sh
 source utils/vcf_utils.sh
