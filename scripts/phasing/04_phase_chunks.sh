@@ -9,7 +9,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qe
-#$ -t 21
+#$ -t 20-22
 #$ -V
 
 set -o errexit
@@ -18,82 +18,71 @@ module purge
 
 # Set up
 source utils/qsub_utils.sh
-#source /well/lindgren/UKBIOBANK/nbaya/resources/ukb_utils/bash/qsub_utils.sh
 source utils/hail_utils.sh
-#source_ukb_utils_scripts hail vcf
+source utils/vcf_utils.sh
 
-spark_dir="data/tmp/spark"
+readonly hail_script="scripts/phasing/04_phase_chunks.py"
+readonly phasing_script="scripts/phasing/_phase_chunks.sh"
+readonly spark_dir="data/tmp/spark"
 set_up_hail
 set_up_pythonpath_legacy
-#add_module_to_pythonpath ukb_utils ukb_wes_qc phase_ukb_imputed phase_ukb_wes
-
-readonly hail_script="scripts/phasing/_phase_chunks.py"
-readonly utils_script="scripts/phasing/_phase_chunks_utils.py"
-
-readonly chr=$( get_chr ${SGE_TASK_ID} )
 
 # Version of chrX-specific filter to use (options: females_only, both_sexes)
 readonly chrX_filter_version="females_only"
 # Number of variants within each interval
 readonly min_interval_unit=1000
 # Default size of phasing window in terms of variant count (should be a multiple of min_interval_unit)
-readonly phasing_region_size=50000 #100000
+readonly phasing_region_size=52000 #100000
 # Minimum overlap between adjacent phasing windows
 readonly phasing_region_overlap=$(( ${phasing_region_size}/4 ))  
 # Maximum size of phasing window allowed, only used at the end of a chromosome
 # Must be larger than phasing_region_size
 readonly max_phasing_region_size=100000 
 
-readonly phasing_interval_flags="--chrom ${chr} --min_interval_unit ${min_interval_unit}"
-readonly intervals_path=$( python3 ${utils_script} ${phasing_interval_flags} --print_phasing_intervals_path )
+readonly chr=$( get_chr ${SGE_TASK_ID} )
 
-if [ -z "${intervals_path}" ]; then
+# Cluster params
+readonly queue="short.qa"
+readonly nslots=24
+
+# what vcf should be phased
+readonly vcf_dir=" data/unphased/wes_union_calls"
+readonly vcf_to_phase="${vcf_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.vcf.bgz"
+
+# Output paths
+readonly out_dir="data/phased/wes_union_calls"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
+readonly out_prefix_w_job_config="${out_prefix}-${nslots}x${queue}/prs${phasing_region_size}_pro${phasing_region_overlap}_mprs${max_phasing_region_size}"
+readonly out="${out_prefix_w_job_config}.vcf.gz"
+readonly out_symlink="${out_prefix}.vcf.gz"
+
+readonly interval_dir="${out_dir}/intervals"
+readonly interval_path="${interval_dir}/intervals_min_${min_interval_unit}_chr${chr}.tsv"
+readonly phasing_interval_flags="--chrom ${chr} --min_interval_unit ${min_interval_unit}"
+
+if [ -z "${interval_path}" ]; then
   raise_error "Getting intervals path failed"
 fi
 
-
 # Write phasing (minumum unit) intervals to slice later for phasing intervals
-if [ ! -f ${intervals_path} ]; then
-  mkdir -p $( dirname ${intervals_path} )
+if [ ! -f ${interval_path} ]; then
+  mkdir -p $( dirname ${interval_path} )
   set_up_hail
   set_up_pythonpath_legacy
   SECONDS=0
   python3 ${hail_script} \
     ${phasing_interval_flags} \
     --write_intervals \
+    --interval_path ${interval_path} \
+    --target_vcf ${vcf_to_phase} \
     && print_update "Finished writing intervals for chr${chr}" ${SECONDS} \
     || raise_error "Writing intervals for chr${chr} failed" 
 else
-  print_update "${intervals_path} already exists!"
+  print_update "${interval_path} already exists!"
 fi
 
-
-# Cluster params
-readonly queue="short.qa"
-readonly nslots=10
-
-# Phased VCF to use as a scaffold for SHAPEIT4
-readonly vcf_dir=" data/unphased/wes_union_calls"
-readonly vcf_to_phase="${vcf_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.vcf.bgz"
-readonly scaffold=""
-
-# Output paths
-readonly out_dir="data/phased/wes/call_union"
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
-readonly out_prefix_w_job_config="${out_prefix}-${nslots}x${queue}/prs${phasing_region_size}_pro${phasing_region_overlap}_mprs${max_phasing_region_size}"
-readonly out="${out_prefix_w_job_config}.vcf.gz"
-readonly out_symlink="${out_prefix}.vcf.gz"
-
-# Phasing script
-readonly phasing_script="scripts/phasing/_phase_chunks.sh"
-
-# Add BCFtools to PATH
-export PATH="${PATH}:/gpfs3/users/gms/whv244/bcftools_1.11/bin"
-#bcftools_check
-
-
 submit_phasing_job() {
-  readonly max_phasing_idx=$( python3 ${hail_script} ${phasing_interval_flags} --phasing_region_size ${phasing_region_size} --phasing_region_overlap ${phasing_region_overlap} --max_phasing_region_size ${max_phasing_region_size} --get_max_phasing_idx )
+  readonly max_phasing_idx=$( python3 ${hail_script} ${phasing_interval_flags} --phasing_region_size ${phasing_region_size} --phasing_region_overlap ${phasing_region_overlap} --max_phasing_region_size ${max_phasing_region_size} --get_max_phasing_idx --interval_path ${interval_path} )
   qsub -N "_c${chr}_phase_chunks" \
     -t 1-${max_phasing_idx} \
     -q ${queue} \
@@ -102,20 +91,18 @@ submit_phasing_job() {
     ${chr} \
     ${vcf_to_phase} \
     ${min_interval_unit} \
+    ${interval_path} \
     ${phasing_region_size} \
     ${phasing_region_overlap} \
     ${max_phasing_region_size} \
-    ${out_prefix_w_job_config} \
-    ${scaffold}
+    ${out_prefix_w_job_config}
 }
 
 if [ ! -f ${out} ]; then
   SECONDS=0
-
-  #vcf_check ${vcf_to_phase}
-  #vcf_check ${scaffold}
+  module load BCFtools/1.12-GCC-10.3.0
+  vcf_check ${vcf_to_phase}
   submit_phasing_job
-
   duration=${SECONDS}
   print_update "Finished submitting scattered phasing jobs for chr${chr}" "${duration}"
 else

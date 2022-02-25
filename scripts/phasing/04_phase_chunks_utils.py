@@ -21,11 +21,14 @@ TMP_DIR = f'{PHASE_WD}/data/tmp'
 def get_prefilter_path_prefix(chrom):
     return f'{TMP_DIR}/prefilter/tmp-ukb_imp_phasing_prefilter_chr{chrom}'
 
-def get_unphased_non_singleton_variants_path_prefix(chrom):
-    return f'{TMP_DIR}/unphased/non_singl{chrom}'
+#def get_unphased_non_singleton_variants_path_prefix(chrom):
+#    return f'{TMP_DIR}/unphased/non_singl{chrom}'
 
-def get_phasing_intervals_path(chrom, min_interval_unit):
-    return f'{DATA_DIR}/intervals/intervals_min{min_interval_unit}_chr{chrom}.tsv'
+#def get_phasing_intervals_path(chrom, min_interval_unit):
+#    return f'{DATA_DIR}/intervals/intervals_min{min_interval_unit}_chr{chrom}.tsv'
+
+#def get_phasing_intervals_path(chrom, min_interval_unit, interval_prefix):
+#            return f'{interval_prefix}_min{min_interval_unit}.tsv'
 
 def get_fam(app_id=11867, imp_200k_only=False):
     # use files created by the command:
@@ -184,13 +187,15 @@ def main(args):
 
     if args.print_prefilter_path_prefix:
         print(get_prefilter_path_prefix(chrom))
-    elif args.print_phased_non_singleton_variants_path_prefix:
-        print(get_phased_non_singleton_variants_path_prefix(chrom))
+    #elif args.print_phased_non_singleton_variants_path_prefix:
+    #    print(get_phased_non_singleton_variants_path_prefix(chrom))
     elif args.print_phasing_intervals_path:
-        print(get_phasing_intervals_path(
-            chrom=args.chrom,
-            min_interval_unit=args.min_interval_unit
-        ))
+        print(args.interval_path)
+        #print(get_phasing_intervals_path(
+        #    chrom=args.chrom,
+        #    min_interval_unit=args.min_interval_unit,
+        #    interval_prefix=args.interval_prefix
+        #))
 
 
 if __name__ == '__main__':
@@ -210,6 +215,8 @@ if __name__ == '__main__':
                         help="Version of filtering to run on chrX")
     parser.add_argument('--min_interval_unit', default=None,
                         help='Number of variants within each interval')
+    parser.add_argument('--interval_path', default=None,
+                        help='path to interval')
     parser.add_argument('--print_phasing_intervals_path', action='store_true',
                         help="Prints path to phasing intervals file. Requires defined args for --chrom, --phasing_region_size, --phasing_region_overlap and --max_phasing_region_size.")
 

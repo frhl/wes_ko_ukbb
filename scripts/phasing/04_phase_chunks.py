@@ -15,15 +15,16 @@ from ukb_utils.vcf import import_vcf
 PHASE_WD = '/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb'
 DATA_DIR = f'{PHASE_WD}/data'
 
-def get_phasing_intervals_path(chrom, min_interval_unit):
-        return f'{DATA_DIR}/intervals/intervals_min{min_interval_unit}_chr{chrom}.tsv'
+#def get_phasing_intervals_path(chrom, min_interval_unit, interval_prefix):
+#        return f'{interval_prefix}_min{min_interval_unit}.tsv'
+#        #return f'{DATA_DIR}/intervals/intervals_min{min_interval_unit}_chr{chrom}.tsv'
 
 
-def get_unphased_non_singleton_variants_path_prefix(chrom):
-        return f'{DATA_DIR}/unphased/wes_union_calls/ukb_eur_wes_union_calls_200k_chr{chrom}'
+#def get_unphased_non_singleton_variants_path_prefix(chrom):
+#        return f'{DATA_DIR}/unphased/wes_union_calls/ukb_eur_wes_union_calls_200k_chr{chrom}'
 
 
-def write_intervals(chrom: int, min_interval_unit: int):
+def write_intervals(chrom: int, min_interval_unit: int, interval_path: str, vcf: str):
     """Write table with variants broken up into intervals
     Note that this is not used to get the intervals that we actually phase with,
     it's to get the chunks of variants that we then slice into to get intervals.
@@ -32,12 +33,11 @@ def write_intervals(chrom: int, min_interval_unit: int):
         files. E.g., if min_interval_unit=1000, the interval file would have every
         1000th variant printed out except for the final row, which has the last
         variant in the dataset.
+    :param interval_prefix: path prefix to interval file
     """
-    intervals_path = get_phasing_intervals_path(chrom, min_interval_unit)
-    vcf_path = get_unphased_non_singleton_variants_path_prefix(chrom)+'.vcf.bgz',
-    print(f'Writing intervals of size {min_interval_unit} to {intervals_path} using {vcf_path}')
+    
     mt = import_vcf(
-        path = vcf_path,
+        path = vcf,
         reference_genome='GRCh38'
     )
     mt = mt.add_row_index()
@@ -56,7 +56,7 @@ def write_intervals(chrom: int, min_interval_unit: int):
         *['row_idx']
     )
 
-    ht.export(intervals_path)
+    ht.export(interval_path)
 
 
 def get_raw_start_idx(phasing_region_size: int, phasing_region_overlap: int,
@@ -75,7 +75,7 @@ def get_raw_start_idx(phasing_region_size: int, phasing_region_overlap: int,
 
 def get_interval(chrom: str, min_interval_unit: int, phasing_region_size: int,
                  phasing_region_overlap: int, max_phasing_region_size: int, phasing_idx: int,
-                 reference_genome='GRCh38'):
+                 interval_path: str, reference_genome='GRCh38'):
     """Return genomic interval to be phased
     :param chrom: Chromosome of genomic interval
     :param min_interval_unit: (integer) Units of variant counts in the interval
@@ -88,6 +88,7 @@ def get_interval(chrom: str, min_interval_unit: int, phasing_region_size: int,
         a phasing interval.
     :param phasing_idx: 1-based index for phasing intervals. The first interval
         has index = 1.
+    :param interval_prefix: path prefix to interval file
     :param reference_genome: Reference genome. Only affects whether a "chr"
         prefix is added to the region.
     """
@@ -100,7 +101,8 @@ def get_interval(chrom: str, min_interval_unit: int, phasing_region_size: int,
             raise ValueError(f"{arg_name} must be a multiple of min_interval_unit")
 
     intervals = pd.read_csv(
-        get_phasing_intervals_path(chrom, min_interval_unit),
+        interval_path,
+        #get_phasing_intervals_path(chrom, min_interval_unit, interval_prefix),
         sep='\t'
     )
 
@@ -154,7 +156,7 @@ def get_interval(chrom: str, min_interval_unit: int, phasing_region_size: int,
     return f"{chrom_prefix}{chrom}:{start_pos}-{stop_pos}"
 
 
-def get_max_phasing_idx(chrom, min_interval_unit, phasing_region_size, phasing_region_overlap, max_phasing_region_size):
+def get_max_phasing_idx(chrom, min_interval_unit, phasing_region_size, phasing_region_overlap, max_phasing_region_size, interval_path):
     """Get maximum phasing index
     """
     # TODO: Make this more elegant + efficient
@@ -165,6 +167,7 @@ def get_max_phasing_idx(chrom, min_interval_unit, phasing_region_size, phasing_r
         'phasing_region_size': phasing_region_size,
         'phasing_region_overlap': phasing_region_overlap,
         'max_phasing_region_size': max_phasing_region_size,
+        'interval_path': interval_path
     }
     while get_interval(phasing_idx=phasing_idx, **kwargs) != '':
         phasing_idx += 1
@@ -193,7 +196,9 @@ def main(args):
 
         write_intervals(
             chrom=args.chrom,
-            min_interval_unit=min_interval_unit
+            min_interval_unit=min_interval_unit,
+            interval_path=args.interval_path,
+            vcf=args.target_vcf
         )
 
     elif args.get_interval:
@@ -204,6 +209,7 @@ def main(args):
             phasing_region_overlap=phasing_region_overlap,
             max_phasing_region_size=max_phasing_region_size,
             phasing_idx=phasing_idx,
+            interval_path=args.interval_path,
             reference_genome=args.reference_genome
         )
         print(interval)
@@ -213,7 +219,8 @@ def main(args):
             min_interval_unit=min_interval_unit,
             phasing_region_size=phasing_region_size,
             phasing_region_overlap=phasing_region_overlap,
-            max_phasing_region_size=max_phasing_region_size
+            max_phasing_region_size=max_phasing_region_size,
+            interval_path=args.interval_path
         )
         print(max_phasing_idx)
 
@@ -240,6 +247,12 @@ if __name__ == '__main__':
                         help="Get genomic interval for phasing")
     parser.add_argument('--get_max_phasing_idx', action='store_true',
                         help="Get maximum phasing index")
+    parser.add_argument('--interval_path', default=None,
+                        help="Path prefix to interval file")
+    parser.add_argument('--target_vcf', default=None,
+                        help="Path prefix to vcf file for which to write intervals")
+
+
 
     args = parser.parse_args()
 
