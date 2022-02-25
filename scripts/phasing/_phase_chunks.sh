@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #$ -N _phase_chunks
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/ukb_phasing
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/_phase_chunks.log
 #$ -e logs/_phase_chunks.errors.log
 #$ -P lindgren.prjc
@@ -32,9 +32,9 @@ readonly phasing_region_size=${4?Error: Missing arg4 (phasing_region_size)} # Mi
 readonly phasing_region_overlap=${5?Error: Missing arg5 (phasing_region_overlap)} # Minimum overlap between adjacent phasing windows
 readonly max_phasing_region_size=${6?Error: Missing arg6 (max_phasing_region_size)} # Maximum size of phasing window allowed, only used at the end of a chromosome. Must be larger than phasing_region_size
 readonly out_prefix=${7?Error: Missing arg7 (path prefix for output intermediate VCF)} # Path to output phased VCF
-readonly scaffold=${8?Error: Missing arg8 (scaffold)} # Path of VCF to use as haplotype scaffold
+#readonly scaffold=${8?Error: Missing arg8 (scaffold)} # Path of VCF to use as haplotype scaffold
 
-readonly shapeit_version="4.2.2"
+#readonly shapeit_version="4.2.2"
 readonly interval_flags="--chrom ${chr} --min_interval_unit ${min_interval_unit} --phasing_region_size ${phasing_region_size} --phasing_region_overlap ${phasing_region_overlap} --max_phasing_region_size ${max_phasing_region_size}"
 
 readonly hail_script="scripts/phasing/_phase_chunks.py"
@@ -53,12 +53,13 @@ phase_with_shapeit() {
   mkdir -p $( dirname ${out} )
   readonly region=$( python3 ${hail_script} ${interval_flags} --get_interval --phasing_idx ${phasing_idx} )
   print_update "Starting phasing for ${region}, out: ${out}"
-  ${shapeit4_exe} \
+  set -x
+  shapeit4.2 \
     --input ${vcf_to_phase} \
     --map ${gmap} \
-    --scaffold ${scaffold} \
-    --region ${region} \
+    --region "chr${region}" \
     --thread $(( ${NSLOTS}-1 )) \
+    --sequencing \
     --log ${log} \
     --output ${out}
   set +x
@@ -67,7 +68,8 @@ phase_with_shapeit() {
 }
 
 if [ ! -f ${out} ]; then
-  set_up_shapeit ${shapeit_version} ${vcf_to_phase}
+  
+  module load SHAPEIT4/4.2.2-foss-2021a
   phase_with_shapeit  
 else
   print_update "Warning: ${out} already exists! Skipping." | tee /dev/stderr
