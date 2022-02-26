@@ -43,8 +43,9 @@ readonly max_phasing_region_size=100000
 readonly chr=$( get_chr ${SGE_TASK_ID} )
 
 # Cluster params
+readonly software="eagle2" #"shapeit4"
 readonly queue="short.qa"
-readonly nslots=24
+readonly nslots=6
 
 # what vcf should be phased
 readonly vcf_dir=" data/unphased/wes_union_calls"
@@ -57,7 +58,7 @@ readonly pedigree="${pedigree_dir}/ukb11867_pedigree.fam"
 # Output paths
 readonly out_dir="data/phased/wes_union_calls/chunks"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
-readonly out_prefix_w_job_config="${out_prefix}-${nslots}x${queue}/prs${phasing_region_size}_pro${phasing_region_overlap}_mprs${max_phasing_region_size}"
+readonly out_prefix_w_job_config="${out_prefix}-${nslots}x${queue}/${software}_prs${phasing_region_size}_pro${phasing_region_overlap}_mprs${max_phasing_region_size}"
 readonly out="${out_prefix_w_job_config}.vcf.gz"
 readonly out_symlink="${out_prefix}.vcf.gz"
 
@@ -88,7 +89,7 @@ fi
 
 submit_phasing_job() {
   readonly max_phasing_idx=$( python3 ${hail_script} ${phasing_interval_flags} --phasing_region_size ${phasing_region_size} --phasing_region_overlap ${phasing_region_overlap} --max_phasing_region_size ${max_phasing_region_size} --get_max_phasing_idx --interval_path ${interval_path} )
-  qsub -N "_c${chr}_phase_chunks" \
+  qsub -N "_c${chr}_${software}_phase_chunks" \
     -t 1-${max_phasing_idx} \
     -q ${queue} \
     -pe shmem ${nslots} \
@@ -101,7 +102,8 @@ submit_phasing_job() {
     ${phasing_region_overlap} \
     ${max_phasing_region_size} \
     ${out_prefix_w_job_config} \
-    ${pedigree}
+    ${pedigree} \
+    ${software}
 }
 
 if [ ! -f ${out} ]; then

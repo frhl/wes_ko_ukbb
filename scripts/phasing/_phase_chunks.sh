@@ -29,6 +29,7 @@ readonly phasing_region_overlap=${6?Error: Missing arg6 (phasing_region_overlap)
 readonly max_phasing_region_size=${7?Error: Missing arg7 (max_phasing_region_size)} # Maximum size of phasing window allowed, only used at the end of a chromosome. Must be larger than phasing_region_size
 readonly out_prefix=${8?Error: Missing arg8 (path prefix for output intermediate VCF)} # Path to output phased VCF
 readonly pedigree=${9?Error: Missing arg9 (pedigree)} # Path of VCF to use as haplotype scaffold
+readonly software=${10?Error: Missing arg10 (software)} # Path of VCF to use as haplotype scaffold
 
 readonly hail_script="scripts/phasing/04_phase_chunks.py"
 readonly interval_flags="--chrom ${chr} --min_interval_unit ${min_interval_unit} --phasing_region_size ${phasing_region_size} --phasing_region_overlap ${phasing_region_overlap} --max_phasing_region_size ${max_phasing_region_size}"
@@ -48,7 +49,7 @@ phase_with_shapeit() {
   local gmap="/well/lindgren/flassen/software/SHAPEIT4/b38.gmap/chr${chr}.b38.gmap.gz"
   mkdir -p $( dirname ${out} )
   readonly region=$( python3 ${hail_script} ${interval_flags} --get_interval --phasing_idx ${phasing_idx} --interval_path ${interval_path} )
-  print_update "Starting phasing for ${region}, out: ${out}"
+  print_update "Starting SHAPEIT4 phasing for ${region}, out: ${out}"
   set -x
   shapeit4.2 \
     --input ${vcf_to_phase} \
@@ -60,13 +61,44 @@ phase_with_shapeit() {
     --output ${out}
   set +x
   duration=${SECONDS}
-  print_update "Finished phasing non-singleton variants for ${region} (chr${chr} ${phasing_idx}/${max_phasing_idx}, out: ${out}" "${duration}"
+  print_update "Finished phasing variants for ${region} (chr${chr} ${phasing_idx}/${max_phasing_idx}, out: ${out}" "${duration}"
+}
+
+phase_with_eagle2() {
+  SECONDS=0
+  local eagle="/well/lindgren/flassen/software/eagle/Eagle_v2.4.1/./eagle"
+  local gmap="/well/lindgren/flassen/software/eagle/Eagle_v2.4.1/tables/genetic_map_hg38_withX.txt.gz"
+  mkdir -p $( dirname ${out} )
+  readonly region=$( python3 ${hail_script} ${interval_flags} --get_interval --phasing_idx ${phasing_idx} --interval_path ${interval_path} )
+  readonly bp_start="$( echo "${region%-*}" | sed 's/^.*://' )"
+  readonly bp_end="${region##*-}"
+  print_update "Starting eagle2 phasing in region ${bp_start}-${bp_end}, out: ${out}"
+  set -x
+  ${eagle} \
+    --vcf ${vcf_to_phase} \
+    --bpStart ${bp_start} \
+    --bpEnd ${bp_end} \
+    --outPrefix ${out_prefix_w_phasing_idx} \
+    --geneticMapFile ${gmap} \
+    --numThreads $(( ${NSLOTS}-1 )) \
+    --maxMissingPerIndiv=0.1 \
+    --maxMissingPerSnp=0.1 \
+    --Kpbwt=20000 \
+    --pbwtOnly
+  set +x
+  duration=${SECONDS}
+  print_update "Finished phasing for ${region} (chr${chr} ${phasing_idx}/${max_phasing_idx}, out: ${out}" "${duration}"
 }
 
 
+
 if [ ! -f ${out} ]; then
-  module load SHAPEIT4/4.2.2-foss-2021a
-  phase_with_shapeit  
+  if [ ${software} = "shapeit4" ]; then
+    module load SHAPEIT4/4.2.2-foss-2021a
+    phase_with_shapeit  
+  elif [ ${software} = "eagle2" ]; then
+    phase_with_eagle2
+  fi
   module purge
   module load BCFtools/1.12-GCC-10.3.0
   bcftools +trio-switch-rate ${out} -- -p ${pedigree} > ${trio}
