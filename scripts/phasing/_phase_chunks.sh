@@ -11,20 +11,15 @@
 
 set -o errexit
 set -o nounset
-module purge
-
-# Set up
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
 source utils/vcf_utils.sh
-#source_ukb_utils_scripts hail vcf phasing
 
-spark_dir="data/tmp/spark"
+readonly spark_dir="data/tmp/spark"
 set_up_hail
 set_up_pythonpath_legacy
 
-# args
 readonly chr=${1?Error: Missing arg1 (chr)} # Chromosome, e.g. "1" for chrom 1
 readonly vcf_to_phase=${2?Error: Missing arg2 (vcf_to_phase)} # Path of VCF to phase
 readonly min_interval_unit=${3?Error: Missing arg3 (min_interval_unit)} 
@@ -33,19 +28,19 @@ readonly phasing_region_size=${5?Error: Missing arg5 (phasing_region_size)} # Mi
 readonly phasing_region_overlap=${6?Error: Missing arg6 (phasing_region_overlap)} # Minimum overlap between adjacent phasing windows
 readonly max_phasing_region_size=${7?Error: Missing arg7 (max_phasing_region_size)} # Maximum size of phasing window allowed, only used at the end of a chromosome. Must be larger than phasing_region_size
 readonly out_prefix=${8?Error: Missing arg8 (path prefix for output intermediate VCF)} # Path to output phased VCF
-#readonly scaffold=${8?Error: Missing arg8 (scaffold)} # Path of VCF to use as haplotype scaffold
-
-#readonly shapeit_version="4.2.2"
-readonly interval_flags="--chrom ${chr} --min_interval_unit ${min_interval_unit} --phasing_region_size ${phasing_region_size} --phasing_region_overlap ${phasing_region_overlap} --max_phasing_region_size ${max_phasing_region_size}"
+readonly pedigree=${9?Error: Missing arg9 (pedigree)} # Path of VCF to use as haplotype scaffold
 
 readonly hail_script="scripts/phasing/04_phase_chunks.py"
-
+readonly interval_flags="--chrom ${chr} --min_interval_unit ${min_interval_unit} --phasing_region_size ${phasing_region_size} --phasing_region_overlap ${phasing_region_overlap} --max_phasing_region_size ${max_phasing_region_size}"
 readonly phasing_idx=${SGE_TASK_ID} # one-based index for which phasing interval to phase
 
-readonly max_phasing_idx=$( python3 ${hail_script} ${interval_flags} --get_max_phasing_idx )
+readonly max_phasing_idx=$( python3 ${hail_script} ${interval_flags} --get_max_phasing_idx --interval_path ${interval_path})
 readonly out_prefix_w_phasing_idx="${out_prefix}.${phasing_idx}of${max_phasing_idx}"
 readonly out="${out_prefix_w_phasing_idx}.vcf.gz"
 readonly log="${out_prefix_w_phasing_idx}.log"
+
+# switch error files
+readonly trio="${out%.*.*}.trio"
 
 
 phase_with_shapeit() {
@@ -68,10 +63,14 @@ phase_with_shapeit() {
   print_update "Finished phasing non-singleton variants for ${region} (chr${chr} ${phasing_idx}/${max_phasing_idx}, out: ${out}" "${duration}"
 }
 
+
 if [ ! -f ${out} ]; then
-  
   module load SHAPEIT4/4.2.2-foss-2021a
   phase_with_shapeit  
+  module purge
+  module load BCFtools/1.12-GCC-10.3.0
+  bcftools +trio-switch-rate ${out} -- -p ${pedigree} > ${trio}
+  switch_errors_by_site ${out} ${pedigree}
 else
   print_update "Warning: ${out} already exists! Skipping." | tee /dev/stderr
 fi
