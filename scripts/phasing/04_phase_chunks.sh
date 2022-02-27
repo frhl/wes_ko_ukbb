@@ -35,7 +35,7 @@ readonly min_interval_unit=1000
 readonly phasing_region_size=50000
 # Minimum overlap between adjacent phasing windows
 #readonly phasing_region_overlap=$(( ${phasing_region_size}/4 ))  
-readonly phasing_region_overlap=10000 #$(( ${phasing_region_size}/4 ))  
+readonly phasing_region_overlap=2000 #$(( ${phasing_region_size}/4 ))  
 # Maximum size of phasing window allowed, only used at the end of a chromosome
 # Must be larger than phasing_region_size
 readonly max_phasing_region_size=100000 
@@ -43,9 +43,9 @@ readonly max_phasing_region_size=100000
 readonly chr=$( get_chr ${SGE_TASK_ID} )
 
 # Cluster params
-readonly software="eagle2" #"shapeit4"
+readonly software="shapeit4" #"shapeit4" or "eagle2"
 readonly queue="short.qa"
-readonly nslots=6
+readonly nslots=16
 
 # what vcf should be phased
 readonly vcf_dir=" data/unphased/wes_union_calls"
@@ -73,8 +73,6 @@ fi
 # Write phasing (minumum unit) intervals to slice later for phasing intervals
 if [ ! -f ${interval_path} ]; then
   mkdir -p $( dirname ${interval_path} )
-  set_up_hail
-  set_up_pythonpath_legacy
   SECONDS=0
   python3 ${hail_script} \
     ${phasing_interval_flags} \
