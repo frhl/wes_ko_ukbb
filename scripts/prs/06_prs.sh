@@ -20,7 +20,7 @@ readonly ldsc_dir="data/prs/ldsc"
 readonly pred_dir="data/prs/hapmap/ukb_500k"
 readonly ld_dir="data/prs/hapmap/ld/matrix"
 readonly pheno_dir="data/phenotypes"
-readonly out_dir="data/prs/scores/inf"
+readonly out_dir="data/prs/scores/auto"
 
 readonly pheno_list_cts="${pheno_dir}/curated_phenotypes_cts_header.tsv"
 readonly phenotype_cts=$( cut -f${SGE_TASK_ID} ${pheno_list_cts} )
@@ -53,6 +53,6 @@ submit_ldpred2()
 }
 
 
-#submit_ldpred2 "auto" "6" "${phenotype_binary}"
-submit_ldpred2 "inf" "1" "${phenotype_binary}"
+submit_ldpred2 "auto" "6" "${phenotype_binary}"
+#submit_ldpred2 "inf" "1" "${phenotype_binary}"
 

@@ -79,7 +79,7 @@ submit_merge_job()
 
 }
 
-submit_gwas_job "data/prs/sumstat/binary/test" "${phenotype_binary}"
+#submit_gwas_job "data/prs/sumstat/binary/" "${phenotype_binary}"
 #submit_gwas_job "data/prs/sumstat/cts/by_chrom" "${phenotype_cts}"
 
 

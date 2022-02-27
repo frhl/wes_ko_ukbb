@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 5
 #$ -q long.qc@@long.hga
-#$ -t 1
+#$ -t 21
 
 set -o errexit
 set -o nounset
@@ -43,6 +43,7 @@ if [ ! -f "${out}/_SUCCESS" ]; then
      --input_unphased_type "mt" \
      --out_prefix ${out_prefix} \
      --out_type "mt"
+  log_runtime ${SECONDS}
 else
   print_update "file ${out} already exists. Skipping!"
 fi
