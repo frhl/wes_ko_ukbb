@@ -5,9 +5,9 @@
 #$ -o logs/wes_union_calls_phasing.log
 #$ -e logs/wes_union_calls_phasing.errors.log
 #$ -P lindgren.prjc
-#$ -q short.qc@@short.hga
+#$ -q long.qc@@long.hga
 #$ -pe shmem 24
-#$ -t 21
+#$ -t 20
 
 # note, shmem 20 is not enough for chrom 21.
 
@@ -16,7 +16,7 @@ source utils/vcf_utils.sh
 source utils/bash_utils.sh
 
 readonly in_dir="data/unphased/wes_union_calls"
-readonly out_dir="data/phased/wes_union_calls"
+readonly out_dir="data/phased/wes_union_calls/naive"
 readonly ref_dir="/well/lindgren/flassen/ressources/panels/liftover_reference_panel/data/liftover"
 readonly fam_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 

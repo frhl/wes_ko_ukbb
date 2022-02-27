@@ -44,7 +44,8 @@ def main(args):
             # get overlapping fraction
             overlap = mt1.filter_rows(hl.is_defined(mt2.rows()[mt1.row_key]))
             n_overlap = overlap.count()[0]
-            
+            print(n_overlap)
+
             # append indexes to overlap, and select right flank for mt1 and left flank for mt2
             overlap = overlap.add_row_index()
             mt1_right_flank = overlap.filter_rows(overlap.row_idx == math.floor(n_overlap / 2)).locus.position.collect()

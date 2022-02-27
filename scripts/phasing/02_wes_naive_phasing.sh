@@ -5,8 +5,8 @@
 #$ -o logs/wes_naive_phasing.log
 #$ -e logs/wes_naive_phasing.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qc@@short.hga
+#$ -pe shmem 24
+#$ -q long.qc@@long.hga
 #$ -t 20
 
 source utils/qsub_utils.sh

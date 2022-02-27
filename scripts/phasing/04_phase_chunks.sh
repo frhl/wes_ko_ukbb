@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Nbaya
+# author: Nbaya with revisions from flassen
 #
 #$ -N phase_chunks
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -35,7 +35,7 @@ readonly min_interval_unit=1000
 readonly phasing_region_size=50000
 # Minimum overlap between adjacent phasing windows
 #readonly phasing_region_overlap=$(( ${phasing_region_size}/4 ))  
-readonly phasing_region_overlap=2000 #$(( ${phasing_region_size}/4 ))  
+readonly phasing_region_overlap=10000 #$(( ${phasing_region_size}/4 ))  
 # Maximum size of phasing window allowed, only used at the end of a chromosome
 # Must be larger than phasing_region_size
 readonly max_phasing_region_size=100000 
@@ -43,8 +43,8 @@ readonly max_phasing_region_size=100000
 readonly chr=$( get_chr ${SGE_TASK_ID} )
 
 # Cluster params
-readonly software="shapeit4" #"shapeit4" or "eagle2"
-readonly queue="short.qa"
+readonly software="eagle2" #"shapeit4" or "eagle2"
+readonly queue="long.qc"
 readonly nslots=16
 
 # what vcf should be phased

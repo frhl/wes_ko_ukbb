@@ -21,21 +21,15 @@ readonly hail_script="scripts/phasing/05_merge_chunks.py"
 readonly spark_dir="data/tmp/spark"
 
 readonly chr=$( get_chr ${SGE_TASK_ID} )
-readonly main_dir="data/phased/wes_union_calls/chunks"
+readonly main_dir="data/phased/wes_union_calls"
 readonly in_dir="${main_dir}/ukb_wes_union_calls_200k_chr${chr}-24xshort.qa"
-#readonly in_prefix="prs52000_pro13000_mprs100000"
-#readonly in_prefix="shapeit4_prs50000_pro2000_mprs100000"
-#readonly in_prefix="shapeit4_prs50000_pro5000_mprs100000"
-readonly in_prefix="prs100000_pro25000_mprs100000"
-#readonly in_prefix="prs50000_pro10000_mprs100000"
-#readonly in_prefix="prs52000_pro13000_mprs100000"
-
+readonly in_prefix="prs52000_pro13000_mprs100000"
 
 readonly pedigree_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 readonly pedigree="${pedigree_dir}/ukb11867_pedigree.fam"
 
-readonly out_dir="data/phased/wes_union_calls/merged"
-readonly out_prefix="${out_dir}/${in_prefix}_${chr}"
+readonly out_dir="data/phased/wes_union_calls/test"
+readonly out_prefix="${out_dir}/merge_chunks_test_${chr}"
 readonly out="${out_prefix}.vcf.bgz"
 readonly trio="${out_prefix}.trio"
 
