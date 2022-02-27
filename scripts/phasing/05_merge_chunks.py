@@ -25,12 +25,12 @@ def main(args):
     if len(files) == 0:
         raise ValuError(f"No files with extension {in_ext} found at {in_dir}")
     if in_prefix:
-        print(files)
         files = [f for f in files if in_prefix in f]
-        print(files)
     if len(files) == 0:
         raise ValueError("No files were found after filtering")
-
+    
+    # import each table as a matrix-table:
+    files.sort()
     mts = [hl.import_vcf(f, force_bgz = True) for f in files]
     
     if len(mts) > 1:
