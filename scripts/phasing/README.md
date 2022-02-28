@@ -9,7 +9,7 @@
 | `03_wes_naive_phasing.sh` | 1. Open whole exome sequencing data </br> 2. Run SHAPEIT4 phasing with [default parameters](https://odelaneau.github.io/shapeit4/) using the `--sequencing` flag. </br> 3. Index result VCF and create `.tbi` files. </br> 4. Calculate combined (trio) switch errors using BCFtools. | `01_prefilter_wes.sh` |
 | `03_calls_naive_phasing.sh` | 1. Open genotype calls </br> 2. Run SHAPEIT4 phasing using default parameters. </br> 3. Index result VCF and create `.tbi` files. </br> 4. Calculate combined (trio) switch errors using BCFtools. | `02_calls_gen.sh` |
 | `03_wes_union_calls_phasing.sh` | 1. Open WES+CALLS data. </br> 2. Run SHAPEIT4 phasing with [default parameters](https://odelaneau.github.io/shapeit4/) using the `--sequencing` flag. </br> 3. Index result VCF and create `.tbi` files. </br> 4. Calculate combined (trio) switch errors using BCFtools. | `01_wes_union_calls_gen.sh` |
-| `04_phase_chunks.sh` | Using either `SHAPEIT4 or `Eagle2` to phase data chromosome-wise in chunks ensuring overlap between the sets. The sizes are controlled by the `phasing_region_overlap`, `phasing_region_overlap` and `max_phasing_region_size` parameters.   | `02_wes_union_calls_gen.sh` |
+| `04_phase_chunks.sh` | Using either `SHAPEIT4` or `Eagle2` to phase data chromosome-wise in chunks ensuring overlap between the sets. The sizes are controlled by the `phasing_region_overlap`, `phasing_region_overlap` and `max_phasing_region_size` parameters.   | `02_wes_union_calls_gen.sh` |
 | `05_merge_chunks.sh` | Subset each phased chunk to the flank that correspond to half the length of the overlap. | `04_phase_chunks.sh` |
 
 
