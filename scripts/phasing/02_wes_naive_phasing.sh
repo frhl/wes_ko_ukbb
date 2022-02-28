@@ -6,22 +6,21 @@
 #$ -e logs/wes_naive_phasing.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 24
-#$ -q long.qc@@long.hga
+#$ -q short.qc@@short.hga
 #$ -t 20
 
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
 source utils/vcf_utils.sh
 
-readonly in_dir="data/unphased/wes/post-qc"
+readonly in_dir="data/unphased/wes/prefilter"
 readonly out_dir="data/phased/wes/naive/"
 readonly ref_dir="/well/lindgren/flassen/ressources/panels/liftover_reference_panel/data/liftover"
 readonly fam_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 
 readonly chr="${SGE_TASK_ID}"
-readonly in_file="${in_dir}/ukb_wes_200k_filtered_chr${chr}.vcf.bgz"
-readonly out_file="${out_dir}/ukb_wes_200k_naive_phasing_chr${chr}.vcf.gz"
-readonly ser_file="${out_dir}/ukb_wes_200k_naive_phasing_chr${chr}.txt"
+readonly in_file="${in_dir}/ukb_eur_wes_prefilter_200k_chr${chr}.vcf.bgz"
+readonly out_file="${out_dir}/ukb_eur_wes_prefilter_200k_naive_phasing_chr${chr}.vcf.gz"
 readonly fam_file="${fam_dir}/ukb11867_pedigree.fam"
 
 readonly ref="${ref_dir}/ALL.chr${chr}.phase3_shapeit2_mvncall_integrated_v5.20130502.genotypes.vcf.bgz"
@@ -45,14 +44,12 @@ if [ ! -f "${out_file}" ]; then
   log_runtime ${SECONDS}
 fi
 
-module load BCFtools/1.12-GCC-10.3.0
 
 if [ ! -f "${out_file}.tbi" ]; then
   module purge
+  module load BCFtools/1.12-GCC-10.3.0
   make_tabix "${out_file}" "tbi"
 fi
 
-export BCFTOOLS_PLUGINS="/apps/eb/2020b/skylake/software/BCFtools/1.12-GCC-10.3.0/libexec/bcftools"
-bcftools +trio-switch-rate "${out_file}" -- -p "${fam_file}" > "${ser_file}"
 
 

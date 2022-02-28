@@ -43,21 +43,21 @@ readonly max_phasing_region_size=100000
 readonly chr=$( get_chr ${SGE_TASK_ID} )
 
 # Cluster params
-readonly software="eagle2" #"shapeit4" or "eagle2"
-readonly queue="long.qc"
+readonly software="shapeit4" #"shapeit4" or "eagle2"
+readonly queue="short.qe"
 readonly nslots=16
 
 # what vcf should be phased
 readonly vcf_dir=" data/unphased/wes_union_calls"
-readonly vcf_to_phase="${vcf_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.vcf.bgz"
+readonly vcf_to_phase="${vcf_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.bgz" # <--- change this back to eur!
 
 # fam file for calculating switch errors
 readonly pedigree_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 readonly pedigree="${pedigree_dir}/ukb11867_pedigree.fam"
 
 # Output paths
-readonly out_dir="data/phased/wes_union_calls/chunks"
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
+readonly out_dir="data/phased/wes_union_calls/chunks_non_eur"
+readonly out_prefix="${out_dir}/ukb_non_eur_wes_union_calls_200k_chr${chr}"
 readonly out_prefix_w_job_config="${out_prefix}-${nslots}x${queue}/${software}_prs${phasing_region_size}_pro${phasing_region_overlap}_mprs${max_phasing_region_size}"
 readonly out="${out_prefix_w_job_config}.vcf.gz"
 readonly out_symlink="${out_prefix}.vcf.gz"
