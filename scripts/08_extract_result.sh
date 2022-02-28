@@ -14,7 +14,7 @@
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
 
-readonly rscript="scripts/09_extract_saige_results.R"
+readonly rscript="scripts/08_extract_saige_results.R"
 readonly out_dir="derived/tables/saige"
 readonly out_prefix="${out_dir}/211220_wes200k_saige_merge"
 

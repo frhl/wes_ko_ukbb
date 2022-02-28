@@ -22,11 +22,11 @@ readonly spark_dir="data/tmp/spark"
 
 readonly chr=$( get_chr ${SGE_TASK_ID} )
 readonly main_dir="data/phased/wes_union_calls/chunks"
-readonly in_dir="${main_dir}/ukb_wes_union_calls_200k_chr${chr}-24xshort.qa"
+readonly in_dir="${main_dir}/ukb_wes_union_calls_200k_chr${chr}-16xshort.qa"
 #readonly in_prefix="prs52000_pro13000_mprs100000"
 #readonly in_prefix="shapeit4_prs50000_pro2000_mprs100000"
-#readonly in_prefix="shapeit4_prs50000_pro5000_mprs100000"
-readonly in_prefix="prs100000_pro25000_mprs100000"
+readonly in_prefix="shapeit4_prs50000_pro5000_mprs100000"
+#readonly in_prefix="prs100000_pro25000_mprs100000"
 #readonly in_prefix="prs50000_pro10000_mprs100000"
 #readonly in_prefix="prs52000_pro13000_mprs100000"
 
@@ -45,6 +45,7 @@ if [ ! -f ${out} ]; then
   set_up_hail
   set_up_pythonpath_legacy
   SECONDS=0
+  set -x
   python3 ${hail_script} \
       --in_dir "${in_dir}" \
       --in_ext ".vcf.gz" \
@@ -53,6 +54,7 @@ if [ ! -f ${out} ]; then
       --out_type "vcf" \
       && print_update "Finished merging phased data for chr${chr}" ${SECONDS} \
       || raise_error "Merging phased data for chr${chr} failed" 
+  set +x
 else
     print_update "Warning: ${out} already exists! Skipping." | tee /dev/stderr
 fi

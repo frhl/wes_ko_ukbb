@@ -21,7 +21,7 @@ readonly out_dir="data/saige/grm/input"
 readonly out_prefix="${out_dir}/211105_ukb_wes_200k_sparse_autosomes_females"
 readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
 
-readonly hail_script="scripts/06_create_grm.py"
+readonly hail_script="scripts/05_create_grm.py"
 readonly threads=$(( ${NSLOTS}-1 ))
 readonly createSparseGRM="/well/lindgren/flassen/software/dev/SAIGE/extdata/createSparseGRM.R"
 
@@ -29,19 +29,21 @@ readonly createSparseGRM="/well/lindgren/flassen/software/dev/SAIGE/extdata/crea
 chroms=$( seq 1 22 | tr '\n' ' ' )
 #chroms=21
 
-# combine markers from UKBB imputed data
+mkdir -p ${out_dir}
+
 if [ $( ls -1 ${out_prefix}.{bed,bim,fam} 2> /dev/null | wc -l ) -ne 3 ]; then
+  SECONDS=0
   set_up_hail
   set_up_pythonpath_legacy
-  mkdir -p ${out_dir}
   python3 "${hail_script}" \
-   --chroms ${chroms} \
-   --out_prefix ${out_prefix} \
-   --final_sample_list ${final_sample_list} \
-   --subset_markers_by_kinship \
-   --sex "females"
+    --chroms ${chroms} \
+    --out_prefix ${out_prefix} \
+    --final_sample_list ${final_sample_list} \
+    --subset_markers_by_kinship \
+    --sex "females" \
+    && print_update "Finished writing samples for relatedness matrix (GRM)" ${SECONDS} \
+    || raise_error "Writing samples for GRM failed"
   conda deactivate
-  print_update "Hail finished writing."
 else
   print_update "${out_prefix}.bed/bim/fam already exists. Skipping"
 fi

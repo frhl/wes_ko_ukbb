@@ -2,7 +2,7 @@
 #
 # probabilistic model for human knockouts
 #
-#$ -N submit_knockouts
+#$ -N knockouts
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/knockouts.log
 #$ -e logs/knockouts.errors.log

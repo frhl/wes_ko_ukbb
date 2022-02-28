@@ -74,6 +74,7 @@ fi
 if [ ! -f ${interval_path} ]; then
   mkdir -p $( dirname ${interval_path} )
   SECONDS=0
+  set -x
   python3 ${hail_script} \
     ${phasing_interval_flags} \
     --write_intervals \
@@ -81,12 +82,14 @@ if [ ! -f ${interval_path} ]; then
     --target_vcf ${vcf_to_phase} \
     && print_update "Finished writing intervals for chr${chr}" ${SECONDS} \
     || raise_error "Writing intervals for chr${chr} failed" 
+  set +x
 else
   print_update "${interval_path} already exists!"
 fi
 
 submit_phasing_job() {
   readonly max_phasing_idx=$( python3 ${hail_script} ${phasing_interval_flags} --phasing_region_size ${phasing_region_size} --phasing_region_overlap ${phasing_region_overlap} --max_phasing_region_size ${max_phasing_region_size} --get_max_phasing_idx --interval_path ${interval_path} )
+  set -x
   qsub -N "_c${chr}_${software}_phase_chunks" \
     -t 1-${max_phasing_idx} \
     -q ${queue} \
@@ -102,6 +105,7 @@ submit_phasing_job() {
     ${out_prefix_w_job_config} \
     ${pedigree} \
     ${software}
+  set +x
 }
 
 if [ ! -f ${out} ]; then

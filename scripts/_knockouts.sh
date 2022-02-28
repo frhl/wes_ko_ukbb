@@ -1,14 +1,10 @@
 #!/usr/bin/env bash
 #
-# note: this scripts is called from 04_knockouts.sh
-#
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/_knockouts.log
 #$ -e logs/_knockouts.errors.log
 #$ -P lindgren.prjc
 #$ -q short.qa
-
-# -q short.qc@@short.hge
 
 set -o errexit
 set -o nounset
@@ -35,6 +31,7 @@ readonly chr=${SGE_TASK_ID}
 readonly input_path_chr=$(echo ${input_path} | sed -e "s/CHR/${chr}/g")
 readonly out_prefix_chr=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
 
+SECONDS=0
 set_up_hail
 set_up_pythonpath_legacy
 set -x
@@ -50,10 +47,17 @@ python3 "${hail_script}" \
     ${in_sex:+--sex "$in_sex"} \
     --use_loftee \
     --out_prefix ${out_prefix_chr} \
-    --out_type ${out_type}
+    --out_type ${out_type} \
+    && print_update "Finished calculating knockouts for chr${chr}" ${SECONDS} \
+    || raise_error "Calculating knockouts for chr${chr} failed"
 
-set +x
-print_update "Finished running HAIL for chr${chr}" "${SECONDS}"
+if [ ! -f "${out_prefix_chr}.vcf.tbi" ]; then
+  module purge
+  module load BCFtools/1.12-GCC-10.3.0
+  make_tabix "${out_prefix_chr}.vcf.bgz" "tbi"
+fi
+
+
 
 
 

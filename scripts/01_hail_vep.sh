@@ -29,18 +29,22 @@ readonly vep="${vep_dir}/ukb_wes_200k_full_vep_chr${chr}.vcf"
 # output path
 readonly out_prefix="${out_dir}/ukb_wes_200k_chr${chr}"
 
-# run hail
-set_up_hail
-set_up_vep
-set_up_pythonpath_legacy  
-python3 "${hail_script}" \
-     --chrom ${chr} \
-     --input_path ${in}\
-     --input_type "mt" \
-     --vep_path ${vep} \
-     --out_prefix ${out_prefix}
-
-print_update "Finished running HAIL for chr${chr}" "${SECONDS}"
+if [ ! -f "${out_prefix}.ht" ]; then 
+  SECONDS=0
+  set_up_hail
+  set_up_vep
+  set_up_pythonpath_legacy  
+  python3 "${hail_script}" \
+       --chrom "${chr}" \
+       --input_path "${in}" \
+       --input_type "mt" \
+       --vep_path "${vep}" \
+       --out_prefix "${out_prefix}" \
+       && print_update "Finished Hail VEP annotation chr${chr}" ${SECONDS} \
+       || raise_error "Hail VEP annotation for chr${chr} failed"
+else
+   raise_error "Hail VEP annotation for chr${chr} already exists. Skipping"
+fi
 
 
 

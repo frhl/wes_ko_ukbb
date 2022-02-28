@@ -55,8 +55,6 @@ main <- function(args){
     
     }))
 
-
-
     # get results from merged files
     # works only for chr20 for now! 
     files_merge = list.files(args$in_dir_merged, 
@@ -71,6 +69,7 @@ main <- function(args){
         return(merged)
     }))
 
+    # combine data
     combined <- rbind(comparison, dfs_merge)
 
     # assume maximum of 4 chunks (index 5 is avg, and 6 is merge)
@@ -113,9 +112,12 @@ main <- function(args){
     # write out plot and table
     outfile_plt = paste0(args$out_prefix, ".pdf")
     outfile_tbl = paste0(args$out_prefix, ".tsv")
-    ggplot(plt, outfile_plt, widt = 8, height = 6)
     fwrite(combined, outfile_tbl, sep = '\t')
-
+    pdf(outfile_plt, width = 8, height = 6)
+    print(plt)
+    graphics.off()
+    #ggplot(filename = outfile_plt, plot = plt, width = 8, height = 6)
+   
 }
 
 # add arguments

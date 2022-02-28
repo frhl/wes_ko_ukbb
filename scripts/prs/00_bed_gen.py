@@ -100,7 +100,7 @@ def main(args):
         mt = mt.filter_rows(filter_expr)
     
     if write_samples and out_prefix:
-        mt.cols().write(out_prefix + "_samples.ht")
+        mt.cols().write(out_prefix + "_samples.ht", overwrite = True)
 
     if out_type and out_prefix:
         io.export_table(mt, out_prefix, out_type)
