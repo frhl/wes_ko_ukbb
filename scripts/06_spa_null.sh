@@ -34,6 +34,8 @@ readonly nslots=3
 fit_binary_traits() {
   local trait_type="binary"
   local out_dir="data/saige/output/combined/binary/step1"
+  local pheno_dir="/well/lindgren/UKBIOBANK/dpalmer/ukb_wes_phenotypes"
+  local pheno_file="${pheno_dir}/curated_phenotypes_binary.tsv"
   local pheno_list="${pheno_dir}/curated_phenotypes_binary_header.tsv"
   local phenotype=$( cut -f${SGE_TASK_ID} ${pheno_list} )
   if [[ ! -z ${phenotype} ]]; then

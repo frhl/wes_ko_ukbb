@@ -9,7 +9,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qe
-#$ -t 20
+#$ -t 1-22
 #$ -V
 
 set -o errexit
@@ -32,10 +32,10 @@ readonly chrX_filter_version="females_only"
 # Number of variants within each interval
 readonly min_interval_unit=1000
 # Default size of phasing window in terms of variant count (should be a multiple of min_interval_unit)
-readonly phasing_region_size=50000
+readonly phasing_region_size=100000
 # Minimum overlap between adjacent phasing windows
 #readonly phasing_region_overlap=$(( ${phasing_region_size}/4 ))  
-readonly phasing_region_overlap=10000 #$(( ${phasing_region_size}/4 ))  
+readonly phasing_region_overlap=$(( ${phasing_region_size}/4 ))  
 # Maximum size of phasing window allowed, only used at the end of a chromosome
 # Must be larger than phasing_region_size
 readonly max_phasing_region_size=100000 
@@ -49,15 +49,15 @@ readonly nslots=16
 
 # what vcf should be phased
 readonly vcf_dir=" data/unphased/wes_union_calls"
-readonly vcf_to_phase="${vcf_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.bgz" # <--- change this back to eur!
+readonly vcf_to_phase="${vcf_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.vcf.bgz" # <--- change this back to eur!
 
 # fam file for calculating switch errors
 readonly pedigree_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 readonly pedigree="${pedigree_dir}/ukb11867_pedigree.fam"
 
 # Output paths
-readonly out_dir="data/phased/wes_union_calls/chunks_non_eur"
-readonly out_prefix="${out_dir}/ukb_non_eur_wes_union_calls_200k_chr${chr}"
+readonly out_dir="data/phased/wes_union_calls/chunks/final"
+readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
 readonly out_prefix_w_job_config="${out_prefix}-${nslots}x${queue}/${software}_prs${phasing_region_size}_pro${phasing_region_overlap}_mprs${max_phasing_region_size}"
 readonly out="${out_prefix_w_job_config}.vcf.gz"
 readonly out_symlink="${out_prefix}.vcf.gz"
