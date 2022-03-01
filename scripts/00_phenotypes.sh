@@ -41,5 +41,12 @@ python3 "${hail_script}" \
      --export_header \
      --out_prefix "${out_cts}"
 
+# create seperate header for Primary Care data
+cat "${in_bin}_header.tsv" | grep care > "${out_bin}_PC_header.tsv"
+cat "${in_bin}_header.tsv" | grep -v care > "${out_bin}_notPC_header.tsv"
+
+# create seperate header for non residuals (i.e. 
+# the signal that's left after conditioning
+cat "${in_cts}" | grep residual > "${out_cts}_residual.tsv"
 
 
