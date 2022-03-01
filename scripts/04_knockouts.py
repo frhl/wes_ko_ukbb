@@ -28,7 +28,7 @@ def main(args):
     maf_min = (args.maf_min)
     use_loftee = args.use_loftee
     csqs_category = (args.csqs_category)
-
+    randomize_phase = args.randomize_phase
     sex = args.sex
 
     # run parser
@@ -47,7 +47,13 @@ def main(args):
 
     if maf_max and maf_min:
         mt = variants.filter_maf(mt, max_maf = float(maf_max),min_maf = float(maf_min))
-   
+    
+    if randomize_phase:
+        hetz_before = ko.agg_count_calls(mt)
+        mt = mt.transmute_entries(GT = ko.rand_flip_call(mt.GT))
+        hetz_after = ko.agg_count_calls(mt)
+        print(f"Phased hetz before {hetz_before} and after {hetz_after}")
+
     # print some stats
     n = mt.count()
     print(f"variants/samples after filtering: {n}")
@@ -114,6 +120,8 @@ if __name__=='__main__':
     parser.add_argument('--af_max', default=None, help='Select all variants with a AF less than the indicated value')
     parser.add_argument('--use_loftee', default=False, action='store_true', help='use LOFTEE to distinghiush between high confidence PTVs')
     parser.add_argument('--csqs_category', default=None, action=SplitArgs, help='What categories should be subsetted to?')
+    
+    parser.add_argument('--randomize_phase', default=None, action='store_true', help='Randomize phased calls?')
     
     args = parser.parse_args()
 
