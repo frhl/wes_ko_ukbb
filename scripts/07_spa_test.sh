@@ -52,7 +52,7 @@ submit_spa_with_csqs() {
   local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
   local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
   local category=${1?Error: Missing arg1 (consequence)}
-  local out_prefix="${out_dir}/${in_prefix}_${category}_${phenotype}"
+  local out_prefix="${out_dir}/${in_prefix}_${phenotype}_${category}"
   local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${category}_ko.vcf.bgz"
   print_update "Submitting SPA for ${phenotype} [${category}]"
   submit_spa_job

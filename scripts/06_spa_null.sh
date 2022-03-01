@@ -1,18 +1,19 @@
 #!/usr/bin/env bash
 #
-#$ -N submit_spa_null
+#$ -N spa_null
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/submit_spa_null.log
-#$ -e logs/submit_spa_null.errors.log
+#$ -o logs/spa_null.log
+#$ -e logs/spa_null.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-80
+#$ -t 1
 #$ -V
 
-module purge
 source utils/bash_utils.sh
 source utils/hail_utils.sh
+
+readonly spa_null_script="scripts/_spa_null.sh"
 
 readonly plink_dir="data/saige/grm/input"
 readonly grm_dir="data/saige/grm/input"
@@ -24,35 +25,31 @@ readonly grm_sam="${grm_mtx}.sampleIDs.txt"
 readonly plink_file="${plink_dir}/211102_long_ukb_wes_200k_sparse_autosomes"
 readonly covar_file="${covar_dir}/covars1.csv"
 readonly covariates=$( cat ${covar_file} )
-readonly pheno_file="${pheno_dir}/curated_phenotypes.tsv"
- 
-readonly spa_null_script="scripts/_spa_null.sh"
 
-readonly queue="short.qe"
+readonly out_prefix="ukb_wes_200k"
+
 readonly nslots=3
+readonly queue="short.qe"
+readonly index=${SGE_TASK_ID}
 
 fit_binary_traits() {
   local trait_type="binary"
   local out_dir="data/saige/output/combined/binary/step1"
-  local pheno_dir="/well/lindgren/UKBIOBANK/dpalmer/ukb_wes_phenotypes"
-  local pheno_file="${pheno_dir}/curated_phenotypes_binary.tsv"
-  local pheno_list="${pheno_dir}/curated_phenotypes_binary_header.tsv"
-  local phenotype=$( cut -f${SGE_TASK_ID} ${pheno_list} )
-  if [[ ! -z ${phenotype} ]]; then
-    local out_prefix="${out_dir}/ukb_wes_200k_${phenotype}"
-    submit_spa_null
-  fi
+  local pheno_file="${pheno_dir}/filtered_phenotypes_binary.tsv.gz"
+  local pheno_list="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
+  local phenotype=$( sed "${index}q;d" ${pheno_list} )
+  local out_prefix="${out_dir}/${out_prefix}_${phenotype}"
+  submit_spa_null
 }
 
 fit_cts_traits() {
   local trait_type="quantitative"
   local out_dir="data/saige/output/combined/cts/step1"
-  local pheno_list="${pheno_dir}/curated_phenotypes_cts_header.tsv"
-  local phenotype=$( cut -f${SGE_TASK_ID} ${pheno_list} )
-  if [[ ! -z ${phenotype} ]]; then
-    local out_prefix="${out_dir}/ukb_wes_200k_${phenotype}"
-    submit_spa_null
-  fi
+  local pheno_file="${pheno_dir}/filtered_phenotypes_cts.tsv.gz"
+  local pheno_list="${pheno_dir}/filtered_phenotypes_cts_header.tsv"
+  local phenotype=$( sed "${index}q;d" ${pheno_list} )
+  local out="${out_dir}/${out_prefix}_${phenotype}"
+  submit_spa_null
 }
 
 submit_spa_null() {
@@ -71,7 +68,7 @@ submit_spa_null() {
       "${trait_type}" \
       "${grm_mtx}" \
       "${grm_sam}" \
-      "${out_prefix}"
+      "${out}"
     set +x
   else
     >&2 echo "${out_prefix} already exists. Skipping.."
@@ -80,7 +77,7 @@ submit_spa_null() {
 
 # Fit null model for binary/cts traits
 fit_binary_traits
-fit_cts_traits
+#fit_cts_traits
 
 
 

@@ -48,7 +48,7 @@ else
   print_update "${out_prefix}.bed/bim/fam already exists. Skipping"
 fi
 
-# generate GRM using SAIGE
+
 set_up_RSAIGE
 print_update "Generating GRM from plink files.. "
 Rscript "${createSparseGRM}" \
@@ -56,8 +56,10 @@ Rscript "${createSparseGRM}" \
   --nThreads=4 \
   --outputPrefix=${out_prefix} \
   --numRandomMarkerforSparseKin=1000 \
-  --relatednessCutoff=0.125
-
+  --relatednessCutoff=0.125 \
+    && print_update "Finished writing GRM" ${SECONDS} \
+    || raise_error "Writing GRM failed"
+ 
 
 
 
