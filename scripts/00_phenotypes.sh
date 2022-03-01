@@ -31,11 +31,14 @@ set_up_pythonpath_legacy
 python3 "${hail_script}" \
      --input_path "${in_bin}" \
      --extract_samples "${final_sample_list}" \
+     --export_header \
+     --count_case_control \
      --out_prefix "${out_bin}"
 
 python3 "${hail_script}" \
      --input_path "${in_cts}" \
      --extract_samples "${final_sample_list}" \
+     --export_header \
      --out_prefix "${out_cts}"
 
 
