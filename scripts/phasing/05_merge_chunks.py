@@ -33,54 +33,58 @@ def main(args):
     files.sort()
     mts = [hl.import_vcf(f, force_bgz = True) for f in files]
     
-    if len(mts) > 1:
-        i = 0
-        max_iter = len(mts)-1
-        mt1 = mts[0]
-        mt2 = mts[1]
-        final = list()
-        while (len(final) < max_iter):
-        
-            # get overlapping fraction
-            overlap = mt1.filter_rows(hl.is_defined(mt2.rows()[mt1.row_key]))
-            n_overlap = overlap.count()[0]
-            print(n_overlap)
+    with open(out_prefix + "_slices.txt", "w") as outfile:
+        if len(mts) > 1:
+            i = 0
+            max_iter = len(mts)-1
+            mt1 = mts[0]
+            mt2 = mts[1]
+            final = list()
+            while (len(final) < max_iter):
+            
+                # get overlapping fraction
+                overlap = mt1.filter_rows(hl.is_defined(mt2.rows()[mt1.row_key]))
+                n_overlap = overlap.count()[0]
 
-            # append indexes to overlap, and select right flank for mt1 and left flank for mt2
-            overlap = overlap.add_row_index()
-            mt1_right_flank = overlap.filter_rows(overlap.row_idx == math.floor(n_overlap / 2)).locus.position.collect()
-            mt2_left_flank = overlap.filter_rows(overlap.row_idx == math.ceil(n_overlap / 2)).locus.position.collect()
-            print(f"iter={i},mt1_right_flank={mt1_right_flank},mt2_left_flank={mt2_left_flank}")
+                # append indexes to overlap, and select right flank for mt1 and left flank for mt2
+                overlap = overlap.add_row_index()
+                mt1_right_flank = overlap.filter_rows(overlap.row_idx == math.floor(n_overlap / 2)).locus.position.collect()[0]
+                mt2_left_flank = overlap.filter_rows(overlap.row_idx == math.ceil(n_overlap / 2)).locus.position.collect()[0]
+                
+                # get position for start/end of overlap
+                start = overlap.head(1).locus.position.collect()[0]
+                end = overlap.tail(1).locus.position.collect()[0]
+                outfile.write(f"{in_dir}\t{in_prefix}\t{i}\t{mt1_right_flank}\t{mt2_left_flank}\t{overlap}\t{start}\t{end}\n")
+                
+                # Trim right flank.
+                mt1 = mt1.filter_rows(mt1.locus.position <= mt1_right_flank)
+                
+                # if mt1 is the first matrix (from left to right) it is now done.
+                # otherwise continue and cut down left flank.
+                #iif i == 0:
+                final.append(mt1)
+                
+                # Finish left flank.
+                # if mt2 is the last matrix, it's now done.
+                # if mt2 is the middle matrix, the left flank is now done. 
+                # Set mt2 to mt1 in order to trim its right flank
+                mt2 = mt2.filter_rows(mt2.locus.position >= mt2_left_flank)
+                
+                i += 1
+                mt1 = mt2
+                if (i < max_iter):
+                    mt2 = mts[i+1]
             
-            # Trim right flank.
-            mt1 = mt1.filter_rows(mt1.locus.position <= mt1_right_flank[0])
-            
-            # if mt1 is the first matrix (from left to right) it is now done.
-            # otherwise continue and cut down left flank.
-            #iif i == 0:
-            final.append(mt1)
-            
-            # Finish left flank.
-            # if mt2 is the last matrix, it's now done.
-            # if mt2 is the middle matrix, the left flank is now done. 
-            # Set mt2 to mt1 in order to trim its right flank
-            mt2 = mt2.filter_rows(mt2.locus.position >= mt2_left_flank[0])
-            
-            i += 1
-            mt1 = mt2
-            if (i < max_iter):
-                mt2 = mts[i+1]
+            # add right-most matrix table
+            final.append(mt2)
+            mt = hl.MatrixTable.union_rows(*final)
         
-        # add right-most matrix table
-        final.append(mt2)
-        mt = hl.MatrixTable.union_rows(*final)
-    
-    else:
-        mt = mts[0]
-        print(f"{in_dir} consist of only a single file. Copying instead of merging..")   
+        else:
+            mt = mts[0]
+            print(f"{in_dir} consist of only a single file. Copying instead of merging..")   
 
     # rbind/merge tables
-    io.export_table(mt, out_prefix, out_type)
+    #io.export_table(mt, out_prefix, out_type)
 
 if __name__=='__main__':
 

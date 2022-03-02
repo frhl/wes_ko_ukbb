@@ -5,9 +5,9 @@
 #$ -o logs/merge_chunks.log
 #$ -e logs/merge_chunks.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 5
+#$ -pe shmem 3
 #$ -q short.qe
-#$ -t 22
+#$ -t 1
 #$ -V
 
 set -o errexit
@@ -29,8 +29,8 @@ readonly in_prefix="shapeit4_prs100000_pro25000_mprs100000"
 readonly pedigree_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 readonly pedigree="${pedigree_dir}/ukb11867_pedigree.fam"
 
-readonly out_dir="data/phased/wes_union_calls/final/merged"
-readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_merged_${chr}"
+readonly out_dir="data/phased/wes_union_calls/merged"
+readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
 readonly out="${out_prefix}.vcf.bgz"
 readonly trio="${out_prefix}.trio"
 
