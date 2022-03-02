@@ -6,8 +6,8 @@
 #$ -e logs/gwas.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q short.qc@@short.hga
-#$ -t 16
+#$ -q test.qc
+#$ -t 1-6
 #$ -V
 
 # cts
@@ -30,25 +30,30 @@ readonly covariates=$( cat ${covar_file} )
 
 readonly input_type="plink"
 readonly input_path="${in_dir}/ukb_hapmap_500k_eur_chrCHR"
-readonly pheno_file="${pheno_dir}/curated_phenotypes.tsv" 
 
-readonly pheno_list_cts="${pheno_dir}/curated_phenotypes_cts_header.tsv"
-readonly phenotype_cts=$( cut -f${SGE_TASK_ID} ${pheno_list_cts} )
-readonly pheno_list_binary="${pheno_dir}/curated_phenotypes_binary_header.tsv"
-readonly phenotype_binary=$( cut -f${SGE_TASK_ID} ${pheno_list_binary} )
+readonly index=${SGE_TASK_ID}
 
-readonly min_cases=1250
+readonly file_cts="${pheno_dir}/filtered_phenotypes_cts.tsv" 
+readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_header.tsv"
+readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
+
+readonly file_binary="${pheno_dir}/filtered_phenotypes_binary.tsv" 
+readonly pheno_list_binary="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
+readonly phenotype_binary=$( sed "${index}q;d" ${pheno_list_binary} )
+
+readonly min_cases=100
 
 submit_gwas_job()
 {
   local out_dir="${1}"
   local phenotype="${2}"
+  local pheno_file="${3}"
   local out_prefix="${out_dir}/ukb_hapmap_500k_eur_${phenotype}"
   local prefix="${out_prefix}_chrCHR"
   mkdir -p ${out_dir}
   set -x
   qsub -N "_${phenotype}_sumstat" \
-    -t 21 \
+    -t 1-22 \
     -q short.qc@@short.hge \
     -pe shmem 1 \
     "${bash_script}" \
@@ -79,7 +84,8 @@ submit_merge_job()
 
 }
 
-#submit_gwas_job "data/prs/sumstat/binary/" "${phenotype_binary}"
+
+submit_gwas_job "data/prs/sumstat/binary/" "${phenotype_binary}" "${file_binary}"
 #submit_gwas_job "data/prs/sumstat/cts/by_chrom" "${phenotype_cts}"
 
 

@@ -22,10 +22,15 @@ readonly ld_dir="data/prs/hapmap/ld/matrix"
 readonly pheno_dir="data/phenotypes"
 readonly out_dir="data/prs/scores/auto_test"
 
-readonly pheno_list_cts="${pheno_dir}/curated_phenotypes_cts_header.tsv"
-readonly phenotype_cts=$( cut -f${SGE_TASK_ID} ${pheno_list_cts} )
-readonly pheno_list_binary="${pheno_dir}/curated_phenotypes_binary_header.tsv"
-readonly phenotype_binary=$( cut -f${SGE_TASK_ID} ${pheno_list_binary} )
+readonly index=${SGE_TASK_ID}
+
+readonly file_cts="${pheno_dir}/filtered_phenotypes_cts.tsv"
+readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_header.tsv"
+readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
+
+readonly file_binary="${pheno_dir}/filtered_phenotypes_binary.tsv"
+readonly pheno_list_binary="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
+readonly phenotype_binary=$( sed "${index}q;d" ${pheno_list_binary} )
 
 mkdir -p ${out_dir}
 

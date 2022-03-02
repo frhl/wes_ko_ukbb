@@ -28,9 +28,10 @@ def main(args):
     if phenotypes:
         ht = hl.import_table(phenotypes,
                      types={'eid': hl.tstr},
-                     missing=["",'""'],
+                     missing=["",'""',"NA"],
                      impute=True,
-                     key='eid') 
+                     key='eid'
+                     ) 
         mt = mt.annotate_cols(pheno=ht[mt.s])
     else:
         raise ValueError("param 'phenotypes' is not set! ")
@@ -52,7 +53,7 @@ def main(args):
                 if cases < int(min_cases):
                      raise ValueError(str(cases) + " cases found! Expected +" + str(min_cases))
                 if adjust_maf_by_case_control:
-                     min_maf = 25/(2 * hl.min([cases, controls]))
+                     min_maf = hl.max(0.01, 25/(2 * hl.min([cases, controls])))
                      mt = mt.filter_rows(variants.get_maf_expr(mt) > float(min_maf))
                 reg = hl.logistic_regression_rows(
                         test='wald',
