@@ -12,8 +12,13 @@ main <- function(args){
     stopifnot(dir.exists(args$in_dir_merged))     
 
     # load files in directories
-    dirs <- strsplit(args$in_dir, split = ',')
-    stops <- lapply(dirs, function(d) stopifnot(dir.exists(d)))
+    dirs <- unlist(strsplit(args$in_dir, split = ','))
+    dirs <- dirs[dirs != ""]
+    #dirs[[1]] <- dirs[[1]][dirs[[1]] != ""]
+    #print(dirs)
+    stops <- lapply(dirs, function(dir) {
+        if (!dir.exists(dir)) stop(paste0(dir, ' (directory) does not exist!'))
+    })
     files <- unlist(lapply(dirs, function(d){list.files(d, pattern = 'trio', full.names = TRUE)}))
     
     # organize by filename, chunks and extension 
@@ -113,7 +118,7 @@ main <- function(args){
     outfile_plt = paste0(args$out_prefix, ".pdf")
     outfile_tbl = paste0(args$out_prefix, ".tsv")
     fwrite(combined, outfile_tbl, sep = '\t')
-    pdf(outfile_plt, width = 8, height = 6)
+    pdf(outfile_plt, width = args$img_width, height = args$img_height)
     print(plt)
     graphics.off()
     #ggplot(filename = outfile_plt, plot = plt, width = 8, height = 6)
@@ -125,6 +130,8 @@ parser <- ArgumentParser()
 parser$add_argument("--in_dir", default=NULL, required = TRUE, help = "Path to QCed SNPs")
 parser$add_argument("--in_dir_merged", default=NULL, required = TRUE, help = "Path to QCed SNPs")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
+parser$add_argument("--img_width", default=8, help = "Where should the results be written?")
+parser$add_argument("--img_height", default=6, help = "Where should the results be written?")
 args <- parser$parse_args()
 
 main(args)
