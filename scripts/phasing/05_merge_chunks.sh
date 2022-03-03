@@ -36,7 +36,7 @@ readonly trio="${out_prefix}.trio"
 
 mkdir -p ${out_dir}
 
-if [ ! -f ${out} ]; then
+#if [ ! -f ${out} ]; then
   set_up_hail
   set_up_pythonpath_legacy
   SECONDS=0
@@ -50,9 +50,9 @@ if [ ! -f ${out} ]; then
       && print_update "Finished merging phased data for chr${chr}" ${SECONDS} \
       || raise_error "Merging phased data for chr${chr} failed" 
   set +x
-else
-    print_update "Warning: ${out} already exists! Skipping." | tee /dev/stderr
-fi
+#else
+#    print_update "Warning: ${out} already exists! Skipping." | tee /dev/stderr
+#fi
 
 if [ ! -f ${trio} ]; then
   module purge
