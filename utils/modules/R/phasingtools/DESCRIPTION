@@ -1,0 +1,23 @@
+Package: phasingtools
+Type: Package
+Title: Package for processing phased datas
+Version: 0.1.0
+Author: Frederik Lassen 
+Maintainer: The package maintainer <yourself@somewhere.net>
+Description: Package for running phasing evaluation funcs.
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+Depends:
+    R (>= 3.6),
+    data.table,
+    ggplot2,
+    Hmisc,
+    stringr
+Suggests:
+    devtools,
+    testthat (>= 2.1.0)
+RoxygenNote: 7.1.2
+Collate:
+    'aggr_ser_by_site.R'
+    'summarize_bcftools_trio_stats.R'
