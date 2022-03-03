@@ -20,9 +20,8 @@ source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
 readonly chr=$( get_chr ${SGE_TASK_ID} )
-readonly main_dir="data/phased/wes_union_calls/chunks/final"
-readonly in_dir="${main_dir}/ukb_eur_wes_union_calls_200k_chr${chr}-16xshort.qe"
-readonly in_prefix="shapeit4_prs100000_pro25000_mprs100000"
+readonly in_dir="data/phased/wes_union_calls"
+readonly in_prefix="${in_dir}/ukb_eur_wes_union_calls_200k_chr${chr}_trim"
 
 files=""
 for f in ${in_dir}/*.vcf.gz; do 
@@ -40,9 +39,7 @@ readonly trio="${out_prefix}.trio"
 
 mkdir -p ${out_dir}
 
-echo "chr${chr}: ${files}"
-
-if [ ! -f ${out} ]; 
+if [ ! -f ${out} ]; then 
   set -x
   bcftools concat --ligate ${files} -O z -o ${out}
   set +x
