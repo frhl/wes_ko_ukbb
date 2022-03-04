@@ -7,12 +7,9 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-20
+#$ -t 1-10
 #$ -V
 
-# cts
-# 1 - 33 contains non-residuals
-# 34 - 103 contains residuals
 
 set -o errexit
 set -o nounset
@@ -89,7 +86,7 @@ submit_merge_job()
 
 
 submit_gwas_job "data/prs/sumstat/binary" "${phenotype_binary}" "${file_binary}"
-submit_gwas_job "data/prs/sumstat/cts" "${phenotype_cts}" "${file_cts}"
+#submit_gwas_job "data/prs/sumstat/cts" "${phenotype_cts}" "${file_cts}"
 
 
 

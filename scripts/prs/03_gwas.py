@@ -5,7 +5,6 @@ import argparse
 
 from ko_utils import qc
 from ukb_utils import hail_init
-from ukb_utils import genotypes
 from ukb_utils import variants
 
 def main(args):
@@ -36,9 +35,9 @@ def main(args):
     else:
         raise ValueError("param 'phenotypes' is not set! ")
 
-    covariates = covariates.split(',')
-    if set(list(mt.pheno)) >= set(covariates):
-        covariates = [mt.pheno[x] for x in covariates]
+    split_covariates = covariates.split(',')
+    if set(list(mt.pheno)) >= set(split_covariates):
+        covariates = [mt.pheno[x] for x in split_covariates]
         covariates.insert(0, 1) 
         if response in list(mt.pheno):
             if mt.pheno[response].dtype == hl.dtype('float64'):
@@ -53,10 +52,15 @@ def main(args):
                 if cases < int(min_cases):
                      raise ValueError(str(cases) + " cases found! Expected +" + str(min_cases))
                 if adjust_maf_by_case_control:
-                     min_maf = hl.max(0.01, 25/(2 * hl.min([cases, controls])))
+                     min_maf = hl.max(0.01, 25/(2 * hl.min([cases, controls]))).collect()[0]
                      mt = mt.filter_rows(variants.get_maf_expr(mt) > min_maf)
-                     with open(out_prefix + "_maf.txt","w") as outfile:
+                     # need to re-initalise covariates, otherwise
+                     # hail will throw an error about using multiple mts
+                     covariates = [mt.pheno[x] for x in split_covariates]
+                     covariates.insert(0, 1) 
+                     with open("data/prs/sumstat/binary/maf_thresholds.txt","a") as outfile:
                          outfile.write(f"{input_path}\t{response}\t{cases}\t{controls}\t{min_maf}\n")
+                
                 reg = hl.logistic_regression_rows(
                         test='wald',
                         y=mt.pheno[response],
