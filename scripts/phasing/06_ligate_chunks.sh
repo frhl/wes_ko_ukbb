@@ -5,9 +5,9 @@
 #$ -o logs/ligate_chunks.log
 #$ -e logs/ligate_chunks.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 5
+#$ -pe shmem 2
 #$ -q short.qe
-#$ -t 1-3
+#$ -t 21
 #$ -V
 
 set -o errexit
@@ -20,37 +20,40 @@ source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
 readonly chr=$( get_chr ${SGE_TASK_ID} )
-readonly in_dir="data/phased/wes_union_calls"
-readonly in_prefix="${in_dir}/ukb_eur_wes_union_calls_200k_chr${chr}_trim"
+readonly in_dir="data/phased/wes_union_calls/trimmed"
+readonly in_prefix="${in_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
+
 
 files=""
-for f in ${in_dir}/*.vcf.gz; do 
+for f in ${in_prefix}*.vcf.bgz; do 
   make_tabix ${f} "tbi"
   files="${files} ${f}"
 done
 
+
 readonly pedigree_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 readonly pedigree="${pedigree_dir}/ukb11867_pedigree.fam"
 
-readonly out_dir="data/phased/wes_union_calls/ligated"
+readonly out_dir="data/phased/wes_union_calls/ligated/new"
 readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
 readonly out="${out_prefix}.vcf.bgz"
 readonly trio="${out_prefix}.trio"
 
 mkdir -p ${out_dir}
 
-if [ ! -f ${out} ]; then 
-  set -x
+# count files
+n=$( ls -l ${in_prefix}*.vcf.bgz | wc -l )
+
+if [ ${n} -gt 1 ] && [ ! -f ${out} ]; then 
   bcftools concat --ligate ${files} -O z -o ${out}
-  set +x
+else
+  ln -s ${in_prefix}*.vcf.bgz ${out}
 fi
+
 
 if [ ! -f ${trio} ]; then
-  bcftools +trio-switch-rate ${out} -- -p ${pedigree} > ${trio}
-  switch_errors_by_site ${out} ${pedigree}
+    bcftools +trio-switch-rate ${out} -- -p ${pedigree} > ${trio}
+    switch_errors_by_site ${out} ${pedigree}
 fi
-
-
-
 
 
