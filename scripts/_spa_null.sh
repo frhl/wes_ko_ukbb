@@ -2,8 +2,8 @@
 #
 #$ -N _spa_null
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/spa_null.log
-#$ -e logs/spa_null.errors.log
+#$ -o logs/_spa_null.log
+#$ -e logs/_spa_null.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q lindgren.qe
@@ -24,11 +24,9 @@ readonly createSparseGRM="/well/lindgren/flassen/software/dev/SAIGE/extdata/crea
 readonly step1_fitNULLGLMM="/well/lindgren/flassen/software/dev/SAIGE/extdata/step1_fitNULLGLMM.R"
 readonly threads=$(( ${NSLOTS}-1 ))
 
-# null model script
 fit_null() {
    if [ ! -f "${out_prefix}.rda" ]; then
      SECONDS=0
-     set -x
      Rscript "${step1_fitNULLGLMM}" \
        --plinkFile="${plink_file}" \
        --phenoFile="${pheno_file}" \
@@ -46,10 +44,10 @@ fit_null() {
        --LOCO=FALSE \
        --skipModelFitting=FALSE \
        --IsSparseKin=TRUE \
-       --isCateVarianceRatio=FALSE # Only needed for SAIGE-GENE+ (geneset)
-     set +x
-     duration=${SECONDS}
-     print_update "Finished fitting null model for ${phenotype}" "$duration"
+       --isCateVarianceRatio=FALSE \
+       && print_update "Finished running SAIGE NULL model for ${phenotype}" ${SECONDS} \
+       || raise_error "SAIGE NULL model failed for ${phenptype}"
+       #--isCateVarianceRatio=FALSE  Only needed for SAIGE-GENE+ (geneset)
    else
      >&2 echo "Warning: Null model at ${out_prefix} already exists. Skipping!"
    fi

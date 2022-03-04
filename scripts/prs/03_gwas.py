@@ -54,7 +54,9 @@ def main(args):
                      raise ValueError(str(cases) + " cases found! Expected +" + str(min_cases))
                 if adjust_maf_by_case_control:
                      min_maf = hl.max(0.01, 25/(2 * hl.min([cases, controls])))
-                     mt = mt.filter_rows(variants.get_maf_expr(mt) > float(min_maf))
+                     mt = mt.filter_rows(variants.get_maf_expr(mt) > min_maf)
+                     with open(out_prefix + "_maf.txt","w") as outfile:
+                         outfile.write(f"{input_path}\t{response}\t{cases}\t{controls}\t{min_maf}\n")
                 reg = hl.logistic_regression_rows(
                         test='wald',
                         y=mt.pheno[response],

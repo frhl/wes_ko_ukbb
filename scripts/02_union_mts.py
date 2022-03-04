@@ -28,6 +28,7 @@ def main(args):
             input_path=input_unphased,
             input_type=input_unphased_type)
 
+    unphased = unphased.annotate_rows(wes = 1)
     unphased = ko_utils_variants.filter_max_mac(unphased, 1)
     unphased = tables.order_cols(unphased, phased)
     mt = io.rbind_matrix_tables(unphased, phased)

@@ -5,9 +5,9 @@
 #$ -o logs/union_mts.log
 #$ -e logs/union_mts.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 5
+#$ -pe shmem 10
 #$ -q long.qc@@long.hga
-#$ -t 21
+#$ -t 1
 
 set -o errexit
 set -o nounset
@@ -19,14 +19,14 @@ readonly spark_dir="data/tmp/spark_dir"
 
 # input files
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 
-readonly in_dir_phased="/well/lindgren/UKBIOBANK/nbaya/wes_200k/phase_ukb_wes/data/phased/non_singleton"
-readonly in_phased="${in_dir_phased}/ukb_wes_phased_non_singleton_chr${chr}-24xlong.qc-v4.2.2.vcf.gz"
-readonly in_dir_unphased="data/unphased/post-qc"
+readonly in_dir_phased="data/phased/wes_union_calls/ligated/new"
+readonly in_phased="${in_dir_phased}/ukb_eur_wes_union_calls_200k_chr${chr}.vcf.bgz"
+readonly in_dir_unphased="data/unphased/wes/post-qc"
 readonly in_unphased="${in_dir_unphased}/ukb_wes_200k_filtered_chr${chr}.mt"
 
 # output files
-readonly out_dir="data/mt/test"
-readonly out_prefix="${out_dir}/ukb_wes_200k_combined_chr${chr}"
+readonly out_dir="data/mt/union"
+readonly out_prefix="${out_dir}/ukb_eur_wes_200k_union_chr${chr}"
 readonly out="${out_prefix}.mt"
 
 # hail script

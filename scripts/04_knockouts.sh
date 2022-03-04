@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 #
-# probabilistic model for human knockouts
 #
-#$ -N knockouts
+#$ -N null_knockouts
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/knockouts.log
-#$ -e logs/knockouts.errors.log
+#$ -o logs/null_knockouts.log
+#$ -e logs/null_knockouts.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qf
@@ -20,7 +19,7 @@ source utils/vcf_utils.sh
 
 readonly in_dir="data/mt"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/knockouts/220207"
+readonly out_dir="data/knockouts/null"
 
 readonly knockout_script="scripts/_knockouts.sh"
 readonly input_path="${in_dir}/ukb_wes_200k_merged_chrCHR.mt"
@@ -36,10 +35,10 @@ readonly tasks="21"
 readonly queue="short.qe"
 readonly nslots=3
 
+mkdir -p ${out_dir}
 
 submit_knockout_job() 
 {
-  mkdir -p ${out_dir}
   local maf_lb=${1}
   local maf_ub=${2}
   local sex=${3}
@@ -66,7 +65,7 @@ submit_knockout_job()
   set +x
 }
 
-submit_knockout_job "0" "1e-2" "" "pLoF,damaging_missense"
-#submit_knockout_job 0 0.01 "" "pLoF"
-#submit_knockout_job 0 0.01 "" "synonymous"
-#submit_knockout_job 0 0.01 "" "ptv,LC"
+submit_knockout_job "0" "0.05" "" "pLoF,damaging_missense"
+#submit_knockout_job 0 0.05 "" "pLoF"
+#submit_knockout_job 0 0.05 "" "synonymous"
+#submit_knockout_job 0 0.05 "" "ptv,LC"

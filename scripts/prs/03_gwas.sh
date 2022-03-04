@@ -7,12 +7,15 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-6
+#$ -t 1-20
 #$ -V
 
 # cts
 # 1 - 33 contains non-residuals
 # 34 - 103 contains residuals
+
+set -o errexit
+set -o nounset
 
 module purge
 source utils/bash_utils.sh
@@ -85,8 +88,8 @@ submit_merge_job()
 }
 
 
-submit_gwas_job "data/prs/sumstat/binary/" "${phenotype_binary}" "${file_binary}"
-#submit_gwas_job "data/prs/sumstat/cts/by_chrom" "${phenotype_cts}"
+submit_gwas_job "data/prs/sumstat/binary" "${phenotype_binary}" "${file_binary}"
+submit_gwas_job "data/prs/sumstat/cts" "${phenotype_cts}" "${file_cts}"
 
 
 

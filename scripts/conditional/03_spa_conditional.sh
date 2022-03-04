@@ -35,17 +35,20 @@ mkdir -p ${out_dir}
 
 submit_spa_cond_job() 
 {
-  if [ -f ${1} ]; then
+  local vcf=${1}
+  local out_prefix=${2}
+  local annotation=${3}
+  if [ -f ${vcf} ]; then
     set -x
-    qsub -N "_spa_cond_${3}" \
+    qsub -N "_spa_cond_${annotation}" \
       -q "short.qc@@short.hge" \
       -t "${SGE_TASK_ID}" \
       -pe shmem 1 \
       "${spa_script}" \
       "${in_gmat}" \
       "${in_var}" \
-      "${1}" \
-      "${2}" \
+      "${vcf}" \
+      "${out_prefix}" \
       "${P_cutoff}" \
       "${max_iter}"
     set +x

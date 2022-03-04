@@ -10,6 +10,9 @@
 #$ -t 1
 #$ -V
 
+set -o errexit
+set -o nounset
+
 source utils/bash_utils.sh
 
 readonly rscript="scripts/prs/07_aggr_prs.R"

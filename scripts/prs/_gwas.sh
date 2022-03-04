@@ -6,6 +6,9 @@
 #$ -e logs/_gwas.errors.log
 #$ -V
 
+set -o errexit
+set -o nounset
+
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
@@ -38,7 +41,8 @@ if [ ! -f "${out_prefix_chr}.txt.gz" ]; then
      --min_cases "${min_cases}" \
      --response "${phenotype}" \
      --covariates "${covariates}" \
-     --out_prefix "${out_prefix_chr}"
+     --out_prefix "${out_prefix_chr}" \
+     --adjust_maf_by_case_control 
   set +x
 else
   echo "Note: ${out_prefix_chr} already exists!"

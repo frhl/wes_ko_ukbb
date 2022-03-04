@@ -42,6 +42,7 @@ python3 "${hail_script}" \
      --out_prefix "${out_cts}"
 
 # create seperate header for Primary Care data
+cat "${in_bin}_"
 cat "${in_bin}_header.tsv" | grep care > "${out_bin}_PC_header.tsv"
 cat "${in_bin}_header.tsv" | grep -v care > "${out_bin}_notPC_header.tsv"
 

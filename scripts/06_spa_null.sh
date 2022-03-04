@@ -10,6 +10,8 @@
 #$ -t 1
 #$ -V
 
+# all binary: 1 - 71
+
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
@@ -28,24 +30,24 @@ readonly covariates=$( cat ${covar_file} )
 
 readonly out_prefix="ukb_wes_200k"
 
-readonly nslots=3
+readonly nslots=2
 readonly queue="short.qe"
 readonly index=${SGE_TASK_ID}
 
 fit_binary_traits() {
   local trait_type="binary"
   local out_dir="data/saige/output/combined/binary/step1"
-  local pheno_file="${pheno_dir}/filtered_phenotypes_binary.tsv.gz"
+  local pheno_file="${pheno_dir}/filtered_phenotypes_binary.tsv"
   local pheno_list="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
   local phenotype=$( sed "${index}q;d" ${pheno_list} )
-  local out_prefix="${out_dir}/${out_prefix}_${phenotype}"
+  local out="${out_dir}/${out_prefix}_${phenotype}"
   submit_spa_null
 }
 
 fit_cts_traits() {
   local trait_type="quantitative"
   local out_dir="data/saige/output/combined/cts/step1"
-  local pheno_file="${pheno_dir}/filtered_phenotypes_cts.tsv.gz"
+  local pheno_file="${pheno_dir}/filtered_phenotypes_cts.tsv"
   local pheno_list="${pheno_dir}/filtered_phenotypes_cts_header.tsv"
   local phenotype=$( sed "${index}q;d" ${pheno_list} )
   local out="${out_dir}/${out_prefix}_${phenotype}"
@@ -76,8 +78,8 @@ submit_spa_null() {
 }
 
 # Fit null model for binary/cts traits
-fit_binary_traits
-#fit_cts_traits
+#fit_binary_traits
+ifit_cts_traits
 
 
 
