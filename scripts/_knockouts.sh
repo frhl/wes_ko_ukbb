@@ -26,7 +26,7 @@ readonly in_sex=${7?Error: Missing arg7 (in_sex)}
 readonly in_category=${8?Error: Missing arg8 (in_category)}
 readonly out_prefix=${9?Error: Missing arg9 (path prefix for saige output)}
 readonly out_type=${10?Error: Missing arg10 (output type e.g., mt,vcf or plink)}
-readonly randomize_phase=${11?Error: Missing arg11 (Should phase be randomized? For creating Null knockout model)}
+readonly randomize_phase=${11?Error: Missing arg11 (Should phase be randomized?)}
 
 readonly chr=${SGE_TASK_ID}
 readonly input_path_chr=$(echo ${input_path} | sed -e "s/CHR/${chr}/g")

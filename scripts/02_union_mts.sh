@@ -5,9 +5,9 @@
 #$ -o logs/union_mts.log
 #$ -e logs/union_mts.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 10
+#$ -pe shmem 5
 #$ -q long.qc@@long.hga
-#$ -t 1
+#$ -t 14-15
 
 set -o errexit
 set -o nounset
@@ -25,7 +25,7 @@ readonly in_dir_unphased="data/unphased/wes/post-qc"
 readonly in_unphased="${in_dir_unphased}/ukb_wes_200k_filtered_chr${chr}.mt"
 
 # output files
-readonly out_dir="data/mt/union"
+readonly out_dir="data/mt/union/14_15"
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_union_chr${chr}"
 readonly out="${out_prefix}.mt"
 

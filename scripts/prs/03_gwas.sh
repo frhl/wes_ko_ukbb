@@ -34,7 +34,8 @@ readonly input_path="${in_dir}/ukb_hapmap_500k_eur_chrCHR"
 readonly index=${SGE_TASK_ID}
 
 readonly file_cts="${pheno_dir}/filtered_phenotypes_cts.tsv" 
-readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_header.tsv"
+readonly pheno_list_cts="${pheno_dir}/manual_filtered_phenotypes_cts_residual.tsv"
+#readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_header.tsv"
 readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
 
 readonly file_binary="${pheno_dir}/filtered_phenotypes_binary.tsv" 
@@ -85,8 +86,8 @@ submit_merge_job()
 }
 
 
-submit_gwas_job "data/prs/sumstat/binary" "${phenotype_binary}" "${file_binary}"
-#submit_gwas_job "data/prs/sumstat/cts" "${phenotype_cts}" "${file_cts}"
+#submit_gwas_job "data/prs/sumstat/binary" "${phenotype_binary}" "${file_binary}"
+submit_gwas_job "data/prs/sumstat/cts" "${phenotype_cts}" "${file_cts}"
 
 
 
