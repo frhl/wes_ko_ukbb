@@ -100,9 +100,9 @@ def main(args):
 
     mt_vcf = mt_vcf.key_rows_by(mt_vcf.locus, mt_vcf.alleles)
     mt_vcf = mt_vcf.drop('gene_id')
-    hl.export_vcf(mt_vcf, csq_prefix + '.vcf.bgz')
+    #hl.export_vcf(mt_vcf, csq_prefix + '.vcf.bgz')
     io.export_table(mt_vcf, csq_prefix, out_type)
-    genes.filter_entries(genes.pKO > 0).entries().flatten().export(csq_prefix + "tsv.gz") 
+    genes.filter_entries(genes.pKO > 0).entries().flatten().export(csq_prefix + ".tsv.gz") 
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
