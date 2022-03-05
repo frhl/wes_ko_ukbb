@@ -46,7 +46,7 @@ def csqs_case_builder(worst_csq_expr: hl.StringExpression, use_loftee: bool = Tr
     return case.or_missing()
 
 
-def set_to_phased_call(gt):
+def set_to_phased_call(gt: hl.call):
     """ Set an unphased genotype call to phased genotype 
     
     :param gt: genotype call to be converted
@@ -72,6 +72,38 @@ def is_phased(gt: hl.call):
         (gt == hl.parse_call('1|1')) |
         (gt == hl.parse_call('0|0'))
            )
+
+def rand_flip_call(gt: hl.call, P: float = 0.5, seed = None):
+    """ Randomize genotype phase of call
+
+    :param gt: genotype call to be flipped
+    :param P: probabily of one phase
+    :param seed: seed for random
+    """
+    assert str(gt.dtype) == 'call'
+
+    return hl.if_else(
+        (gt.n_alt_alleles() == 1) &
+        (is_phased(gt)), 
+        hl.if_else(
+            hl.rand_bool(P),
+            hl.parse_call("1|0"),
+            hl.parse_call("0|1")
+        ),
+        gt
+    )
+
+
+def agg_count_calls(mt: hl.MatrixTable, phased: bool = True):
+    """ Count number of phased/unphased hetz and what haplotype they reside on
+
+    :param mt: MatrixTable with GT field
+    :param mt: test for phased genotypes only
+    """
+    aggr = mt.aggregate_entries(hl.agg.counter(mt.GT))
+    gt10 = aggr[hl.Call(alleles=[1, 0], phased = phased)]
+    gt01 = aggr[hl.Call(alleles=[0, 1], phased = phased)]
+    return((gt10,gt01))
 
 
 def collect_gt_by_expr(mt: hl.MatrixTable, expr: hl.StringExpression):

@@ -102,7 +102,7 @@ set_up_RSAIGE() {
   module load Anaconda3/2020.07
   module load java/1.8.0_latest
   source "/apps/eb/skylake/software/Anaconda3/2020.07/etc/profile.d/conda.sh"
-  conda activate rsaige
+  conda activate saige
 }
 
 
@@ -112,6 +112,14 @@ set_up_rpy() {
   source "/apps/eb/skylake/software/Anaconda3/2020.07/etc/profile.d/conda.sh"
   conda activate rpy
 }
+
+set_up_tensorflow() {
+  module load Anaconda3/2020.07
+  module load java/1.8.0_latest
+  source "/apps/eb/skylake/software/Anaconda3/2020.07/etc/profile.d/conda.sh"
+  conda activate tf
+}
+
 
 #set_up_vep() {
 #  module load EnsEMBLCoreAPI/96.0-r20190601-foss-2019a-Perl-5.28.1 # required for LOFTEE
