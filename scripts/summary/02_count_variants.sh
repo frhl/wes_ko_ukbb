@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
 #$ -N count_variants
-#$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/count_variants.log
 #$ -e logs/count_variants.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 1
+#$ -pe shmem 2
 #$ -q short.qc@@short.hge
-#$ -t 1-22
+#$ -t 2,4
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh

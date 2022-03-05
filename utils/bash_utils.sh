@@ -33,26 +33,28 @@ print_update() {
   set -o nounset
 }
 
-vcf_check() {
-  if [ ! -f $1 ]; then # check that VCF exists
-    raise_error "$1 does not exist"
-  elif [ ! -s $1 ]; then # check that VCF is not an empty file
-    raise_error "$1 exists but is empty"
-  elif [ $( bcftools view -h $1 2>&1 | head | grep "No BGZF EOF marker" | wc -l ) -gt 0 ]; then # check that VCF is not truncated
-    raise_error "$1 may be truncated"
-  fi
-}
 
-make_tabix() {
-  if [ ! -f $1.tbi ]; then
-    local _start_time=${SECONDS}
-    bcftools index $1 \
-      --tbi \
-      --threads $(( ${NSLOTS}-1 ))
-    local _duration=$(( ${SECONDS}-${_start_time} ))
-    print_update "finished tabix of $1" "${_duration}"
-  fi
-}
+
+#vcf_check() {
+#  if [ ! -f $1 ]; then # check that VCF exists
+#    raise_error "$1 does not exist"
+#  elif [ ! -s $1 ]; then # check that VCF is not an empty file
+#    raise_error "$1 exists but is empty"
+#  elif [ $( bcftools view -h $1 2>&1 | head | grep "No BGZF EOF marker" | wc -l ) -gt 0 ]; then # check that VCF is not truncated
+#    raise_error "$1 may be truncated"
+#  fi
+#}
+
+#make_tabix() {
+#  if [ ! -f $1.tbi ]; then
+#    local _start_time=${SECONDS}
+#    bcftools index $1 \
+#      --tbi \
+#      --threads $(( ${NSLOTS}-1 ))
+#    local _duration=$(( ${SECONDS}-${_start_time} ))
+#    print_update "finished tabix of $1" "${_duration}"
+#  fi
+#}
 
 set_up_conda() {
   local __conda_setup="$('/apps/eb/skylake/software/Anaconda3/2020.07/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
@@ -70,19 +72,19 @@ set_up_conda() {
   unset __conda_setup
 }
 
-get_hail_memory() {
-  if [[ -z ${QUEUE} || -z ${NSLOTS} ]]; then
-    raise_error "QUEUE and NSLOTS must both be defined"
-  fi
-  if [[ "${QUEUE}" = *".qe" || "${QUEUE}" = *".qc" ]]; then
-    local _mem_per_slot=10
-  elif [[ "${QUEUE}" = *".qf" ]]; then
-    local _mem_per_slot=3
-  else
-    raise_error "QUEUE must end in either \".qe\", \".qc\", or \".qf\""
-  fi
-  echo $(( ${_mem_per_slot}*${NSLOTS} ))
-}
+#get_hail_memory() {
+#  if [[ -z ${QUEUE} || -z ${NSLOTS} ]]; then
+#    raise_error "QUEUE and NSLOTS must both be defined"
+#  fi
+#  if [[ "${QUEUE}" = *".qe" || "${QUEUE}" = *".qc" ]]; then
+#    local _mem_per_slot=10
+#  elif [[ "${QUEUE}" = *".qf" ]]; then
+#    local _mem_per_slot=3
+#  else
+#    raise_error "QUEUE must end in either \".qe\", \".qc\", or \".qf\""
+#  fi
+#  echo $(( ${_mem_per_slot}*${NSLOTS} ))
+#}
 
 #set_up_hail() {
 #  mkdir -p ${spark_dir} # directory for Hail's temporary Spark output files
@@ -100,7 +102,7 @@ set_up_RSAIGE() {
   module load Anaconda3/2020.07
   module load java/1.8.0_latest
   source "/apps/eb/skylake/software/Anaconda3/2020.07/etc/profile.d/conda.sh"
-  conda activate RSAIGE
+  conda activate saige
 }
 
 
@@ -110,6 +112,14 @@ set_up_rpy() {
   source "/apps/eb/skylake/software/Anaconda3/2020.07/etc/profile.d/conda.sh"
   conda activate rpy
 }
+
+set_up_tensorflow() {
+  module load Anaconda3/2020.07
+  module load java/1.8.0_latest
+  source "/apps/eb/skylake/software/Anaconda3/2020.07/etc/profile.d/conda.sh"
+  conda activate tf
+}
+
 
 #set_up_vep() {
 #  module load EnsEMBLCoreAPI/96.0-r20190601-foss-2019a-Perl-5.28.1 # required for LOFTEE

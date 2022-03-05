@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #$ -N write_knockout_sample_count
-#$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/write_knockout_sample_count.log
 #$ -e logs/write_knockout_sample_count.errors.log
 #$ -P lindgren.prjc

@@ -1,78 +1,75 @@
 #!/usr/bin/env bash
 #
-# Combine phased and unphased data to make a probabilistic model
-# for human knockouts.
 #
-# 1) A fake VCF with probablistic encoding of KO (for SAIGE+ input)
-# 2) A matrix containg the variant consequences in each gene for each sample
-# 3) A ko probabiltiy matrix containg individuals, genes and probability of KO
-# 4) A ko probability matrix with the above + variants involved in KO.
-#
-#$ -N knockout
-#$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/submit_knockout.log
-#$ -e logs/submit_knockout.errors.log
+#$ -N knockouts
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#$ -o logs/knockouts.log
+#$ -e logs/knockouts.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q short.qf
+#$ -q test.qc
 #$ -V
 
-#set -o errexit
-#set -o nounset
+set -o errexit
+set -o nounset
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
-# directories
 readonly in_dir="data/mt"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="derived/knockouts/211116"
+readonly out_dir="data/knockouts/alt"
 
-# input path
 readonly knockout_script="scripts/_knockouts.sh"
-readonly in_phased="${in_dir}/ukb_wes_200k_annotated_chrCHR.mt"
-readonly in_unphased="${in_dir}/ukb_wes_200k_annotated_chrCHR_singletons.mt"
-readonly in_phased_type="mt"
-readonly in_unphased_type="mt"
+readonly input_path="${in_dir}/ukb_wes_200k_merged_chrCHR.mt"
+readonly input_type="mt"
 
-# parameters
-#readonly af_min=0
-#readonly af_max=0.01
-readonly maf_max=0.01
-readonly maf_min=0
-readonly sex='both'
+readonly af_min=""
+readonly af_max=""
 
-# output path
-readonly out_prefix="${out_dir}/ukb_wes_200k_females_maf00_01_chrCHR"
+readonly out_prefix="${out_dir}/test_varid_ukb_wes_200k"
+readonly out_type="vcf"
+
+readonly tasks="16"
+readonly queue="short.qe"
+readonly nslots=3
+readonly phase=""
+
+mkdir -p ${out_dir}
 
 submit_knockout_job() 
 {
-  name=$( echo ${1} | tr "," "_")
-  qsub -N "_ko_${name}" \
-    -t 1-22 \
-    -q "short.qa" \
-    -pe shmem 2 \
+  local maf_lb=${1}
+  local maf_ub=${2}
+  local sex=${3}
+  local csq=${4}
+  local prefix="${out_prefix}_maf${maf_lb}_${maf_ub}_${sex:+_${sex}}chrCHR"
+  local qsub_name=$( echo ${csq} | tr "," "_")
+  
+  set -x
+  qsub -N "_${qsub_name}" \
+    -o "logs/_knockouts.log"
+    -e "logs/_knockouts.errors.log"
+    -t ${tasks} \
+    -q "${queue}" \
+    -pe shmem ${nslots} \
     "${knockout_script}" \
-    "${in_phased}" \
-    "${in_phased_type}" \
-    "${in_unphased}" \
-    "${in_unphased_type}" \
+    "${input_path}" \
+    "${input_type}" \
     "${af_min}" \
     "${af_max}" \
-    "${maf_max}" \
-    "${maf_min}" \
-    "${1}" \
-    "${sex}"\
-    "${out_prefix}"
+    "${maf_lb}" \
+    "${maf_ub}" \
+    "${sex}" \
+    "${csq}" \
+    "${prefix}" \
+    "${out_type}" \
+    "${phase}"
+  set +x
 }
 
-
-mkdir -p ${out_dir}
-submit_knockout_job "ptv,damaging_missense"
-submit_knockout_job "ptv"
-submit_knockout_job "synonymous"
-#submit_knockout_job "ptv,ptv_LC"
-#submit_knockout_job "ptv,ptv_LC,damaging_missense"
-
-
+submit_knockout_job "0" "0.05" "" "pLoF,damaging_missense"
+#submit_knockout_job 0 0.05 "" "pLoF"
+#submit_knockout_job 0 0.05 "" "synonymous"
+#submit_knockout_job 0 0.05 "" "ptv,LC"

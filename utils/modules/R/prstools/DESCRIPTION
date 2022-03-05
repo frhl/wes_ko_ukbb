@@ -1,0 +1,34 @@
+Package: PRStools
+Type: Package
+Title: Polygenic Risk Scoring Tools
+Version: 0.1.0
+Author: Frederik Lassen 
+Maintainer: The package maintainer <yourself@somewhere.net>
+Description: Package for running PRS related functions under the
+    the compound het project.
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+Depends:
+    R (>= 3.6),
+    bigsnpr,
+    data.table,
+    bigassertr
+Suggests:
+    devtools,
+    testthat (>= 2.1.0)
+RoxygenNote: 7.1.2
+Collate:
+    'calc_inflation.R'
+    'calc_ld_matrix.R'
+    'calc_single_ld_matrix.R'
+    'get_ld_matrix.R'
+    'get_single_ld_matrix.R'
+    'get_ldpred_marker.R'
+    'load_bigsnp_from_bed.R'
+    'match_bigsnp_with_gwas.R'
+    'misc.R'
+    'predict_prs.R'
+    'read_hail_sumstat.R'
+    'qc_sumstat.R'
+    'snp_as_genetic_position.R'

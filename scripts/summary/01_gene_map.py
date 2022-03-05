@@ -38,7 +38,9 @@ def main(args):
     groups="ptv,damaging_missense|ptv_LC,ptv|damaging_missense|ptv_LC,ptv|damaging_missense,damaging_missense,other_missense,synonymous"
     # Create a distinct file for each annotation
     for group in groups.split(','):
-        gene_ht = gene_map_ht.filter(group==gene_map_ht.annotation)
+        lst = group.split('|')
+        #gene_ht = gene_map_ht.filter(group==gene_map_ht.annotation)
+        gene_ht = gene_map_ht.fiter(hl.literal(set(lst)).contains(gene_map_ht.annotation))
         output_group_input_path_tmp = out_prefix + '_' + group.replace('|','_') + '.tsv.gz'
         gene_ht.select(
             group=gene_ht.gene_id + '_' + gene_ht.gene_symbol + '_' + gene_ht.annotation,

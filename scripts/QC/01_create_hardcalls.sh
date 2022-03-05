@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #$ -N unphased_hardcalls
-#$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/create_hardcalls_unphased.log
 #$ -e logs/create_hardcalls_unphased.errors.log
 #$ -P lindgren.prjc

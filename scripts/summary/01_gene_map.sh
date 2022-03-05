@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
 #$ -N gene_map
-#$ -wd /well/lindgren/UKBIOBANK/flassen/projects/KO/wes_ko_ukbb
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/gene_map.log
 #$ -e logs/gene_map.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc@@short.hge
-#$ -t 1-22
+#$ -t 21
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
