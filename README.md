@@ -1,5 +1,6 @@
 # Compound Heterozygous Effects in UKBB
 
+See scripts for individual workflows.
 
 ## Overview
 See the scripts directory for individual analyses. The following repository contains information regarding: 
@@ -13,7 +14,6 @@ See the scripts directory for individual analyses. The following repository cont
 6. How to condition out polygenic background, common variants and rare variants and search for remaining effects
 7. How to simulate compound heterozygous effects
 
-## References
 
 
 
