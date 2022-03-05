@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
 #
-#$ -N null_knockouts
+#$ -N knockouts
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/null_knockouts.log
-#$ -e logs/null_knockouts.errors.log
+#$ -o logs/knockouts.log
+#$ -e logs/knockouts.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q short.qf
+#$ -q test.qc
 #$ -V
 
 set -o errexit
@@ -19,7 +19,7 @@ source utils/vcf_utils.sh
 
 readonly in_dir="data/mt"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="data/knockouts/null"
+readonly out_dir="data/knockouts/alt"
 
 readonly knockout_script="scripts/_knockouts.sh"
 readonly input_path="${in_dir}/ukb_wes_200k_merged_chrCHR.mt"
