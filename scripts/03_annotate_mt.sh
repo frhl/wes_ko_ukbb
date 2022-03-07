@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 4
 #$ -q long.qc@@long.hga
-#$ -t 1
+#$ -t 14-15
 
 set -o errexit
 set -o nounset
