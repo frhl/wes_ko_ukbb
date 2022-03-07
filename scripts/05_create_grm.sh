@@ -23,7 +23,7 @@ readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc
 
 readonly hail_script="scripts/05_create_grm.py"
 readonly threads=$(( ${NSLOTS}-1 ))
-readonly createSparseGRM="/well/lindgren/flassen/software/dev/SAIGE/extdata/createSparseGRM.R"
+readonly createSparseGRM="utils/saige/createSparseGRM.R"
 
 # Generate a sequence of chromosomes to be included
 chroms=$( seq 1 22 | tr '\n' ' ' )
@@ -53,7 +53,7 @@ set_up_RSAIGE
 print_update "Generating GRM from plink files.. "
 Rscript "${createSparseGRM}" \
   --plinkFile=${out_prefix} \
-  --nThreads=4 \
+  --nThreads=9 \
   --outputPrefix=${out_prefix} \
   --numRandomMarkerforSparseKin=1000 \
   --relatednessCutoff=0.125 \
