@@ -26,9 +26,7 @@ readonly csi=$(echo ${in_csi} | sed -e "s/CHR/${chr}/g")
 readonly markers=$(cat $(echo ${in_markers} | sed -e "s/CHR/${chr}/g"))
 
 readonly threads=$(( ${NSLOTS}-1 ))
-readonly createSparseGRM="/well/lindgren/flassen/software/dev/SAIGE/extdata/createSparseGRM.R"
-readonly step1_fitNULLGLMM="/well/lindgren/flassen/software/dev/SAIGE/extdata/step1_fitNULLGLMM.R"
-readonly step2_SPAtests="/well/lindgren/flassen/software/dev/SAIGE/extdata/step2_SPAtests.R"
+readonly step2_SPAtests="utils/saige/step2_SPAtests.R"
 
 readonly out="${out_prefix}_chr${chr}"
 

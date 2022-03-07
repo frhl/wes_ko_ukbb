@@ -20,8 +20,7 @@ readonly grm_mtx=${6?Error: Missing arg6 (path prefix for saige output)}
 readonly grm_sam=${7?Error: Missing arg7 (Optional file with conditioning markers)}
 readonly out_prefix=${8?Error: Missing arg7 (Optional file with conditioning markers)}
 
-readonly createSparseGRM="/well/lindgren/flassen/software/dev/SAIGE/extdata/createSparseGRM.R"
-readonly step1_fitNULLGLMM="/well/lindgren/flassen/software/dev/SAIGE/extdata/step1_fitNULLGLMM.R"
+readonly step1_fitNULLGLMM="utils/saige/step1_fitNULLGLMM.R"
 readonly threads=$(( ${NSLOTS}-1 ))
 
 fit_null() {
@@ -43,7 +42,7 @@ fit_null() {
        --nThreads=${threads} \
        --LOCO=FALSE \
        --skipModelFitting=FALSE \
-       --IsSparseKin=TRUE \
+       --useSparseGRMtoFitNULL=TRUE \
        --isCateVarianceRatio=FALSE \
        && print_update "Finished running SAIGE NULL model for ${phenotype}" ${SECONDS} \
        || raise_error "SAIGE NULL model failed for ${phenptype}"
