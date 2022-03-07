@@ -19,22 +19,23 @@ source utils/vcf_utils.sh
 
 readonly in_dir="data/mt/annotated"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="data/knockouts/alt/new"
+readonly out_dir="data/knockouts/alt/10mem"
 
-readonly knockout_script="scripts/_knockouts.sh"
+readonly knockout_script="scripts/_phased_knockouts.sh"
 readonly input_path="${in_dir}/ukb_eur_wes_200k_annot_chrCHR.mt"
 readonly input_type="mt"
 
 readonly af_min=""
 readonly af_max=""
 readonly phase=""
+readonly only_vcf=""
 
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k"
 readonly out_type="vcf"
 
 readonly tasks="1-22"
 readonly queue="short.qe"
-readonly nslots=4
+readonly nslots=10
 
 mkdir -p ${out_dir}
 
@@ -44,7 +45,7 @@ submit_knockout_job()
   local maf_ub=${2}
   local sex=${3}
   local csq=${4}
-  local prefix="${out_prefix}_chrCHR_maf${maf_lb}to${maf_ub}_${sex:+_${sex}}"
+  local prefix="${out_prefix}_chrCHR_maf${maf_lb}to${maf_ub}${sex:+_${sex}}"
   local qsub_name=$( echo ${csq} | tr "," "_")
   
   set -x
@@ -65,14 +66,15 @@ submit_knockout_job()
     "${csq}" \
     "${prefix}" \
     "${out_type}" \
-    "${phase}"
+    "${phase}" \
+    "${only_vcf}"
   set +x
 }
 
-submit_knockout_job "0" "5e-2" "" "pLoF"
-submit_knockout_job "0" "5e-2" "" "damaging_missense"
+#submit_knockout_job "0" "5e-2" "" "pLoF"
+#submit_knockout_job "0" "5e-2" "" "damaging_missense"
 submit_knockout_job "0" "5e-2" "" "pLoF,damaging_missense"
-submit_knockout_job "0" "5e-2" "" "pLoF,LC,damaging_missense"
+#submit_knockout_job "0" "5e-2" "" "pLoF,LC,damaging_missense"
 
 #submit_knockout_job 0 0.05 "" "pLoF"
 #submit_knockout_job 0 0.05 "" "synonymous"

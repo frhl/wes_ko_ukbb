@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-10
+#$ -t 1
 #$ -V
 
 
@@ -34,8 +34,7 @@ readonly input_path="${in_dir}/ukb_hapmap_500k_eur_chrCHR"
 readonly index=${SGE_TASK_ID}
 
 readonly file_cts="${pheno_dir}/filtered_phenotypes_cts.tsv" 
-readonly pheno_list_cts="${pheno_dir}/manual_filtered_phenotypes_cts_residual.tsv"
-#readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_header.tsv"
+readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
 readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
 
 readonly file_binary="${pheno_dir}/filtered_phenotypes_binary.tsv" 

@@ -10,8 +10,8 @@
 #$ -t 1
 #$ -V
 
-set -o errexit
-set -o nounset
+#set -o errexit
+#set -o nounset
 
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
@@ -29,7 +29,7 @@ readonly ld_dir="data/prs/hapmap/ld/matrix"
 readonly index=${SGE_TASK_ID}
 
 readonly file_cts="${pheno_dir}/filtered_phenotypes_cts.tsv"
-readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_header.tsv"
+readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
 readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
 
 readonly file_binary="${pheno_dir}/filtered_phenotypes_binary.tsv"
@@ -62,5 +62,5 @@ estimate_heritability(){
 }
 
 estimate_heritability "${phenotype_binary}" "binary"
-#estimate_heritability "${phenotype_cts}" "cts"
+estimate_heritability "${phenotype_cts}" "cts"
 

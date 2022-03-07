@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
 #
-#$ -N knockouts_random
+#$ -N rand_phase_ko
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/knockouts_random.log
-#$ -e logs/knockouts_random.errors.log
+#$ -o logs/rand_phase_ko.log
+#$ -e logs/rand_phase_ko.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
@@ -21,7 +21,7 @@ readonly in_dir="data/mt"
 readonly spark_dir="data/tmp/spark"
 readonly out_dir="data/knockouts/null"
 
-readonly knockout_script="scripts/_knockouts.sh"
+readonly knockout_script="scripts/_phased_knockouts.sh"
 readonly input_path="${in_dir}/ukb_wes_200k_merged_chrCHR.mt"
 readonly input_type="mt"
 
@@ -29,11 +29,12 @@ readonly out_type="vcf"
 
 readonly af_min=""
 readonly af_max=""
+readonly phase="random"
+readonly only_vcf="yes"
 
-readonly tasks="16"
+readonly tasks="22"
 readonly queue="short.qe"
 readonly nslots=2
-readonly phase="random"
 
 mkdir -p ${out_dir}
 
@@ -43,7 +44,7 @@ submit_knockout_random_job()
   local maf_ub=${2}
   local sex=${3}
   local csq=${4}
-  local prefix="${out_prefix}_maf${maf_lb}_${maf_ub}_${sex:+_${sex}}chrCHR"
+  local prefix="${out_prefix}_chrCHR_"maf${maf_lb}_${maf_ub}${sex:+_${sex}}
   local qsub_name=$( echo ${csq} | tr "," "_")
   
   set -x
@@ -64,15 +65,16 @@ submit_knockout_random_job()
     "${csq}" \
     "${prefix}" \
     "${out_type}" \
-    "${phase}"
+    "${phase}" \
+    "${only_vcf}"
   set +x
 }
 
 
-for i in $(seq 1 3); do 
+#for i in $(seq 1 4); do 
   out_prefix="${out_dir}/test_varid_ukb_wes_200k_rand${i}"
-  submit_knockout_random_job "0" "0.05" "" "pLoF,damaging_missense"
-done
+  submit_knockout_random_job "0" "5e-2" "" "pLoF,damaging_missense"
+#done
 
 #submit_knockout_random_job 0 0.05 "" "pLoF"
 #submit_knockout_random_job 0 0.05 "" "synonymous"

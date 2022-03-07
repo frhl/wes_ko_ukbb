@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-10
+#$ -t 1
 #$ -V
 
 # all binary: 1 - 71
@@ -36,7 +36,7 @@ readonly index=${SGE_TASK_ID}
 
 fit_binary_traits() {
   local trait_type="binary"
-  local out_dir="data/saige/output/combined/binary/step1"
+  local out_dir="data/saige/output/combined/binary/step1/test"
   local pheno_file="${pheno_dir}/filtered_phenotypes_binary.tsv"
   local pheno_list="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
   local phenotype=$( sed "${index}q;d" ${pheno_list} )
@@ -48,7 +48,7 @@ fit_cts_traits() {
   local trait_type="quantitative"
   local out_dir="data/saige/output/combined/cts/step1"
   local pheno_file="${pheno_dir}/filtered_phenotypes_cts.tsv"
-  local pheno_list="${pheno_dir}/manual_filtered_phenotypes_cts_residual.tsv"
+  local pheno_list="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
   #local pheno_list="${pheno_dir}/filtered_phenotypes_cts_header.tsv"
   local phenotype=$( sed "${index}q;d" ${pheno_list} )
   local out="${out_dir}/${out_prefix}_${phenotype}"
@@ -79,8 +79,8 @@ submit_spa_null() {
 }
 
 # Fit null model for binary/cts traits
-#fit_binary_traits
-fit_cts_traits
+fit_binary_traits
+#fit_cts_traits
 
 
 

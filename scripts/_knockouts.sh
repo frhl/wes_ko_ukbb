@@ -13,7 +13,7 @@ source utils/qsub_utils.sh
 source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
-readonly hail_script="scripts/04_knockouts.py"
+readonly hail_script="scripts/04_phased_knockouts.py"
 readonly spark_dir="data/tmp/spark"
 
 readonly input_path=${1?Error: Missing arg1 (input_path)}
@@ -36,7 +36,6 @@ readonly out_prefix_chr=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
 SECONDS=0
 set_up_hail
 set_up_pythonpath_legacy
-set -x
 python3 "${hail_script}" \
     --chrom ${chr} \
     --input_path ${input_path_chr} \
