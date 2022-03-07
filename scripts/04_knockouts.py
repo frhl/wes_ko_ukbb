@@ -74,9 +74,8 @@ def main(args):
     # convert to gene x sample matrix
     genes=(mt.group_rows_by(mt.consequence.vep.worst_csq_by_gene_canonical.gene_id)
             .aggregate(
-                gts=hl.agg.collect(mt.GT),
-                varid=hl.agg.collect(mt.varid)
-                #rsid=hl.agg.collect(mt.rsid)
+                gts=hl.agg.filter(mt.GT.is_non_ref(), hl.agg.collect(mt.GT)),
+                varid=hl.agg.filter(mt.GT.is_non_ref(), hl.agg.collect(mt.varid))
                 )
            )
 
@@ -85,8 +84,8 @@ def main(args):
     expr_pko = ko.calc_prob_ko(genes.hom_alt, genes.phased, genes.unphased)
     expr_ko = ko.annotate_knockout(genes.hom_alt, expr_pko)
     genes = genes.annotate_entries(
-            pKO = expr_pko,
-            knockout = expr_ko)
+            pKO=expr_pko,
+            knockout=expr_ko)
 
     # convert to dosage and write vcf
     csq_prefix = str(out_prefix) + "_" + str(category)
@@ -100,7 +99,6 @@ def main(args):
 
     mt_vcf = mt_vcf.key_rows_by(mt_vcf.locus, mt_vcf.alleles)
     mt_vcf = mt_vcf.drop('gene_id')
-    #hl.export_vcf(mt_vcf, csq_prefix + '.vcf.bgz')
     io.export_table(mt_vcf, csq_prefix, out_type)
     genes.filter_entries(genes.pKO > 0).entries().flatten().export(csq_prefix + ".tsv.gz") 
 
