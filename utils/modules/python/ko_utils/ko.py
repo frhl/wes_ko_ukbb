@@ -101,8 +101,8 @@ def agg_count_calls(mt: hl.MatrixTable, phased: bool = True):
     :param mt: test for phased genotypes only
     """
     aggr = mt.aggregate_entries(hl.agg.counter(mt.GT))
-    gt10 = aggr[hl.Call(alleles=[1, 0], phased = phased)]
-    gt01 = aggr[hl.Call(alleles=[0, 1], phased = phased)]
+    gt10 = aggr[hl.Call(alleles=[1, 0], phased=phased)]
+    gt01 = aggr[hl.Call(alleles=[0, 1], phased=phased)]
     return((gt10,gt01))
 
 
@@ -113,7 +113,7 @@ def collect_gt_by_expr(mt: hl.MatrixTable, expr: hl.StringExpression):
     :param expr: what expression to collapse on, e.g. "gene_id"
     """
     return (mt.group_rows_by(expr)
-            .aggregate(gts=hl.agg.collect(mt.GT))
+            .aggregate(gts=hl.agg.filter(mt.GT.is_non_ref(), hl.agg.collect(mt.GT)))
             )
 
 
@@ -124,26 +124,25 @@ def sum_gts_entries(mt: hl.MatrixTable):
     """
     assert 'gts' in list(mt.entry), 'missing entry field "gts"'
    
-    return (mt.annotate_entries(
-   
-        hom_alt=hl.sum(mt.gts.map(
-                lambda x: x.is_hom_var())),
-
-        phased=hl.struct(
-            a1=hl.sum(mt.gts.map(
-                lambda x: x == hl.parse_call('1|0'))),
-            a2=hl.sum(mt.gts.map(
-                lambda x: x == hl.parse_call('0|1')))
-            ),
-
-        unphased=hl.struct(
-            a1=hl.sum(mt.gts.map(
-                lambda x: x == hl.parse_call('1/0'))),
-            a2=hl.sum(mt.gts.map(
-                lambda x: x == hl.parse_call('0/1')))
+    return (mt.annotate_entries( 
+            hom_alt=hl.sum(mt.gts.map(
+                    lambda x: x.is_hom_var())),
+            phased=hl.struct(
+                a1=hl.sum(mt.gts.map(
+                    lambda x: x == hl.parse_call('1|0'))),
+                a2=hl.sum(mt.gts.map(
+                    lambda x: x == hl.parse_call('0|1')))
+                ),
+            unphased=hl.struct(
+                n=hl.sum(mt.gts.map(
+                    lambda x: (~x.phased) & (x.is_het_ref())
+                    )
+                )
+            )
         )
-    ))
+    )
 
+   
 
 def calc_prob_ko(hom_expr, phased_expr, unphased_expr):
     """Calculate probability of knockout based on phased 
@@ -154,7 +153,8 @@ def calc_prob_ko(hom_expr, phased_expr, unphased_expr):
     :param unphased_expr: struct with integers a1 and a2
     """
     
-    n = unphased_expr.a1 + unphased_expr.a2 
+    n = unphased_expr.n
+    #n = unphased_expr.a1 + unphased_expr.a2 
     return (hl.case()
            .when(hom_expr > 0, 1) # homozygote
            .when(
@@ -166,8 +166,8 @@ def calc_prob_ko(hom_expr, phased_expr, unphased_expr):
                 (n > 0), 1 - (1 / 2) ** n)
            .when(
                ((phased_expr.a1 == 0) | # likely compound het (zero phased het)
-                 (phased_expr.a2 == 0)) &
-                 (n > 1), 1 - 2 * (1 / 2) ** n)
+                (phased_expr.a2 == 0)) &
+                (n > 1), 1 - 2 * (1 / 2) ** n)
            .default(0)
             )
 
