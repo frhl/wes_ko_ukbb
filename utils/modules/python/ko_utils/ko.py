@@ -117,6 +117,35 @@ def collect_gt_by_expr(mt: hl.MatrixTable, expr: hl.StringExpression):
             )
 
 
+def aggr_phase_count_by_expr(mt: hl.MatrixTable, expr):
+    """Get aggregated phased/unphased. This is a faster method
+    than using "sum_gst_entries", however, it does not allow
+    for variant IDs to be collected.
+    
+    :param mt: MatrixTable with at least some phased entries
+    :param expr: StringExpression for what string to perform
+    the aggregation on.
+    
+    """
+    return (mt.group_rows_by(gene_symbol=expr)
+                .aggregate(
+                    phased=hl.struct(
+                        a1=hl.agg.count_where(
+                            (mt.GT == hl.parse_call("1|0"))),
+                        a2=hl.agg.count_where(
+                            (mt.GT == hl.parse_call("0|1"))),
+                        n=hl.agg.count_where(
+                            (mt.GT.is_het_ref()) & (mt.GT.phased))
+                    ),  
+                    unphased=hl.struct(
+                        n=hl.agg.count_where(
+                            (mt.GT.is_het_ref()) & (~mt.GT.phased))
+                    ),
+                    hom_alt_n=hl.agg.count_where(mt.GT.is_hom_var())
+                    )
+           )
+
+
 def sum_gts_entries(mt: hl.MatrixTable):
     """sum phased/unphased calls 
 
