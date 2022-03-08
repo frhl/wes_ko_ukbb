@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
 #
-#$ -N knockouts
+#$ -N knockouts_rand_phase
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/test.log
-#$ -e logs/test.errors.log
+#$ -o logs/_knockouts_rand_phase.log
+#$ -e logs/_knockouts_rand_phase.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
@@ -19,7 +19,6 @@ source utils/vcf_utils.sh
 
 readonly in_dir="data/mt/annotated"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="data/knockouts/test_aggr_method"
 
 readonly knockout_script="scripts/_knockouts.sh"
 readonly input_path="${in_dir}/ukb_eur_wes_200k_annot_chrCHR.mt"
@@ -28,20 +27,18 @@ readonly input_type="mt"
 readonly af_min=""
 readonly af_max=""
 
-readonly phase=""
+readonly phase="random"
 readonly only_vcf="yes"
-readonly aggr_method="collect" # either fasts or collect
+readonly checkpoint=""
+readonly aggr_method="fast"
 
-readonly out_prefix="${out_dir}/ukb_eur_wes_200k"
-readonly out_type="vcf"
 
-readonly tasks="21"
-readonly queue="short.qe"
-readonly nslots=3
+readonly tasks="1-22"
+readonly nslots=4
+readonly queue="short.qa"
 
-mkdir -p ${out_dir}
 
-submit_knockout_job() 
+submit_knockout_random_job() 
 {
   local maf_lb=${1}
   local maf_ub=${2}
@@ -68,15 +65,19 @@ submit_knockout_job()
     "${out_type}" \
     "${aggr_method}" \
     "${phase}" \
-    "${only_vcf}"
+    "${only_vcf}" \
+    "${checkpoint}"
   set +x
 }
 
-#submit_knockout_job "0" "5e-2" "" "pLoF"
-#submit_knockout_job "0" "5e-2" "" "damaging_missense"
-submit_knockout_job "0" "5e-2" "" "pLoF,damaging_missense"
-#submit_knockout_job "0" "5e-2" "" "pLoF,LC,damaging_missense"
 
-#submit_knockout_job 0 0.05 "" "pLoF"
-#submit_knockout_job 0 0.05 "" "synonymous"
-#submit_knockout_job 0 0.05 "" "ptv,LC"
+#for i in $(seq 1 2); do
+i=1
+out_dir="data/knockouts/null/iter${i}"
+out_prefix="${out_dir}/ukb_wes_200k_rand_phase"
+out_type="vcf"
+submit_knockout_random_job "0" "5e-2" "" "pLoF,damaging_missense"
+#done
+
+
+

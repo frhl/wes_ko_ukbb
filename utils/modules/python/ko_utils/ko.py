@@ -94,7 +94,7 @@ def rand_flip_call(gt: hl.call, P: float = 0.5, seed = None):
     )
 
 
-def agg_count_calls(mt: hl.MatrixTable, phased: bool = True):
+def aggr_count_calls(mt: hl.MatrixTable, phased: bool = True):
     """ Count number of phased/unphased hetz and what haplotype they reside on
 
     :param mt: MatrixTable with GT field
@@ -106,14 +106,15 @@ def agg_count_calls(mt: hl.MatrixTable, phased: bool = True):
     return((gt10,gt01))
 
 
-def collect_gt_by_expr(mt: hl.MatrixTable, expr: hl.StringExpression):
+def collect_phase_count_by_expr(mt: hl.MatrixTable, expr: hl.StringExpression):
     """Create a hail table of aggregated genotypes by expr
     
     :param mt: MatrixTable to be used
     :param expr: what expression to collapse on, e.g. "gene_id"
     """
-    return (mt.group_rows_by(expr)
-            .aggregate(gts=hl.agg.filter(mt.GT.is_non_ref(), hl.agg.collect(mt.GT)))
+    return mt.group_rows_by(expr).aggregate(
+              gts=hl.agg.filter(mt.GT.is_non_ref(), hl.agg.collect(mt.GT)),
+              varid=hl.agg.filter(mt.GT.is_non_ref(), hl.agg.collect(mt.varid))
             )
 
 
@@ -127,7 +128,7 @@ def aggr_phase_count_by_expr(mt: hl.MatrixTable, expr):
     the aggregation on.
     
     """
-    return (mt.group_rows_by(gene_symbol=expr)
+    return (mt.group_rows_by(expr)
                 .aggregate(
                     phased=hl.struct(
                         a1=hl.agg.count_where(
@@ -154,7 +155,7 @@ def sum_gts_entries(mt: hl.MatrixTable):
     assert 'gts' in list(mt.entry), 'missing entry field "gts"'
    
     return (mt.annotate_entries( 
-            hom_alt=hl.sum(mt.gts.map(
+            hom_alt_n=hl.sum(mt.gts.map(
                     lambda x: x.is_hom_var())),
             phased=hl.struct(
                 a1=hl.sum(mt.gts.map(
