@@ -32,7 +32,6 @@ readonly only_vcf="yes"
 readonly checkpoint=""
 readonly aggr_method="fast"
 
-
 readonly tasks="1-22"
 readonly nslots=4
 readonly queue="short.qa"
@@ -49,8 +48,8 @@ submit_knockout_random_job()
   
   set -x
   qsub -N "_${qsub_name}" \
-    -o "logs/_test.log" \
-    -e "logs/_test.errors.log" \
+    -o "logs/_knockouts_rand_phase.log" \
+    -e "logs/_knockouts_rand_phase.errors.log" \
     -t ${tasks} \
     -q "${queue}" \
     -pe shmem ${nslots} \
@@ -76,6 +75,7 @@ i=1
 out_dir="data/knockouts/null/iter${i}"
 out_prefix="${out_dir}/ukb_wes_200k_rand_phase"
 out_type="vcf"
+mkdir -p ${out_dir}
 submit_knockout_random_job "0" "5e-2" "" "pLoF,damaging_missense"
 #done
 

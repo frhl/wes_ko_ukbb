@@ -19,7 +19,7 @@ source utils/vcf_utils.sh
 
 readonly in_dir="data/mt/annotated"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="data/knockouts/test_aggr_method"
+readonly out_dir="data/knockouts/alt"
 
 readonly knockout_script="scripts/_knockouts.sh"
 readonly input_path="${in_dir}/ukb_eur_wes_200k_annot_chrCHR.mt"
@@ -30,14 +30,16 @@ readonly af_max=""
 
 readonly phase=""
 readonly only_vcf="yes"
-readonly aggr_method="collect" # either fasts or collect
+readonly aggr_method="fast" # either fasts or collect
 
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k"
 readonly out_type="vcf"
 
-readonly tasks="21"
+# Note: ~20 slots are needed for running chr1 
+# when using aggr_method="collect" on short.qe
+readonly tasks="1-22"
 readonly queue="short.qe"
-readonly nslots=3
+readonly nslots=1
 
 mkdir -p ${out_dir}
 
@@ -52,8 +54,8 @@ submit_knockout_job()
   
   set -x
   qsub -N "_${qsub_name}" \
-    -o "logs/_test.log" \
-    -e "logs/_test.errors.log" \
+    -o "logs/_knockouts.log" \
+    -e "logs/_knockouts.errors.log" \
     -t ${tasks} \
     -q "${queue}" \
     -pe shmem ${nslots} \

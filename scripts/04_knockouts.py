@@ -44,9 +44,9 @@ def main(args):
         mt = variants.filter_maf(mt, max_maf = float(maf_max),min_maf = float(maf_min))
     
     if randomize_phase:
-        hetz_before = ko.agg_count_calls(mt)
+        hetz_before = ko.aggr_count_calls(mt)
         mt = mt.transmute_entries(GT = ko.rand_flip_call(mt.GT))
-        hetz_after = ko.agg_count_calls(mt)
+        hetz_after = ko.aggr_count_calls(mt)
         print(f"Phased hetz before {hetz_before} and after {hetz_after}")
 
     # Build variant annotation
