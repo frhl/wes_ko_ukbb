@@ -24,7 +24,8 @@ readonly out_prefix=${7?Error: Missing arg7 (path prefix for saige output)}
 readonly out_type=${8?Error: Missing arg8 (output type e.g., mt,vcf or plink)}
 readonly aggr_method=${9?Error: Missing arg9 (Aggr method: fast or collect)}
 readonly randomize_phase=${10?Error: Missing arg10 (Should phase be randomized?)}
-readonly only_vcf=${11?Error: Missing arg11 (Only return VCF)}
+readonly seed=${11?Error: Missing arg11 (Seed for random operations)}
+readonly only_vcf=${12?Error: Missing arg12 (Only return VCF)}
 
 readonly chr=${SGE_TASK_ID}
 readonly input_path_chr=$(echo ${input_path} | sed -e "s/CHR/${chr}/g")
@@ -46,6 +47,7 @@ if [ ! -f "${out_prefix_csq}.vcf.bgz" ]; then
       ${maf_max:+--maf_max "$maf_max"} \
       ${maf_min:+--maf_min "$maf_min"} \
       ${in_sex:+--sex "$in_sex"} \
+      ${seed:+--seed "$seed"} \
       ${randomize_phase:+--randomize_phase} \
       ${only_vcf:+--only_vcf} \
       ${aggr_method:+--aggr_method "$aggr_method"} \

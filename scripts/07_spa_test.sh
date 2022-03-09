@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-50
+#$ -t 1-10
 #$ -V
 
 # 12,18
@@ -101,16 +101,10 @@ submit_merge_job()
 # Binary traits
 maf="maf0to5e-2"
 #submit_spa_binary_with_csqs "pLoF"
-submit_spa_binary_with_csqs "pLoF_damaging_missense"
+#submit_spa_binary_with_csqs "pLoF_damaging_missense"
 #submit_spa_binary_with_csqs "synonymous"
-#submit_spa_binary_with_csqs "ptv_ptv_LC"
-#submit_spa_binary_with_csqs "ptv_ptv_LC_damaging_missense"
 
 # cts traits
-#submit_spa_cts_with_csqs "ptv"
-#submit_spa_cts_with_csqs "ptv_damaging_missense"
-#submit_spa_cts_with_csqs "synonymous"
-#submit_spa_cts_with_csqs "ptv_ptv_LC"
-#submit_spa_cts_with_csqs "ptv_ptv_LC_damaging_missense"
+submit_spa_cts_with_csqs "pLoF_damaging_missense"
 
 

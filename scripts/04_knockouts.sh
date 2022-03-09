@@ -29,6 +29,7 @@ readonly af_min=""
 readonly af_max=""
 
 readonly phase=""
+readonly seed=""
 readonly only_vcf="yes"
 readonly aggr_method="fast" # either fasts or collect
 
@@ -70,6 +71,7 @@ submit_knockout_job()
     "${out_type}" \
     "${aggr_method}" \
     "${phase}" \
+    "${seed}" \
     "${only_vcf}"
   set +x
 }

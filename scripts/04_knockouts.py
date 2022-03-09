@@ -28,6 +28,7 @@ def main(args):
     only_vcf = args.only_vcf
     csqs_category = (args.csqs_category)
     randomize_phase = args.randomize_phase
+    seed = args.seed
     aggr_method = args.aggr_method
     checkpoint = args.checkpoint
     sex = args.sex
@@ -41,11 +42,11 @@ def main(args):
         mt = samples.filter_to_sex(mt, sex)
 
     if maf_max and maf_min:
-        mt = variants.filter_maf(mt, max_maf = float(maf_max),min_maf = float(maf_min))
+        mt = variants.filter_maf(mt, max_maf=float(maf_max),min_maf=float(maf_min))
     
     if randomize_phase:
         hetz_before = ko.aggr_count_calls(mt)
-        mt = mt.transmute_entries(GT = ko.rand_flip_call(mt.GT))
+        mt = mt.transmute_entries(GT=ko.rand_flip_call(mt.GT, seed=int(seed)))
         hetz_after = ko.aggr_count_calls(mt)
         print(f"Phased hetz before {hetz_before} and after {hetz_after}")
 
@@ -121,6 +122,7 @@ if __name__=='__main__':
     parser.add_argument('--only_vcf', default=False, action='store_true', help='Only return VCF (less memory required when running)')
     parser.add_argument('--checkpoint', default=False, action='store_true', help='Checkpoint gene-aggregation matrix to avoid Spark Memory overflow errors') 
     parser.add_argument('--randomize_phase', default=None, action='store_true', help='Randomize phased calls?')
+    parser.add_argument('--seed', default=None, help='Seed used for randomizing')
     
     args = parser.parse_args()
 
