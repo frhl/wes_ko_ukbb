@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 #
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_knockouts.log
-#$ -e logs/_knockouts.errors.log
 #$ -P lindgren.prjc
 #$ -q short.qa
 
@@ -31,33 +29,42 @@ readonly only_vcf=${11?Error: Missing arg11 (Only return VCF)}
 readonly chr=${SGE_TASK_ID}
 readonly input_path_chr=$(echo ${input_path} | sed -e "s/CHR/${chr}/g")
 readonly out_prefix_chr=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
+readonly out_prefix_csq=$(echo "${out_prefix_chr}_${in_category}" | tr "," "_")
 
-SECONDS=0
-set_up_hail
-set_up_pythonpath_legacy
-python3 "${hail_script}" \
-    --chrom ${chr} \
-    --input_path ${input_path_chr} \
-    --input_type ${input_type} \
-    --csqs_category ${in_category} \
-    ${maf_max:+--maf_max "$maf_max"} \
-    ${maf_min:+--maf_min "$maf_min"} \
-    ${in_sex:+--sex "$in_sex"} \
-    ${randomize_phase:+--randomize_phase} \
-    ${only_vcf:+--only_vcf} \
-    ${aggr_method:+--aggr_method "$aggr_method"} \
-    --use_loftee \
-    --out_prefix ${out_prefix_chr} \
-    --out_type ${out_type} \
-    && print_update "Finished calculating knockouts for chr${chr}" ${SECONDS} \
-    || raise_error "Calculating knockouts for chr${chr} failed"
+echo $out_prefix_csq
+echo $out_prefix_chr
 
-if [ ! -f "${out_prefix_chr}.vcf.tbi" ]; then
+if [ ! -f "${out_prefix_csq}.vcf.bgz" ]; then
+  SECONDS=0
+  set_up_hail
+  set_up_pythonpath_legacy
+  python3 "${hail_script}" \
+      --chrom ${chr} \
+      --input_path ${input_path_chr} \
+      --input_type ${input_type} \
+      --csqs_category ${in_category} \
+      ${maf_max:+--maf_max "$maf_max"} \
+      ${maf_min:+--maf_min "$maf_min"} \
+      ${in_sex:+--sex "$in_sex"} \
+      ${randomize_phase:+--randomize_phase} \
+      ${only_vcf:+--only_vcf} \
+      ${aggr_method:+--aggr_method "$aggr_method"} \
+      --use_loftee \
+      --out_prefix ${out_prefix_chr} \
+      --out_type ${out_type} \
+      && print_update "Finished calculating knockouts for chr${chr}" ${SECONDS} \
+      || raise_error "Calculating knockouts for chr${chr} failed"
+else
+  >&2 echo "${out_prefix_csq}.vcf.bgz already exists. Skipping.."
+fi 
+
+if [ ! -f "${out_prefix_csq}.vcf.csi" ]; then
   module purge
   module load BCFtools/1.12-GCC-10.3.0
-  make_tabix "${out_prefix_chr}.vcf.bgz" "tbi"
+  make_tabix "${out_prefix_csq}.vcf.bgz" "csi"
+else
+  >&2 echo "${out_prefix_csq}.vcf.bgz.csi (index) already exists. Skipping.."
 fi
-
 
 
 
