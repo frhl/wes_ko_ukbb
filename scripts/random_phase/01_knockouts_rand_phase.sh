@@ -27,15 +27,14 @@ readonly input_type="mt"
 readonly af_min=""
 readonly af_max=""
 
-readonly phase="random"
 readonly only_vcf=""
 readonly checkpoint=""
 readonly aggr_method="fast"
+readonly phase="random"
 
-readonly tasks="21"
+readonly tasks="1-22"
 readonly nslots=4
 readonly queue="short.qa"
-
 
 submit_knockout_random_job() 
 {
@@ -43,6 +42,7 @@ submit_knockout_random_job()
   local maf_ub=${2}
   local sex=${3}
   local csq=${4}
+  local seed=${5}
   local prefix="${out_prefix}_chrCHR_maf${maf_lb}to${maf_ub}${sex:+_${sex}}"
   local qsub_name=$( echo ${csq} | tr "," "_")
   
@@ -64,18 +64,19 @@ submit_knockout_random_job()
     "${out_type}" \
     "${aggr_method}" \
     "${phase}" \
+    "${seed}" \
     "${only_vcf}" \
-    "${checkpoint}"
+    "${checkpoint}" 
   set +x
 }
 
 
-for i in $(seq 1 5); do
-  out_dir="data/knockouts/null/iter${i}"
-  out_prefix="${out_dir}/ukb_eur_wes_200k_rand_phase"
-  out_type="vcf"
+out_type="vcf" 
+for seed in $(seq 1 5); do
+  #out_dir="data/knockouts/null/seed${seed}"
+  #out_prefix="${out_dir}/ukb_eur_wes_200k_rand_phase"
   mkdir -p ${out_dir}
-  submit_knockout_random_job "0" "5e-2" "" "pLoF,damaging_missense"
+  submit_knockout_random_job "0" "5e-2" "" "pLoF,damaging_missense" "${seed}"
 done
 
 
