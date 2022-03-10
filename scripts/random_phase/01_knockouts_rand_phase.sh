@@ -3,8 +3,8 @@
 #
 #$ -N knockouts_rand_phase
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_knockouts_rand_phase.log
-#$ -e logs/_knockouts_rand_phase.errors.log
+#$ -o logs/knockouts_rand_phase.log
+#$ -e logs/knockouts_rand_phase.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
@@ -21,6 +21,7 @@ readonly in_dir="data/mt/annotated"
 readonly spark_dir="data/tmp/spark"
 
 readonly knockout_script="scripts/_knockouts.sh"
+readonly exclude="data/genes/220310_common_plofs_to_exclude.txt"
 readonly input_path="${in_dir}/ukb_eur_wes_200k_annot_chrCHR.mt"
 readonly input_type="mt"
 
@@ -66,15 +67,15 @@ submit_knockout_random_job()
     "${phase}" \
     "${seed}" \
     "${only_vcf}" \
-    "${checkpoint}" 
+    "${exclude}" 
   set +x
 }
 
 
 out_type="vcf" 
-for seed in $(seq 1 5); do
-  #out_dir="data/knockouts/null/seed${seed}"
-  #out_prefix="${out_dir}/ukb_eur_wes_200k_rand_phase"
+for seed in $(seq 6 6); do
+  out_dir="data/knockouts/null/seed${seed}"
+  out_prefix="${out_dir}/ukb_eur_wes_200k_rand_phase"
   mkdir -p ${out_dir}
   submit_knockout_random_job "0" "5e-2" "" "pLoF,damaging_missense" "${seed}"
 done
