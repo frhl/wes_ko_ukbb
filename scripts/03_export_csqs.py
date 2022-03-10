@@ -35,7 +35,7 @@ def main(args):
     ht = ht.annotate(
         varid = varid,
         csqs = csqs)
-    ht = ht.select('rsid','info','varid','csqs')
+    ht = ht.select('rsid','info','MAF', 'MAC', 'varid','csqs', 'consequence_category')
     ht.flatten().export(out_prefix + ".tsv.gz")
 
 if __name__=='__main__':

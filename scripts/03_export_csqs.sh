@@ -24,7 +24,7 @@ readonly in_dir="data/mt/annotated"
 readonly input_prefix="${in_dir}/ukb_eur_wes_200k_annot_chr${chr}.mt"
 
 readonly out_dir="data/mt/csqs"
-readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_eur_wes_200k_csqs_chr${chr}"
 
 
 mkdir -p ${out_dir}
