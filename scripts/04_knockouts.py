@@ -24,6 +24,7 @@ def main(args):
     chrom = int(args.chrom)
     maf_max = (args.maf_max)
     maf_min = (args.maf_min)
+    exclude = args.exclude
     use_loftee = args.use_loftee
     only_vcf = args.only_vcf
     csqs_category = (args.csqs_category)
@@ -43,7 +44,13 @@ def main(args):
 
     if maf_max and maf_min:
         mt = variants.filter_maf(mt, max_maf=float(maf_max),min_maf=float(maf_min))
-    
+   
+    if exclude:
+        exlcude = exclude.split(',').strip()
+        rsid_expr = hl.literal(set(exclude)).contains(mt.rsid)
+        varid_expr = hl.literal(set(exclude)).contains(mt.varid)
+        mt = mt.filter_rows(~(rsid_expr | varid_expr))
+
     if randomize_phase:
         hetz_before = ko.aggr_count_calls(mt)
         mt = mt.transmute_entries(GT=ko.rand_flip_call(mt.GT, seed=int(seed)))
@@ -114,8 +121,7 @@ if __name__=='__main__':
     parser.add_argument('--sex', default='both', help='Filter to sex (males or females)')
     parser.add_argument('--maf_min', default=None, help='Select all variants with a maf greater than the indicated values')
     parser.add_argument('--maf_max', default=None, help='Select all variants with a maf less than the indicated value')
-    parser.add_argument('--af_min', default=None, help='Select all variants with a AF greater than the indicated value')
-    parser.add_argument('--af_max', default=None, help='Select all variants with a AF less than the indicated value')
+    parser.add_argument('--exclude', default=None, help='exclude variants by rsid and/or variant id')
     parser.add_argument('--use_loftee', default=False, action='store_true', help='use LOFTEE to distinghiush between high confidence PTVs')
     parser.add_argument('--csqs_category', default=None, action=SplitArgs, help='What categories should be subsetted to?')
     
