@@ -4,9 +4,9 @@ import hail as hl
 import argparse
 
 from ukb_utils import hail_init
-from ukb_utils import samples
 from ukb_utils import variants
 from ko_utils import io
+from ko_utils import ko
 
 def main(args):
     
@@ -19,6 +19,12 @@ def main(args):
 
     mt = io.import_table(in_file, in_type)
     mt = io.recalc_info(mt)
+    mt = mt.annotate_rows(
+        MAF=variants.get_maf_expr(mt),
+        MAC=variants.get_mac_expr(mt),
+        consequence_category=ko.csqs_case_builder(
+                worst_csq_expr=mt.consequence.vep.worst_csq_for_variant_canonical,
+                use_loftee=True)) 
     ht = mt.rows()
     varid = hl.delimit([
         hl.str(ht.locus.contig), 
