@@ -26,6 +26,7 @@ readonly aggr_method=${9?Error: Missing arg9 (Aggr method: fast or collect)}
 readonly randomize_phase=${10?Error: Missing arg10 (Should phase be randomized?)}
 readonly seed=${11?Error: Missing arg11 (Seed for random operations)}
 readonly only_vcf=${12?Error: Missing arg12 (Only return VCF)}
+readonly exclude=${13?Error: Missing arg13 (Exclude variants)}
 
 readonly chr=${SGE_TASK_ID}
 readonly input_path_chr=$(echo ${input_path} | sed -e "s/CHR/${chr}/g")
@@ -51,6 +52,7 @@ if [ ! -f "${out_prefix_csq}.vcf.bgz" ]; then
       ${randomize_phase:+--randomize_phase} \
       ${only_vcf:+--only_vcf} \
       ${aggr_method:+--aggr_method "$aggr_method"} \
+      ${exclude:+--exclude "$exclude"} \
       --use_loftee \
       --out_prefix ${out_prefix_chr} \
       --out_type ${out_type} \

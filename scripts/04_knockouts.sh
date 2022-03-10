@@ -19,9 +19,10 @@ source utils/vcf_utils.sh
 
 readonly in_dir="data/mt/annotated"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="data/knockouts/alt"
+readonly out_dir="data/knockouts/alt/test"
 
 readonly knockout_script="scripts/_knockouts.sh"
+readonly exclude="data/genes/220310_common_plofs_to_exclude.txt"
 readonly input_path="${in_dir}/ukb_eur_wes_200k_annot_chrCHR.mt"
 readonly input_type="mt"
 
@@ -30,7 +31,7 @@ readonly af_max=""
 
 readonly phase=""
 readonly seed=""
-readonly only_vcf="yes"
+readonly only_vcf=""
 readonly aggr_method="fast" # either fasts or collect
 
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k"
@@ -38,7 +39,7 @@ readonly out_type="vcf"
 
 # Note: ~20 slots are needed for running chr1 
 # when using aggr_method="collect" on short.qe
-readonly tasks="1-22"
+readonly tasks="21"
 readonly queue="short.qe"
 readonly nslots=1
 
@@ -72,7 +73,8 @@ submit_knockout_job()
     "${aggr_method}" \
     "${phase}" \
     "${seed}" \
-    "${only_vcf}"
+    "${only_vcf}" \
+    "${exclude}"
   set +x
 }
 
@@ -83,4 +85,4 @@ submit_knockout_job "0" "5e-2" "" "pLoF,damaging_missense"
 
 #submit_knockout_job 0 0.05 "" "pLoF"
 #submit_knockout_job 0 0.05 "" "synonymous"
-#submit_knockout_job 0 0.05 "" "ptv,LC"
+#§submit_knockout_job 0 0.05 "" "ptv,LC"

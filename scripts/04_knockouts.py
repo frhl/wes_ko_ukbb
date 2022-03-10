@@ -44,12 +44,10 @@ def main(args):
 
     if maf_max and maf_min:
         mt = variants.filter_maf(mt, max_maf=float(maf_max),min_maf=float(maf_min))
-   
+
     if exclude:
-        exlcude = exclude.split(',').strip()
-        rsid_expr = hl.literal(set(exclude)).contains(mt.rsid)
-        varid_expr = hl.literal(set(exclude)).contains(mt.varid)
-        mt = mt.filter_rows(~(rsid_expr | varid_expr))
+        ht = hl.import_table(exclude, impute = True).key_by('varid')
+        mt = mt.filter_rows(~mt.varid.contains(ht.varid))
 
     if randomize_phase:
         hetz_before = ko.aggr_count_calls(mt)
