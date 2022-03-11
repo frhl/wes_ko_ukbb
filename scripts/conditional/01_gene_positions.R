@@ -13,12 +13,11 @@ main <- function(args){
     mrg <- mrg[mrg$fdr < args$fdr_cutoff,]
 
     out <- data.table(
-        gene = mrg$gene_id,
+        gene = gsub("\\..+$",'',mrg$ensembl_gene_id),
         fdr = mrg$fdr,
         contig = mrg$chromosome_name,
         start = mrg$start_position - as.numeric(args$flanking_bp),
-        end = mrg$end_position + as.numeric(args$flanking_bp),
-        contig_length = mrg$length
+        end = mrg$end_position + as.numeric(args$flanking_bp)
      )
 
     if (nrow(out) > 0){

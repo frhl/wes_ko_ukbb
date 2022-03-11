@@ -59,7 +59,7 @@ submit_intervals()
   Rscript "${rscript}" \
     --in_spa_file "${in_file}" \
     --coordinates "${genes}" \
-    --flanking_bp 25000 \
+    --flanking_bp 0 \
     --fdr_cutoff "0.25" \
     --out_prefix "${out_prefix}"
   set +x
