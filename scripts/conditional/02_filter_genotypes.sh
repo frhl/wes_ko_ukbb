@@ -11,11 +11,12 @@
 #$ -t 1 
 #$ -V
 
+
 set -o errexit
 set -o nounset
 
-source utils/vcf_utils.sh
-source utils/hail_utils.sh
+source utils/qsub_utils.sh
+source utils/bash_utils.sh
 
 readonly bash_script="scripts/conditional/_filter_genotypes.sh"
 
@@ -47,14 +48,13 @@ submit_cts_analysis()
   submit_intervals "${annotation}" "${phenotype}" "cts"
 }
 
-submit_analysis()
+submit_intervals()
 {
-  set_up_rpy
   local annotation=${1?Error: Missing arg1 (consequence)}
   local phenotype=${2?Error: Missing arg2 (phenotype)}
   local trait=${3?Error: Missing arg3 (trait)}
 
-  local genes="${in_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}.txt.gz"
+  local genes="${in_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}.tsv.gz"
   local out_prefix="${out_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}"
 
   mkdir -p ${out_dir}
@@ -73,8 +73,8 @@ submit_analysis()
   set +x
 }
 
-#submit_binary_intervals "pLoF_damaging_missense"
-submit_cts_intervals "pLoF_damaging_missense"
+#submit_binary_analysis "pLoF_damaging_missense"
+submit_cts_analysis "pLoF_damaging_missense"
 
 
 

@@ -15,7 +15,7 @@ def main(args):
 
     out_prefix = args.out_prefix
     gene_table = args.gene_table
-    extract = args.extractt
+    extract = args.extract
     min_info = float(args.min_info)
     min_maf = float(args.min_maf)
     missing = float(args.missing)
@@ -27,18 +27,21 @@ def main(args):
         reference_genome)
     hl._set_flags(no_whole_stage_codegen='1')
 
-    # load table of genes that are significant in primary analysis
     ht = hl.import_table(
         gene_table,
-        force_bgz=True,
+        force=True,
         delimiter='\t',
         missing='',
         types={
             'contig': hl.tstr,
             'start': hl.tint,
-            'end': hl.tint,
-            'contig_length': hl.tint})
+            'end': hl.tint})
     ht = ht.annotate(contig=hl.delimit(['chr', ht.contig], ''))
+    
+    # get refernece genome with lengths
+    rg = hl.get_reference('GRCh38')
+    chr_lens = hl.literal(rg.lengths)
+    ht = ht.annotate(contig_length=chr_lens[ht.contig])
 
     # annotate regions with padding
     ht = ht.annotate(ranges=hl.array([ht.start, ht.end]))
@@ -113,6 +116,7 @@ def main(args):
         mt = mt.filter_cols(hl.is_defined(ht_final_samples[mt.col_key]))
 
     # filter variants based on missingness
+    mt = io.recalc_info(mt)
     mt = filter_missing(mt, missing)
     mt = filter_min_maf(mt, min_maf)
 
