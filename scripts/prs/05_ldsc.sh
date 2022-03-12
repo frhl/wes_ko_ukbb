@@ -61,6 +61,6 @@ estimate_heritability(){
   fi
 }
 
-estimate_heritability "${phenotype_binary}" "binary"
-#estimate_heritability "${phenotype_cts}" "cts"
+#estimate_heritability "${phenotype_binary}" "binary"
+estimate_heritability "${phenotype_cts}" "cts"
 

@@ -19,7 +19,7 @@ source utils/vcf_utils.sh
 
 readonly in_dir="data/mt/annotated"
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="data/knockouts/alt/test"
+readonly out_dir="data/knockouts/alt_filtered"
 
 readonly knockout_script="scripts/_knockouts.sh"
 readonly exclude="data/genes/220310_common_plofs_to_exclude.txt"
@@ -32,16 +32,16 @@ readonly af_max=""
 readonly phase=""
 readonly seed=""
 readonly only_vcf=""
-readonly aggr_method="fast" # either fasts or collect
+readonly aggr_method="collect" # either fasts or collect
 
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k"
 readonly out_type="vcf"
 
 # Note: ~20 slots are needed for running chr1 
 # when using aggr_method="collect" on short.qe
-readonly tasks="21"
+readonly tasks="1-22"
 readonly queue="short.qe"
-readonly nslots=1
+readonly nslots=20
 
 mkdir -p ${out_dir}
 

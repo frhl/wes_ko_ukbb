@@ -73,7 +73,7 @@ submit_knockout_random_job()
 
 
 out_type="vcf" 
-for seed in $(seq 6 6); do
+for seed in $(seq 7 10); do
   out_dir="data/knockouts/null/seed${seed}"
   out_prefix="${out_dir}/ukb_eur_wes_200k_rand_phase"
   mkdir -p ${out_dir}

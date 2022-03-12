@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 4-8
+#$ -t 1
 #$ -V
 
 set -o errexit
@@ -28,7 +28,7 @@ readonly out_dir="data/prs/scores/auto_test"
 readonly index=${SGE_TASK_ID}
 
 readonly file_cts="${pheno_dir}/filtered_phenotypes_cts.tsv"
-readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_header.tsv"
+readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
 readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
 
 readonly file_binary="${pheno_dir}/filtered_phenotypes_binary.tsv"
@@ -47,7 +47,7 @@ submit_ldpred2()
   local out_prefix="${out_dir}/prs_${method}_${phenotype}_chrCHR"
   set -x
   qsub -N "_prs_${phenotype}" \
-    -t 2 \
+    -t 1-22 \
     -q short.qc@@short.hge \
     -pe shmem "${cores}" \
     "${bash_script}" \
@@ -61,6 +61,6 @@ submit_ldpred2()
 }
 
 
-submit_ldpred2 "auto" "6" "${phenotype_binary}"
+submit_ldpred2 "auto" "4" "${phenotype_cts}"
 #submit_ldpred2 "inf" "1" "${phenotype_binary}"
 

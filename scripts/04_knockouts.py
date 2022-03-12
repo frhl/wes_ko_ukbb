@@ -47,7 +47,7 @@ def main(args):
 
     if exclude:
         ht = hl.import_table(exclude, impute = True).key_by('varid')
-        mt = mt.filter_rows(~mt.varid.contains(ht.varid))
+        mt = mt.filter_rows(~hl.literal(set(ht.varid.collect())).contains(mt.varid))
 
     if randomize_phase:
         hetz_before = ko.aggr_count_calls(mt)
