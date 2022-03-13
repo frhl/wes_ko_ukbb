@@ -86,7 +86,7 @@ def rand_flip_call(gt: hl.call, P: float = 0.5, seed = None):
         (gt.n_alt_alleles() == 1) &
         (is_phased(gt)), 
         hl.if_else(
-            hl.rand_bool(P),
+            hl.rand_bool(P, seed=seed),
             hl.parse_call("1|0"),
             hl.parse_call("0|1")
         ),
