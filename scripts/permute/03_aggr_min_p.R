@@ -55,8 +55,6 @@ main <- function(args){
     write(paste("[verbose] writing",outfile),stderr())
     fwrite(spa_aggr, outfile, sep = '\t')
 
-
-
 }
 
 # add arguments
