@@ -7,6 +7,7 @@ import argparse
 from ukb_utils import hail_init
 from ukb_utils import genotypes
 from ukb_utils import variants
+from ukb_utils import samples
 from ko_utils import io
 from ko_utils.variants import filter_min_maf, filter_missing
 
@@ -105,6 +106,7 @@ def main(args):
     
     # get imputed genotypes
     mt = genotypes.get_ukb_imputed_v3_bgen(chromosomes)
+    mt = samples.remove_withdrawn(mt)
     mt = mt.filter_rows(hl.is_defined(mfi[mt.row_key]))
     n = mt.count()
     print(f"Loaded {n} variants/samples")
