@@ -15,7 +15,7 @@ source utils/hail_utils.sh
 readonly in_vcf=${1?Error: Missing arg1 (phenotype)}
 readonly in_tsv=${2?Error: Missing arg2 (in_vcf)}
 readonly in_spa=${3?Error: Missing arg3 (in_csi)}
-readonly out_prefix=${7?Error: Missing arg6 (path prefix for saige output)}
+readonly out_prefix=${4?Error: Missing arg6 (path prefix for saige output)}
 readonly chr=${SGE_TASK_ID}
 
 readonly vcf=$(echo ${in_vcf} | sed -e "s/CHR/${chr}/g")
@@ -25,24 +25,24 @@ readonly threads=$(( ${NSLOTS}-1 ))
 readonly step2_SPAtests="utils/saige/step2_SPAtests.R"
 
 
-calc_permute_chunk() {
-
-
-
+calc_permutations_required() 
+{
+  set_up_rpy
+  Rscript ${rscript} \
+    --in_spa ${in_spa} \
+    --in_tsv ${in_tsv} \
+    --out_prefix ${out_prefix} \
 }
+
 
 
 
 submit_permute_chunk() {
 
-
 }
 
-if [ ! -f ${out} ]; then
-   set_up_RSAIGE
-   spa_test
-else
-  >&2 echo "${out} already exists. Skipping.."
-fi 
+
+
+
 
 
