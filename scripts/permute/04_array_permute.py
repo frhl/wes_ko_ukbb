@@ -56,8 +56,6 @@ def main(args):
             mts = mt_
         mt_prev = mt_
 
-    # combine 
-    #mt = hl.MatrixTable.union_rows(*mts) 
     io.export_table(mt, out_prefix, out_type)
 
 if __name__=='__main__':
