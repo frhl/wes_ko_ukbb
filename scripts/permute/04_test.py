@@ -7,6 +7,23 @@ from ukb_utils import hail_init
 from ko_utils import io
 from ko_utils import ko
 
+def annotate_gene_knockouts(mt, gene_expr):
+    """ annotate genes that are knockedout conditioned on current phase """
+    
+    genes = ko.aggr_phase_count_by_expr(mt, gene_expr)
+    expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased)
+    genes = genes.annotate_entries(pKO=expr_pko)
+
+    prob = genes.annotate_entries(DS=genes.pKO * 2)
+    prob = prob.select_entries(prob.DS)
+    prob = prob.annotate_rows(
+            locus=hl.parse_locus('chr' + str(chrom) + ':1'),
+            alleles=hl.literal(['0', '1']),
+            rsid=prob.gene_id)
+    prob = prob.key_rows_by(prob.locus, prob.alleles)
+    prob = prob.drop('gene_id')
+    return(prob)
+
 
 def main(args):
     
@@ -46,36 +63,9 @@ def main(args):
     items = csqs_category
     mt = mt.filter_rows(hl.literal(set(items)).contains(mt.consequence_category))
     mt = mt.checkpoint(out_prefix + "_checkpoint.mt", overwrite=True)
-
-
-    # 
-    #mt.filter_rows(hl.literal(set(variants)).contains(mt.varid))
-
-    # permute variant phase
-    # Note 1: The following is doing some pretty deep recursion
-    # and thus we need to checkpoint quite regularly. We can't 
-    # read and write from the same checkpoint and thus we need
-    # two.
-    mt_prev = None
-    flip = 1
-    for i in range(n):
-        mt_ = mt
-        mt_ = mt_.annotate_rows(permute_id=i)
-        mt_ = mt_.transmute_entries(
-            GT = ko.rand_flip_call(mt_.GT, seed = int(seed)*99)
-        )
-        if mt_prev is not None:
-            mts = mts.union_rows(mt_)
-        else:
-            mts = mt_
-        mt_prev = mt_
-        if i % 100 == 0:
-            flip = flip * (-1)
-            if flip > 0:
-                mts = mts.checkpoint(out_prefix + "_checkpoint_n.mt", overwrite=True)
-            elif flip < 0:
-                mts = mts.checkpoint(out_prefix + "_checkpoint_p.mt", overwrite=True)
-
+    gene_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
+    
+       
     io.export_table(mt, out_prefix, out_type)
 
 if __name__=='__main__':

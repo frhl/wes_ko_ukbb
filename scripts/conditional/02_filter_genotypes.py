@@ -105,9 +105,10 @@ def main(args):
     mfi = mfi.filter(mfi.info >= min_info)
     
     # get imputed genotypes
-    mt = genotypes.get_ukb_imputed_v3_bgen(chromosomes)
+    #mt = genotypes.get_ukb_imputed_v3_bgen(chromosomes)
+    mt = genotypes.genotypes.get_ukb_genotypes_bed(chromosomes)
     mt = samples.remove_withdrawn(mt)
-    mt = mt.filter_rows(hl.is_defined(mfi[mt.row_key]))
+    #mt = mt.filter_rows(hl.is_defined(mfi[mt.row_key]))
     n = mt.count()
     print(f"Loaded {n} variants/samples")
 

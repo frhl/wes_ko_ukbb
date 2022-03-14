@@ -22,7 +22,7 @@ readonly bash_script="scripts/conditional/_filter_genotypes.sh"
 
 readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
 
-readonly padding=250000
+readonly padding=10e+6
 readonly min_maf=0.01
 readonly min_info=0.8
 

@@ -21,7 +21,7 @@ readonly out_dir="data/saige/grm/input"
 readonly out_prefix="${out_dir}/211105_ukb_wes_200k_sparse_autosomes_females"
 readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
 
-readonly hail_script="scripts/05_create_grm.py"
+readonly hail_script="scripts/06_create_grm.py"
 readonly threads=$(( ${NSLOTS}-1 ))
 readonly createSparseGRM="utils/saige/createSparseGRM.R"
 # Generate a sequence of chromosomes to be included
