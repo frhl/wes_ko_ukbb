@@ -44,6 +44,7 @@ def main(args):
 
     # permute variant phase
     mt_prev = None
+    flip = 1
     for i in range(n):
         mt_ = mt
         mt_ = mt_.annotate_rows(permute_id=i)
@@ -55,6 +56,12 @@ def main(args):
         else:
             mts = mt_
         mt_prev = mt_
+        if i % 100 == 0:
+            flip = flip * (-1)
+            if flip > 0:
+                mts = mts.checkpoint(out_prefix + "_checkpoint_n.mt", overwrite=True)
+            elif flip < 0:
+                mts = mts.checkpoint(out_prefix + "_checkpoint_p.mt", overwrite=True)
 
     io.export_table(mt, out_prefix, out_type)
 

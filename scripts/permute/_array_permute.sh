@@ -12,14 +12,11 @@
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
-readonly in_vcf=${1?Error: Missing arg1 (phenotype)}
-readonly in_tsv=${2?Error: Missing arg2 (in_vcf)}
-readonly in_spa=${3?Error: Missing arg3 (in_csi)}
-readonly out_prefix=${4?Error: Missing arg6 (path prefix for saige output)}
-readonly chr=${SGE_TASK_ID}
-
-readonly vcf=$(echo ${in_vcf} | sed -e "s/CHR/${chr}/g")
-readonly out=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
+readonly chr=${1?Error: Missing arg1 (phenotype)}
+readonly in_vcf=${2?Error: Missing arg1 (phenotype)}
+readonly in_tsv=${3?Error: Missing arg2 (in_vcf)}
+readonly in_spa=${4?Error: Missing arg3 (in_csi)}
+readonly out_prefix=${5?Error: Missing arg6 (path prefix for saige output)}
 
 readonly threads=$(( ${NSLOTS}-1 ))
 readonly step2_SPAtests="utils/saige/step2_SPAtests.R"
