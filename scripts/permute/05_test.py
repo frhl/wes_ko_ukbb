@@ -7,7 +7,7 @@ from ukb_utils import hail_init
 from ko_utils import io
 from ko_utils import ko
 
-def annotate_gene_knockouts(mt, gene_expr):
+def annotate_gene_knockouts(mt, gene_expr, chrom):
     """ annotate genes that are knockedout conditioned on current phase """
     
     genes = ko.aggr_phase_count_by_expr(mt, gene_expr)
@@ -17,7 +17,7 @@ def annotate_gene_knockouts(mt, gene_expr):
     prob = genes.annotate_entries(DS=genes.pKO * 2)
     prob = prob.select_entries(prob.DS)
     prob = prob.annotate_rows(
-            locus=hl.parse_locus('chr' + str(chrom) + ':1'),
+            locus=hl.parse_locus(str(chrom) + ':1'),
             alleles=hl.literal(['0', '1']),
             rsid=prob.gene_id)
     prob = prob.key_rows_by(prob.locus, prob.alleles)
@@ -38,34 +38,21 @@ def main(args):
     
     hail_init.hail_bmrc_init('logs/hail/array_permute.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1')
-
-    # get table of variants involed in knockouts
-    ht = hl.import_table(
-        permutations,
-        force = True,
-        impute = True
-    )
-
-    # get variants in the speceific chromosome
-    ht = ht.filter(ht.CHR == chrom)
-    variants = ", ".join(ht.varid.collect()).split(', ') 
-
-    # how many permutations required?
-    n_cur = int(ht.aggregate(hl.agg.max(ht.permut)))
-    n = min(n_cur, int(max_permutations))
-    print(f"{n_cur} permutations required. Using {n}.")
-
-    # get matrix table with variants
     mt = io.import_table(input_path, input_type)
     
-    # subet to damaging category
-    category = "_".join(csqs_category)
-    items = csqs_category
-    mt = mt.filter_rows(hl.literal(set(items)).contains(mt.consequence_category))
-    mt = mt.checkpoint(out_prefix + "_checkpoint.mt", overwrite=True)
-    gene_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
-    
-       
+    n = 2
+    mts = list()
+    for i in range(n):
+        use_seed = int(seed) * i
+        _mt = mt.transmute_entries(GT = ko.rand_flip_call(mt.GT, seed = use_seed))
+        _gene_expr = _mt.consequence.vep.worst_csq_by_gene_canonical.gene_id 
+        _mt = annotate_gene_knockouts(_mt, _gene_expr, chrom)
+        _mt = _mt.annotate_rows(k=i, seed=use_seed)
+        _mt = _mt.transmute_rows(rsid = hl.delimit([_mt.rsid, hl.str('-p'), hl.str(i)],'')) 
+        mts.append(_mt)
+        print(f"iter {i}")
+
+    mt = hl.MatrixTable.union_rows(*mts)
     io.export_table(mt, out_prefix, out_type)
 
 if __name__=='__main__':
@@ -76,6 +63,7 @@ if __name__=='__main__':
     parser.add_argument('--permutations', default=None, help='')
     parser.add_argument('--max_permutations', default=None, help='')
     parser.add_argument('--seed', default=None, help='Seed used for randomizing')
+    parser.add_argument('--n', default=2, help='')
     parser.add_argument('--out_prefix', default=None, help='')
     parser.add_argument('--out_type', default=None, help='')
     args = parser.parse_args()
