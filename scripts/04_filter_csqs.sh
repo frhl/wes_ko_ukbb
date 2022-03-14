@@ -21,13 +21,13 @@ readonly spark_dir="data/tmp/spark"
 readonly out_dir="data/mt/csqs"
 
 readonly bash_script="scripts/_filter_csqs.sh"
-readonly exclude="data/genes/220310_common_plofs_to_exclude.txt"
 readonly input_path="${in_dir}/ukb_eur_wes_200k_annot_chrCHR.mt"
 readonly input_type="mt"
 
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k"
 readonly out_type="mt"
 
+readonly exclude="data/genes/220310_common_plofs_to_exclude.txt"
 readonly af_min=""
 readonly af_max=""
 
@@ -69,7 +69,7 @@ submit_filter_job()
 # note, we need to use comma here, as we can't split on '_'
 submit_filter_job "0" "5e-2" "" "pLoF"
 submit_filter_job "0" "5e-2" "" "damaging_missense"
-submit_filter_job "0" "5e-2" "" "pLoF,damaging_missense"
+#submit_filter_job "0" "5e-2" "" "pLoF,damaging_missense"
 
 #submit_knockout_job 0 0.05 "" "synonymous"
 
