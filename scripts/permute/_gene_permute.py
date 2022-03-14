@@ -30,9 +30,9 @@ def main(args):
     chrom = args.chrom
     input_path = args.input_path
     input_type = args.input_type
-    permutations = args.permutations
-    max_permutations = args.max_permutations
+    replicates = args.replicates
     seed = args.seed
+    gene = args.gene
     out_prefix = args.out_prefix
     out_type = args.out_type
     
@@ -40,7 +40,11 @@ def main(args):
     hl._set_flags(no_whole_stage_codegen='1')
     mt = io.import_table(input_path, input_type)
     
-    n = 2
+    if gene:
+        gene_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id 
+        mt = mt.filter_rows(gene_expr == gene)
+
+    n = int(replicates)
     mts = list()
     for i in range(n):
         use_seed = int(seed) * i
@@ -60,10 +64,9 @@ if __name__=='__main__':
     parser.add_argument('--chrom', default=None, help='')
     parser.add_argument('--input_path', default=None, help='')
     parser.add_argument('--input_type', default=None, help='')
-    parser.add_argument('--permutations', default=None, help='')
-    parser.add_argument('--max_permutations', default=None, help='')
+    parser.add_argument('--gene', default=None, help='')
     parser.add_argument('--seed', default=None, help='Seed used for randomizing')
-    parser.add_argument('--n', default=2, help='')
+    parser.add_argument('--replicates', default=2, help='')
     parser.add_argument('--out_prefix', default=None, help='')
     parser.add_argument('--out_type', default=None, help='')
     args = parser.parse_args()

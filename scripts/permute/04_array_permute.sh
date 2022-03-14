@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 #
-#$ -N _500_array_permute
+#$ -N array_permute
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_500_array_permute.log
-#$ -e logs/_500_array_permute.errors.log
+#$ -o logs/array_permute.log
+#$ -e logs/array_permute.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 5
-#$ -q short.qc
+#$ -pe shmem 1
+#$ -q test.qc
 #$ -t 21
 #$ -V
 
@@ -18,36 +18,46 @@ source utils/hail_utils.sh
 
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/permute/04_array_permute.py"
+readonly bash_script="scripts/permute/_array_permute.sh"
 
-readonly in_dir="data/mt/annotated"
-readonly out_dir="data/permute/output"
-readonly genes="data/permute/overview/overview.tsv.gz"
+readonly in_dir="data/mt/csqs"
+readonly out_dir="data/permute/test"
 
 readonly chr="${SGE_TASK_ID}"
-readonly input_file="${in_dir}/ukb_eur_wes_200k_annot_chr${chr}.mt"
+readonly input_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense.mt"
+readonly input_type='mt'
 
 readonly maf="maf0to5e-2"
 readonly annotation="pLoF_damaging_missense"
 readonly out_prefix="${out_dir}/test_ukb_eur_wes_200k_permuted_chr${chr}"
+readonly out_type="vcf"
 
-SECONDS=0
-set_up_hail
-set_up_pythonpath_legacy
-python3 ${hail_script} \
-  --chrom "chr${chr}" \
-  --input_path ${input_file} \
-  --input_type "mt" \
-  --permutations ${genes} \
-  --max_permutations 2000 \
-  --out_prefix ${out_prefix} \
-  --out_type 'mt' \
-  --seed "1995" \
-  && print_update "Finished permuting phase for chr${chr}" ${SECONDS} \
-  || raise_error "Permuting phase for chr${chr} failed"
+readonly overview="data/permute/overview/overview.tsv.gz"
+readonly max_allowed_jobs=24
+readonly p_per_job=100
+readonly seed=134
 
+readonly n_tasks=$( zcat ${overview} | grep "chr${chr}" | wc -l)
+#readonly tasks="1-${n_tasks}"
+readonly tasks=5-10
 
-
-
+set -x
+qsub -N "_chr${chr}_permute" \
+    -o "logs/_array_permute.log" \
+    -e "logs/_array_permute.errors.log" \
+    -q "test.qc" \
+    -pe shmem 1 \
+    -t ${tasks} \
+    "${bash_script}" \
+    "${chr}" \
+    "${input_path}" \
+    "${input_type}" \
+    "${out_prefix}" \
+    "${out_type}" \
+    "${overview}" \
+    "${seed}" \
+    "${p_per_job}" \
+    "${max_allowed_jobs}"
+set +x
 
 
