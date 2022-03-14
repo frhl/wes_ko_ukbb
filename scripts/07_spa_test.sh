@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-10
+#$ -t 2-10
 #$ -V
 
 # 12,18
@@ -23,7 +23,7 @@ readonly spa_script="scripts/_spa_test.sh"
 readonly merge_script="scripts/_spa_merge.sh"
 readonly in_prefix="ukb_eur_wes_200k_chrCHR"
 
-readonly min_mac=4
+readonly min_mac=6
 
 readonly tasks=1-22
 readonly queue="short.qf"
@@ -53,7 +53,7 @@ submit_spa_with_csqs()
   local trait=${3?Error: Missing arg3 (trait)}
 
   local step1_dir="data/saige/output/combined/${trait}/step1"
-  local step2_dir="data/saige/output/null/${trait}/step2/seed${seed}"
+  local step2_dir="data/saige/output/combined/${trait}/step2/minmac${min_mac}"
   local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
   local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
   local out_prefix="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}"
@@ -108,5 +108,6 @@ maf="maf0to5e-2"
 
 # cts traits
 submit_spa_cts_with_csqs "pLoF_damaging_missense"
+submit_spa_binary_with_csqs "pLoF_damaging_missense"
 
 
