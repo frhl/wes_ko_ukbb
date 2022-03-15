@@ -24,6 +24,8 @@ readonly overview=${6?Error: Missing arg6 (path prefix for saige output)}
 readonly seed=${7?Error: Missing arg6 (path prefix for saige output)}
 readonly p_per_job=${8?Error: Missing arg6 (path prefix for saige output)}
 readonly max_tasks_allowed=${9?Error: Missing arg6 (path prefix for saige output)}
+readonly nslots=${10?Error: Missing arg6 (path prefix for saige output)}
+readonly queue=${11?Error: Missing arg6 (path prefix for saige output)}
 
 readonly NUM=${SGE_TASK_ID}
 readonly gene="$(zcat ${overview} | grep "chr${chr}" | cut -f1 | sed ${NUM}'q;d' )"
@@ -39,8 +41,8 @@ if [ ${n_tasks} -le ${max_tasks_allowed} ]; then
       -o "logs/_gene_permute.log" \
       -e "logs/_gene_permute.errors.log" \
       -t ${tasks} \
-      -q "short.qc" \
-      -pe shmem 3 \
+      -q "${queue}" \
+      -pe shmem ${nslots} \
       "${bash_script}" \
       "${chr}" \
       "${input_path}" \

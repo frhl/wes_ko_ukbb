@@ -31,6 +31,7 @@ readonly n_tasks=${9?Error: Missing arg6 (path prefix for saige output)}
 readonly id=${SGE_TASK_ID}
 readonly sge_seed=$(( ${id} * ${seed}))
 readonly out_prefix_gene="${out_prefix}_${gene}_${id}of${n_tasks}"
+readonly checkpoint="${out_prefix_gene}_${sge_seed}_checkpoint.mt"
 
 SECONDS=0
 set_up_hail
@@ -44,7 +45,12 @@ python3 ${hail_script} \
   --out_type ${out_type} \
   --seed ${sge_seed} \
   --gene ${gene} \
+  --checkpoint ${checkpoint} \
   && print_update "Finished permuting phase for chr${chr}" ${SECONDS} \
   || raise_error "Permuting phase for chr${chr} failed"
+
+rm -rf ${checkpoint}
+
+
 
 

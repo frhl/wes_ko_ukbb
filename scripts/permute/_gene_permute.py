@@ -33,6 +33,7 @@ def main(args):
     replicates = args.replicates
     seed = args.seed
     gene = args.gene
+    checkpoint = args.checkpoint
     out_prefix = args.out_prefix
     out_type = args.out_type
     
@@ -43,6 +44,9 @@ def main(args):
     if gene:
         gene_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id 
         mt = mt.filter_rows(gene_expr == gene)
+
+    if checkpoint:
+        mt = mt.checkpoint(checkpoint)
 
     n = int(replicates)
     mts = list()
@@ -67,6 +71,7 @@ if __name__=='__main__':
     parser.add_argument('--gene', default=None, help='')
     parser.add_argument('--seed', default=None, help='Seed used for randomizing')
     parser.add_argument('--replicates', default=2, help='')
+    parser.add_argument('--checkpoint', default=None, help='')
     parser.add_argument('--out_prefix', default=None, help='')
     parser.add_argument('--out_type', default=None, help='')
     args = parser.parse_args()

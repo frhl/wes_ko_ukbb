@@ -33,13 +33,17 @@ readonly out_prefix="${out_dir}/test_ukb_eur_wes_200k_permuted_chr${chr}"
 readonly out_type="vcf"
 
 readonly overview="data/permute/overview/overview.tsv.gz"
-readonly max_allowed_jobs=24
-readonly p_per_job=100
+readonly max_allowed_jobs=30
+readonly p_per_job=20
 readonly seed=134
+readonly nslots=1
+readonly queue="short.qc"
 
-readonly n_tasks=$( zcat ${overview} | grep "chr${chr}" | wc -l)
+readonly n_tasks="$( zcat ${overview} | grep "chr${chr}" | wc -l)"
 #readonly tasks="1-${n_tasks}"
-readonly tasks=5-10
+readonly tasks=5
+
+mkdir -p ${out_dir}
 
 set -x
 qsub -N "_chr${chr}_permute" \
@@ -57,7 +61,9 @@ qsub -N "_chr${chr}_permute" \
     "${overview}" \
     "${seed}" \
     "${p_per_job}" \
-    "${max_allowed_jobs}"
+    "${max_allowed_jobs}" \
+    "${nslots}" \
+    "${queue}"
 set +x
 
 
