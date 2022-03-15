@@ -62,7 +62,7 @@ submit_intervals()
   qsub -N "_filter_genotypes_${1}" \
     -q "short.qc@@short.hge" \
     -t "${SGE_TASK_ID}" \
-    -pe shmem 4 \
+    -pe shmem 5 \
     "${bash_script}" \
     "${genes}" \
     "${final_sample_list}" \

@@ -20,7 +20,7 @@ def main(args):
     min_info = float(args.min_info)
     min_maf = float(args.min_maf)
     missing = float(args.missing)
-    padding = int(args.padding)
+    padding = int(float(args.padding))
 
     reference_genome = 'GRCh38'
     hail_init.hail_bmrc_init_local(
@@ -105,12 +105,10 @@ def main(args):
     mfi = mfi.filter(mfi.info >= min_info)
     
     # get imputed genotypes
-    #mt = genotypes.get_ukb_imputed_v3_bgen(chromosomes)
-    mt = genotypes.genotypes.get_ukb_genotypes_bed(chromosomes)
+    mt = genotypes.get_ukb_imputed_v3_bgen(chromosomes)
     mt = samples.remove_withdrawn(mt)
-    #mt = mt.filter_rows(hl.is_defined(mfi[mt.row_key]))
-    n = mt.count()
-    print(f"Loaded {n} variants/samples")
+    mt = mt.filter_rows(hl.is_defined(mfi[mt.row_key]))
+    mt = mt.select_entries(mt.GT)
 
     # Filter samples
     if extract:
@@ -118,20 +116,31 @@ def main(args):
             extract, no_header=True, key='f0', delimiter=',')
         mt = mt.filter_cols(hl.is_defined(ht_final_samples[mt.col_key]))
 
-    # filter variants based on missingness
+    # filter variants based on missingness, 
+    # drop info field so that we don't have to recalculate
     mt = io.recalc_info(mt)
     mt = filter_missing(mt, missing)
     mt = filter_min_maf(mt, min_maf)
+    mt = mt.drop('info')
 
     # perform liftover to GRCh38 and filter to intervals
     mt = variants.liftover(mt)
     hail_intervals = ht.intervals.collect()
     mt = hl.filter_intervals(mt, hail_intervals)
-    print(hail_intervals)
 
-    mt = io.recalc_info(mt)
-    n = mt.count()
-    print(f'filtered genotypes to {n} variants/samples. Writing to VCF..')
+    mt.describe()
+    print(mt.describe())
+
+    # add variant IDs
+    mt = mt.annotate_rows(
+                varid = hl.delimit(
+                    [hl.str(mt.locus.contig),
+                     hl.str(mt.locus.position),
+                     mt.alleles[0],
+                     mt.alleles[1]],
+                    ':')
+                ) 
+
     hl.export_vcf(mt, out_prefix + '.vcf.bgz')
 
 
