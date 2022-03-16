@@ -46,7 +46,7 @@ def main(args):
         mt = mt.filter_rows(gene_expr == gene)
 
     if checkpoint:
-        mt = mt.checkpoint(checkpoint)
+        mt = mt.checkpoint(checkpoint, overwrite = True)
 
     n = int(replicates)
     mts = list()

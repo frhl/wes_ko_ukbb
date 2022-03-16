@@ -21,7 +21,7 @@ readonly spark_dir="data/tmp/spark"
 readonly bash_script="scripts/permute/_array_permute.sh"
 
 readonly in_dir="data/mt/csqs"
-readonly out_dir="data/permute/test"
+readonly out_dir="data/permute/test_400"
 
 readonly chr="${SGE_TASK_ID}"
 readonly input_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense.mt"
@@ -32,11 +32,14 @@ readonly annotation="pLoF_damaging_missense"
 readonly out_prefix="${out_dir}/test_ukb_eur_wes_200k_permuted_chr${chr}"
 readonly out_type="vcf"
 
+# note, 500 p_per_job with 2 short.qc cores causes Java Class to large errors
+# note, 200 p_per_job with 2 short.qc cores finished in 0.66h
+
 readonly overview="data/permute/overview/overview.tsv.gz"
-readonly max_allowed_jobs=30
-readonly p_per_job=20
+readonly max_allowed_jobs=10
+readonly p_per_job=400
 readonly seed=134
-readonly nslots=1
+readonly nslots=2
 readonly queue="short.qc"
 
 readonly n_tasks="$( zcat ${overview} | grep "chr${chr}" | wc -l)"
