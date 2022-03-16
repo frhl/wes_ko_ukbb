@@ -25,6 +25,19 @@ def annotate_gene_knockouts(mt, gene_expr, chrom):
     return(prob)
 
 
+def pseudo_variant(mt,  chrom):
+    """ annotate psuedo variants which are required
+    to export the as a Variant Call File
+    """
+    mt = mt.annotate_rows(
+            locus=hl.parse_locus(str(chrom) + ':1'),
+            alleles=hl.literal(['0', '1']))
+    mt = mt.key_rows_by(mt.locus, mt.alleles)
+    mt = mt.drop('gene_id')
+    return(mt)
+
+
+
 def main(args):
     
     chrom = args.chrom
@@ -39,11 +52,10 @@ def main(args):
     
     hail_init.hail_bmrc_init('logs/hail/array_permute.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1')
-    mt = io.import_table(input_path, input_type)
+    mt = io.import_table(input_path, input_type, calc_info = False)
     
     if gene:
-        gene_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id 
-        mt = mt.filter_rows(gene_expr == gene)
+        mt = mt.filter_rows(mt.gene_id == gene)
 
     if checkpoint:
         mt = mt.checkpoint(checkpoint, overwrite = True)
@@ -52,15 +64,15 @@ def main(args):
     mts = list()
     for i in range(n):
         use_seed = int(seed) * i
-        _mt = mt.transmute_entries(GT = ko.rand_flip_call(mt.GT, seed = use_seed))
-        _gene_expr = _mt.consequence.vep.worst_csq_by_gene_canonical.gene_id 
-        _mt = annotate_gene_knockouts(_mt, _gene_expr, chrom)
+        _mt = mt.annotate_entries(KO = hl.rand_bool(mt.pTKO, use_seed))
+        _mt = _mt.annotate_entries(DS = ko.calc_prop_het_ko(_mt.KO, _mt.phased_het, _mt.unphased_het) * 2 )
+        _mt = _mt.select_entries(_mt.DS)
         _mt = _mt.annotate_rows(k=i, seed=use_seed)
-        _mt = _mt.transmute_rows(rsid = hl.delimit([_mt.rsid, hl.str('-p'), hl.str(i)],'')) 
+        _mt = _mt.annotate_rows(rsid = hl.delimit([_mt.gene_id, hl.str('-p'), hl.str(i)],'')) 
         mts.append(_mt)
-        print(f"iter {i}")
-
+    
     mt = hl.MatrixTable.union_rows(*mts)
+    mt = pseudo_variant(mt, chrom)
     io.export_table(mt, out_prefix, out_type)
 
 if __name__=='__main__':

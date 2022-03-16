@@ -20,11 +20,11 @@ readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
 readonly bash_script="scripts/permute/_array_permute.sh"
 
-readonly in_dir="data/mt/csqs"
-readonly out_dir="data/permute/test_400"
+readonly in_dir="data/permute/counts"
+readonly out_dir="data/permute/permute"
 
 readonly chr="${SGE_TASK_ID}"
-readonly input_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense.mt"
+readonly input_path="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_counts_chr${chr}.mt"
 readonly input_type='mt'
 
 readonly maf="maf0to5e-2"
@@ -36,15 +36,15 @@ readonly out_type="vcf"
 # note, 200 p_per_job with 2 short.qc cores finished in 0.66h
 
 readonly overview="data/permute/overview/overview.tsv.gz"
-readonly max_allowed_jobs=10
+readonly max_allowed_jobs=5
 readonly p_per_job=400
 readonly seed=134
 readonly nslots=2
 readonly queue="short.qc"
 
 readonly n_tasks="$( zcat ${overview} | grep "chr${chr}" | wc -l)"
-#readonly tasks="1-${n_tasks}"
-readonly tasks=5
+readonly tasks="1-${n_tasks}"
+#readonly tasks=6
 
 mkdir -p ${out_dir}
 
