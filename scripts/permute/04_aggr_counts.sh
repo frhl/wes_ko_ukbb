@@ -17,7 +17,7 @@ source utils/bash_utils.sh
 source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/permute/03_aggr_counts.py"
+readonly hail_script="scripts/permute/04_aggr_counts.py"
 
 readonly in_dir="data/mt/csqs"
 readonly out_dir="data/permute/counts"
