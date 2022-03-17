@@ -8,7 +8,7 @@
 #$ -e logs/filter_genotypes.errors.log
 #$ -P lindgren.prjc
 #$ -q test.qc
-#$ -t 1
+#$ -t 1-40
 #$ -V
 
 
@@ -27,7 +27,7 @@ readonly min_maf=0.01
 readonly min_info=0.8
 
 readonly in_dir="data/conditional/common/intervals"
-readonly out_dir="data/conditional/common/test_intervals"
+readonly out_dir="data/conditional/common/intervals"
 readonly pheno_dir="data/phenotypes"
 readonly in_prefix="ukb_eur_wes_200k"
 readonly maf="0to5e-2"
@@ -62,7 +62,7 @@ submit_intervals()
   qsub -N "_filter_genotypes_${1}" \
     -q "short.qc@@short.hge" \
     -t "${SGE_TASK_ID}" \
-    -pe shmem 5 \
+    -pe shmem 4 \
     "${bash_script}" \
     "${genes}" \
     "${final_sample_list}" \
@@ -73,7 +73,7 @@ submit_intervals()
   set +x
 }
 
-#submit_binary_analysis "pLoF_damaging_missense"
+submit_binary_analysis "pLoF_damaging_missense"
 submit_cts_analysis "pLoF_damaging_missense"
 
 

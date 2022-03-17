@@ -17,10 +17,11 @@ source utils/bash_utils.sh
 readonly in_gmat=${1?Error: Missing arg1 (in_gmat)}
 readonly in_var=${2?Error: Missing arg2 (in_var)}
 readonly vcf=${3?Error: Missing arg3 (vcf)}
-readonly out_prefix=${4?Error: Missing arg4 (out_prefix)}
-readonly P_cutoff=${5?Error: Missing arg5 (P_cutoff)}
-readonly max_iter=${6?Error: Missing arg6 (max_iter)}
-readonly min_mac=${7?Error: Missing arg7 (min_mac)}
+readonly ko_vcf=${4?Error: Missing arg3 (vcf)}
+readonly out_prefix=${5?Error: Missing arg4 (out_prefix)}
+readonly P_cutoff=${6?Error: Missing arg5 (P_cutoff)}
+readonly max_iter=${7?Error: Missing arg6 (max_iter)}
+readonly min_mac=${8?Error: Missing arg7 (min_mac)}
 
 readonly csi="${vcf}.csi"
 readonly step2_SPAtests="utils/saige/step2_SPAtests.R"

@@ -15,8 +15,12 @@ set -o nounset
 
 readonly bash_script="scripts/conditional/_spa_conditional.sh"
 
-readonly in_dir="data/conditional/common/test_intervals"
+readonly ko_dir="data/knockouts/alt"
+readonly ko_prefix="ukb_eur_wes_200k_chrCHR"
+
+readonly interval_dir="data/conditional/common/test_intervals"
 readonly out_dir="data/conditional/common/spa"
+
 readonly pheno_dir="data/phenotypes"
 readonly in_prefix="ukb_eur_wes_200k"
 readonly maf="0to5e-2"
@@ -52,7 +56,8 @@ submit_cond_spa()
   local step2_dir="data/saige/output/combined/${trait}/step2/minmac${min_mac}"
   local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
   local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
-  local in_vcf="${in_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}.vcf.bgz"
+  local interval_vcf="${interval_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}.vcf.bgz"
+  local ko_vcf="${ko_dir}/${ko_prefix}_maf${maf}_${annotation}.vcf.bgz"
   local out_prefix="${out_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}_cond"
 
   mkdir -p ${out_dir}
@@ -64,7 +69,8 @@ submit_cond_spa()
     "${bash_script}" \
     "${in_gmat}" \
     "${in_var}" \
-    "${in_vcf}" \
+    "${interval_vcf}" \
+    "${ko_vcf}" \
     "${out_prefix}" \
     "${P_cutoff}" \
     "${max_iter}" \
