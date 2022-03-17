@@ -1,17 +1,20 @@
 import os
 import hail as hl
 import argparse
+import random
 
 from ukb_utils import hail_init
 from ukb_utils import genotypes
+from ukb_utils import variants
 from ukb_utils import samples
 from ko_utils import qc
 
 def main(args):
 
     chroms = args.chroms
-    subset_markers_by_kinship = args.subset_markers_by_kinship
+    use_markers_by_kinship = args.use_markers_by_kinship
     out_prefix = args.out_prefix
+    use_markers_by_mac = args.use_markers_by_mac
     final_sample_list = args.final_sample_list
     sex = args.sex
 
@@ -19,6 +22,8 @@ def main(args):
     hl._set_flags(no_whole_stage_codegen='1')
     mt = genotypes.get_ukb_genotypes_bed(chroms)
     mt = samples.remove_withdrawn(mt)
+    markers = list() # keep track of final markers
+    random.seed(1336) # seed for random
 
     if sex:
         mt = samples.filter_to_sex(mt, sex)
@@ -27,12 +32,22 @@ def main(args):
          ht_final_samples = hl.import_table(final_sample_list, no_header=True, key='f0',delimiter = ',')
          mt = mt.filter_cols(hl.is_defined(ht_final_samples[mt.col_key]))
 
-    if subset_markers_by_kinship:
+    if use_markers_by_mac:
+        ht = genotypes.get_ukb_parsed_imputed_v3_mfi(chroms)
+        mt_mac = mt.annotate_rows(info = ht[mt.row_key].info)
+        mt_mac = mt_mac.annotate_rows(MAC = variants.get_mac_expr(mt_mac))
+        mt_mac = mt_mac.filter_rows((mt_mac.MAC <= 20) & (mt_mac.info > 0.8))
+        mac_markers = mt_mac.rsid.collect()
+        min_markers = min(int(use_markers_by_mac), len(mac_markers)) 
+        markers.append(random.sample(mac_markers, min_markers))
+
+    if use_markers_by_kinship:
         ht = hl.import_table('/well/lindgren/UKBIOBANK/DATA/QC/ukb_snp_qc.txt', impute = True, delimiter = ' ')
         ht = ht.filter(ht.in_Relatedness == 1)
-        rsids = ht.rs_id.collect()
-        mt = mt.filter_rows(hl.literal(rsids).contains(mt.rsid))
+        kinship_markers = ht.rs_id.collect()
+        markers.append(kinship_markers) 
 
+    mt = mt.filter_rows(hl.literal(set(markers)).contains(mt.rsid))
     n = mt.count()
     print(f"Final count after merging data {n}")
     hl.export_plink(mt, out_prefix, ind_id = mt.s)
@@ -41,10 +56,8 @@ if __name__=='__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--chroms', nargs='+', default=None, help='chroms to be included')
-    parser.add_argument('--subset_markers_by_kinship', action='store_true', help='Only use markers that have been used in UKBB as kinship markers')
-    parser.add_argument('--subset_samples_by_wes200k', action='store_true', help='Subset samples to those that are presennt in the post QC WES.')
-    parser.add_argument('--subset_samples_by_genet_eur', action='store_true', help='Subset samples to those that are genetically european.') 
-    parser.add_argument('--subset_samples_by_ukbb_eur', action='store_true', default = False, help='Subset samples to those that are european designated by UKBB.') 
+    parser.add_argument('--use_markers_by_kinship', action='store_true', help='Use markers that have been used in UKBB as kinship markers')
+    parser.add_argument('--use_markers_by_mac', default=None, help='Use N markers that have a MAC <= 20')
     parser.add_argument('--add_rare_variants', action='store_true', help='Add rare variants to plink file (this is required for SAIGE-GENE+ analysis')
     parser.add_argument('--final_sample_list', default=None, help='Path to HailTable that contains the final samples included in the analysis.')
     parser.add_argument('--sex', default=None, help='Only include "females" or "males".')

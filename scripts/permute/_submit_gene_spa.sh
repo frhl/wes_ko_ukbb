@@ -54,7 +54,8 @@ qsub -N "_c${chr}_${gene}" \
     "${in_var}" \
     "${phenotype}" \
     "${gene}" \
-    "${n_tasks}"
+    "${n_tasks}" \
+    "${min_mac}" 
 set +x
 
 

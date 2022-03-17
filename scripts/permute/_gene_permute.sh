@@ -12,6 +12,7 @@
 set -o errexit
 set -o nounset
 
+source utils/vcf_utils.sh
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
@@ -32,22 +33,24 @@ readonly id=${SGE_TASK_ID}
 readonly sge_seed=$(( ${id} * ${seed}))
 readonly out_prefix_gene="${out_prefix}_${gene}_${id}of${n_tasks}"
 readonly checkpoint="${out_prefix_gene}_${sge_seed}_checkpoint.mt"
+readonly input_path_gene=$(echo ${input_path} | sed -e "s/GENE/${gene}/g")
+
 
 SECONDS=0
 set_up_hail
 set_up_pythonpath_legacy
 python3 ${hail_script} \
   --chrom "chr${chr}" \
-  --input_path ${input_path} \
+  --input_path ${input_path_gene} \
   --input_type ${input_type} \
   --replicates ${replicates} \
   --out_prefix ${out_prefix_gene} \
   --out_type ${out_type} \
-  --seed ${sge_seed} \
-  --gene ${gene} \
-  --checkpoint ${checkpoint} \
-  && print_update "Finished permuting phase for chr${chr}" ${SECONDS} \
-  || raise_error "Permuting phase for chr${chr} failed"
+  --seed ${sge_seed} 
+  #--gene ${gene} \
+  #--checkpoint ${checkpoint} \
+  #&& print_update "Finished permuting phase for chr${chr}" ${SECONDS} \
+  #|| raise_error "Permuting phase for chr${chr} failed"
 
 rm -rf ${checkpoint}
 

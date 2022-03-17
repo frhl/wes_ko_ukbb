@@ -36,8 +36,9 @@ readonly index=${SGE_TASK_ID}
 
 fit_binary_traits() {
   local trait_type="binary"
-  local out_dir="data/saige/output/combined/binary/step1/test"
-  local pheno_file="${pheno_dir}/filtered_phenotypes_binary.tsv"
+  local inv_normalize="FALSE"
+  local out_dir="data/saige/output/binary/step1"
+  local pheno_file="${pheno_dir}/filtered_phenotypes_binary.tsv.gz"
   local pheno_list="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
   local phenotype=$( sed "${index}q;d" ${pheno_list} )
   local out="${out_dir}/${out_prefix}_${phenotype}"
@@ -46,10 +47,10 @@ fit_binary_traits() {
 
 fit_cts_traits() {
   local trait_type="quantitative"
-  local out_dir="data/saige/output/combined/cts/step1"
-  local pheno_file="${pheno_dir}/filtered_phenotypes_cts.tsv"
+  local inv_normalize="TRUE"
+  local out_dir="data/saige/output/cts/step1/test3"
+  local pheno_file="${pheno_dir}/filtered_phenotypes_cts.tsv.gz"
   local pheno_list="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
-  #local pheno_list="${pheno_dir}/filtered_phenotypes_cts_header.tsv"
   local phenotype=$( sed "${index}q;d" ${pheno_list} )
   local out="${out_dir}/${out_prefix}_${phenotype}"
   submit_spa_null
@@ -59,7 +60,7 @@ submit_spa_null() {
   mkdir -p ${out_dir}
   if [ ! -f "${out_prefix}.rda" ]; then
     set -x
-    qsub -N "spa_${phenotype}" \
+    qsub -N "_null_${phenotype}" \
       -t "${SGE_TASK_ID}" \
       -q "${queue}" \
       -pe shmem ${nslots} \
@@ -71,6 +72,7 @@ submit_spa_null() {
       "${trait_type}" \
       "${grm_mtx}" \
       "${grm_sam}" \
+      "${inv_normalize}" \
       "${out}"
     set +x
   else
@@ -79,8 +81,8 @@ submit_spa_null() {
 }
 
 # Fit null model for binary/cts traits
-fit_binary_traits
-#fit_cts_traits
+#fit_binary_traits
+fit_cts_traits
 
 
 

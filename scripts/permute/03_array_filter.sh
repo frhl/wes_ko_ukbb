@@ -18,27 +18,22 @@ source utils/hail_utils.sh
 
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
-readonly bash_script="scripts/permute/_array_permute.sh"
+readonly bash_script="scripts/permute/_array_filter.sh"
 
 readonly chr="${SGE_TASK_ID}"
-readonly in_dir="data/permute/genes/chr${chr}"
-#readonly in_dir="data/permute/counts"
-readonly out_dir="data/permute/test_100/chr${chr}"
+readonly in_dir="data/permute/counts"
+readonly out_dir="data/permute/genes/chr${chr}"
 
-readonly input_path="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_chr${chr}_GENE.mt"
-#readonly input_path="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_counts_chr${chr}.mt"
+readonly input_path="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_counts_chr${chr}.mt"
 readonly input_type='mt'
 
 readonly maf="maf0to5e-2"
 readonly annotation="pLoF_damaging_missense"
-readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_permuted_chr${chr}"
-readonly out_type="vcf"
+readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_chr${chr}"
+readonly out_type="mt"
 
 readonly overview="data/permute/overview/overview.tsv.gz"
-readonly max_allowed_jobs=300
-readonly p_per_job=100
-readonly seed=134
-readonly nslots=1
+readonly nslots=2
 readonly queue="short.qc"
 
 readonly n_tasks="$( zcat ${overview} | grep "chr${chr}" | wc -l)"
@@ -48,8 +43,8 @@ mkdir -p ${out_dir}
 
 set -x
 qsub -N "_chr${chr}_permute" \
-    -o "logs/_array_permute.log" \
-    -e "logs/_array_permute.errors.log" \
+    -o "logs/_array_filter.log" \
+    -e "logs/_array_filter.errors.log" \
     -q "test.qc" \
     -pe shmem 1 \
     -t ${tasks} \
@@ -60,9 +55,6 @@ qsub -N "_chr${chr}_permute" \
     "${out_prefix}" \
     "${out_type}" \
     "${overview}" \
-    "${seed}" \
-    "${p_per_job}" \
-    "${max_allowed_jobs}" \
     "${nslots}" \
     "${queue}"
 set +x

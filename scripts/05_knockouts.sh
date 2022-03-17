@@ -28,9 +28,9 @@ readonly out_type="vcf"
 
 # Note: ~20 slots are needed for running chr1 
 # when using aggr_method="collect" on short.qe
-readonly tasks="21"
+readonly tasks="1-22"
 readonly queue="short.qe"
-readonly nslots=2
+readonly nslots=1
 
 readonly phase=""
 readonly seed=""

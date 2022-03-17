@@ -24,7 +24,7 @@ readonly in_dir="data/permute/genes/chrCHR"
 readonly out_dir="data/permute/spa/chrCHR"
 
 readonly in_prefix="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_permuted_chrCHR_GENE"
-readonly out_prefix="${out_dir}/test_chrCHR_GENE"
+readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_permuted_chrCHR_GENE"
 
 readonly overview="data/permute/overview/overview.tsv.gz"
 
