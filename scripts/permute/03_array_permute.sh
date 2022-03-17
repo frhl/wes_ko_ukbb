@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 20-22
+#$ -t 21
 #$ -V
 
 set -o errexit
@@ -33,7 +33,6 @@ readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_permuted
 readonly out_type="vcf"
 
 # note, 500 p_per_job with 2 short.qc cores causes Java Class to large errors
-# note, 200 p_per_job with 2 short.qc cores finished in 0.66h
 
 readonly overview="data/permute/overview/overview.tsv.gz"
 readonly max_allowed_jobs=100
@@ -44,7 +43,6 @@ readonly queue="short.qc"
 
 readonly n_tasks="$( zcat ${overview} | grep "chr${chr}" | wc -l)"
 readonly tasks="1-${n_tasks}"
-#readonly tasks=1
 
 mkdir -p ${out_dir}
 

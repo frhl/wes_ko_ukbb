@@ -8,6 +8,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q lindgren.qe
+#$ -V
 
 set -o errexit
 set -o nounset
@@ -29,11 +30,12 @@ readonly n_tasks=${8?Error: Missing arg6 (path prefix for saige output)}
 
 readonly id=${SGE_TASK_ID}
 readonly vcf="${in_vcf}_${id}of${n_tasks}.vcf.bgz"
+readonly csi="${vcf}.csi"
 readonly out_gene_task="${out_gene}_${id}of${n_tasks}.txt"
 
-set -eu
-set_up_RSAIGE
 set +eu
+set_up_RSAIGE
+set -eu
 
 SECONDS=0
 Rscript "${step2_SPAtests}"  \

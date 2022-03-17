@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N aggr_min_p
+#$ -N calc_min_permutations
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/aggr_min_p.log
-#$ -e logs/aggr_min_p.errors.log
+#$ -o logs/calc_min_permutations.log
+#$ -e logs/calc_min_permutations.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
@@ -16,7 +16,7 @@
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
-readonly rscript="scripts/permute/03_aggr_min_p.R"
+readonly rscript="scripts/permute/01_calc_min_permutations.R"
 
 readonly spa_cts_dir="data/saige/output/combined/cts/step2"
 readonly spa_bin_dir="data/saige/output/combined/binary/step2"

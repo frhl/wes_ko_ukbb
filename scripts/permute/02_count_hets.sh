@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N aggr_counts
+#$ -N count_hets
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/aggr_counts.log
-#$ -e logs/aggr_counts.errors.log
+#$ -o logs/count_hets.log
+#$ -e logs/count_hets.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc
@@ -17,7 +17,7 @@ source utils/bash_utils.sh
 source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/permute/04_aggr_counts.py"
+readonly hail_script="scripts/permute/02_count_hets.py"
 
 readonly in_dir="data/mt/csqs"
 readonly out_dir="data/permute/counts"

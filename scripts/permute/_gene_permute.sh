@@ -51,6 +51,9 @@ python3 ${hail_script} \
 
 rm -rf ${checkpoint}
 
+module purge
+module load BCFtools/1.12-GCC-10.3.0
+make_tabix "${out_prefix_gene}.vcf.bgz" "csi"
 
 
 
