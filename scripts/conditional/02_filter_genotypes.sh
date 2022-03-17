@@ -8,7 +8,7 @@
 #$ -e logs/filter_genotypes.errors.log
 #$ -P lindgren.prjc
 #$ -q test.qc
-#$ -t 1-3
+#$ -t 1
 #$ -V
 
 
@@ -27,7 +27,7 @@ readonly min_maf=0.01
 readonly min_info=0.8
 
 readonly in_dir="data/conditional/common/intervals"
-readonly out_dir="data/conditional/common/intervals"
+readonly out_dir="data/conditional/common/test_intervals"
 readonly pheno_dir="data/phenotypes"
 readonly in_prefix="ukb_eur_wes_200k"
 readonly maf="0to5e-2"

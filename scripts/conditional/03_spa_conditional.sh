@@ -15,15 +15,15 @@ set -o nounset
 
 readonly bash_script="scripts/conditional/_spa_conditional.sh"
 
-readonly in_dir="data/conditional/common/intervals"
+readonly in_dir="data/conditional/common/test_intervals"
 readonly out_dir="data/conditional/common/spa"
 readonly pheno_dir="data/phenotypes"
 readonly in_prefix="ukb_eur_wes_200k"
 readonly maf="0to5e-2"
 
 readonly min_mac=4
-readonly max_iter=10
-readonly P_cutoff=0.00001 #5e-8
+readonly max_iter=5
+readonly P_cutoff=0.01 #5e-8
 
 
 submit_binary_analysis()

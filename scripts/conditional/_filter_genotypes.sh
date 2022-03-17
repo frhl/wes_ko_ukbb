@@ -25,21 +25,22 @@ readonly min_info=${6?Error: Missing arg1 (Filter variants by min INFO)}
 readonly spark_dir="data/tmp/spark"
 readonly hail_script="scripts/conditional/02_filter_genotypes.py"
 
-filter_genotypes() {
+filter_genotypes() 
+{
   python3 "${hail_script}" \
      --min_maf ${min_maf} \
      --min_info ${min_info} \
      --padding ${padding} \
      --gene_table ${gene_table} \
      --extract ${final_sample_list} \
-     --out_prefix ${out_prefix}
-  print_update "Hail finished writing."
-  make_tabix "${out_prefix}.vcf.bgz" "csi"
+     --out_prefix ${out_prefix} \
+     && print_update "Finished filtering imputed genotypes ${out_prefix}" ${SECONDS} \
+     || raise_error "Filtering impyted genotypes for for ${out_prefix} failed!"
 }
 
 # run analysis
 set_up_hail
 set_up_pythonpath_legacy
 filter_genotypes
-
+make_tabix "${out_prefix}.vcf.bgz" "csi"
 
