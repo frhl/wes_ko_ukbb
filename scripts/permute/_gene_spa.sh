@@ -27,6 +27,7 @@ readonly in_var=${5?Error: Missing arg6 (path prefix for saige output)}
 readonly phenotype=${6?Error: Missing arg6 (path prefix for saige output)}
 readonly gene=${7?Error: Missing arg6 (path prefix for saige output)}
 readonly n_tasks=${8?Error: Missing arg6 (path prefix for saige output)}
+readonly min_mac=${9?Error: Missing arg6 (path prefix for saige output)}
 
 readonly id=${SGE_TASK_ID}
 readonly vcf="${in_vcf}_${id}of${n_tasks}.vcf.bgz"
