@@ -36,7 +36,7 @@ def main(args):
         ht = genotypes.get_ukb_parsed_imputed_v3_mfi(chroms)
         mt_mac = mt.annotate_rows(info = ht[mt.row_key].info)
         mt_mac = mt_mac.annotate_rows(MAC = variants.get_mac_expr(mt_mac))
-        mt_mac = mt_mac.filter_rows((mt_mac.MAC <= 20) & (mt_mac.info > 0.7))
+        mt_mac = mt_mac.filter_rows((mt_mac.MAC <= 20) & (mt_mac.info > 0.6))
         mac_markers = mt_mac.rsid.collect()
         min_markers = min(int(use_markers_by_mac), len(mac_markers)) 
         print(f"min_markers={min_markers}")
@@ -49,9 +49,7 @@ def main(args):
         markers.extend(kinship_markers) 
 
     mt = mt.filter_rows(hl.literal(set(markers)).contains(mt.rsid))
-    n = mt.count()
-    print(f"Final count after merging data {n}")
-    io.export_table(prob, out_prefix, out_type)
+    io.export_table(mt, out_prefix, out_type)
 
 if __name__=='__main__':
 
