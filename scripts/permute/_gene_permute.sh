@@ -46,12 +46,12 @@ python3 ${hail_script} \
   --replicates ${replicates} \
   --out_prefix ${out_prefix_gene} \
   --out_type ${out_type} \
-  --seed ${sge_seed} 
-  #--gene ${gene} \
+  --seed ${sge_seed} \
+  && print_update "Finished permuting phase for chr${chr}" ${SECONDS} \
+  || raise_error "Permuting phase for chr${chr} failed"
+ #--gene ${gene} \
   #--checkpoint ${checkpoint} \
-  #&& print_update "Finished permuting phase for chr${chr}" ${SECONDS} \
-  #|| raise_error "Permuting phase for chr${chr} failed"
-
+  
 rm -rf ${checkpoint}
 
 module purge
