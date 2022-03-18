@@ -36,16 +36,17 @@ def main(args):
         ht = genotypes.get_ukb_parsed_imputed_v3_mfi(chroms)
         mt_mac = mt.annotate_rows(info = ht[mt.row_key].info)
         mt_mac = mt_mac.annotate_rows(MAC = variants.get_mac_expr(mt_mac))
-        mt_mac = mt_mac.filter_rows((mt_mac.MAC <= 20) & (mt_mac.info > 0.8))
+        mt_mac = mt_mac.filter_rows((mt_mac.MAC <= 20) & (mt_mac.info > 0.7))
         mac_markers = mt_mac.rsid.collect()
         min_markers = min(int(use_markers_by_mac), len(mac_markers)) 
-        markers.append(random.sample(mac_markers, min_markers))
+        print(f"min_markers={min_markers}")
+        markers.extend(random.sample(mac_markers, min_markers))
 
     if use_markers_by_kinship:
         ht = hl.import_table('/well/lindgren/UKBIOBANK/DATA/QC/ukb_snp_qc.txt', impute = True, delimiter = ' ')
         ht = ht.filter(ht.in_Relatedness == 1)
         kinship_markers = ht.rs_id.collect()
-        markers.append(kinship_markers) 
+        markers.extend(kinship_markers) 
 
     mt = mt.filter_rows(hl.literal(set(markers)).contains(mt.rsid))
     n = mt.count()

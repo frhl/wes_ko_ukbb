@@ -30,7 +30,7 @@ python3 "${hail_script}" \
   --out_prefix ${out} \
   --final_sample_list ${final_sample_list} \
   --use_markers_by_kinship \
-  --use_markers_by_mac 2000 \
+  --use_markers_by_mac 200 \
   && print_update "Finished writing samples for relatedness matrix (GRM)" ${SECONDS} \
   || raise_error "Writing samples for GRM failed"
 

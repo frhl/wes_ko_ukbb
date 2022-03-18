@@ -23,7 +23,7 @@ readonly bash_script="scripts/permute/_array_permute.sh"
 readonly chr="${SGE_TASK_ID}"
 readonly in_dir="data/permute/genes/chr${chr}"
 #readonly in_dir="data/permute/counts"
-readonly out_dir="data/permute/test_200/chr${chr}"
+readonly out_dir="data/permute/test_300/chr${chr}"
 
 readonly input_path="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_chr${chr}_GENE.mt"
 #readonly input_path="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_counts_chr${chr}.mt"
@@ -36,13 +36,14 @@ readonly out_type="vcf"
 
 readonly overview="data/permute/overview/overview.tsv.gz"
 readonly max_allowed_jobs=300
-readonly p_per_job=200
+readonly p_per_job=300
 readonly seed=134
 readonly nslots=1
 readonly queue="short.qc"
 
 readonly n_tasks="$( zcat ${overview} | grep "chr${chr}" | wc -l)"
-readonly tasks="1-${n_tasks}"
+#readonly tasks="1-${n_tasks}"
+tasks=1
 
 mkdir -p ${out_dir}
 

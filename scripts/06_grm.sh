@@ -37,9 +37,9 @@ create_grm() {
   qsub -N "_create_grm" \
     -o "logs/_create_grm.log" \
     -e "logs/_create_grm.errors.log" \
-    -t 21 \
+    -t 1-22 \
     -q "short.qc" \
-    -pe shmem 4 \
+    -pe shmem 5 \
     "${grm_script}" \
     "${out_grm_prefix}" \
     "${out_type}" \
@@ -56,7 +56,8 @@ merge_grm() {
   qsub -N "_merge_grm" \
     -o "logs/_merge_grm.log" \
     -e "logs/_merge_grm.errors.log" \
-    -t 21 \
+    -hold_jid "_create_grm" \
+    -t 1 \
     -q "short.qc" \
     -pe shmem 4 \
     "${mrg_script}" \
@@ -74,9 +75,9 @@ fit_grm() {
   qsub -N "_create_grm" \
     -o "logs/_create_grm.log" \
     -e "logs/_create_grm.errors.log" \
-    -t 21 \
+    -hold_jid "_merge_grm" \
     -q "short.qc" \
-    -pe shmem 4 \
+    -pe shmem 10 \
     "${grm_script}" \
     "${plink_file}" \
     "${out_fit_prefix}"
@@ -85,5 +86,11 @@ fit_grm() {
 
 
 create_grm ${out_prefix}
+
+
+
+
+
+
 
 
