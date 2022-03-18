@@ -84,10 +84,18 @@ fit_grm() {
   set +x
 }
 
+readonly prefix_chr="${out_prefix}_chr"
+readonly prefix_mrg="${out_preifx}_mrg"
+readonly prefix_fit="${out_prefix}"
 
+# create each chunk of GRM by chromosome
 create_grm ${out_prefix}
 
+# merge chunks into a single plink file
+merge_grm "${prefix_chr}" "${prefix_mrg}"
 
+# git GRM using SAIGE
+fit_grm "${prefix_mrg}" "${prefix_fit}"
 
 
 

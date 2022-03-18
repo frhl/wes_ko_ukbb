@@ -1,4 +1,3 @@
-import os
 import hail as hl
 import argparse
 import random
@@ -7,18 +6,19 @@ from ukb_utils import hail_init
 from ukb_utils import genotypes
 from ukb_utils import variants
 from ukb_utils import samples
-from ko_utils import qc
+from ko_utils import io
 
 def main(args):
 
     chroms = args.chroms
     use_markers_by_kinship = args.use_markers_by_kinship
     out_prefix = args.out_prefix
+    out_type = args.out_type
     use_markers_by_mac = args.use_markers_by_mac
     final_sample_list = args.final_sample_list
     sex = args.sex
 
-    hail_init.hail_bmrc_init_local('logs/hail/hail_format.log', 'GRCh37')
+    hail_init.hail_bmrc_init_local('logs/hail/_create_grm.log', 'GRCh37')
     hl._set_flags(no_whole_stage_codegen='1')
     mt = genotypes.get_ukb_genotypes_bed(chroms)
     mt = samples.remove_withdrawn(mt)
@@ -51,8 +51,8 @@ def main(args):
     mt = mt.filter_rows(hl.literal(set(markers)).contains(mt.rsid))
     n = mt.count()
     print(f"Final count after merging data {n}")
-    hl.export_plink(mt, out_prefix, ind_id = mt.s)
-   
+    io.export_table(prob, out_prefix, out_type)
+
 if __name__=='__main__':
 
     parser = argparse.ArgumentParser()
@@ -62,8 +62,8 @@ if __name__=='__main__':
     parser.add_argument('--add_rare_variants', action='store_true', help='Add rare variants to plink file (this is required for SAIGE-GENE+ analysis')
     parser.add_argument('--final_sample_list', default=None, help='Path to HailTable that contains the final samples included in the analysis.')
     parser.add_argument('--sex', default=None, help='Only include "females" or "males".')
-    parser.add_argument('--phenotypes', default=None, help='Path to phenotype table that also includes sex.')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset (plink format)')
+    parser.add_argument('--out_type', default=None, help='Path prefix for output dataset (plink format)')
     args = parser.parse_args()
 
     main(args)

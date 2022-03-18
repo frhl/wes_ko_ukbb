@@ -28,6 +28,7 @@ set_up_pythonpath_legacy
 python3 "${hail_script}" \
   --chroms ${chr} \
   --out_prefix ${out} \
+  --out_type ${out_type} \
   --final_sample_list ${final_sample_list} \
   --use_markers_by_kinship \
   --use_markers_by_mac 200 \

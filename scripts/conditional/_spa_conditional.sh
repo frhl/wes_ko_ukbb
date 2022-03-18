@@ -122,8 +122,10 @@ conditional_analysis() {
         >&2 echo "[Iteration ${i}]: No other markers passing sig threshold (P-value<${P_cutoff}). Ended loop with markers: ${marker_list}"
         break
       fi
+      # clean up
+      rm -f "${out_prefix_iter}_chr"*
+      rm -f ${out_prefix_mrg}
   done
-  # clean up
   echo ${marker_list} > "${out_prefix}.markers"
 }
 
@@ -131,7 +133,7 @@ set +eu
 
 # setup constant files 
 readonly CHROMS=$(extract_chr_from_vcf ${vcf}) 
-readonly markers_conditional="${out_prefix}_markers.txt"
+readonly markers_conditional="${out_prefix}.spa"
 rm -f ${markers_conditional}
 
 # setup saige

@@ -14,7 +14,7 @@ def main(args):
     out_prefix = args.out_prefix
     out_type = args.out_type
 
-    hail_init.hail_bmrc_init_local('logs/hail/hail_format.log', 'GRCh38')
+    hail_init.hail_bmrc_init_local('logs/hail/hail_format.log', 'GRCh37')
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
 
     AUTOSOMES = list(map(str, range(1, 23)))
