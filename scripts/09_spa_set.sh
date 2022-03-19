@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1
+#$ -t 1-44
 #$ -V
 
 # 12,18
@@ -15,20 +15,21 @@
 module purge
 source utils/bash_utils.sh
 
-readonly vcf_dir="data/knockouts/alt"
+#readonly vcf_dir="data/knockouts/alt"
+readonly vcf_dir="data/mt/annotated"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
 
 readonly spa_script="scripts/_spa_set.sh"
 readonly merge_script="scripts/_spa_merge.sh"
-readonly in_prefix="ukb_eur_wes_200k_chrCHR"
+readonly in_prefix="ukb_eur_wes_200k_annot_chrCHR"
 
 readonly group_dir="data/mt/vep"
 readonly group="${group_dir}/ukb_eur_wes_200k_csqs_chrCHR.saige"
 
-readonly min_mac=5
+readonly min_mac=4
 
-readonly tasks=21
+readonly tasks=1-22
 readonly queue="short.qf"
 readonly nslots=1
 
@@ -56,11 +57,11 @@ submit_spa_pair()
   local trait=${3?Error: Missing arg3 (trait)}
 
   local step1_dir="data/saige/output/${trait}/step1"
-  local step2_dir="data/saige/output/set/${trait}/step2"
+  local step2_dir="data/saige/output/${trait}/step2_set"
   local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
   local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
-  local out_prefix="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}"
-  local in_vcf="${vcf_dir}/${in_prefix}_${maf}_${annotation}.vcf.bgz"
+  local out_prefix="${step2_dir}/${in_prefix}_${phenotype}_${annotation}"
+  local in_vcf="${vcf_dir}/${in_prefix}.vcf.bgz"
   submit_spa_set_job
  # submit_merge_job
 }
@@ -105,7 +106,6 @@ submit_merge_job()
 }
 
 
-# Binary traits
 maf="maf0to5e-2"
 #submit_spa_binary_with_csqs "pLoF"
 #submit_spa_binary_with_csqs "pLoF_damaging_missense"
@@ -113,6 +113,6 @@ maf="maf0to5e-2"
 
 # cts traits
 submit_spa_set_cts "pLoF_damaging_missense"
-#submit_spa_binary_with_csqs "pLoF_damaging_missense"
+submit_spa_binary_with_csqs "pLoF_damaging_missense"
 
 

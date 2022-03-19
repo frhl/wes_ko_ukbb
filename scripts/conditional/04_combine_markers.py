@@ -5,7 +5,7 @@ import argparse
 
 from ukb_utils import hail_init
 from ukb_utils import tables
-from ko_utils import genotypes
+from ukb_utils import genotypes
 from ko_utils import io
 
 def main(args):

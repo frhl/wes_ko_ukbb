@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 4
 #$ -q short.qc@@short.hga
-#$ -t 22
+#$ -t 1-21
 
 set -o errexit
 set -o nounset
@@ -30,18 +30,18 @@ readonly out_dir="data/mt/annotated"
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_annot_chr${chr}"
 readonly out_type="vcf"
 
-#SECONDS=0
-#set_up_hail
-#set_up_pythonpath_legacy  
-#set -x
-#python3 "${hail_script}" \
-#   --in_file ${input_prefix}\
-#   --in_type "${input_type}" \
-#   --out_prefix ${out_prefix} \
-#   --out_type "${out_type}" \
-#   && print_update "Finished annotating MatrixTables chr${chr}" ${SECONDS} \
-#   || raise_error "Annotating MatrixTables for chr${chr} failed"
-#set +x 
+SECONDS=0
+set_up_hail
+set_up_pythonpath_legacy  
+set -x
+python3 "${hail_script}" \
+   --in_file ${input_prefix}\
+   --in_type "${input_type}" \
+   --out_prefix ${out_prefix} \
+   --out_type "${out_type}" \
+   && print_update "Finished annotating MatrixTables chr${chr}" ${SECONDS} \
+   || raise_error "Annotating MatrixTables for chr${chr} failed"
+set +x 
 
 
 if [ ${out_type} == "vcf" ]; then

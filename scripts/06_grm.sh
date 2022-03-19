@@ -23,7 +23,7 @@ readonly mrg_script="scripts/_merge_grm.sh"
 readonly fit_script="scripts/_fit_grm.sh"
 
 readonly spark_dir="data/tmp/spark"
-readonly out_dir="data/saige/grm/input/chunks"
+readonly out_dir="data/saige/grm/input/combined"
 readonly out_prefix="${out_dir}/ukb_wes_200k_sparse_autosomes"
 readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
 
@@ -85,7 +85,7 @@ fit_grm() {
 }
 
 readonly prefix_chr="${out_prefix}_chr"
-readonly prefix_mrg="${out_preifx}_mrg"
+readonly prefix_mrg="${out_prefix}_mrg"
 readonly prefix_fit="${out_prefix}"
 
 # create each chunk of GRM by chromosome

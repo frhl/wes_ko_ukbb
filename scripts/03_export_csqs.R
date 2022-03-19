@@ -20,7 +20,7 @@ main <- function(args){
       nas <- (is.na(variants) | is.na(annotations))
       variants <- variants[!nas]
       annotations <- annotations[!nas]
-      accepted <- annotations %in% c('pLoF','damaging_missense')
+      accepted <- annotations %in% c('pLoF','damaging_missense', "synonymous")
       if (sum(accepted) > 0){
           variants <- variants[accepted]
           annotations <- annotations[accepted]

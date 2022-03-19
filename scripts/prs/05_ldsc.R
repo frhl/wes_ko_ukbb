@@ -69,7 +69,9 @@ main <- function(args){
   ) 
 
   #write(paste0(args$pred, ".. done! Writing to ", args$out_prefix, ".rds"), stdout())
-  saveRDS(ldsc_out, paste0(args$out_prefix,".rds"))
+  outfile = paste0(args$prefix, ".rds")
+  write(paste("Done! writing to", outfile), stdout())
+  saveRDS(ldsc_out, outfile)
   
 }
 

@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1
+#$ -t 1-43
 #$ -V
 
 # 12,18
@@ -23,7 +23,7 @@ readonly spa_script="scripts/_spa_test.sh"
 readonly merge_script="scripts/_spa_merge.sh"
 readonly in_prefix="ukb_eur_wes_200k_chrCHR"
 
-readonly min_mac=6
+readonly min_mac=4
 
 readonly tasks=1-22
 readonly queue="short.qf"

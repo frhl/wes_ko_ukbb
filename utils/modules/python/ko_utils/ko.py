@@ -202,6 +202,30 @@ def calc_prob_ko(hom_expr, phased_expr, unphased_expr):
             )
 
 
+def calc_prop_het_ko(ko_expr, phased_expr, unphased_expr):
+    """Calculate probability of knockout based on a knockout expression
+    and a count of phased and unphased het sites. Unlike calc_prop_ko,
+    this function is designed to take in a knockout expression and then
+    add deal with the uncertainity of unphased het sites.
+    
+    :param hom_expr: integer for homozygous count 
+    :param phased_expr: count of phased heterozygous sites
+    :param unphased_expr: count of unphased heterozygous sites
+    """
+    
+    return (hl.case()
+        .when(
+            ko_expr == 1, 1)
+        .when(
+            (phased_expr == 1) & (unphased_expr > 0), 
+            (1 - (1 / 2) ** unphased_expr))
+        .when(
+            (phased_expr == 0) & (unphased_expr > 1), 
+            (1 - 2 * (1 / 2) ** unphased_expr))
+        .default(0))
+    
+
+
 def annotate_knockout(hom_expr, pko_expr):
     """Annotate entry knockout type
    

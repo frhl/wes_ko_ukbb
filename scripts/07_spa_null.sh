@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1
+#$ -t 1-80
 #$ -V
 
 # all binary: 1 - 71
@@ -24,7 +24,8 @@ readonly pheno_dir="data/phenotypes"
 
 readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
-readonly plink_file="${plink_dir}/211102_long_ukb_wes_200k_sparse_autosomes"
+#readonly plink_file="${plink_dir}/211102_long_ukb_wes_200k_sparse_autosomes"
+readonly plink_file="${plink_dir}/chunks/ukb_wes_200k_sparse_autosomes_mrg"
 readonly covar_file="${covar_dir}/covars1.csv"
 readonly covariates=$( cat ${covar_file} )
 
@@ -48,7 +49,7 @@ fit_binary_traits() {
 fit_cts_traits() {
   local trait_type="quantitative"
   local inv_normalize="TRUE"
-  local out_dir="data/saige/output/cts/step1/test3"
+  local out_dir="data/saige/output/cts/step1"
   local pheno_file="${pheno_dir}/filtered_phenotypes_cts.tsv.gz"
   local pheno_list="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
   local phenotype=$( sed "${index}q;d" ${pheno_list} )
@@ -81,7 +82,7 @@ submit_spa_null() {
 }
 
 # Fit null model for binary/cts traits
-#fit_binary_traits
+fit_binary_traits
 fit_cts_traits
 
 
