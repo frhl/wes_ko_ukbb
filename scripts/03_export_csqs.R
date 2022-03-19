@@ -3,6 +3,10 @@
 library(argparse)
 library(data.table)
 
+null_omit <- function(lst) {
+    lst[!vapply(lst, is.null, logical(1))]
+}
+
 main <- function(args){
 
     d <- fread(args$input_path)
@@ -10,18 +14,23 @@ main <- function(args){
     colnames(M) <- c('gene','variant','anno')
 
     genes <- unique(M$gene)
-
     out <- lapply(genes, function(g){
       variants <- M$variant[M$gene %in% g]
       annotations <- M$anno[M$gene %in% g]
       nas <- (is.na(variants) | is.na(annotations))
       variants <- variants[!nas]
       annotations <- annotations[!nas]
-      row1 <- paste(c(g,'var',variants), collapse = args$delimiter)
-      row2 <- paste(c(g, 'anno', annotations), collapse = args$delimiter)
-      return(paste0(c(row1, row2), collapse = '\n'))
-    })
+      accepted <- annotations %in% c('pLoF','damaging_missense')
+      if (sum(accepted) > 0){
+          variants <- variants[accepted]
+          annotations <- annotations[accepted]
+          row1 <- paste(c(g,'var',variants), collapse = " ")
+          row2 <- paste(c(g, 'anno', annotations), collapse = " ")
+          return(paste0(c(row1, row2), collapse = '\n'))
+      }
+    }) 
 
+    out <- null_omit(out)
     writeLines(paste(out, collapse = '\n'), args$output_path)
 
 }
