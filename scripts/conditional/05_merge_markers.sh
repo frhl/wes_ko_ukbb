@@ -26,11 +26,17 @@ readonly padding=10e+6
 readonly min_maf=0.01
 readonly min_info=0.8
 
-readonly in_dir="data/conditional/common/intervals"
-readonly out_dir="data/conditional/common/intervals"
+readonly ko_dir="data/knockouts/alt"
+readonly interval_dir="data/conditional/common/intervals"
+
+readonly out_dir="data/conditional/common/knockouts"
 readonly pheno_dir="data/phenotypes"
+
 readonly in_prefix="ukb_eur_wes_200k"
 readonly maf="0to5e-2"
+
+readonly ko_vcf="${ko_dir}/ukb_eur_wes_200k_chrCHR_maf${maf}_pLoF_damaging_missense.vcf.bgz"
+
 
 submit_binary_analysis()
 {
@@ -54,8 +60,8 @@ submit_intervals()
   local phenotype=${2?Error: Missing arg2 (phenotype)}
   local trait=${3?Error: Missing arg3 (trait)}
 
-  local genes="${in_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}.tsv.gz"
-  local out_prefix="${out_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}"
+  local interval_vcf="${interval_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}.vcf.bgz"
+  local markers="${out_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}_cond.markers"
 
   mkdir -p ${out_dir}
   set -x
@@ -64,12 +70,10 @@ submit_intervals()
     -t "${SGE_TASK_ID}" \
     -pe shmem 4 \
     "${bash_script}" \
-    "${genes}" \
-    "${final_sample_list}" \
-    "${out_prefix}" \
-    "${padding}" \
-    "${min_maf}" \
-    "${min_info}"
+    "${interval_vcf}" \
+    "${ko_vcf}" \
+    "${markers}" \
+    "${out_prefix}"
   set +x
 }
 
