@@ -11,20 +11,18 @@ main <- function(args){
 
     genes <- unique(M$gene)
 
-    out <- do.call(rbind, lapply(genes, function(g){
-        variants <- M$variant[M$gene %in% g]
-        annotations <- M$anno[M$gene %in% g]
-        variants[is.na(variants)] <- "N/A"
-        variants[is.na(annotations)] <- "N/A"
-        row1 <- c(g,'var',variants)
-        row2 <- c(g, 'anno', annotations)
-        stopifnot(length(row1) == length(row2))
-        as.data.frame(t(data.frame(
-            r1 = paste0(row1, collapse = '\t'), 
-            r2 = paste0(row2, collapse = '\t'))))
-    }))
+    out <- lapply(genes, function(g){
+      variants <- M$variant[M$gene %in% g]
+      annotations <- M$anno[M$gene %in% g]
+      nas <- (is.na(variants) | is.na(annotations))
+      variants <- variants[!nas]
+      annotations <- annotations[!nas]
+      row1 <- paste(c(g,'var',variants), collapse = args$delimiter)
+      row2 <- paste(c(g, 'anno', annotations), collapse = args$delimiter)
+      return(paste0(c(row1, row2), collapse = '\n'))
+    })
 
-    fwrite(out, args$output_path, sep = '\t', col.names = FALSE, quote = FALSE)
+    writeLines(paste(out, collapse = '\n'), args$output_path)
 
 }
 
@@ -32,6 +30,7 @@ main <- function(args){
 parser <- ArgumentParser()
 parser$add_argument("--input_path", default=NULL, help = "?")
 parser$add_argument("--output_path", default=NULL, help = "?")
+parser$add_argument("--delimiter", default=NULL, help = "?")
 args <- parser$parse_args()
 
 main(args)

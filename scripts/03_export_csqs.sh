@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc@@short.hga
-#$ -t 21
+#$ -t 1-22
 
 set -o errexit
 set -o nounset
@@ -45,20 +45,11 @@ if [ ! -f "${out_prefix}.tsv.gz" ]; then
 fi 
 
 
-set +eu
 module purge
 set_up_rpy
-set -eu
 Rscript ${rscript} \
   --input_path "${out_prefix}.tsv.gz" \
-  --output_path "${out_saige}"
-
-
-
-
-
-
-
-
+  --output_path "${out_saige}" \
+  --delimiter " "
 
 
