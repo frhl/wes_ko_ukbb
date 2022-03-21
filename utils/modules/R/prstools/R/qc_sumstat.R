@@ -2,9 +2,10 @@
 #' @param G genotypes from bigsnpr
 #' @param info_snp info from bigsnpr
 #' @param trait either "binary" or"cts"
+#' @param sd_y standard deviation of cts phenotype (assuming inverse rank normalisation)
 #' @export
 
-qc_sumstat <- function(G, info_snp, n_eff, trait, ncores = 1){
+qc_sumstat <- function(G, info_snp, n_eff, trait, ncores = 1, sd_y = NULL)
     stopifnot(trait %in% c("binary", "cts"))
     maf <- snp_MAF(G, ind.col = info_snp$`_NUM_ID_`, ncores = ncores)
     sd_val <- sqrt(2 * maf * (1 - maf))
@@ -13,7 +14,8 @@ qc_sumstat <- function(G, info_snp, n_eff, trait, ncores = 1){
       sd_ss <- with(info_snp, 2 / sqrt(n_eff * beta_se^2 + beta^2))
     } else {
       # estimate sd(y) from summary statistics
-      sd_y <- min(with(info_snp, sqrt(0.5) * beta_se^2 * n_eff)) 
+      #sd_y <- min(with(info_snp, sqrt(0.5) * beta_se^2 * n_eff)) 
+      stopifnot(!is.null(sd_y))
       sd_ss <- with(info_snp, sd_y / sqrt(n_eff * beta_se^2 + beta^2))
     }
     is_bad_sd <-
