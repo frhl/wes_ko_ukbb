@@ -34,6 +34,7 @@ if (( $(echo "$n > $N" | bc -l) )); then
         rm "${file}.index"
      fi 
   done
+  echo "Merge completed for ${out_without_gz}."
   gzip "${out_without_gz}"
  else
   >&2 echo "Some chromosomes are missing for ${file}"

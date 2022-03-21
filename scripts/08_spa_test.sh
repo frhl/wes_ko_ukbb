@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 11-50
+#$ -t 1-44
 #$ -tc 1
 #$ -V
 
@@ -58,7 +58,7 @@ submit_spa_with_csqs()
     local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
     local out_prefix="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}"
     local in_vcf="${vcf_dir}/${in_prefix}_${maf}_${annotation}.vcf.bgz"
-    submit_spa_job
+    #submit_spa_job
     submit_merge_job
   else
     >&2 echo "No phenotype at index ${SGE_TASK_ID}. Exiting.." 
@@ -95,7 +95,7 @@ submit_merge_job()
     -hold_jid "spa_${phenotype}_${category}" \
     "${merge_script}" \
     "${out_prefix}" \
-    "${out_dir}" \
+    "${step2_dir}" \
     "${out_prefix}.txt.gz" \
     "${remove_by_chr}"
   set +x
