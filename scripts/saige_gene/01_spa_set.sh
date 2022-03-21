@@ -8,6 +8,7 @@
 #$ -pe shmem 1
 #$ -q test.qc
 #$ -t 1-44
+#$ -tc 1
 #$ -V
 
 # 12,18
@@ -20,7 +21,7 @@ readonly vcf_dir="data/mt/annotated"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
 
-readonly spa_script="scripts/_spa_set.sh"
+readonly spa_script="scripts/saige_gene/_spa_set.sh"
 readonly merge_script="scripts/_spa_merge.sh"
 readonly in_prefix="ukb_eur_wes_200k_annot_chrCHR"
 
