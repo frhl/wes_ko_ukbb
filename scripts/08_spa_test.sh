@@ -11,7 +11,8 @@
 #$ -tc 1
 #$ -V
 
-# 12,18
+set -o errexit
+set -o nounset
 
 module purge
 source utils/bash_utils.sh
