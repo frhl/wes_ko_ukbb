@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
-#$ -N submit_spa_test
+#$ -N spa_test
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/submit_spa_test.log
-#$ -e logs/submit_spa_test.errors.log
+#$ -o logs/spa_test.log
+#$ -e logs/spa_test.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-43
+#$ -t 80
 #$ -V
 
 # 12,18
@@ -25,7 +25,7 @@ readonly in_prefix="ukb_eur_wes_200k_chrCHR"
 
 readonly min_mac=4
 
-readonly tasks=1-22
+readonly tasks=21
 readonly queue="short.qf"
 readonly nslots=1
 
@@ -47,19 +47,21 @@ submit_spa_cts_with_csqs()
 
 submit_spa_with_csqs()
 {
-
   local annotation=${1?Error: Missing arg1 (consequence)}
   local phenotype=${2?Error: Missing arg2 (phenotype)}
   local trait=${3?Error: Missing arg3 (trait)}
-
-  local step1_dir="data/saige/output/${trait}/step1"
-  local step2_dir="data/saige/output/${trait}/step2"
-  local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
-  local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
-  local out_prefix="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}"
-  local in_vcf="${vcf_dir}/${in_prefix}_${maf}_${annotation}.vcf.bgz"
-  submit_spa_job
-  submit_merge_job
+  if [ ! -z ${phenotype} ]; then
+    local step1_dir="data/saige/output/${trait}/step1"
+    local step2_dir="data/saige/output/${trait}/step2"
+    local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
+    local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
+    local out_prefix="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}"
+    local in_vcf="${vcf_dir}/${in_prefix}_${maf}_${annotation}.vcf.bgz"
+    submit_spa_job
+    submit_merge_job
+  else
+    >&2 echo "No phenotype at index ${SGE_TASK_ID}. Exiting.." 
+  fi 
 }
 
 
@@ -107,7 +109,7 @@ maf="maf0to5e-2"
 #submit_spa_binary_with_csqs "synonymous"
 
 # cts traits
-submit_spa_cts_with_csqs "pLoF_damaging_missense"
+#submit_spa_cts_with_csqs "pLoF_damaging_missense"
 submit_spa_binary_with_csqs "pLoF_damaging_missense"
 
 

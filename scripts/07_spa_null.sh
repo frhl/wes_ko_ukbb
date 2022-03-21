@@ -59,25 +59,29 @@ fit_cts_traits() {
 
 submit_spa_null() {
   mkdir -p ${out_dir}
-  if [ ! -f "${out_prefix}.rda" ]; then
-    set -x
-    qsub -N "_null_${phenotype}" \
-      -t "${SGE_TASK_ID}" \
-      -q "${queue}" \
-      -pe shmem ${nslots} \
-      "${spa_null_script}" \
-      "${plink_file}" \
-      "${pheno_file}" \
-      "${phenotype}" \
-      "${covariates}" \
-      "${trait_type}" \
-      "${grm_mtx}" \
-      "${grm_sam}" \
-      "${inv_normalize}" \
-      "${out}"
-    set +x
+  if [ ! -z ${phenotype} ]; then
+    if [ ! -f "${out_prefix}.rda" ]; then
+      set -x
+      qsub -N "_null_${phenotype}" \
+        -t "${SGE_TASK_ID}" \
+        -q "${queue}" \
+        -pe shmem ${nslots} \
+        "${spa_null_script}" \
+        "${plink_file}" \
+        "${pheno_file}" \
+        "${phenotype}" \
+        "${covariates}" \
+        "${trait_type}" \
+        "${grm_mtx}" \
+        "${grm_sam}" \
+        "${inv_normalize}" \
+        "${out}"
+      set +x
+    else
+      >&2 echo "${out_prefix} already exists. Skipping.."
+    fi
   else
-    >&2 echo "${out_prefix} already exists. Skipping.."
+    >&2 echo "No phenotype at index ${SGE_TASK_ID}. Exiting.." 
   fi
 }
 
