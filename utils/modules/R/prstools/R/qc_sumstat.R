@@ -5,7 +5,7 @@
 #' @param sd_y standard deviation of cts phenotype (assuming inverse rank normalisation)
 #' @export
 
-qc_sumstat <- function(G, info_snp, n_eff, trait, ncores = 1, sd_y = NULL)
+qc_sumstat <- function(G, info_snp, n_eff, trait, ncores = 1, sd_y = NULL){
     stopifnot(trait %in% c("binary", "cts"))
     maf <- snp_MAF(G, ind.col = info_snp$`_NUM_ID_`, ncores = ncores)
     sd_val <- sqrt(2 * maf * (1 - maf))

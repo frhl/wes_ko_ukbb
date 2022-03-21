@@ -3,7 +3,7 @@
 #' @param info_snp info from bigsnpr
 #' @export
 
-qc_sumstat_binary <- function(G, info_snp, ncores = 1)
+qc_sumstat_binary <- function(G, info_snp, ncores = 1) {
     maf <- snp_MAF(G, ind.col = info_snp$`_NUM_ID_`, ncores = ncores)
     sd_val <- sqrt(2 * maf * (1 - maf))
     # see section 3.4 of https://academic.oup.com/bioinformatics/article/36/22-23/5424/6039173?login=true#233620521
