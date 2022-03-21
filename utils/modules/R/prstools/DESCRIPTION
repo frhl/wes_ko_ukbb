@@ -31,4 +31,6 @@ Collate:
     'predict_prs.R'
     'read_hail_sumstat.R'
     'qc_sumstat.R'
+    'qc_sumstat_binary.R'
+    'qc_sumstat_cts.R'
     'snp_as_genetic_position.R'
