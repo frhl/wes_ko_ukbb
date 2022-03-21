@@ -7,7 +7,8 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 80
+#$ -t 11-50
+#$ -tc 1
 #$ -V
 
 # 12,18
@@ -25,7 +26,7 @@ readonly in_prefix="ukb_eur_wes_200k_chrCHR"
 
 readonly min_mac=4
 
-readonly tasks=21
+readonly tasks=1-22
 readonly queue="short.qf"
 readonly nslots=1
 
