@@ -7,11 +7,14 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-44
+#$ -t 44
 #$ -tc 1
 #$ -V
 
 # 12,18
+
+set -o errexit
+set -o nounset
 
 module purge
 source utils/bash_utils.sh
@@ -63,8 +66,8 @@ submit_spa_pair()
   local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
   local out_prefix="${step2_dir}/${in_prefix}_${phenotype}_${annotation}"
   local in_vcf="${vcf_dir}/${in_prefix}.vcf.bgz"
-  submit_spa_set_job
- # submit_merge_job
+  #submit_spa_set_job
+  submit_merge_job
 }
 
 
@@ -72,7 +75,7 @@ submit_spa_set_job()
 {
   mkdir -p ${step2_dir}
   set -x
-  qsub -N "spa_${phenotype}_${category}" \
+  qsub -N "spa_${phenotype}_${annotation}" \
     -t ${tasks} \
     -q "${queue}" \
     -pe shmem ${nslots} \
@@ -96,10 +99,10 @@ submit_merge_job()
   qsub -N "_mrg_${phenotype}" \
     -q short.qc@@short.hge \
     -pe shmem 1 \
-    -hold_jid "spa_${phenotype}_${category}" \
+    -hold_jid "spa_${phenotype}_${annotation}" \
     "${merge_script}" \
     "${out_prefix}" \
-    "${out_dir}" \
+    "${step2_dir}" \
     "${out_prefix}.txt.gz" \
     "${remove_by_chr}"
   set +x
@@ -114,6 +117,6 @@ maf="maf0to5e-2"
 
 # cts traits
 submit_spa_set_cts "pLoF_damaging_missense"
-submit_spa_binary_with_csqs "pLoF_damaging_missense"
+#submit_spa_binary_with_csqs "pLoF_damaging_missense"
 
 
