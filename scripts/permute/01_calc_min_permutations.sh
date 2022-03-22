@@ -20,15 +20,15 @@ readonly rscript="scripts/permute/01_calc_min_permutations.R"
 
 readonly spa_cts_dir="data/saige/output/combined/cts/step2"
 readonly spa_bin_dir="data/saige/output/combined/binary/step2"
-readonly tsv_path="data/knockouts/alt_filtered/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense.tsv.gz"
 readonly out_dir="data/permute/overview"
 readonly out_prefix="${out_dir}/overview"
 
+# required to pin down which genes are ch knockout and which are hom alt knockouts
+readonly tsv_path="data/knockouts/alt_filtered/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense.tsv.gz"
+
 mkdir -p ${out_dir}
 
-set +eu
 set_up_rpy
-set -eu
 
 Rscript ${rscript} \
   --tsv_path ${tsv_path} \

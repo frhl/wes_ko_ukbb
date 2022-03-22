@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 21
+#$ -t 20-22
 #$ -V
 
 set -o errexit
@@ -48,6 +48,7 @@ qsub -N "_chr${chr}_permute" \
     -q "test.qc" \
     -pe shmem 1 \
     -t ${tasks} \
+    -tc 1 \
     "${bash_script}" \
     "${chr}" \
     "${input_path}" \
