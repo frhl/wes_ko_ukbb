@@ -20,9 +20,9 @@ readonly out_without_gz=$(echo ${out} | sed -e "s/\\.gz//g" | sed -e "s/_chrCHR/
 file=$(echo ${prefix} | sed -e "s/CHR/[0-9]+/g" )
 files="${file##*/}$"
 readonly n=$(ls -l "${out_dir}" | grep -E "${files}" | wc -l)
-readonly N=21
-
-if (( $(echo "$n > $N" | bc -l) )); then
+readonly N=22
+# always expecting 22 autosomes
+if (( $(echo "$n == $N" | bc -l) )); then
   for chr in {1..22}; do
      file=$(echo ${prefix} | sed -e "s/CHR/${chr}/g")
      if [ "${chr}" == "1" ]; then
@@ -37,7 +37,7 @@ if (( $(echo "$n > $N" | bc -l) )); then
   echo "Merge completed for ${out_without_gz}."
   gzip "${out_without_gz}"
  else
-  >&2 echo "Some chromosomes are missing for ${file}"
+  >&2 echo "Some chromosomes are missing for ${file} (found ${n}, but expected ${N})."
 fi
 
 
