@@ -21,6 +21,7 @@ main <- function(args){
   stopifnot(file.exists(args$gwas)) 
   stopifnot(file.exists(args$ld_bed))
   stopifnot(dir.exists(args$ld_dir))
+  stopifnot(args$out_prefix != "")
   stopifnot(args$trait %in% c('binary', 'cts'))
 
   # setup parallel environment
@@ -49,7 +50,7 @@ main <- function(args){
   gwas$marker <- get_ldpred_marker(gwas)
 
   # Get LD matrix for final SNPs
-  snp <- get_ld_matrix(gwas, ld_dir = args$ld_dir, verbose = TRUE)
+  snp <- get_ld_matrix(gwas, chrs = 1-22, ld_dir = args$ld_dir, verbose = TRUE)
  
   # match GWAS with snp-map
   indicies <- na.omit(match(snp$map$marker, gwas$marker))
@@ -86,7 +87,9 @@ main <- function(args){
   ) 
 
   #write(paste0(args$pred, ".. done! Writing to ", args$out_prefix, ".rds"), stdout())
-  outfile = paste0(args$prefix, ".rds")
+  print(args)
+  print(str(ldsc_out))
+  outfile = paste0(args$out_prefix, ".rds")
   write(paste("Done! writing to", outfile), stdout())
   saveRDS(ldsc_out, outfile)
   

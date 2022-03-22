@@ -7,11 +7,12 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 1-44
+#$ -t 1-71
+#$ -tc 5
 #$ -V
 
-#set -o errexit
-#set -o nounset
+set -o errexit
+set -o nounset
 
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
@@ -54,6 +55,8 @@ estimate_heritability(){
         --ld_bed "${ld_bed}" \
         --ld_dir "${ld_dir}" \
         --trait "${trait}" \
+        --phenotype "${phenotype}" \
+        --path_cts_phenotypes "${file_cts}" \
         --out_prefix "${out_prefix}"
     set +x
   else
