@@ -48,7 +48,7 @@ spa_set_test() {
      --SAIGEOutputFile=${out} \
      --LOCO=FALSE \
      --groupFile=${group} \
-     --annotation_in_groupTest=pLoF,damaging_missense:pLoF \
+     --annotation_in_groupTest=pLoF,damaging_missense,synonymous,damaging_missense:pLoF,synonymous:damaging_missense:pLoF \
      --maxMAF_in_groupTest=0.001,0.01
      ${markers:+--condition "$markers"} 
    set +x

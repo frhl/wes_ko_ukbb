@@ -9,7 +9,8 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qf
-#$ -t 1-40
+#$ -t 2-71
+#$ -tc 10
 
 #set -o errexit
 #set -o nounset
@@ -48,7 +49,7 @@ submit_intervals()
   local annotation=${1?Error: Missing arg1 (consequence)}
   local phenotype=${2?Error: Missing arg2 (phenotype)}
   local trait=${3?Error: Missing arg3 (trait)}
-  local step2_dir="data/saige/output/combined/${trait}/step2"
+  local step2_dir="data/saige/output/${trait}/step2"
   
   local in_file="${step2_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}.txt.gz"
   local out_prefix="${out_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}"

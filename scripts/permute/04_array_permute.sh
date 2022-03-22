@@ -23,7 +23,7 @@ readonly bash_script="scripts/permute/_array_permute.sh"
 readonly chr="${SGE_TASK_ID}"
 readonly in_dir="data/permute/genes/chr${chr}"
 #readonly in_dir="data/permute/counts"
-readonly out_dir="data/permute/test_300/chr${chr}"
+readonly out_dir="data/permute/permutations/chr${chr}"
 
 readonly input_path="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_chr${chr}_GENE.mt"
 #readonly input_path="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_counts_chr${chr}.mt"

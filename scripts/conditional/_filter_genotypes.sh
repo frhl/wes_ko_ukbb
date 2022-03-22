@@ -27,15 +27,19 @@ readonly hail_script="scripts/conditional/02_filter_genotypes.py"
 
 filter_genotypes() 
 {
-  python3 "${hail_script}" \
-     --min_maf ${min_maf} \
-     --min_info ${min_info} \
-     --padding ${padding} \
-     --gene_table ${gene_table} \
-     --extract ${final_sample_list} \
-     --out_prefix ${out_prefix} \
-     && print_update "Finished filtering imputed genotypes ${out_prefix}" ${SECONDS} \
-     || raise_error "Filtering impyted genotypes for for ${out_prefix} failed!"
+  if [ ! -f ${out_prefix}.vcf.bgz ]; then
+    python3 "${hail_script}" \
+       --min_maf ${min_maf} \
+       --min_info ${min_info} \
+       --padding ${padding} \
+       --gene_table ${gene_table} \
+       --extract ${final_sample_list} \
+       --out_prefix ${out_prefix} \
+       && print_update "Finished filtering imputed genotypes ${out_prefix}" ${SECONDS} \
+       || raise_error "Filtering impyted genotypes for for ${out_prefix} failed!"
+  else
+    >%2 echo "${out_prefix}.vcf.bgz already exists. Skipping.."
+  fi
 }
 
 # run analysis

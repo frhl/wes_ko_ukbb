@@ -61,12 +61,12 @@ submit_spa_pair()
   local trait=${3?Error: Missing arg3 (trait)}
 
   local step1_dir="data/saige/output/${trait}/step1"
-  local step2_dir="data/saige/output/${trait}/step2_set"
+  local step2_dir="data/saige/output/${trait}/step2_set/test"
   local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
   local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
   local out_prefix="${step2_dir}/${in_prefix}_${phenotype}_${annotation}"
   local in_vcf="${vcf_dir}/${in_prefix}.vcf.bgz"
-  #submit_spa_set_job
+  submit_spa_set_job
   submit_merge_job
 }
 

@@ -8,7 +8,7 @@
 #$ -e logs/filter_genotypes.errors.log
 #$ -P lindgren.prjc
 #$ -q test.qc
-#$ -t 1-10
+#$ -t 2-71
 #$ -V
 
 
@@ -58,19 +58,24 @@ submit_intervals()
   local out_prefix="${out_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}"
 
   mkdir -p ${out_dir}
-  set -x
-  qsub -N "_filter_genotypes_${1}" \
-    -q "short.qc@@short.hge" \
-    -t "${SGE_TASK_ID}" \
-    -pe shmem 4 \
-    "${bash_script}" \
-    "${genes}" \
-    "${final_sample_list}" \
-    "${out_prefix}" \
-    "${padding}" \
-    "${min_maf}" \
-    "${min_info}"
-  set +x
+  
+  if [ -f ${genes} ]; then
+    set -x
+    qsub -N "_filter_genotypes_${1}" \
+      -q "short.qc@@short.hge" \
+      -t "${SGE_TASK_ID}" \
+      -pe shmem 4 \
+      "${bash_script}" \
+      "${genes}" \
+      "${final_sample_list}" \
+      "${out_prefix}" \
+      "${padding}" \
+      "${min_maf}" \
+      "${min_info}"
+    set +x
+  else
+    >&2 echo "${genes} (${phenotype}) did not pass significance threshold. Skipping.."
+  fi
 }
 
 submit_binary_analysis "pLoF_damaging_missense"
