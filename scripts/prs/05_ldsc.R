@@ -50,7 +50,7 @@ main <- function(args){
   gwas$marker <- get_ldpred_marker(gwas)
 
   # Get LD matrix for final SNPs
-  snp <- get_ld_matrix(gwas, chrs = 1-22, ld_dir = args$ld_dir, verbose = TRUE)
+  snp <- get_ld_matrix(gwas, chrs = 1:22, ld_dir = args$ld_dir, verbose = TRUE)
  
   # match GWAS with snp-map
   indicies <- na.omit(match(snp$map$marker, gwas$marker))
