@@ -15,6 +15,7 @@ def main(args):
     by = args.by
     by_explode = args.by_explode
     out_prefix = args.out_prefix
+    out_type = args.out_type
 
     hail_init.hail_bmrc_init_local('logs/hail/get_csqs.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1')
@@ -40,7 +41,11 @@ def main(args):
         varid = varid,
         csqs = csqs)
     ht = ht.select('rsid','info','MAF', 'MAC', 'varid','csqs', 'consequence_category')
-    ht.flatten().export(out_prefix + ".tsv.gz")
+    # export as hail table or flattened tsv
+    if out_type in "ht":
+        ht.write(out_prefix + ".ht")
+    else:
+        ht.flatten().export(out_prefix + ".tsv.gz")
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
@@ -50,6 +55,7 @@ if __name__=='__main__':
     parser.add_argument('--by', default=None, required = True, help='What should be used for gene annotation')
     parser.add_argument('--by_explode', action='store_true', help='What should be used for gene annotation')
     parser.add_argument('--out_prefix', default=None, required = True, help='Path prefix for output dataset')
+    parser.add_argument('--out_type', default=None, required = True, help='either "ht" or "tsv".')
  
     args = parser.parse_args()
 

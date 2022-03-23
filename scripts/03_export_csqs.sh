@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc@@short.hga
-#$ -t 1-22
+#$ -t 1-21
 
 set -o errexit
 set -o nounset
@@ -40,8 +40,11 @@ if [ ! -f "${out_prefix}.tsv.gz" ]; then
      --out_prefix ${out_prefix} \
      --by "worst_csq_by_gene_canonical" \
      --by_explode \
+     --out_type "tsv" \
      && print_update "Finished exporting csqs chr${chr}" ${SECONDS} \
      || raise_error "Exporting csqs for chr${chr} failed"
+else
+  >&2 echo "${out_prefix} already exists. Skipping.."
 fi 
 
 
