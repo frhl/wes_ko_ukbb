@@ -7,7 +7,8 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 2-10
+#$ -t 10-12
+#$ -tc 2
 #$ -V
 
 
@@ -54,6 +55,7 @@ submit_gwas_job()
   set -x
   qsub -N "_${phenotype}_sumstat" \
     -t 1-22 \
+    -tc 11 \
     -q short.qc@@short.hge \
     -pe shmem 1 \
     "${bash_script}" \
@@ -85,7 +87,7 @@ submit_merge_job()
 }
 
 
-submit_gwas_job "data/prs/sumstat/binary" "${phenotype_binary}" "${file_binary}"
+#submit_gwas_job "data/prs/sumstat/binary" "${phenotype_binary}" "${file_binary}"
 submit_gwas_job "data/prs/sumstat/cts" "${phenotype_cts}" "${file_cts}"
 
 
