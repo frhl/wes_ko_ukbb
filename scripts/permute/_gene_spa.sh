@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
 #
-#$ -N _gene_permute
+#$ -N _gene_spa
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_gene_permute.log
-#$ -e logs/_gene_permute.errors.log
+#$ -o logs/_gene_spa.log
+#$ -e logs/_gene_spa.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q lindgren.qe

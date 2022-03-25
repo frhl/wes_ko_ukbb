@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 #
-#$ -N array_permute
+#$ -N array_filter
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/array_permute.log
-#$ -e logs/array_permute.errors.log
+#$ -o logs/array_filter.log
+#$ -e logs/array_filter.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-19
-#$ -tc 3
+#$ -t 1-9
+#$ -tc 1
 #$ -V
 
 set -o errexit

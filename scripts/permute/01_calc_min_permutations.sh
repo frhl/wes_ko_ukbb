@@ -18,8 +18,8 @@ source utils/qsub_utils.sh
 
 readonly rscript="scripts/permute/01_calc_min_permutations.R"
 
-readonly spa_cts_dir="data/saige/output/combined/cts/step2"
-readonly spa_bin_dir="data/saige/output/combined/binary/step2"
+readonly spa_cts_dir="data/saige/output/cts/step2"
+readonly spa_bin_dir="data/saige/output/binary/step2"
 readonly out_dir="data/permute/overview"
 readonly out_prefix="${out_dir}/overview"
 

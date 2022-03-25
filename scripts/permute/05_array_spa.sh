@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1
+#$ -t 44
 #$ -V
 
 set -o errexit
@@ -18,18 +18,20 @@ source utils/hail_utils.sh
 
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
-readonly bash_script="scripts/permute/_submit_chr_spa.sh"
+readonly bash_script="scripts/permute/_array_spa.sh"
 
-readonly in_dir="data/permute/genes/chrCHR"
+readonly in_dir="data/permute/permutations/chrCHR"
 readonly out_dir="data/permute/spa/chrCHR"
+readonly overview_dir="data/permute/overview"
 
 readonly in_prefix="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_permuted_chrCHR_GENE"
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_permuted_chrCHR_GENE"
 
-readonly overview="data/permute/overview/overview.tsv.gz"
+readonly overview="${overview_dir}/overview.tsv.gz"
+readonly gene_spa="${overview_dir}/overview_genes.tsv.gz"
 
 readonly min_mac=5
-readonly tasks=21
+readonly tasks=22
 readonly queue="short.qf"
 readonly nslots=1
 
@@ -57,7 +59,7 @@ submit_spa_pair()
   local step2_dir="data/saige/output/set/${trait}/step2"
   local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
   local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
-  local out_prefix_pheno="${in_prefix}_${phenotype}"
+  local out_prefix_pheno="${out_prefix}_${phenotype}"
   submit_spa_gene_job
 }
 
@@ -67,8 +69,6 @@ submit_spa_gene_job()
   mkdir -p ${step2_dir}
   set -x
   qsub -N "spa_${phenotype}" \
-    -o "logs/submit_chr_spa.log" \
-    -e "logs/submit_chr_spa.errors.log" \
     -t ${tasks} \
     -q "${queue}" \
     -pe shmem ${nslots} \
@@ -79,7 +79,9 @@ submit_spa_gene_job()
     "${in_var}" \
     "${min_mac}" \
     "${overview}" \
-    "${out_prefix_pheno}"
+    "${gene_spa}" \
+    "${out_prefix_pheno}" \
+    "${out_dir}"
   set +x
 }
 

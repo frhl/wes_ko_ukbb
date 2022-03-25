@@ -7,7 +7,8 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 21
+#$ -t 22
+#$ -tc 1
 #$ -V
 
 set -o errexit
@@ -35,15 +36,15 @@ readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_permuted
 readonly out_type="vcf"
 
 readonly overview="data/permute/overview/overview.tsv.gz"
-readonly max_allowed_jobs=300
+readonly max_allowed_jobs=1000
 readonly p_per_job=300
 readonly seed=134
 readonly nslots=1
 readonly queue="short.qc"
 
 readonly n_tasks="$( zcat ${overview} | grep "chr${chr}" | wc -l)"
-#readonly tasks="1-${n_tasks}"
-tasks=1
+readonly tasks="1-${n_tasks}"
+#tasks=1
 
 mkdir -p ${out_dir}
 
