@@ -53,7 +53,7 @@ submit_gwas_job()
   local prefix="${out_prefix}_chrCHR"
   mkdir -p ${out_dir}
   if [ ! -f "${out_prefix}.txt.gz" ]; then
-    if [ -z ${phenotype} ]; then
+    if [ ! -z ${phenotype} ]; then
       set -x
       qsub -N "_${phenotype}_sumstat" \
         -t 1-22 \
