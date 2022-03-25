@@ -7,8 +7,8 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 10-12
-#$ -tc 2
+#$ -t 1-71
+#$ -tc 1
 #$ -V
 
 
@@ -52,23 +52,29 @@ submit_gwas_job()
   local out_prefix="${out_dir}/ukb_hapmap_500k_eur_${phenotype}"
   local prefix="${out_prefix}_chrCHR"
   mkdir -p ${out_dir}
-  set -x
-  qsub -N "_${phenotype}_sumstat" \
-    -t 1-22 \
-    -tc 11 \
-    -q short.qc@@short.hge \
-    -pe shmem 1 \
-    "${bash_script}" \
-    "${hail_script}" \
-    "${input_path}" \
-    "${input_type}" \
-    "${pheno_file}" \
-    "${phenotype}" \
-    "${covariates}" \
-    "${min_cases}" \
-    "${prefix}"
-  set +x
-  submit_merge_job
+  if [ ! -f "${out_prefix}.txt.gz" ]; then
+    if [ -z ${phenotype} ]; then
+      set -x
+      qsub -N "_${phenotype}_sumstat" \
+        -t 1-22 \
+        -tc 11 \
+        -q short.qc@@short.hge \
+        -pe shmem 1 \
+        "${bash_script}" \
+        "${hail_script}" \
+        "${input_path}" \
+        "${input_type}" \
+        "${pheno_file}" \
+        "${phenotype}" \
+        "${covariates}" \
+        "${min_cases}" \
+        "${prefix}"
+      set +x
+      submit_merge_job
+    fi
+  else
+    >&2 echo "${out_prefix}.tsv.gz already exists. Skipping.."
+  fi
 }
 
 submit_merge_job()
@@ -87,7 +93,7 @@ submit_merge_job()
 }
 
 
-#submit_gwas_job "data/prs/sumstat/binary" "${phenotype_binary}" "${file_binary}"
+submit_gwas_job "data/prs/sumstat/binary" "${phenotype_binary}" "${file_binary}"
 submit_gwas_job "data/prs/sumstat/cts" "${phenotype_cts}" "${file_cts}"
 
 
