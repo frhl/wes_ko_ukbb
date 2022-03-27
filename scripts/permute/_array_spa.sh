@@ -26,7 +26,7 @@ readonly out_prefix=${8?Error: Missing arg6 (path prefix for saige output)}
 readonly out_dir=${9?Error: Missing arg6 (path prefix for saige output)}
 
 readonly chr=${SGE_TASK_ID}
-readonly n_tasks="$( zcat ${overview} | grep "chr${chr}" | wc -l)"
+readonly n_tasks="$( zcat ${overview} | grep "CH" | grep "chr${chr}" | wc -l)"
 readonly tasks="1-${n_tasks}"
 
 readonly vcf_chr=$(echo ${in_vcf} | sed -e "s/CHR/${chr}/g")

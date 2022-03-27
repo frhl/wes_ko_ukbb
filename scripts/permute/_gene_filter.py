@@ -22,7 +22,8 @@ def main(args):
     hl._set_flags(no_whole_stage_codegen='1')
     mt = io.import_table(input_path, input_type, calc_info = False)
     mt = mt.filter_rows(mt.gene_id == gene)
-    io.export_table(mt, out_prefix, out_type)
+    mt.entries().export(out_prefix + ".tsv.gz")
+    #io.export_table(mt, out_prefix, out_type)
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()

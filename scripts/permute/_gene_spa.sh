@@ -53,6 +53,7 @@ Rscript "${step2_SPAtests}"  \
    && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
    || raise_error "Saddle-point approximation for chr${chr} failed"
 
+rm "${out_gene_task}.index"
 
 
 

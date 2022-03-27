@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 22
+#$ -t 21
 #$ -tc 1
 #$ -V
 
@@ -23,11 +23,9 @@ readonly bash_script="scripts/permute/_array_permute.sh"
 
 readonly chr="${SGE_TASK_ID}"
 readonly in_dir="data/permute/genes/chr${chr}"
-#readonly in_dir="data/permute/counts"
 readonly out_dir="data/permute/permutations/chr${chr}"
 
-readonly input_path="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_chr${chr}_GENE.mt"
-#readonly input_path="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_counts_chr${chr}.mt"
+readonly input_path="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_chr${chr}_GENE.tsv.gz"
 readonly input_type='mt'
 
 readonly maf="maf0to5e-2"
@@ -36,22 +34,20 @@ readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_permuted
 readonly out_type="vcf"
 
 readonly overview="data/permute/overview/overview.tsv.gz"
-readonly max_allowed_jobs=1000
-readonly p_per_job=300
+readonly max_allowed_jobs=10
+readonly p_per_job=1000
 readonly seed=134
 readonly nslots=1
 readonly queue="short.qc"
 
-readonly n_tasks="$( zcat ${overview} | grep "chr${chr}" | wc -l)"
-readonly tasks="1-${n_tasks}"
-#tasks=1
+readonly n_tasks="$( zcat ${overview} | grep "CH" | grep "chr${chr}" | wc -l)"
+#readonly tasks="1-${n_tasks}"
+tasks=15
 
 mkdir -p ${out_dir}
 
 set -x
 qsub -N "_chr${chr}_permute" \
-    -o "logs/_array_permute.log" \
-    -e "logs/_array_permute.errors.log" \
     -q "test.qc" \
     -pe shmem 1 \
     -t ${tasks} \

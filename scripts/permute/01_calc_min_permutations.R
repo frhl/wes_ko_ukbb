@@ -63,12 +63,11 @@ main <- function(args){
     spa_aggr <- aggregate(p.value ~ MarkerID, data = spa, FUN = function(x) min(x, na.rm = TRUE))
     
     # deal with extremely low P-values (that cause Inf permutations)
-    #cutoff <- 10e-16
-    #p_extreme <- spa_aggr$p.value < cutoff
-    #spa_aggr$p.value[p_extreme] <- cutoff
-    
+    p_extreme <- spa_aggr$p.value < as.numeric(args$p_cutoff)
+    spa_aggr$p.value[p_extreme] <- as.numeric(args$p_cutoff)
+ 
     # calculate needed number of permutations reqeuired
-    spa_aggr$permut <- ceiling(2/spa_aggr$p.value)
+    spa_aggr$permut <- ceiling(1/spa_aggr$p.value)
 
     tsv <- do.call(rbind, lapply(1:22, function(chr){
         path <- gsub('CHR',chr, args$tsv_path)
@@ -86,11 +85,15 @@ main <- function(args){
     spa_aggr <- merge(spa_aggr, aggr, all.x = TRUE) # combine SPA / tsv
     spa_aggr <- merge(spa_aggr, spa_chr, all.x = TRUE) # add chromsome
     spa_aggr <- spa_aggr[rev(order(spa_aggr$permut)),]
-
+    
+    # mark genes that are only homozygous (i.e. only one variant in the gene)
+    n_variants <- unlist(lapply(strsplit(spa_aggr$varid, split = ','), length))
+    spa_aggr$n_variants <- n_variants
+    spa_aggr$knockout <- ifelse(n_variants > 1, 'CH', 'HOM only')
 
     outfile <- paste0(args$out_prefix, ".tsv.gz")
     write(paste("[verbose] writing",outfile),stderr())
-    fwrite(spa_aggr, outfile, sep = '\t')
+    fwrite(spa_aggr, outfile, sep = '\t', scipen = 50)
 
 }
 
@@ -99,6 +102,7 @@ parser <- ArgumentParser()
 parser$add_argument("--spa_cts_dir", default=NULL, required = TRUE, help = "Path to QCed SNPs")
 parser$add_argument("--spa_bin_dir", default=NULL, required = TRUE, help = "Path to QCed SNPs")
 parser$add_argument("--tsv_path", default=NULL, required = TRUE, help = "Path to QCed SNPs")
+parser$add_argument("--p_cutoff", default=10e-12, required = TRUE, help = "Path to QCed SNPs")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()
 

@@ -27,8 +27,8 @@ readonly out_prefix=${9?Error: Missing arg6 (path prefix for saige output)}
 
 readonly p_per_job=300
 readonly NUM=${SGE_TASK_ID}
-readonly gene="$(zcat ${overview} | grep "chr${chr}" | cut -f1 | sed ${NUM}'q;d' )"
-readonly permutation="$(zcat ${overview} | grep "chr${chr}" | cut -f3 | sed ${NUM}'q;d' )"
+readonly gene="$(zcat ${overview} | grep "CH" | grep "chr${chr}" | cut -f1 | sed ${NUM}'q;d' )"
+readonly permutation="$(zcat ${overview} | grep "CH" | grep "chr${chr}" | cut -f3 | sed ${NUM}'q;d' )"
 readonly n_tasks="$(( ( ${permutation} / ${p_per_job} ) + 1 ))"
 readonly tasks="1-${n_tasks}"
 
