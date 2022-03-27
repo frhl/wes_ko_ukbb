@@ -31,7 +31,7 @@ readonly input_type='mt'
 readonly maf="maf0to5e-2"
 readonly annotation="pLoF_damaging_missense"
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_permuted_chr${chr}"
-readonly out_type="vcf"
+readonly out_type="vcf" # can currently only do vcf after migration to R-based permutations
 
 readonly overview="data/permute/overview/overview.tsv.gz"
 readonly max_allowed_jobs=10
