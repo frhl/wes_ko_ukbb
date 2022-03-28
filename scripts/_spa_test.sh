@@ -9,6 +9,9 @@
 #$ -pe shmem 1
 #$ -q lindgren.qe
 
+set -o errexit
+set -o nounset
+
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
@@ -19,7 +22,7 @@ readonly in_gmat=${4?Error: Missing arg4 (in_gmat)}
 readonly in_var=${5?Error: Missing arg5 (in_var)} 
 readonly min_mac=${6?Error: Missing arg6 (min_mac)} 
 readonly out_prefix=${7?Error: Missing arg6 (path prefix for saige output)}
-readonly in_markers=${8} # optional conditioning markers
+readonly in_markers="${8}" # optional conditioning markers
 readonly chr=${SGE_TASK_ID}
 
 readonly vcf=$(echo ${in_vcf} | sed -e "s/CHR/${chr}/g")
@@ -29,7 +32,6 @@ readonly out=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
 
 readonly threads=$(( ${NSLOTS}-1 ))
 readonly step2_SPAtests="utils/saige/step2_SPAtests.R"
-#readonly out="${out_prefix}" # assuming out_prefix has chrCHR
 
 spa_test() {
    SECONDS=0

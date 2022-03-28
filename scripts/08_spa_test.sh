@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 45-71
+#$ -t 23
 #$ -tc 1
 #$ -V
 
@@ -25,11 +25,12 @@ readonly spa_script="scripts/_spa_test.sh"
 readonly merge_script="scripts/_spa_merge.sh"
 readonly in_prefix="ukb_eur_wes_200k_chrCHR"
 
+readonly conditioning_markers=""
 readonly min_mac=4
-
 readonly tasks=1-22
 readonly queue="short.qf"
 readonly nslots=1
+
 
 submit_spa_binary_with_csqs()
 {
@@ -54,7 +55,7 @@ submit_spa_with_csqs()
   local trait=${3?Error: Missing arg3 (trait)}
   if [ ! -z ${phenotype} ]; then
     local step1_dir="data/saige/output/${trait}/step1"
-    local step2_dir="data/saige/output/${trait}/step2"
+    local step2_dir="data/saige/output/${trait}/step2/test_cols"
     local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
     local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
     local out_prefix="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}"
@@ -81,7 +82,8 @@ submit_spa_job() {
     "${in_gmat}" \
     "${in_var}" \
     "${min_mac}" \
-    "${out_prefix}"
+    "${out_prefix}" \
+    "${conditioning_markers}"
   set +x
 }
 
