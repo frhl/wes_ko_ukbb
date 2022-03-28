@@ -32,7 +32,7 @@ readonly chr=${SGE_TASK_ID}
 readonly input_path_chr=$(echo ${input_path} | sed -e "s/CHR/${chr}/g")
 readonly out_prefix_chr=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
 
-if [ ! -f "${out_prefix_chr}.vcf.bgz" ]; then
+evaluate_knockouts() {
   SECONDS=0
   set_up_hail
   set_up_pythonpath_legacy
@@ -51,12 +51,19 @@ if [ ! -f "${out_prefix_chr}.vcf.bgz" ]; then
       ${in_sex:+--sex "$in_sex"} \
       --out_prefix ${out_prefix_chr} \
       --out_type ${out_type} \
-      && print_update "Finished calculating knockouts for chr${chr}" ${SECONDS} \
-      || raise_error "Calculating knockouts for chr${chr} failed"
+      && print_update "Finished evaluation knockouts for chr${chr}" ${SECONDS} \
+      || raise_error "Evaluating knockouts for chr${chr} failed"
+}
+
+
+# Find knockouts in data
+if [ ! -f "${out_prefix_chr}.vcf.bgz" ]; then
+  evaluate_knockouts
 else
   >&2 echo "${out_prefix_chr}.vcf.bgz already exists. Skipping.."
 fi 
 
+# index resulting knockout VCF for future SAIGE analysis
 if [ ! -f "${out_prefix_chr}.vcf.csi" ]; then
   module purge
   module load BCFtools/1.12-GCC-10.3.0
