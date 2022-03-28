@@ -21,7 +21,6 @@ readonly spark_dir="data/tmp/spark"
 readonly bash_script="scripts/permute/_array_spa.sh"
 
 readonly in_dir="data/permute/permutations/chrCHR"
-#readonly in_dir="data/permute/permutations/with_hail"
 readonly out_dir="data/permute/spa/chrCHR"
 readonly overview_dir="data/permute/overview"
 

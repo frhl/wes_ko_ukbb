@@ -25,7 +25,7 @@ readonly overview=${7?Error: Missing arg6 (path prefix for saige output)}
 readonly gene_spa=${8?Error: Missing arg6 (path prefix for saige output)}
 readonly out_prefix=${9?Error: Missing arg6 (path prefix for saige output)}
 
-readonly p_per_job=300
+readonly p_per_job=20000
 readonly NUM=${SGE_TASK_ID}
 readonly gene="$(zcat ${overview} | grep "CH" | grep "chr${chr}" | cut -f1 | sed ${NUM}'q;d' )"
 readonly permutation="$(zcat ${overview} | grep "CH" | grep "chr${chr}" | cut -f3 | sed ${NUM}'q;d' )"
@@ -40,7 +40,7 @@ echo "Trying to submit ${gene} with ${vcf_gene} with ${n_tasks} task(s) using ${
 # check whether current gene has been tested in this phenotype
 # note, may need to also check for the annotation! 
 readonly spa_check="$( zcat ${gene_spa} | grep ${phenotype} | grep ${gene} | wc -l )"
-readonly task_limit=2000
+readonly task_limit=500
 
 if [[ ${n_tasks} -le ${task_limit} ]]; then
   if [[ ${spa_check} -ge 0 ]]; then

@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 44
+#$ -t 1-44
 #$ -tc 1
 #$ -V
 
@@ -66,7 +66,8 @@ submit_spa_pair()
   local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
   local out_prefix="${step2_dir}/${in_prefix}_${phenotype}_${annotation}"
   local in_vcf="${vcf_dir}/${in_prefix}.vcf.bgz"
-  submit_spa_set_job
+  #if [ ! -f ${out_prefix}
+  #submit_spa_set_job
   submit_merge_job
 }
 
@@ -117,6 +118,6 @@ maf="maf0to5e-2"
 
 # cts traits
 submit_spa_set_cts "pLoF_damaging_missense"
-#submit_spa_binary_with_csqs "pLoF_damaging_missense"
+submit_spa_binary_with_csqs "pLoF_damaging_missense"
 
 

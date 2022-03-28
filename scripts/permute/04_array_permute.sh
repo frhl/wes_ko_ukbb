@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 21
+#$ -t 20-22
 #$ -tc 1
 #$ -V
 
@@ -25,9 +25,8 @@ readonly chr="${SGE_TASK_ID}"
 readonly in_dir="data/permute/genes/chr${chr}"
 readonly out_dir="data/permute/permutations/chr${chr}"
 
-#readonly input_path="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_chr${chr}_GENE.mt"
 readonly input_path="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_chr${chr}_GENE.tsv.gz"
-readonly input_type='mt'
+readonly input_type='mt' # deprecated
 
 readonly maf="maf0to5e-2"
 readonly annotation="pLoF_damaging_missense"
@@ -35,15 +34,14 @@ readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_permuted
 readonly out_type="vcf" # can currently only do vcf after migration to R-based permutations
 
 readonly overview="data/permute/overview/overview.tsv.gz"
-readonly max_allowed_jobs=200
-readonly p_per_job=20000
+readonly max_allowed_jobs=250
+readonly p_per_job=10000
 readonly seed=134
-readonly nslots=8
+readonly nslots=4
 readonly queue="short.qe"
 
 readonly n_tasks="$( zcat ${overview} | grep "CH" | grep "chr${chr}" | wc -l)"
-#readonly tasks="1-${n_tasks}"
-tasks=1
+readonly tasks="1-${n_tasks}"
 
 mkdir -p ${out_dir}
 
