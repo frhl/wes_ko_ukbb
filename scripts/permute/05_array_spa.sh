@@ -21,6 +21,7 @@ readonly spark_dir="data/tmp/spark"
 readonly bash_script="scripts/permute/_array_spa.sh"
 
 readonly in_dir="data/permute/permutations/chrCHR"
+#readonly in_dir="data/permute/permutations/with_hail"
 readonly out_dir="data/permute/spa/chrCHR"
 readonly overview_dir="data/permute/overview"
 
@@ -30,8 +31,8 @@ readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_permuted
 readonly overview="${overview_dir}/overview.tsv.gz"
 readonly gene_spa="${overview_dir}/overview_genes.tsv.gz"
 
-readonly min_mac=5
-readonly tasks=22
+readonly min_mac=1
+readonly tasks=21
 readonly queue="short.qf"
 readonly nslots=1
 

@@ -28,17 +28,16 @@ main <- function(args){
     reps <- replicate(n, shuffle_knockouts(d))
     rownames(reps) <- d$s
     reps <- data.table(t(reps))
-    
-    # knockout ceiling
-    #ko_count <- ceiling(apply(reps, 1, sum))
-    
+ 
     # synthethic row
     row <- data.table(
       "#CHROM" = args$chrom, 
       POS = 1:n,
       ID = args$vcf_id,
-      REF = '0',
-      ALT = '1',
+      REF = 'X',
+      ALT = 'Y',
+      QUAL = '.',
+      FILTER = '.',
       INFO = '.',
       FORMAT = 'DS'
     )

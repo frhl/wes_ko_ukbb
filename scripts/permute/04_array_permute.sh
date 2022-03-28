@@ -25,6 +25,7 @@ readonly chr="${SGE_TASK_ID}"
 readonly in_dir="data/permute/genes/chr${chr}"
 readonly out_dir="data/permute/permutations/chr${chr}"
 
+#readonly input_path="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_chr${chr}_GENE.mt"
 readonly input_path="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_chr${chr}_GENE.tsv.gz"
 readonly input_type='mt'
 
@@ -34,15 +35,15 @@ readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_permuted
 readonly out_type="vcf" # can currently only do vcf after migration to R-based permutations
 
 readonly overview="data/permute/overview/overview.tsv.gz"
-readonly max_allowed_jobs=10
-readonly p_per_job=1000
+readonly max_allowed_jobs=200
+readonly p_per_job=20000
 readonly seed=134
-readonly nslots=1
-readonly queue="short.qc"
+readonly nslots=8
+readonly queue="short.qe"
 
 readonly n_tasks="$( zcat ${overview} | grep "CH" | grep "chr${chr}" | wc -l)"
 #readonly tasks="1-${n_tasks}"
-tasks=15
+tasks=1
 
 mkdir -p ${out_dir}
 

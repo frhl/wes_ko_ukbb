@@ -36,8 +36,10 @@ readonly out_prefix_gene="${out_prefix}_${gene}_${id}of${n_tasks}"
 readonly checkpoint="${out_prefix_gene}_${sge_seed}_checkpoint.mt"
 readonly input_path_gene=$(echo ${input_path} | sed -e "s/GENE/${gene}/g")
 
+#readonly vcf_sample="data/permute/overview/sample_order.txt"
+#--vcf_sample ${vcf_sample} \
 
-if [ ! -f "${out_prefix_gene}.vcf.bgz" ]; then
+if [ ! -f "${out_prefix_gene}.vcf.gz" ]; then
   set_up_rpy
   Rscript ${rscript} \
     --chrom "chr${chr}" \
@@ -51,9 +53,30 @@ if [ ! -f "${out_prefix_gene}.vcf.bgz" ]; then
   module purge
   module load BCFtools/1.12-GCC-10.3.0
   bgzip "${out_prefix_gene}.vcf"
+  rm -f "${out_prefix_gene}.vcf"
   make_tabix "${out_prefix_gene}.vcf.gz" "csi"
 else
   >&2 echo "${out_prefix_gene}.vcf.bgz already exists. Skipping.."
 fi
+
+
+#SECONDS=0
+#  set_up_hail
+#  set_up_pythonpath_legacy
+#  python3 ${hail_script} \
+#    --chrom "chr${chr}" \
+#    --input_path ${input_path_gene} \
+#    --input_type ${input_type} \
+#    --replicates ${replicates} \
+#    --out_prefix ${out_prefix_gene} \
+#    --out_type ${out_type} \
+#    --seed ${sge_seed} \
+#    && print_update "Finished permuting phase for chr${chr}" ${SECONDS} \
+#    || raise_error "Permuting phase for chr${chr} failed"
+#  rm -rf ${checkpoint}
+#  module purge
+#  module load BCFtools/1.12-GCC-10.3.0
+#  make_tabix "${out_prefix_gene}.vcf.bgz" "csi"
+
 
 
