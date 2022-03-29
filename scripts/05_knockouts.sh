@@ -37,6 +37,8 @@ readonly aggr_method="fast" # either fasts or collect
 
 # variant and sample parameters
 readonly exclude="data/genes/220310_common_plofs_to_exclude.txt"
+readonly af_min=""
+readonly af_max=""
 readonly maf_lb="0"
 readonly maf_ub="5e-2"
 readonly sex="both"
@@ -50,7 +52,7 @@ submit_knockout_job()
   local input_path="${in_prefix}_chrCHR_maf${maf_lb}to${maf_ub}_${annotation}.mt"
   local prefix="${out_prefix}_chrCHR_maf${maf_lb}to${maf_ub}_${annotation}"
   set -x
-  qsub -N "_ko_${csqs}" \
+  qsub -N "_ko_${annotation}" \
     -o "logs/_knockouts.log" \
     -e "logs/_knockouts.errors.log" \
     -t ${tasks} \
