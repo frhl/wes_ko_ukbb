@@ -6,10 +6,12 @@ import argparse
 from ukb_utils import hail_init
 from ukb_utils import tables
 from ukb_utils import genotypes
+from ukb_utils import samples
 from ko_utils import io
 
 def main(args):
     
+    chrom = args.chrom
     ko_path = args.ko_path
     ko_type = args.ko_type
     markers = args.markers
@@ -31,8 +33,8 @@ def main(args):
     mk = mk.filter_rows(hl.literal(set(markers)).contains(mk.marker))
     mk = mk.annotate_entries(DS=mk.GT.n_alt_alleles())
     mk = mk.select_entries(DS)
-    samples = mt.count()[1]
-    if samples > 0:
+    n_samples = mt.count()[1]
+    if n_samples > 0:
         # combine the two tables and export
         ko = io.import_table(ko_path, ko_type, calc_info = False)
         ko = tables.order_cols(ko, mk)
@@ -41,8 +43,9 @@ def main(args):
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--input_path', default=None, help='')
-    parser.add_argument('--input_type', default=None, help='')
+    parser.add_argument('--chrom', default=None, help='')
+    parser.add_argument('--ko_path', default=None, help='')
+    parser.add_argument('--ko_type', default=None, help='')
     parser.add_argument('--markers', default=None, help='')
     parser.add_argument('--out_prefix', default=None, help='')
     parser.add_argument('--out_type', default=None, help='')

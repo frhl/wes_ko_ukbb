@@ -25,8 +25,8 @@ readonly markers_dir="data/conditional/common/spa"
 readonly ko_dir="data/knockouts/alt"
 readonly out_dir="data/conditional/common/knockout/alt"
 
-readonly input_path="${ko_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense.tsv.gz"
-readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense.tsv.gz"
+readonly input_path="${ko_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense.vcf.bgz"
+readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense"
 readonly input_type="vcf"
 readonly out_type="vcf"
 
@@ -38,8 +38,9 @@ SECONDS=0
 set_up_hail
 set_up_pythonpath_legacy
 python3 "${hail_script}" \
-   --input_path ${input_path} \
-   --input_type ${input_type} \
+   --chrom ${chr} \
+   --ko_path ${input_path} \
+   --ko_type ${input_type} \
    --markers ${markers} \
    --out_type ${out_type} \
    --out_prefix ${out_prefix} \
