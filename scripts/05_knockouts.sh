@@ -23,6 +23,8 @@ readonly bash_script="scripts/_knockouts.sh"
 readonly in_dir="data/mt/annotated"
 readonly out_dir="data/knockouts/alt"
 readonly in_prefix="${in_dir}/ukb_eur_wes_200k_annot_chrCHR.mt"
+readonly in_type="mt"
+
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k"
 readonly out_type="vcf"
 
@@ -30,7 +32,7 @@ readonly out_type="vcf"
 # when using aggr_method="collect" on short.qe
 readonly tasks="21"
 readonly queue="short.qa"
-readonly nslots=1
+readonly nslots=4
 
 readonly only_vcf=""
 readonly aggr_method="fast" # either fasts or collect
@@ -48,9 +50,8 @@ mkdir -p ${out_dir}
 submit_knockout_job() 
 {
   local annotation=${1}
-  local input_type="mt"
-  local input_path="${in_prefix}_chrCHR_maf${maf_lb}to${maf_ub}_${annotation}.mt"
-  local prefix="${out_prefix}_chrCHR_maf${maf_lb}to${maf_ub}_${annotation}"
+  #local input_path="${in_prefix}_chrCHR_maf${maf_lb}to${maf_ub}_${annotation}.mt"
+  local out_prefix_csqs="${out_prefix}_chrCHR_maf${maf_lb}to${maf_ub}_${annotation}"
   set -x
   qsub -N "_ko_${annotation}" \
     -o "logs/_knockouts.log" \
@@ -59,8 +60,8 @@ submit_knockout_job()
     -q "${queue}" \
     -pe shmem ${nslots} \
     "${bash_script}" \
-    "${input_path}" \
-    "${input_type}" \
+    "${in_prefix}" \
+    "${in_type}" \
     "${af_min}" \
     "${af_max}" \
     "${maf_lb}" \
@@ -70,7 +71,7 @@ submit_knockout_job()
     "${annotation}" \
     "${only_vcf}" \
     "${aggr_method}" \
-    "${prefix}" \
+    "${out_prefix_csqs}" \
     "${out_type}" 
   set +x
 }
