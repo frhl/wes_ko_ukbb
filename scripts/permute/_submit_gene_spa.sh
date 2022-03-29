@@ -33,7 +33,7 @@ readonly permutation="$(zcat ${overview} | grep "CH" | grep "chr${chr}" | cut -f
 readonly n_tasks="$(( ( ${permutation} / ${p_per_job} ) + 1 ))"
 readonly tasks="1-${n_tasks}"
 
-readonly out_dir="$(dirname "${out_prefix}")"
+readonly in_dir="$(dirname "${in_vcf}")"
 readonly vcf_gene=$(echo ${in_vcf} | sed -e "s/GENE/${gene}/g")
 readonly out_gene=$(echo ${out_prefix} | sed -e "s/GENE/${gene}/g")
 
@@ -42,7 +42,11 @@ readonly out_gene=$(echo ${out_prefix} | sed -e "s/GENE/${gene}/g")
 readonly pheno_check="$( zcat ${gene_spa} | grep ${phenotype} | grep ${gene} | wc -l )"
 readonly task_limit=500
 
-if [ $( ls ${out_dir} | grep ${gene} | wc -l) -ge 1 ]; then
+
+echo "out_prefix:${out_prefix}"
+echo "in_dir:${in_dir}"
+
+if [ $( ls ${in_dir} | grep ${gene} | wc -l) -ge 1 ]; then
   if [[ ${n_tasks} -le ${task_limit} ]]; then
     if [[ ${pheno_check} -ge 0 ]]; then
       set -x
@@ -63,7 +67,6 @@ if [ $( ls ${out_dir} | grep ${gene} | wc -l) -ge 1 ]; then
           "${gene}" \
           "${n_tasks}" \
           "${min_mac}"
-
       # merge SPAs
       qsub -N ${merge_name} \
           -q "short.qc" \
@@ -74,12 +77,13 @@ if [ $( ls ${out_dir} | grep ${gene} | wc -l) -ge 1 ]; then
           "${n_tasks}" 
       set +x
     else
-       >& echo "${gene} is not tested with ${pheotype}. Skipping.."
+       >2& echo "${gene} is not tested with ${pheotype}. Skipping.."
     fi
   else
     >&2 echo "Error: ${gene} with ${tasks} tasks is greater than the limit of ${task_limit}! Exiting.."
   fi
 else
+  echo "$( ls ${in_dir} )"
   >&2 echo "Error: ${vcf_gene}* prefix does not exist! Exiting.."
 fi
 

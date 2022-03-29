@@ -32,7 +32,8 @@ readonly gene="$(zcat ${overview} | grep "CH" | grep "chr${chr}" | cut -f1 | sed
 readonly permutation="$(zcat ${overview} | grep "CH" | grep "chr${chr}" | cut -f3 | sed ${NUM}'q;d' )"
 
 readonly n_tasks="$(( ( ${permutation} / ${p_per_job} ) + 1 ))"
-readonly tasks="1-${n_tasks}"
+#readonly tasks="1-${n_tasks}"
+tasks=14
 
 if [ ${n_tasks} -le ${max_tasks_allowed} ]; then
   echo "${gene} -> ${permutation} .. submitting ${n_tasks} jobs"

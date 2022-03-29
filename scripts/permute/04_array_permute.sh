@@ -37,7 +37,7 @@ readonly overview="data/permute/overview/overview.tsv.gz"
 readonly max_allowed_jobs=250
 readonly p_per_job=10000
 readonly seed=134
-readonly nslots=4
+readonly nslots=5
 readonly queue="short.qe"
 
 readonly n_tasks="$( zcat ${overview} | grep "CH" | grep "chr${chr}" | wc -l)"
