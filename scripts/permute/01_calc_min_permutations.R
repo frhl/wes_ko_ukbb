@@ -49,12 +49,11 @@ main <- function(args){
     out_prefix_genes <- paste0(args$out_prefix, "_genes.tsv.gz")
     write(paste("[verbose] writing", out_prefix_genes),stderr())
     fwrite(tabulate_MarkerID_basename(spa_full), out_prefix_genes, sep = '\t')
-  
-    # write out phenotype - gene P-values pairs
-    #spa_pheno_full <- rbind(spa_cts_full[,c("MarkerID","basename", "p.value")], spa_bin_full[,c("MarkerID","basename","p.value")])
-    #out_prefix_pheno <- paste0(args$out_prefix, "_genes_pheno_p.tsv.gz")
-    #write(paste("[verbose] writing", out_prefix_pheno),stderr())
-    #fwrite(spa_pheno_full, out_prefix_pheno)
+    
+    # write out phenotype-genes P-value pairs
+    out_prefix_p <- paste0(args$out_prefix, "_pvalue_genes.tsv.gz")
+    write(paste("[verbose] writing", out_prefix_p),stderr())
+    fwrite(spa_full, out_prefix_genes, sep = '\t')
 
     # now combine the two files and get min P-value detected for each gene
     spa_cts <- spa_cts_full[,c('MarkerID','p.value', 'CHR')]
