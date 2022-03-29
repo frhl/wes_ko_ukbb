@@ -32,8 +32,8 @@ def main(args):
                 ],':'))
     mk = mk.filter_rows(hl.literal(set(markers)).contains(mk.marker))
     mk = mk.annotate_entries(DS=mk.GT.n_alt_alleles())
-    mk = mk.select_entries(DS)
-    n_samples = mt.count()[1]
+    mk = mk.select_entries(mk.DS)
+    n_samples = mk.count()[1]
     if n_samples > 0:
         # combine the two tables and export
         ko = io.import_table(ko_path, ko_type, calc_info = False)
