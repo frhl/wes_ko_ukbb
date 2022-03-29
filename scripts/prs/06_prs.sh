@@ -23,7 +23,7 @@ readonly ldsc_dir="data/prs/ldsc"
 readonly pred_dir="data/prs/hapmap/ukb_500k"
 readonly ld_dir="data/prs/hapmap/ld/matrix"
 readonly pheno_dir="data/phenotypes"
-readonly out_dir="data/prs/scores/auto_test"
+readonly out_dir="data/prs/scores/auto"
 
 readonly index=${SGE_TASK_ID}
 
@@ -48,7 +48,7 @@ submit_ldpred2()
   set -x
   qsub -N "_prs_${phenotype}" \
     -t 1-22 \
-    -q short.qc@@short.hge \
+    -q short.qc@@short.hga \
     -pe shmem "${cores}" \
     "${bash_script}" \
     "${rscript}" \
