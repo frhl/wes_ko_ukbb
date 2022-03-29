@@ -24,7 +24,7 @@ readonly out_dir="data/permute/overview"
 readonly out_prefix="${out_dir}/overview"
 
 # required to pin down which genes are ch knockout and which are hom alt knockouts
-readonly tsv_path="data/knockouts/alt_filtered/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense.tsv.gz"
+readonly tsv_path="data/knockouts/alt/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense.tsv.gz"
 
 readonly p_cutoff="5e-7"
 

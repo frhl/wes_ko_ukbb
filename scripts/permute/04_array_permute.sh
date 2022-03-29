@@ -41,7 +41,8 @@ readonly nslots=4
 readonly queue="short.qe"
 
 readonly n_tasks="$( zcat ${overview} | grep "CH" | grep "chr${chr}" | wc -l)"
-readonly tasks="1-${n_tasks}"
+#readonly tasks="1-${n_tasks}"
+tasks=1
 
 mkdir -p ${out_dir}
 

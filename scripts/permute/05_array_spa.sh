@@ -31,8 +31,8 @@ readonly overview="${overview_dir}/overview.tsv.gz"
 readonly gene_spa="${overview_dir}/overview_genes.tsv.gz"
 
 readonly min_mac=1
-readonly tasks=21
-readonly queue="short.qf"
+readonly tasks=21 # chromosomes
+readonly p_per_job=10000 # permutations per job (same as in permutation script)
 readonly nslots=1
 
 submit_spa_set_binary()
@@ -70,7 +70,7 @@ submit_spa_gene_job()
   set -x
   qsub -N "spa_${phenotype}" \
     -t ${tasks} \
-    -q "${queue}" \
+    -q "test.qc" \
     -pe shmem ${nslots} \
     "${bash_script}" \
     "${phenotype}" \
@@ -80,6 +80,7 @@ submit_spa_gene_job()
     "${min_mac}" \
     "${overview}" \
     "${gene_spa}" \
+    "${p_per_job}" \
     "${out_prefix_pheno}" \
     "${out_dir}"
   set +x

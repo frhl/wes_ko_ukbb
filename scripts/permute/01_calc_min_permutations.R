@@ -44,10 +44,17 @@ main <- function(args){
     spa_bin_full <- do.call(rbind, lapply(spa_bin_files, fread_with_basename))
 
     # write out each gene involved in each comparison (avg of ~1700 genes per SPA)
-    spa_full <- rbind(spa_cts_full[,c("MarkerID","basename")], spa_bin_full[,c("MarkerID","basename")])
+    spa_full <- rbind(spa_cts_full[,c("MarkerID","basename", "p.value")], spa_bin_full[,c("MarkerID","basename", "p.value")])
+    print(head(spa_full))
     out_prefix_genes <- paste0(args$out_prefix, "_genes.tsv.gz")
     write(paste("[verbose] writing", out_prefix_genes),stderr())
     fwrite(tabulate_MarkerID_basename(spa_full), out_prefix_genes, sep = '\t')
+  
+    # write out phenotype - gene P-values pairs
+    #spa_pheno_full <- rbind(spa_cts_full[,c("MarkerID","basename", "p.value")], spa_bin_full[,c("MarkerID","basename","p.value")])
+    #out_prefix_pheno <- paste0(args$out_prefix, "_genes_pheno_p.tsv.gz")
+    #write(paste("[verbose] writing", out_prefix_pheno),stderr())
+    #fwrite(spa_pheno_full, out_prefix_pheno)
 
     # now combine the two files and get min P-value detected for each gene
     spa_cts <- spa_cts_full[,c('MarkerID','p.value', 'CHR')]
@@ -56,8 +63,8 @@ main <- function(args){
     spa$p.value <- as.numeric(spa$p.value)
     NAs <- suppressWarnings(sum(is.na(spa$p.value)))
     if (NAs > 0) write(paste("[verbose]",NAs, "NAs in SPA P.values"), stderr())
-
-    # aggregate p-value by marker id and take min
+    
+      # aggregate p-value by marker id and take min
     spa_chr <- spa[,c('MarkerID', 'CHR')]
     spa_chr <- spa_chr[!duplicated(spa_chr),]
     spa_aggr <- aggregate(p.value ~ MarkerID, data = spa, FUN = function(x) min(x, na.rm = TRUE))

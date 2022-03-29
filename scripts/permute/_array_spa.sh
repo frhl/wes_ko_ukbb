@@ -6,6 +6,7 @@
 #$ -o logs/_array_spa.log
 #$ -e logs/_array_spa.errors.log
 #$ -P lindgren.prjc
+#$ -q test.qc
 #$ -pe shmem 1
 #$ -q lindgren.qe
 #$ -V
@@ -16,14 +17,15 @@ set -o nounset
 readonly bash_script="scripts/permute/_submit_gene_spa.sh"
 
 readonly phenotype=${1?Error: Missing arg1 (phenotype)}
-readonly in_vcf=${2?Error: Missing arg1 (phenotype)}
-readonly in_gmat=${3?Error: Missing arg2 (in_vcf)}
-readonly in_var=${4?Error: Missing arg3 (in_csi)}
-readonly min_mac=${5?Error: Missing arg3 (in_csi)}
-readonly overview=${6?Error: Missing arg6 (path prefix for saige output)}
-readonly gene_spa=${7?Error: Missing arg6 (path prefix for saige output)}
-readonly out_prefix=${8?Error: Missing arg6 (path prefix for saige output)}
-readonly out_dir=${9?Error: Missing arg6 (path prefix for saige output)}
+readonly in_vcf=${2?Error: Missing arg2 (in_vcf)}
+readonly in_gmat=${3?Error: Missing arg3 (in_gmat)}
+readonly in_var=${4?Error: Missing arg4 (in_var)}
+readonly min_mac=${5?Error: Missing arg5 (min_mac)}
+readonly overview=${6?Error: Missing arg6 (overview)}
+readonly gene_spa=${7?Error: Missing arg7 (gene_spa)}
+readonly p_per_job=${8?Error: Missing arg8 (p_per_job)}
+readonly out_prefix=${9?Error: Missing arg9 (out_prefix)}
+readonly out_dir=${10?Error: Missing arg10 (out_dir)}
 
 readonly chr=${SGE_TASK_ID}
 readonly n_tasks="$( zcat ${overview} | grep "CH" | grep "chr${chr}" | wc -l)"
@@ -52,6 +54,7 @@ if [[ ${tasks} -le ${task_limit} ]]; then
       "${min_mac}" \
       "${overview}" \
       "${gene_spa}" \
+      "${p_per_job}" \
       "${out_chr}"
   set +x
 else
