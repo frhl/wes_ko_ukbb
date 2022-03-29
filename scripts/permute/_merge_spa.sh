@@ -12,14 +12,15 @@ set -o nounset
 source utils/bash_utils.sh
 
 readonly prefix=${1?Error: Missing arg1 (prefix)}
-readonly n_tasks=${2?Error: Missing arg2 (n_tasks)}
+readonly actual_tasks=${2?Error: Missing arg2 (n_tasks)}
+readonly max_tasks=${3?Error: Missing arg2 (n_tasks)}
 readonly out_no_gz="${prefix}.txt"
 
 readonly files="${prefix##*/}$"
 echo ">${files}"
 
-for id in $(seq 1 ${n_tasks}); do
-   file="${prefix}_${id}of${n_tasks}.txt"
+for id in $(seq 1 ${actual_tasks}); do
+   file="${prefix}_${id}of${max_tasks}.txt"
    if [ -f ${file} ]; then
      echo ${file}
      if [ "${id}" == "1" ]; then

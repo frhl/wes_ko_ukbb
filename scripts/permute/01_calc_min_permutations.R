@@ -53,7 +53,10 @@ main <- function(args){
     # write out phenotype-genes P-value pairs
     out_prefix_p <- paste0(args$out_prefix, "_pvalue_genes.tsv.gz")
     write(paste("[verbose] writing", out_prefix_p),stderr())
-    fwrite(spa_full, out_prefix_genes, sep = '\t')
+    p_extreme <- spa_full$p.value < as.numeric(args$p_cutoff)
+    spa_full$p.value[p_extreme] <- as.numeric(args$p_cutoff)
+    spa_full$permut <- ceiling(1/spa_full$p.value)
+    fwrite(spa_full[order(spa_full$p.value),], out_prefix_p, sep = '\t')
 
     # now combine the two files and get min P-value detected for each gene
     spa_cts <- spa_cts_full[,c('MarkerID','p.value', 'CHR')]

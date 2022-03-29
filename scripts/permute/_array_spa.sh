@@ -21,16 +21,17 @@ readonly in_vcf=${2?Error: Missing arg2 (in_vcf)}
 readonly in_gmat=${3?Error: Missing arg3 (in_gmat)}
 readonly in_var=${4?Error: Missing arg4 (in_var)}
 readonly min_mac=${5?Error: Missing arg5 (min_mac)}
-readonly overview=${6?Error: Missing arg6 (overview)}
-readonly gene_spa=${7?Error: Missing arg7 (gene_spa)}
-readonly p_per_job=${8?Error: Missing arg8 (p_per_job)}
-readonly out_prefix=${9?Error: Missing arg9 (out_prefix)}
-readonly out_dir=${10?Error: Missing arg10 (out_dir)}
+readonly annotation=${6?Error: Missing arg6 (annotation)}
+readonly gene_pheno_p=${7?Error: Missing arg7 (gene_pheno_p)}
+readonly overview=${8?Error: Missing arg8 (overview)}
+readonly gene_spa=${9?Error: Missing arg9 (gene_spa)}
+readonly p_per_job=${10?Error: Missing arg10 (p_per_job)}
+readonly out_prefix=${11?Error: Missing arg11 (out_prefix)}
+readonly out_dir=${12?Error: Missing arg12 (out_dir)}
 
 readonly chr=${SGE_TASK_ID}
 readonly n_tasks="$( zcat ${overview} | grep "CH" | grep "chr${chr}" | wc -l)"
-#readonly tasks="1-${n_tasks}"
-readonly tasks=15
+readonly tasks="1-${n_tasks}"
 
 readonly vcf_chr=$(echo ${in_vcf} | sed -e "s/CHR/${chr}/g")
 readonly out_chr=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
@@ -52,6 +53,8 @@ if [[ ${tasks} -le ${task_limit} ]]; then
       "${in_gmat}" \
       "${in_var}" \
       "${min_mac}" \
+      "${annotation}" \
+      "${gene_pheno_p}" \
       "${overview}" \
       "${gene_spa}" \
       "${p_per_job}" \
