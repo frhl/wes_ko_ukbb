@@ -5,7 +5,8 @@
 #$ -o logs/combine_markers.log
 #$ -e logs/combine_markers.errors.log
 #$ -P lindgren.prjc
-#$ -q test.qc
+#$ -q short.qc
+#$ -pe shmem 2
 #$ -t 14
 #$ -V
 
