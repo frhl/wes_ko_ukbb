@@ -22,17 +22,18 @@ readonly step2_SPAtests="utils/saige/step2_SPAtests.R"
 readonly chr=${1?Error: Missing arg1 (chr)}
 readonly in_vcf=${2?Error: Missing arg2 (in_vcf)}
 readonly out_gene=${3?Error: Missing arg3 (out_gene)}
-readonly in_gmat=${4?Error: Missing arg4 (in_gmat)}
-readonly in_var=${5?Error: Missing arg5 (in_var)}
-readonly phenotype=${6?Error: Missing arg6 (phenotype)}
-readonly gene=${7?Error: Missing arg7 (gene)}
-readonly n_tasks=${8?Error: Missing arg8 (n_tasks)}
+readonly out_spa_success=${4?Error: Missing arg3 (out_gene)}
+readonly in_gmat=${5?Error: Missing arg4 (in_gmat)}
+readonly in_var=${6?Error: Missing arg5 (in_var)}
+readonly phenotype=${7?Error: Missing arg6 (phenotype)}
+readonly gene=${8?Error: Missing arg7 (gene)}
 readonly min_mac=${9?Error: Missing arg9 (min_mac)}
 
 readonly id=${SGE_TASK_ID}
-readonly vcf="${in_vcf}_${id}of${n_tasks}.vcf.gz"
-readonly csi="${vcf}.csi"
-readonly out_gene_task="${out_gene}_${id}of${n_tasks}.txt"
+readonly vcf="${in_vcf}_${id}.vcf.gz"
+readonly csi="${vcf}_${id}.csi"
+readonly out_gene_task="${out_gene}_${id}.txt"
+readonly out_file_success="${out_spa_success}_${id}.SUCCESS"
 
 set_up_RSAIGE
 
@@ -52,6 +53,7 @@ if [ ! -f ${out_gene_task} ]; then
      && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
      || raise_error "Saddle-point approximation for chr${chr} failed"
   rm -f "${out_gene_task}.index"
+  touch ${out_file_success}
 else
   >&2 echo "${out_gene_task} already exists. Skipping.."
 fi

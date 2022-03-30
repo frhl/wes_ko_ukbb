@@ -18,7 +18,7 @@ source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark"
 readonly bash_script="scripts/permute/_gene_permute.sh"
-readonly bash_script="scripts/permute/_gene_spa.sh"
+readonly spa_script="scripts/permute/_gene_spa.sh"
 readonly merge_script="scripts/permute/_merge_spa.sh"
 
 readonly chr=${1?Error: Missing argX}
@@ -30,6 +30,7 @@ readonly n_slots=${6?Error: Missing argX}
 readonly start_n_shuffle=${7?Error: Missing argX}
 readonly gene=${8?Error: Missing argX}
 readonly annotation="pLoF"
+readonly replicates=100
 
 readonly input_path_gene=$(echo ${input_path} | sed -e "s/GENE/${gene}/g")
 readonly out_prefix_gene=$(echo ${out_prefix} | sed -e "s/GENE/${gene}/g")
@@ -111,7 +112,6 @@ shuffle_phase() {
   # $n_tasks_submitted as global variables
    
   local permutations_demand=${1}
-  local replicates=100
   local n_tasks_required=$(( (${permutations_demand} / ${replicates}) - ${permutation_supply} ))
   local sge_seed=3
 
@@ -142,32 +142,49 @@ shuffle_phase() {
 
 }
 
-saige() {
+submit_saige() {
 
-  local phenotype=${1}
-  local in_gmat=${2}
-  local in_var=${3}
-  local min_var=${3}
-  
-  local saige_demand=${permutation_supply}
- 
-   qsub -N "${spa_name}" \
-          -t ${actual_tasks} \
-          -q "short.qc" \
-          -pe shmem 1 \
-          "${bash_script}" \
-          "${chr}" \
-          "${vcf_gene}" \
-          "${out_gene}" \
-          "${in_gmat}" \
-          "${in_var}" \
-          "${phenotype}" \
-          "${gene}" \
-          "${max_tasks}" \
-          "${min_mac}" 
+  # one big problem here is that SAIGE supply changes deending on phenotype.
+  # should look up array to check how many have already been run
 
+  local saige_demand=${1}
+  local phenotype=${2}
 
+  local vcf_gene_spa="${out_prefix_gene}"
+  local out_gene_spa="${out_prefix_gene}_spa"
 
+  local n_tasks_required=$(( (${saige_demand} / ${replicates}) - ${saige_supply} ))
+
+  if [ ${n_tasks_required} -ge 1 ]; then
+
+    local tasks_spa=$(( ${saige_supply} + 1 ))-$(( ${saige_supply} + ${n_tasks_required} ))
+    saige_supply=$(( ${saige_supply} + ${n_tasks_required}))
+    local out_spa_success="${out_gene_spa}_${tasks_spa}"
+
+    local spa_name="spa_${gene}_${tasks_spa}"
+    local merge_name="mrg_${gene}_${tasks_spa}"
+
+    qsub -N "${spa_name}" \
+            -t ${tasks_spa} \
+            -q "short.qc" \
+            -pe shmem 1 \
+            "${spa_script}" \
+            "${chr}" \
+            "${vcf_gene_spa}" \
+            "${out_gene_spa}" \
+            "${out_spa_success}" \
+            "${in_gmat}" \
+            "${in_var}" \
+            "${phenotype}" \
+            "${gene}" \
+            "${min_mac}" 
+
+    wait_for_files ${out_spa_success} ${n_tasks_required} 10s 100
+    rm -f ${out_prefix_success}*.SUCCESS
+
+  else
+    >&2 echo "needed ${permutations_demand} but already have $(( ${replicates} * ${permutation_supply} )). Skipping.."
+  fi
 
 }
 
@@ -216,9 +233,9 @@ while [ ${n_shuffle} -le ${n_shuffle_cutoff}]; do
       if [[ ! " ${phenotypes_done[*]} " =~ " ${phenotype} " ]]; then
 
         set_arr_saige ${phenotype}
-        gmat=${arr_saige[2]}
-        var=${arr_saige[3]}
-        saige ${phenotype} ${gmat} ${var} ${min_mac}
+        in_gmat=${arr_saige[2]}
+        in_var=${arr_saige[3]}
+        submit_saige ${n_shuffle} ${phenotype}
 
         true_p=$( lookup_true_p ${phenotype} ${gene} "${annotation}" )
         echo "${phenotype} ${gene} ${annotation}"
