@@ -7,6 +7,7 @@ from ukb_utils import hail_init
 from ukb_utils import tables
 from ukb_utils import genotypes
 from ukb_utils import samples
+from ukb_utils import variants
 from ko_utils import io
 
 def main(args):
@@ -31,6 +32,7 @@ def main(args):
                 hl.str(mk.alleles[1])
                 ],':'))
     mk = mk.filter_rows(hl.literal(set(markers)).contains(mk.marker))
+    mk = variants.liftover(mk)
     mk = mk.annotate_entries(DS=mk.GT.n_alt_alleles())
     mk = mk.select_entries(mk.DS)
     n_samples = mk.count()[1]
