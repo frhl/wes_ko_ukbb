@@ -31,9 +31,10 @@ readonly NUM=${SGE_TASK_ID}
 readonly gene="$(zcat ${overview} | grep "CH" | grep "chr${chr}" | cut -f1 | sed ${NUM}'q;d' )"
 readonly permutation="$(zcat ${overview} | grep "CH" | grep "chr${chr}" | cut -f3 | sed ${NUM}'q;d' )"
 
-readonly n_tasks="$(( ( ${permutation} / ${p_per_job} ) + 1 ))"
+#readonly n_tasks="$(( ( ${permutation} / ${p_per_job} ) + 1 ))"
 #readonly tasks="1-${n_tasks}"
-tasks=14
+readonly n_tasks="1"
+readonly tasks="1"
 
 if [ ${n_tasks} -le ${max_tasks_allowed} ]; then
   echo "${gene} -> ${permutation} .. submitting ${n_tasks} jobs"

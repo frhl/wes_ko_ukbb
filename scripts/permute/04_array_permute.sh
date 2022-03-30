@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 20-22
+#$ -t 1-22
 #$ -tc 1
 #$ -V
 
@@ -34,15 +34,15 @@ readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_permuted
 readonly out_type="vcf" # can currently only do vcf after migration to R-based permutations
 
 readonly overview="data/permute/overview/overview.tsv.gz"
-readonly max_allowed_jobs=250
-readonly p_per_job=10000
+readonly max_allowed_jobs=1
+readonly p_per_job=100
 readonly seed=134
-readonly nslots=5
+readonly nslots=1
 readonly queue="short.qe"
 
 readonly n_tasks="$( zcat ${overview} | grep "CH" | grep "chr${chr}" | wc -l)"
-#readonly tasks="1-${n_tasks}"
-tasks=1
+readonly tasks="1-${n_tasks}"
+#tasks=4
 
 mkdir -p ${out_dir}
 

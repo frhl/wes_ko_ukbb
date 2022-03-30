@@ -33,7 +33,7 @@ def main(args):
                 ],':'))
     mk = mk.filter_rows(hl.literal(set(markers)).contains(mk.marker))
     mk = variants.liftover(mk)
-    mk = mk.annotate_entries(DS=mk.GT.n_alt_alleles())
+    mk = mk.annotate_entries(DS=hl.float64(mk.GT.n_alt_alleles()))
     mk = mk.select_entries(mk.DS)
     n_samples = mk.count()[1]
     if n_samples > 0:

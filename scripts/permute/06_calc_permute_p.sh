@@ -18,9 +18,8 @@ source utils/hail_utils.sh
 
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
-readonly bash_script="scripts/permute/_array_spa.sh"
+readonly bash_script="scripts/permute/_calc_permute_p.sh"
 
-readonly alt_dir="data/saige/output/....."
 readonly null_dir="data/permute/permutations/spa/CHR"
 readonly out_dir="data/permute/empirical_p/"
 
@@ -28,9 +27,6 @@ readonly out_dir="data/permute/empirical_p/"
 readonly in_prefix="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_permuted_chrCHR_GENE"
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_permuted_chrCHR_GENE"
 
-readonly overview="${overview_dir}/overview.tsv.gz"
-readonly gene_pheno_p="${overview_dir}/overview_pvalue_genes.tsv.gz"
-readonly gene_spa="${overview_dir}/overview_genes.tsv.gz"
 readonly annotation="pLoF_damaging_missense"
 
 calc_p_binary()
@@ -49,29 +45,19 @@ calc_p_cts()
 
 calc_p()
 {
-
   local phenotype=${1?Error: Missing arg2 (phenotype)}
   local trait=${2?Error: Missing arg3 (trait)}
+  local step2_dir="data/saige/output/${trait}/step2"
+  local alt_prefix="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}"
   local out_prefix_pheno="${out_prefix}_${phenotype}"
   mkdir -p ${step2_dir}
   set -x
   qsub -N "spa_${phenotype}" \
-    -t ${tasks} \
+    -t 1-22 \
     -q "test.qc" \
     -pe shmem ${nslots} \
     "${bash_script}" \
-    "${phenotype}" \
-    "${in_prefix}" \
-    "${in_gmat}" \
-    "${in_var}" \
-    "${min_mac}" \
-    "${annotation}" \
-    "${gene_pheno_p}" \
-    "${overview}" \
-    "${gene_spa}" \
-    "${p_per_job}" \
-    "${out_prefix_pheno}" \
-    "${out_dir}"
+    "${phenotype}"
 }
 
 

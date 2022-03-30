@@ -148,9 +148,10 @@ def rbind_matrix_tables(mt1: hl.MatrixTable, mt2: hl.MatrixTable,
     :param mt2: A MatrixTable (e.g. with unphased entries)
     '''
     
-    
-    mt1 = mt1.drop('info')
-    mt2 = mt2.drop('info')
+    if 'info' in list(mt1.row):    
+        mt1 = mt1.drop('info')
+    if 'info' in list(mt2.row):
+        mt2 = mt2.drop('info')
 
     overlap = set(mt1.row) & set(mt2.row)
     overlap = overlap - set(list(mt1.row_key))

@@ -17,7 +17,7 @@ source utils/bash_utils.sh
 
 readonly rscript="scripts/prs/07_aggr_prs.R"
 
-readonly in_dir="data/prs/scores/inf"
+readonly in_dir="data/prs/scores/auto"
 
 readonly pheno_dir="data/phenotypes"
 readonly phenos="${pheno_dir}/curated_phenotypes_header.tsv"

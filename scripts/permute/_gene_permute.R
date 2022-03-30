@@ -14,7 +14,6 @@ shuffle_knockouts <- function(d){
 
 main <- function(args){
     
-    print(args)
     stopifnot(file.exists(args$input_path))
     stopifnot(!is.na(as.numeric(args$permutations)))
 

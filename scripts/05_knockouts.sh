@@ -32,10 +32,10 @@ readonly out_type="vcf"
 # when using aggr_method="collect" on short.qe
 readonly tasks="21"
 readonly queue="short.qa"
-readonly nslots=4
+readonly nslots=16
 
 readonly only_vcf=""
-readonly aggr_method="fast" # either fasts or collect
+readonly aggr_method="collect" # either fasts or collect
 
 # variant and sample parameters
 readonly exclude="data/genes/220310_common_plofs_to_exclude.txt"

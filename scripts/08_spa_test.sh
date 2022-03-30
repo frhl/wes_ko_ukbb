@@ -55,7 +55,7 @@ submit_spa_with_csqs()
   local trait=${3?Error: Missing arg3 (trait)}
   if [ ! -z ${phenotype} ]; then
     local step1_dir="data/saige/output/${trait}/step1"
-    local step2_dir="data/saige/output/${trait}/step2/test_cols"
+    local step2_dir="data/saige/output/${trait}/step2/test_cols2"
     local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
     local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
     local out_prefix="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}"
