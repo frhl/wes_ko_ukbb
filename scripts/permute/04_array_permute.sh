@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-22
+#$ -t 21
 #$ -tc 1
 #$ -V
 
@@ -26,23 +26,20 @@ readonly in_dir="data/permute/genes/chr${chr}"
 readonly out_dir="data/permute/permutations/chr${chr}"
 
 readonly input_path="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_chr${chr}_GENE.tsv.gz"
-readonly input_type='mt' # deprecated
 
 readonly maf="maf0to5e-2"
 readonly annotation="pLoF_damaging_missense"
-readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_permuted_chr${chr}"
-readonly out_type="vcf" # can currently only do vcf after migration to R-based permutations
+readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_permuted_chr${chr}_GENE"
 
-readonly overview="data/permute/overview/overview.tsv.gz"
-readonly max_allowed_jobs=1
-readonly p_per_job=100
-readonly seed=134
-readonly nslots=1
+readonly genes_path="data/permute/overview/overview_genes.tsv.gz"
+readonly true_p_path="data/permute/overview/overview_true_p.tsv.gz"
+
+readonly n_shuffle=100
+readonly n_slots=1
 readonly queue="short.qe"
 
-readonly n_tasks="$( zcat ${overview} | grep "CH" | grep "chr${chr}" | wc -l)"
-readonly tasks="1-${n_tasks}"
-#tasks=4
+readonly n_genes="$( zcat ${genes_path} | grep "chr${chr}" | wc -l)"
+readonly sge_tasks="1-${n_genes}"
 
 mkdir -p ${out_dir}
 
@@ -50,18 +47,16 @@ set -x
 qsub -N "_chr${chr}_permute" \
     -q "test.qc" \
     -pe shmem 1 \
-    -t ${tasks} \
+    -t ${sge_tasks} \
     "${bash_script}" \
     "${chr}" \
     "${input_path}" \
-    "${input_type}" \
     "${out_prefix}" \
-    "${out_type}" \
-    "${overview}" \
-    "${seed}" \
-    "${p_per_job}" \
-    "${max_allowed_jobs}" \
-    "${nslots}" \
+    "${pheno_dir}" \
+    "${genes_path}" \
+    "${true_p_path}" \
+    "${n_slots}" \
+    "${n_shuffle}" \
     "${queue}"
 set +x
 

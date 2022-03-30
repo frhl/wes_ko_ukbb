@@ -12,6 +12,31 @@ shuffle_knockouts <- function(d){
     return(d$pKO)
 }
 
+# make header of VCF file
+make_vcf_dosage_header <- function(chrom){    
+    vcf_format <- '##fileformat=VCFv4.2'
+    vcf_entry <-  '##FORMAT=<ID=DS,Number=1,Type=Float,Description="">'
+    vcf_filter <- '##FILTER=<ID=PASS,Description="All filters passed">"'
+    vcf_contig <- paste0('##contig=<ID=',chrom,',length=81195210>')
+    vcf_out <- paste(vcf_format, vcf_entry, vcf_filter, vcf_contig, sep = '\n')
+    return(vcf_out)
+}
+
+# make vcf-like rows for dosage entries
+make_vcf_dosage_rows <- function(chrom, positions, marker){
+    return(data.table(
+      "#CHROM" = chrom, 
+      POS = positions,
+      ID = marker,
+      REF = 'X',
+      ALT = 'Y',
+      QUAL = '.',
+      FILTER = '.',
+      INFO = '.',
+      FORMAT = 'DS'
+    ))
+}
+
 main <- function(args){
     
     stopifnot(file.exists(args$input_path))
@@ -28,33 +53,17 @@ main <- function(args){
     rownames(reps) <- d$s
     reps <- data.table(t(reps))
  
-    # synthethic row
-    row <- data.table(
-      "#CHROM" = args$chrom, 
-      POS = 1:n,
-      ID = args$vcf_id,
-      REF = 'X',
-      ALT = 'Y',
-      QUAL = '.',
-      FILTER = '.',
-      INFO = '.',
-      FORMAT = 'DS'
-    )
-
     # combine synthethic rows with knockout matrix
-    M <- cbind(row, reps)
+    rows <- make_vcf_dosage_rows(args$chrom, 1:n, args$vcf_id)
+    final <- cbind(rows, reps)
 
-    # create synthethic VCF output
-    vcf_format <- '##fileformat=VCFv4.2'
-    vcf_entry <-  '##FORMAT=<ID=DS,Number=1,Type=Float,Description="">'
-    vcf_filter <- '##FILTER=<ID=PASS,Description="All filters passed">"'
-    vcf_contig <- paste0('##contig=<ID=',args$chr,',length=81195210>')
-    vcf_out <- paste(vcf_format, vcf_entry, vcf_filter, vcf_contig, sep = '\n')
-
-    # write header of vcf
+    # (1) write header of VCF
+    vcf_out = make_vcf_dosage_header(args$chrom)
     outfile = paste0(args$out_prefix, ".vcf")
     writeLines(text = vcf_out, outfile)
-    fwrite(M, outfile, append = TRUE, quote = FALSE, sep = '\t', col.names = TRUE)
+
+    # (2) append with permuted data
+    fwrite(final, outfile, append = TRUE, quote = FALSE, sep = '\t', col.names = TRUE)
 
 }
 
