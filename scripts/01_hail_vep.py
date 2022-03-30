@@ -31,6 +31,12 @@ def main(args):
     # write out VEP hail table
     ht.write(out_prefix + "_vep.ht", overwrite=True)
 
+    # write a table with variants and consequences which
+    # we can access in other coding languages
+    ht.
+
+
+
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
     # initial params

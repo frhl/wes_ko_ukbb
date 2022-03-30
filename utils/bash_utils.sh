@@ -99,18 +99,22 @@ set_up_conda() {
 #}
 
 set_up_RSAIGE() {
-  module load Anaconda3/2020.07
+  set +eu
+  module load Anaconda3/2020.07 
   module load java/1.8.0_latest
   source "/apps/eb/skylake/software/Anaconda3/2020.07/etc/profile.d/conda.sh"
-  conda activate saige
+  conda activate saige-v1.0.0
+  set -eu
 }
 
 
 set_up_rpy() {
+  set +eu
   module load Anaconda3/2020.07
   module load java/1.8.0_latest
   source "/apps/eb/skylake/software/Anaconda3/2020.07/etc/profile.d/conda.sh"
   conda activate rpy
+  set -eu
 }
 
 set_up_tensorflow() {

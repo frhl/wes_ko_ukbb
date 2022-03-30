@@ -37,8 +37,10 @@ read_hail_sumstat <- function(path, trait, remove_failed = TRUE){
      n_control <- as.numeric(unique(sumstats$n) - n_case)
      stopifnot(length(c(n_case, n_control)) == 2)
      n_eff_final <- 4 / ((1 / n_control) + (1 / n_case))
+     n_total <- n_control + n_case
   } else {
      n_eff_final <- sumstats$n
+     n_total <- sumstats$n
   }
   
   # re-create clean summary stat matrix 
@@ -50,6 +52,7 @@ read_hail_sumstat <- function(path, trait, remove_failed = TRUE){
           a1 = sumstats$a1,
           a0 = sumstats$a0,
           n_eff = n_eff_final,
+          n = n_total,
           beta_se = sumstats$standard_error,
           p = sumstats$p_value,
           beta = sumstats$beta,

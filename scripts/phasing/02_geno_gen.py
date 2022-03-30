@@ -10,7 +10,7 @@ from ukb_utils import tables
 from ukb_utils import genotypes
 from ukb_utils import variants
 from ukb_utils import samples
-
+from ko_utils.samples import filter_to_females
 from ko_utils.variants import filter_min_mac, filter_missing
 
 def main(args):
@@ -50,6 +50,8 @@ def main(args):
     if extract_samples:
         ht_samples = hl.import_table(extract_samples, no_header=True, key='f0', delimiter=',')
         mt = mt.filter_cols(hl.is_defined(ht_samples[mt.col_key])) 
+    if chrom in "X":
+        mt = filter_to_females(mt)
     if liftover:
         mt = variants.liftover(mt, from_build='GRCh37', to_build='GRCh38', drop_annotations=True)
 
@@ -91,7 +93,7 @@ def main(args):
         final = mt.count()
         print(f"Final aggregated count: {final}")
     
-    if missing or min_mac:
+    if missing or min_mac or chrom in "X":
         mt = io.recalc_info(mt)
     if ancestry:
         mt = samples.filter_ukb_to_ancestry(mt, ancestry)

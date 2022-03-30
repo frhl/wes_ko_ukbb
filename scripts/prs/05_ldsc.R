@@ -7,11 +7,21 @@
 devtools::load_all('utils/modules/R/prstools')
 library(argparse)
 
+
+get_sd_y <- function(path_cts_phenotypes, phenotype){
+    stopifnot(file.exists(path_cts_phenotypes))
+    phenos <- fread(path_cts_phenotypes)
+    stopifnot(phenotype %in% colnames(phenos))
+    y <- phenos[[phenotype]]
+    return(sd(y, na.rm = TRUE))
+}
+
 main <- function(args){
 
   stopifnot(file.exists(args$gwas)) 
   stopifnot(file.exists(args$ld_bed))
   stopifnot(dir.exists(args$ld_dir))
+  stopifnot(args$out_prefix != "")
   stopifnot(args$trait %in% c('binary', 'cts'))
 
   # setup parallel environment
@@ -26,13 +36,21 @@ main <- function(args){
   info_snp <- snp_match(gwas, ld_data$map, join_by_pos = TRUE, strand_flip = FALSE)
 
   # qc summary statistics
-  qc <- qc_sumstat(ld_data$G, info_snp, trait = args$trait, ncores = NCORES)
+  if (args$trait %in% "binary"){
+    qc <- qc_sumstat_binary(ld_data$G, info_snp, ncores = NCORES)
+  } else {
+    # Note, the cts traits require the standard deviation of the phenotype
+    sd_y <- get_sd_y(args$path_cts_phenotypes, args$phenotype)
+    qc <- qc_sumstat_cts(ld_data$G, info_snp, sd_y, ncores = NCORES)
+  }  
+  
+  
   well_behaved_snps <- (!qc$is_bad)
   gwas <- info_snp[well_behaved_snps, ]
   gwas$marker <- get_ldpred_marker(gwas)
 
   # Get LD matrix for final SNPs
-  snp <- get_ld_matrix(gwas, ld_dir = args$ld_dir, verbose = TRUE)
+  snp <- get_ld_matrix(gwas, chrs = 1:22, ld_dir = args$ld_dir, verbose = TRUE)
  
   # match GWAS with snp-map
   indicies <- na.omit(match(snp$map$marker, gwas$marker))
@@ -69,7 +87,11 @@ main <- function(args){
   ) 
 
   #write(paste0(args$pred, ".. done! Writing to ", args$out_prefix, ".rds"), stdout())
-  saveRDS(ldsc_out, paste0(args$out_prefix,".rds"))
+  print(args)
+  print(str(ldsc_out))
+  outfile = paste0(args$out_prefix, ".rds")
+  write(paste("Done! writing to", outfile), stdout())
+  saveRDS(ldsc_out, outfile)
   
 }
 
@@ -79,6 +101,8 @@ parser$add_argument("--trait", default=NULL, required = TRUE, help = "either 'bi
 parser$add_argument("--gwas", default=NULL, required = TRUE, help = "Path to QCed SNPs")
 parser$add_argument("--ld_bed", default=NULL, required = TRUE, help = "Path to plink file (bed) used to design LD-matrix")
 parser$add_argument("--ld_dir", default=NULL, required = TRUE, help = "Path to directory with pre-calcualted SNP correlations and LD (.rds files)")
+parser$add_argument("--phenotype", default=NULL, required = TRUE, help = "Where should the results be written?")
+parser$add_argument("--path_cts_phenotypes", default=NULL, required = TRUE, help = "Where should the results be written?")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()
 

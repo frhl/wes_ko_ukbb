@@ -3,6 +3,10 @@
 import hail as hl
 
 
+def get_phenotype_path():
+    r''' returns the current path to Duncan's Phenotype table'''
+    return("/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/data/phenotypes/curated_phenotypes_cts.tsv")
+
 def translate_sample_ids(ht, from_app: int, to_app: int):
     r'''Translate sample IDs from one UKB application to another
     `from_app` and `to_app` are UKB application IDs. This function only supports
@@ -63,6 +67,25 @@ def filter_to_european(mt, genetically_european=True, use_existing_field=True):
         f'[get_european]:{post_filter_count[1]}/{pre_filter_count[1]} IDs were included as genetically european.')
 
     return mt
+
+
+def filter_to_females(mt):
+    '''Filter MatrixTable with chrX variants
+    :param mt: MatrixTable to filter
+    '''
+    # Sex is genetic sex (UKB field 22001), unless:
+    #   - Genetic sex is missing, in which case reported sex (UKB field 31) is used.
+    #   - If genetic and reported sex are defined and genetic sex does not
+    #     match reported sex, then sex is set to unknown/missing.
+    # Sex has been recoded to PLINK coding (2=female, 1=male, 0=unknown)
+    # from UKB coding (0=female, 1=male).
+    ht = hl.import_table(
+            samples.get_phenotype_path(), 
+            impute = True, 
+            key = 'eid', missing = ["NA",""], 
+            types = {"eid": hl.tstr})
+    # Filter to females
+    return mt.filter_cols(ht[mt.s].sex == 0)
 
 
 def filter_to_european_legacy(

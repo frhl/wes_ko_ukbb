@@ -86,7 +86,7 @@ def rand_flip_call(gt: hl.call, P: float = 0.5, seed = None):
         (gt.n_alt_alleles() == 1) &
         (is_phased(gt)), 
         hl.if_else(
-            hl.rand_bool(P),
+            hl.rand_bool(P, seed=seed),
             hl.parse_call("1|0"),
             hl.parse_call("0|1")
         ),
@@ -94,27 +94,57 @@ def rand_flip_call(gt: hl.call, P: float = 0.5, seed = None):
     )
 
 
-def agg_count_calls(mt: hl.MatrixTable, phased: bool = True):
+def aggr_count_calls(mt: hl.MatrixTable, phased: bool = True):
     """ Count number of phased/unphased hetz and what haplotype they reside on
 
     :param mt: MatrixTable with GT field
     :param mt: test for phased genotypes only
     """
     aggr = mt.aggregate_entries(hl.agg.counter(mt.GT))
-    gt10 = aggr[hl.Call(alleles=[1, 0], phased = phased)]
-    gt01 = aggr[hl.Call(alleles=[0, 1], phased = phased)]
+    gt10 = aggr[hl.Call(alleles=[1, 0], phased=phased)]
+    gt01 = aggr[hl.Call(alleles=[0, 1], phased=phased)]
     return((gt10,gt01))
 
 
-def collect_gt_by_expr(mt: hl.MatrixTable, expr: hl.StringExpression):
+def collect_phase_count_by_expr(mt: hl.MatrixTable, expr: hl.StringExpression):
     """Create a hail table of aggregated genotypes by expr
     
     :param mt: MatrixTable to be used
     :param expr: what expression to collapse on, e.g. "gene_id"
     """
-    return (mt.group_rows_by(expr)
-            .aggregate(gts=hl.agg.collect(mt.GT))
+    return mt.group_rows_by(expr).aggregate(
+              gts=hl.agg.filter(mt.GT.is_non_ref(), hl.agg.collect(mt.GT)),
+              varid=hl.agg.filter(mt.GT.is_non_ref(), hl.agg.collect(mt.varid))
             )
+
+
+def aggr_phase_count_by_expr(mt: hl.MatrixTable, expr):
+    """Get aggregated phased/unphased. This is a faster method
+    than using "sum_gst_entries", however, it does not allow
+    for variant IDs to be collected.
+    
+    :param mt: MatrixTable with at least some phased entries
+    :param expr: StringExpression for what string to perform
+    the aggregation on.
+    
+    """
+    return (mt.group_rows_by(expr)
+                .aggregate(
+                    phased=hl.struct(
+                        a1=hl.agg.count_where(
+                            (mt.GT == hl.parse_call("1|0"))),
+                        a2=hl.agg.count_where(
+                            (mt.GT == hl.parse_call("0|1"))),
+                        n=hl.agg.count_where(
+                            (mt.GT.is_het_ref()) & (mt.GT.phased))
+                    ),  
+                    unphased=hl.struct(
+                        n=hl.agg.count_where(
+                            (mt.GT.is_het_ref()) & (~mt.GT.phased))
+                    ),
+                    hom_alt_n=hl.agg.count_where(mt.GT.is_hom_var())
+                    )
+           )
 
 
 def sum_gts_entries(mt: hl.MatrixTable):
@@ -124,26 +154,25 @@ def sum_gts_entries(mt: hl.MatrixTable):
     """
     assert 'gts' in list(mt.entry), 'missing entry field "gts"'
    
-    return (mt.annotate_entries(
-   
-        hom_alt=hl.sum(mt.gts.map(
-                lambda x: x.is_hom_var())),
-
-        phased=hl.struct(
-            a1=hl.sum(mt.gts.map(
-                lambda x: x == hl.parse_call('1|0'))),
-            a2=hl.sum(mt.gts.map(
-                lambda x: x == hl.parse_call('0|1')))
-            ),
-
-        unphased=hl.struct(
-            a1=hl.sum(mt.gts.map(
-                lambda x: x == hl.parse_call('1/0'))),
-            a2=hl.sum(mt.gts.map(
-                lambda x: x == hl.parse_call('0/1')))
+    return (mt.annotate_entries( 
+            hom_alt_n=hl.sum(mt.gts.map(
+                    lambda x: x.is_hom_var())),
+            phased=hl.struct(
+                a1=hl.sum(mt.gts.map(
+                    lambda x: x == hl.parse_call('1|0'))),
+                a2=hl.sum(mt.gts.map(
+                    lambda x: x == hl.parse_call('0|1')))
+                ),
+            unphased=hl.struct(
+                n=hl.sum(mt.gts.map(
+                    lambda x: (~x.phased) & (x.is_het_ref())
+                    )
+                )
+            )
         )
-    ))
+    )
 
+   
 
 def calc_prob_ko(hom_expr, phased_expr, unphased_expr):
     """Calculate probability of knockout based on phased 
@@ -154,7 +183,8 @@ def calc_prob_ko(hom_expr, phased_expr, unphased_expr):
     :param unphased_expr: struct with integers a1 and a2
     """
     
-    n = unphased_expr.a1 + unphased_expr.a2 
+    n = unphased_expr.n
+    #n = unphased_expr.a1 + unphased_expr.a2 
     return (hl.case()
            .when(hom_expr > 0, 1) # homozygote
            .when(
@@ -166,10 +196,34 @@ def calc_prob_ko(hom_expr, phased_expr, unphased_expr):
                 (n > 0), 1 - (1 / 2) ** n)
            .when(
                ((phased_expr.a1 == 0) | # likely compound het (zero phased het)
-                 (phased_expr.a2 == 0)) &
-                 (n > 1), 1 - 2 * (1 / 2) ** n)
+                (phased_expr.a2 == 0)) &
+                (n > 1), 1 - 2 * (1 / 2) ** n)
            .default(0)
             )
+
+
+def calc_prop_het_ko(ko_expr, phased_expr, unphased_expr):
+    """Calculate probability of knockout based on a knockout expression
+    and a count of phased and unphased het sites. Unlike calc_prop_ko,
+    this function is designed to take in a knockout expression and then
+    add deal with the uncertainity of unphased het sites.
+    
+    :param hom_expr: integer for homozygous count 
+    :param phased_expr: count of phased heterozygous sites
+    :param unphased_expr: count of unphased heterozygous sites
+    """
+    
+    return (hl.case()
+        .when(
+            ko_expr == 1, 1)
+        .when(
+            (phased_expr == 1) & (unphased_expr > 0), 
+            (1 - (1 / 2) ** unphased_expr))
+        .when(
+            (phased_expr == 0) & (unphased_expr > 1), 
+            (1 - 2 * (1 / 2) ** unphased_expr))
+        .default(0))
+    
 
 
 def annotate_knockout(hom_expr, pko_expr):

@@ -5,21 +5,21 @@
 #$ -o logs/hail_vep.log
 #$ -e logs/hail_vep.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 10
-#$ -q short.qf
-#$ -t 1-24
+#$ -pe shmem 5
+#$ -q short.qc
+#$ -t 23
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
 
 # directories
-readonly in_dir="data/unphased/post-qc"
+readonly in_dir="data/unphased/wes/post-qc"
 readonly spark_dir="data/tmp/spark"
 readonly vep_dir="data/vep/full"
 readonly out_dir="data/vep/hail"
 
 # hail script
-readonly hail_script="scripts/00_hail_vep.py"
+readonly hail_script="scripts/01_hail_vep.py"
 
 # input paths
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 

@@ -18,10 +18,10 @@ readonly covariates=${4?Error: Missing arg4 (in_gmat)}
 readonly trait_type=${5?Error: Missing arg5 (in_var)} 
 readonly grm_mtx=${6?Error: Missing arg6 (path prefix for saige output)}
 readonly grm_sam=${7?Error: Missing arg7 (Optional file with conditioning markers)}
-readonly out_prefix=${8?Error: Missing arg7 (Optional file with conditioning markers)}
+readonly inv_normalize=${8?Error: Missing arg8(Should input be inverse normalized)}
+readonly out_prefix=${9?Error: Missing arg7 (Optional file with conditioning markers)}
 
-readonly createSparseGRM="/well/lindgren/flassen/software/dev/SAIGE/extdata/createSparseGRM.R"
-readonly step1_fitNULLGLMM="/well/lindgren/flassen/software/dev/SAIGE/extdata/step1_fitNULLGLMM.R"
+readonly step1_fitNULLGLMM="utils/saige/step1_fitNULLGLMM.R"
 readonly threads=$(( ${NSLOTS}-1 ))
 
 fit_null() {
@@ -34,7 +34,7 @@ fit_null() {
        --covarColList=${covariates} \
        --sampleIDColinphenoFile="eid" \
        --traitType="${trait_type}" \
-       --invNormalize=TRUE \
+       --invNormalize="${inv_normalize}" \
        --outputPrefix="${out_prefix}" \
        --outputPrefix_varRatio="${out_prefix}" \
        --IsOverwriteVarianceRatioFile=TRUE \
@@ -42,9 +42,8 @@ fit_null() {
        --sparseGRMSampleIDFile=${grm_sam}  \
        --nThreads=${threads} \
        --LOCO=FALSE \
-       --skipModelFitting=FALSE \
-       --IsSparseKin=TRUE \
-       --isCateVarianceRatio=FALSE \
+       --useSparseGRMtoFitNULL=TRUE \
+       --isCateVarianceRatio=TRUE \
        && print_update "Finished running SAIGE NULL model for ${phenotype}" ${SECONDS} \
        || raise_error "SAIGE NULL model failed for ${phenptype}"
        #--isCateVarianceRatio=FALSE  Only needed for SAIGE-GENE+ (geneset)
