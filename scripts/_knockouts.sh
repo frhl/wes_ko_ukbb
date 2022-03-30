@@ -53,7 +53,7 @@ evaluate_knockouts() {
       --out_type ${out_type} \
       && print_update "Finished evaluation knockouts for chr${chr}" ${SECONDS} \
       || raise_error "Evaluating knockouts for chr${chr} failed"
-  rf -f "${out_prefix_chr}_checkpoint.mt"
+  rm -rf "${out_prefix_chr}_checkpoint.mt"
 }
 
 
