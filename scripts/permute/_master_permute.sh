@@ -19,6 +19,7 @@ source utils/bash_utils.sh
 readonly bash_script="scripts/permute/_gene_permute.sh"
 readonly spa_script="scripts/permute/_gene_spa.sh"
 readonly r_spa_script="scripts/permute/_get_spa_p.R"
+readonly r_p_script="scripts/permute/_calc_empirical_p.R"
 readonly merge_script="scripts/permute/_merge_spa.sh"
 
 readonly chr=${1?Error: Missing argX}
@@ -35,8 +36,9 @@ readonly tick_interval=${11?Error: Missing argX}
 readonly tick_timeout=${12?Error: Missing argX}
 readonly queue_saige=${13?Error: Missing argX}
 readonly queue_permute=${14?Error: Missing argX}
-readonly static_assoc=${15?Error: Missing argX}
-readonly gene=${16?Error: Missing argX}
+readonly annotation=${15?Error: Missing argX}
+readonly static_assoc=${16?Error: Missing argX}
+readonly gene=${17?Error: Missing argX}
 
 
 # get array of path to phenotype names
@@ -96,7 +98,7 @@ wait_for_files() {
     sleep ${ticks_sec}
     local n_found=$(ls -l ${target_dir} | grep ${target_base} | grep "SUCCESS" | wc -l )
     local cur_ticks=$(( ${cur_ticks} + 1 ))
-    echo "sleep tick ${cur_ticks} - found ${n_found} of ${n_expected} files found."
+    echo "sleep tick ${cur_ticks} - ${n_found} / ${n_expected} files found."
     if [ ${cur_ticks} -ge ${ticks_max} ]; then
       >&2 echo "Error: max ticks reached!"
       echo 0
@@ -188,25 +190,29 @@ submit_saige() {
 }
 
 # use a table to lookup the true P-value from the primary analysis.
-lookup_true_p() {
+lookup_true() {
 
   # problematic when you are using strings that are subsets of otuer strings,
   # e.g. WHR and WHRadjBMI. Seraching for the first will result in two phenotypes.
 
-  # requires global variables $assoc and $true_p_path
-
   local phenotype=${1}
   local gene=${2}
   local annotation=${3}
+  local column=${4}
 
+  # read file and subset to current gene/pheno/annotation
   local cur_assoc=$( echo ${static_assoc} | sed -e "s/PHENO/${phenotype}/g" | sed -e "s/ANNO/${annotation}/g") 
   local readfile=$( zcat ${true_p_path} | grep ${gene} | grep ${cur_assoc} )
-  local true_p=$( echo ${readfile} | cut -d" " -f4 )
 
-  if [ -z ${true_p} ]; then
-    >&2 echo "Error: true_p could not be determined for ${phenotype} x ${gene} x ${annotation}"
+  # return P-value or T-stat
+  if [[ "${column}" == "p" ]]; then
+    local true_value=$( echo ${readfile} | cut -d" " -f4 )
+    echo ${true_value}
+  elif [[ "${column}" == "t" ]]; then
+    local true_value=$( echo ${readfile} | cut -d" " -f5 )
+    echo ${true_value}
   else
-    echo ${true_p}
+    >&2 echo "Error: column must be t (t-statistic) or p (P-value)."
   fi
 
 }
@@ -255,7 +261,7 @@ for pheno in ${arr_phenos[@]}; do phenos_done[${pheno}]=0; done
 for pheno in ${arr_phenos[@]}; do saige_supply[${pheno}]=0; done
 
 n_shuffle=${n_start_shuffle}
-n_shuffle_cutoff=400
+n_shuffle_cutoff=1000
 permutation_supply=0
 set_up_rpy
 testit=("WHR" "BMI")
@@ -280,11 +286,13 @@ while [ ${n_shuffle} -le ${n_shuffle_cutoff} ]; do
         aggregate_saige ${n_shuffle} ${phenotype}
 
         permuted_p=$( Rscript ${r_spa_script} --input_path "${saige_merged}" --select_min_p 100)
-        true_p=$( lookup_true_p ${phenotype} ${gene} ${annotation} )
+        true_p=$( lookup_true ${phenotype} ${gene} ${annotation} "p" )
 
         if [ echo "${true_p} >= ${permuted_p}" | bc ]; then
-          echo "Finished ${phenotype} x ${gene} at ${n_shuffle}. P-true = ${true_p}, P-permuted[100] = ${permuted_p}"
           phenos_done[${phenotype}]=1
+          true_t=$( lookup_true ${phenotype} ${gene} ${annotation} "t" )
+          empirical_p=$( Rscript ${r_p_script} --input_path "${saige_merged}" --true_tstat ${true_t})
+          echo "Finished ${phenotype} x ${gene} at ${n_shuffle}. P-true = ${true_p}, P-permuted[100] = ${permuted_p}. Emp-p: ${empirical_p}"
         fi
       fi
 

@@ -31,7 +31,8 @@ readonly tick_timeout=${13?Error: Missing arg13}
 readonly queue_saige=${14?Error: Missing arg14}
 readonly queue_permute=${15?Error: Missing arg15}
 readonly queue_master=${16?Error: Missing arg16}
-readonly assoc_format=${17?Error: Missing arg17}
+readonly annotation=${17?Error: Missing arg17}
+readonly assoc_format=${18?Error: Missing arg18}
 
 readonly index=${SGE_TASK_ID}
 readonly gene="$(zcat ${genes_path} | grep "chr${chr}" | cut -f1 | sed ${index}'q;d' )"
@@ -58,6 +59,7 @@ qsub -N "_c${chr}_${gene}" \
     "${tick_timeout}" \
     "${queue_saige}" \
     "${queue_permute}" \
+    "${annotation}" \
     "${assoc_format}" \
     "${gene}"
 set +x

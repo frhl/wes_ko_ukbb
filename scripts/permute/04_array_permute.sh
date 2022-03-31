@@ -77,6 +77,7 @@ qsub -N "_chr${chr}_permute" \
     "${queue_saige}" \
     "${queue_permute}" \
     "${queue_master}" \
+    "${annotation}" \
     "${assoc_format}"
 set +x
 

@@ -38,7 +38,8 @@ make_vcf_dosage_rows <- function(chrom, positions, marker){
 }
 
 main <- function(args){
-    
+
+    print(args)  
     stopifnot(file.exists(args$input_path))
     stopifnot(!is.na(as.numeric(args$permutations)))
 
