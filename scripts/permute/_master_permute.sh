@@ -19,6 +19,7 @@ source utils/hail_utils.sh
 readonly spark_dir="data/tmp/spark"
 readonly bash_script="scripts/permute/_gene_permute.sh"
 readonly spa_script="scripts/permute/_gene_spa.sh"
+readonly r_spa_script="scripts/permute/_get_spa_p.R"
 readonly merge_script="scripts/permute/_merge_spa.sh"
 
 readonly chr=${1?Error: Missing argX}
@@ -29,9 +30,13 @@ readonly true_p_path=${5?Error: Missing argX}
 readonly n_slots=${6?Error: Missing argX}
 readonly start_n_shuffle=${7?Error: Missing argX}
 readonly gene=${8?Error: Missing argX}
+
 readonly annotation="pLoF"
 readonly replicates=100
 readonly min_mac=1
+
+readonly static_assoc="ukb_eur_wes_200k_maf0to5e-2_PHENOTYPE_ANNOTATION"
+
 
 readonly input_path_gene=$(echo ${input_path} | sed -e "s/GENE/${gene}/g")
 readonly out_prefix_gene=$(echo ${out_prefix} | sed -e "s/GENE/${gene}/g")
@@ -191,13 +196,24 @@ submit_saige() {
 
 lookup_true_p() {
 
+  # problematic when you are using strings that are subsets of otuer strings,
+  # e.g. WHR and WHRadjBMI. Seraching for the first will result in two phenotypes.
+
+  # requires global variables $assoc and $true_p_path
+
   local phenotype=${1}
   local gene=${2}
   local annotation=${3}
-  local readfile=$( zcat ${true_p_path} | grep ${phenotype} | grep ${gene} | grep ${annotation})
-  local true_p=$( echo ${readfile} | cut -f3 )
-  echo "Looking up true P=${true_p} for ${phenotype} x ${gene} x ${annotation}"
-  echo ${true_p}
+
+  local cur_assoc=$( echo ${static_assoc} | sed -e "s/PHENO/${phenotype}/g" | sed -e "s/ANNO/${annotation}/g") 
+  local readfile=$( zcat ${true_p_path} | grep ${gene} | grep ${cur_assoc} )
+  local true_p=$( echo ${readfile} | cut -d" " -f4 )
+
+  if [ -z ${true_p} ]; then
+    >&2 echo "Error: true_p could not be determined for ${phenotype} x ${gene} x ${annotation}"
+  else
+    echo ${true_p}
+  fi
 
 }
 
@@ -211,18 +227,29 @@ aggregate_permuted_p() {
   local max_tasks=$(( (${shuffles} / ${replicates})  )) 
   local merge_name="mrg_${gene}_${phenotype}"
 
-  qsub -N ${merge_name} \
-      -q "short.qc" \
-      -pe shmem 1 \
-      "${merge_script}" \
-      "${in_gene_spa}" \
-      "${out_gene_mrg}" \
-      "${max_tasks}"
+  if [ ${shuffles} -ge 100]; then
+    if [ ${max_tasks} -ge 1]; then
 
-  wait_for_files "${out_gene_mrg}" 1 10s 100
-  rm "${out_gene_merged}.SUCCESS"
+      qsub -N ${merge_name} \
+          -q "short.qc" \
+          -pe shmem 1 \
+          "${merge_script}" \
+          "${in_gene_spa}" \
+          "${out_gene_mrg}" \
+          "${max_tasks}"
 
+      set_up_rpy
+      wait_for_files "${out_gene_mrg}" 1 10s 30
+      rm "${out_gene_merged}.SUCCESS"
+      local p_min=$( Rscript ${r_spa_script} --input_path "${out_gene_mrg}.gz" --select_min_p 100)
+      echo $p_min
 
+    else
+      >&2 echo "Error: need at least one task to submit merge. Exiting.."
+    fi
+  else
+    >&2 echo "Error: Invalid amount of shuffles. Exiting.."
+  fi
 
 }
 
@@ -258,13 +285,14 @@ while [ ${n_shuffle} -le ${n_shuffle_cutoff}]; do
 
         true_p=$( lookup_true_p ${phenotype} ${gene} ${annotation} )
         saige_p=$( aggregate_permuted_p ${phenotype} ${gene} ${annotation} )
-        
+
         if [ ${true_p} > ${saige_p} ]; then
-          echo "tel"
+          phenos_done[${phenotype}]=1
+          echo "Finished ${phenotype} x ${gene} at ${n_shuffle}. P-true = ${true_p}, P-permuted[100] = ${saige_p}"
         fi
 
       fi
-    
+
     done
     n_shuffle=$(( ${n_shuffle} * 10 )) 
 
