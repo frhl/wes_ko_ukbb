@@ -25,8 +25,15 @@ main <- function(args){
     spa_cts_full <- do.call(rbind, lapply(spa_cts_files, fread_with_basename))
     spa_bin_full <- do.call(rbind, lapply(spa_bin_files, fread_with_basename))
 
+    print(head(spa_cts_full))
+
+    print(head(spa_bin_full))
+
     # write out gene-spa p-value pairs
-    spa_full <- rbind(spa_cts_full[,c("CHR","MarkerID","basename", "p.value")], spa_bin_full[,c("CHR","MarkerID","basename", "p.value")])
+    spa_full <- rbind(
+        spa_cts_full[,c("CHR","MarkerID","basename", "p.value", "Tstat")], 
+        spa_bin_full[,c("CHR","MarkerID","basename", "p.value", "Tstat")]
+    )
     out_prefix_true_p <- paste0(args$out_prefix, "_true_p.tsv.gz")
     fwrite(spa_full, out_prefix_true_p, sep = '\t')
     

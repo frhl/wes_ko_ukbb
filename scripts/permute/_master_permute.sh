@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 #
 #
-#$ -N _gene_permute
+#$ -N _master_permute
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_gene_permute.log
-#$ -e logs/_gene_permute.errors.log
+#$ -o logs/_master_permute.log
+#$ -e logs/_master_permute.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q lindgren.qe
+#$ -V
 
 set -o errexit
 set -o nounset
@@ -25,24 +26,18 @@ readonly input_path=${2?Error: Missing argX}
 readonly out_prefix=${3?Error: Missing argX}
 readonly pheno_dir=${4?Error: Missing argX}
 readonly true_p_path=${5?Error: Missing argX}
-readonly n_slots=${6?Error: Missing argX}
-readonly start_n_shuffle=${7?Error: Missing argX}
-readonly gene=${8?Error: Missing argX}
+readonly min_mac=${6?Error: Missing argX}
+readonly replicates=${7?Error: Missing argX}
+readonly n_start_shuffle=${8?Error: Missing argX}
+readonly n_slots_saige=${9?Error: Missing argX}
+readonly n_slots_permute=${10?Error: Missing argX}
+readonly tick_interval=${11?Error: Missing argX}
+readonly tick_timeout=${12?Error: Missing argX}
+readonly queue_saige=${13?Error: Missing argX}
+readonly queue_permute=${14?Error: Missing argX}
+readonly static_assoc=${15?Error: Missing argX}
+readonly gene=${16?Error: Missing argX}
 
-
-## consider bringing these arguments to the input
-readonly annotation="pLoF"
-readonly replicates=100
-readonly min_mac=1
-readonly static_assoc="ukb_eur_wes_200k_maf0to5e-2_PHENO_ANNO"
-
-
-readonly input_path_gene=$(echo ${input_path} | sed -e "s/GENE/${gene}/g")
-readonly out_prefix_gene=$(echo ${out_prefix} | sed -e "s/GENE/${gene}/g")
-
-# todo
-# remember to set new tick values!
-# 
 
 # get array of path to phenotype names
 set_arr_phenos() {
@@ -124,24 +119,24 @@ shuffle_phase() {
 
     local tasks_permute=$(( ${permutation_supply} + 1 ))-$(( ${permutation_supply} + ${n_tasks_required} ))
     permutation_supply=$(( ${permutation_supply} + ${n_tasks_required}))
-    local out_prefix_success="${out_prefix_gene}_${tasks_permute}"
+    local out_permute_success="${out_prefix}_${tasks_permute}"
     echo "Shuffling phase ${n_tasks_required} times.."
 
     qsub -N "c${chr}_${gene}" \
       -t ${tasks_permute} \
-      -q "short.qe" \
-      -pe shmem ${n_slots} \
+      -q ${queue_permute} \
+      -pe shmem ${n_slots_permute} \
       ${bash_script} \
       ${chr} \
-      ${input_path_gene} \
-      ${out_prefix_gene} \
-      ${out_prefix_success} \
+      ${input_path} \
+      ${out_prefix} \
+      ${out_permute_success} \
       ${sge_seed} \
       ${gene} \
       ${replicates}
 
-    wait_for_files ${out_prefix_success} ${n_tasks_required} 10s 100
-    rm -f ${out_prefix_success}*.SUCCESS
+    wait_for_files ${out_permute_success} ${n_tasks_required} ${tick_interval} ${tick_timeout}
+    rm -f ${out_permute_success}*.SUCCESS
   else
     >&2 echo "needed ${permutations_demand} but already have $(( ${replicates} * ${permutation_supply} )). Skipping.."
   fi
@@ -162,16 +157,16 @@ submit_saige() {
     local tasks_spa=$(( ${pheno_saige_supply} + 1 ))-$(( ${pheno_saige_supply} + ${n_tasks_required} ))
     saige_supply[${phenotype}]=$(( ${pheno_saige_supply} + ${n_tasks_required}))
 
-    local vcf_gene_spa="${out_prefix_gene}"
-    local out_gene_spa="${out_prefix_gene}_${phenotype}"
+    local vcf_gene_spa="${out_prefix}"
+    local out_gene_spa="${out_prefix}_${phenotype}"
     local out_spa_success="${out_gene_spa}_${tasks_spa}"
 
     local spa_name="spa_${gene}_${tasks_spa}"
 
     qsub -N "${spa_name}" \
             -t ${tasks_spa} \
-            -q "short.qc" \
-            -pe shmem 1 \
+            -q ${queue_saige} \
+            -pe shmem ${n_slots_saige} \
             "${spa_script}" \
             "${chr}" \
             "${vcf_gene_spa}" \
@@ -183,8 +178,8 @@ submit_saige() {
             "${gene}" \
             "${min_mac}" 
 
-    wait_for_files ${out_spa_success} ${n_tasks_required} 10s 100
-    rm -f ${out_prefix_success}*.SUCCESS
+    wait_for_files ${out_spa_success} ${n_tasks_required} ${tick_interval} ${tick_timeout}
+    rm -f ${out_spa_success}*.SUCCESS
 
   else
     >&2 echo "needed ${saige_demand} but already have $(( ${replicates} * ${pheno_saige_supply} )). Skipping.."
@@ -221,7 +216,7 @@ aggregate_saige() {
 
   local shuffles=${1}
   local phenotype=${2}
-  local prefix="${out_prefix_gene}_${phenotype}"
+  local prefix="${out_prefix}_${phenotype}"
   local out_no_gz="${prefix}_merged.txt"
   local max_tasks=$(( (${shuffles} / ${replicates})  )) 
   rm -f "${out_no_gz}.gz"
@@ -259,8 +254,8 @@ declare -A saige_supply
 for pheno in ${arr_phenos[@]}; do phenos_done[${pheno}]=0; done
 for pheno in ${arr_phenos[@]}; do saige_supply[${pheno}]=0; done
 
-n_shuffle=${start_n_shuffle}
-n_shuffle_cutoff=1000
+n_shuffle=${n_start_shuffle}
+n_shuffle_cutoff=400
 permutation_supply=0
 set_up_rpy
 testit=("WHR" "BMI")
@@ -281,7 +276,7 @@ while [ ${n_shuffle} -le ${n_shuffle_cutoff} ]; do
 
         # submit saige and merge jobs upon completion
         submit_saige ${n_shuffle} ${phenotype}
-        saige_merged="${out_prefix_gene}_${phenotype}_merged.txt.gz"
+        saige_merged="${out_prefix}_${phenotype}_merged.txt.gz"
         aggregate_saige ${n_shuffle} ${phenotype}
 
         permuted_p=$( Rscript ${r_spa_script} --input_path "${saige_merged}" --select_min_p 100)
@@ -294,7 +289,7 @@ while [ ${n_shuffle} -le ${n_shuffle_cutoff} ]; do
       fi
 
     done
-    n_shuffle=$(( ${n_shuffle} * 10 )) 
+    n_shuffle=$(( ${n_shuffle} * 2 )) 
 done
 
 
