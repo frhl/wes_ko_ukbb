@@ -14,9 +14,7 @@ set -o nounset
 
 source utils/vcf_utils.sh
 source utils/bash_utils.sh
-source utils/hail_utils.sh
 
-readonly spark_dir="data/tmp/spark"
 readonly bash_script="scripts/permute/_gene_permute.sh"
 readonly spa_script="scripts/permute/_gene_spa.sh"
 readonly r_spa_script="scripts/permute/_get_spa_p.R"
@@ -31,11 +29,12 @@ readonly n_slots=${6?Error: Missing argX}
 readonly start_n_shuffle=${7?Error: Missing argX}
 readonly gene=${8?Error: Missing argX}
 
+
+## consider bringing these arguments to the input
 readonly annotation="pLoF"
 readonly replicates=100
 readonly min_mac=1
-
-readonly static_assoc="ukb_eur_wes_200k_maf0to5e-2_PHENOTYPE_ANNOTATION"
+readonly static_assoc="ukb_eur_wes_200k_maf0to5e-2_PHENO_ANNO"
 
 
 readonly input_path_gene=$(echo ${input_path} | sed -e "s/GENE/${gene}/g")
@@ -45,8 +44,8 @@ readonly out_prefix_gene=$(echo ${out_prefix} | sed -e "s/GENE/${gene}/g")
 # remember to set new tick values!
 # 
 
+# get array of path to phenotype names
 set_arr_phenos() {
-
   if [ ! -z ${pheno_dir} ]; then
     local pheno_bin="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
     local pheno_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
@@ -59,8 +58,8 @@ set_arr_phenos() {
 }
 
 
+# set array of paths to saige null models
 set_arr_saige() {
-
   local phenotype=${1}
   local trait=$( get_trait_from_pheno ${phenotype} )
   if [[ ( $trait == "cts" ) || ( $trait == "binary") ]]; then
@@ -72,13 +71,11 @@ set_arr_saige() {
   else
     >&2 echo "Error: ${1} is not a valid trait"
   fi
-
 }
 
 
-# return"binary" or "cts" depending on phenotype
+# lookup if phenotype is "binary" or "cts"
 get_trait_from_pheno() {
-
   local phenotype=${1}
   if [[ " ${arr_bin[*]} " =~ " ${phenotype} " ]]; then
     echo "binary"
@@ -90,7 +87,7 @@ get_trait_from_pheno() {
 }
 
 
-# sleeps untill the desired file and count has been found
+# sleep until the desired file and count has been found
 wait_for_files() {
   local file=${1}
   local n_expected=${2}
@@ -115,17 +112,16 @@ wait_for_files() {
 }
 
 
+# call qsub to shuffle phase depending on how many shuffles that has already
+# been completed. Will wait for the qsub script to run before proceeding.
 shuffle_phase() {
 
-  # note: requires $chr $input_path_gene $gene and 
-  # $n_tasks_submitted as global variables
-   
   local permutations_demand=${1}
   local n_tasks_required=$(( (${permutations_demand} / ${replicates}) - ${permutation_supply} ))
   local sge_seed=3
 
   if [ ${n_tasks_required} -ge 1 ]; then
-    
+
     local tasks_permute=$(( ${permutation_supply} + 1 ))-$(( ${permutation_supply} + ${n_tasks_required} ))
     permutation_supply=$(( ${permutation_supply} + ${n_tasks_required}))
     local out_prefix_success="${out_prefix_gene}_${tasks_permute}"
@@ -151,6 +147,7 @@ shuffle_phase() {
 
 }
 
+# call qsub on saige for a desired phenotype. Wait for qsub before proceeding.
 submit_saige() {
 
   local saige_demand=${1}
@@ -193,7 +190,7 @@ submit_saige() {
 
 }
 
-
+# use a table to lookup the true P-value from the primary analysis.
 lookup_true_p() {
 
   # problematic when you are using strings that are subsets of otuer strings,
@@ -217,7 +214,8 @@ lookup_true_p() {
 
 }
 
-aggregate_permuted_p() {
+# aggregated saige output files into a single file
+aggregate_saige() {
 
   local shuffles=${1}
   local phenotype=${2}
@@ -227,8 +225,8 @@ aggregate_permuted_p() {
   local max_tasks=$(( (${shuffles} / ${replicates})  )) 
   local merge_name="mrg_${gene}_${phenotype}"
 
-  if [ ${shuffles} -ge 100]; then
-    if [ ${max_tasks} -ge 1]; then
+  if [ ${shuffles} -ge 100 ]; then
+    if [ ${max_tasks} -ge 1 ]; then
 
       qsub -N ${merge_name} \
           -q "short.qc" \
@@ -240,10 +238,7 @@ aggregate_permuted_p() {
 
       set_up_rpy
       wait_for_files "${out_gene_mrg}" 1 10s 30
-      rm "${out_gene_merged}.SUCCESS"
-      local p_min=$( Rscript ${r_spa_script} --input_path "${out_gene_mrg}.gz" --select_min_p 100)
-      echo $p_min
-
+      rm -f "${out_gene_mrg}.SUCCESS"
     else
       >&2 echo "Error: need at least one task to submit merge. Exiting.."
     fi
@@ -254,9 +249,11 @@ aggregate_permuted_p() {
 }
 
 
+################
+# main scripts #
+################
 
-# keep track of how many times saige has been run for individual phenotypes
-set_arr_phenos_all
+set_arr_phenos
 declare -A phenos_done
 declare -A saige_supply
 for pheno in ${arr_phenos[@]}; do phenos_done[${pheno}]=0; done
@@ -264,10 +261,9 @@ for pheno in ${arr_phenos[@]}; do saige_supply[${pheno}]=0; done
 
 n_shuffle=${start_n_shuffle}
 n_shuffle_cutoff=900
-ermutation_supply=0
+permutation_supply=0
 
 
-# only do untill we reach cutoff
 while [ ${n_shuffle} -le ${n_shuffle_cutoff}]; do
 
     shuffle_phase ${n_shuffle}
@@ -282,20 +278,21 @@ while [ ${n_shuffle} -le ${n_shuffle_cutoff}]; do
         in_gmat=${arr_saige[2]}
         in_var=${arr_saige[3]}
         submit_saige ${n_shuffle} ${phenotype}
+        aggregate_saige ${n_shuffle} ${phenotype}
 
+        saige_merged="${out_prefix_gene}_${phenotype}_merged.txt.gz"
+
+        permuted_p=$( Rscript ${r_spa_script} --input_path "${saige_merged}" --select_min_p 100)
         true_p=$( lookup_true_p ${phenotype} ${gene} ${annotation} )
-        saige_p=$( aggregate_permuted_p ${phenotype} ${gene} ${annotation} )
 
-        if [ ${true_p} > ${saige_p} ]; then
+        if [ ${true_p} > $(( ${permuted_p} * 0.95 )) ]; then
           phenos_done[${phenotype}]=1
           echo "Finished ${phenotype} x ${gene} at ${n_shuffle}. P-true = ${true_p}, P-permuted[100] = ${saige_p}"
         fi
-
       fi
 
     done
     n_shuffle=$(( ${n_shuffle} * 10 )) 
-
 done
 
 echo "done"
