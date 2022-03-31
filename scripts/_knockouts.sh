@@ -43,6 +43,7 @@ evaluate_knockouts() {
       --csqs_category ${in_category} \
       --use_loftee \
       ${only_vcf:+--only_vcf} \
+      ${aggr_method:+--aggr_method} \
       ${af_min:+--af_min "$af_min"} \
       ${af_max:+--af_min "$af_max"} \
       ${maf_max:+--maf_max "$maf_max"} \
