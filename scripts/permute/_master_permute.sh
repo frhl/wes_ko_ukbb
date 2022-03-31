@@ -31,6 +31,7 @@ readonly start_n_shuffle=${7?Error: Missing argX}
 readonly gene=${8?Error: Missing argX}
 readonly annotation="pLoF"
 readonly replicates=100
+readonly min_mac=1
 
 readonly input_path_gene=$(echo ${input_path} | sed -e "s/GENE/${gene}/g")
 readonly out_prefix_gene=$(echo ${out_prefix} | sed -e "s/GENE/${gene}/g")
@@ -39,17 +40,19 @@ readonly out_prefix_gene=$(echo ${out_prefix} | sed -e "s/GENE/${gene}/g")
 # remember to set new tick values!
 # 
 
-set_arr_phenos_all() {
+set_arr_phenos() {
 
-  readonly pheno_bin="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
-  readonly pheno_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
-  readarray -t bin < ${pheno_bin}
-  readarray -t cts < ${pheno_cts}
-  declare arr_bin=${bin}
-  declare arr_cts=${cts}
-  declare phenos_all=("${arr_cts[@]}" "${arr_bin[@]}")
-
+  if [ ! -z ${pheno_dir} ]; then
+    local pheno_bin="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
+    local pheno_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
+    readarray -t arr_bin < ${pheno_bin}
+    readarray -t arr_cts < ${pheno_cts}
+    arr_phenos=("${arr_bin[@]}" "${arr_cts[@]}")
+  else
+    echo "Error: global variable 'pheno_dir' has not been defined"
+  fi
 }
+
 
 set_arr_saige() {
 
@@ -99,7 +102,8 @@ wait_for_files() {
     echo "waiting for ${target_base} [tick ${cur_ticks}] found ${n_found} equal to ${n_expected}"
     if [ ${cur_ticks} -ge ${ticks_max} ]; then
       >&2 echo "Error: max ticks reached!"
-      exit 1
+      echo 0
+      break
     fi
   done
   echo 1
@@ -144,25 +148,21 @@ shuffle_phase() {
 
 submit_saige() {
 
-  # one big problem here is that SAIGE supply changes deending on phenotype.
-  # should look up array to check how many have already been run
-
   local saige_demand=${1}
   local phenotype=${2}
-
-  local vcf_gene_spa="${out_prefix_gene}"
-  local out_gene_spa="${out_prefix_gene}_spa"
-
-  local n_tasks_required=$(( (${saige_demand} / ${replicates}) - ${saige_supply} ))
+  local pheno_saige_supply=${saige_supply[${phenotype}]}
+  local n_tasks_required=$(( (${saige_demand} / ${replicates}) - ${pheno_saige_supply} ))
 
   if [ ${n_tasks_required} -ge 1 ]; then
 
-    local tasks_spa=$(( ${saige_supply} + 1 ))-$(( ${saige_supply} + ${n_tasks_required} ))
-    saige_supply=$(( ${saige_supply} + ${n_tasks_required}))
+    local tasks_spa=$(( ${pheno_saige_supply} + 1 ))-$(( ${pheno_saige_supply} + ${n_tasks_required} ))
+    saige_supply[${phenotype}]=$(( ${pheno_saige_supply} + ${n_tasks_required}))
+
+    local vcf_gene_spa="${out_prefix_gene}"
+    local out_gene_spa="${out_prefix_gene}_${phenotype}"
     local out_spa_success="${out_gene_spa}_${tasks_spa}"
 
     local spa_name="spa_${gene}_${tasks_spa}"
-    local merge_name="mrg_${gene}_${tasks_spa}"
 
     qsub -N "${spa_name}" \
             -t ${tasks_spa} \
@@ -183,16 +183,8 @@ submit_saige() {
     rm -f ${out_prefix_success}*.SUCCESS
 
   else
-    >&2 echo "needed ${permutations_demand} but already have $(( ${replicates} * ${permutation_supply} )). Skipping.."
+    >&2 echo "needed ${saige_demand} but already have $(( ${replicates} * ${pheno_saige_supply} )). Skipping.."
   fi
-
-}
-
-
-get_sorted_saige_p() {
-  
-  local file=${1}
-  local take_top=${2}
 
 }
 
@@ -209,20 +201,47 @@ lookup_true_p() {
 
 }
 
-echo "test 1"
+aggregate_permuted_p() {
 
+  local shuffles=${1}
+  local phenotype=${2}
+  local in_gene_spa="${out_prefix_gene}_${phenotype}"
+  local out_gene_mrg="${in_gene_spa}_merged.txt"
+
+  local max_tasks=$(( (${shuffles} / ${replicates})  )) 
+  local merge_name="mrg_${gene}_${phenotype}"
+
+  qsub -N ${merge_name} \
+      -q "short.qc" \
+      -pe shmem 1 \
+      "${merge_script}" \
+      "${in_gene_spa}" \
+      "${out_gene_mrg}" \
+      "${max_tasks}"
+
+  wait_for_files "${out_gene_mrg}" 1 10s 100
+  rm "${out_gene_merged}.SUCCESS"
+
+
+
+}
+
+
+
+# keep track of how many times saige has been run for individual phenotypes
 set_arr_phenos_all
-declare phenos_done=()
+declare -A phenos_done
+declare -A saige_supply
+for pheno in ${arr_phenos[@]}; do phenos_done[${pheno}]=0; done
+for pheno in ${arr_phenos[@]}; do saige_supply[${pheno}]=0; done
+
 n_shuffle=${start_n_shuffle}
 n_shuffle_cutoff=900
 ermutation_supply=0
-saige_supply=0
+
 
 # only do untill we reach cutoff
 while [ ${n_shuffle} -le ${n_shuffle_cutoff}]; do
-
-  # while there are still phenotypes left to test
-  if [ ${#phenos_all[@]} != ${#phenos_done[@]} ]; then
 
     shuffle_phase ${n_shuffle}
 
@@ -230,22 +249,25 @@ while [ ${n_shuffle} -le ${n_shuffle_cutoff}]; do
     for phenotype in "${phenos_all[@]}"; do
 
       # check if phenotype is already done
-      if [[ ! " ${phenotypes_done[*]} " =~ " ${phenotype} " ]]; then
+      if [ ${phenos_done[${phenotype}]} == "0" ]; then
 
         set_arr_saige ${phenotype}
         in_gmat=${arr_saige[2]}
         in_var=${arr_saige[3]}
         submit_saige ${n_shuffle} ${phenotype}
 
-        true_p=$( lookup_true_p ${phenotype} ${gene} "${annotation}" )
-        echo "${phenotype} ${gene} ${annotation}"
+        true_p=$( lookup_true_p ${phenotype} ${gene} ${annotation} )
+        saige_p=$( aggregate_permuted_p ${phenotype} ${gene} ${annotation} )
+        
+        if [ ${true_p} > ${saige_p} ]; then
+          echo "tel"
+        fi
 
       fi
-    break # <------
+    
     done
     n_shuffle=$(( ${n_shuffle} * 10 )) 
-  fi
-  break # <------
+
 done
 
 echo "done"

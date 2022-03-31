@@ -12,31 +12,30 @@ set -o nounset
 source utils/bash_utils.sh
 
 readonly prefix=${1?Error: Missing arg1 (prefix)}
-readonly actual_tasks=${2?Error: Missing arg2 (n_tasks)}
+readonly out_no_gz=${2?Error: Missing arg1 (prefix)}
 readonly max_tasks=${3?Error: Missing arg2 (n_tasks)}
-readonly out_no_gz="${prefix}.txt"
 
-readonly files="${prefix##*/}$"
-echo ">${files}"
+readonly out_file_success="${out_no_gz}.SUCCESS"
 
-for id in $(seq 1 ${actual_tasks}); do
-   file="${prefix}_${id}of${max_tasks}.txt"
+
+for id in $(seq 1 ${max_tasks}); do
+   file="${prefix}_${id}.txt"
    if [ -f ${file} ]; then
      echo ${file}
      if [ "${id}" == "1" ]; then
         cat "${file}" | head -n 1  >> "${out_no_gz}"
      fi
      cat "${file}" | tail -n +2  >> "${out_no_gz}"
-     rm -f "${file}"
    fi
 done
 
 
 if [ -f ${out_no_gz} ]; then
   gzip "${out_no_gz}"
+  touch ${out_file_success}
   echo "Merge complete for ${out_no_gz}"
 else 
-  >&2 "Error: ${out_no_gz} could not be found."
+  >&2 echo "Error: ${out_no_gz} could not be found."
 fi
 
 
