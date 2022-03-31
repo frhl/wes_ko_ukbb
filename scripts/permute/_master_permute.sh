@@ -219,26 +219,24 @@ aggregate_saige() {
 
   local shuffles=${1}
   local phenotype=${2}
-  local in_gene_spa="${out_prefix_gene}_${phenotype}"
-  local out_gene_mrg="${in_gene_spa}_merged.txt"
-
+  local prefix="${out_prefix_gene}_${phenotype}"
+  local out_no_gz="${prefix}_merged.txt"
   local max_tasks=$(( (${shuffles} / ${replicates})  )) 
-  local merge_name="mrg_${gene}_${phenotype}"
 
   if [ ${shuffles} -ge 100 ]; then
     if [ ${max_tasks} -ge 1 ]; then
-
-      qsub -N ${merge_name} \
-          -q "short.qc" \
-          -pe shmem 1 \
-          "${merge_script}" \
-          "${in_gene_spa}" \
-          "${out_gene_mrg}" \
-          "${max_tasks}"
-
-      set_up_rpy
-      wait_for_files "${out_gene_mrg}" 1 10s 30
-      rm -f "${out_gene_mrg}.SUCCESS"
+      for id in $(seq 1 ${max_tasks}); do
+        file="${prefix}_${id}.txt"
+         if [ -f ${file} ]; then
+           echo ${file}
+           if [ "${id}" == "1" ]; then
+              cat "${file}" | head -n 1  >> "${out_no_gz}"
+           fi
+           cat "${file}" | tail -n +2  >> "${out_no_gz}"
+         fi
+       done
+       gzip "${out_no_gz}"
+       echo "Merge complete for ${out_no_gz}"
     else
       >&2 echo "Error: need at least one task to submit merge. Exiting.."
     fi
@@ -262,7 +260,7 @@ for pheno in ${arr_phenos[@]}; do saige_supply[${pheno}]=0; done
 n_shuffle=${start_n_shuffle}
 n_shuffle_cutoff=900
 permutation_supply=0
-
+set_up_rpy
 
 while [ ${n_shuffle} -le ${n_shuffle_cutoff}]; do
 
