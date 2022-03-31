@@ -101,7 +101,7 @@ wait_for_files() {
     sleep ${ticks_sec}
     local n_found=$(ls -l ${target_dir} | grep ${target_base} | grep "SUCCESS" | wc -l )
     local cur_ticks=$(( ${cur_ticks} + 1 ))
-    echo "waiting for ${target_base} [tick ${cur_ticks}] found ${n_found} equal to ${n_expected}"
+    echo "sleep tick ${cur_ticks} - found ${n_found} of ${n_expected} files found."
     if [ ${cur_ticks} -ge ${ticks_max} ]; then
       >&2 echo "Error: max ticks reached!"
       echo 0
@@ -125,6 +125,7 @@ shuffle_phase() {
     local tasks_permute=$(( ${permutation_supply} + 1 ))-$(( ${permutation_supply} + ${n_tasks_required} ))
     permutation_supply=$(( ${permutation_supply} + ${n_tasks_required}))
     local out_prefix_success="${out_prefix_gene}_${tasks_permute}"
+    echo "Shuffling phase ${n_tasks_required} times.."
 
     qsub -N "c${chr}_${gene}" \
       -t ${tasks_permute} \
@@ -157,6 +158,7 @@ submit_saige() {
 
   if [ ${n_tasks_required} -ge 1 ]; then
 
+    echo "Running saige for ${phenotype} with ${n_tasks_required} jobs."
     local tasks_spa=$(( ${pheno_saige_supply} + 1 ))-$(( ${pheno_saige_supply} + ${n_tasks_required} ))
     saige_supply[${phenotype}]=$(( ${pheno_saige_supply} + ${n_tasks_required}))
 
@@ -222,7 +224,7 @@ aggregate_saige() {
   local prefix="${out_prefix_gene}_${phenotype}"
   local out_no_gz="${prefix}_merged.txt"
   local max_tasks=$(( (${shuffles} / ${replicates})  )) 
-
+  rm -f "${out_no_gz}.gz"
   if [ ${shuffles} -ge 100 ]; then
     if [ ${max_tasks} -ge 1 ]; then
       for id in $(seq 1 ${max_tasks}); do
@@ -236,7 +238,7 @@ aggregate_saige() {
          fi
        done
        gzip "${out_no_gz}"
-       echo "Merge complete for ${out_no_gz}"
+       echo "Aggregated ${max_tasks} files to ${out_no_gz}."
     else
       >&2 echo "Error: need at least one task to submit merge. Exiting.."
     fi
@@ -258,34 +260,36 @@ for pheno in ${arr_phenos[@]}; do phenos_done[${pheno}]=0; done
 for pheno in ${arr_phenos[@]}; do saige_supply[${pheno}]=0; done
 
 n_shuffle=${start_n_shuffle}
-n_shuffle_cutoff=900
+n_shuffle_cutoff=1000
 permutation_supply=0
 set_up_rpy
+testit=("WHR" "BMI")
 
-while [ ${n_shuffle} -le ${n_shuffle_cutoff}]; do
+while [ ${n_shuffle} -le ${n_shuffle_cutoff} ]; do
 
     shuffle_phase ${n_shuffle}
 
-    # iterate over all phenotypes
-    for phenotype in "${phenos_all[@]}"; do
+    for phenotype in "${testit[@]}"; do
+    #for phenotype in "${phenos_all[@]}"; do
 
-      # check if phenotype is already done
       if [ ${phenos_done[${phenotype}]} == "0" ]; then
 
+        # get trait saige variables
         set_arr_saige ${phenotype}
         in_gmat=${arr_saige[2]}
         in_var=${arr_saige[3]}
-        submit_saige ${n_shuffle} ${phenotype}
-        aggregate_saige ${n_shuffle} ${phenotype}
 
+        # submit saige and merge jobs upon completion
+        submit_saige ${n_shuffle} ${phenotype}
         saige_merged="${out_prefix_gene}_${phenotype}_merged.txt.gz"
+        aggregate_saige ${n_shuffle} ${phenotype}
 
         permuted_p=$( Rscript ${r_spa_script} --input_path "${saige_merged}" --select_min_p 100)
         true_p=$( lookup_true_p ${phenotype} ${gene} ${annotation} )
 
-        if [ ${true_p} > $(( ${permuted_p} * 0.95 )) ]; then
+        if [ echo "${true_p} >= ${permuted_p}" | bc ]; then
+          echo "Finished ${phenotype} x ${gene} at ${n_shuffle}. P-true = ${true_p}, P-permuted[100] = ${permuted_p}"
           phenos_done[${phenotype}]=1
-          echo "Finished ${phenotype} x ${gene} at ${n_shuffle}. P-true = ${true_p}, P-permuted[100] = ${saige_p}"
         fi
       fi
 
@@ -293,6 +297,5 @@ while [ ${n_shuffle} -le ${n_shuffle_cutoff}]; do
     n_shuffle=$(( ${n_shuffle} * 10 )) 
 done
 
-echo "done"
 
 
