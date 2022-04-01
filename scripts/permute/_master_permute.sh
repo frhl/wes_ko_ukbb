@@ -274,7 +274,7 @@ while [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; do
     shuffle_phase ${n_shuffle}
 
     #for phenotype in "${testit[@]}"; do
-    for phenotype in "${phenos_all[@]}"; do
+    for phenotype in "${arr_phenos[@]}"; do
 
       if [ ${phenos_done[${phenotype}]} == "0" ]; then
 
