@@ -29,34 +29,43 @@ readonly phenotype=${7?Error: Missing arg6 (phenotype)}
 readonly gene=${8?Error: Missing arg7 (gene)}
 readonly min_mac=${9?Error: Missing arg9 (min_mac)}
 
+readonly var_bytes=$( file_size ${in_var} )
+readonly gmat_bytes=$( file_size ${in_gmat} )
+
 readonly id=${SGE_TASK_ID}
 readonly vcf="${in_vcf}_${id}.vcf.gz"
 readonly csi="${vcf}_${id}.csi"
 readonly out_gene_task="${out_gene}_${id}.txt"
 readonly out_file_success="${out_spa_success}_${id}.SUCCESS"
+readonly out_file_failure="${out_spa_success}_${id}.FAILURE"
 
-set_up_RSAIGE
+
 
 if [ ! -f ${out_gene_task} ]; then
-  SECONDS=0
-  Rscript "${step2_SPAtests}"  \
-     --vcfFile=${vcf} \
-     --vcfFileIndex=${csi} \
-     --vcfField="DS" \
-     --chrom="chr${chr}" \
-     --minMAF=0.000000001 \
-     --minMAC=${min_mac} \
-     --GMMATmodelFile=${in_gmat} \
-     --varianceRatioFile=${in_var} \
-     --SAIGEOutputFile=${out_gene_task} \
-     --LOCO=FALSE\
-     && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
-     || raise_error "Saddle-point approximation for chr${chr} failed"
-  rm -f "${out_gene_task}.index"
-  touch ${out_file_success}
+  if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then 
+    SECONDS=0
+    set_up_RSAIGE
+    Rscript "${step2_SPAtests}"  \
+       --vcfFile=${vcf} \
+       --vcfFileIndex=${csi} \
+       --vcfField="DS" \
+       --chrom="chr${chr}" \
+       --minMAF=0.000000001 \
+       --minMAC=${min_mac} \
+       --GMMATmodelFile=${in_gmat} \
+       --varianceRatioFile=${in_var} \
+       --SAIGEOutputFile=${out_gene_task} \
+       --LOCO=FALSE\
+       && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
+       || raise_error "Saddle-point approximation for chr${chr} failed"
+    rm -f "${out_gene_task}.index"
+  else
+    touch ${out_file_failure}
+  fi
 else
   >&2 echo "${out_gene_task} already exists. Skipping.."
 fi
 
 
+touch ${out_file_success}
 
