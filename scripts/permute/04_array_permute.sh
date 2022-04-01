@@ -23,7 +23,7 @@ readonly chr="${SGE_TASK_ID}"
 
 # setup directories
 readonly in_dir="data/permute/genes/chr${chr}"
-readonly out_dir="data/permute/permutations/chr${chr}"
+readonly out_dir="data/permute/permutations/chr${chr}/GENE"
 readonly pheno_dir="data/phenotypes"
 
 # setup input and putput paths
@@ -39,21 +39,22 @@ readonly true_p_path="data/permute/overview/overview_true_p.tsv.gz"
 # count how many genes to submit for the given chromosome
 readonly n_genes="$( zcat ${genes_path} | grep "chr${chr}" | wc -l)"
 #readonly sge_tasks="1-${n_genes}"
-readonly sge_tasks=1
+readonly sge_tasks=2
 
 # parameters for master script
 readonly min_mac=1
 readonly n_replicates=100
 readonly n_start_shuffle=100
+readonly n_cutoff_shuffle=1000
 readonly n_slots_saige=1
-readonly n_slots_permute=1
+readonly n_slots_permute=2
 readonly tick_interval=10
-readonly tick_timeout=100 # 10 x 100 seconds
-readonly queue_saige="short.qe"
-readonly queue_permute="short.qe"
-readonly queue_master="short.qa"
+readonly tick_timeout=600 # 10 x 100 seconds
+readonly queue_saige="short.qf"
+readonly queue_permute="short.qa"
+readonly queue_master="short.qe"
 
-mkdir -p ${out_dir}
+#mkdir -p ${out_dir}
 
 set -x
 qsub -N "_chr${chr}_permute" \
@@ -70,6 +71,7 @@ qsub -N "_chr${chr}_permute" \
     "${min_mac}" \
     "${n_replicates}" \
     "${n_start_shuffle}" \
+    "${n_cutoff_shuffle}" \
     "${n_slots_saige}" \
     "${n_slots_permute}" \
     "${tick_interval}" \

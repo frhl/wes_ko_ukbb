@@ -30,15 +30,16 @@ readonly true_p_path=${5?Error: Missing argX}
 readonly min_mac=${6?Error: Missing argX}
 readonly replicates=${7?Error: Missing argX}
 readonly n_start_shuffle=${8?Error: Missing argX}
-readonly n_slots_saige=${9?Error: Missing argX}
-readonly n_slots_permute=${10?Error: Missing argX}
-readonly tick_interval=${11?Error: Missing argX}
-readonly tick_timeout=${12?Error: Missing argX}
-readonly queue_saige=${13?Error: Missing argX}
-readonly queue_permute=${14?Error: Missing argX}
-readonly annotation=${15?Error: Missing argX}
-readonly static_assoc=${16?Error: Missing argX}
-readonly gene=${17?Error: Missing argX}
+readonly n_cutoff_shuffle=${9?Error: Missing argX}
+readonly n_slots_saige=${10?Error: Missing argX}
+readonly n_slots_permute=${11?Error: Missing argX}
+readonly tick_interval=${12?Error: Missing argX}
+readonly tick_timeout=${13?Error: Missing argX}
+readonly queue_saige=${14?Error: Missing argX}
+readonly queue_permute=${15?Error: Missing argX}
+readonly annotation=${16?Error: Missing argX}
+readonly static_assoc=${17?Error: Missing argX}
+readonly gene=${18?Error: Missing argX}
 
 
 # get array of path to phenotype names
@@ -196,9 +197,7 @@ lookup_true() {
   # e.g. WHR and WHRadjBMI. Seraching for the first will result in two phenotypes.
 
   local phenotype=${1}
-  local gene=${2}
-  local annotation=${3}
-  local column=${4}
+  local column=${2}
 
   # read file and subset to current gene/pheno/annotation
   local cur_assoc=$( echo ${static_assoc} | sed -e "s/PHENO/${phenotype}/g" | sed -e "s/ANNO/${annotation}/g") 
@@ -254,19 +253,20 @@ aggregate_saige() {
 # main scripts #
 ################
 
+set_up_rpy
 set_arr_phenos
 declare -A phenos_done
 declare -A saige_supply
 for pheno in ${arr_phenos[@]}; do phenos_done[${pheno}]=0; done
 for pheno in ${arr_phenos[@]}; do saige_supply[${pheno}]=0; done
 
+
 n_shuffle=${n_start_shuffle}
-n_shuffle_cutoff=1000
 permutation_supply=0
-set_up_rpy
+top_p=5
 testit=("WHR" "BMI")
 
-while [ ${n_shuffle} -le ${n_shuffle_cutoff} ]; do
+while [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; do
 
     shuffle_phase ${n_shuffle}
 
@@ -285,19 +285,21 @@ while [ ${n_shuffle} -le ${n_shuffle_cutoff} ]; do
         saige_merged="${out_prefix}_${phenotype}_merged.txt.gz"
         aggregate_saige ${n_shuffle} ${phenotype}
 
-        permuted_p=$( Rscript ${r_spa_script} --input_path "${saige_merged}" --select_min_p 100)
-        true_p=$( lookup_true ${phenotype} ${gene} ${annotation} "p" )
+        permuted_p=$( Rscript ${r_spa_script} --input_path "${saige_merged}" --select_min_p ${top_p} )
+        true_p=$( lookup_true ${phenotype} "p" )
 
-        if [ echo "${true_p} >= ${permuted_p}" | bc ]; then
+        if [ $( echo "${true_p} >= ${permuted_p}" | bc ) ]; then
           phenos_done[${phenotype}]=1
-          true_t=$( lookup_true ${phenotype} ${gene} ${annotation} "t" )
-          empirical_p=$( Rscript ${r_p_script} --input_path "${saige_merged}" --true_tstat ${true_t})
+          true_t=$( lookup_true ${phenotype} "t" )
+          outfile="${out_prefix}_${phenotype}_empirical_p"
+          empirical_p=$( Rscript ${r_p_script} --input_path "${saige_merged}" --true_tstat ${true_t} --true_p ${true_p} --out_prefix ${outfile})
           echo "Finished ${phenotype} x ${gene} at ${n_shuffle}. P-true = ${true_p}, P-permuted[100] = ${permuted_p}. Emp-p: ${empirical_p}"
         fi
       fi
 
     done
-    n_shuffle=$(( ${n_shuffle} * 2 )) 
+    n_shuffle=$(( ${n_shuffle} * 10 ))
+    top_p=100
 done
 
 
