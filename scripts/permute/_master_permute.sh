@@ -256,6 +256,8 @@ aggregate_saige() {
 # main scripts #
 ################
 
+# * note: n_shuffle must be larger or equal to n_start_shuffle
+
 set_up_rpy
 set_arr_phenos
 declare -A phenos_done
@@ -278,32 +280,43 @@ while [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; do
 
       if [ ${phenos_done[${phenotype}]} == "0" ]; then
 
-        # get trait saige variables
         set_arr_saige ${phenotype}
         in_gmat=${arr_saige[2]}
         in_var=${arr_saige[3]}
+        gmat_bytes=$( file_size ${in_gmat} )
+        var_bytes=$( file_size ${in_gmat} )
 
-        # submit saige and merge jobs upon completion
-        submit_saige ${n_shuffle} ${phenotype}
-        saige_merged="${out_prefix}_${phenotype}_merged.txt.gz"
-        aggregate_saige ${n_shuffle} ${phenotype}
+        if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0]; then
 
-        permuted_p=$( Rscript ${r_spa_script} --input_path "${saige_merged}" --select_min_p ${top_p} )
-        true_p=$( lookup_true ${phenotype} "p" )
+          submit_saige ${n_shuffle} ${phenotype}
+          saige_merged="${out_prefix}_${phenotype}_merged.txt.gz"
+          aggregate_saige ${n_shuffle} ${phenotype}
 
-        if [ $( zcat ${saige_merged} | wc -l ) -ge 2 ]; then
-          if [ $( echo "${true_p} >= ${permuted_p}" | bc ) ]; then
+          permuted_p=$( Rscript ${r_spa_script} --input_path "${saige_merged}" --select_min_p ${top_p} )
+          true_p=$( lookup_true ${phenotype} "p" )
+
+          if [ $( zcat ${saige_merged} | wc -l ) -ge 2 ]; then
+
+            if [ $( echo "${true_p} >= ${permuted_p}" | bc ) ]; then
+
+              phenos_done[${phenotype}]=1
+              true_t=$( lookup_true ${phenotype} "t" )
+              outfile="${out_prefix}_${phenotype}_empirical_p"
+              empirical_p=$( Rscript ${r_p_script} --input_path "${saige_merged}" --true_tstat ${true_t} --true_p ${true_p} --out_prefix ${outfile})
+              print_update "Finished ${phenotype} x ${gene} with empirical P: ${empirical_p}" "${SECONDS}" 
+
+            fi
+
+          else
             phenos_done[${phenotype}]=1
-            true_t=$( lookup_true ${phenotype} "t" )
-            outfile="${out_prefix}_${phenotype}_empirical_p"
-            empirical_p=$( Rscript ${r_p_script} --input_path "${saige_merged}" --true_tstat ${true_t} --true_p ${true_p} --out_prefix ${outfile})
-            print_update "Finished ${phenotype} x ${gene} with empirical P: ${empirical_p}" "${SECONDS}" 
+            print_update "Finished ${phenotype} x ${gene}. No markers with min_mac=${min_mac}." "${SECONDS}" 
           fi
+
         else
           phenos_done[${phenotype}]=1
-          print_update "Finished ${phenotype} x ${gene}. No markers with min_mac=${min_mac}" "${SECONDS}" 
+          print_update "Stopped ${phenotype} x ${gene}. The gmat and variance ratio files are empty." "${SECONDS}" 
         fi
-      
+
       fi
     done
 
