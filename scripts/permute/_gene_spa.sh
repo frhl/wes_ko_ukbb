@@ -39,9 +39,9 @@ readonly out_gene_task="${out_gene}_${id}.txt"
 readonly out_file_success="${out_spa_success}_${id}.SUCCESS"
 readonly out_file_failure="${out_spa_success}_${id}.FAILURE"
 
-
-
 if [ ! -f ${out_gene_task} ]; then
+  echo "var_bytes=${var_bytes} at ${in_var}"
+  echo "gmat_bytes=${gmat_bytes} at ${in_gmat}"
   if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then 
     SECONDS=0
     set_up_RSAIGE

@@ -123,26 +123,37 @@ shuffle_phase() {
 
   if [ ${n_tasks_required} -ge 1 ]; then
 
-    local tasks_permute=$(( ${permutation_supply} + 1 ))-$(( ${permutation_supply} + ${n_tasks_required} ))
+    echo "Running shuffle phase ${n_tasks_required} times."
+    local tasks_lower_bound=$(( ${permutation_supply} + 1 ))
+    local tasks_upper_bound=$(( ${permutation_supply} + ${n_tasks_required} ))
+    local tasks_permute=${tasks_lower_bound}-${tasks_upper_bound}
     permutation_supply=$(( ${permutation_supply} + ${n_tasks_required}))
+
     local out_permute_success="${out_prefix}_${tasks_permute}"
-    echo "Shuffling phase ${n_tasks_required} times.."
+    local out_permute_upper_bound="${out_prefix}_${tasks_upper_bound}"
 
-    qsub -N "c${chr}_${gene}" \
-      -t ${tasks_permute} \
-      -q ${queue_permute} \
-      -pe shmem ${n_slots_permute} \
-      ${bash_script} \
-      ${chr} \
-      ${input_path} \
-      ${out_prefix} \
-      ${out_permute_success} \
-      ${sge_seed} \
-      ${gene} \
-      ${replicates}
+    # if the permutation already exists. Skip submission..
+    if [ ! -f "${out_permute_upper_bound}.vcf.gz" ]; then
 
-    wait_for_files ${out_permute_success} ${n_tasks_required} ${tick_interval} ${tick_timeout}
-    rm -f ${out_permute_success}*.SUCCESS
+      qsub -N "c${chr}_${gene}" \
+          -t ${tasks_permute} \
+          -q ${queue_permute} \
+          -pe shmem ${n_slots_permute} \
+          ${bash_script} \
+          ${chr} \
+          ${input_path} \
+          ${out_prefix} \
+          ${out_permute_success} \
+          ${sge_seed} \
+          ${gene} \
+          ${replicates}
+
+      wait_for_files ${out_permute_success} ${n_tasks_required} ${tick_interval} ${tick_timeout}
+      rm -f ${out_permute_success}*.SUCCESS
+
+    else
+      echo >&2 "${out_permute_upper_bound} already exists. Skipping.."
+    fi
   else
     >&2 echo "needed ${permutations_demand} but already have $(( ${replicates} * ${permutation_supply} )). Skipping.."
   fi
@@ -160,33 +171,41 @@ submit_saige() {
   if [ ${n_tasks_required} -ge 1 ]; then
 
     echo "Running saige for ${phenotype} with ${n_tasks_required} jobs."
-    local tasks_spa=$(( ${pheno_saige_supply} + 1 ))-$(( ${pheno_saige_supply} + ${n_tasks_required} ))
+    local tasks_lower_bound=$(( ${pheno_saige_supply} + 1 ))
+    local tasks_upper_bound=$(( ${pheno_saige_supply} + ${n_tasks_required} ))
+    local tasks_spa=${tasks_lower_bound}-${tasks_upper_bound}
     saige_supply[${phenotype}]=$(( ${pheno_saige_supply} + ${n_tasks_required}))
 
     local vcf_gene_spa="${out_prefix}"
     local out_gene_spa="${out_prefix}_${phenotype}"
     local out_spa_success="${out_gene_spa}_${tasks_spa}"
+    local out_spa_upper_bound="${out_gene_spa}_${tasks_upper_bound}"
 
     local spa_name="spa_${gene}_${tasks_spa}"
 
-    qsub -N "${spa_name}" \
-            -t ${tasks_spa} \
-            -q ${queue_saige} \
-            -pe shmem ${n_slots_saige} \
-            "${spa_script}" \
-            "${chr}" \
-            "${vcf_gene_spa}" \
-            "${out_gene_spa}" \
-            "${out_spa_success}" \
-            "${in_gmat}" \
-            "${in_var}" \
-            "${phenotype}" \
-            "${gene}" \
-            "${min_mac}" 
+    # if the SPA has already been performed. Skip it.
+    if [ ! -f "${out_spa_upper_bound}.txt" ]; then
 
-    wait_for_files ${out_spa_success} ${n_tasks_required} ${tick_interval} ${tick_timeout}
-    rm -f ${out_spa_success}*.SUCCESS
+      qsub -N "${spa_name}" \
+              -t ${tasks_spa} \
+              -q ${queue_saige} \
+              -pe shmem ${n_slots_saige} \
+              "${spa_script}" \
+              "${chr}" \
+              "${vcf_gene_spa}" \
+              "${out_gene_spa}" \
+              "${out_spa_success}" \
+              "${in_gmat}" \
+              "${in_var}" \
+              "${phenotype}" \
+              "${gene}" \
+              "${min_mac}" 
 
+      wait_for_files ${out_spa_success} ${n_tasks_required} ${tick_interval} ${tick_timeout}
+      rm -f ${out_spa_success}*.SUCCESS
+    else
+      echo >&2 "${out_spa_upper_bound} already exists. Skipping.."
+    fi
   else
     >&2 echo "needed ${saige_demand} but already have $(( ${replicates} * ${pheno_saige_supply} )). Skipping.."
   fi
@@ -284,9 +303,9 @@ while [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; do
         in_gmat=${arr_saige[2]}
         in_var=${arr_saige[3]}
         gmat_bytes=$( file_size ${in_gmat} )
-        var_bytes=$( file_size ${in_gmat} )
+        var_bytes=$( file_size ${in_var} )
 
-        if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0]; then
+        if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then
 
           submit_saige ${n_shuffle} ${phenotype}
           saige_merged="${out_prefix}_${phenotype}_merged.txt.gz"
@@ -304,7 +323,6 @@ while [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; do
               outfile="${out_prefix}_${phenotype}_empirical_p"
               empirical_p=$( Rscript ${r_p_script} --input_path "${saige_merged}" --true_tstat ${true_t} --true_p ${true_p} --out_prefix ${outfile})
               print_update "Finished ${phenotype} x ${gene} with empirical P: ${empirical_p}" "${SECONDS}" 
-
             fi
 
           else

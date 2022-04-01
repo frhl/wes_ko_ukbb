@@ -43,13 +43,13 @@ readonly sge_tasks=2
 
 # parameters for master script
 readonly min_mac=4
-readonly n_replicates=1000
+readonly n_replicates=100
 readonly n_start_shuffle=100
-readonly n_cutoff_shuffle=100000
+readonly n_cutoff_shuffle=1000
 readonly n_slots_saige=1
 readonly n_slots_permute=2
 readonly tick_interval=10
-readonly tick_timeout=600 # 10 x 100 seconds
+readonly tick_timeout=100 # 10 x 100 seconds
 readonly queue_saige="short.qf"
 readonly queue_permute="short.qa"
 readonly queue_master="short.qe"
