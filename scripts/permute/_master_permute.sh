@@ -51,7 +51,7 @@ set_arr_phenos() {
     readarray -t arr_cts < ${pheno_cts}
     arr_phenos=("${arr_bin[@]}" "${arr_cts[@]}")
   else
-    echo "Error: global variable 'pheno_dir' has not been defined"
+    raise_error "global variable 'pheno_dir' has not been defined"
   fi
 }
 
@@ -67,10 +67,13 @@ set_arr_saige() {
     local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
     read -a arr_saige <<< "${step1_dir} ${step2_dir} ${in_gmat} ${in_var}"
   else
-    >&2 echo "Error: ${1} is not a valid trait"
+    raise_error "${1} is not a valid trait"
   fi
 }
 
+are_phenos_done() {
+  echo "$( echo ${phenos_done[@]} | grep -v 0 | grep 1 | wc -l )"
+}
 
 # lookup if phenotype is "binary" or "cts"
 get_trait_from_pheno() {
@@ -80,7 +83,7 @@ get_trait_from_pheno() {
   elif [[ " ${arr_cts[*]} " =~ " ${phenotype} " ]]; then
     echo "cts"
   else
-    >&2 echo "Error: ${1} is not in binary/cts array"
+    raise_error "${1} is not in binary/cts array"
   fi
 }
 
@@ -101,7 +104,7 @@ wait_for_files() {
     local cur_ticks=$(( ${cur_ticks} + 1 ))
     echo "sleep tick ${cur_ticks} - ${n_found} / ${n_expected} files found."
     if [ ${cur_ticks} -ge ${ticks_max} ]; then
-      >&2 echo "Error: max ticks reached!"
+      raise_error "max ticks reached!"
       echo 0
       break
     fi
@@ -211,7 +214,7 @@ lookup_true() {
     local true_value=$( echo ${readfile} | cut -d" " -f5 )
     echo ${true_value}
   else
-    >&2 echo "Error: column must be t (t-statistic) or p (P-value)."
+    raise_error "Column must be t (t-statistic) or p (P-value)."
   fi
 
 }
@@ -240,10 +243,10 @@ aggregate_saige() {
        gzip "${out_no_gz}"
        echo "Aggregated ${max_tasks} files to ${out_no_gz}."
     else
-      >&2 echo "Error: need at least one task to submit merge. Exiting.."
+      raise_error "Need at least one task to submit merge"
     fi
   else
-    >&2 echo "Error: Invalid amount of shuffles. Exiting.."
+    raise_error "Invalid amount of shuffles"
   fi
 
 }
@@ -260,18 +263,18 @@ declare -A saige_supply
 for pheno in ${arr_phenos[@]}; do phenos_done[${pheno}]=0; done
 for pheno in ${arr_phenos[@]}; do saige_supply[${pheno}]=0; done
 
-
+SECONDS=0
 n_shuffle=${n_start_shuffle}
 permutation_supply=0
-top_p=5
-testit=("WHR" "BMI")
+top_p=10
+#testit=("WHR" "BMI")
 
 while [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; do
 
     shuffle_phase ${n_shuffle}
 
-    for phenotype in "${testit[@]}"; do
-    #for phenotype in "${phenos_all[@]}"; do
+    #for phenotype in "${testit[@]}"; do
+    for phenotype in "${phenos_all[@]}"; do
 
       if [ ${phenos_done[${phenotype}]} == "0" ]; then
 
@@ -288,19 +291,32 @@ while [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; do
         permuted_p=$( Rscript ${r_spa_script} --input_path "${saige_merged}" --select_min_p ${top_p} )
         true_p=$( lookup_true ${phenotype} "p" )
 
-        if [ $( echo "${true_p} >= ${permuted_p}" | bc ) ]; then
+        if [ $( zcat ${saige_merged} | wc -l ) -ge 2 ]; then
+          if [ $( echo "${true_p} >= ${permuted_p}" | bc ) ]; then
+            phenos_done[${phenotype}]=1
+            true_t=$( lookup_true ${phenotype} "t" )
+            outfile="${out_prefix}_${phenotype}_empirical_p"
+            empirical_p=$( Rscript ${r_p_script} --input_path "${saige_merged}" --true_tstat ${true_t} --true_p ${true_p} --out_prefix ${outfile})
+            print_update "Finished ${phenotype} x ${gene} with empirical P: ${empirical_p}" "${SECONDS}" 
+          fi
+        else
           phenos_done[${phenotype}]=1
-          true_t=$( lookup_true ${phenotype} "t" )
-          outfile="${out_prefix}_${phenotype}_empirical_p"
-          empirical_p=$( Rscript ${r_p_script} --input_path "${saige_merged}" --true_tstat ${true_t} --true_p ${true_p} --out_prefix ${outfile})
-          echo "Finished ${phenotype} x ${gene} at ${n_shuffle}. P-true = ${true_p}, P-permuted[100] = ${permuted_p}. Emp-p: ${empirical_p}"
+          print_update "Finished ${phenotype} x ${gene}. No markers with min_mac=${min_mac}" "${SECONDS}" 
         fi
+      
       fi
-
     done
-    n_shuffle=$(( ${n_shuffle} * 10 ))
-    top_p=100
+
+    if [ $( are_phenos_done ) ]; then
+      break
+    else  
+      n_shuffle=$(( ${n_shuffle} * 10 ))
+      top_p=100
+    fi
+
 done
 
-
+# finish up
+print_update "Done! ${n_shuffle} permutations required." ${SECONDS}
+touch "${out_prefix}.SUCCESS"
 

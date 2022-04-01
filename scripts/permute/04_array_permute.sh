@@ -42,10 +42,10 @@ readonly n_genes="$( zcat ${genes_path} | grep "chr${chr}" | wc -l)"
 readonly sge_tasks=2
 
 # parameters for master script
-readonly min_mac=1
-readonly n_replicates=100
+readonly min_mac=4
+readonly n_replicates=1000
 readonly n_start_shuffle=100
-readonly n_cutoff_shuffle=1000
+readonly n_cutoff_shuffle=100000
 readonly n_slots_saige=1
 readonly n_slots_permute=2
 readonly tick_interval=10
