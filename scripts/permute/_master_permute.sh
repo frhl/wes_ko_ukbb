@@ -334,7 +334,7 @@ while [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; do
               true_t=$( lookup_true ${phenotype} "t" )
               outfile="${out_prefix}_${phenotype}_empirical_p"
               empirical_p=$( Rscript ${r_p_script} --input_path "${saige_merged}" --true_tstat ${true_t} --true_p ${true_p} --out_prefix ${outfile})
-              echo "${gene}\t${phenotype}\t${n_shuffle}\t${true_p}\t${permuted_p}\t${min_mac}\n" >> ${log}
+              echo -e "${gene}\t${phenotype}\t${n_shuffle}\t${true_p}\t${permuted_p}\t${min_mac}\n" >> ${log}
 
             fi
 
