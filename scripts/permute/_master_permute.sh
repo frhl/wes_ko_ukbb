@@ -75,6 +75,13 @@ are_phenos_done() {
   echo "$( echo ${phenos_done[@]} | grep -v 0 | grep 1 | wc -l )"
 }
 
+divide_ceil() {
+  local divide=${1}
+  local by=${2}
+  echo $(( (${divide}+${by}-1)/${by} ))
+}
+
+
 # lookup if phenotype is "binary" or "cts"
 get_trait_from_pheno() {
   local phenotype=${1}
@@ -118,6 +125,8 @@ wait_for_files() {
 shuffle_phase() {
 
   local permutations_demand=${1}
+  #local max_tasks_required=$( divide_ceil ${permutations_demand} ${replicates} )
+  #local n_tasks_required=$(( ${max_tasks_required} - ${permutation_supply} ))
   local n_tasks_required=$(( (${permutations_demand} / ${replicates}) - ${permutation_supply} ))
   local sge_seed=3
 
@@ -284,6 +293,9 @@ declare -A saige_supply
 for pheno in ${arr_phenos[@]}; do phenos_done[${pheno}]=0; done
 for pheno in ${arr_phenos[@]}; do saige_supply[${pheno}]=0; done
 
+readonly log="${out_prefix}.log"
+readonly success="${out_prefix}.SUCCESS"
+
 SECONDS=0
 n_shuffle=${n_start_shuffle}
 permutation_supply=0
@@ -322,12 +334,13 @@ while [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; do
               true_t=$( lookup_true ${phenotype} "t" )
               outfile="${out_prefix}_${phenotype}_empirical_p"
               empirical_p=$( Rscript ${r_p_script} --input_path "${saige_merged}" --true_tstat ${true_t} --true_p ${true_p} --out_prefix ${outfile})
-              print_update "Finished ${phenotype} x ${gene} with empirical P: ${empirical_p}" "${SECONDS}" 
+              echo "${gene}\t${phenotype}\t${n_shuffle}\t${true_p}\t${permuted_p}\t${min_mac}\n" >> ${log}
+
             fi
 
           else
             phenos_done[${phenotype}]=1
-            print_update "Finished ${phenotype} x ${gene}. No markers with min_mac=${min_mac}." "${SECONDS}" 
+            print_update "Stopped ${phenotype} x ${gene}. No markers with min_mac=${min_mac}." "${SECONDS}" 
           fi
 
         else
@@ -349,5 +362,7 @@ done
 
 # finish up
 print_update "Done! ${n_shuffle} permutations required." ${SECONDS}
-touch "${out_prefix}.SUCCESS"
+mv ${log} ${success}
+
+
 
