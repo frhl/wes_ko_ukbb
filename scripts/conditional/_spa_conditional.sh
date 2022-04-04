@@ -25,6 +25,7 @@ readonly min_mac=${8?Error: Missing arg7 (min_mac)}
 
 readonly csi="${vcf}.csi"
 readonly step2_SPAtests="utils/saige/step2_SPAtests.R"
+readonly shell_spa="scripts/conditional/_chr_spa.sh"
 readonly rscript="scripts/conditional/03_spa_conditional.R"
 
 # A function to extract all the (unique) chromsomes
@@ -49,6 +50,7 @@ merge_spa_by_chr(){
        fi
        cat "${file}" | grep -v "MarkerID"  >> "${out}"
        rm "${file}"
+       rm "${file}.index"
      fi
   done
 }
@@ -78,6 +80,25 @@ spa_chr_loop() {
    done
    set -eu
 }
+
+qsub_spa_chr_loop() {
+# deprecated for now ..
+   local markers="${1}"
+   local spa_prefix="${2}_chr"
+   qsub -N "_cond_spa_${markers}" \
+        -t 1-22 \
+        -q "short.qf" \
+        -pe shmem 1 \
+        "${shell_spa}" \
+        "${vcf}" \
+        "${in_gmat}" \
+        "${in_var}" \
+        "${phenotype}" \
+        "${prefix}" \
+        "${markers}"
+}
+
+
 
 conditional_analysis() {
   

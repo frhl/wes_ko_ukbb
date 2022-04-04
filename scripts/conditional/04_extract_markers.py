@@ -23,6 +23,9 @@ def main(args):
     hail_init.hail_bmrc_init('logs/hail/combine_markers.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1')
     markers = markers.split(",") # format chr12:4214:A:T
+    if len(markers) == 0:
+        raise TypeError("no markers prsent in input!")
+
     mt = genotypes.get_ukb_imputed_v3_bgen(chrom)
     mt = samples.remove_withdrawn(mt)
     mt = mt.annotate_rows(
@@ -43,9 +46,20 @@ def main(args):
                 no_header=True, key='f0',
                 delimiter=',')
         mt = mt.filter_cols(hl.is_defined(ht_final_samples[mt.col_key])) 
+
+    # select only relevant rows
+    mt = mt.select_rows(*[mt.rsid, mt.varid])
     
+    # extract entries
+    mt.entries().flatten().export(out_prefix + ".tsv.gz")
+
     # export variants to be used for conditional analysis
     io.export_table(mt, out_prefix, out_type)
+    
+
+
+
+
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()

@@ -19,7 +19,7 @@ readonly ko_dir="data/knockouts/alt"
 readonly ko_prefix="ukb_eur_wes_200k_chrCHR"
 
 readonly interval_dir="data/conditional/common/test_intervals"
-readonly out_dir="data/conditional/common/spa"
+readonly out_dir="data/conditional/common/spa_test2"
 
 readonly pheno_dir="data/phenotypes"
 readonly in_prefix="ukb_eur_wes_200k"
@@ -27,7 +27,7 @@ readonly maf="0to5e-2"
 
 readonly min_mac=4
 readonly max_iter=5
-readonly P_cutoff=0.01 #5e-8
+readonly P_cutoff=0.005 #5e-8
 
 
 submit_binary_analysis()
@@ -52,8 +52,8 @@ submit_cond_spa()
   local phenotype=${2?Error: Missing arg2 (phenotype)}
   local trait=${3?Error: Missing arg3 (trait)}
 
-  local step1_dir="data/saige/output/combined/${trait}/step1"
-  local step2_dir="data/saige/output/combined/${trait}/step2/minmac${min_mac}"
+  local step1_dir="data/saige/output/${trait}/step1"
+  local step2_dir="data/saige/output/${trait}/step2/minmac${min_mac}"
   local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
   local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
   local interval_vcf="${interval_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}.vcf.bgz"
@@ -62,7 +62,7 @@ submit_cond_spa()
 
   mkdir -p ${out_dir}
   set -x
-  qsub -N "_spa_conditional_${1}" \
+  qsub -N "_cond_${1}" \
     -q "short.qc@@short.hge" \
     -t "${SGE_TASK_ID}" \
     -pe shmem 1 \
