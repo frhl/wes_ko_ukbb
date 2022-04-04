@@ -79,7 +79,6 @@ spa_chr_loop() {
    set -eu
 }
 
-# main script for per
 conditional_analysis() {
   
   local i=0 
@@ -129,7 +128,9 @@ conditional_analysis() {
   echo ${marker_list} > "${out_prefix}.markers"
 }
 
-set +eu 
+###############
+# main script #
+##############
 
 # setup constant files 
 readonly CHROMS=$(extract_chr_from_vcf ${vcf}) 
@@ -139,8 +140,6 @@ rm -f ${markers_conditional}
 # setup saige
 module purge
 set_up_RSAIGE
-
-set -eu 
 
 # Run conditional analysis
 conditional_analysis ${vcf} ${out_prefix}
