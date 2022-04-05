@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 3
 #$ -q short.qc@@short.hge
-#$ -t 21
+#$ -t 1,20
 #$ -V
 
 source utils/qsub_utils.sh
@@ -18,8 +18,8 @@ readonly hail_script="scripts/simulation/00_bed_gen.py"
 readonly spark_dir="data/tmp/spark_dir"
 
 readonly chr=$( get_chr ${SGE_TASK_ID} )
-readonly in_dir="data/phased"
-readonly in_prefix="${in_dir}/ukb_wes_phased_chr${chr}.vcf.gz"
+readonly in_dir="data/mt/annotated"
+readonly in_prefix="${in_dir}/ukb_eur_wes_200k_annot_chr${chr}.mt"
 
 readonly out_dir="data/simulation/data"
 readonly out_prefix="${out_dir}/ukb_eur_100000_samples_chr${chr}"
@@ -38,7 +38,7 @@ if [ ! -f "${out_prefix}.bed" ]; then
   python3 "${hail_script}" \
      --chrom "${chr}" \
      --in_prefix "${in_prefix}"\
-     --in_type "vcf" \
+     --in_type "mt" \
      --ancestry "eur" \
      --input_annotation_path "${annotation_table}" \
      --random_samples 100000 \
