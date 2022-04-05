@@ -22,11 +22,18 @@ def main(args):
     h2 = args.h2
     pi = args.pi
     simulations = args.simulations
-
+    export_single_markers = args.export_single_markers
+    seed = args.seed
+    
+    # set parameters
+    pi = float(pi) if pi is not None else None
+    h2 = float(h2) if h2 is not None else None
+ 
     # import table
-    mt = io.import_table(in_prefix, in_type)
     hail_init.hail_bmrc_init('logs/hail/absence_of_effect.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1')
+    hl.set_global_seed(int(seed))
+    mt = io.import_table(in_prefix, in_type)
 
     # annotate with variant consequence
     mt = mt.explode_rows(mt.consequence.vep.worst_csq_by_gene_canonical)
@@ -34,7 +41,6 @@ def main(args):
     consequence_category=ko.csqs_case_builder(
             worst_csq_expr=mt.consequence.vep.worst_csq_by_gene_canonical,
             use_loftee=True))
-
     # simulate betas
     mt = hl.experimental.ldscsim.make_betas(mt, float(h2), pi = pi)[0]
     mt = mt.filter_rows(hl.agg.stats(mt.GT.n_alt_alleles()).stdev>0)
@@ -54,6 +60,9 @@ def main(args):
     ht = mt.cols()
     ht.flatten().export(out_prefix + ".tsv.gz")
     
+    if export_single_markers:
+        io.export_table(mt, out_prefix + "_markers", out_type)
+
     # collapse to gene knockout
     mt = mt.filter_rows(hl.literal(set(csqs_category)).contains(mt.consequence_category))
     gene_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
@@ -84,11 +93,13 @@ if __name__=='__main__':
     parser.add_argument('--csqs_category', default=None, action=SplitArgs, help='comma sepearted field')
     parser.add_argument('--h2', default=None, help='Heritability for phenotype simulated')
     parser.add_argument('--pi', default=None, help='Probability of variant being causal')
-    parser.add_argument('--simulations', default=None, help='simulations to be dobe')
+    parser.add_argument('--simulations', default=1, help='simulations to be dobe')
+    parser.add_argument('--seed', default=None, help='seed for random simulations')
     parser.add_argument('--in_prefix', default=None, help='Path prefix for input dataset')
     parser.add_argument('--in_type', default=None, help='Either "mt", "vcf" or "plink"')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Either "mt", "vcf" or "plink"')
+    parser.add_argument('--export_single_markers', action='store_true', help='Either "mt", "vcf" or "plink"')
     args = parser.parse_args()
 
     main(args)

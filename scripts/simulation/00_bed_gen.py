@@ -53,7 +53,8 @@ def main(args):
             mt = genotypes.get_ukb_genotypes_bed(chroms=chrom)
     else:
         mt = io.import_table(in_prefix, in_type)
- 
+        print(mt.count())
+
     if extract_samples:
         ht_samples = hl.import_table(extract_samples, no_header=True, key='f0', delimiter=',')
         mt = mt.filter_cols(hl.is_defined(ht_samples[mt.col_key]))

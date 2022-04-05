@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 3
 #$ -q short.qc@@short.hge
-#$ -t 1,20
+#$ -t 20
 #$ -V
 
 source utils/qsub_utils.sh
@@ -21,8 +21,8 @@ readonly chr=$( get_chr ${SGE_TASK_ID} )
 readonly in_dir="data/mt/annotated"
 readonly in_prefix="${in_dir}/ukb_eur_wes_200k_annot_chr${chr}.mt"
 
-readonly out_dir="data/simulation/data"
-readonly out_prefix="${out_dir}/ukb_eur_100000_samples_chr${chr}"
+readonly out_dir="data/simulation/mt"
+readonly out_prefix="${out_dir}/ukb_eur_25k_samples_chr${chr}"
 
 readonly hap_file="/well/lindgren/flassen/ressources/hapmap/weights.l2.ldscore.liftover.ht"
 readonly annotation_table="data/vep/hail/ukb_wes_200k_chr${chr}_vep.ht"
@@ -39,13 +39,10 @@ if [ ! -f "${out_prefix}.bed" ]; then
      --chrom "${chr}" \
      --in_prefix "${in_prefix}"\
      --in_type "mt" \
-     --ancestry "eur" \
-     --input_annotation_path "${annotation_table}" \
-     --random_samples 100000 \
+     --random_samples 25000 \
      --sample_seed 42 \
-     --exclude_related \
      --out_prefix "${out_prefix}" \
-     --out_type "mt" 
+     --out_type "mt"
   set +x
 else
   print_update "file ${out} already exists. Skipping!"
