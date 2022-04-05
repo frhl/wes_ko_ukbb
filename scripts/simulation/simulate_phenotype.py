@@ -21,6 +21,7 @@ def main(args):
     #csqs_category = args.csqs_category
     h2 = args.h2
     pi = args.pi
+    K = args.K
     simulations = args.simulations
     #export_single_markers = args.export_single_markers
     seed = args.seed
