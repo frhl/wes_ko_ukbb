@@ -6,6 +6,7 @@ import argparse
 from ko_utils import io
 from ko_utils import ko
 from ukb_utils import hail_init
+import scipy.stats as stats
 
 class SplitArgs(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
@@ -55,12 +56,17 @@ def main(args):
     for i in range(int(simulations)):
         col_cts = "cts" + str(i)
         col_bin = "bin" + str(i)
-        y_cts = mt.y_no_noise + hl.rand_norm(0, hl.sqrt(1-h2))
-        y_bin = hl.experimental.ldscsim.binarize(mt, y_cts, K)
-        mt = mt.annotate_cols(y_cts=y_cts)
-        mt = mt.annotate_cols(y_bin=y_bin)
-        mt = mt.rename({'y_cts': col_cts, 'y_bin': col_bin})
+        mt = mt.annotate_cols(
+                y_cts = mt.y_no_noise + hl.rand_norm(0, hl.sqrt(1-h2))
+                )
+        if K is not None:
+            y_stats = mt.aggregate_cols(hl.agg.stats(mt.y_cts))
+            threshold = stats.norm.ppf(1-K, loc=y_stats.mean, scale=y_stats.stdev)
+            mt = mt.annotate_cols(y_bin=y > threshold)
+            mt = mt.rename({'y_bin': col_bin})
 
+        mt = mt.rename({'y_cts': col_cts})
+    
     # export simulated phenotypes
     ht = mt.cols()
     ht.flatten().export(out_prefix + ".tsv.gz")
@@ -97,7 +103,7 @@ if __name__=='__main__':
     #parser.add_argument('--chrom', default=None, help='chromosome')
     parser.add_argument('--h2', default=None, help='Heritability for phenotype simulated')
     parser.add_argument('--pi', default=None, help='Probability of variant being causal')
-    parser.add_argument('--K', default=0, help='Prevalence of phenotype: cases / (cases + controls)')
+    parser.add_argument('--K', default=None, help='Prevalence of phenotype: cases / (cases + controls)')
     parser.add_argument('--simulations', default=1, help='simulations to be dobe')
     parser.add_argument('--seed', default=None, help='seed for random simulations')
     parser.add_argument('--in_prefix', default=None, help='Path prefix for input dataset')
