@@ -10,8 +10,11 @@
 #$ -t 1
 #$ -V
 
+set -o errexit
+set -o nounset
+
 source utils/qsub_utils.sh
-source utils/hail_utils.sh
+source utils/bash_utils.sh
 
 readonly plink_dir="data/saige/grm/input"
 readonly grm_dir="data/saige/grm/input"
@@ -27,7 +30,7 @@ readonly covar_file="${covar_dir}/covars1.csv"
 readonly covariates=$( cat ${covar_file} )
 
 readonly chr="21"
-readonly pheno_file="${pheno_dir}/ukb_eur_wes_200k_annot_chr${chr}_phenotype.tsv.gz"
+readonly pheno_file="${pheno_dir}/ukb_eur_h2_0_pi_None_chr${chr}_phenotype.tsv.gz"
 readonly step1_fitNULLGLMM="utils/saige/step1_fitNULLGLMM.R"
 
 

@@ -10,6 +10,8 @@
 #$ -t 0
 #$ -V
 
+set -o errexit
+set -o nounset
 
 set -o errexit
 set -o nounset

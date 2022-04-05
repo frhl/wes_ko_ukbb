@@ -10,6 +10,9 @@
 #$ -t 21
 #$ -V
 
+set -o errexit
+set -o nounset
+
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
 source utils/bash_utils.sh
