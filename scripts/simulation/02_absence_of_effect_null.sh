@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc@@short.hge
-#$ -t 21
+#$ -t 0
 #$ -V
 
 source utils/qsub_utils.sh
@@ -26,17 +26,28 @@ readonly covar_file="${covar_dir}/covars1.csv"
 readonly covariates=$( cat ${covar_file} )
 
 readonly chr="21"
-readonly out_dir="data/simulated/saige/null"
-readonly out_prefix="${out_dir}/ukb_eur_h2_0_pi_None_chr${chr}"
-readonly pheno_file="${pheno_dir}/ukb_eur_wes_200k_annot_chr21.tsv.gz"
-readonly trait_type="qauntitative"
-readonly inv_normalize="TRUE"
-
-readonly phenotype="y${SGE_TASK_ID}"
-
+eadonly pheno_file="${pheno_dir}/ukb_eur_wes_200k_annot_chr${chr}_phenotype.tsv.gz"
 readonly step1_fitNULLGLMM="utils/saige/step1_fitNULLGLMM.R"
 
+fit_cts() {
+  local trait_type="quantitative"
+  local inv_normalize="TRUE"
+  local phenotype="y_cts${SGE_TASK_ID}"
+ fit_null 
+}
+
+fit_bin() {
+  local trait_type="binary"
+  local inv_normalize="FALSE"
+  local phenotype="y_bin${SGE_TASK_ID}"
+  fit_null 
+}
+
+
+
 fit_null() {
+   local out_dir="data/simulated/saige/null"
+   local out_prefix="${out_dir}/ukb_eur_h2_0_pi_None_${phenotype}_chr${chr}"
    if [ ! -f "${out_prefix}.rda" ]; then
      SECONDS=0
      Rscript "${step1_fitNULLGLMM}" \
@@ -67,5 +78,7 @@ fit_null() {
 
 # Running null model
 set_up_RSAIGE
-fit_null
+fit_bin
+
+
 

@@ -12,42 +12,43 @@
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
-source utils/vcf_utils.sh
+source utils/bash_utils.sh
 
 readonly hail_script="scripts/simulation/simulate_phenotype.py"
+readonly rscript="scripts/simulation/simulate_phenotype.R"
 readonly spark_dir="data/tmp/spark_dir"
 
 readonly chr=$( get_chr ${SGE_TASK_ID} )
 
+readonly pheno_dir="data/phenotypes"
+readonly pheno_file="${pheno_dir}/filtered_covar_phenotypes_cts.tsv.gz"
+
 readonly in_dir="data/mt/annotated"
-#readonly in_prefix="${in_dir}/ukb_eur_25k_samples_chr${chr}.mt"
 readonly in_prefix="${in_dir}/ukb_eur_wes_200k_annot_chr${chr}.mt"
 
 readonly out_dir="data/simulation/effect_absence"
-#readonly out_prefix="${out_dir}/ukb_eur_25k_h2_0_pi_None_chr${chr}"
 readonly out_prefix="${out_dir}/ukb_eur_h2_0_pi_None_chr${chr}"
 readonly out_phenotypes="${out_dir}/ukb_eur_h2_0_pi_None_chr${chr}_phenotype.tsv.gz"
 
 mkdir -p ${spark_dir}
 mkdir -p ${out_dir}
 
-if [ ! -f "${out_prefix}.vcf.bgz" ]; then
+SECONDS=0
+
+if [ ! -f "${out_prefix}.tsv.gz" ]; then
+  module purge
   set_up_hail
   set_up_pythonpath_legacy
-  set -x
   python3 "${hail_script}" \
      --in_prefix "${in_prefix}"\
      --in_type "mt" \
-     --chrom "${chr}" \
      --h2 0 \
+     --K 0.05 \
      --seed 42 \
      --simulations 20 \
-     --csqs_category "pLoF,damaging_missense" \
      --out_prefix "${out_prefix}" \
-     --out_type "vcf" \
      && print_update "Finished simulating phenotypes for chr${chr}" ${SECONDS} \
      || raise_error "Simulating phenotypes for for chr${chr} failed"
-  set +x
 else
   print_update "file ${out} already exists. Skipping!"
 fi
@@ -57,7 +58,7 @@ if [ ! -f "${out_phenotypes}" ]; then
   set_up_rpy
   Rscript "${rscript}" \
     --input_path "${out_prefix}.tsv.gz" \
-    --real_phenotype_path "${out_prefix}.tsv.gz" \
+    --real_phenotype_path "${pheno_file}" \
     --output_path "${out_phenotypes}" \
     && print_update "Finished merging with true phenotypes for chr${chr}" ${SECONDS} \
     || raise_error "Merging with true phenotypes for chr${chr} failed"
