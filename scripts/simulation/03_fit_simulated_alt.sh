@@ -32,9 +32,9 @@ readonly nslots=1
 
 submit_spa_cts_with_csqs()
 {
-  local annotation="${1?Error: Missing arg1 (annotation)}"
+  local saige_prefix="${1?Error: Missing arg1 (saige_prefix)}"
+  local annotation="${2?Error: Missing arg2 (annotation)}"
   local phenotype="cts${SGE_TASK_ID}"
-  local saige_prefix="ukb_eur_h2_0_pi_None_${phenotype}_chr${chr}"
   submit_spa_with_csqs "${annotation}" "${phenotype}" "${saige_prefix}" "cts"
 }
 
@@ -45,7 +45,7 @@ submit_spa_with_csqs()
   local phenotype=${2?Error: Missing arg2 (phenotype)}
   local saige_prefix=${3?Error: Missing arg3 (saige_prefix)}
   local trait=${4?Error: Missing arg4 (trait)}
-  local step1_dir="data/simulation/saige/null"
+  local step1_dir="data/simulation/saige/step1"
   local step2_dir="data/simulation/saige/step2"
   local in_gmat="${step1_dir}/${saige_prefix}.rda"
   local in_var="${step1_dir}/${saige_prefix}.varianceRatio.txt"
@@ -70,12 +70,12 @@ submit_spa_job() {
     "${in_gmat}" \
     "${in_var}" \
     "${min_mac}" \
-    "${out_prefix}" \
+    "${out_prefix}.txt" \
     "${conditioning_markers}"
   set +x
 }
 
-submit_spa_cts_with_csqs "pLoF_damaging_missense"
+submit_spa_cts_with_csqs "ukb_eur_h2_0_pi_0_K_1e-1_chr21_cts${SGE_TASK_ID}" "pLoF_damaging_missense"
 
 
 
