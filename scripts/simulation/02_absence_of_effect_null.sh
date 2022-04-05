@@ -5,9 +5,9 @@
 #$ -o logs/absence_of_effect_null.log
 #$ -e logs/absence_of_effect_null.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 2
+#$ -pe shmem 1
 #$ -q short.qc@@short.hge
-#$ -t 1
+#$ -t 2
 #$ -V
 
 set -o errexit
@@ -20,7 +20,7 @@ readonly plink_dir="data/saige/grm/input"
 readonly grm_dir="data/saige/grm/input"
 readonly covar_dir="data/phenotypes"
 readonly pheno_dir="data/simulation/absence_of_effect"
-readonly out_dir="data/simulated/saige/null"
+readonly out_dir="data/simulation/saige/step1"
 
 readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
@@ -37,18 +37,19 @@ readonly step1_fitNULLGLMM="utils/saige/step1_fitNULLGLMM.R"
 fit_cts() {
   local trait_type="quantitative"
   local inv_normalize="TRUE"
-  local phenotype="y_cts${SGE_TASK_ID}"
+  local phenotype="cts${SGE_TASK_ID}"
  fit_null 
 }
 
 fit_bin() {
   local trait_type="binary"
   local inv_normalize="FALSE"
-  local phenotype="y_bin${SGE_TASK_ID}"
+  local phenotype="bin${SGE_TASK_ID}"
   fit_null 
 }
 
 fit_null() {
+   mkdir -p ${out_dir}
    local out_prefix="${out_dir}/ukb_eur_h2_0_pi_None_${phenotype}_chr${chr}"
    if [ ! -f "${out_prefix}.rda" ]; then
      SECONDS=0
@@ -80,7 +81,7 @@ fit_null() {
 
 # Running null model
 set_up_RSAIGE
-fit_bin
+fit_cts
 
 
 

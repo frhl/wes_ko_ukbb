@@ -29,7 +29,7 @@ readonly pheno_file="${pheno_dir}/filtered_covar_phenotypes_cts.tsv.gz"
 readonly in_dir="data/mt/annotated"
 readonly in_prefix="${in_dir}/ukb_eur_wes_200k_annot_chr${chr}.mt"
 
-readonly out_dir="data/simulation/absence_of_effect"
+readonly out_dir="data/simulation/absence_of_effect_test"
 readonly out_prefix="${out_dir}/ukb_eur_h2_0_pi_None_chr${chr}"
 readonly out_phenotypes="${out_dir}/ukb_eur_h2_0_pi_None_chr${chr}_phenotype.tsv.gz"
 
@@ -46,8 +46,9 @@ if [ ! -f "${out_prefix}.tsv.gz" ]; then
      --in_prefix "${in_prefix}"\
      --in_type "mt" \
      --h2 0 \
+     --K 0.1 \
      --seed 42 \
-     --simulations 3 \
+     --simulations 30 \
      --out_prefix "${out_prefix}" \
      && print_update "Finished simulating phenotypes for chr${chr}" ${SECONDS} \
      || raise_error "Simulating phenotypes for for chr${chr} failed"

@@ -63,7 +63,7 @@ def main(args):
         if K is not None:
             y_stats = mt.aggregate_cols(hl.agg.stats(mt.y_cts))
             threshold = stats.norm.ppf(1-K, loc=y_stats.mean, scale=y_stats.stdev)
-            mt = mt.annotate_cols(y_bin=y > threshold)
+            mt = mt.annotate_cols(y_bin=mt.y_cts > threshold)
             mt = mt.rename({'y_bin': col_bin})
 
         mt = mt.rename({'y_cts': col_cts})
