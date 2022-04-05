@@ -12,7 +12,7 @@ main <- function(args){
 
   d1 <- fread(args$input_path)
   d2 <- fread(args$real_phenotype_path)
-  d <- merge(d1, d2, by = 'eid', all.x = TRUE)
+  d <- merge(d1, d2, by.x = 's', by.y = 'eid', all.x = TRUE)
   fwrite(d, args$output_path, sep = args$delimiter)
 
 }
