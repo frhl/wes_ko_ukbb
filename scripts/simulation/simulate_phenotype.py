@@ -28,7 +28,7 @@ def main(args):
     seed = args.seed
     
     # set parameters
-    pi = float(pi) if pi is not None else None
+    pi = float(pi) if pi is not 0 else None
     h2 = float(h2) if h2 is not None else None
     K = float(K) if K is not None else None
  
@@ -103,7 +103,7 @@ if __name__=='__main__':
     parser = argparse.ArgumentParser()
     #parser.add_argument('--chrom', default=None, help='chromosome')
     parser.add_argument('--h2', default=None, help='Heritability for phenotype simulated')
-    parser.add_argument('--pi', default=None, help='Probability of variant being causal')
+    parser.add_argument('--pi', default=0, help='Probability of variant being causal')
     parser.add_argument('--K', default=None, help='Prevalence of phenotype: cases / (cases + controls)')
     parser.add_argument('--simulations', default=1, help='simulations to be dobe')
     parser.add_argument('--seed', default=None, help='seed for random simulations')
