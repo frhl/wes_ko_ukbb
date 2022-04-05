@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N absence_of_effect_null
+#$ -N fit_simulated_null
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/absence_of_effect_null.log
-#$ -e logs/absence_of_effect_null.errors.log
+#$ -o logs/fit_similated_null.log
+#$ -e logs/fit_simulated_null.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc@@short.hge
@@ -30,11 +30,11 @@ readonly covar_file="${covar_dir}/covars1.csv"
 readonly covariates=$( cat ${covar_file} )
 
 readonly chr="21"
-readonly pheno_file="${pheno_dir}/ukb_eur_h2_0_pi_None_chr${chr}_phenotype.tsv.gz"
 readonly step1_fitNULLGLMM="utils/saige/step1_fitNULLGLMM.R"
 
 
 fit_cts() {
+  local pheno_file=${1}
   local trait_type="quantitative"
   local inv_normalize="TRUE"
   local phenotype="cts${SGE_TASK_ID}"
@@ -42,6 +42,7 @@ fit_cts() {
 }
 
 fit_bin() {
+  local pheno_file=${1}
   local trait_type="binary"
   local inv_normalize="FALSE"
   local phenotype="bin${SGE_TASK_ID}"
@@ -81,7 +82,7 @@ fit_null() {
 
 # Running null model
 set_up_RSAIGE
-fit_cts
+fit_cts "${pheno_dir}/ukb_eur_K_1e-1_h2_0_pi_0_chr${chr}_phenotype.tsv.gz
 
 
 

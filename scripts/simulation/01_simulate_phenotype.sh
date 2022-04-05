@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N absence_of_effect
+#$ -N simulate_phenotype
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/absence_of_effect.log
-#$ -e logs/absence_of_effect.errors.log
+#$ -o logs/simulate_phenptype.log
+#$ -e logs/simulate_phenptype.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc@@short.hge
@@ -29,22 +29,22 @@ readonly pheno_file="${pheno_dir}/filtered_covar_phenotypes_cts.tsv.gz"
 readonly in_dir="data/mt/annotated"
 readonly in_prefix="${in_dir}/ukb_eur_wes_200k_annot_chr${chr}.mt"
 
-readonly K=1e-1
-readonly h2=0
-readonly pi=0
-readonly seed=42
-
-readonly out_dir="data/simulation/absence_of_effect_test"
-readonly out_prefix="${out_dir}/ukb_eur_h2_${h2}_pi_${pi}_K_${K}_chr${chr}"
-readonly out_phenotypes="${out_prefix}_phenotype.tsv.gz"
-
-mkdir -p ${spark_dir}
-mkdir -p ${out_dir}
-
 simulate_phenotypes() {
+
+  local K=${1}
+  local h2=${2}
+  local pi=${3}
+
+  local out_dir="data/simulation/phenotypes"
+  local out_prefix="${out_dir}/ukb_eur_h2_${h2}_pi_${pi}_K_${K}_chr${chr}"
+  local out_phenotypes="${out_prefix}_phenotype.tsv.gz"
+
+  mkdir -p ${out_dir}
+  mkdir -p ${spark_dir}
 
   local SECONDS=0
   if [ ! -f "${out_prefix}.tsv.gz" ]; then
+    echo "Simulating ${simulations} traits (${out_phenotypes})"
     module purge
     set_up_hail
     set_up_pythonpath_legacy
@@ -54,7 +54,7 @@ simulate_phenotypes() {
        --h2 ${h2} \
        --K ${K} \
        --seed ${seed} \
-       --simulations 5 \
+       --simulations ${simulations} \
        --out_prefix "${out_prefix}" \
        && print_update "Finished simulating phenotypes for chr${chr}" ${SECONDS} \
        || raise_error "Simulating phenotypes for for chr${chr} failed"
@@ -75,7 +75,20 @@ simulate_phenotypes() {
 
 }
 
+###############
+# main script #
+###############
 
-simulate_phenotypes
+readonly seed=42
+readonly simulations=30
+
+# simulate traits with no heritability
+simulate_phenotypes 1e-1 0 0
+
+# simulate traits slightly polygenic traits
+simulate_phenotypes 1e-1 1e-1 0
+
+# simulate moderately polygenic traits
+simulate_phenotypes 1e-1 3e-1 0
 
 

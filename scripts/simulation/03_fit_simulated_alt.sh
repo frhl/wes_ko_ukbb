@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N absence_of_effect_alt
+#$ -N fit_simulated_alt
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/absence_of_effect_alt.log
-#$ -e logs/absence_of_effect_alt.errors.log
+#$ -o logs/fit_simulated_alt.log
+#$ -e logs/fit_simulated_alt.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
