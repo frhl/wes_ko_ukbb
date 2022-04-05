@@ -39,11 +39,12 @@ def main(args):
     mt = io.import_table(in_prefix, in_type)
 
     # annotate with variant consequence
-    mt = mt.explode_rows(mt.consequence.vep.worst_csq_by_gene_canonical)
-    mt = mt.annotate_rows(
-    consequence_category=ko.csqs_case_builder(
-            worst_csq_expr=mt.consequence.vep.worst_csq_by_gene_canonical,
-            use_loftee=True))
+    #mt = mt.explode_rows(mt.consequence.vep.worst_csq_by_gene_canonical)
+    #mt = mt.annotate_rows(
+    #consequence_category=ko.csqs_case_builder(
+    #        worst_csq_expr=mt.consequence.vep.worst_csq_by_gene_canonical,
+    #        use_loftee=True))
+    
     # simulate betas
     mt = hl.experimental.ldscsim.make_betas(mt, float(h2), pi = pi)[0]
     mt = mt.filter_rows(hl.agg.stats(mt.GT.n_alt_alleles()).stdev>0)

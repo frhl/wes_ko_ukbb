@@ -45,18 +45,14 @@ submit_spa_with_csqs()
   local annotation=${1?Error: Missing arg1 (consequence)}
   local phenotype=${2?Error: Missing arg2 (phenotype)}
   local trait=${3?Error: Missing arg3 (trait)}
-  if [ ! -z ${phenotype} ]; then
-    local step1_dir="data/saige/output/${trait}/step1"
-    local step2_dir="data/saige/output/${trait}/step2"
-    local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
-    local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
-    local out_prefix="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}"
-    local in_vcf="${vcf_dir}/${in_prefix}_${maf}_${annotation}.vcf.bgz"
-    submit_spa_job
-    submit_merge_job
-  else
-    >&2 echo "No phenotype at index ${SGE_TASK_ID}. Exiting.."
-  fi
+  local step1_dir="data/saige/output/${trait}/step1"
+  local step2_dir="data/saige/output/${trait}/step2"
+  local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
+  local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
+  local out_prefix="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}"
+  local in_vcf="${vcf_dir}/${in_prefix}_${maf}_${annotation}.vcf.bgz"
+  submit_spa_job
+
 }
 
 

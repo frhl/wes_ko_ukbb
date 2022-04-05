@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc@@short.hge
-#$ -t 0
+#$ -t 1
 #$ -V
 
 source utils/qsub_utils.sh
@@ -16,7 +16,8 @@ source utils/hail_utils.sh
 readonly plink_dir="data/saige/grm/input"
 readonly grm_dir="data/saige/grm/input"
 readonly covar_dir="data/phenotypes"
-readonly pheno_dir="data/simulation/effect_absence"
+readonly pheno_dir="data/simulation/absence_of_effect"
+readonly out_dir="data/simulated/saige/null"
 
 readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
@@ -26,8 +27,9 @@ readonly covar_file="${covar_dir}/covars1.csv"
 readonly covariates=$( cat ${covar_file} )
 
 readonly chr="21"
-eadonly pheno_file="${pheno_dir}/ukb_eur_wes_200k_annot_chr${chr}_phenotype.tsv.gz"
+readonly pheno_file="${pheno_dir}/ukb_eur_wes_200k_annot_chr${chr}_phenotype.tsv.gz"
 readonly step1_fitNULLGLMM="utils/saige/step1_fitNULLGLMM.R"
+
 
 fit_cts() {
   local trait_type="quantitative"
@@ -43,10 +45,7 @@ fit_bin() {
   fit_null 
 }
 
-
-
 fit_null() {
-   local out_dir="data/simulated/saige/null"
    local out_prefix="${out_dir}/ukb_eur_h2_0_pi_None_${phenotype}_chr${chr}"
    if [ ! -f "${out_prefix}.rda" ]; then
      SECONDS=0
