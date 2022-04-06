@@ -5,9 +5,9 @@
 #$ -o logs/simulate_phenptype.log
 #$ -e logs/simulate_phenptype.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 2
+#$ -pe shmem 4
 #$ -q short.qc@@short.hge
-#$ -t 21
+#$ -t 1
 #$ -V
 
 set -o errexit
@@ -26,21 +26,29 @@ readonly chr=$( get_chr ${SGE_TASK_ID} )
 readonly pheno_dir="data/phenotypes"
 readonly pheno_file="${pheno_dir}/filtered_covar_phenotypes_cts.tsv.gz"
 
+readonly covar_file="${covar_dir}/covars2.csv"
+readonly covariates=$( cat ${covar_file} )
+
+
 readonly in_dir="data/mt/annotated"
 readonly in_prefix="${in_dir}/ukb_eur_wes_200k_annot_chr${chr}.mt"
 
 simulate_phenotypes() {
 
   local K=${1}
-  local h2=${2}
-  local pi=${3}
+  local h2_snp=${2}
+  local pi_snp=${3}
+  local h2_ch=${4}
+  local pi_ch=${5}
 
   local out_dir="data/simulation/phenotypes"
-  local out_prefix="${out_dir}/ukb_eur_h2_${h2}_pi_${pi}_K_${K}_chr${chr}"
+  local out_prefix="${out_dir}/ukb_eur_h2_${h2_snp}_${h2_ch}_pi_${pi_snp}_${pi_ch}_K_${K}_chr${chr}"
   local out_phenotypes="${out_prefix}_phenotype.tsv.gz"
 
   mkdir -p ${out_dir}
   mkdir -p ${spark_dir}
+
+  # qsub this script...
 
   local SECONDS=0
   if [ ! -f "${out_prefix}.tsv.gz" ]; then
@@ -51,7 +59,10 @@ simulate_phenotypes() {
     python3 "${hail_script}" \
        --in_prefix "${in_prefix}"\
        --in_type "mt" \
-       --h2 ${h2} \
+       --h2_snp ${h2_snp} \
+       --pi_snp ${pi_ch} \
+       --h2_ch ${h2_snp} \
+       --pi_ch ${pi_ch} \
        --K ${K} \
        --seed ${seed} \
        --simulations ${simulations} \
@@ -68,6 +79,7 @@ simulate_phenotypes() {
     Rscript "${rscript}" \
       --input_path "${out_prefix}.tsv.gz" \
       --real_phenotype_path "${pheno_file}" \
+      --covars_keep "${covariates}" \
       --output_path "${out_phenotypes}" \
       && print_update "Finished merging with true phenotypes for chr${chr}" ${SECONDS} \
       || raise_error "Merging with true phenotypes for chr${chr} failed"
@@ -83,12 +95,20 @@ readonly seed=42
 readonly simulations=30
 
 # simulate traits with no heritability
-simulate_phenotypes 1e-1 0 0
+#simulate_phenotypes 1e-1 0 0
 
 # simulate traits slightly polygenic traits
-simulate_phenotypes 1e-1 1e-1 0
+#simulate_phenotypes 1e-1 1e-1 0
 
 # simulate moderately polygenic traits
-simulate_phenotypes 1e-1 3e-1 0
+#simulate_phenotypes 1e-1 3e-1 0
+
+# simulate 0.1 % causal varaints
+#simulate_phenotypes 1e-1 2e-1 1e-3
+
+
+
+
+
 
 

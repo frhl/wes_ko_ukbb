@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc@@short.hge
-#$ -t 1
+#$ -t 1-30
 #$ -V
 
 set -o errexit
@@ -85,6 +85,14 @@ fit_null() {
 set_up_RSAIGE
 fit_cts "${pheno_dir}/ukb_eur_h2_0_pi_0_K_1e-1_chr21_phenotype.tsv.gz" "ukb_eur_h2_0_pi_0_K_1e-1_chr21"
 fit_bin "${pheno_dir}/ukb_eur_h2_0_pi_0_K_1e-1_chr21_phenotype.tsv.gz" "ukb_eur_h2_0_pi_0_K_1e-1_chr21"
+
+fit_cts "${pheno_dir}/ukb_eur_h2_1e-1_pi_0_K_1e-1_chr21_phenotype.tsv.gz" "ukb_eur_h2_1e-1_pi_0_K_1e-1_chr21"
+fit_bin "${pheno_dir}/ukb_eur_h2_1e-1_pi_0_K_1e-1_chr21_phenotype.tsv.gz" "ukb_eur_h2_1e-1_pi_0_K_1e-1_chr21"
+
+fit_cts "${pheno_dir}/ukb_eur_h2_3e-1_pi_0_K_1e-1_chr21_phenotype.tsv.gz" "ukb_eur_h2_3e-1_pi_0_K_1e-1_chr21"
+fit_bin "${pheno_dir}/ukb_eur_h2_3e-1_pi_0_K_1e-1_chr21_phenotype.tsv.gz" "ukb_eur_h2_3e-1_pi_0_K_1e-1_chr21"
+
+
 
 
 

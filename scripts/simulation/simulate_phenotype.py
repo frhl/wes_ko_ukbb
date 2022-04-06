@@ -17,19 +17,18 @@ def main(args):
     in_prefix = args.in_prefix
     in_type = args.in_type
     out_prefix = args.out_prefix
-    #out_type = args.out_type
-    #chrom = args.chrom
-    #csqs_category = args.csqs_category
-    h2 = args.h2
-    pi = args.pi
+    h2_snp = args.h2_snp
+    h2_ko = args.h2_ko
+    pi_snp = args.pi_snp
+    pi_ko = args.pi_ko
     K = args.K
-    simulations = args.simulations
-    #export_single_markers = args.export_single_markers
     seed = args.seed
     
     # set parameters
-    pi = float(pi) if pi is not 0 else None
-    h2 = float(h2) if h2 is not None else None
+    pi_snp = float(pi_snp) if pi_snp is not 0 else None
+    pi_ko = float(pi_ko) if pi_ko is not 0 else None
+    h2_snp = float(h2_snp) if h2_snp is not None else None
+    h2_ko = float(h2_ko) if h2_ko is not None else None
     K = float(K) if K is not None else None
  
     # import table
@@ -39,73 +38,76 @@ def main(args):
     mt = io.import_table(in_prefix, in_type)
 
     # annotate with variant consequence
-    #mt = mt.explode_rows(mt.consequence.vep.worst_csq_by_gene_canonical)
-    #mt = mt.annotate_rows(
-    #consequence_category=ko.csqs_case_builder(
-    #        worst_csq_expr=mt.consequence.vep.worst_csq_by_gene_canonical,
-    #        use_loftee=True))
+    mt = mt.explode_rows(mt.consequence.vep.worst_csq_by_gene_canonical)
+    mt = mt.annotate_rows(
+        consequence_category=ko.csqs_case_builder(
+                worst_csq_expr=mt.consequence.vep.worst_csq_by_gene_canonical,
+                use_loftee=True))
     
     # simulate betas
-    mt = hl.experimental.ldscsim.make_betas(mt, float(h2), pi = pi)[0]
     mt = mt.filter_rows(hl.agg.stats(mt.GT.n_alt_alleles()).stdev>0)
-    mt = hl.experimental.ldscsim.normalize_genotypes(mt.GT)  
+    mt = hl.experimental.ldscsim.make_betas(mt, h2=h2_snp, pi=pi_snp)[0]
+    mt = hl.experimental.ldscsim.normalize_genotypes(mt.GT) 
+    mt = mt.annotate_cols(y_no_noise_snp=hl.agg.sum(mt.beta * mt['norm_gt']))
 
-    # add noise/environemental component
-    mt = mt.annotate_cols(y_no_noise=hl.agg.sum(mt.beta * mt['norm_gt']))
+    # annotate with CH effect
+    if h2_ko is not None:
 
-    # simulate x times
-    for i in range(int(simulations)):
-        col_cts = "cts" + str(i)
-        col_bin = "bin" + str(i)
-        mt = mt.annotate_cols(
-                y_cts = mt.y_no_noise + hl.rand_norm(0, hl.sqrt(1-h2))
-                )
-        if K is not None:
-            y_stats = mt.aggregate_cols(hl.agg.stats(mt.y_cts))
-            threshold = stats.norm.ppf(1-K, loc=y_stats.mean, scale=y_stats.stdev)
-            mt = mt.annotate_cols(y_bin=mt.y_cts > threshold)
-            mt = mt.rename({'y_bin': col_bin})
+        # prune MatrixTable (remove 95% of homs entry-wise)
+        items = ['pLoF','LC','damaging_missense']
+        gene_mt = mt.filter_rows(hl.literal(set(items)).contains(mt.consequence_category))
+        gene_mt = gene_mt.transmute_entries(GT = ko.rand_hom_to_het(gene_mt.GT, 0.98, seed = seed))
 
-        mt = mt.rename({'y_cts': col_cts})
+        # generate gene x sample matrix
+        gene_expr = gene_mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
+        genes = ko.aggr_phase_count_by_expr(gene_mt, gene_expr)
+        expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased)
+        expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko)
+        genes = genes.annotate_entries(pKO=expr_pko, knockout=expr_ko)
+
+        # write how many homs and ko's
+        counts = genes.aggregate_entries(hl.agg.counter(genes.knockout))
+        with open(out_prefix + '_ko.txt', 'a') as outfile:
+            outfile.write("Homozygotes:" + str(counts['Homozygote']) + '\n')
+            outfile.write("Compound heterozygotes:" + str(counts['Compound heterozygote']) + '\n')
+
+        # simulate thetas
+        genes = genes.filter_rows(hl.agg.stats(genes.pKO).stdev>0)
+        genes = ko.normalize_by_name(genes, "pKO")
+        genes = ko.make_thetas(genes, h2=h2_ko, pi=pi_ko)
+        genes = genes.annotate_cols(y_no_noise=hl.agg.sum(genes.theta * genes.norm_pKO))
+
+        # write genes
+        #genes.entries().flatten().write(out_prefix + "_genes.txt.gz")
+
+        # annotate original matrix with thetas from gene x sample matrix
+        mt = mt.annotate_cols(y_no_noise_ko = genes.index_cols(mt.col_key).y_no_noise)
+
+    if h2_ko is not None:
+        mt = mt.annotate_cols(y_cts=mt.y_no_noise_snp + 
+                mt.y_no_noise_ko + hl.rand_norm(0, hl.sqrt(1-h2_ko-h2_snp)))
+    else:
+        mt = mt.annotate_cols(y_cts = mt.y_no_noise_snp +
+                hl.rand_norm(0, hl.sqrt(1-h2_snp)))
     
+    if K is not None:
+        y_stats = mt.aggregate_cols(hl.agg.stats(mt.y_cts))
+        threshold = stats.norm.ppf(1-K, loc=y_stats.mean, scale=y_stats.stdev)
+        mt = mt.annotate_cols(y_bin=mt.y_cts > threshold)
+
     # export simulated phenotypes
     ht = mt.cols()
     ht.flatten().export(out_prefix + ".tsv.gz")
-    
-    #if export_single_markers:
-    #    io.export_table(mt, out_prefix + "_markers", out_type)
-
-    # collapse to gene knockout
-    #mt = mt.filter_rows(hl.literal(set(csqs_category)).contains(mt.consequence_category))
-    #gene_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
-    #genes = ko.aggr_phase_count_by_expr(mt, gene_expr)
-    
-    # calculate p(KO)
-    #expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased)
-    #expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko)
-    #genes = genes.annotate_entries(
-    #        pKO=expr_pko,
-    #        knockout=expr_ko)
-
-    # annotate dosage (used by SAIGE)
-    #prob = genes.annotate_entries(DS=genes.pKO * 2)
-    #prob = prob.select_entries(prob.DS)
-    #prob = prob.annotate_rows(
-    #        locus=hl.parse_locus('chr' + str(chrom) + ':1'),
-    #        alleles=hl.literal(['0', '1']),
-    #        rsid=prob.gene_id)
-    #prob = prob.key_rows_by(prob.locus, prob.alleles)
-    #prob = prob.drop('gene_id')
-    #io.export_table(prob, out_prefix, out_type)
 
 if __name__=='__main__':
 
     parser = argparse.ArgumentParser()
     #parser.add_argument('--chrom', default=None, help='chromosome')
-    parser.add_argument('--h2', default=None, help='Heritability for phenotype simulated')
-    parser.add_argument('--pi', default=0, help='Probability of variant being causal')
+    parser.add_argument('--h2_snp', default=None, help='Heritability for phenotype simulated')
+    parser.add_argument('--h2_ko', default=None, help='Heritability for phenotype simulated')
+    parser.add_argument('--pi_snp', default=0, help='Probability of variant being causal')
+    parser.add_argument('--pi_ko', default=0, help='Probability of variant being causal')
     parser.add_argument('--K', default=None, help='Prevalence of phenotype: cases / (cases + controls)')
-    parser.add_argument('--simulations', default=1, help='simulations to be dobe')
     parser.add_argument('--seed', default=None, help='seed for random simulations')
     parser.add_argument('--in_prefix', default=None, help='Path prefix for input dataset')
     parser.add_argument('--in_type', default=None, help='Either "mt", "vcf" or "plink"')
