@@ -17,19 +17,20 @@ def main(args):
     in_prefix = args.in_prefix
     in_type = args.in_type
     out_prefix = args.out_prefix
+    prune_hom_alt = args.prune_hom_alt
     h2_snp = args.h2_snp
     h2_ko = args.h2_ko
     pi_snp = args.pi_snp
     pi_ko = args.pi_ko
     K = args.K
     seed = args.seed
-    
+
     # set parameters
     pi_snp = float(pi_snp) if pi_snp is not 0 else None
     pi_ko = float(pi_ko) if pi_ko is not 0 else None
-    h2_snp = float(h2_snp) if h2_snp is not None else None
-    h2_ko = float(h2_ko) if h2_ko is not None else None
-    K = float(K) if K is not None else None
+    h2_snp = float(h2_snp) if h2_snp is not 0 else None
+    h2_ko = float(h2_ko) if h2_ko is not 0 else None
+    K = float(K) if K is not 0 else None
  
     # import table
     hail_init.hail_bmrc_init('logs/hail/absence_of_effect.log', 'GRCh38')
@@ -43,7 +44,11 @@ def main(args):
         consequence_category=ko.csqs_case_builder(
                 worst_csq_expr=mt.consequence.vep.worst_csq_by_gene_canonical,
                 use_loftee=True))
-    
+
+    # subset to potential 'damaging variants' 
+    items = ['pLoF','LC','damaging_missense']
+    gene_mt = mt.filter_rows(hl.literal(set(items)).contains(mt.consequence_category))
+ 
     # simulate betas
     mt = mt.filter_rows(hl.agg.stats(mt.GT.n_alt_alleles()).stdev>0)
     mt = hl.experimental.ldscsim.make_betas(mt, h2=h2_snp, pi=pi_snp)[0]
@@ -53,10 +58,10 @@ def main(args):
     # annotate with CH effect
     if h2_ko is not None:
 
-        # prune MatrixTable (remove 95% of homs entry-wise)
-        items = ['pLoF','LC','damaging_missense']
-        gene_mt = mt.filter_rows(hl.literal(set(items)).contains(mt.consequence_category))
-        gene_mt = gene_mt.transmute_entries(GT = ko.rand_hom_to_het(gene_mt.GT, 0.98, seed = seed))
+        # prune away knockedout owed to homozygote alternates
+        if prune_hom_alt:
+            prune_hom_alt = float(prune_hom_alt)
+            gene_mt = gene_mt.transmute_entries(GT = ko.rand_hom_to_het(gene_mt.GT, prune_hom_alt, seed = seed))
 
         # generate gene x sample matrix
         gene_expr = gene_mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
@@ -77,6 +82,7 @@ def main(args):
         genes = ko.make_thetas(genes, h2=h2_ko, pi=pi_ko)
         genes = genes.annotate_cols(y_no_noise=hl.agg.sum(genes.theta * genes.norm_pKO))
 
+        print(genes.describe())
         # write genes
         #genes.entries().flatten().write(out_prefix + "_genes.txt.gz")
 
@@ -103,18 +109,18 @@ if __name__=='__main__':
 
     parser = argparse.ArgumentParser()
     #parser.add_argument('--chrom', default=None, help='chromosome')
-    parser.add_argument('--h2_snp', default=None, help='Heritability for phenotype simulated')
-    parser.add_argument('--h2_ko', default=None, help='Heritability for phenotype simulated')
+    parser.add_argument('--h2_snp', default=0, help='Heritability for phenotype simulated')
+    parser.add_argument('--h2_ko', default=0, help='Heritability for phenotype simulated')
     parser.add_argument('--pi_snp', default=0, help='Probability of variant being causal')
     parser.add_argument('--pi_ko', default=0, help='Probability of variant being causal')
-    parser.add_argument('--K', default=None, help='Prevalence of phenotype: cases / (cases + controls)')
+    parser.add_argument('--K', default=0, help='Prevalence of phenotype: cases / (cases + controls)')
     parser.add_argument('--seed', default=None, help='seed for random simulations')
     parser.add_argument('--in_prefix', default=None, help='Path prefix for input dataset')
     parser.add_argument('--in_type', default=None, help='Either "mt", "vcf" or "plink"')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
+    parser.add_argument('--prune_hom_alt', default=None, help='Path prefix for output dataset')
     #parser.add_argument('--csqs_category', default=None, action=SplitArgs, help='comma sepearted field')
     #parser.add_argument('--out_type', default=None, help='Either "mt", "vcf" or "plink"')
-    #parser.add_argument('--export_single_markers', action='store_true', help='Either "mt", "vcf" or "plink"')
     args = parser.parse_args()
 
     main(args)

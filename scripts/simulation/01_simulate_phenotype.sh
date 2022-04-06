@@ -5,8 +5,8 @@
 #$ -o logs/simulate_phenptype.log
 #$ -e logs/simulate_phenptype.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 4
-#$ -q short.qc@@short.hge
+#$ -pe shmem 1
+#$ -q test.qc
 #$ -t 1
 #$ -V
 
@@ -14,10 +14,10 @@ set -o errexit
 set -o nounset
 
 source utils/qsub_utils.sh
-source utils/hail_utils.sh
 source utils/bash_utils.sh
 
-readonly hail_script="scripts/simulation/simulate_phenotype.py"
+readonly bash_script="scripts/simulation/_simulate_phenotype.sh"
+readonly merge_script="scripts/simulation/_merge_phenotype.sh"
 readonly rscript="scripts/simulation/simulate_phenotype.R"
 readonly spark_dir="data/tmp/spark_dir"
 
@@ -26,12 +26,15 @@ readonly chr=$( get_chr ${SGE_TASK_ID} )
 readonly pheno_dir="data/phenotypes"
 readonly pheno_file="${pheno_dir}/filtered_covar_phenotypes_cts.tsv.gz"
 
-readonly covar_file="${covar_dir}/covars2.csv"
+readonly covar_file="${pheno_dir}/covars2.csv"
 readonly covariates=$( cat ${covar_file} )
 
+readonly queue="short.qc"
+readonly nslots="2"
 
 readonly in_dir="data/mt/annotated"
 readonly in_prefix="${in_dir}/ukb_eur_wes_200k_annot_chr${chr}.mt"
+readonly in_type="mt"
 
 simulate_phenotypes() {
 
@@ -44,47 +47,37 @@ simulate_phenotypes() {
   local out_dir="data/simulation/phenotypes"
   local out_prefix="${out_dir}/ukb_eur_h2_${h2_snp}_${h2_ch}_pi_${pi_snp}_${pi_ch}_K_${K}_chr${chr}"
   local out_phenotypes="${out_prefix}_phenotype.tsv.gz"
+  
+  local sim_name="_sim_${SGE_TASK_ID}"
+  local mrg_name="_mrg_${SGE_TASK_ID}"
 
-  mkdir -p ${out_dir}
-  mkdir -p ${spark_dir}
+  set -x
+  qsub -N "${sim_name}" \
+       -t ${tasks} \
+       -q ${queue} \
+       -pe shmem ${nslots} \
+       ${bash_script} \
+       ${in_prefix}\
+       ${in_type} \
+       ${h2_snp} \
+       ${pi_ch} \
+       ${h2_snp} \
+       ${pi_ch} \
+       ${K} \
+       ${seed} \
+       ${out_prefix}
 
-  # qsub this script...
-
-  local SECONDS=0
-  if [ ! -f "${out_prefix}.tsv.gz" ]; then
-    echo "Simulating ${simulations} traits (${out_phenotypes})"
-    module purge
-    set_up_hail
-    set_up_pythonpath_legacy
-    python3 "${hail_script}" \
-       --in_prefix "${in_prefix}"\
-       --in_type "mt" \
-       --h2_snp ${h2_snp} \
-       --pi_snp ${pi_ch} \
-       --h2_ch ${h2_snp} \
-       --pi_ch ${pi_ch} \
-       --K ${K} \
-       --seed ${seed} \
-       --simulations ${simulations} \
-       --out_prefix "${out_prefix}" \
-       && print_update "Finished simulating phenotypes for chr${chr}" ${SECONDS} \
-       || raise_error "Simulating phenotypes for for chr${chr} failed"
-  else
-    print_update "file ${out} already exists. Skipping!"
-  fi
-
-  if [ ! -f "${out_phenotypes}" ]; then
-    module purge
-    set_up_rpy
-    Rscript "${rscript}" \
-      --input_path "${out_prefix}.tsv.gz" \
-      --real_phenotype_path "${pheno_file}" \
-      --covars_keep "${covariates}" \
-      --output_path "${out_phenotypes}" \
-      && print_update "Finished merging with true phenotypes for chr${chr}" ${SECONDS} \
-      || raise_error "Merging with true phenotypes for chr${chr} failed"
-  fi
-
+  qsub -N "${mrg_name}" \
+       -hold_jid ${sim_name} \
+       -t 1 \
+       -q "short.qc" \
+       -pe shmem 1 \
+       ${merge_script} \
+       ${out_prefix}\
+       ${pheno_file} \
+       ${covariates} \
+       ${out_phenotypes}
+  set +x
 }
 
 ###############
@@ -92,10 +85,11 @@ simulate_phenotypes() {
 ###############
 
 readonly seed=42
-readonly simulations=30
+readonly tasks=2
 
 # simulate traits with no heritability
-#simulate_phenotypes 1e-1 0 0
+#simulate_phenotypes 1e-1 0 0 0 0
+simulate_phenotypes 1e-1 0 0 1e-1 0
 
 # simulate traits slightly polygenic traits
 #simulate_phenotypes 1e-1 1e-1 0
