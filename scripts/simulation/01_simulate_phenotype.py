@@ -8,6 +8,10 @@ from ko_utils import ko
 from ukb_utils import hail_init
 import scipy.stats as stats
 
+
+def try_set_float(x):
+        return float(x) if x not in [None, "NA","None"] else None
+
 class SplitArgs(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, values.split(','))
@@ -18,20 +22,13 @@ def main(args):
     in_type = args.in_type
     out_prefix = args.out_prefix
     prune_hom_alt = args.prune_hom_alt
-    h2_snp = args.h2_snp
-    h2_ko = args.h2_ko
-    pi_snp = args.pi_snp
-    pi_ko = args.pi_ko
-    K = args.K
     seed = args.seed
+    h2_snp = try_set_float(args.h2_snp)
+    h2_ko = try_set_float(args.h2_ko)
+    pi_snp = try_set_float(args.pi_snp)
+    pi_ko = try_set_float(args.pi_ko)
+    K = try_set_float(args.K)
 
-    # set parameters
-    pi_snp = float(pi_snp) if pi_snp is not 0 else None
-    pi_ko = float(pi_ko) if pi_ko is not 0 else None
-    h2_snp = float(h2_snp) if h2_snp is not 0 else None
-    h2_ko = float(h2_ko) if h2_ko is not 0 else None
-    K = float(K) if K is not 0 else None
- 
     # import table
     hail_init.hail_bmrc_init('logs/hail/absence_of_effect.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1')
@@ -47,7 +44,7 @@ def main(args):
 
     # subset to potential 'damaging variants' 
     items = ['pLoF','LC','damaging_missense']
-    gene_mt = mt.filter_rows(hl.literal(set(items)).contains(mt.consequence_category))
+    mt = mt.filter_rows(hl.literal(set(items)).contains(mt.consequence_category))
  
     # simulate betas
     mt = mt.filter_rows(hl.agg.stats(mt.GT.n_alt_alleles()).stdev>0)
@@ -58,10 +55,12 @@ def main(args):
     # annotate with CH effect
     if h2_ko is not None:
 
+        gene_mt = mt
+
         # prune away knockedout owed to homozygote alternates
         if prune_hom_alt:
             prune_hom_alt = float(prune_hom_alt)
-            gene_mt = gene_mt.transmute_entries(GT = ko.rand_hom_to_het(gene_mt.GT, prune_hom_alt, seed = seed))
+            gene_mt = gene_mt.transmute_entries(GT = ko.rand_hom_to_het(gene_mt.GT, prune_hom_alt))
 
         # generate gene x sample matrix
         gene_expr = gene_mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
@@ -70,36 +69,29 @@ def main(args):
         expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko)
         genes = genes.annotate_entries(pKO=expr_pko, knockout=expr_ko)
 
-        # write how many homs and ko's
-        counts = genes.aggregate_entries(hl.agg.counter(genes.knockout))
-        with open(out_prefix + '_ko.txt', 'a') as outfile:
-            outfile.write("Homozygotes:" + str(counts['Homozygote']) + '\n')
-            outfile.write("Compound heterozygotes:" + str(counts['Compound heterozygote']) + '\n')
-
-        # simulate thetas
+        # simulate thetas (CH effects).
         genes = genes.filter_rows(hl.agg.stats(genes.pKO).stdev>0)
-        genes = ko.normalize_by_name(genes, "pKO")
+        genes = ko.normalize_by_name(genes, "pKO") # <---- set library
         genes = ko.make_thetas(genes, h2=h2_ko, pi=pi_ko)
-        genes = genes.annotate_cols(y_no_noise=hl.agg.sum(genes.theta * genes.norm_pKO))
-
-        print(genes.describe())
-        # write genes
-        #genes.entries().flatten().write(out_prefix + "_genes.txt.gz")
+        genes = genes.annotate_cols(y_no_noise_ko=hl.agg.sum(genes.theta * genes.norm_pKO))
+        
+        # return thetas for genes and samples
+        ht = genes.select_rows('theta').select_entries('pKO')
+        ht.entries().flatten().export(out_prefix + "_genes.tsv.gz")
 
         # annotate original matrix with thetas from gene x sample matrix
-        mt = mt.annotate_cols(y_no_noise_ko = genes.index_cols(mt.col_key).y_no_noise)
-
-    if h2_ko is not None:
-        mt = mt.annotate_cols(y_cts=mt.y_no_noise_snp + 
+        mt = mt.annotate_cols(y_no_noise_ko = genes.index_cols(mt.col_key).y_no_noise_ko)
+        mt = mt.annotate_cols(y_cts=mt.y_no_noise_snp +
                 mt.y_no_noise_ko + hl.rand_norm(0, hl.sqrt(1-h2_ko-h2_snp)))
     else:
         mt = mt.annotate_cols(y_cts = mt.y_no_noise_snp +
                 hl.rand_norm(0, hl.sqrt(1-h2_snp)))
-    
+
+    # binarize phenotype
     if K is not None:
         y_stats = mt.aggregate_cols(hl.agg.stats(mt.y_cts))
         threshold = stats.norm.ppf(1-K, loc=y_stats.mean, scale=y_stats.stdev)
-        mt = mt.annotate_cols(y_bin=mt.y_cts > threshold)
+        mt = mt.annotate_cols(y_bin=mt.y_cts > threshold) 
 
     # export simulated phenotypes
     ht = mt.cols()

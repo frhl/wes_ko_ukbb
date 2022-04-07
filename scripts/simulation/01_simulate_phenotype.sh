@@ -32,6 +32,7 @@ readonly covariates=$( cat ${covar_file} )
 readonly queue="short.qc"
 readonly nslots="2"
 
+readonly out_dir="data/simulation/phenotypes_new"
 readonly in_dir="data/mt/annotated"
 readonly in_prefix="${in_dir}/ukb_eur_wes_200k_annot_chr${chr}.mt"
 readonly in_type="mt"
@@ -44,7 +45,6 @@ simulate_phenotypes() {
   local h2_ch=${4}
   local pi_ch=${5}
 
-  local out_dir="data/simulation/phenotypes"
   local out_prefix="${out_dir}/ukb_eur_h2_${h2_snp}_${h2_ch}_pi_${pi_snp}_${pi_ch}_K_${K}_chr${chr}"
   local out_phenotypes="${out_prefix}_phenotype.tsv.gz"
   
@@ -85,11 +85,11 @@ simulate_phenotypes() {
 ###############
 
 readonly seed=42
-readonly tasks=2
+readonly tasks=7-8
 
 # simulate traits with no heritability
-#simulate_phenotypes 1e-1 0 0 0 0
-simulate_phenotypes 1e-1 0 0 1e-1 0
+simulate_phenotypes 1e-1 0 NA 0.3 NA
+#simulate_phenotypes 1e-1 0 0 1e-1 0
 
 # simulate traits slightly polygenic traits
 #simulate_phenotypes 1e-1 1e-1 0

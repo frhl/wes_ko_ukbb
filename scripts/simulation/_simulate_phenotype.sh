@@ -17,8 +17,8 @@ source utils/qsub_utils.sh
 source utils/hail_utils.sh
 source utils/bash_utils.sh
 
-readonly hail_script="scripts/simulation/simulate_phenotype.py"
-readonly rscript="scripts/simulation/simulate_phenotype.R"
+readonly hail_script="scripts/simulation/01_simulate_phenotype.py"
+readonly rscript="scripts/simulation/01_simulate_phenotype.R"
 readonly spark_dir="data/tmp/spark_dir"
 
 readonly in_prefix=${1?Error: Missing arg1 (phenotype)}
@@ -39,6 +39,7 @@ mkdir -p ${spark_dir}
 SECONDS=0
 set_up_hail
 set_up_pythonpath_legacy
+set -x
 python3 "${hail_script}" \
    --in_prefix "${in_prefix}"\
    --in_type "${in_type}" \
@@ -52,5 +53,5 @@ python3 "${hail_script}" \
    --out_prefix "${out_sge_prefix}" \
    && print_update "Finished simulating phenotypes for ${in_prefix}" ${SECONDS} \
    || raise_error "Simulating phenotypes for ${in_prefix} failed"
-
+set +x
 
