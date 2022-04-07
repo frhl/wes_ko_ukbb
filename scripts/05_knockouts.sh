@@ -30,12 +30,12 @@ readonly out_type="vcf"
 
 # Note: ~20 slots are needed for running chr1 
 # when using aggr_method="collect" on short.qe
-readonly tasks="21"
+readonly tasks="1-22"
 readonly queue="short.qa"
-readonly nslots=16
+#readonly nslots=16
 
 readonly only_vcf=""
-readonly aggr_method="collect" # either fasts or collect
+#readonly aggr_method="collect" # either fasts or collect
 
 # variant and sample parameters
 readonly exclude="data/genes/220310_common_plofs_to_exclude.txt"
@@ -50,6 +50,8 @@ mkdir -p ${out_dir}
 submit_knockout_job() 
 {
   local annotation=${1}
+  local nslots=${2}
+  local aggr_method=${3}
   #local input_path="${in_prefix}_chrCHR_maf${maf_lb}to${maf_ub}_${annotation}.mt"
   local out_prefix_csqs="${out_prefix}_chrCHR_maf${maf_lb}to${maf_ub}_${annotation}"
   set -x
@@ -76,8 +78,12 @@ submit_knockout_job()
   set +x
 }
 
-#submit_knockout_job "pLoF_damaging_missense"
-submit_knockout_job "pLoF"
+submit_knockout_job "synonymous" "5" "fast"
+#submit_knockout_job "other_missense" "5" "fast"
+#submit_knockout_job "pLoF" "20" "collect"
+#submit_knockout_job "damaging_missense" "20" "collect"
+#submit_knockout_job "pLoF,damaging_missense" "20" "collect"
+
 #submit_knockout_job "0" "5e-2" "" "damaging_missense"
 #submit_knockout_job "0" "5e-2" "" "synonymous"
 #submit_knockout_job "0" "5e-2" "" "pLoF,LC,damaging_missense"

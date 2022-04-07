@@ -5,9 +5,10 @@
 #$ -o logs/spa_null.log
 #$ -e logs/spa_null.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 1
+#$ -pe shmem 2
 #$ -q test.qc
 #$ -t 1-80
+#$ -tc 1
 #$ -V
 
 # all binary: 1 - 71
@@ -26,7 +27,7 @@ readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatedne
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
 #readonly plink_file="${plink_dir}/211102_long_ukb_wes_200k_sparse_autosomes"
 readonly plink_file="${plink_dir}/chunks/ukb_wes_200k_sparse_autosomes_mrg"
-readonly covar_file="${covar_dir}/covars1.csv"
+readonly covar_file="${covar_dir}/covars2.csv"
 readonly covariates=$( cat ${covar_file} )
 
 readonly out_prefix="ukb_wes_200k"
@@ -38,8 +39,8 @@ readonly index=${SGE_TASK_ID}
 fit_binary_traits() {
   local trait_type="binary"
   local inv_normalize="FALSE"
-  local out_dir="data/saige/output/binary/step1"
-  local pheno_file="${pheno_dir}/filtered_phenotypes_binary.tsv.gz"
+  local out_dir="data/saige/output/binary/step1_new"
+  local pheno_file="${pheno_dir}/filtered_covar_phenotypes_binary.tsv.gz"
   local pheno_list="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
   local phenotype=$( sed "${index}q;d" ${pheno_list} )
   local out="${out_dir}/${out_prefix}_${phenotype}"
@@ -49,8 +50,8 @@ fit_binary_traits() {
 fit_cts_traits() {
   local trait_type="quantitative"
   local inv_normalize="TRUE"
-  local out_dir="data/saige/output/cts/step1"
-  local pheno_file="${pheno_dir}/filtered_phenotypes_cts.tsv.gz"
+  local out_dir="data/saige/output/cts/step1_new"
+  local pheno_file="${pheno_dir}/filtered_covar_phenotypes_cts.tsv.gz"
   local pheno_list="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
   local phenotype=$( sed "${index}q;d" ${pheno_list} )
   local out="${out_dir}/${out_prefix}_${phenotype}"

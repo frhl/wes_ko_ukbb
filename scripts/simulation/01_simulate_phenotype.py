@@ -76,7 +76,7 @@ def main(args):
         genes = genes.annotate_cols(y_no_noise_ko=hl.agg.sum(genes.theta * genes.norm_pKO))
         
         # return thetas for genes and samples
-        ht = genes.select_rows('theta').select_entries('pKO')
+        ht = genes.select_rows('theta').select_entries(*['pKO','knockout'])
         ht.entries().flatten().export(out_prefix + "_genes.tsv.gz")
 
         # annotate original matrix with thetas from gene x sample matrix

@@ -27,7 +27,7 @@ readonly maf="0to5e-2"
 
 readonly min_mac=4
 readonly max_iter=5
-readonly P_cutoff=0.005 #5e-8
+readonly P_cutoff=0.01 #5e-8
 
 
 submit_binary_analysis()

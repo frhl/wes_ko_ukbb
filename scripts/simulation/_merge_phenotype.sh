@@ -27,7 +27,7 @@ SECONDS=0
 set_up_rpy
 set -x
 Rscript "${rscript}" \
-   --input_path "${out_prefix}.tsv.gz" \
+   --input_path "${in_prefix}" \
    --real_phenotype_path "${pheno_file}" \
    --covars_keep "${covariates}" \
    --output_path "${out_file}" \

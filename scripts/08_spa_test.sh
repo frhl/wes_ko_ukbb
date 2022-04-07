@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 23
+#$ -t 1-44
 #$ -tc 1
 #$ -V
 
@@ -55,7 +55,7 @@ submit_spa_with_csqs()
   local trait=${3?Error: Missing arg3 (trait)}
   if [ ! -z ${phenotype} ]; then
     local step1_dir="data/saige/output/${trait}/step1"
-    local step2_dir="data/saige/output/${trait}/step2/test_cols2"
+    local step2_dir="data/saige/output/${trait}/step2"
     local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
     local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
     local out_prefix="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}"
@@ -113,7 +113,16 @@ maf="maf0to5e-2"
 #submit_spa_binary_with_csqs "synonymous"
 
 # cts traits
-#submit_spa_cts_with_csqs "pLoF_damaging_missense"
-submit_spa_binary_with_csqs "pLoF_damaging_missense"
+submit_spa_cts_with_csqs "pLoF_damaging_missense"
+#submit_spa_binary_with_csqs "pLoF_damaging_missense"
+submit_spa_cts_with_csqs "pLoF"
+#submit_spa_binary_with_csqs "pLoF"
+submit_spa_cts_with_csqs "damaging_missense"
+#submit_spa_binary_with_csqs "damaging_missense"
+submit_spa_cts_with_csqs "synonymous"
+#submit_spa_binary_with_csqs "synonymous"
+
+
+
 
 

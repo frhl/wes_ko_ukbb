@@ -122,13 +122,17 @@ conditional_analysis() {
       local old_p=${current_p}
 
       if [ ${i} -eq 1 ]; then
+
         cat ${out_prefix_mrg} | awk -v P="${P_cutoff}" '$13 < P' | head -n1 >> ${markers_conditional}
         local current_p=$( tail -n1 ${markers_conditional} | cut -f13)
         local current_marker=$( tail -n1 ${markers_conditional} | awk '{print $1":"$2":"$4":"$5}')
+
       else
+
         cat ${out_prefix_mrg} | awk -v P="${P_cutoff}" '$18 < P' | head -n1 >> ${markers_conditional} 
         local current_p=$( tail -n1 ${markers_conditional} | cut -f18)
         local current_marker=$( tail -n1 ${markers_conditional} | awk '{print $1":"$2":"$4":"$5}')
+
       fi
 
       if [[ "${current_marker}" != "${old_marker}" ]]; then
