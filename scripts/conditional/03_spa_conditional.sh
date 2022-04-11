@@ -15,11 +15,8 @@ set -o nounset
 
 readonly bash_script="scripts/conditional/_spa_conditional.sh"
 
-readonly ko_dir="data/knockouts/alt"
-readonly ko_prefix="ukb_eur_wes_200k_chrCHR"
-
-readonly interval_dir="data/conditional/common/test_intervals"
-readonly out_dir="data/conditional/common/spa_test2"
+readonly interval_dir="data/conditional/common/intervals"
+readonly out_dir="data/conditional/common/spa_iter"
 
 readonly pheno_dir="data/phenotypes"
 readonly in_prefix="ukb_eur_wes_200k"
@@ -27,7 +24,7 @@ readonly maf="0to5e-2"
 
 readonly min_mac=4
 readonly max_iter=5
-readonly P_cutoff=0.01 #5e-8
+readonly P_cutoff=0.01
 
 
 submit_binary_analysis()
@@ -57,28 +54,36 @@ submit_cond_spa()
   local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
   local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
   local interval_vcf="${interval_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}.vcf.bgz"
-  local ko_vcf="${ko_dir}/${ko_prefix}_maf${maf}_${annotation}.vcf.bgz"
   local out_prefix="${out_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}_cond"
 
+  echo "interval_vcf: $( ls -l ${interval_vcf})"
+
   mkdir -p ${out_dir}
-  set -x
-  qsub -N "_cond_${1}" \
-    -q "short.qc@@short.hge" \
-    -t "${SGE_TASK_ID}" \
-    -pe shmem 1 \
-    "${bash_script}" \
-    "${in_gmat}" \
-    "${in_var}" \
-    "${interval_vcf}" \
-    "${ko_vcf}" \
-    "${out_prefix}" \
-    "${P_cutoff}" \
-    "${max_iter}" \
-    "${min_mac}"
-  set +x
+  if [[ "$P_cutoff" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
+    if [ -f ${interval_vcf} ]; then 
+      qsub -N "_cond_${1}" \
+        -q "short.qc@@short.hge" \
+        -t "${SGE_TASK_ID}" \
+        -pe shmem 1 \
+        "${bash_script}" \
+        "${in_gmat}" \
+        "${in_var}" \
+        "${interval_vcf}" \
+        "${out_prefix}" \
+        "${P_cutoff}" \
+        "${max_iter}" \
+        "${min_mac}"
+    else
+      >&2 echo "${interval_vcf} (interval) does not exist. Exiting.."
+    fi
+  else
+    >&2 echo "${P_cutoff} is not a valid decimal number"
+  fi
+
 }
 
 submit_cts_analysis "pLoF_damaging_missense"
+#submit_binary_analysis "pLoF_damaging_missense"
 
 
 
