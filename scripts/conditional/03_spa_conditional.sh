@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1
+#$ -t 2-44
 #$ -V
 
 set -o errexit
@@ -24,7 +24,7 @@ readonly maf="0to5e-2"
 
 readonly min_mac=4
 readonly max_iter=5
-readonly P_cutoff=0.01
+readonly P_cutoff="5e-8" #$( from_sci "5e-8" ) 
 
 
 submit_binary_analysis()
@@ -59,7 +59,7 @@ submit_cond_spa()
   echo "interval_vcf: $( ls -l ${interval_vcf})"
 
   mkdir -p ${out_dir}
-  if [[ "$P_cutoff" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
+  #if [[ "$P_cutoff" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
     if [ -f ${interval_vcf} ]; then 
       qsub -N "_cond_${1}" \
         -q "short.qc@@short.hge" \
@@ -76,9 +76,9 @@ submit_cond_spa()
     else
       >&2 echo "${interval_vcf} (interval) does not exist. Exiting.."
     fi
-  else
-    >&2 echo "${P_cutoff} is not a valid decimal number"
-  fi
+  #else
+  #  >&2 echo "${P_cutoff} is not a valid decimal number"
+  #fi
 
 }
 
