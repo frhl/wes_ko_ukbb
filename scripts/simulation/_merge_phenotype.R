@@ -35,6 +35,10 @@ main <- function(args){
   reduced <- Reduce(merge, lst)
   final <- merge(reduced, d, by.x = 's', by.y = 'eid', all.x = TRUE)
 
+  # add missing covariates
+  final$age2 <- final$age^2
+  final$sex_age <- final$age * final$sex
+
   # write out
   colnames(final)[colnames(final)=="s"] <- 'eid'
   fwrite(final, args$output_path, sep = args$delimiter)

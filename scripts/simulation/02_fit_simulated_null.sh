@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc@@short.hge
-#$ -t 1-30
+#$ -t 1-10
 #$ -V
 
 set -o errexit
@@ -26,7 +26,7 @@ readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatedne
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
 
 readonly plink_file="${plink_dir}/chunks/ukb_wes_200k_sparse_autosomes_mrg"
-readonly covar_file="${covar_dir}/covars1.csv"
+readonly covar_file="${covar_dir}/covars2.csv"
 readonly covariates=$( cat ${covar_file} )
 
 readonly step1_fitNULLGLMM="utils/saige/step1_fitNULLGLMM.R"
@@ -37,7 +37,7 @@ fit_cts() {
   local prefix=${2}
   local trait_type="quantitative"
   local inv_normalize="TRUE"
-  local phenotype="cts${SGE_TASK_ID}"
+  local phenotype="y_cts_${SGE_TASK_ID}"
  fit_null
 }
 
@@ -46,7 +46,7 @@ fit_bin() {
   local prefix=${2}
   local trait_type="binary"
   local inv_normalize="FALSE"
-  local phenotype="bin${SGE_TASK_ID}"
+  local phenotype="y_bin_${SGE_TASK_ID}"
   fit_null 
 }
 
@@ -84,8 +84,8 @@ fit_null() {
 
 # Running null model
 set_up_RSAIGE
-fit_cts "${pheno_dir}/ukb_eur_h2_0_0_pi_0_0_K_1e-1_chr21_phenotype.tsv.gz" "ukb_eur_h2_0_0_pi_0_0_K_1e-1_chr21"
-fit_bin "${pheno_dir}/ukb_eur_h2_0_0_pi_0_0_K_1e-1_chr21_phenotype.tsv.gz" "ukb_eur_h2_0_0_pi_0_0_K_1e-1_chr21"
+fit_cts "${pheno_dir}/ukb_eur_h2_0_0_pi_NA_NA_K_1e-1_chr21_phenos.tsv.gz" "ukb_eur_h2_0_0_pi_NA_NA_K_1e-1_chr21"
+fit_bin "${pheno_dir}/ukb_eur_h2_0_0_pi_NA_NA_K_1e-1_chr21_phenos.tsv.gz" "ukb_eur_h2_0_0_pi_NA_NA_K_1e-1_chr21"
 
 
 
