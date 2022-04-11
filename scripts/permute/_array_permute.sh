@@ -41,10 +41,16 @@ readonly gene="$(zcat ${genes_path} | grep "chr${chr}" | cut -f1 | sed ${index}'
 readonly input_path_gene=$(echo ${input_path} | sed -e "s/GENE/${gene}/g")
 readonly out_prefix_gene=$(echo ${out_prefix} | sed -e "s/GENE/${gene}/g")
 
-mkdir -p $( dirname ${out_prefix_gene} )
+readonly target_dir="$( dirname ${out_prefix_gene} )"
+readonly log_file="${target_dir}/${gene}.log"
+readonly error_file="${target_dir}/${gene}.errors.log"
+
+mkdir -p ${target_dir}
 
 set -x
 qsub -N "_c${chr}_${gene}" \
+    -o "${log_file}" \
+    -e "${error_file}" \
     -q "${queue_master}" \
     -pe shmem 1 \
     "${bash_script}" \
