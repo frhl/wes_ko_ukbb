@@ -41,6 +41,11 @@ readonly annotation=${16?Error: Missing argX}
 readonly static_assoc=${17?Error: Missing argX}
 readonly gene=${18?Error: Missing argX}
 
+readonly task_log="${out_prefix}.log"
+readonly task_log_errors="${out_prefix}.errors.log"
+
+
+
 
 # get array of path to phenotype names
 set_arr_phenos() {
@@ -146,6 +151,8 @@ shuffle_phase() {
 
       qsub -N "c${chr}_${gene}" \
           -t ${tasks_permute} \
+          -o ${task_log} \
+          -e ${task_log_errors} \
           -q ${queue_permute} \
           -pe shmem ${n_slots_permute} \
           ${bash_script} \
@@ -196,6 +203,8 @@ submit_saige() {
     if [ ! -f "${out_spa_upper_bound}.txt" ]; then
 
       qsub -N "${spa_name}" \
+              -o ${task_log} \
+              -e ${task_log_errors} \
               -t ${tasks_spa} \
               -q ${queue_saige} \
               -pe shmem ${n_slots_saige} \
@@ -314,40 +323,42 @@ while [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; do
         set_arr_saige ${phenotype}
         in_gmat=${arr_saige[2]}
         in_var=${arr_saige[3]}
-        gmat_bytes=$( file_size ${in_gmat} )
-        var_bytes=$( file_size ${in_var} )
 
-        if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then
+        if [ -f ${in_gmat} ] && [ -f ${in_var} ]; then
+          gmat_bytes=$( file_size ${in_gmat} )
+          var_bytes=$( file_size ${in_var} )
 
-          submit_saige ${n_shuffle} ${phenotype}
-          saige_merged="${out_prefix}_${phenotype}_merged.txt.gz"
-          aggregate_saige ${n_shuffle} ${phenotype}
+          if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then
 
-          permuted_p=$( Rscript ${r_spa_script} --input_path "${saige_merged}" --select_min_p ${top_p} )
-          true_p=$( lookup_true ${phenotype} "p" )
+            submit_saige ${n_shuffle} ${phenotype}
+            saige_merged="${out_prefix}_${phenotype}_merged.txt.gz"
+            aggregate_saige ${n_shuffle} ${phenotype}
 
-          if [ $( zcat ${saige_merged} | wc -l ) -ge 2 ]; then
+            permuted_p=$( Rscript ${r_spa_script} --input_path "${saige_merged}" --select_min_p ${top_p} )
+            true_p=$( lookup_true ${phenotype} "p" )
 
-            if [ $( echo "${true_p} >= ${permuted_p}" | bc ) ]; then
+            if [ $( zcat ${saige_merged} | wc -l ) -ge 2 ]; then
 
+              if [ $( echo "${true_p} >= ${permuted_p}" | bc ) ]; then
+
+                phenos_done[${phenotype}]=1
+                true_t=$( lookup_true ${phenotype} "t" )
+                outfile="${out_prefix}_${phenotype}_empirical_p"
+                empirical_p=$( Rscript ${r_p_script} --input_path "${saige_merged}" --true_tstat ${true_t} --true_p ${true_p} --out_prefix ${outfile})
+                echo -e "${gene}\t${phenotype}\t${n_shuffle}\t${true_p}\t${permuted_p}\t${min_mac}\n" >> ${log}
+              fi
+            else
               phenos_done[${phenotype}]=1
-              true_t=$( lookup_true ${phenotype} "t" )
-              outfile="${out_prefix}_${phenotype}_empirical_p"
-              empirical_p=$( Rscript ${r_p_script} --input_path "${saige_merged}" --true_tstat ${true_t} --true_p ${true_p} --out_prefix ${outfile})
-              echo -e "${gene}\t${phenotype}\t${n_shuffle}\t${true_p}\t${permuted_p}\t${min_mac}\n" >> ${log}
-
+              print_update "Stopped ${phenotype} x ${gene}. No markers with min_mac=${min_mac}." "${SECONDS}" 
             fi
-
           else
             phenos_done[${phenotype}]=1
-            print_update "Stopped ${phenotype} x ${gene}. No markers with min_mac=${min_mac}." "${SECONDS}" 
+            print_update "Stopped ${phenotype} x ${gene}. The gmat and/or variance ratio files are empty." "${SECONDS}" 
           fi
-
         else
           phenos_done[${phenotype}]=1
-          print_update "Stopped ${phenotype} x ${gene}. The gmat and variance ratio files are empty." "${SECONDS}" 
+          print_update "Stopped ${phenotype} x ${gene}. The gmat and/or variance ratio does not exist." "${SECONDS}" 
         fi
-
       fi
     done
 
