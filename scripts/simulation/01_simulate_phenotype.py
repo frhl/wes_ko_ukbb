@@ -12,6 +12,14 @@ import scipy.stats as stats
 def try_set_float(x):
         return float(x) if x not in [None, "NA","None"] else None
 
+def make_y_region(mt: hl.MatrixTable, h2, pi, region: list()):
+    mt = mt.filter_rows(hl.literal(set(region)).contains(mt.consequence_category))
+    mt = mt.filter_rows(hl.agg.stats(mt.GT.n_alt_alleles()).stdev>0)
+    mt = hl.experimental.ldscsim.make_betas(mt, h2=h2, pi=pi)[0]
+    mt = hl.experimental.ldscsim.normalize_genotypes(mt.GT) 
+    mt = mt.annotate_cols(y_no_noise=hl.agg.sum(mt.beta * mt['norm_gt']))
+    return(mt)
+
 class SplitArgs(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, values.split(','))
@@ -23,9 +31,11 @@ def main(args):
     out_prefix = args.out_prefix
     prune_hom_alt = args.prune_hom_alt
     seed = args.seed
-    h2_snp = try_set_float(args.h2_snp)
+    h2_nc = try_set_float(args.h2_nc)
+    h2_co = try_set_float(args.h2_co)
     h2_ko = try_set_float(args.h2_ko)
-    pi_snp = try_set_float(args.pi_snp)
+    pi_nc = try_set_float(args.pi_nc)
+    pi_co = try_set_float(args.pi_co)
     pi_ko = try_set_float(args.pi_ko)
     K = try_set_float(args.K)
 
@@ -46,7 +56,9 @@ def main(args):
     items = ['pLoF','LC','damaging_missense']
     mt = mt.filter_rows(hl.literal(set(items)).contains(mt.consequence_category))
  
-    # simulate betas
+   
+
+    # simulate betas (coding region)
     mt = mt.filter_rows(hl.agg.stats(mt.GT.n_alt_alleles()).stdev>0)
     mt = hl.experimental.ldscsim.make_betas(mt, h2=h2_snp, pi=pi_snp)[0]
     mt = hl.experimental.ldscsim.normalize_genotypes(mt.GT) 
@@ -101,10 +113,12 @@ if __name__=='__main__':
 
     parser = argparse.ArgumentParser()
     #parser.add_argument('--chrom', default=None, help='chromosome')
-    parser.add_argument('--h2_snp', default=0, help='Heritability for phenotype simulated')
-    parser.add_argument('--h2_ko', default=0, help='Heritability for phenotype simulated')
-    parser.add_argument('--pi_snp', default=0, help='Probability of variant being causal')
-    parser.add_argument('--pi_ko', default=0, help='Probability of variant being causal')
+    parser.add_argument('--h2_co', default=0, help='Heritability for coding region')
+    parser.add_argument('--h2_nc', default=0, help='Heritability for non-coding region')
+    parser.add_argument('--h2_ko', default=0, help='Heritability for knockouts')
+    parser.add_argument('--pi_co', default=0, help='Probability of variant being causal in coding region')
+    parser.add_argument('--pi_nc', default=0, help='Probability of variant being causal in non-coding region')
+    parser.add_argument('--pi_ko', default=0, help='Probability of variant being causal in knockouts')
     parser.add_argument('--K', default=0, help='Prevalence of phenotype: cases / (cases + controls)')
     parser.add_argument('--seed', default=None, help='seed for random simulations')
     parser.add_argument('--in_prefix', default=None, help='Path prefix for input dataset')
