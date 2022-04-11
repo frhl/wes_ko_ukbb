@@ -48,8 +48,8 @@ merge_spa_by_chr(){
           local first_iter="N"
        fi
        cat "${file}" | grep -v "MarkerID"  >> "${out}"
-       rm "${file}"
-       rm "${file}.index"
+       rm -f "${file}"
+       rm -f "${file}.index"
      fi
   done
 }
