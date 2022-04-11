@@ -20,6 +20,7 @@ main <- function(args){
   # load prefixes
   files <- list.files(dirname(args$input_path), pattern = basename(args$input_path), full.names = TRUE)
   files <- files[!grepl('_genes',files)]
+  files <- files[!grepl('_phenos',files)]
 
   # merge prefixes
   lst <- lapply(files, function(f){
