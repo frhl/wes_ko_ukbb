@@ -50,20 +50,20 @@ simulate_phenotypes() {
   local mrg_name="_mrg_${SGE_TASK_ID}"
 
   set -x
-  #qsub -N "${sim_name}" \
-  #     -t ${tasks} \
-  #    -q ${queue} \
-  #     -pe shmem ${nslots} \
-  #     ${bash_script} \
-  #     ${in_prefix}\
-  #     ${in_type} \
-  #     ${h2_snp} \
-  #     ${pi_ch} \
-  #     ${h2_snp} \
-  #     ${pi_ch} \
-  #     ${K} \
-  #     ${seed} \
-  #     ${out_prefix}
+  qsub -N "${sim_name}" \
+       -t ${tasks} \
+      -q ${queue} \
+       -pe shmem ${nslots} \
+       ${bash_script} \
+       ${in_prefix}\
+       ${in_type} \
+       ${h2_snp} \
+       ${pi_ch} \
+       ${h2_snp} \
+       ${pi_ch} \
+       ${K} \
+       ${seed} \
+       ${out_prefix}
 
   qsub -N "${mrg_name}" \
        -hold_jid ${sim_name} \

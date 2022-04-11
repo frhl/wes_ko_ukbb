@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-30
+#$ -t 1
 #$ -tc 1
 #$ -V
 
@@ -35,7 +35,7 @@ submit_spa_cts_with_csqs()
 {
   local saige_prefix="${1?Error: Missing arg1 (saige_prefix)}"
   local annotation="${2?Error: Missing arg2 (annotation)}"
-  local phenotype="cts${SGE_TASK_ID}"
+  local phenotype="y_cts_${SGE_TASK_ID}"
   submit_spa_with_csqs "${annotation}" "${phenotype}" "${saige_prefix}" "cts"
 }
 
@@ -76,7 +76,8 @@ submit_spa_job() {
   set +x
 }
 
-submit_spa_cts_with_csqs "ukb_eur_h2_0_pi_0_K_1e-1_chr21_cts${SGE_TASK_ID}" "pLoF_damaging_missense"
+submit_spa_cts_with_csqs "ukb_eur_h2_0_0_pi_NA_NA_K_1e-1_chr21_y_cts_${SGE_TASK_ID}" "pLoF_damaging_missense"
+#submit_spa_cts_with_csqs "ukb_eur_h2_0_pi_0_K_1e-1_chr21_cts${SGE_TASK_ID}" "pLoF_damaging_missense"
 
 
 
