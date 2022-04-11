@@ -20,14 +20,15 @@ def main(args):
     out_type = args.out_type
     final_sample_list = args.final_sample_list
     
-    hail_init.hail_bmrc_init('logs/hail/combine_markers.log', 'GRCh38')
+    hail_init.hail_bmrc_init('logs/hail/extract_markers.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1')
+    print(markers)
     markers = markers.split(",") # format chr12:4214:A:T
     if len(markers) == 0:
-        raise TypeError("no markers prsent in input!")
+        raise TypeError("no markers are present after splitting on ','")
 
     mt = genotypes.get_ukb_imputed_v3_bgen(chrom)
-    mt = samples.remove_withdrawn(mt)
+    mt = variants.liftover(mt)
     mt = mt.annotate_rows(
             marker = hl.delimit([
                 hl.str(mt.locus.contig), 
@@ -35,10 +36,12 @@ def main(args):
                 hl.str(mt.alleles[0]),
                 hl.str(mt.alleles[1])
                 ],':'))
+    print(markers)
+    print(mt.count())
     mt = mt.filter_rows(hl.literal(set(markers)).contains(mt.marker))
-    mt = variants.liftover(mt)
     mt = mt.annotate_entries(DS=hl.float64(mt.GT.n_alt_alleles()))
     mt = mt.select_entries(mt.DS)
+    print(mt.count())
     
     if final_sample_list:
         ht_final_samples = hl.import_table(
