@@ -35,7 +35,7 @@ main <- function(args){
   final <- merge(reduced, d, by.x = 's', by.y = 'eid', all.x = TRUE)
 
   # write out
-  colnames(d)[colnames(d)=="s"] <- 'eid'
+  colnames(final)[colnames(final)=="s"] <- 'eid'
   fwrite(final, args$output_path, sep = args$delimiter)
 
 
