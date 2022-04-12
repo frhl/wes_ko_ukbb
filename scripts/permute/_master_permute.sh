@@ -41,8 +41,9 @@ readonly annotation=${16?Error: Missing argX}
 readonly static_assoc=${17?Error: Missing argX}
 readonly gene=${18?Error: Missing argX}
 
-readonly task_log="${out_prefix}.log"
-readonly task_log_errors="${out_prefix}.errors.log"
+readonly write_dir="$( dirname ${out_prefix})"
+readonly task_log="${write_dir}/${gene}.log"
+readonly task_log_errors="${write_dir}/${gene}.errors.log"
 
 
 
@@ -130,8 +131,6 @@ wait_for_files() {
 shuffle_phase() {
 
   local permutations_demand=${1}
-  #local max_tasks_required=$( divide_ceil ${permutations_demand} ${replicates} )
-  #local n_tasks_required=$(( ${max_tasks_required} - ${permutation_supply} ))
   local n_tasks_required=$(( (${permutations_demand} / ${replicates}) - ${permutation_supply} ))
   local sge_seed=3
 

@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 21
+#$ -t 22
 #$ -tc 1
 #$ -V
 
@@ -38,19 +38,19 @@ readonly true_p_path="data/permute/overview/overview_true_p.tsv.gz"
 
 # count how many genes to submit for the given chromosome
 readonly n_genes="$( zcat ${genes_path} | grep "chr${chr}" | wc -l)"
-#readonly sge_tasks="1-${n_genes}"
-readonly sge_tasks=8
+readonly sge_tasks="1-${n_genes}"
+#readonly sge_tasks=1-10
 
 # parameters for master script
 readonly min_mac=4
 readonly n_replicates=1000
 readonly n_start_shuffle=1000
-readonly n_cutoff_shuffle=1000000
+readonly n_cutoff_shuffle=100000000
 readonly n_slots_saige=1
-readonly n_slots_permute=2
+readonly n_slots_permute=1
 readonly tick_interval=10
-readonly tick_timeout=200 # 10 x 200 seconds
-readonly queue_saige="short.qf"
+readonly tick_timeout=400 # 10 x 400 seconds
+readonly queue_saige="short.qe"
 readonly queue_permute="short.qa"
 readonly queue_master="short.qe"
 
