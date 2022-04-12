@@ -115,16 +115,39 @@ set_up_conda() {
 #}
 
 
+
+wait_for_path() {
+  local path=${1}
+  local thedir=$( dirname $path)
+  local base=$( basename $path)
+  local max_ticks=100
+  local cur_ticks=0
+  if [ "$(ls -l ${thedir} | grep ${base} |  wc -l)" -eq "0" ]; then
+    echo "Waiting for '${path}' (${max_ticks} ticks).."
+    while [  "$(ls -l ${thedir} | grep ${base} |  wc -l)" -eq "0" ]; do
+      local cur_ticks=$(( ${cur_ticks} + 1 ))
+      if [[ ${cur_ticks} -ge ${max_ticks} ]]; then
+            >&2 echo "max ticks reached. Breaking loop.."
+            break
+        fi
+      sleep 2
+    done
+  fi
+}
+
+
 set_up_RSAIGE() {
   module load Anaconda3/2020.07 
   local version="${1:-1.0.5}"
   local envs=$( conda env list | grep $version )
   local env_dir=$(echo $envs | cut -d" " -f2 )
   local env_saige="saige-v${version}"
+  local ld_paths="${env_dir}/lib/R/etc/ldpaths"
   if [ -d "${env_dir}" ]; then
     set +eu
     module load java/1.8.0_latest
     source "/apps/eb/skylake/software/Anaconda3/2020.07/etc/profile.d/conda.sh"
+    wait_for_path ${ld_paths}
     echo "Loading ${env_saige} (env dir: ${env_dir})"
     conda activate ${env_saige}
     set -eu
