@@ -38,10 +38,18 @@ file_size(){
   if [ -f ${file} ]; then
     echo "$( stat --printf="%s" ${file} )"
   else 
+    #echo 0
     raise_error "${file} does not exist."
   fi
 }
 
+from_sci() {
+  sci=${1}
+  result=$( echo "${sci}" | awk -F"E" 'BEGIN{OFMT="%10.20f"} {print $1 * (10 ^ $2)}' )
+  if [ ! -z "${result}" ]; then
+    echo ${result}
+  fi
+}
 
 #vcf_check() {
 #  if [ ! -f $1 ]; then # check that VCF exists
@@ -108,20 +116,20 @@ set_up_conda() {
 
 
 set_up_RSAIGE() {
+  module load Anaconda3/2020.07 
   local version="${1:-1.0.5}"
   local envs=$( conda env list | grep $version )
   local env_dir=$(echo $envs | cut -d" " -f2 )
   local env_saige="saige-v${version}"
   if [ -d "${env_dir}" ]; then
     set +eu
-    module load Anaconda3/2020.07 
     module load java/1.8.0_latest
     source "/apps/eb/skylake/software/Anaconda3/2020.07/etc/profile.d/conda.sh"
     echo "Loading ${env_saige} (env dir: ${env_dir})"
     conda activate ${env_saige}
     set -eu
   else
-    raise_error "${env_saige} does not exist. Exiting.."
+    raise_error "${env_saige} does not exist."
   fi
 }
 

@@ -94,6 +94,29 @@ def rand_flip_call(gt: hl.call, P: float = 0.5, seed = None):
     )
 
 
+def rand_hom_to_het(gt: hl.call, P: float = 0.9, seed = None, phase = "|"):
+    """ Randomize genotype phase of call
+    :param gt: genotype call to be flipped
+    :param P: probabily of flipping hom to het
+    :param seed: seed for random
+    """
+    assert str(gt.dtype) == 'call'
+
+    return hl.if_else(
+        (gt.n_alt_alleles() == 2),
+        hl.if_else(
+            (hl.rand_bool(P, seed=seed)),
+            hl.if_else(
+                (hl.rand_bool(0.5, seed=seed)),
+                hl.parse_call("1" + str(phase) + "0"),
+                hl.parse_call("0" + str(phase) + "1")
+            ),
+            gt
+        ),
+        gt
+    )
+
+
 def aggr_count_calls(mt: hl.MatrixTable, phased: bool = True):
     """ Count number of phased/unphased hetz and what haplotype they reside on
 
@@ -239,5 +262,26 @@ def annotate_knockout(hom_expr, pko_expr):
            .when((hom_expr == 0) & (pko_expr >= 0.5),'Possible Compound heterozygote')
            .or_missing()
             )
+
+
+def normalize_by_name(mt, name):
+    """Normalize entry to have mean of zero and variance of 1"""
+    mt = mt.annotate_rows(**{'stats': hl.agg.stats(mt[name])})
+    mt = mt.annotate_entries(
+        norm=(mt[name]-mt.stats.mean)/mt.stats.stdev)
+    mt = mt.rename({"norm" : "norm_" + str(name)})
+    return(mt)
+
+
+def make_thetas(mt, h2, pi = None):
+    """ Make thetas (effect sizes) for genes (gene x sample matrix) with
+    either infintesimal or spike and slab model. 
+    """
+    
+    M = mt.count()[0]
+    pi_temp = 1 if pi == None else pi
+    mt = mt.annotate_rows(
+        theta = hl.rand_bool(pi_temp)*hl.rand_norm(0, hl.sqrt(h2/(M*pi_temp))))
+    return(mt)
 
 
