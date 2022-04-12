@@ -7,8 +7,8 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-44
-#$ -tc 1
+#$ -t 1-80
+#$ -tc 2
 #$ -V
 
 set -o errexit
@@ -24,12 +24,6 @@ readonly spark_dir="data/tmp/spark"
 readonly spa_script="scripts/_spa_test.sh"
 readonly merge_script="scripts/_spa_merge.sh"
 readonly in_prefix="ukb_eur_wes_200k_chrCHR"
-
-readonly conditioning_markers=""
-readonly min_mac=4
-readonly tasks=1-22
-readonly queue="short.qf"
-readonly nslots=1
 
 
 submit_spa_binary_with_csqs()
@@ -60,8 +54,11 @@ submit_spa_with_csqs()
     local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
     local out_prefix="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}"
     local in_vcf="${vcf_dir}/${in_prefix}_${maf}_${annotation}.vcf.bgz"
-    submit_spa_job
-    submit_merge_job
+    local out_mrg="${out_prefix}.txt.gz"
+    if [ ! -f "${out_mrg}" ]; then
+      submit_spa_job
+      submit_merge_job
+    fi
   else
     >&2 echo "No phenotype at index ${SGE_TASK_ID}. Exiting.." 
   fi 
@@ -74,6 +71,7 @@ submit_spa_job() {
   qsub -N "spa_${phenotype}_${annotation}" \
     -t ${tasks} \
     -q "${queue}" \
+    -tc 12 \
     -pe shmem ${nslots} \
     "${spa_script}" \
     "${phenotype}" \
@@ -99,11 +97,19 @@ submit_merge_job()
     "${merge_script}" \
     "${out_prefix}" \
     "${step2_dir}" \
-    "${out_prefix}.txt.gz" \
+    "${out_mrg}" \
     "${remove_by_chr}"
   set +x
 
 }
+
+# parameters
+readonly conditioning_markers=""
+readonly min_mac=4
+readonly tasks=1-22
+readonly queue="short.qe"
+readonly nslots=1
+
 
 
 # Binary traits
@@ -113,13 +119,20 @@ maf="maf0to5e-2"
 #submit_spa_binary_with_csqs "synonymous"
 
 # cts traits
-submit_spa_cts_with_csqs "pLoF_damaging_missense"
+#submit_spa_cts_with_csqs "pLoF_damaging_missense"
+#sleep 10
 #submit_spa_binary_with_csqs "pLoF_damaging_missense"
+#sleep 10
 submit_spa_cts_with_csqs "pLoF"
+#sleep 10
 #submit_spa_binary_with_csqs "pLoF"
-submit_spa_cts_with_csqs "damaging_missense"
+#sleep 10
+#submit_spa_cts_with_csqs "damaging_missense"
+#sleep 10
 #submit_spa_binary_with_csqs "damaging_missense"
-submit_spa_cts_with_csqs "synonymous"
+#sleep 10
+#submit_spa_cts_with_csqs "synonymous"
+#sleep 10
 #submit_spa_binary_with_csqs "synonymous"
 
 

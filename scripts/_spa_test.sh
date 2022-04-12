@@ -25,6 +25,9 @@ readonly out_prefix=${7?Error: Missing arg6 (path prefix for saige output)}
 readonly in_markers="${8}" # optional conditioning markers
 readonly chr=${SGE_TASK_ID}
 
+readonly var_bytes=$( file_size ${in_var} )
+readonly gmat_bytes=$( file_size ${in_gmat} )
+
 readonly vcf=$(echo ${in_vcf} | sed -e "s/CHR/${chr}/g")
 readonly csi=$(echo ${in_csi} | sed -e "s/CHR/${chr}/g")
 readonly markers=$(cat $(echo ${in_markers} | sed -e "s/CHR/${chr}/g"))
@@ -34,8 +37,11 @@ readonly threads=$(( ${NSLOTS}-1 ))
 readonly step2_SPAtests="utils/saige/step2_SPAtests.R"
 
 spa_test() {
-   SECONDS=0
-   Rscript "${step2_SPAtests}"	\
+  echo "var_bytes=${var_bytes} at ${in_var}"
+  echo "gmat_bytes=${gmat_bytes} at ${in_gmat}"
+  if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then 
+  SECONDS=0
+  Rscript "${step2_SPAtests}"	\
      --vcfFile=${vcf} \
      --vcfFileIndex=${csi} \
      --vcfField="DS" \
@@ -49,6 +55,9 @@ spa_test() {
      ${markers:+--condition "$markers"} \
      && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
      || raise_error "Saddle-point approximation for chr${chr} failed"
+  else
+    raise_error "${in_var} or ${in_gmat} does not contain any bytes!"
+  fi
 }
 
 if [ ! -f ${out} ]; then

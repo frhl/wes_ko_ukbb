@@ -68,5 +68,8 @@ submit_intervals()
 
 submit_binary_intervals "pLoF_damaging_missense"
 submit_cts_intervals "pLoF_damaging_missense"
+submit_binary_intervals "pLoF_damaging_missense"
+submit_cts_intervals "pLoF_damaging_missense"
+
 
 

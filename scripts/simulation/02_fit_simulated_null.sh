@@ -80,12 +80,13 @@ fit_null() {
    fi
  }
 
-# ukb_eur_h2_2e-1_3e-1_pi_NA_NA_K_1e-1_chr21
 
 # Running null model
 set_up_RSAIGE
 fit_cts "${pheno_dir}/ukb_eur_h2_0_0_pi_NA_NA_K_1e-1_chr21_phenos.tsv.gz" "ukb_eur_h2_0_0_pi_NA_NA_K_1e-1_chr21"
-fit_bin "${pheno_dir}/ukb_eur_h2_0_0_pi_NA_NA_K_1e-1_chr21_phenos.tsv.gz" "ukb_eur_h2_0_0_pi_NA_NA_K_1e-1_chr21"
+fit_cts "${pheno_dir}/ukb_eur_h2_0_3e-1_pi_NA_NA_K_1e-1_chr21_phenos.tsv.gz" "ukb_eur_h2_0_3e-1_pi_NA_NA_K_1e-1_chr21"
+fit_cts "${pheno_dir}/ukb_eur_h2_2e-1_3e-1_pi_NA_NA_K_1e-1_chr21_phenos.tsv.gz" "ukb_eur_h2_2e-1_3e-1_pi_NA_NA_K_1e-1_chr21"
+#fit_bin "${pheno_dir}/ukb_eur_h2_0_0_pi_NA_NA_K_1e-1_chr21_phenos.tsv.gz" "ukb_eur_h2_0_0_pi_NA_NA_K_1e-1_chr21"
 
 
 
