@@ -130,7 +130,7 @@ wait_for_path() {
             >&2 echo "max ticks reached. Breaking loop.."
             break
         fi
-      sleep 2
+      sleep 3
     done
   fi
 }
@@ -138,7 +138,7 @@ wait_for_path() {
 
 set_up_RSAIGE() {
   module load Anaconda3/2020.07 
-  local version="${1:-1.0.5}"
+  local version="${1:-1.0.4}"
   local envs=$( conda env list | grep $version )
   local env_dir=$(echo $envs | cut -d" " -f2 )
   local env_saige="saige-v${version}"
@@ -148,8 +148,12 @@ set_up_RSAIGE() {
     module load java/1.8.0_latest
     source "/apps/eb/skylake/software/Anaconda3/2020.07/etc/profile.d/conda.sh"
     wait_for_path ${ld_paths}
-    echo "Loading ${env_saige} (env dir: ${env_dir})"
-    conda activate ${env_saige}
+    if [ $( file_size ${ld_paths} ) -ge 1 ]; then
+      echo "Loading ${env_saige} (env dir: ${env_dir})"
+      conda activate ${env_saige}
+    else
+      raise_error "${ld_paths} has zero bytes! Expected ~1500 bytes."
+    fi
     set -eu
   else
     raise_error "${env_saige} does not exist."
