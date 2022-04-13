@@ -20,6 +20,7 @@ readonly bash_script="scripts/permute/_gene_permute.sh"
 readonly spa_script="scripts/permute/_gene_spa.sh"
 readonly r_spa_script="scripts/permute/_get_spa_p.R"
 readonly r_p_script="scripts/permute/_calc_empirical_p.R"
+readonly logic="scripts/permute/_logic.R"
 readonly merge_script="scripts/permute/_merge_spa.sh"
 
 readonly chr=${1?Error: Missing argX}
@@ -303,6 +304,7 @@ for pheno in ${arr_phenos[@]}; do saige_supply[${pheno}]=0; done
 
 readonly log="${out_prefix}.log"
 readonly success="${out_prefix}.SUCCESS"
+#touch ${log}
 
 SECONDS=0
 n_shuffle=${n_start_shuffle}
@@ -327,6 +329,7 @@ while [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; do
           gmat_bytes=$( file_size ${in_gmat} )
           var_bytes=$( file_size ${in_var} )
 
+          # ensure that the saige auxillary files contain data
           if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then
 
             submit_saige ${n_shuffle} ${phenotype}
@@ -336,15 +339,19 @@ while [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; do
             permuted_p=$( Rscript ${r_spa_script} --input_path "${saige_merged}" --select_min_p ${top_p} )
             true_p=$( lookup_true ${phenotype} "p" )
 
+            # Check that the saige file produces more than a single line
+            # indicating more than one pseudo marker could be tested
             if [ $( zcat ${saige_merged} | wc -l ) -ge 2 ]; then
 
-              if [ $( echo "${true_p} >= ${permuted_p}" | bc ) ]; then
+              # floating point logic with scientific notation will be handled by R to
+              # check whether the true P-value is greater than the permuted P-value.
+              if [ $( Rscript ${logic} --a ${true_p} --o "ge" --b ${permuted_p}) ]; then
 
                 phenos_done[${phenotype}]=1
                 true_t=$( lookup_true ${phenotype} "t" )
                 outfile="${out_prefix}_${phenotype}_empirical_p"
                 empirical_p=$( Rscript ${r_p_script} --input_path "${saige_merged}" --true_tstat ${true_t} --true_p ${true_p} --out_prefix ${outfile})
-                echo -e "${gene}\t${phenotype}\t${n_shuffle}\t${true_p}\t${permuted_p}\t${min_mac}\n" >> ${log}
+                echo -e "${gene}\t${phenotype}\t${n_shuffle}\t${true_p}\t${permuted_p}\t${min_mac}" >> ${log}
               fi
             else
               phenos_done[${phenotype}]=1
@@ -364,6 +371,7 @@ while [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; do
     if [ $( are_phenos_done ) ]; then
       break
     else  
+      echo "itereration completed. Increasing shuffle to ${n_shuffle} * 10"
       n_shuffle=$(( ${n_shuffle} * 10 ))
       top_p=100
     fi
@@ -373,6 +381,5 @@ done
 # finish up
 print_update "Done! ${n_shuffle} permutations required." ${SECONDS}
 mv ${log} ${success}
-
 
 
