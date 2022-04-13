@@ -27,7 +27,7 @@ main <- function(args){
 # add arguments
 parser <- ArgumentParser()
 parser$add_argument("--a", default=NULL, help = "A value")
-parser$add_argument("--v", default=NULL, help = "B value")
+parser$add_argument("--b", default=NULL, help = "B value")
 parser$add_argument("--o", default=NULL, help = "operator")
 args <- parser$parse_args()
 
