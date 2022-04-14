@@ -45,8 +45,8 @@ readonly gene=${18?Error: Missing argX}
 readonly write_dir="$( dirname ${out_prefix})"
 readonly task_log="${write_dir}/${gene}.log"
 readonly task_log_errors="${write_dir}/${gene}.errors.log"
-
-
+readonly saige_log="${write_dir}/${gene}.saige.log"
+readonly saige_log_errors="${write_dir}/${gene}.saige.errors.log"
 
 
 # get array of path to phenotype names
@@ -203,8 +203,8 @@ submit_saige() {
     if [ ! -f "${out_spa_upper_bound}.txt" ]; then
 
       qsub -N "${spa_name}" \
-              -o ${task_log} \
-              -e ${task_log_errors} \
+              -o ${saige_log} \
+              -e ${saige_log_errors} \
               -t ${tasks_spa} \
               -q ${queue_saige} \
               -pe shmem ${n_slots_saige} \
@@ -311,6 +311,8 @@ n_shuffle=${n_start_shuffle}
 permutation_supply=0
 top_p=10
 #testit=("WHR" "BMI")
+#testit=("WHR" "EP_combined")
+
 
 while [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; do
 
@@ -346,7 +348,6 @@ while [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; do
               # floating point logic with scientific notation will be handled by R to
               # check whether the true P-value is greater than the permuted P-value.
               if [ $( Rscript ${logic} --a ${true_p} --o "ge" --b ${permuted_p}) ]; then
-
                 phenos_done[${phenotype}]=1
                 true_t=$( lookup_true ${phenotype} "t" )
                 outfile="${out_prefix}_${phenotype}_empirical_p"
@@ -368,7 +369,13 @@ while [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; do
       fi
     done
 
-    if [ $( are_phenos_done ) ]; then
+
+    echo "# are phenos done?"
+    echo "# ${phenos_done[@]}"
+    echo "# value: $( are_phenos_done )"
+
+    if [ "$( are_phenos_done )" -eq "1" ]; then
+      echo "phenos are done!"
       break
     else  
       echo "itereration completed. Increasing shuffle to ${n_shuffle} * 10"
