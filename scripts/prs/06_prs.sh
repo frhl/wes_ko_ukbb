@@ -7,7 +7,8 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1
+#$ -t 1-2
+#$ -tc 1
 #$ -V
 
 set -o errexit
@@ -61,6 +62,6 @@ submit_ldpred2()
 }
 
 
-submit_ldpred2 "auto" "4" "${phenotype_cts}"
-#submit_ldpred2 "inf" "1" "${phenotype_binary}"
+submit_ldpred2 "auto" "6" "${phenotype_cts}"
+submit_ldpred2 "auto" "6" "${phenotype_binary}"
 

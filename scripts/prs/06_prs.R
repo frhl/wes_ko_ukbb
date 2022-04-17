@@ -12,6 +12,7 @@ main <- function(args){
   stopifnot(file.exists(args$pred))
   stopifnot(file.exists(args$ldsc))
   stopifnot(dir.exists(args$ld_dir))
+  stopifnot(dir.exists(dirname(args$out_prefix)))
   stopifnot(args$method %in% c('inf', 'auto'))
 
   # setup parallel environment
@@ -46,9 +47,10 @@ main <- function(args){
   stopifnot(all(snp$map$marker %in% gwas$marker)) 
   stopifnot(sum(gwas$marker == snp$map$marker) / nrow(gwas) == 1)
   
-   # load data to be used for prediction 
+  # load data to be used for prediction 
+  bfile <- tempfile(tmpdir = dirname(args$out_prefix))
   pred <- load_bigsnp_from_bed(args$pred)
-  pred <- match_bigsnp_with_gwas(pred, gwas)
+  pred <- match_bigsnp_with_gwas(obj=pred, gwas=gwas, bfile=bfile)
   genotypes <- pred$genotypes  
   indicies <- pred$gwas_indicies
 
@@ -130,6 +132,7 @@ main <- function(args){
   write(paste0(args$pred, ".. done! Writing to ", args$out_prefix, ".txt.gz"), stdout())
   fwrite(PGS, file = paste0(args$out_prefix,".txt.gz"), sep = '\t')
   fwrite(model, file = paste0(args$out_prefix,".model"), sep = '\t')
+  unlink(bfile)
   
 }
 
