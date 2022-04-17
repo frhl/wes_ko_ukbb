@@ -2,10 +2,11 @@
 #' @param obj a bigsnp obj (see library bigsnpr)
 #' @param gwas a gwas summary statistics data.frame
 #' @param ind_row sequence of numbers for samples to select.
+#' @param bfile backing file (warning, this file will take up a lot of space! so delete)
 #' @param ncores how many cores should be used.
 #' @export
 
-match_bigsnp_with_gwas <- function(obj, gwas, ind_row = NULL, ncores = 1){
+match_bigsnp_with_gwas <- function(obj, gwas, ind_row = NULL, bfile = NULL, ncores = 1){
 
     # add indexes used for later subsetting
     bed_map <- obj$map
@@ -32,7 +33,11 @@ match_bigsnp_with_gwas <- function(obj, gwas, ind_row = NULL, ncores = 1){
     # subset bigsnp to get the right genotypes
     samples <- obj$bigsnp$fam$sample.ID
     if (is.null(ind_row)) ind_row <- 1:length(samples)
-    subsetted_bigsnp <- snp_subset(obj$bigsnp, ind.col = bed_map$index, ind.row = ind_row)
+    subsetted_bigsnp <- snp_subset(obj$bigsnp, 
+                                   ind.col = bed_map$index, 
+                                   ind.row = ind_row,
+                                   backingfile = bfile
+                                   )
     subsetted_bigsnp <- snp_attach(subsetted_bigsnp)
     genotypes <- subsetted_bigsnp$genotypes
     stopifnot(dim(genotypes)[2] == nrow(gwas_matched))
