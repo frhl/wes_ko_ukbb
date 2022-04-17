@@ -58,6 +58,8 @@ submit_spa_with_csqs()
     if [ ! -f "${out_mrg}" ]; then
       submit_spa_job
       submit_merge_job
+    else
+      >&2 echo "Phenotype ${phenotype} with annotation ${annotation} already exists! Skipping.." 
     fi
   else
     >&2 echo "No phenotype at index ${SGE_TASK_ID}. Exiting.." 
@@ -119,21 +121,21 @@ maf="maf0to5e-2"
 #submit_spa_binary_with_csqs "synonymous"
 
 # cts traits
-#submit_spa_cts_with_csqs "pLoF_damaging_missense"
+submit_spa_cts_with_csqs "pLoF_damaging_missense"
 #sleep 10
-#submit_spa_binary_with_csqs "pLoF_damaging_missense"
+submit_spa_binary_with_csqs "pLoF_damaging_missense"
 #sleep 10
 submit_spa_cts_with_csqs "pLoF"
 #sleep 10
-#submit_spa_binary_with_csqs "pLoF"
+submit_spa_binary_with_csqs "pLoF"
 #sleep 10
-#submit_spa_cts_with_csqs "damaging_missense"
+submit_spa_cts_with_csqs "damaging_missense"
 #sleep 10
-#submit_spa_binary_with_csqs "damaging_missense"
+submit_spa_binary_with_csqs "damaging_missense"
 #sleep 10
-#submit_spa_cts_with_csqs "synonymous"
+submit_spa_cts_with_csqs "synonymous"
 #sleep 10
-#submit_spa_binary_with_csqs "synonymous"
+submit_spa_binary_with_csqs "synonymous"
 
 
 
