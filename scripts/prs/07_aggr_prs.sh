@@ -20,7 +20,11 @@ readonly rscript="scripts/prs/07_aggr_prs.R"
 readonly in_dir="data/prs/scores/auto"
 
 readonly pheno_dir="data/phenotypes"
-readonly phenos="${pheno_dir}/curated_phenotypes_header.tsv"
+#readonly phenos="${pheno_dir}/curated_phenotypes_header.tsv"
+
+readonly file_cts="${pheno_dir}/filtered_phenotypes_cts.tsv"
+readonly file_binary="${pheno_dir}/filtered_phenotypes_binary.tsv"
+
 
 readonly out_dir="data/prs/scores"
 readonly out_prefix="${out_dir}/ukb_eur_500k_hm3_binary_pgs"
@@ -29,6 +33,7 @@ mkdir -p ${out_dir}
 
 aggregate_pgs()
 { 
+  local phenos=${1}
   set_up_rpy
   set -x
   Rscript "${rscript}" \
@@ -38,7 +43,7 @@ aggregate_pgs()
   set +x
 }
 
-aggregate_pgs
+aggregate_pgs ${file_binary}
 
 
 

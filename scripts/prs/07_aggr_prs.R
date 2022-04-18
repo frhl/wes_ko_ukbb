@@ -10,7 +10,9 @@ main <- function(args){
   
   phenos <- unlist(strsplit(readLines(args$path_phenos), split = "\\s+", perl = TRUE)) 
   files <- list.files(args$in_dir, pattern = '.txt.gz', full.names = TRUE)
-  
+  print(phenos)
+  print(files)
+
    pheno_list <- lapply(phenos, function(pheno){
       
       if (is.null(args$grep)){
@@ -64,9 +66,9 @@ main <- function(args){
 
 # add arguments
 parser <- ArgumentParser()
-parser$add_argument("--in_dir", default=NULL, required = TRUE, help = "Path to QCed SNPs")
-parser$add_argument("--path_phenos", default=NULL, required = TRUE, help = "Path to QCed SNPs")
-parser$add_argument("--grep", default=NULL, help = "Path to QCed SNPs")
+parser$add_argument("--in_dir", default=NULL, required = TRUE, help = "Directory for (chromosome-wise) PRS")
+parser$add_argument("--path_phenos", default=NULL, required = TRUE, help = "Path to phenotype file with phenotype names as header")
+parser$add_argument("--grep", default=NULL, help = "Subset in_dir files by command")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()
 

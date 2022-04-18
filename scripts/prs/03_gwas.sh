@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-44
+#$ -t 1-80
 #$ -tc 1
 #$ -V
 
@@ -59,7 +59,7 @@ submit_gwas_job()
         -t 1-22 \
         -tc 11 \
         -q short.qc@@short.hge \
-        -pe shmem 1 \
+        -pe shmem 3 \
         "${bash_script}" \
         "${hail_script}" \
         "${input_path}" \
@@ -93,8 +93,9 @@ submit_merge_job()
 }
 
 
-#submit_gwas_job "data/prs/sumstat/binary_new" "${phenotype_binary}" "${file_binary}"
-submit_gwas_job "data/prs/sumstat/cts_new" "${phenotype_cts}" "${file_cts}"
+submit_gwas_job "data/prs/sumstat/binary_new" "${phenotype_binary}" "${file_binary}"
+#sleep 120
+#submit_gwas_job "data/prs/sumstat/cts_new" "${phenotype_cts}" "${file_cts}"
 
 
 

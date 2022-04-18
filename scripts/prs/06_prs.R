@@ -11,6 +11,7 @@ main <- function(args){
 
   stopifnot(file.exists(args$pred))
   stopifnot(file.exists(args$ldsc))
+  stopifnot(!file.exists(args$tmp_bfile))
   stopifnot(dir.exists(args$ld_dir))
   stopifnot(dir.exists(dirname(args$out_prefix)))
   stopifnot(args$method %in% c('inf', 'auto'))
@@ -50,7 +51,7 @@ main <- function(args){
   # load data to be used for prediction 
   bfile <- tempfile(tmpdir = dirname(args$out_prefix))
   pred <- load_bigsnp_from_bed(args$pred)
-  pred <- match_bigsnp_with_gwas(obj=pred, gwas=gwas, bfile=bfile)
+  pred <- match_bigsnp_with_gwas(obj=pred, gwas=gwas, bfile=args$tmp_bfile)
   genotypes <- pred$genotypes  
   indicies <- pred$gwas_indicies
 
@@ -132,7 +133,7 @@ main <- function(args){
   write(paste0(args$pred, ".. done! Writing to ", args$out_prefix, ".txt.gz"), stdout())
   fwrite(PGS, file = paste0(args$out_prefix,".txt.gz"), sep = '\t')
   fwrite(model, file = paste0(args$out_prefix,".model"), sep = '\t')
-  unlink(bfile)
+
   
 }
 
@@ -142,6 +143,7 @@ parser$add_argument("--chrom", default=NULL, required = TRUE, help = "chromosome
 parser$add_argument("--method", default=NULL, required = TRUE, help = "either 'inf' or 'auto'")
 parser$add_argument("--pred", default=NULL, required = TRUE, help = "Path to plink (bed) for PGS prediction")
 parser$add_argument("--ldsc", default=NULL, required = TRUE, help = ".rds object containing QCed GWAS and ldsc heritability estimates")
+parser$add_argument("--tmp_bfile", default=NULL, required = TRUE, help = "File path to temporary backing files")
 parser$add_argument("--ld_dir", default=NULL, required = TRUE, help = "Path to directory with pre-calcualted SNP correlations and LD (.rds files)")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()
