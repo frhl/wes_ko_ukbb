@@ -268,13 +268,13 @@ aggregate_saige() {
   if [ ${shuffles} -ge 100 ]; then
     if [ ${max_tasks} -ge 1 ]; then
       for id in $(seq 1 ${max_tasks}); do
-        file="${prefix}_${id}.txt"
+        file="${prefix}_${id}.txt.gz"
          if [ -f ${file} ]; then
            echo ${file}
            if [ "${id}" == "1" ]; then
-              cat "${file}" | head -n 1  >> "${out_no_gz}"
+              zcat "${file}" | head -n 1  >> "${out_no_gz}"
            fi
-           cat "${file}" | tail -n +2  >> "${out_no_gz}"
+           zcat "${file}" | tail -n +2  >> "${out_no_gz}"
          fi
        done
        gzip "${out_no_gz}"
@@ -313,6 +313,7 @@ top_p=10
 #testit=("WHR" "BMI")
 #testit=("WHR" "EP_combined")
 
+echo -e "gene\tphenotype\tn_shuffle\ttrue_p\tpermuted_p\tmin_mac" > ${log}
 
 while [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; do
 
@@ -340,6 +341,10 @@ while [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; do
 
             permuted_p=$( Rscript ${r_spa_script} --input_path "${saige_merged}" --select_min_p ${top_p} )
             true_p=$( lookup_true ${phenotype} "p" )
+            true_t=$( lookup_true ${phenotype} "t" )
+
+            echo "${phenotype}: true_p = ${true_p}"
+            echo "${phenotype}: permuted_p = ${permuted_p}"
 
             # Check that the saige file produces more than a single line
             # indicating more than one pseudo marker could be tested
@@ -347,22 +352,24 @@ while [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; do
 
               # floating point logic with scientific notation will be handled by R to
               # check whether the true P-value is greater than the permuted P-value.
-              if [ $( Rscript ${logic} --a ${true_p} --o "ge" --b ${permuted_p}) ]; then
+              if [ $( Rscript ${logic} --a ${true_p} --o "ge" --b ${permuted_p}) -eq "1" ]; then
                 phenos_done[${phenotype}]=1
-                true_t=$( lookup_true ${phenotype} "t" )
                 outfile="${out_prefix}_${phenotype}_empirical_p"
                 empirical_p=$( Rscript ${r_p_script} --input_path "${saige_merged}" --true_tstat ${true_t} --true_p ${true_p} --out_prefix ${outfile})
                 echo -e "${gene}\t${phenotype}\t${n_shuffle}\t${true_p}\t${permuted_p}\t${min_mac}" >> ${log}
               fi
             else
+              echo "setting ${phenotype} to done. (no markers, min_mac)"
               phenos_done[${phenotype}]=1
               print_update "Stopped ${phenotype} x ${gene}. No markers with min_mac=${min_mac}." "${SECONDS}" 
             fi
           else
+            echo "setting ${phenotype} to done. (gmat/variance bytes)"
             phenos_done[${phenotype}]=1
             print_update "Stopped ${phenotype} x ${gene}. The gmat and/or variance ratio files are empty." "${SECONDS}" 
           fi
         else
+          echo "setting ${phenotype} to done. (gmat/variance)"
           phenos_done[${phenotype}]=1
           print_update "Stopped ${phenotype} x ${gene}. The gmat and/or variance ratio does not exist." "${SECONDS}" 
         fi
