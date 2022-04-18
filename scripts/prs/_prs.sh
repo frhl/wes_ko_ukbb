@@ -19,7 +19,7 @@ readonly prefix=${6?Error: Missing arg8 (prefix)}
 readonly chr="${SGE_TASK_ID}"
 readonly pred_chr=$(echo ${pred} | sed -e "s/CHR/${chr}/g")
 readonly out_prefix_chr=$(echo ${prefix} | sed -e "s/CHR/${chr}/g")
-readonly tmp_bfile="bfile_${out_prefix_chr}"
+readonly tmp_bfile="${out_prefix_chr}.bfile"
 
 export OPENBLAS_NUM_THREADS=1 # avoid two levels of parallelization
 

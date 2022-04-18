@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1
+#$ -t 20-30
 #$ -tc 1
 #$ -V
 
@@ -25,7 +25,7 @@ readonly ldsc_dir="data/prs/ldsc"
 readonly pred_dir="data/prs/hapmap/ukb_500k"
 readonly ld_dir="data/prs/hapmap/ld/matrix"
 readonly pheno_dir="data/phenotypes"
-readonly out_dir="data/prs/scores/clean_test"
+readonly out_dir="data/prs/scores/auto"
 
 readonly index=${SGE_TASK_ID}
 
@@ -73,6 +73,6 @@ submit_ldpred2()
 }
 
 
-#submit_ldpred2 "auto" "4" "${phenotype_cts}"
+submit_ldpred2 "auto" "4" "${phenotype_cts}"
 submit_ldpred2 "auto" "4" "${phenotype_binary}"
 

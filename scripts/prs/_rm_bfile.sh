@@ -11,11 +11,14 @@ readonly prefix=${2?Error: Missing arg8 (prefix)}
 
 readonly chr="${SGE_TASK_ID}"
 readonly out_prefix_chr=$(echo ${prefix} | sed -e "s/CHR/${chr}/g")
-readonly tmp_bfile="bfile_${out_prefix_chr}"
+readonly tmp_bfile="${out_prefix_chr}.bfile"
 
-echo "Removing backing files.."
-rm -f  "${tmp_bfile}.bk"
-rm -f "${tmp_bfile}.rds"
+readonly bk="${tmp_bfile}.bk"
+readonly rds="${tmp_bfile}.rds"
+
+>&2 echo "Removing ${bk} and ${rds}.."
+rm -f ${bk}
+rm -f ${rds}
 
 
 
