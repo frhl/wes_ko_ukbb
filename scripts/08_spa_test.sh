@@ -8,7 +8,7 @@
 #$ -pe shmem 1
 #$ -q test.qc
 #$ -t 1-80
-#$ -tc 2
+#$ -tc 10
 #$ -V
 
 set -o errexit
@@ -23,7 +23,7 @@ readonly spark_dir="data/tmp/spark"
 
 readonly spa_script="scripts/_spa_test.sh"
 readonly merge_script="scripts/_spa_merge.sh"
-readonly in_prefix="ukb_eur_wes_200k_chrCHR"
+readonly in_prefix="ukb_eur_wes_200k"
 
 
 submit_spa_binary_with_csqs()
@@ -52,9 +52,9 @@ submit_spa_with_csqs()
     local step2_dir="data/saige/output/${trait}/step2"
     local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
     local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
-    local out_prefix="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}"
+    local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}"
+    local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}.txt.gz"
     local in_vcf="${vcf_dir}/${in_prefix}_${maf}_${annotation}.vcf.bgz"
-    local out_mrg="${out_prefix}.txt.gz"
     if [ ! -f "${out_mrg}" ]; then
       submit_spa_job
       submit_merge_job
@@ -98,7 +98,6 @@ submit_merge_job()
     -hold_jid "spa_${phenotype}_${annotation}" \
     "${merge_script}" \
     "${out_prefix}" \
-    "${step2_dir}" \
     "${out_mrg}" \
     "${remove_by_chr}"
   set +x
@@ -121,20 +120,18 @@ maf="maf0to5e-2"
 #submit_spa_binary_with_csqs "synonymous"
 
 # cts traits
-submit_spa_cts_with_csqs "pLoF_damaging_missense"
-#sleep 10
-submit_spa_binary_with_csqs "pLoF_damaging_missense"
-#sleep 10
+#submit_spa_cts_with_csqs "pLoF_damaging_missense"
+#submit_spa_binary_with_csqs "pLoF_damaging_missense"
+
 submit_spa_cts_with_csqs "pLoF"
-#sleep 10
 submit_spa_binary_with_csqs "pLoF"
-#sleep 10
+
+sleep 10
 submit_spa_cts_with_csqs "damaging_missense"
-#sleep 10
 submit_spa_binary_with_csqs "damaging_missense"
-#sleep 10
+
+sleep 10
 submit_spa_cts_with_csqs "synonymous"
-#sleep 10
 submit_spa_binary_with_csqs "synonymous"
 
 
