@@ -18,7 +18,10 @@ main <- function(args){
   stopifnot(ncol(d) > 0 )
 
   # load prefixes
-  files <- list.files(dirname(args$input_path), pattern = basename(args$input_path), full.names = TRUE)
+  bname <- basename(args$input_path)
+  dname <- dirname(args$input_path)
+  files <- list.files(dname, pattern = bname, full.names = TRUE)
+  if (length(files) == 0) stop(paste("no files with pattern",bname,"in directory",dname))
   files <- files[!grepl('_genes',files)]
   files <- files[!grepl('_phenos',files)]
 
