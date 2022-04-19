@@ -59,6 +59,7 @@ if [ ! -f ${out_gene_task} ]; then
        && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
        || raise_error "Saddle-point approximation for chr${chr} failed"
     rm -f "${out_gene_task}.index"
+    gzip ${out_gene_task}
   else
     touch ${out_file_failure}
   fi

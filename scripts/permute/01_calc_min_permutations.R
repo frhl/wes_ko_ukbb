@@ -3,13 +3,20 @@
 library(argparse)
 library(data.table)
 
+
+
 # Read with and annotate basename
 fread_with_basename <- function(f){
     d <- fread(f)
-    file_sans_gz <- tools::file_path_sans_ext(basename(f))
-    file_sans_txt <- tools::file_path_sans_ext(file_sans_gz)
-    d$basename <- file_sans_txt
-    return(d)
+    if (! "V1" %in% colnames(d)){
+        file_sans_gz <- tools::file_path_sans_ext(basename(f))
+        file_sans_txt <- tools::file_path_sans_ext(file_sans_gz)
+        d$basename <- file_sans_txt
+        return(d)
+    } else {
+        warning(paste(f, "had NA's in colname! Skipping.."))
+        return(NULL)
+    }
 }
 
 main <- function(args){
@@ -24,9 +31,9 @@ main <- function(args){
     # read in all the SPA step 2 results
     spa_cts_full <- do.call(rbind, lapply(spa_cts_files, fread_with_basename))
     spa_bin_full <- do.call(rbind, lapply(spa_bin_files, fread_with_basename))
+    write("Loaded all cts/binary files..", stdout())
 
     print(head(spa_cts_full))
-
     print(head(spa_bin_full))
 
     # write out gene-spa p-value pairs

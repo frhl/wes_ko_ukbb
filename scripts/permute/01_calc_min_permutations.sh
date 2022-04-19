@@ -5,7 +5,7 @@
 #$ -o logs/calc_min_permutations.log
 #$ -e logs/calc_min_permutations.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 1
+#$ -pe shmem 2
 #$ -q short.qc
 #$ -t 1
 #$ -V
