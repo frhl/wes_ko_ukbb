@@ -120,15 +120,14 @@ def main(args):
 
     # add noise
     if h2_ko == 0 and h2_co == 0:
-           print("finished phenotype h2=0")
            mt = mt.annotate_cols(y_cts=hl.rand_norm(0, hl.sqrt(1)))
     elif h2_ko > 0 and h2_co > 0:
         mt = mt.annotate_cols(y_cts=mt.y_no_noise_co +
                     mt.y_no_noise_ko + hl.rand_norm(0, hl.sqrt(1-h2_ko-h2_co)))
-    elif h2_ko > 0 and h2_co is None:
+    elif h2_ko > 0 and h2_co == 0:
         mt = mt.annotate_cols(y_cts = mt.y_no_noise_ko +
                     hl.rand_norm(0, hl.sqrt(1-h2_ko)))
-    elif h2_ko is None and h2_co > 0:
+    elif h2_ko == 0 and h2_co > 0:
         mt = mt.annotate_cols(y_cts = mt.y_no_noise_co +
                     hl.rand_norm(0, hl.sqrt(1-h2_co)))
 

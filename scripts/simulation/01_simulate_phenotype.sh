@@ -93,9 +93,9 @@ readonly seed=44
 
 # simulate traits with no heritability
 simulate_phenotypes 0.0 0.0 0.0 0.0
-simulate_phenotypes 0.0 0.0 0.1 0.01
-simulate_phenotypes 0.0 0.0 0.1 0.02
-simulate_phenotypes 0.0 0.0 0.1 0.05
+simulate_phenotypes 0.0 0.0 0.1 0.06
+simulate_phenotypes 0.0 0.0 0.1 0.08
+simulate_phenotypes 0.0 0.0 0.1 0.1
 #simulate_phenotypes 0.0 0.0 0.1 0.1
 
 #simulate_phenotypes 0.0 0.0 0.0 0.0
