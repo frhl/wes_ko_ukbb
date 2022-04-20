@@ -41,8 +41,12 @@ main <- function(args){
         spa_cts_full[,c("CHR","MarkerID","basename", "p.value", "Tstat")], 
         spa_bin_full[,c("CHR","MarkerID","basename", "p.value", "Tstat")]
     )
+    
+    # format to avoid scientific notation 
+    spa_full$p.value <- format(spa_full$p.value, scientific = FALSE)
+    spa_full$Tstat <- format(spa_full$Tstat, scientific = FALSE)
     out_prefix_true_p <- paste0(args$out_prefix, "_true_p.tsv.gz")
-    fwrite(spa_full, out_prefix_true_p, sep = '\t')
+    fwrite(spa_full, out_prefix_true_p, sep = '\t', quote = FALSE)
     
     # write out genes and chromosomes used 
     spa_genes <- spa_full[,c("MarkerID","CHR")]
