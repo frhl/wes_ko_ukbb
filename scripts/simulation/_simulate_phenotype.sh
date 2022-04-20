@@ -23,8 +23,8 @@ readonly spark_dir="data/tmp/spark_dir"
 
 readonly in_prefix=${1?Error: Missing arg1 (phenotype)}
 readonly in_type=${2?Error: Missing arg2 (in_vcf)}
-readonly h2_snp=${3?Error: Missing arg3 ()}
-readonly pi_snp=${4?Error: Missing arg3 ()}
+readonly h2_co=${3?Error: Missing arg3 ()}
+readonly pi_co=${4?Error: Missing arg3 ()}
 readonly h2_ko=${5?Error: Missing arg3 ()}
 readonly pi_ko=${6?Error: Missing arg3 ()}
 readonly K=${7?Error: Missing arg3 ()}
@@ -43,12 +43,13 @@ set -x
 python3 "${hail_script}" \
    --in_prefix "${in_prefix}"\
    --in_type "${in_type}" \
-   --h2_snp ${h2_snp} \
-   --pi_snp ${pi_ko} \
-   --h2_ko ${h2_snp} \
+   --h2_co ${h2_co} \
+   --pi_co ${pi_co} \
+   --h2_ko ${h2_ko} \
    --pi_ko ${pi_ko} \
    --K ${K} \
-   --prune_hom_alt "0.96" \
+   --prune_hom_alt 0.98 \
+   --max_maf 0.05 \
    --seed ${sge_seed} \
    --out_prefix "${out_sge_prefix}" \
    && print_update "Finished simulating phenotypes for ${in_prefix}" ${SECONDS} \

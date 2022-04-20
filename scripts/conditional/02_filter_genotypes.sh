@@ -78,8 +78,8 @@ submit_intervals()
   fi
 }
 
-submit_binary_analysis "pLoF_damaging_missense"
-submit_cts_analysis "pLoF_damaging_missense"
+submit_binary_analysis "pLoF"
+submit_cts_analysis "pLoF"
 
 
 

@@ -78,10 +78,11 @@ submit_knockout_job()
   set +x
 }
 
-submit_knockout_job "synonymous" "5" "fast"
+#submit_knockout_job "synonymous" "5" "fast"
 #submit_knockout_job "other_missense" "5" "fast"
 #submit_knockout_job "pLoF" "20" "collect"
-#submit_knockout_job "damaging_missense" "20" "collect"
+submit_knockout_job "damaging_missense" "5" "fast"
+#
 #submit_knockout_job "pLoF,damaging_missense" "20" "collect"
 
 #submit_knockout_job "0" "5e-2" "" "damaging_missense"

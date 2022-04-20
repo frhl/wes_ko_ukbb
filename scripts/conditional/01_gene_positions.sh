@@ -9,7 +9,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qf
-#$ -t 2-71
+#$ -t 1-80
 #$ -tc 10
 
 #set -o errexit
@@ -68,8 +68,13 @@ submit_intervals()
 
 submit_binary_intervals "pLoF_damaging_missense"
 submit_cts_intervals "pLoF_damaging_missense"
-submit_binary_intervals "pLoF_damaging_missense"
-submit_cts_intervals "pLoF_damaging_missense"
+submit_binary_intervals "pLoF"
+submit_cts_intervals "pLoF"
+submit_binary_intervals "damaging_missense"
+submit_cts_intervals "damaging_missense"
+submit_binary_intervals "synonymous"
+submit_cts_intervals "synonymous"
+
 
 
 

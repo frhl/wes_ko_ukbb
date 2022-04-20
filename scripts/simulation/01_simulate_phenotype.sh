@@ -37,19 +37,21 @@ mkdir -p ${out_dir}
 
 simulate_phenotypes() {
 
-  local K=${1}
-  local h2_snp=${2}
-  local pi_snp=${3}
-  local h2_ch=${4}
-  local pi_ch=${5}
+  local K=0.1
+  local h2_co=${1}
+  local pi_co=${2}
+  local h2_ko=${3}
+  local pi_ko=${4}
 
-  local out_prefix="${out_dir}/ukb_eur_h2_${h2_snp}_${h2_ch}_pi_${pi_snp}_${pi_ch}_K_${K}_chr${chr}"
+  local out_prefix="${out_dir}/ukb_eur_h2_${h2_co}_${h2_ko}_pi_${pi_co}_${pi_ko}_K_${K}_chr${chr}"
   local out_phenotypes="${out_prefix}_phenos.tsv.gz"
   
-  local sim_name="_sim_${SGE_TASK_ID}"
-  local mrg_name="_mrg_${SGE_TASK_ID}"
+  local sim_name="sim_${SGE_TASK_ID}"
+  local mrg_name="mrg_${SGE_TASK_ID}"
+
 
   set -x
+  if [ 1 -eq 1 ]; then
   qsub -N "${sim_name}" \
        -t ${tasks} \
       -q ${queue} \
@@ -57,13 +59,14 @@ simulate_phenotypes() {
        ${bash_script} \
        ${in_prefix}\
        ${in_type} \
-       ${h2_snp} \
-       ${pi_ch} \
-       ${h2_snp} \
-       ${pi_ch} \
+       ${h2_co} \
+       ${pi_co} \
+       ${h2_ko} \
+       ${pi_ko} \
        ${K} \
        ${seed} \
        ${out_prefix}
+  fi
 
   qsub -N "${mrg_name}" \
        -hold_jid ${sim_name} \
@@ -84,20 +87,23 @@ simulate_phenotypes() {
 
 
 readonly queue="short.qc"
-readonly nslots="2"
-readonly tasks=1-10
-readonly seed=42
+readonly nslots="3"
+readonly tasks=1-15
+readonly seed=44
 
 # simulate traits with no heritability
-simulate_phenotypes 1e-1 0 NA NA NA
-#simulate_phenotypes 1e-1 1e-1 NA NA NA
-simulate_phenotypes 1e-1 1e-3 NA NA NA
+simulate_phenotypes 0.0 0.0 0.0 0.0
+simulate_phenotypes 0.0 0.0 0.1 0.01
+simulate_phenotypes 0.0 0.0 0.1 0.02
+simulate_phenotypes 0.0 0.0 0.1 0.05
+#simulate_phenotypes 0.0 0.0 0.1 0.1
 
-simulate_phenotypes 1e-1 0 NA 0 NA
-simulate_phenotypes 1e-1 0 NA 1e-1 NA
-simulate_phenotypes 1e-1 0 NA 3e-1 NA
+#simulate_phenotypes 0.0 0.0 0.0 0.0
+#simulate_phenotypes 0.2 0.001 0.0 0.0
+#simulate_phenotypes 0.2 0.002 0.0 0.0
+#simulate_phenotypes 0.2 0.005 0.0 0.0
+#simulate_phenotypes 0.2 0.01 0.0 0.0
 
-simulate_phenotypes 1e-1 2e-1 NA 3e-1 NA
 
 # simulate traits slightly polygenic traits
 #simulate_phenotypes 1e-1 1e-1 0

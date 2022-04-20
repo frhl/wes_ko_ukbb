@@ -54,8 +54,10 @@ submit_spa_with_csqs()
     local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
     local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}"
     local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}.txt.gz"
-    local in_vcf="${vcf_dir}/${in_prefix}_${maf}_${annotation}.vcf.bgz"
+    local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${maf}_${annotation}.vcf.bgz"
     if [ ! -f "${out_mrg}" ]; then
+      local qsub_spa_name="spa_${phenotype}_${annotation}"
+      local qsub_merge_name="_mrg_${phenotype}_${annotation}"
       submit_spa_job
       submit_merge_job
     else
@@ -70,10 +72,10 @@ submit_spa_with_csqs()
 submit_spa_job() {
   mkdir -p ${step2_dir}
   set -x
-  qsub -N "spa_${phenotype}_${annotation}" \
+  qsub -N "${qsub_spa_name}" \
     -t ${tasks} \
     -q "${queue}" \
-    -tc 12 \
+    -tc 11 \
     -pe shmem ${nslots} \
     "${spa_script}" \
     "${phenotype}" \
@@ -90,12 +92,12 @@ submit_spa_job() {
 
 submit_merge_job()
 {
-  readonly remove_by_chr="Y"
+  local remove_by_chr="Y"
   set -x
-  qsub -N "_mrg_${phenotype}" \
+  qsub -N "${qsub_merge_name}" \
     -q short.qc@@short.hge \
     -pe shmem 1 \
-    -hold_jid "spa_${phenotype}_${annotation}" \
+    -hold_jid "${qsub_spa_name}" \
     "${merge_script}" \
     "${out_prefix}" \
     "${out_mrg}" \
@@ -115,22 +117,21 @@ readonly nslots=1
 
 # Binary traits
 maf="maf0to5e-2"
-#submit_spa_binary_with_csqs "pLoF"
-#submit_spa_binary_with_csqs "pLoF_damaging_missense"
-#submit_spa_binary_with_csqs "synonymous"
 
 # cts traits
-#submit_spa_cts_with_csqs "pLoF_damaging_missense"
-#submit_spa_binary_with_csqs "pLoF_damaging_missense"
+submit_spa_cts_with_csqs "pLoF_damaging_missense"
+submit_spa_binary_with_csqs "pLoF_damaging_missense"
 
+#sleep 10
 submit_spa_cts_with_csqs "pLoF"
 submit_spa_binary_with_csqs "pLoF"
 
-sleep 10
+#sleep 10
 submit_spa_cts_with_csqs "damaging_missense"
 submit_spa_binary_with_csqs "damaging_missense"
 
-sleep 10
+#sleep 10
+qinit_custom_now a 1
 submit_spa_cts_with_csqs "synonymous"
 submit_spa_binary_with_csqs "synonymous"
 

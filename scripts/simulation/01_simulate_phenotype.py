@@ -1,16 +1,23 @@
 #!/usr/bin/env python3
 
 import hail as hl
+import numpy as np
 import argparse
 
 from ko_utils import io
 from ko_utils import ko
 from ukb_utils import hail_init
+from ukb_utils import variants
 import scipy.stats as stats
 
 
-def try_set_float(x):
-        return float(x) if x not in [None, "NA","None"] else None
+
+def try_param_h2(x):
+    return float(x) if x not in [None, "NA","None"] else None
+
+def try_param_pi(x):
+    return float(x) if x not in [0, None, "NA","None"] else None
+
 
 def make_y_region(mt: hl.MatrixTable, h2, pi, region: list()):
     mt = mt.filter_rows(hl.literal(set(region)).contains(mt.consequence_category))
@@ -31,13 +38,14 @@ def main(args):
     out_prefix = args.out_prefix
     prune_hom_alt = args.prune_hom_alt
     seed = args.seed
-    h2_nc = try_set_float(args.h2_nc)
-    h2_co = try_set_float(args.h2_co)
-    h2_ko = try_set_float(args.h2_ko)
-    pi_nc = try_set_float(args.pi_nc)
-    pi_co = try_set_float(args.pi_co)
-    pi_ko = try_set_float(args.pi_ko)
-    K = try_set_float(args.K)
+    h2_nc = try_param_h2(args.h2_nc)
+    h2_co = try_param_h2(args.h2_co)
+    h2_ko = try_param_h2(args.h2_ko)
+    pi_nc = try_param_pi(args.pi_nc)
+    pi_co = try_param_pi(args.pi_co)
+    pi_ko = try_param_pi(args.pi_ko)
+    K = float(args.K)
+    max_maf = args.max_maf
 
     # import table
     hail_init.hail_bmrc_init('logs/hail/absence_of_effect.log', 'GRCh38')
@@ -55,21 +63,27 @@ def main(args):
     # subset to potential 'damaging variants' 
     items = ['pLoF','LC','damaging_missense']
     mt = mt.filter_rows(hl.literal(set(items)).contains(mt.consequence_category))
- 
-   
+    
+    if max_maf:
+        mt = mt.annotate_rows(MAF=variants.get_maf_expr(mt))
+        mt = mt.filter_rows(mt.MAF <= float(max_maf))
 
-    # simulate betas (coding region)
-    mt = mt.filter_rows(hl.agg.stats(mt.GT.n_alt_alleles()).stdev>0)
-    mt = hl.experimental.ldscsim.make_betas(mt, h2=h2_snp, pi=pi_snp)[0]
-    mt = hl.experimental.ldscsim.normalize_genotypes(mt.GT) 
-    mt = mt.annotate_cols(y_no_noise_snp=hl.agg.sum(mt.beta * mt['norm_gt']))
+    if h2_co > 0:
+        # simulate betas (coding region)
+        print("Simulating coding variant phenotype with h2=%s and pi=%s" % (h2_co, pi_co))
+        mt = mt.filter_rows(hl.agg.stats(mt.GT.n_alt_alleles()).stdev>0)
+        mt = hl.experimental.ldscsim.make_betas(mt, h2=h2_co, pi=pi_co)[0]
+        mt = hl.experimental.ldscsim.normalize_genotypes(mt.GT)
+        mt = mt.annotate_cols(y_no_noise_co=hl.agg.sum(mt.beta * mt['norm_gt']))
 
     # annotate with CH effect
-    if h2_ko is not None:
+    if h2_ko > 0:
 
-        gene_mt = mt
+        # simulate compound het effects
+        print("Simulating compound het phenotype with h2=%s and pi=%s" % (h2_ko, pi_ko))
 
         # prune away knockedout owed to homozygote alternates
+        gene_mt = mt
         if prune_hom_alt:
             prune_hom_alt = float(prune_hom_alt)
             gene_mt = gene_mt.transmute_entries(GT = ko.rand_hom_to_het(gene_mt.GT, prune_hom_alt))
@@ -81,23 +95,42 @@ def main(args):
         expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko)
         genes = genes.annotate_entries(pKO=expr_pko, knockout=expr_ko)
 
+        n = genes.count()[0]
+        if pi_ko:
+            n_causal_genes = n * pi_ko
+            print("Around %0.2f of %0.0f genes will be causal with pi=%f." % (n_causal_genes, n, pi_ko))
+
         # simulate thetas (CH effects).
         genes = genes.filter_rows(hl.agg.stats(genes.pKO).stdev>0)
-        genes = ko.normalize_by_name(genes, "pKO") # <---- set library
+        genes = ko.normalize_by_name(genes, "pKO")
         genes = ko.make_thetas(genes, h2=h2_ko, pi=pi_ko)
         genes = genes.annotate_cols(y_no_noise_ko=hl.agg.sum(genes.theta * genes.norm_pKO))
-        
+    
+        if pi_ko:
+            found_causal_genes = np.sum(np.array(genes.theta.collect()) != 0)
+            print("Observed %0.2f of %0.0f causal genes.." % (found_causal_genes, n))
+
         # return thetas for genes and samples
         ht = genes.select_rows('theta').select_entries(*['pKO','knockout'])
         ht.entries().flatten().export(out_prefix + "_genes.tsv.gz")
 
         # annotate original matrix with thetas from gene x sample matrix
-        mt = mt.annotate_cols(y_no_noise_ko = genes.index_cols(mt.col_key).y_no_noise_ko)
-        mt = mt.annotate_cols(y_cts=mt.y_no_noise_snp +
-                mt.y_no_noise_ko + hl.rand_norm(0, hl.sqrt(1-h2_ko-h2_snp)))
-    else:
-        mt = mt.annotate_cols(y_cts = mt.y_no_noise_snp +
-                hl.rand_norm(0, hl.sqrt(1-h2_snp)))
+        mt = mt.annotate_cols(y_no_noise_ko = genes.index_cols(mt.col_key).y_no_noise_ko) 
+
+
+    # add noise
+    if h2_ko == 0 and h2_co == 0:
+           print("finished phenotype h2=0")
+           mt = mt.annotate_cols(y_cts=hl.rand_norm(0, hl.sqrt(1)))
+    elif h2_ko > 0 and h2_co > 0:
+        mt = mt.annotate_cols(y_cts=mt.y_no_noise_co +
+                    mt.y_no_noise_ko + hl.rand_norm(0, hl.sqrt(1-h2_ko-h2_co)))
+    elif h2_ko > 0 and h2_co is None:
+        mt = mt.annotate_cols(y_cts = mt.y_no_noise_ko +
+                    hl.rand_norm(0, hl.sqrt(1-h2_ko)))
+    elif h2_ko is None and h2_co > 0:
+        mt = mt.annotate_cols(y_cts = mt.y_no_noise_co +
+                    hl.rand_norm(0, hl.sqrt(1-h2_co)))
 
     # binarize phenotype
     if K is not None:
@@ -119,7 +152,9 @@ if __name__=='__main__':
     parser.add_argument('--pi_co', default=0, help='Probability of variant being causal in coding region')
     parser.add_argument('--pi_nc', default=0, help='Probability of variant being causal in non-coding region')
     parser.add_argument('--pi_ko', default=0, help='Probability of variant being causal in knockouts')
+    parser.add_argument('--causal_genes_ko', default=None, help='Desired number of causal genes')
     parser.add_argument('--K', default=0, help='Prevalence of phenotype: cases / (cases + controls)')
+    parser.add_argument('--max_maf', default=None, help='Maximum minor allele frequency')
     parser.add_argument('--seed', default=None, help='seed for random simulations')
     parser.add_argument('--in_prefix', default=None, help='Path prefix for input dataset')
     parser.add_argument('--in_type', default=None, help='Either "mt", "vcf" or "plink"')
