@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-80
+#$ -t 1
 #$ -tc 10
 #$ -V
 
@@ -48,13 +48,23 @@ submit_spa_with_csqs()
   local phenotype=${2?Error: Missing arg2 (phenotype)}
   local trait=${3?Error: Missing arg3 (trait)}
   if [ ! -z ${phenotype} ]; then
+
     local step1_dir="data/saige/output/${trait}/step1"
     local step2_dir="data/saige/output/${trait}/step2"
-    local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
-    local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
-    local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}"
-    local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}.txt.gz"
     local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${maf}_${annotation}.vcf.bgz"
+
+    if [ "${use_prs}" -eq "0" ]; then
+      local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
+      local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
+      local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}"
+      local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}.txt.gz"
+    else
+      local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.rda"
+      local in_var="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.varianceRatio.txt"
+      local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}_locoprs"
+      local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}_locoprs.txt.gz"
+    fi
+
     if [ ! -f "${out_mrg}" ]; then
       local qsub_spa_name="spa_${phenotype}_${annotation}"
       local qsub_merge_name="_mrg_${phenotype}_${annotation}"
@@ -108,6 +118,7 @@ submit_merge_job()
 
 # parameters
 readonly conditioning_markers=""
+readonly use_prs="1"
 readonly min_mac=4
 readonly tasks=1-22
 readonly queue="short.qe"
@@ -120,20 +131,19 @@ maf="maf0to5e-2"
 
 # cts traits
 submit_spa_cts_with_csqs "pLoF_damaging_missense"
-submit_spa_binary_with_csqs "pLoF_damaging_missense"
+#submit_spa_binary_with_csqs "pLoF_damaging_missense"
 
 #sleep 10
-submit_spa_cts_with_csqs "pLoF"
-submit_spa_binary_with_csqs "pLoF"
+#submit_spa_cts_with_csqs "pLoF"
+#submit_spa_binary_with_csqs "pLoF"
 
 #sleep 10
-submit_spa_cts_with_csqs "damaging_missense"
-submit_spa_binary_with_csqs "damaging_missense"
+#submit_spa_cts_with_csqs "damaging_missense"
+#submit_spa_binary_with_csqs "damaging_missense"
 
 #sleep 10
-qinit_custom_now a 1
-submit_spa_cts_with_csqs "synonymous"
-submit_spa_binary_with_csqs "synonymous"
+#submit_spa_cts_with_csqs "synonymous"
+#submit_spa_binary_with_csqs "synonymous"
 
 
 
