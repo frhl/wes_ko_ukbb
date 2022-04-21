@@ -242,17 +242,22 @@ lookup_true() {
   # read file and subset to current gene/pheno/annotation
   local cur_assoc=$( echo ${static_assoc} | sed -e "s/PHENO/${phenotype}/g" | sed -e "s/ANNO/${annotation}/g") 
   local readfile=$( zcat ${true_p_path} | grep ${gene} | grep ${cur_assoc} )
+  local lines=$( zcat ${true_p_path} | grep ${gene} | grep ${cur_assoc} | wc -l)
 
   # return P-value or T-stat
-  if [[ "${column}" == "p" ]]; then
-    local true_value=$( echo ${readfile} | cut -d" " -f4 )
-    echo ${true_value}
-  elif [[ "${column}" == "t" ]]; then
-    local true_value=$( echo ${readfile} | cut -d" " -f5 )
-    echo ${true_value}
+  if [ "${lines}" -eq 1 ]; then
+    if [[ "${column}" == "p" ]]; then
+      local true_value=$( echo ${readfile} | cut -d" " -f4 )
+      echo ${true_value}
+    elif [[ "${column}" == "t" ]]; then
+      local true_value=$( echo ${readfile} | cut -d" " -f5 )
+      echo ${true_value}
+    else
+      raise_error "Column must be t (t-statistic) or p (P-value)."
+    fi
   else
-    raise_error "Column must be t (t-statistic) or p (P-value)."
-  fi
+    raise_error "Lookup true P-value failed for ${gene} at ${cur_assoc} (Too many lines!)" 
+ fi
 
 }
 
@@ -275,6 +280,8 @@ aggregate_saige() {
               zcat "${file}" | head -n 1  >> "${out_no_gz}"
            fi
            zcat "${file}" | tail -n +2  >> "${out_no_gz}"
+         else
+           >&2 echo "File ${file} does not exists (aggregate_saige). Skipping.." 
          fi
        done
        gzip "${out_no_gz}"
@@ -304,9 +311,9 @@ for pheno in ${arr_phenos[@]}; do saige_supply[${pheno}]=0; done
 
 readonly log="${out_prefix}.log"
 readonly success="${out_prefix}.SUCCESS"
-#touch ${log}
 
 SECONDS=0
+iteration=0
 n_shuffle=${n_start_shuffle}
 permutation_supply=0
 top_p=10
@@ -317,6 +324,7 @@ echo -e "gene\tphenotype\tn_shuffle\ttrue_p\tpermuted_p\tmin_mac" > ${log}
 
 while [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; do
 
+    iteration=$(( ${iteration} + 1 ))
     shuffle_phase ${n_shuffle}
 
     #for phenotype in "${testit[@]}"; do
@@ -329,6 +337,7 @@ while [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; do
         in_var=${arr_saige[3]}
 
         if [ -f ${in_gmat} ] && [ -f ${in_var} ]; then
+
           gmat_bytes=$( file_size ${in_gmat} )
           var_bytes=$( file_size ${in_var} )
 
@@ -343,8 +352,13 @@ while [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; do
             true_p=$( lookup_true ${phenotype} "p" )
             true_t=$( lookup_true ${phenotype} "t" )
 
+            echo "${phenotype}: true_t = ${true_t}"
             echo "${phenotype}: true_p = ${true_p}"
             echo "${phenotype}: permuted_p = ${permuted_p}"
+
+            >&2 echo "${phenotype}: true_t = ${true_t}"
+            >&2 echo "${phenotype}: true_p = ${true_p}"
+            >&2 echo "${phenotype}: permuted_p = ${permuted_p}"
 
             # Check that the saige file produces more than a single line
             # indicating more than one pseudo marker could be tested
@@ -359,17 +373,17 @@ while [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; do
                 echo -e "${gene}\t${phenotype}\t${n_shuffle}\t${true_p}\t${permuted_p}\t${min_mac}" >> ${log}
               fi
             else
-              echo "setting ${phenotype} to done. (no markers, min_mac)"
+              >&2 echo "setting ${phenotype} to done. (no markers, min_mac)"
               phenos_done[${phenotype}]=1
               print_update "Stopped ${phenotype} x ${gene}. No markers with min_mac=${min_mac}." "${SECONDS}" 
             fi
           else
-            echo "setting ${phenotype} to done. (gmat/variance bytes)"
+            >&2 echo "setting ${phenotype} to done. (gmat/variance bytes)"
             phenos_done[${phenotype}]=1
             print_update "Stopped ${phenotype} x ${gene}. The gmat and/or variance ratio files are empty." "${SECONDS}" 
           fi
         else
-          echo "setting ${phenotype} to done. (gmat/variance)"
+          >&2 echo "setting ${phenotype} to done. (gmat/variance)"
           phenos_done[${phenotype}]=1
           print_update "Stopped ${phenotype} x ${gene}. The gmat and/or variance ratio does not exist." "${SECONDS}" 
         fi
@@ -377,15 +391,13 @@ while [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; do
     done
 
 
-    echo "# are phenos done?"
-    echo "# ${phenos_done[@]}"
-    echo "# value: $( are_phenos_done )"
+    echo "# are phenos done: ${phenos_done[@]}.# result: $( are_phenos_done )"
 
     if [ "$( are_phenos_done )" -eq "1" ]; then
-      echo "phenos are done!"
+      echo "iteration ${iteration} completed! All phenotypes have been permuted accordingly."
       break
     else  
-      echo "itereration completed. Increasing shuffle to ${n_shuffle} * 10"
+      echo "itereration ${iteration} completed. Increasing shuffle to ${n_shuffle} * 10"
       n_shuffle=$(( ${n_shuffle} * 10 ))
       top_p=100
     fi
@@ -393,7 +405,7 @@ while [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; do
 done
 
 # finish up
-print_update "Done! ${n_shuffle} permutations required." ${SECONDS}
+print_update "Done! Iteration ${iteration} with ${n_shuffle} permutations required." ${SECONDS}
 mv ${log} ${success}
 
 
