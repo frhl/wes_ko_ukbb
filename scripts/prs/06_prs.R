@@ -75,7 +75,7 @@ main <- function(args){
         corr = snp$corr,
         df_beta = gwas,
         h2_init = h2_init,
-        vec_p_init = seq_log(1e-4, 0.5, 30),
+        vec_p_init = seq_log(1e-4, 0.9, 30),
         ncores = NCORES)
 
      # save data chains
