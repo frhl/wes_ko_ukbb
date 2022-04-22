@@ -7,8 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 1-80
-#$ -tc 10
+#$ -t 1-45
 #$ -V
 
 set -o errexit
@@ -64,6 +63,6 @@ estimate_heritability(){
   fi
 }
 
-estimate_heritability "${phenotype_binary}" "binary"
 estimate_heritability "${phenotype_cts}" "cts"
+estimate_heritability "${phenotype_binary}" "binary"
 

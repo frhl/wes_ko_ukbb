@@ -13,6 +13,7 @@ main <- function(args){
   stopifnot(file.exists(args$ldsc))
   stopifnot(!file.exists(args$tmp_bfile))
   stopifnot(dir.exists(args$ld_dir))
+  stopifnot(args$chrom %in% paste0("chr",1:22))
   stopifnot(dir.exists(dirname(args$out_prefix)))
   stopifnot(args$method %in% c('inf', 'auto'))
 
@@ -29,7 +30,7 @@ main <- function(args){
 
   # Estimate h2 chromosome-wide
   N_total <- nrow(gwas)
-  N_chr <- sum(gwas$chr == args$chr)
+  N_chr <- sum(gwas$chr == args$chrom)
   h2_init <- h2 * (N_chr / N_total)
   
   # check estimates
@@ -57,6 +58,24 @@ main <- function(args){
 
   stopifnot(!is.null(genotypes))
   stopifnot(!is.null(indicies))
+
+  # need to impute missing SNPs
+  if (!is.null(args$impute)){
+    
+    # count variants with missing GTs
+    cols <- genotypes$`.->ncol`
+    rows <- genotypes$`.->nrow`
+    lst <- lapply(1:rows, function(i)
+        return(sum(is.na(genotypes[i,])))
+    )
+    missing_gt <- sum(unlist(lst))
+    pct <- round(missing_gt/rows, 4)*100
+    msg <- paste0(missing_gt,"/",rows," (",pct,") variants with at least one missing GT")
+    write(msg, stderr())
+
+    # impute missing genotypes
+    genotypes <- snp_fastImputeSimple(genotypes, method = args$impute) 
+  }
 
   if (args$method %in% "inf"){
 
@@ -92,13 +111,8 @@ main <- function(args){
         beta_auto,
         ncores = NCORES)
 
+
      # quality controls on chains
-     na_rows <- rowSums(is.na(pred_auto)) > 0 
-     if (any(na_rows)) {
-        na_rows_pct <- round(100*(sum(na_rows) / nrow(pred_auto)), 2)
-        write(paste0(na_rows_pct,"% of chain rows contains NAs"), stderr())
-     }
-     
      sc <- apply(pred_auto, 2, sd, na.rm = TRUE)
      keep <- abs(sc - median(sc)) < 3 * mad(sc)
      final_beta_auto <- rowMeans(beta_auto[, keep], na.rm = TRUE) 
@@ -145,6 +159,7 @@ parser$add_argument("--pred", default=NULL, required = TRUE, help = "Path to pli
 parser$add_argument("--ldsc", default=NULL, required = TRUE, help = ".rds object containing QCed GWAS and ldsc heritability estimates")
 parser$add_argument("--tmp_bfile", default=NULL, required = TRUE, help = "File path to temporary backing files")
 parser$add_argument("--ld_dir", default=NULL, required = TRUE, help = "Path to directory with pre-calcualted SNP correlations and LD (.rds files)")
+parser$add_argument("--impute", default=NULL, required = TRUE, help = "Should missing genotypes be imputed? (See https://privefl.github.io/bigsnpr/reference/snp_fastImputeSimple.html)")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()
 

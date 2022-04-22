@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-80
+#$ -t 1
 #$ -tc 1
 #$ -V
 
@@ -38,6 +38,7 @@ readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
 readonly file_binary="${pheno_dir}/filtered_phenotypes_binary.tsv"
 readonly pheno_list_binary="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
 readonly phenotype_binary=$( sed "${index}q;d" ${pheno_list_binary} )
+readonly impute="mean0"
 
 mkdir -p ${out_dir}
 
@@ -55,13 +56,13 @@ submit_ldpred2()
   local qsub_clean="_clean_${phenotype}"
 
   # fit actual pgs
-  #fit_pgs
+  fit_pgs
 
   # aggregate into matrix
   aggr_pgs
 
   # remove disk backing files
-  #clean_pgs
+  clean_pgs
 
 }
 
@@ -79,6 +80,7 @@ fit_pgs()
     "${ldsc}" \
     "${ld_dir}" \
     "${method}" \
+    "${impute}" \
     "${out_prefix}"
   set +x
 }
