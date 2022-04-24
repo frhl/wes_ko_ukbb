@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc
-#$ -t 1-18
+#$ -t 1-22
 #$ -V
 
 set -o errexit
@@ -32,14 +32,17 @@ readonly out_type="mt"
 
 mkdir -p ${out_dir}
 
-set_up_hail
-set_up_pythonpath_legacy
-python3 ${hail_script} \
-  --input_path ${input_path} \
-  --input_type ${input_type} \
-  --out_prefix ${out_prefix} \
-  --out_type ${out_type}
-
+if [ -d "${out_prefix}.mt" ]; then
+  set_up_hail
+  set_up_pythonpath_legacy
+  python3 ${hail_script} \
+    --input_path ${input_path} \
+    --input_type ${input_type} \
+    --out_prefix ${out_prefix} \
+    --out_type ${out_type}
+else
+  >&2 echo "${out_prefix}.mt already exists. Skipping.."
+fi
 
 
 
