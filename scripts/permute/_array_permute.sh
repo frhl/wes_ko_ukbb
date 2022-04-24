@@ -47,33 +47,36 @@ readonly error_file="${target_dir}/${gene}.errors.log"
 
 mkdir -p ${target_dir}
 
-set -x
-qsub -N "_c${chr}_${gene}" \
-    -o "${log_file}" \
-    -e "${error_file}" \
-    -q "${queue_master}" \
-    -pe shmem 1 \
-    "${bash_script}" \
-    "${chr}" \
-    "${input_path_gene}" \
-    "${out_prefix_gene}" \
-    "${pheno_dir}" \
-    "${true_p_path}" \
-    "${min_mac}" \
-    "${n_replicates}" \
-    "${n_start_shuffle}" \
-    "${n_cutoff_shuffle}" \
-    "${n_slots_saige}" \
-    "${n_slots_permute}" \
-    "${tick_interval}" \
-    "${tick_timeout}" \
-    "${queue_saige}" \
-    "${queue_permute}" \
-    "${annotation}" \
-    "${assoc_format}" \
-    "${gene}"
-set +x
-
+if [ -f "${input_path_gene}" ]; then
+  set -x
+  qsub -N "_c${chr}_${gene}" \
+      -o "${log_file}" \
+      -e "${error_file}" \
+      -q "${queue_master}" \
+      -pe shmem 1 \
+      "${bash_script}" \
+      "${chr}" \
+      "${input_path_gene}" \
+      "${out_prefix_gene}" \
+      "${pheno_dir}" \
+      "${true_p_path}" \
+      "${min_mac}" \
+      "${n_replicates}" \
+      "${n_start_shuffle}" \
+      "${n_cutoff_shuffle}" \
+      "${n_slots_saige}" \
+      "${n_slots_permute}" \
+      "${tick_interval}" \
+      "${tick_timeout}" \
+      "${queue_saige}" \
+      "${queue_permute}" \
+      "${annotation}" \
+      "${assoc_format}" \
+      "${gene}"
+  set +x
+else
+ >&2 "${input_path_gene} does not exist! Skipping.."
+fi
 
 
 
