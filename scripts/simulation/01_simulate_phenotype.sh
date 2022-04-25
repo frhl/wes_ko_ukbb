@@ -2,8 +2,8 @@
 #
 #$ -N simulate_phenotype
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/simulate_phenptype.log
-#$ -e logs/simulate_phenptype.errors.log
+#$ -o logs/simulate_phenotype.log
+#$ -e logs/simulate_phenotype.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
@@ -30,7 +30,7 @@ readonly in_dir="data/mt/annotated"
 readonly in_prefix="${in_dir}/ukb_eur_wes_200k_annot_chr${chr}.mt"
 readonly in_type="mt"
 
-readonly out_dir="data/simulation/phenotypes"
+readonly out_dir="data/simulation/phenotypes_only_genes"
 
 mkdir -p ${out_dir}
 
@@ -88,14 +88,12 @@ simulate_phenotypes() {
 
 readonly queue="short.qc"
 readonly nslots="3"
-readonly tasks=1-15
-readonly seed=44
+readonly tasks=1-3
+readonly seed=42
 
 # simulate traits with no heritability
-simulate_phenotypes 0.0 0.0 0.0 0.0
-simulate_phenotypes 0.0 0.0 0.1 0.06
-simulate_phenotypes 0.0 0.0 0.1 0.08
-simulate_phenotypes 0.0 0.0 0.1 0.1
+#simulate_phenotypes 0.0 0.0 0.04 0.1
+simulate_phenotypes 0.0 0.0 0.09 0.1
 #simulate_phenotypes 0.0 0.0 0.1 0.1
 
 #simulate_phenotypes 0.0 0.0 0.0 0.0

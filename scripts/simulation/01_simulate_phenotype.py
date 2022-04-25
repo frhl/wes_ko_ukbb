@@ -18,15 +18,6 @@ def try_param_h2(x):
 def try_param_pi(x):
     return float(x) if x not in [0, None, "NA","None"] else None
 
-
-def make_y_region(mt: hl.MatrixTable, h2, pi, region: list()):
-    mt = mt.filter_rows(hl.literal(set(region)).contains(mt.consequence_category))
-    mt = mt.filter_rows(hl.agg.stats(mt.GT.n_alt_alleles()).stdev>0)
-    mt = hl.experimental.ldscsim.make_betas(mt, h2=h2, pi=pi)[0]
-    mt = hl.experimental.ldscsim.normalize_genotypes(mt.GT) 
-    mt = mt.annotate_cols(y_no_noise=hl.agg.sum(mt.beta * mt['norm_gt']))
-    return(mt)
-
 class SplitArgs(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, values.split(','))
@@ -102,44 +93,50 @@ def main(args):
 
         # simulate thetas (CH effects).
         genes = genes.filter_rows(hl.agg.stats(genes.pKO).stdev>0)
-        genes = ko.normalize_by_name(genes, "pKO")
         genes = ko.make_thetas(genes, h2=h2_ko, pi=pi_ko)
-        genes = genes.annotate_cols(y_no_noise_ko=hl.agg.sum(genes.theta * genes.norm_pKO))
+        genes = ko.normalize_by_name(genes, "pKO")
+        genes = genes.annotate_entries(y_theta_norm_pKO = genes.theta * genes.norm_pKO)
+        genes = genes.annotate_cols(y_no_noise_ko=hl.agg.sum(genes.y_theta_norm_pKO))
+        genes = genes.annotate_cols(y = genes.y_no_noise_ko + hl.rand_norm(0, hl.sqrt(1-h2_ko))) 
+        #genes = genes.annotate_cols(y_no_noise_ko=hl.agg.sum(genes.theta * genes.pKO))
     
         if pi_ko:
             found_causal_genes = np.sum(np.array(genes.theta.collect()) != 0)
             print("Observed %0.2f of %0.0f causal genes.." % (found_causal_genes, n))
 
         # return thetas for genes and samples
-        ht = genes.select_rows('theta').select_entries(*['pKO','knockout'])
-        ht.entries().flatten().export(out_prefix + "_genes.tsv.gz")
+        ht = genes.select_rows('theta').select_entries(*['pKO','norm_pKO','knockout', 'y_theta_norm_pKO'])
+        ht.entries().flatten().export(out_prefix + "_genes_w_mt.tsv.gz")
+        genes.write(out_prefix + "_genes_w_mt.mt")
 
         # annotate original matrix with thetas from gene x sample matrix
-        mt = mt.annotate_cols(y_no_noise_ko = genes.index_cols(mt.col_key).y_no_noise_ko) 
+        #mt = mt.annotate_cols(y_no_noise_ko = genes.index_cols(mt.col_key).y_no_noise_ko) 
 
 
     # add noise
-    if h2_ko == 0 and h2_co == 0:
-           mt = mt.annotate_cols(y_cts=hl.rand_norm(0, hl.sqrt(1)))
-    elif h2_ko > 0 and h2_co > 0:
-        mt = mt.annotate_cols(y_cts=mt.y_no_noise_co +
-                    mt.y_no_noise_ko + hl.rand_norm(0, hl.sqrt(1-h2_ko-h2_co)))
-    elif h2_ko > 0 and h2_co == 0:
-        mt = mt.annotate_cols(y_cts = mt.y_no_noise_ko +
-                    hl.rand_norm(0, hl.sqrt(1-h2_ko)))
-    elif h2_ko == 0 and h2_co > 0:
-        mt = mt.annotate_cols(y_cts = mt.y_no_noise_co +
-                    hl.rand_norm(0, hl.sqrt(1-h2_co)))
+    #if h2_ko == 0 and h2_co == 0:
+    #       mt = mt.annotate_cols(y_cts=hl.rand_norm(0, hl.sqrt(1)))
+    #elif h2_ko > 0 and h2_co > 0:
+    #    mt = mt.annotate_cols(y_cts=mt.y_no_noise_co +
+    #                mt.y_no_noise_ko + hl.rand_norm(0, hl.sqrt(1-h2_ko-h2_co)))
+    #elif h2_ko > 0 and h2_co == 0:
+    #    mt = mt.annotate_cols(y_cts = mt.y_no_noise_ko +
+    #                hl.rand_norm(0, hl.sqrt(1-h2_ko)))
+    #elif h2_ko == 0 and h2_co > 0:
+    #    mt = mt.annotate_cols(y_cts = mt.y_no_noise_co +
+    #                hl.rand_norm(0, hl.sqrt(1-h2_co)))
+    #else:
+    #    raise TypeError("Invalid use of h2_ko and h2_co! Are some of them None")
 
     # binarize phenotype
-    if K is not None:
-        y_stats = mt.aggregate_cols(hl.agg.stats(mt.y_cts))
-        threshold = stats.norm.ppf(1-K, loc=y_stats.mean, scale=y_stats.stdev)
-        mt = mt.annotate_cols(y_bin=mt.y_cts > threshold) 
+    #if K is not None:
+    #    y_stats = mt.aggregate_cols(hl.agg.stats(mt.y_cts))
+    #    threshold = stats.norm.ppf(1-K, loc=y_stats.mean, scale=y_stats.stdev)
+    #    mt = mt.annotate_cols(y_bin=mt.y_cts > threshold) 
 
     # export simulated phenotypes
-    ht = mt.cols()
-    ht.flatten().export(out_prefix + ".tsv.gz")
+    #ht = mt.cols()
+    #ht.flatten().export(out_prefix + ".tsv.gz")
 
 if __name__=='__main__':
 
