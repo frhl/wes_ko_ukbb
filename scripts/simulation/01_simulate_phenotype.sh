@@ -30,7 +30,7 @@ readonly in_dir="data/mt/annotated"
 readonly in_prefix="${in_dir}/ukb_eur_wes_200k_annot_chr${chr}.mt"
 readonly in_type="mt"
 
-readonly out_dir="data/simulation/phenotypes_only_genes"
+readonly out_dir="data/simulation/phenotypes"
 
 mkdir -p ${out_dir}
 
@@ -88,13 +88,13 @@ simulate_phenotypes() {
 
 readonly queue="short.qc"
 readonly nslots="3"
-readonly tasks=1-3
+readonly tasks=1-50
 readonly seed=42
 
 # simulate traits with no heritability
-#simulate_phenotypes 0.0 0.0 0.04 0.1
 simulate_phenotypes 0.0 0.0 0.09 0.1
-#simulate_phenotypes 0.0 0.0 0.1 0.1
+simulate_phenotypes 0.0 0.0 0.05 0.12
+simulate_phenotypes 0.0 0.0 0.1 0.1
 
 #simulate_phenotypes 0.0 0.0 0.0 0.0
 #simulate_phenotypes 0.2 0.001 0.0 0.0

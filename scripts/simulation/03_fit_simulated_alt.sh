@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-10
+#$ -t 1-15
 #$ -tc 1
 #$ -V
 
@@ -25,7 +25,7 @@ readonly merge_script="scripts/_spa_merge.sh"
 readonly vcf_prefix="ukb_eur_wes_200k_chrCHR_maf0to5e-2"
 
 readonly conditioning_markers=""
-readonly min_mac=1
+readonly min_mac=4
 readonly chr=21
 readonly tasks=${chr}
 readonly queue="short.qf"
@@ -76,9 +76,15 @@ submit_spa_job() {
   set +x
 }
 
-submit_spa_cts_with_csqs "ukb_eur_h2_0_0_pi_NA_NA_K_1e-1_chr21_y_cts_${SGE_TASK_ID}" "pLoF_damaging_missense"
-submit_spa_cts_with_csqs "ukb_eur_h2_0_3e-1_pi_NA_NA_K_1e-1_chr21_y_cts_${SGE_TASK_ID}" "pLoF_damaging_missense"
-submit_spa_cts_with_csqs "ukb_eur_h2_2e-1_3e-1_pi_NA_NA_K_1e-1_chr21_y_cts_${SGE_TASK_ID}" "pLoF_damaging_missense"
+
+#submit_spa_cts_with_csqs  "ukb_eur_h2_0.0_0.0_pi_0.0_0.0_K_0.1_chr21_y_cts_${SGE_TASK_ID}" "pLoF_damaging_missense"
+#submit_spa_cts_with_csqs  "ukb_eur_h2_0.0_0.1_pi_0.0_0.06_K_0.1_chr21_y_cts_${SGE_TASK_ID}" "pLoF_damaging_missense"
+submit_spa_cts_with_csqs  "ukb_eur_h2_0.0_0.09_pi_0.0_0.1_K_0.1_chr21_y_cts_${SGE_TASK_ID}" "pLoF_damaging_missense"
+#submit_spa_cts_with_csqs  "ukb_eur_h2_0.0_0.1_pi_0.0_0.1_K_0.1_chr21_y_cts_${SGE_TASK_ID}" "pLoF_damaging_missense"
+
+#submit_spa_cts_with_csqs "ukb_eur_h2_0_0_pi_NA_NA_K_1e-1_chr21_y_cts_${SGE_TASK_ID}" "pLoF_damaging_missense"
+#submit_spa_cts_with_csqs "ukb_eur_h2_0_3e-1_pi_NA_NA_K_1e-1_chr21_y_cts_${SGE_TASK_ID}" "pLoF_damaging_missense"
+#submit_spa_cts_with_csqs "ukb_eur_h2_2e-1_3e-1_pi_NA_NA_K_1e-1_chr21_y_cts_${SGE_TASK_ID}" "pLoF_damaging_missense"
 #submit_spa_cts_with_csqs "ukb_eur_h2_0_pi_0_K_1e-1_chr21_cts${SGE_TASK_ID}" "pLoF_damaging_missense"
 
 
