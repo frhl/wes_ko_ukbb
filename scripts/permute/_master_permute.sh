@@ -63,6 +63,7 @@ set_arr_phenos() {
 }
 
 
+
 # set array of paths to saige null models
 set_arr_saige() {
   local phenotype=${1}
@@ -304,6 +305,7 @@ aggregate_saige() {
 
 set_up_rpy
 set_arr_phenos
+arr_phenos=( "CC_combined" )
 declare -A phenos_done
 declare -A saige_supply
 for pheno in ${arr_phenos[@]}; do phenos_done[${pheno}]=0; done

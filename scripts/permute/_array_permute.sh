@@ -34,6 +34,7 @@ readonly queue_permute=${16?Error: Missing arg15}
 readonly queue_master=${17?Error: Missing arg16}
 readonly annotation=${18?Error: Missing arg17}
 readonly assoc_format=${19?Error: Missing arg18}
+readonly n_concurrent_jobs=${20?Error: Missing arg18}
 
 readonly index=${SGE_TASK_ID}
 readonly gene="$(zcat ${genes_path} | grep "chr${chr}" | cut -f1 | sed ${index}'q;d' )"
@@ -53,6 +54,7 @@ if [ -f "${input_path_gene}" ]; then
       -o "${log_file}" \
       -e "${error_file}" \
       -q "${queue_master}" \
+      -tc "${n_concurrent_jobs}" \
       -pe shmem 1 \
       "${bash_script}" \
       "${chr}" \
