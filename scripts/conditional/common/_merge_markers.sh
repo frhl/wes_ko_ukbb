@@ -19,7 +19,7 @@ readonly arg_out_prefix=${3?Error: Missing arg3 (in dir)}
 
 readonly chr="${SGE_TASK_ID}"
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/conditional/04_merge_markers.py"
+readonly hail_script="scripts/conditional/common/04_merge_markers.py"
 
 sub_chr () {
   echo ${1} | sed -e "s/CHR/${chr}/g"

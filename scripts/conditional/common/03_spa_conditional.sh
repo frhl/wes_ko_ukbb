@@ -13,7 +13,7 @@
 set -o errexit
 set -o nounset
 
-readonly bash_script="scripts/conditional/_spa_conditional.sh"
+readonly bash_script="scripts/conditional/common/_spa_conditional.sh"
 
 readonly interval_dir="data/conditional/common/intervals"
 readonly out_dir="data/conditional/common/spa_iter"

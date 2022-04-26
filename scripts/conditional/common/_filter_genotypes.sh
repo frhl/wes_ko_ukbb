@@ -23,7 +23,7 @@ readonly min_maf=${5?Error: Missing arg5 (Filter variants by min MAF)}
 readonly min_info=${6?Error: Missing arg1 (Filter variants by min INFO)}
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/conditional/02_filter_genotypes.py"
+readonly hail_script="scripts/conditional/common/02_filter_genotypes.py"
 
 filter_genotypes() 
 {

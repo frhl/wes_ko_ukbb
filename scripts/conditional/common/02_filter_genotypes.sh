@@ -8,7 +8,7 @@
 #$ -e logs/filter_genotypes.errors.log
 #$ -P lindgren.prjc
 #$ -q test.qc
-#$ -t 2-71
+#$ -t 1-5
 #$ -V
 
 
@@ -18,7 +18,7 @@ set -o nounset
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
 
-readonly bash_script="scripts/conditional/_filter_genotypes.sh"
+readonly bash_script="scripts/conditional/common/_filter_genotypes.sh"
 
 readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
 
@@ -78,8 +78,19 @@ submit_intervals()
   fi
 }
 
+submit_binary_analysis "pLoF_damaging_missense"
+submit_cts_analysis "pLoF_damaging_missense"
+
 submit_binary_analysis "pLoF"
 submit_cts_analysis "pLoF"
+
+submit_binary_analysis "damaging_missense"
+submit_cts_analysis "damaging_missense"
+
+submit_binary_analysis "synonymous"
+submit_cts_analysis "synonymous"
+
+
 
 
 

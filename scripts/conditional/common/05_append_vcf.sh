@@ -19,7 +19,7 @@ source utils/bash_utils.sh
 source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/conditional/05_append_vcf.py"
+readonly hail_script="scripts/conditional/common/05_append_vcf.py"
 
 readonly chr="${SGE_TASK_ID}"
 readonly markers_dir="data/conditional/common/spa"

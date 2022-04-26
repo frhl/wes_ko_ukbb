@@ -18,7 +18,7 @@
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
 
-readonly rscript="scripts/conditional/01_gene_positions.R"
+readonly rscript="scripts/conditional/common/01_gene_positions.R"
 
 readonly genes="data/genes/220310_ensgid_grch38_pos.tsv.gz"
 readonly out_dir="data/conditional/common/intervals"

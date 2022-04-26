@@ -24,8 +24,8 @@ readonly min_mac=${7?Error: Missing arg7 (min_mac)}
 
 readonly csi="${vcf}.csi"
 readonly step2_SPAtests="utils/saige/step2_SPAtests.R"
-readonly shell_spa="scripts/conditional/_chr_spa.sh"
-readonly rscript="scripts/conditional/03_spa_conditional.R"
+readonly shell_spa="scripts/conditional/common/_chr_spa.sh"
+readonly rscript="scripts/conditional/common/03_spa_conditional.R"
 
 # A function to extract all the (unique) chromsomes
 extract_chr_from_vcf() {
