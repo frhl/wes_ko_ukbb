@@ -16,7 +16,7 @@ def try_param_h2(x):
     return float(x) if x not in [None, "NA","None"] else None
 
 def try_param_pi(x):
-    return float(x) if x not in [0, None, "NA","None"] else None
+    return float(x) if x not in [0, None, "NA","None", "0.0", "0"] else None
 
 class SplitArgs(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
