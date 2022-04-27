@@ -42,7 +42,7 @@ readonly csi=$(echo ${in_csi} | sed -e "s/CHR/${chr}/g")
 readonly out=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
 
 readonly threads=$(( ${NSLOTS}-1 ))
-readonly step2_SPAtests="utils/saige/step2_SPAtests.R"
+readonly step2_SPAtests="utils/saige/step2_SPAtests_cond.R"
 
 # condiitonal markers based on rare variants
 readonly cond_chr=$(echo ${cond} | sed -e "s/CHR/${chr}/g")
@@ -86,5 +86,7 @@ if [ ! -f ${out} ]; then
 else
   >&2 echo "${out} already exists. Skipping.."
 fi 
+
+rm ${markers_file}
 
 
