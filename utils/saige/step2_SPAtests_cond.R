@@ -172,7 +172,8 @@ if (BLASctl_installed){
   blas_set_num_threads(1)
 }
 
-if (!is.null(opt$condition_file)){
+if (opt$condition_file != ""){
+    print(opt$condition_file)
     stopifnot(file.exists(opt$condition_file))
     markers <- readLines(opt$condition_file)
     print(head(markers))
