@@ -1,17 +1,11 @@
 # Simulation for Compound Het pipeline
 
-In this section, we will detail how we simulated compound heterozygous phenotypes and applied the pipeline functions to detect the compound het effects.
+For this section we use real genotypes and annotation with simulated phenotypes. We partition the heritability of the phenotype into three components, 1) a non-coding polygenic component, 2) a rare variant component and finally 3) a compound het component. We simulate under a combination of the infinitesimal model and the spike-slab model. We simulate combinations of phenotypes with the following option:
 
-
-To-do:
-* Set up scripts that subsets UKBB samples and selected genotypes
-* Set up python scripts that can
-	* identify enumerations of compound hetz based on an annotation.
-	* Create a phenotype effects based on selected causal SNPs
-	* Create a phenotype effects based on CH effect
-	* Create a phenotype based on both causal effects and CH effects (+ noise)
-
-
-
-
+| Options | Description |
+| --- | --- |
+| h2 | We simulate the model under different heritabilities (0, 0.01, 0.05, 0.1) |
+| pi | We simulate variying degree of polygenicity (0.01, 0.1, 1) |
+| annotations | We simulate conditioned on underlying variant annotation (i.e. polygenicity for non-coding variants, spike-and-slab for coding variants and genes) |
+| beta | We add fixed effects to gene effects (Probably something in the range of 0.001, 0.01, 0.01. |
 
