@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 20-22
+#$ -t 21
 #$ -tc 1
 #$ -V
 
@@ -17,7 +17,7 @@ set -o nounset
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
-readonly bash_script="scripts/permute/_array_permute.sh"
+readonly bash_script="scripts/permute/_master_permute.sh"
 
 readonly chr="${SGE_TASK_ID}"
 
@@ -38,8 +38,8 @@ readonly true_p_path="data/permute/overview/overview_true_p.tsv.gz"
 
 # count how many genes to submit for the given chromosome
 readonly n_genes="$( zcat ${genes_path} | grep "chr${chr}" | wc -l)"
-readonly sge_tasks="1-${n_genes}"
-#readonly sge_tasks=3
+#readonly sge_tasks="1-${n_genes}"
+readonly sge_tasks=1-2
 
 # parameters for master script
 readonly min_mac=4
@@ -53,11 +53,11 @@ readonly tick_timeout=400 # 10 x 400 seconds
 readonly queue_saige="short.qf"
 readonly queue_permute="short.qa"
 readonly queue_master="short.qe"
-readonly n_concurrent_jobs="10"
+readonly n_concurrent_jobs=2
 
 set -x
 qsub -N "_chr${chr}_permute" \
-    -q "test.qc" \
+    -q "${queue_master}" \
     -pe shmem 1 \
     -t ${sge_tasks} \
     -tc ${n_concurrent_jobs} \
@@ -78,10 +78,8 @@ qsub -N "_chr${chr}_permute" \
     "${tick_timeout}" \
     "${queue_saige}" \
     "${queue_permute}" \
-    "${queue_master}" \
     "${annotation}" \
-    "${assoc_format}" \
-    "${n_concurrent_jobs}"
+    "${assoc_format}"
 set +x
 
 
