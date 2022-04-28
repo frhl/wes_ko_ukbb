@@ -54,7 +54,6 @@ if [ -f "${input_path_gene}" ]; then
       -o "${log_file}" \
       -e "${error_file}" \
       -q "${queue_master}" \
-      -tc "${n_concurrent_jobs}" \
       -pe shmem 1 \
       "${bash_script}" \
       "${chr}" \

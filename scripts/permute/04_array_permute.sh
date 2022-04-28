@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-22
+#$ -t 20-22
 #$ -tc 1
 #$ -V
 
@@ -60,6 +60,7 @@ qsub -N "_chr${chr}_permute" \
     -q "test.qc" \
     -pe shmem 1 \
     -t ${sge_tasks} \
+    -tc ${n_concurrent_jobs} \
     "${bash_script}" \
     "${chr}" \
     "${input_path}" \
