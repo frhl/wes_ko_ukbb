@@ -50,12 +50,16 @@ readonly gene="$(zcat ${genes_path} | grep "chr${chr}" | cut -f1 | sed ${index}'
 readonly input_path=$(echo ${input_path_prelim} | sed -e "s/GENE/${gene}/g")
 readonly out_prefix=$(echo ${out_prefix_prelim} | sed -e "s/GENE/${gene}/g")
 
-# keep track of logs
+# keep track of logs and temporary files
 readonly write_dir="$( dirname ${out_prefix})"
 readonly task_log="${write_dir}/${gene}.log"
 readonly task_log_errors="${write_dir}/${gene}.errors.log"
 readonly saige_log="${write_dir}/${gene}.saige.log"
 readonly saige_log_errors="${write_dir}/${gene}.saige.errors.log"
+readonly log="${out_prefix}.log"
+readonly success="${out_prefix}.SUCCESS"
+
+mkdir -p ${write_dir}
 
 
 # get array of path to phenotype names
@@ -314,14 +318,11 @@ aggregate_saige() {
 
 set_up_rpy
 set_arr_phenos
-arr_phenos=( "CC_combined" )
+#arr_phenos=( "CC_combined" )
 declare -A phenos_done
 declare -A saige_supply
 for pheno in ${arr_phenos[@]}; do phenos_done[${pheno}]=0; done
 for pheno in ${arr_phenos[@]}; do saige_supply[${pheno}]=0; done
-
-readonly log="${out_prefix}.log"
-readonly success="${out_prefix}.SUCCESS"
 
 SECONDS=0
 iteration=0

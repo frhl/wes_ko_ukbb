@@ -38,8 +38,7 @@ readonly true_p_path="data/permute/overview/overview_true_p.tsv.gz"
 
 # count how many genes to submit for the given chromosome
 readonly n_genes="$( zcat ${genes_path} | grep "chr${chr}" | wc -l)"
-#readonly sge_tasks="1-${n_genes}"
-readonly sge_tasks=1-4
+readonly sge_tasks="1-${n_genes}"
 
 # parameters for master script
 readonly min_mac=4
@@ -49,11 +48,11 @@ readonly n_cutoff_shuffle=10000000
 readonly n_slots_saige=1
 readonly n_slots_permute=5
 readonly tick_interval=30
-readonly tick_timeout=400 # 10 x 400 seconds
+readonly tick_timeout=800 # 10 x 400 seconds
 readonly queue_saige="short.qf"
 readonly queue_permute="short.qe"
 readonly queue_master="short.qf"
-readonly n_concurrent_jobs=2
+readonly n_concurrent_jobs=5
 
 set -x
 qsub -N "_chr${chr}_permute" \
