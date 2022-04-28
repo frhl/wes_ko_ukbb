@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N array_permute
+#$ -N master_permute
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/array_permute.log
-#$ -e logs/array_permute.errors.log
+#$ -o logs/master_permute.log
+#$ -e logs/master_permute.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
@@ -39,7 +39,7 @@ readonly true_p_path="data/permute/overview/overview_true_p.tsv.gz"
 # count how many genes to submit for the given chromosome
 readonly n_genes="$( zcat ${genes_path} | grep "chr${chr}" | wc -l)"
 #readonly sge_tasks="1-${n_genes}"
-readonly sge_tasks=1-2
+readonly sge_tasks=1-4
 
 # parameters for master script
 readonly min_mac=4
@@ -51,8 +51,8 @@ readonly n_slots_permute=5
 readonly tick_interval=30
 readonly tick_timeout=400 # 10 x 400 seconds
 readonly queue_saige="short.qf"
-readonly queue_permute="short.qa"
-readonly queue_master="short.qe"
+readonly queue_permute="short.qe"
+readonly queue_master="short.qf"
 readonly n_concurrent_jobs=2
 
 set -x

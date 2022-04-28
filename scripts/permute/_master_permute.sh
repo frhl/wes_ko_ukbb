@@ -50,27 +50,6 @@ readonly gene="$(zcat ${genes_path} | grep "chr${chr}" | cut -f1 | sed ${index}'
 readonly input_path=$(echo ${input_path_prelim} | sed -e "s/GENE/${gene}/g")
 readonly out_prefix=$(echo ${out_prefix_prelim} | sed -e "s/GENE/${gene}/g")
 
-
-#readonly chr=${1?Error: Missing argX}
-#readonly input_path=${2?Error: Missing argX}
-#readonly out_prefix=${3?Error: Missing argX}
-#readonly pheno_dir=${4?Error: Missing argX}
-#readonly true_p_path=${5?Error: Missing argX}
-#readonly min_mac=${6?Error: Missing argX}
-#readonly replicates=${7?Error: Missing argX}
-#readonly n_start_shuffle=${8?Error: Missing argX}
-#readonly n_cutoff_shuffle=${9?Error: Missing argX}
-#readonly n_slots_saige=${10?Error: Missing argX}
-#readonly n_slots_permute=${11?Error: Missing argX}
-#readonly tick_interval=${12?Error: Missing argX}
-#readonly tick_timeout=${13?Error: Missing argX}
-#readonly queue_saige=${14?Error: Missing argX}
-#readonly queue_permute=${15?Error: Missing argX}
-#readonly annotation=${16?Error: Missing argX}
-#readonly static_assoc=${17?Error: Missing argX}
-#readonly gene=${18?Error: Missing argX}
-
-
 # keep track of logs
 readonly write_dir="$( dirname ${out_prefix})"
 readonly task_log="${write_dir}/${gene}.log"
@@ -349,8 +328,6 @@ iteration=0
 n_shuffle=${n_start_shuffle}
 permutation_supply=0
 top_p=10
-#testit=("WHR" "BMI")
-#testit=("WHR" "EP_combined")
 
 echo -e "gene\tphenotype\tn_shuffle\ttrue_p\tpermuted_p\tmin_mac" > ${log}
 
@@ -424,7 +401,6 @@ while [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; do
 
 
     echo "# are phenos done: ${phenos_done[@]}.# result: $( are_phenos_done )"
-
     if [ "$( are_phenos_done )" -eq "1" ]; then
       echo "iteration ${iteration} completed! All phenotypes have been permuted accordingly."
       break
