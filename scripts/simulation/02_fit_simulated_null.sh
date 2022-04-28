@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc@@short.hge
-#$ -t 1-15
+#$ -t 1-50
 #$ -V
 
 set -o errexit
@@ -83,9 +83,14 @@ fit_null() {
 
 # Running null model
 set_up_RSAIGE
-#fit_cts "${pheno_dir}/ukb_eur_h2_0.0_0.04_pi_0.0_0.1_K_0.1_chr21_phenos.tsv.gz" "ukb_eur_h2_0.0_0.04_pi_0.0_0.1_K_0.1_chr21"
+fit_cts "${pheno_dir}/ukb_eur_h2_0.0_0.05_pi_0.0_0.12_K_0.1_chr21_phenos.tsv.gz" "ukb_eur_h2_0.0_0.05_pi_0.0_0.12_K_0.1_chr21"
 fit_cts "${pheno_dir}/ukb_eur_h2_0.0_0.09_pi_0.0_0.1_K_0.1_chr21_phenos.tsv.gz" "ukb_eur_h2_0.0_0.09_pi_0.0_0.1_K_0.1_chr21"
-#fit_cts "${pheno_dir}/ukb_eur_h2_0.0_0.0_pi_0.0_0.0_K_0.1_chr21_phenos.tsv.gz" "ukb_eur_h2_0.0_0.0_pi_0.0_0.0_K_0.1_chr21"
+fit_cts "${pheno_dir}/ukb_eur_h2_0.0_0.1_pi_0.0_0.1_K_0.1_chr21_phenos.tsv.gz" "ukb_eur_h2_0.0_0.1_pi_0.0_0.1_K_0.1_chr21"
+
+#fit_cts "${pheno_dir}/ukb_eur_h2_0.0_0.1_pi_0.0_0.1_K_0.1_chr21_phenos.tsv.gz" "ukb_eur_h2_0.0_0.1_pi_0.0_0.1_K_0.1_chr21"
+
+
+
 #fit_cts "${pheno_dir}/ukb_eur_h2_0.0_0.1_pi_0.0_0.06_K_0.1_chr21_phenos.tsv.gz" "ukb_eur_h2_0.0_0.1_pi_0.0_0.06_K_0.1_chr21"
 #fit_cts "${pheno_dir}/ukb_eur_h2_0.0_0.1_pi_0.0_0.08_K_0.1_chr21_phenos.tsv.gz" "ukb_eur_h2_0.0_0.1_pi_0.0_0.08_K_0.1_chr21"
 #fit_cts "${pheno_dir}/ukb_eur_h2_0.0_0.1_pi_0.0_0.1_K_0.1_chr21_phenos.tsv.gz" "ukb_eur_h2_0.0_0.1_pi_0.0_0.1_K_0.1_chr21"

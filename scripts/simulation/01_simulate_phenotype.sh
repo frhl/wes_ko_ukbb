@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 21
+#$ -t 1
 #$ -V
 
 set -o errexit
@@ -92,9 +92,14 @@ readonly tasks=1-50
 readonly seed=42
 
 # simulate traits with no heritability
-simulate_phenotypes 0.1 0.0 0.09 0.1
-#simulate_phenotypes 0.05 0.0 0.05 0.12
-#simulate_phenotypes 0.01 0.0 0.1 0.1
+simulate_phenotypes 0.05 0.0 0.1 0.1
+simulate_phenotypes 0.10 0.0 0.1 0.1
+simulate_phenotypes 0.20 0.0 0.1 0.1
+
+simulate_phenotypes 0.0 0.0 0.09 0.1
+simulate_phenotypes 0.00 0.0 0.05 0.12
+simulate_phenotypes 0.00 0.0 0.1 0.1
+
 
 #simulate_phenotypes 0.0 0.0 0.0 0.0
 #simulate_phenotypes 0.2 0.001 0.0 0.0
