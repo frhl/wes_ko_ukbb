@@ -48,6 +48,8 @@ lookup_true() {
     else
       raise_error "Column must be t (t-statistic) or p (P-value)."
     fi
+  elif [ "${lines}" -eq 1 ]; then
+    raise_error "Lookup true P-value failed for ${gene} at ${cur_assoc} (No lines! true_p does not exist.)"
   else
     raise_error "Lookup true P-value failed for ${gene} at ${cur_assoc} (Too many lines!)"
  fi
@@ -65,7 +67,6 @@ if [ -f ${saige_merged} ]; then
   readonly true_t=$( lookup_true "t" )
   readonly permuted_p=$(Rscript ${r_get_spa_p} --input_path "${saige_merged}" --select_min_p ${top_p} )
   readonly done=$(Rscript ${rlogic} --a ${true_p} --o "ge" --b ${permuted_p})
-
   if [ ${done} -eq 1 ]; then
     readonly empirical_p=$(
       Rscript ${r_calc_emp_p} \
@@ -73,11 +74,10 @@ if [ -f ${saige_merged} ]; then
         --true_tstat ${true_t} \
         --true_p ${true_p} \
         --out_prefix ${outfile})
-    echo -e "${gene}\t${phenotype}\t${n_shuffle}\t${true_p}\t${permuted_p}\t${empirical_p}" >> ${outfile}
-    >&2 echo -e "${gene}\t${phenotype}\t${n_shuffle}\t${true_p}\t${permuted_p}\t${empirical_p} (done)"
   else
-    >&2 echo -e "${gene}\t${phenotype}\t${n_shuffle}\t${true_p}\t${permuted_p}\tNA (not done)"
+    readonly empirical_p="NA"
   fi
+  echo -e "${gene}\t${phenotype}\t${n_shuffle}\t${true_p}\t${permuted_p}\t${empirical_p}" >> ${outfile}
 else
   >&2 "Missing saige_merged: ${saige_merged}"
 fi
