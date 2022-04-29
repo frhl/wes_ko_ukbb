@@ -70,14 +70,18 @@ readonly log_errors="${write_dir}/${gene}.errors.log"
 readonly log_saige_errors="${write_dir}/saige.errors.log"
 
 
-# get array of path to phenotype names
 set_arr_phenos() {
+  trait=${1}
   if [ ! -z ${pheno_dir} ]; then
     local pheno_bin="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
     local pheno_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
     readarray -t arr_bin < ${pheno_bin}
     readarray -t arr_cts < ${pheno_cts}
-    arr_phenos=("${arr_bin[@]}" "${arr_cts[@]}")
+    if [[ "${trait}" == "both" ]]; then
+      arr_phenos=("${arr_bin[@]}" "${arr_cts[@]}")
+    elif [[ "${trait}" == "cts" ]]; then
+      arr_phenos=("${arr_cts[@]}")
+    fi
   else
     raise_error "global variable 'pheno_dir' has not been defined"
   fi
@@ -283,12 +287,8 @@ resubmit_loop() {
 }
 
 check_if_done() {
-  local file="${out_prefix}_${phenotype}_empirical_p.txt.gz"
-  if [ -f ${file} ]; then
-    echo "1"
-  else
-    echo "0"
-  fi
+  local file="${out_prefix}_empirical_p.txt"
+  echo $(cat ${file} | awk -v var="${phenotype}" '$2 == var' | wc -l)
 }
 
 get_saige_supply() {
@@ -305,17 +305,10 @@ get_saige_supply() {
 SECONDS=0
 do_extra_loop=0
 iteration=$((${iteration} + 1))
-
-# set up phenotype
-set_arr_phenos
-arr_phenos=( "CAD_combined" "BC_combined" )
-declare -A phenos_done
-declare -A saige_supply
-for pheno in ${arr_phenos[@]}; do phenos_done[${pheno}]=0; done
-for pheno in ${arr_phenos[@]}; do saige_supply[${pheno}]=0; done
+set_arr_phenos "cts"
 
 >&2 echo "Starting iteration ${iteration}"
-if [ ${n_shuffle} -lt ${n_cutoff_shuffle} ]; then
+if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then
   submit_shuffle_phase ${n_shuffle}
   for phenotype in "${arr_phenos[@]}"; do
     if [ $(check_if_done) -eq "0" ]; then
@@ -342,7 +335,7 @@ if [ ${n_shuffle} -lt ${n_cutoff_shuffle} ]; then
     new_n_shuffle=$(( ${n_shuffle} * 10 ))
     resubmit_loop
   else
-    echo "finished all inputted phenotypes."
+    echo "Done! Finished all inputted phenotypes."
   fi
 else
   echo "Reached cutoff (${n_cutoff_shuffle}). Ending loop."

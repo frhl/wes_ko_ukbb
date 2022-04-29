@@ -26,7 +26,7 @@ readonly true_p_path=${7?Error: Missing arg1 (prefix)}
 readonly n_shuffle=${8?Error: Missing arg1 (prefix)}
 readonly out_prefix=${9?Error: Missing arg1 (prefix)}
 
-readonly outfile="${out_prefix}_${phenotype}_empirical_p"
+readonly outfile="${out_prefix}_empirical_p.txt"
 
 # use a table to lookup the true P-value from the primary analysis.
 # problematic when you are using strings that are subsets of otuer strings,

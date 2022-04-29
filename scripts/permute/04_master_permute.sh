@@ -55,7 +55,7 @@ readonly queue_permute="test.qc"
 readonly queue_merge="test.qc"
 readonly queue_master="test.qc"
 readonly n_concurrent_jobs=5
-readonly iteration=0
+readonly iteration=1
 readonly permutation_supply=0
 readonly initial_top_p=10
 
