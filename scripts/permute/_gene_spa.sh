@@ -68,5 +68,3 @@ else
 fi
 
 
-touch ${out_file_success}
-

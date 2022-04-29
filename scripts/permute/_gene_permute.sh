@@ -49,7 +49,6 @@ if [ ! -f "${out_prefix_id}.vcf.gz" ]; then
   bgzip "${out_prefix_id}.vcf"
   rm -f "${out_prefix_id}.vcf"
   make_tabix "${out_prefix_id}.vcf.gz" "csi"
-  touch ${out_file_success}
 else
   >&2 echo "Error: ${out_prefix_id}.vcf.bgz already exists. Skipping.."
 fi
