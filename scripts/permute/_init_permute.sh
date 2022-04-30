@@ -54,7 +54,7 @@ readonly gene="$(zcat ${genes_path} | grep "chr${chr}" | cut -f1 | sed ${index}'
 readonly input_path=$(echo ${input_path_prelim} | sed -e "s/GENE/${gene}/g")
 readonly out_prefix=$(echo ${out_prefix_prelim} | sed -e "s/GENE/${gene}/g")
 readonly write_dir="$( dirname ${out_prefix})"
-mkdir -p ${write_dir}
+readonly tested_phenos="${out_prefix}.phenos"
 
 # qsub names
 readonly name_shuffle="_shf_${gene}"
@@ -68,6 +68,11 @@ readonly log="${write_dir}/${gene}.log"
 readonly log_saige="${write_dir}/saige.log"
 readonly log_errors="${write_dir}/${gene}.errors.log"
 readonly log_saige_errors="${write_dir}/saige.errors.log"
+
+# create files and dirs
+mkdir -p ${write_dir}
+touch ${tested_phenos}
+
 
 
 set_arr_phenos() {
@@ -170,7 +175,7 @@ submit_saige() {
 
   if [ ${n_tasks_required} -ge 1 ]; then
 
-    echo "Running saige for ${phenotype} with ${n_tasks_required} jobs."
+    echo "Running saige for ${phenotype} with ${n_tasks_required} job(s)."
     local tasks_lower_bound=$(( ${pheno_saige_supply} + 1 ))
     local tasks_upper_bound=$(( ${pheno_saige_supply} + ${n_tasks_required} ))
     local tasks_spa=${tasks_lower_bound}-${tasks_upper_bound}
@@ -288,48 +293,66 @@ resubmit_loop() {
 
 check_if_done() {
   local file="${out_prefix}_empirical_p.txt"
-  echo $(cat ${file} | awk -v var="${phenotype}" '$2 == var' | wc -l)
+  local fcount="$(cat ${file} | grep "OK" | awk -v var="${phenotype}" '$2 == var' | wc -l)"
+  if [ ${fcount} -ge "1" ]; then
+    echo "1"
+  else
+    echo "0"
+  fi
 }
+
+
+check_if_all_done() {
+  local file="${out_prefix}_empirical_p.txt"
+  local obs_count="$(cat ${file} | grep "OK" | cut -f2 | sort | uniq | wc -l)"
+  local expt_count="$(cat ${tested_phenos} | sort | uniq | wc -l)"
+  if [ ${obs_count} -ge 1 ]; then
+    if [ ${expt_count} -eq ${obs_count} ]; then
+      echo "1"
+    else
+      echo "0"
+    fi
+  else
+    echo "0"
+  fi
+}
+
 
 get_saige_supply() {
   echo "$( ls "${out_prefix}_${phenotype}_"[0-9]*.txt.gz | wc -l )"
 }
-
-#get_permutation_supply() {
-#  echo "$( ls "${out_prefix}_"[0-9]*.vcf.gz | wc -l )"
-#}
-
-
-
 
 SECONDS=0
 do_extra_loop=0
 iteration=$((${iteration} + 1))
 set_arr_phenos "cts"
 
->&2 echo "Starting iteration ${iteration}"
+echo "Starting iteration ${iteration}"
 if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then
-  submit_shuffle_phase ${n_shuffle}
-  for phenotype in "${arr_phenos[@]}"; do
-    if [ $(check_if_done) -eq "0" ]; then
-      set_arr_saige ${phenotype}
-      in_gmat=${arr_saige[2]}
-      in_var=${arr_saige[3]}
-      if [ -f ${in_gmat} ] && [ -f ${in_var} ]; then
-        gmat_bytes=$( file_size ${in_gmat} )
-        var_bytes=$( file_size ${in_var} )
-        if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then
-          path_merged="${out_prefix}_${phenotype}_merged.txt"
-          if [ ! -f ${path_merged} ]; then
-            submit_saige ${n_shuffle}
-            submit_merge 
+  if [ $(check_if_all_done) -eq "0" ]; then
+    submit_shuffle_phase ${n_shuffle}
+    for phenotype in "${arr_phenos[@]}"; do
+      if [ $(check_if_done) -eq "0" ]; then
+        set_arr_saige ${phenotype}
+        in_gmat=${arr_saige[2]}
+        in_var=${arr_saige[3]}
+        if [ -f ${in_gmat} ] && [ -f ${in_var} ]; then
+          gmat_bytes=$( file_size ${in_gmat} )
+          var_bytes=$( file_size ${in_var} )
+          if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then
+            echo ${phenotype} >> ${tested_phenos}
+            path_merged="${out_prefix}_${phenotype}_merged.txt"
+            if [ ! -f ${path_merged} ]; then
+              submit_saige ${n_shuffle}
+              submit_merge 
+            fi
+            submit_calc_p
+            do_extra_loop=1
           fi
-          submit_calc_p
-          do_extra_loop=1
-        fi
-     fi
-    fi
-  done
+       fi
+      fi
+    done
+  fi
   if [ ${do_extra_loop} -eq "1" ]; then
     new_top_p=100
     new_n_shuffle=$(( ${n_shuffle} * 10 ))
@@ -338,7 +361,7 @@ if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then
     echo "Done! Finished all inputted phenotypes."
   fi
 else
-  echo "Reached cutoff (${n_cutoff_shuffle}). Ending loop."
+  echo "Reached cutoff (${n_cutoff_shuffle}. Last phenotype: ${phenotype}). Ending loop.."
 fi
 
 

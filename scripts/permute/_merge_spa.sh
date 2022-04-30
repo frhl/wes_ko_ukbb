@@ -28,7 +28,7 @@ aggregate_saige() {
       for id in $(seq 1 ${max_tasks}); do
         file="${prefix}_${id}.txt.gz"
          if [ -f ${file} ]; then
-           echo ${file}
+           #echo ${file}
            if [ "${id}" == "1" ]; then
               zcat "${file}" | head -n 1  >> "${out_no_gz}"
            fi

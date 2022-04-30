@@ -48,38 +48,45 @@ lookup_true() {
     else
       raise_error "Column must be t (t-statistic) or p (P-value)."
     fi
-  elif [ "${lines}" -eq 1 ]; then
-    raise_error "Lookup true P-value failed for ${gene} at ${cur_assoc} (No lines! true_p does not exist.)"
+  elif [ "${lines}" -le 1 ]; then
+    echo "NA"
+    >&2 "Lookup true P-value failed for ${gene} at ${cur_assoc} (No lines! true_p does not exist.)"
   else
-    raise_error "Lookup true P-value failed for ${gene} at ${cur_assoc} (Too many lines!)"
+    echo "NA"
+    >&2 "Lookup true P-value failed for ${gene} at ${cur_assoc} (Too many lines!)"
  fi
-
 }
 
 
 if [ -f ${saige_merged} ]; then
-  
-  # set up R-environemnt
   set_up_rpy
-
-  # Lookup permuted P, select top x, and lookup true P
   readonly true_p=$( lookup_true "p" )
   readonly true_t=$( lookup_true "t" )
-  readonly permuted_p=$(Rscript ${r_get_spa_p} --input_path "${saige_merged}" --select_min_p ${top_p} )
-  readonly done=$(Rscript ${rlogic} --a ${true_p} --o "ge" --b ${permuted_p})
-  if [ ${done} -eq 1 ]; then
-    readonly empirical_p=$(
-      Rscript ${r_calc_emp_p} \
-        --input_path "${saige_merged}" \
-        --true_tstat ${true_t} \
-        --true_p ${true_p} \
-        --out_prefix ${outfile})
+  if [ "${true_p}" != "NA" ]; then
+    readonly permuted_p=$(Rscript ${r_get_spa_p} --input_path "${saige_merged}" --select_min_p ${top_p} )
+    readonly done=$(Rscript ${rlogic} --a ${true_p} --o "ge" --b ${permuted_p})
+    if [ ${done} -eq 1 ]; then
+      readonly the_status="OK"
+      readonly empirical_p=$(
+        Rscript ${r_calc_emp_p} \
+          --input_path "${saige_merged}" \
+          --true_tstat ${true_t} \
+          --true_p ${true_p} \
+          --out_prefix ${outfile})
+    else
+      readonly empirical_p="NA"
+      readonly the_status="NA"
+    fi
   else
+    # gene not present in saige 
+    # primary analysis for phenotype
+    readonly permuted_p="NA"
     readonly empirical_p="NA"
+    readonly the_status="OK"
   fi
-  echo -e "${gene}\t${phenotype}\t${n_shuffle}\t${true_p}\t${permuted_p}\t${empirical_p}" >> ${outfile}
+  echo -e "${gene}\t${phenotype}\t${n_shuffle}\t${true_p}\t${permuted_p}\t${empirical_p}\t${the_status}" >> ${outfile}
 else
-  >&2 "Missing saige_merged: ${saige_merged}"
+  raise_error "Missing saige_merged: ${saige_merged}"
 fi
 
 
