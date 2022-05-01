@@ -55,6 +55,7 @@ readonly input_path=$(echo ${input_path_prelim} | sed -e "s/GENE/${gene}/g")
 readonly out_prefix=$(echo ${out_prefix_prelim} | sed -e "s/GENE/${gene}/g")
 readonly write_dir="$( dirname ${out_prefix})"
 readonly tested_phenos="${out_prefix}.phenos"
+readonly empirical_p="${out_prefix}_empirical_p.txt"
 
 # qsub names
 readonly name_shuffle="_shf_${gene}"
@@ -73,6 +74,9 @@ readonly log_saige_errors="${write_dir}/saige.errors.log"
 mkdir -p ${write_dir}
 touch ${tested_phenos}
 
+#if [ ! -z ${empirical_p} ]; then
+#  echo -e "gene\tphenotype\tn_shuffle\ttrue_p\tpermuted_p\tempirical_p\tstatus" > ${empirical_p}
+#fi
 
 
 set_arr_phenos() {

@@ -38,8 +38,8 @@ readonly true_p_path="data/permute/overview/overview_true_p.tsv.gz"
 
 # count how many genes to submit for the given chromosome
 readonly n_genes="$( zcat ${genes_path} | grep "chr${chr}" | wc -l)"
-#readonly sge_tasks="1-${n_genes}"
-readonly sge_tasks="1"
+readonly sge_tasks="1-${n_genes}"
+#readonly sge_tasks="2-3"
 
 # parameters for master script
 readonly min_mac=4

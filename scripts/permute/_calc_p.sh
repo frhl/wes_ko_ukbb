@@ -59,30 +59,39 @@ lookup_true() {
 
 
 if [ -f ${saige_merged} ]; then
-  set_up_rpy
   readonly true_p=$( lookup_true "p" )
   readonly true_t=$( lookup_true "t" )
-  if [ "${true_p}" != "NA" ]; then
-    readonly permuted_p=$(Rscript ${r_get_spa_p} --input_path "${saige_merged}" --select_min_p ${top_p} )
-    readonly done=$(Rscript ${rlogic} --a ${true_p} --o "ge" --b ${permuted_p})
-    if [ ${done} -eq 1 ]; then
-      readonly the_status="OK"
-      readonly empirical_p=$(
-        Rscript ${r_calc_emp_p} \
-          --input_path "${saige_merged}" \
-          --true_tstat ${true_t} \
-          --true_p ${true_p} \
-          --out_prefix ${outfile})
+  if [ $(zcat ${saige_merged} | wc -l) -gt 1 ]; then
+    if [[ "${true_p}" != "NA" ]]; then
+      set_up_rpy
+      readonly permuted_p=$(Rscript ${r_get_spa_p} --input_path "${saige_merged}" --select_min_p ${top_p} )
+      readonly done=$(Rscript ${rlogic} --a ${true_p} --o "ge" --b ${permuted_p})
+      #>&2 echo "checking rlogic ${true_p} >= ${permuted_p} == ${done} ? (check saige_merged ${saige_merged} with ${top_p} as top-p) - ${phenotype}"
+      if [ ${done} -eq 1 ]; then
+        readonly the_status="OK"
+        readonly empirical_p=$(
+          Rscript ${r_calc_emp_p} \
+            --input_path "${saige_merged}" \
+            --true_tstat ${true_t} \
+            --true_p ${true_p} \
+            --out_prefix ${outfile})
+      else
+        readonly empirical_p="NA"
+        readonly the_status="NA"
+      fi
     else
+      # gene not present in saige 
+      # primary analysis for phenotype
+      readonly permuted_p="NA"
       readonly empirical_p="NA"
-      readonly the_status="NA"
+      readonly the_status="OK (gene)"
     fi
   else
-    # gene not present in saige 
-    # primary analysis for phenotype
+    # min mac causing saige_merged to
+    # to have only a single line
     readonly permuted_p="NA"
     readonly empirical_p="NA"
-    readonly the_status="OK"
+    readonly the_status="OK (min_mac)"
   fi
   echo -e "${gene}\t${phenotype}\t${n_shuffle}\t${true_p}\t${permuted_p}\t${empirical_p}\t${the_status}" >> ${outfile}
 else
