@@ -33,25 +33,28 @@ readonly sge_seed=$(( ${id} * ${seed}))
 readonly out_prefix_id="${out_prefix}_${id}"
 readonly out_file_success="${out_prefix_success}_${id}.SUCCESS"
 
-if [ ! -f "${out_prefix_id}.vcf.gz" ]; then
-  set_up_rpy
-  Rscript ${rscript} \
-    --chrom "chr${chr}" \
-    --input_path ${input_path} \
-    --permutations ${replicates} \
-    --out_prefix ${out_prefix_id} \
-    --vcf_id ${gene} \
-    --seed ${sge_seed} \
-    && print_update "Finished permuting phase for chr${chr}" ${SECONDS} \
-    || raise_error "Permuting phase for chr${chr} failed"
-  module purge
-  module load BCFtools/1.12-GCC-10.3.0
-  bgzip "${out_prefix_id}.vcf"
-  rm -f "${out_prefix_id}.vcf"
-  make_tabix "${out_prefix_id}.vcf.gz" "csi"
+if [ -f "${input_path}" ]; then
+  if [ ! -f "${out_prefix_id}.vcf.gz" ]; then
+    set_up_rpy
+    Rscript ${rscript} \
+      --chrom "chr${chr}" \
+      --input_path ${input_path} \
+      --permutations ${replicates} \
+      --out_prefix ${out_prefix_id} \
+      --vcf_id ${gene} \
+      --seed ${sge_seed} \
+      && print_update "Finished permuting phase for chr${chr}" ${SECONDS} \
+      || raise_error "Permuting phase for chr${chr} failed"
+    module purge
+    module load BCFtools/1.12-GCC-10.3.0
+    bgzip "${out_prefix_id}.vcf"
+    rm -f "${out_prefix_id}.vcf"
+    make_tabix "${out_prefix_id}.vcf.gz" "csi"
+  else
+    >&2 echo "Error: ${out_prefix_id}.vcf.bgz already exists. Skipping.."
+  fi
 else
-  >&2 echo "Error: ${out_prefix_id}.vcf.bgz already exists. Skipping.."
+  >&2 echo "Error: ${input_path} does not exist!"
 fi
-
 
 

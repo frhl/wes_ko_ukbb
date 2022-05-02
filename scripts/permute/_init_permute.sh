@@ -70,6 +70,11 @@ readonly log_saige="${write_dir}/saige.log"
 readonly log_errors="${write_dir}/${gene}.errors.log"
 readonly log_saige_errors="${write_dir}/saige.errors.log"
 
+# check if permute gene even exists:
+if [ ! -f "${input_path}" ]; then
+  raise_error "${input_path} does not exist."
+fi
+
 # create files and dirs
 mkdir -p ${write_dir}
 touch ${tested_phenos}
@@ -330,6 +335,7 @@ SECONDS=0
 do_extra_loop=0
 iteration=$((${iteration} + 1))
 set_arr_phenos "cts"
+arr_phenos=( "Alanine_aminotransferase_residual" )
 
 echo "Starting iteration ${iteration}"
 if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then
