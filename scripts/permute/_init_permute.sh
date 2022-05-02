@@ -73,7 +73,11 @@ readonly log_saige_errors="${write_dir}/saige.errors.log"
 # check if permute gene even exists:
 if [ ! -f "${input_path}" ]; then
   raise_error "${input_path} does not exist."
+elif [ $( zcat ${input_path} | wc -l ) -le 1 ]; then
+  raise_error "${input_path} only contains a header!"
 fi
+
+
 
 # create files and dirs
 mkdir -p ${write_dir}

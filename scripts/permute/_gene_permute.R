@@ -50,6 +50,7 @@ main <- function(args){
     # replicate knockout 
     n <- as.numeric(args$permutations)
     d <- fread(args$input_path)
+    stopifnot(nrow(d) > 0)
     reps <- replicate(n, shuffle_knockouts(d))
     rownames(reps) <- d$s
     reps <- data.table(t(reps))
