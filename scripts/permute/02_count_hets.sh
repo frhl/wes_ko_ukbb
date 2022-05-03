@@ -32,7 +32,7 @@ readonly out_type="mt"
 
 mkdir -p ${out_dir}
 
-if [ -d "${out_prefix}.mt" ]; then
+if [ ! -d "${out_prefix}.mt" ]; then
   set_up_hail
   set_up_pythonpath_legacy
   python3 ${hail_script} \

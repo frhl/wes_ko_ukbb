@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
 #
-#$ -N _init_permute
+#$ -N _permute
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_init_permute.log
-#$ -e logs/_init_permute.errors.log
+#$ -o logs/_permute.log
+#$ -e logs/_permute.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q lindgren.qe

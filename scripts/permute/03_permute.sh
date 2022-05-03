@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N master_permute
+#$ -N permute
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/master_permute.log
-#$ -e logs/master_permute.errors.log
+#$ -o logs/permute.log
+#$ -e logs/permute.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
@@ -17,7 +17,7 @@ set -o nounset
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
-readonly bash_script="scripts/permute/_init_permute.sh"
+readonly bash_script="scripts/permute/_permute.sh"
 
 readonly chr="${SGE_TASK_ID}"
 
