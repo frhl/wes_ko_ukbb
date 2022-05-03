@@ -126,7 +126,7 @@ readonly use_prs="1"
 readonly min_mac=4
 readonly tasks=21
 readonly queue="short.qe"
-readonly nslots=1
+readonly nslots=2
 
 
 

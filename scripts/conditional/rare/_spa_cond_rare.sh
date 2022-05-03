@@ -72,7 +72,7 @@ spa_test() {
      --varianceRatioFile=${var} \
      --SAIGEOutputFile=${out} \
      --LOCO=FALSE \
-     --condition "${markers_file}" \
+     --condition_file "${markers_file}" \
      && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
      || raise_error "Saddle-point approximation for chr${chr} failed"
   else
