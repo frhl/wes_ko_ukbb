@@ -5,6 +5,7 @@ import argparse
 
 from ukb_utils import hail_init
 from ko_utils import io
+from ko_utils import io
 
 def main(args):
     
@@ -26,7 +27,10 @@ def main(args):
                         hom_alt_n=hl.agg.count_where(mt.GT.is_hom_var())
                         )
                )
-    # calculate likelihood of being a true knockouts
+    # calculate likelihood of being a true knockouts, these probabilities
+    # will be used later to draw from when permuting the phase.
+    
+    # what about unphased hets?? These are not considered?
     pTKO = (hl.case()
         .when((mt.hom_alt_n > 0), 1)
         .when((mt.phased_het > 1), 1 - 2*(1/2) ** mt.phased_het)

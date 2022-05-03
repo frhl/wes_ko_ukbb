@@ -3,6 +3,7 @@
 library(argparse)
 library(data.table)
 
+r_temp = "data/tmp/rtmp"
 
 main <- function(args){
     
