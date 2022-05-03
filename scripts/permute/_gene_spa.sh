@@ -50,7 +50,7 @@ if [ ! -f ${out_gene_task} ]; then
        --vcfFileIndex=${csi} \
        --vcfField="DS" \
        --chrom="chr${chr}" \
-       --minMAF=0.000000001 \
+       --minMAF=0.0000001 \
        --minMAC=${min_mac} \
        --GMMATmodelFile=${in_gmat} \
        --varianceRatioFile=${in_var} \
