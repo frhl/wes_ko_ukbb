@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N _merge_spa
+#$ -N _merge_permuted_spa
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_merge_spa.log
-#$ -e logs/_merge_spa.errors.log
+#$ -o logs/_merge_permuted_spa.log
+#$ -e logs/_merge_permuted_spa.errors.log
 #$ -V
 
 set -o errexit

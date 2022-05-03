@@ -16,10 +16,10 @@ set -o nounset
 source utils/vcf_utils.sh
 source utils/bash_utils.sh
 
-readonly this_script="scripts/permute/_init_permute.sh"
+readonly this_script="scripts/permute/_permute.sh"
 readonly bash_script="scripts/permute/_gene_permute.sh"
 readonly spa_script="scripts/permute/_gene_spa.sh"
-readonly merge_script="scripts/permute/_merge_spa.sh"
+readonly merge_script="scripts/permute/_merge_permuted_spa.sh"
 readonly calc_script="scripts/permute/_calc_p.sh"
 
 readonly index=${SGE_TASK_ID}
