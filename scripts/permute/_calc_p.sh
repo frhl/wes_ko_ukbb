@@ -20,11 +20,12 @@ readonly gene=${1?Error: Missing arg1 (prefix)}
 readonly phenotype=${2?Error: Missing arg1 (prefix)}
 readonly annotation=${3?Error: Missing arg1 (prefix)}
 readonly static_assoc=${4?Error: Missing arg1 (prefix)}
-readonly saige_merged=${5?Error: Missing arg1 (prefix)}
-readonly top_p=${6?Error: Missing arg1 (prefix)}
-readonly true_p_path=${7?Error: Missing arg1 (prefix)}
-readonly n_shuffle=${8?Error: Missing arg1 (prefix)}
-readonly out_prefix=${9?Error: Missing arg1 (prefix)}
+readonly use_prs=${5?Error: Missing arg1 (prefix)}
+readonly saige_merged=${6?Error: Missing arg1 (prefix)}
+readonly top_p=${7?Error: Missing arg1 (prefix)}
+readonly true_p_path=${8?Error: Missing arg1 (prefix)}
+readonly n_shuffle=${9?Error: Missing arg1 (prefix)}
+readonly out_prefix=${10?Error: Missing arg1 (prefix)}
 
 readonly outfile="${out_prefix}_empirical_p.txt"
 
@@ -34,7 +35,11 @@ readonly outfile="${out_prefix}_empirical_p.txt"
 lookup_true() {
   local column=${1}
   # read file and subset to current gene/pheno/annotation
-  local cur_assoc=$( echo ${static_assoc} | sed -e "s/PHENO/${phenotype}/g" | sed -e "s/ANNO/${annotation}/g")
+  if [ ${use_prs} -eq 1 ]; then
+    local cur_assoc=$( echo ${static_assoc} | sed -e "s/PHENO/${phenotype}/g" | grep "locoprs" | sed -e "s/ANNO/${annotation}/g")
+  else
+    local cur_assoc=$( echo ${static_assoc} | sed -e "s/PHENO/${phenotype}/g" | grep -v "locoprs" | sed -e "s/ANNO/${annotation}/g")
+  fi
   local readfile=$( zcat ${true_p_path} | grep ${gene} | grep ${cur_assoc} )
   local lines=$( zcat ${true_p_path} | grep ${gene} | grep ${cur_assoc} | wc -l)
   # return P-value or T-stat
@@ -53,7 +58,7 @@ lookup_true() {
     >&2 "Lookup true P-value failed for ${gene} at ${cur_assoc} (No lines! true_p does not exist.)"
   else
     echo "NA"
-    >&2 "Lookup true P-value failed for ${gene} at ${cur_assoc} (Too many lines!)"
+    >&2 "Lookup true P-value failed for ${gene} at ${cur_assoc} (Too many lines! Lines: $( head ${lines}))"
  fi
 }
 
@@ -84,7 +89,7 @@ if [ -f ${saige_merged} ]; then
       # primary analysis for phenotype
       readonly permuted_p="NA"
       readonly empirical_p="NA"
-      readonly the_status="OK (gene)"
+      readonly the_status="OK (true_p invalid)"
     fi
   else
     # min mac causing saige_merged to

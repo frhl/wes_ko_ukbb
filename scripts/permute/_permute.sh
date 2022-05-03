@@ -45,9 +45,10 @@ readonly queue_merge=${17?Error: Missing arg15}
 readonly queue_master=${18?Error: Missing arg15}
 readonly annotation=${19?Error: Missing arg17}
 readonly static_assoc=${20?Error: Missing arg18}
-iteration=${21?Error: Missing arg18}
-permutation_supply=${22?Error: Missing arg18}
-top_p=${23?Error: Missing arg18}
+readonly use_prs=${21?Error: Missing arg18}
+iteration=${22?Error: Missing arg18}
+permutation_supply=${23?Error: Missing arg18}
+top_p=${24?Error: Missing arg18}
 
 # set final paths depending on gene
 readonly gene="$(zcat ${genes_path} | grep "chr${chr}" | cut -f1 | sed ${index}'q;d' )"
@@ -261,6 +262,7 @@ submit_calc_p() {
     "${phenotype}" \
     "${annotation}" \
     "${static_assoc}" \
+    "${use_prs}" \
     "${path_merged}.gz" \
     "${top_p}" \
     "${true_p_path}" \
@@ -298,9 +300,10 @@ resubmit_loop() {
     "${queue_master}" \
     "${annotation}" \
     "${static_assoc}" \
+    "${use_prs}" \
     "${iteration}" \
     "${permutation_supply}" \
-    "${new_top_p}"
+    "${new_top_p}" 
   set +x
 }
 
