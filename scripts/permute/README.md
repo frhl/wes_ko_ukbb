@@ -1,5 +1,8 @@
 # Permutation pipeline
 
+* Note, that `03_permute.sh` will result in the submission of thousands of jobs. Please test on chromosome 21 before submitting for all chromosomes.
+* Note, that we currently consider phased and unphased hets as the same when specifying the underlying distibution for drawing knockouts (i.e. MAC is not relevant here).
+
 ## Overview
 | Script                            | Description                                   | Requires output from |
 | -                                 | -                                             | - |
