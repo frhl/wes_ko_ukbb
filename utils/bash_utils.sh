@@ -38,7 +38,6 @@ file_size(){
   if [ -f ${file} ]; then
     echo "$( stat --printf="%s" ${file} )"
   else 
-    #echo 0
     raise_error "${file} does not exist."
   fi
 }
