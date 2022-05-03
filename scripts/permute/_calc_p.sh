@@ -27,7 +27,8 @@ readonly true_p_path=${8?Error: Missing arg1 (prefix)}
 readonly n_shuffle=${9?Error: Missing arg1 (prefix)}
 readonly out_prefix=${10?Error: Missing arg1 (prefix)}
 
-readonly outfile="${out_prefix}_empirical_p.txt"
+readonly outfile="${out_prefix}.permuted"
+readonly pfile="${out_prefix}.pvalues"
 
 # use a table to lookup the true P-value from the primary analysis.
 # problematic when you are using strings that are subsets of otuer strings,
@@ -40,7 +41,6 @@ lookup_true() {
     local readfile=$( zcat ${true_p_path} | grep ${gene} | grep ${cur_assoc} | grep "locoprs" )
     local lines=$( zcat ${true_p_path} | grep ${gene} | grep ${cur_assoc} | grep "locoprs" | wc -l)
   else
-    >&2 echo "NOT using PRS"
     local cur_assoc=$( echo ${static_assoc} | sed -e "s/PHENO/${phenotype}/g" | grep -v "locoprs" | sed -e "s/ANNO/${annotation}/g")
     local readfile=$( zcat ${true_p_path} | grep ${gene} | grep ${cur_assoc} | grep -v "locoprs" )
     local lines=$( zcat ${true_p_path} | grep ${gene} | grep ${cur_assoc} | grep -v "locoprs" | wc -l)
@@ -58,10 +58,10 @@ lookup_true() {
     fi
   elif [ "${lines}" -le 1 ]; then
     echo "NA"
-    >&2 "Lookup true P-value failed for ${gene} at ${cur_assoc} (No lines! true_p does not exist.)"
+    >&2 echo "Lookup true P-value failed for ${gene} at ${cur_assoc} (No lines! true_p does not exist.)"
   else
     echo "NA"
-    >&2 "Lookup true P-value failed for ${gene} at ${cur_assoc} (Too many lines! Lines=${lines}.)"
+    >&2 echo "Lookup true P-value failed for ${gene} at ${cur_assoc} (Too many lines! Lines=${lines}.)"
  fi
 }
 
@@ -82,7 +82,7 @@ if [ -f ${saige_merged} ]; then
             --input_path "${saige_merged}" \
             --true_tstat ${true_t} \
             --true_p ${true_p} \
-            --out_prefix ${outfile})
+            --out_prefix ${pfile})
       else
         readonly empirical_p="NA"
         readonly the_status="NA"

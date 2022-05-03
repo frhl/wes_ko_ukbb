@@ -56,7 +56,7 @@ readonly input_path=$(echo ${input_path_prelim} | sed -e "s/GENE/${gene}/g")
 readonly out_prefix=$(echo ${out_prefix_prelim} | sed -e "s/GENE/${gene}/g")
 readonly write_dir="$( dirname ${out_prefix})"
 readonly tested_phenos="${out_prefix}.phenos"
-readonly empirical_p="${out_prefix}_empirical_p.txt"
+readonly empirical_p="${out_prefix}.permuted"
 
 # qsub names
 readonly name_shuffle="_shf_${gene}"
@@ -308,7 +308,7 @@ resubmit_loop() {
 }
 
 check_if_done() {
-  local file="${out_prefix}_empirical_p.txt"
+  local file="${out_prefix}.permuted"
   local fcount="$(cat ${file} | grep "OK" | awk -v var="${phenotype}" '$2 == var' | wc -l)"
   if [ ${fcount} -ge "1" ]; then
     echo "1"
@@ -319,7 +319,7 @@ check_if_done() {
 
 
 check_if_all_done() {
-  local file="${out_prefix}_empirical_p.txt"
+  local file="${out_prefix}.permuted"
   local obs_count="$(cat ${file} | grep "OK" | cut -f2 | sort | uniq | wc -l)"
   local expt_count="$(cat ${tested_phenos} | sort | uniq | wc -l)"
   if [ ${obs_count} -ge 1 ]; then
