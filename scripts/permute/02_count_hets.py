@@ -5,7 +5,6 @@ import argparse
 
 from ukb_utils import hail_init
 from ko_utils import io
-from ko_utils import io
 
 def main(args):
     
@@ -27,13 +26,17 @@ def main(args):
                         hom_alt_n=hl.agg.count_where(mt.GT.is_hom_var())
                         )
                )
+    
+    # What is the probability that they are all on the same phase? We don't need to distinghuish
+    # between mac1 an mac+1 PTVs in this case. 
+    # 1 - p(all on phase 1) - p(all on phase 2) = 1 - 2*p(all on phase 1) = 1 - 2*(1/2)^k
+    mt = mt.annotate_entries(het = mt.unphased_het + mt.phased_het)
+    
     # calculate likelihood of being a true knockouts, these probabilities
     # will be used later to draw from when permuting the phase.
-    
-    # what about unphased hets?? These are not considered?
     pTKO = (hl.case()
         .when((mt.hom_alt_n > 0), 1)
-        .when((mt.phased_het > 1), 1 - 2*(1/2) ** mt.phased_het)
+        .when((mt.het > 1), 1 - 2*(1/2) ** mt.het)
         .default(0))
     mt = mt.annotate_entries(pTKO = pTKO) 
     io.export_table(mt, out_prefix, out_type)
