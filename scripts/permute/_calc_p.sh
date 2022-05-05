@@ -74,15 +74,16 @@ if [ -f ${saige_merged} ]; then
       set_up_rpy
       readonly permuted_p=$(Rscript ${r_get_spa_p} --input_path "${saige_merged}" --select_min_p ${top_p} )
       readonly done=$(Rscript ${rlogic} --a ${true_p} --o "ge" --b ${permuted_p})
-      #>&2 echo "checking rlogic ${true_p} >= ${permuted_p} == ${done} ? (check saige_merged ${saige_merged} with ${top_p} as top-p) - ${phenotype}"
-      if [ ${done} -eq 1 ]; then
-        readonly the_status="OK"
-        readonly empirical_p=$(
+      readonly tmp_empirical_p=$(
           Rscript ${r_calc_emp_p} \
             --input_path "${saige_merged}" \
             --true_tstat ${true_t} \
             --true_p ${true_p} \
-            --out_prefix ${pfile})
+            --out_prefix "${pfile}.tmp")
+      if [ ${done} -eq 1 ]; then
+        readonly the_status="OK"
+        readonly empirical_p=${tmp_empirical_p}
+        mv "${pfile}.tmp" "${pfile}"
       else
         readonly empirical_p="NA"
         readonly the_status="NA"
