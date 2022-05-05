@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 21
+#$ -t 1-22
 #$ -V
 
 set -o errexit
@@ -38,7 +38,7 @@ readonly tasks="1-${n_tasks}"
 mkdir -p ${out_dir}
 
 set -x
-qsub -N "_chr${chr}_permute" \
+qsub -N "_c${chr}_make_genes" \
     -q "short.qc" \
     -pe shmem 1 \
     -t ${tasks} \
