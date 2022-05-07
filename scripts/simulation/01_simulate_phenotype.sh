@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1
+#$ -t 21
 #$ -V
 
 set -o errexit
@@ -38,17 +38,25 @@ mkdir -p ${out_dir}
 simulate_phenotypes() {
 
   local K=0.1
-  local h2_co=${1}
-  local pi_co=${2}
+  local h2_nc=${1}
+  local h2_co=${2}
   local h2_ko=${3}
-  local pi_ko=${4}
+  local pi_nc=${4}
+  local pi_co=${5}
+  local pi_ko=${6}
+  local alpha=${7}
+  local beta=${8}
+  local theta=${9}
 
-  local out_prefix="${out_dir}/ukb_eur_h2_${h2_co}_${h2_ko}_pi_${pi_co}_${pi_ko}_K_${K}_chr${chr}"
+  local h2s="${h2_nc}_${h2_co}_${h2_ko}"
+  local pis="${pi_nc}_${pi_co}_${pi_ko}"
+  local effects="a${alpha}_b${beta}_t${theta}"
+
+  local out_prefix="${out_dir}/ukb_eur_h2_${h2s}_pi_${pis}_K${K}_${effects}_chr${chr}"
   local out_phenotypes="${out_prefix}_phenos.tsv.gz"
   
-  local sim_name="sim_${SGE_TASK_ID}"
-  local mrg_name="mrg_${SGE_TASK_ID}"
-
+  local sim_name="sim_c${SGE_TASK_ID}_h2_${h2s}_pi_${pis}_${effects}"
+  local mrg_name="mrg_c${SGE_TASK_ID}_h2_${h2s}_pi_${pis}_${effects}"
 
   set -x
   if [ 1 -eq 1 ]; then
@@ -59,10 +67,15 @@ simulate_phenotypes() {
        ${bash_script} \
        ${in_prefix}\
        ${in_type} \
+       ${h2_nc} \
        ${h2_co} \
-       ${pi_co} \
        ${h2_ko} \
+       ${pi_nc} \
+       ${pi_co} \
        ${pi_ko} \
+       ${alpha} \
+       ${beta} \
+       ${theta} \
        ${K} \
        ${seed} \
        ${out_prefix}
@@ -88,36 +101,29 @@ simulate_phenotypes() {
 
 readonly queue="short.qc"
 readonly nslots="3"
-readonly tasks=1-50
+readonly tasks=1-25
 readonly seed=42
 
-# simulate traits with no heritability
-simulate_phenotypes 0.05 0.0 0.1 0.1
-simulate_phenotypes 0.10 0.0 0.1 0.1
-simulate_phenotypes 0.20 0.0 0.1 0.1
+# simulate absence of CH effects
+simulate_phenotypes 0.00 0.00 0.00 0.00 0.00 0.00 NA NA NA
+simulate_phenotypes 0.10 0.00 0.00 0.00 0.00 0.00 NA NA NA
+simulate_phenotypes 0.00 0.10 0.00 0.00 0.00 0.00 NA NA NA
+simulate_phenotypes 0.10 0.10 0.00 0.00 0.00 0.00 NA NA NA
 
-simulate_phenotypes 0.0 0.0 0.09 0.1
-simulate_phenotypes 0.00 0.0 0.05 0.12
-simulate_phenotypes 0.00 0.0 0.1 0.1
+# simualte CH effect
+simulate_phenotypes 0.00 0.00 0.02 0.00 0.00 0.10 NA NA NA
+simulate_phenotypes 0.00 0.10 0.02 0.00 0.00 0.10 NA NA NA
+simulate_phenotypes 0.00 0.10 0.02 0.00 0.00 0.10 NA NA NA
 
-
-#simulate_phenotypes 0.0 0.0 0.0 0.0
-#simulate_phenotypes 0.2 0.001 0.0 0.0
-#simulate_phenotypes 0.2 0.002 0.0 0.0
-#simulate_phenotypes 0.2 0.005 0.0 0.0
-#simulate_phenotypes 0.2 0.01 0.0 0.0
-
-
-# simulate traits slightly polygenic traits
-#simulate_phenotypes 1e-1 1e-1 0
-
-# simulate moderately polygenic traits
-#simulate_phenotypes 1e-1 3e-1 0
-
-# simulate 0.1 % causal varaints
-#simulate_phenotypes 1e-1 2e-1 1e-3
+# simulate effects with betas
+simulate_phenotypes 0.00 0.00 0.00 0.00 0.00 0.10 NA NA 0.01
+simulate_phenotypes 0.00 0.00 0.00 0.00 0.00 0.10 NA NA 0.10
 
 
+#simulate_phenotypes 0.10 0.10 0.10 0.10 0.10 0.10 NA NA NA
+#simulate_phenotypes 0.00 0.00 0.00 0.10 0.10 0.10 0.01 0.01 0.01
+#simulate_phenotypes 0.00 0.00 0.00 0.10 0.10 0.10 0.0 0.0 0.01
+#simulate_phenotypes 0.00 0.00 0.00 0.10 0.10 0.10 0.01 0.01 0.00
 
 
 

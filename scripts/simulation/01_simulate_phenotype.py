@@ -35,6 +35,9 @@ def main(args):
     pi_nc = try_param_pi(args.pi_nc)
     pi_co = try_param_pi(args.pi_co)
     pi_ko = try_param_pi(args.pi_ko)
+    alpha = try_param_h2(args.alpha)
+    beta = try_param_h2(args.beta)
+    theta = try_param_h2(args.theta)
     K = float(args.K)
     max_maf = args.max_maf
 
@@ -59,16 +62,34 @@ def main(args):
         mt = mt.annotate_rows(MAF=variants.get_maf_expr(mt))
         mt = mt.filter_rows(mt.MAF <= float(max_maf))
 
-    if h2_co > 0:
+    if h2_nc > 0 or alpha:
+        # simulate alphas (coding region)
+        print("Simulating non-coding variant phenotype with h2=%s and pi=%s" % (h2_nc, pi_nc))
+        mt = mt.filter_rows(hl.agg.stats(mt.GT.n_alt_alleles()).stdev>0)
+        if alpha:
+            alpha = ko.make_effect_size(mt, alpha, pi_nc)
+        else:
+            alpha = ko.simulate_effect_size(mt, h2_nc, pi_nc)
+        mt = mt.annotate_rows(alpha = alpha)
+        #mt = hl.experimental.ldscsim.make_betas(mt, h2=h2_nc, pi=pi_nc)[0]
+        mt = hl.experimental.ldscsim.normalize_genotypes(mt.GT)
+        mt = mt.annotate_cols(y_no_noise_nc=hl.agg.sum(mt.alpha * mt['norm_gt']))
+
+    if h2_co > 0 or beta:
         # simulate betas (coding region)
         print("Simulating coding variant phenotype with h2=%s and pi=%s" % (h2_co, pi_co))
         mt = mt.filter_rows(hl.agg.stats(mt.GT.n_alt_alleles()).stdev>0)
-        mt = hl.experimental.ldscsim.make_betas(mt, h2=h2_co, pi=pi_co)[0]
+        if beta:
+            beta = ko.make_effect_size(mt, beta, pi_co)
+        else:
+            beta = ko.simulate_effect_size(mt, h2_co, pi_co)
+        mt = mt.annotate_rows(beta = beta)
+        #mt = hl.experimental.ldscsim.make_betas(mt, h2=h2_co, pi=pi_co)[0]
         mt = hl.experimental.ldscsim.normalize_genotypes(mt.GT)
         mt = mt.annotate_cols(y_no_noise_co=hl.agg.sum(mt.beta * mt['norm_gt']))
 
     # annotate with CH effect
-    if h2_ko > 0:
+    if h2_ko > 0 or theta:
 
         # simulate compound het effects
         print("Simulating compound het phenotype with h2=%s and pi=%s" % (h2_ko, pi_ko))
@@ -93,12 +114,16 @@ def main(args):
 
         # simulate thetas (CH effects).
         genes = genes.filter_rows(hl.agg.stats(genes.pKO).stdev>0)
-        genes = ko.make_thetas(genes, h2=h2_ko, pi=pi_ko)
+        if theta:
+            theta = ko.make_effect_size(genes, theta, pi_ko)
+        else:
+            theta = ko.simulate_effect_size(genes, h2_ko, pi_ko)
+        genes = genes.annotate_rows(theta = theta)
+        #genes = ko.make_thetas(genes, h2=h2_ko, pi=pi_ko)
         genes = ko.normalize_by_name(genes, "pKO")
         genes = genes.filter_rows(genes.theta > 0)
         genes = genes.annotate_cols(y_no_noise_ko=hl.agg.sum(genes.theta * genes.norm_pKO))
         genes = genes.annotate_cols(y = genes.y_no_noise_ko + hl.rand_norm(0, hl.sqrt(1-h2_ko))) 
-        #genes = genes.annotate_cols(y_no_noise_ko=hl.agg.sum(genes.theta * genes.pKO))
     
         if pi_ko:
             found_causal_genes = np.sum(np.array(genes.theta.collect()) != 0)
@@ -107,26 +132,34 @@ def main(args):
         # return thetas for genes and samples
         ht = genes.select_rows('theta').select_entries(*['pKO','norm_pKO','knockout'])
         ht.entries().flatten().export(out_prefix + "_genes.tsv.gz")
-        #genes.write(out_prefix + "_genes.mt")
 
         # annotate original matrix with thetas from gene x sample matrix
         mt = mt.annotate_cols(y_no_noise_ko = genes.index_cols(mt.col_key).y_no_noise_ko) 
 
 
-    # add noise
-    if h2_ko == 0 and h2_co == 0:
+    # generate final phenotype by adding noise component
+    if h2_ko == 0 and h2_co == 0 and h2_nc == 0:
            mt = mt.annotate_cols(y_cts=hl.rand_norm(0, hl.sqrt(1)))
-    elif h2_ko > 0 and h2_co > 0:
+    elif h2_ko > 0 and h2_co > 0 and h2_nc == 0:
         mt = mt.annotate_cols(y_cts=mt.y_no_noise_co +
                     mt.y_no_noise_ko + hl.rand_norm(0, hl.sqrt(1-h2_ko-h2_co)))
-    elif h2_ko > 0 and h2_co == 0:
+    elif h2_ko > 0 and h2_co == 0 and h2_nc == 0:
         mt = mt.annotate_cols(y_cts = mt.y_no_noise_ko +
                     hl.rand_norm(0, hl.sqrt(1-h2_ko)))
-    elif h2_ko == 0 and h2_co > 0:
+    elif h2_ko == 0 and h2_co > 0 and h2_nc == 0:
         mt = mt.annotate_cols(y_cts = mt.y_no_noise_co +
                     hl.rand_norm(0, hl.sqrt(1-h2_co)))
+    elif h2_ko > 0 and h2_co > 0 and h2_nc > 0:
+        mt = mt.annotate_cols(y_cts=mt.y_no_noise_co +
+                    mt.y_no_noise_ko + hl.rand_norm(0, hl.sqrt(1-h2_ko-h2_co-h2_nc)))
+    elif h2_ko > 0 and h2_co == 0 and h2_nc > 0:
+        mt = mt.annotate_cols(y_cts = mt.y_no_noise_ko +
+                    hl.rand_norm(0, hl.sqrt(1-h2_ko-h2_nc)))
+    elif h2_ko == 0 and h2_co > 0 and h2_nc > 0:
+        mt = mt.annotate_cols(y_cts = mt.y_no_noise_co +
+                    hl.rand_norm(0, hl.sqrt(1-h2_co-h2_nc)))
     else:
-        raise TypeError("Invalid use of h2_ko and h2_co! Are some of them None")
+        raise TypeError("Invalid use of h2_ko, h2_co and h2_nc! Are some of them None?")
 
     # binarize phenotype
     if K is not None:
@@ -156,6 +189,9 @@ if __name__=='__main__':
     parser.add_argument('--in_type', default=None, help='Either "mt", "vcf" or "plink"')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--prune_hom_alt', default=None, help='Path prefix for output dataset')
+    parser.add_argument('--alpha', default=None, help='Pre-defined effect size for causal non-coding variants')
+    parser.add_argument('--beta', default=None, help='Pre-defined effect size for causal coding variants')
+    parser.add_argument('--theta', default=None, help='Pre-defined effect size for causal compound het pseudo variants')
     #parser.add_argument('--csqs_category', default=None, action=SplitArgs, help='comma sepearted field')
     #parser.add_argument('--out_type', default=None, help='Either "mt", "vcf" or "plink"')
     args = parser.parse_args()
