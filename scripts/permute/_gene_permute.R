@@ -42,6 +42,7 @@ main <- function(args){
     #print(args)  
     stopifnot(file.exists(args$input_path))
     stopifnot(!is.na(as.numeric(args$permutations)))
+    stopifnot(!is.null(args$permutations))
 
     # seed for reproducibility
     seed <- as.numeric(args$seed)
@@ -54,10 +55,13 @@ main <- function(args){
     reps <- replicate(n, shuffle_knockouts(d))
     rownames(reps) <- d$s
     reps <- data.table(t(reps))
- 
+
+    # convert to dosage
+    dosage <- reps * 2
+
     # combine synthethic rows with knockout matrix
     rows <- make_vcf_dosage_rows(args$chrom, 1:n, args$vcf_id)
-    final <- cbind(rows, reps)
+    final <- cbind(rows, dosage)
 
     # (1) write header of VCF
     vcf_out = make_vcf_dosage_header(args$chrom)
