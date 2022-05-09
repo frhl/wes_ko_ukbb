@@ -83,7 +83,7 @@ if [ -f ${saige_merged} ]; then
       if [ ${done} -eq 1 ]; then
         readonly the_status="OK"
         readonly empirical_p=${tmp_empirical_p}
-        mv "${pfile}.tmp.txt.gz" "${pfile}"
+        mv "${pfile}.tmp.txt.gz" "${pfile}.txt.gz"
       else
         readonly empirical_p="NA"
         readonly the_status="NA"

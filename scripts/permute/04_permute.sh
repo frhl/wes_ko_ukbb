@@ -42,7 +42,7 @@ readonly sge_tasks="1-${n_genes}"
 #readonly sge_tasks="30"
 
 # parameters for master script
-readonly min_mac=4
+readonly min_mac=6
 readonly n_replicates=1000
 readonly n_start_shuffle=1000
 readonly n_cutoff_shuffle=100000
