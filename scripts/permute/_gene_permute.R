@@ -6,9 +6,10 @@ library(data.table)
 # simple method to shuffle knockouts
 shuffle_knockouts <- function(d){
     d$KO <- rbinom(n=nrow(d), size=1, prob = d$pTKO)
-    d$pKO <- ifelse((d$KO == 1), 1,
-             ifelse((d$phased_het == 1 & d$unphased_het > 0), 1 - 1*(1/2)^d$unphased_het,
-             ifelse((d$phased_het == 0 & d$unphased_het > 1), 1 - 2*(1/2)^d$unphased_het, 0)))
+    d$pKO <- ifelse((d$KO == 1 & d$unphased_het == 0), 1,
+         ifelse((d$KO == 1 & d$hom_alt_n > 0), 1,
+         ifelse((d$phased_het == 1 & d$unphased_het > 0), 1 - 1*(1/2)^d$unphased_het,
+         ifelse((d$phased_het == 0 & d$unphased_het > 1), 1 - 2*(1/2)^d$unphased_het, 0))))
     return(d$pKO)
 }
 
