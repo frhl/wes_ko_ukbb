@@ -43,18 +43,18 @@ readonly sge_tasks="1-${n_genes}"
 
 # parameters for master script
 readonly min_mac=4
-readonly n_replicates=10000
+readonly n_replicates=1000
 readonly n_start_shuffle=10000
-readonly n_cutoff_shuffle=10000000
+readonly n_cutoff_shuffle=100000
 readonly n_slots_saige=1
-readonly n_slots_permute=5
+readonly n_slots_permute=1
 readonly tick_interval=30
 readonly tick_timeout=800 # 10 x 400 seconds
 readonly queue_saige="short.qf"
 readonly queue_permute="short.qe"
 readonly queue_merge="test.qc"
 readonly queue_master="test.qc"
-readonly n_concurrent_jobs=20
+readonly n_concurrent_jobs=30
 readonly iteration=1
 readonly permutation_supply=0
 readonly initial_top_p=10
