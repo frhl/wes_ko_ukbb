@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1
+#$ -t 1-44
 #$ -tc 10
 #$ -V
 
@@ -50,8 +50,9 @@ submit_spa_with_csqs()
   if [ ! -z ${phenotype} ]; then
 
     local step1_dir="data/saige/output/${trait}/step1"
-    local step2_dir="data/saige/output/${trait}/step2"
+    local step2_dir="data/saige/output/${trait}/step2/min_mac${min_mac}"
     local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${maf}_${annotation}.vcf.bgz"
+    mkdir -p ${step2_dir}
 
     if [ "${use_prs}" -eq "0" ]; then
       local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
@@ -119,7 +120,7 @@ submit_merge_job()
 # parameters
 readonly conditioning_markers=""
 readonly use_prs="1"
-readonly min_mac=4
+readonly min_mac=6
 readonly tasks=1-22
 readonly queue="short.qe"
 readonly nslots=1
