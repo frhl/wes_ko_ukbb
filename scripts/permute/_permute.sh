@@ -57,6 +57,7 @@ readonly out_prefix=$(echo ${out_prefix_prelim} | sed -e "s/GENE/${gene}/g")
 readonly write_dir="$( dirname ${out_prefix})"
 readonly tested_phenos="${out_prefix}.phenos"
 readonly empirical_p="${out_prefix}.permuted"
+readonly file_cutoff="${out_prefix}.cutoff"
 
 # qsub names
 readonly name_shuffle="_shf_${gene}"
@@ -378,6 +379,7 @@ if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then
     echo "Done! Finished all inputted phenotypes."
   fi
 else
+  touch ${file_cutoff}
   echo "Reached cutoff (${n_cutoff_shuffle}. Last phenotype: ${phenotype}). Ending loop.."
 fi
 
