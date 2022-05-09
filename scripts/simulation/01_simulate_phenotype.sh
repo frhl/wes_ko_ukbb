@@ -101,23 +101,23 @@ simulate_phenotypes() {
 
 readonly queue="short.qc"
 readonly nslots="3"
-readonly tasks=1-25
+readonly tasks=1
 readonly seed=42
 
 # simulate absence of CH effects
-simulate_phenotypes 0.00 0.00 0.00 0.00 0.00 0.00 NA NA NA
-simulate_phenotypes 0.10 0.00 0.00 0.00 0.00 0.00 NA NA NA
-simulate_phenotypes 0.00 0.10 0.00 0.00 0.00 0.00 NA NA NA
+#simulate_phenotypes 0.00 0.00 0.00 0.00 0.00 0.00 NA NA NA
+#simulate_phenotypes 0.10 0.00 0.00 0.00 0.00 0.00 NA NA NA
+#simulate_phenotypes 0.00 0.10 0.00 0.00 0.00 0.00 NA NA NA
 simulate_phenotypes 0.10 0.10 0.00 0.00 0.00 0.00 NA NA NA
 
 # simualte CH effect
-simulate_phenotypes 0.00 0.00 0.02 0.00 0.00 0.10 NA NA NA
-simulate_phenotypes 0.00 0.10 0.02 0.00 0.00 0.10 NA NA NA
-simulate_phenotypes 0.00 0.10 0.02 0.00 0.00 0.10 NA NA NA
+#simulate_phenotypes 0.00 0.00 0.02 0.00 0.00 0.10 NA NA NA
+#simulate_phenotypes 0.00 0.10 0.02 0.00 0.00 0.10 NA NA NA
+#simulate_phenotypes 0.00 0.10 0.02 0.00 0.00 0.10 NA NA NA
 
 # simulate effects with betas
-simulate_phenotypes 0.00 0.00 0.00 0.00 0.00 0.10 NA NA 0.01
-simulate_phenotypes 0.00 0.00 0.00 0.00 0.00 0.10 NA NA 0.10
+#simulate_phenotypes 0.00 0.00 0.00 0.00 0.00 0.10 NA NA 0.01
+#simulate_phenotypes 0.00 0.00 0.00 0.00 0.00 0.10 NA NA 0.10
 
 
 #simulate_phenotypes 0.10 0.10 0.10 0.10 0.10 0.10 NA NA NA

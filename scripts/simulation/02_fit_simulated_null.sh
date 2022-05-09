@@ -83,22 +83,22 @@ fit_null() {
    set +x
  }
 
-readonly tasks="1-25"
+readonly tasks="1-50"
 
 # Absence of CH effects
-fit_phenotypes 0.00 0.00 0.00 0.00 0.00 0.00 NA NA NA
+#fit_phenotypes 0.00 0.00 0.00 0.00 0.00 0.00 NA NA NA
 fit_phenotypes 0.10 0.00 0.00 0.00 0.00 0.00 NA NA NA
-fit_phenotypes 0.00 0.10 0.00 0.00 0.00 0.00 NA NA NA
+#fit_phenotypes 0.00 0.10 0.00 0.00 0.00 0.00 NA NA NA
 fit_phenotypes 0.10 0.10 0.00 0.00 0.00 0.00 NA NA NA
 
 # simulate CH effects
 #fit_phenotypes 0.00 0.00 0.02 0.00 0.00 0.10 NA NA NA
-fit_phenotypes 0.00 0.10 0.02 0.00 0.00 0.10 NA NA NA
-fit_phenotypes 0.00 0.10 0.02 0.00 0.00 0.10 NA NA NA
+#fit_phenotypes 0.00 0.10 0.02 0.00 0.00 0.10 NA NA NA
+#fit_phenotypes 0.00 0.10 0.02 0.00 0.00 0.10 NA NA NA
 
 # simulate effects with thetas
-fit_phenotypes 0.00 0.00 0.00 0.00 0.00 0.10 NA NA 0.01
-fit_phenotypes 0.00 0.00 0.00 0.00 0.00 0.10 NA NA 0.10
+#fit_phenotypes 0.00 0.00 0.00 0.00 0.00 0.10 NA NA 0.01
+#fit_phenotypes 0.00 0.00 0.00 0.00 0.00 0.10 NA NA 0.10
 
 
 

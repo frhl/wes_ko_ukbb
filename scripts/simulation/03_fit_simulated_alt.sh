@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-25
+#$ -t 1-50
 #$ -tc 5
 #$ -V
 

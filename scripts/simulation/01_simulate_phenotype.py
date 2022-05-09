@@ -46,6 +46,11 @@ def main(args):
     hl._set_flags(no_whole_stage_codegen='1')
     hl.set_global_seed(int(seed))
     mt = io.import_table(in_prefix, in_type)
+    
+    # filter on MAF 
+    if max_maf:
+        mt = mt.annotate_rows(MAF=variants.get_maf_expr(mt))
+        mt = mt.filter_rows(mt.MAF <= float(max_maf))
 
     # annotate with variant consequence
     mt = mt.explode_rows(mt.consequence.vep.worst_csq_by_gene_canonical)
@@ -54,39 +59,38 @@ def main(args):
                 worst_csq_expr=mt.consequence.vep.worst_csq_by_gene_canonical,
                 use_loftee=True))
 
-    # subset to potential 'damaging variants' 
-    items = ['pLoF','LC','damaging_missense']
-    mt = mt.filter_rows(hl.literal(set(items)).contains(mt.consequence_category))
+    # filter to variants with SD > 0
+    mt = mt.filter_rows(hl.agg.stats(mt.GT.n_alt_alleles()).stdev>0)
     
-    if max_maf:
-        mt = mt.annotate_rows(MAF=variants.get_maf_expr(mt))
-        mt = mt.filter_rows(mt.MAF <= float(max_maf))
+    # subset to potential 'damaging variants' 
+    items_co = ['pLoF','LC','damaging_missense']
+    items_nc = ['non_coding'] 
+    mt_co = mt.filter_rows(hl.literal(set(items_co)).contains(mt.consequence_category))
+    mt_nc = mt.filter_rows(hl.literal(set(items_nc)).contains(mt.consequence_category))
 
     if h2_nc > 0 or alpha:
         # simulate alphas (coding region)
         print("Simulating non-coding variant phenotype with h2=%s and pi=%s" % (h2_nc, pi_nc))
-        mt = mt.filter_rows(hl.agg.stats(mt.GT.n_alt_alleles()).stdev>0)
         if alpha:
-            alpha = ko.make_effect_size(mt, alpha, pi_nc)
+            alpha = ko.make_effect_size(mt_nc, alpha, pi_nc)
         else:
-            alpha = ko.simulate_effect_size(mt, h2_nc, pi_nc)
-        mt = mt.annotate_rows(alpha = alpha)
-        #mt = hl.experimental.ldscsim.make_betas(mt, h2=h2_nc, pi=pi_nc)[0]
-        mt = hl.experimental.ldscsim.normalize_genotypes(mt.GT)
-        mt = mt.annotate_cols(y_no_noise_nc=hl.agg.sum(mt.alpha * mt['norm_gt']))
+            alpha = ko.simulate_effect_size(mt_nc, h2_nc, pi_nc)
+        mt_nc = mt_nc.annotate_rows(alpha = alpha)
+        mt_nc = hl.experimental.ldscsim.normalize_genotypes(mt_nc.GT)
+        mt_nc = mt.annotate_cols(y_no_noise_nc=hl.agg.sum(mt_nc.alpha * mt_nc['norm_gt']))
+        mt = mt.annotate_cols(y_no_noise_nc = mt_nc.index_cols(mt.col_key).y_no_noise_nc) 
 
     if h2_co > 0 or beta:
         # simulate betas (coding region)
         print("Simulating coding variant phenotype with h2=%s and pi=%s" % (h2_co, pi_co))
-        mt = mt.filter_rows(hl.agg.stats(mt.GT.n_alt_alleles()).stdev>0)
         if beta:
-            beta = ko.make_effect_size(mt, beta, pi_co)
+            beta = ko.make_effect_size(mt_co, beta, pi_co)
         else:
-            beta = ko.simulate_effect_size(mt, h2_co, pi_co)
-        mt = mt.annotate_rows(beta = beta)
-        #mt = hl.experimental.ldscsim.make_betas(mt, h2=h2_co, pi=pi_co)[0]
-        mt = hl.experimental.ldscsim.normalize_genotypes(mt.GT)
-        mt = mt.annotate_cols(y_no_noise_co=hl.agg.sum(mt.beta * mt['norm_gt']))
+            beta = ko.simulate_effect_size(mt_co, h2_co, pi_co)
+        mt_co = mt_co.annotate_rows(beta = beta)
+        mt_co = hl.experimental.ldscsim.normalize_genotypes(mt_co.GT)
+        mt_co = mt_co.annotate_cols(y_no_noise_co=hl.agg.sum(mt_co.beta * mt_co['norm_gt']))
+        mt = mt.annotate_cols(y_no_noise_nc = mt_co.index_cols(mt.col_key).y_no_noise_co) 
 
     # annotate with CH effect
     if h2_ko > 0 or theta:
@@ -95,7 +99,7 @@ def main(args):
         print("Simulating compound het phenotype with h2=%s and pi=%s" % (h2_ko, pi_ko))
 
         # prune away knockedout owed to homozygote alternates
-        gene_mt = mt
+        gene_mt = mt_nc
         if prune_hom_alt:
             prune_hom_alt = float(prune_hom_alt)
             gene_mt = gene_mt.transmute_entries(GT = ko.rand_hom_to_het(gene_mt.GT, prune_hom_alt))
