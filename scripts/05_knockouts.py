@@ -31,6 +31,7 @@ def main(args):
     maf_min = args.maf_min
     exclude = args.exclude
     use_loftee = args.use_loftee
+    export_all_csqs = args.export_all_csqs
     csqs_category = args.csqs_category
 
     # import phased/unphased data
@@ -58,22 +59,23 @@ def main(args):
     mt = mt.filter_rows(hl.literal(set(csqs_category)).contains(mt.consequence_category))
 
     # perform an aggregation based on "collect", which requires a lot
-    # of memory but allows the variant ID to be returned as well?
+    # of memory but allows the variant ID to be returned as well alongside
+    # with information of cis/trans-CHs and heterozygotes.
     gene_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
     if aggr_method in "fast":
         genes = ko.aggr_phase_count_by_expr(mt, gene_expr)
+        expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased)
+        expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko)
     elif aggr_method in "collect":
         genes = ko.collect_phase_count_by_expr(mt, gene_expr)
         genes = ko.sum_gts_entries(genes)
+        expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased)
+        expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko, genes.phased)
     else:
         raise TypeError(str(aggr_method) + " is not allowed!")
 
     # calculate probability of being knocked out based on phased counts
-    expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased)
-    expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko)
-    genes = genes.annotate_entries(
-            pKO=expr_pko,
-            knockout=expr_ko)
+    genes = genes.annotate_entries(pKO=expr_pko, knockout=expr_ko)
 
     # checkpoint for more effecient data use
     if checkpoint or aggr_method in "collect":
@@ -88,11 +90,14 @@ def main(args):
             rsid=prob.gene_id)
     prob = prob.key_rows_by(prob.locus, prob.alleles)
     prob = prob.drop('gene_id')
-    
+
     # write out variants involved and vcf
     io.export_table(prob, out_prefix, out_type)
     if not only_vcf:
-        genes.filter_entries(genes.pKO > 0).entries().flatten().export(out_prefix + ".tsv.gz")
+        if export_all_csqs:
+            genes.entries().flatten().export(out_prefix + "_all.tsv.gz")
+        else:
+            genes.filter_entries(genes.pKO > 0).entries().flatten().export(out_prefix + ".tsv.gz")
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
@@ -111,6 +116,7 @@ if __name__=='__main__':
     parser.add_argument('--maf_max', default=None, help='Select all variants with a maf less than the indicated value')
     parser.add_argument('--exclude', default=None, help='exclude variants by rsid and/or variant id')
     parser.add_argument('--use_loftee', default=False, action='store_true', help='use LOFTEE to distinghiush between high confidence PTVs')
+    parser.add_argument('--export_all_csqs', default=False, action='store_true', help='Exports a table of all csqs')
     parser.add_argument('--csqs_category', default=None, action=SplitArgs, help='What categories should be subsetted to?')
 
     args = parser.parse_args()
