@@ -60,6 +60,9 @@ main <- function(args){
     # convert to dosage
     dosage <- reps * 2
 
+    # only keep non-probabilistic knockouts
+    if (args$only_non_prob_ko) dosage[dosage < 2] <- 0
+
     # combine synthethic rows with knockout matrix
     rows <- make_vcf_dosage_rows(args$chrom, 1:n, args$vcf_id)
     final <- cbind(rows, dosage)
@@ -79,6 +82,7 @@ parser <- ArgumentParser()
 parser$add_argument("--chrom", default=NULL, help = "chromosome")
 parser$add_argument("--input_path", default=NULL, help = "path to the input")
 parser$add_argument("--permutations", default=NULL, help = "number of times the gene should be permuted")
+parser$add_argument("--only_non_prob_ko", action="store_true", default=NULL, help = "Only keep knockouts of phased heterozygotes.")
 parser$add_argument("--seed", default=NULL, help = "seed for randomizer")
 parser$add_argument("--vcf_id", default="GENE", help = "Substitute for rsid")
 parser$add_argument("--out_prefix", default=NULL, help = "prefix for out file")
