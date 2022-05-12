@@ -23,14 +23,23 @@ make_vcf_dosage_header <- function(chrom){
     return(vcf_out)
 }
 
+
+# make a random string of n characters and numbers
+random_string <- function(n){
+    return(paste0(sample(c(0:9, LETTERS), n, replace = TRUE), collapse = ""))
+} 
+
 # make vcf-like rows for dosage entries
-make_vcf_dosage_rows <- function(chrom, positions, marker){
+make_vcf_dosage_rows <- function(chrom, positions, marker, use_random_alleles = TRUE){
+    rows <- length(positions)
+    refs <- unlist(ifelse(use_random_alleles, list(replicate(rows, random_string(4))), "A0"))
+    alts <- unlist(ifelse(use_random_alleles, list(replicate(rows, random_string(4))), "A1"))
     return(data.table(
       "#CHROM" = chrom, 
       POS = positions,
       ID = marker,
-      REF = '0',
-      ALT = '1',
+      REF = refs,
+      ALT = alts,
       QUAL = '.',
       FILTER = '.',
       INFO = '.',
