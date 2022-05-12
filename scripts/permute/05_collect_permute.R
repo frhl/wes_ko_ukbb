@@ -42,6 +42,17 @@ main <- function(args){
       sum_p_equal_zero <- sum(p_values == 0)
       sum_p_equal_one <- sum(p_values == 1)
       
+      # get deciles
+      sum_p_decile_0_1 <- sum(p_values <= 0.0 & p_values < 0.1)
+      sum_p_decile_1_2 <- sum(p_values <= 0.1 & p_values < 0.2)
+      sum_p_decile_2_3 <- sum(p_values <= 0.2 & p_values < 0.3)
+      sum_p_decile_3_4 <- sum(p_values <= 0.3 & p_values < 0.4)
+      sum_p_decile_4_5 <- sum(p_values <= 0.4 & p_values < 0.5)
+      sum_p_decile_5_6 <- sum(p_values <= 0.5 & p_values < 0.6)
+      sum_p_decile_7_8 <- sum(p_values <= 0.7 & p_values < 0.8)
+      sum_p_decile_8_9 <- sum(p_values <= 0.8 & p_values < 0.9)
+      sum_p_decile_9_10 <- sum(p_values < 0.9 & p_values <= 1.0)
+    
       # summarize in out data
       d_out <- data.frame(
           chrom,
@@ -57,7 +68,16 @@ main <- function(args){
           sum_p_values_ge_p_true,
           sum_p_values_gt_p_true,
           sum_p_equal_zero,
-          sum_p_equal_one
+          sum_p_equal_one,
+          sum_p_decile_0_1,
+          sum_p_decile_1_2,
+          sum_p_decile_2_3,
+          sum_p_decile_3_4,
+          sum_p_decile_4_5,
+          sum_p_decile_5_6,
+          sum_p_decile_7_8,
+          sum_p_decile_8_9,
+          sum_p_decile_9_10,
           files = f
       )
       
