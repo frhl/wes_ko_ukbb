@@ -28,10 +28,10 @@ readonly chr=${SGE_TASK_ID}
 
 # chromosome specified at in_gmat and in_var
 # when off chromosome PRS will beused
-if [[ ${in_gmat} == *"chrCHR"* ]]; then
-  readonly gmat=$(echo ${in_gmat} | sed -e "s/CHR/${chr}/g")
-  readonly var=$(echo ${in_var} | sed -e "s/CHR/${chr}/g")
-fi
+readonly gmat=$(echo ${in_gmat} | sed -e "s/CHR/${chr}/g")
+readonly var=$(echo ${in_var} | sed -e "s/CHR/${chr}/g")
+
+>&2 echo "${gmat} and ${var} with ${phenotype}"
 
 readonly var_bytes=$( file_size ${var} )
 readonly gmat_bytes=$( file_size ${gmat} )
@@ -61,7 +61,7 @@ spa_test() {
      --SAIGEOutputFile=${out} \
      --LOCO=FALSE\
      ${markers:+--condition "$markers"} \
-     && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
+     && print_update "Finished saddle-point approximation. Writing to ${out}" ${SECONDS} \
      || raise_error "Saddle-point approximation for chr${chr} failed"
   else
     raise_error "${var} or ${gmat} does not contain any bytes!"

@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1
+#$ -t 40-44
 #$ -tc 1
 #$ -V
 
@@ -30,11 +30,6 @@ readonly in_prefix="ukb_eur_wes_200k_annot"
 
 readonly group_dir="data/mt/vep"
 readonly group="${group_dir}/ukb_eur_wes_200k_csqs_chrCHR.saige"
-
-readonly min_mac=4
-readonly tasks=21
-readonly queue="short.qf"
-readonly nslots=1
 
 submit_spa_set_binary()
 {
@@ -59,12 +54,18 @@ submit_spa_pair()
   local phenotype=${2?Error: Missing arg2 (phenotype)}
   local trait=${3?Error: Missing arg3 (trait)}
 
-  local step1_dir="data/saige/output/${trait}/step1"
-  local step2_dir="data/saige/output/${trait}/step2_set"
-  local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
-  local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
-  local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${phenotype}_${annotation}"
-  local out_mrg="${step2_dir}/${in_prefix}_chrCHR_${phenotype}_${annotation}.txt.gz"
+  if [ "${use_prs}" -eq "0" ]; then
+      local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
+      local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
+      local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}"
+      local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}.txt.gz"
+    else
+      local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.rda"
+      local in_var="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.varianceRatio.txt"
+      local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}_locoprs"
+      local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}_locoprs.txt.gz"
+  fi 
+
   local in_vcf="${vcf_dir}/${in_prefix}_chrCHR.vcf.bgz"
   mkdir -p ${step2_dir}
   if [ ! -f ${out_mrg} ]; then
@@ -115,11 +116,15 @@ submit_merge_job()
 
 }
 
-
 readonly maf="maf0to5e-2"
+readonly min_mac=4
+readonly tasks=1-22
+readonly queue="short.qf"
+readonly nslots=1
+readonly use_prs="1"
 
 # cts traits
-submit_spa_set_cts "pLoF"
+submit_spa_set_cts "pLoF_damaging_missense"
 #submit_spa_set_binary "pLoF"
 
 

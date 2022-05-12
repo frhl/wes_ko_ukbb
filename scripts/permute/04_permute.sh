@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 21
+#$ -t 1-22
 #$ -tc 10
 #$ -V
 
@@ -36,7 +36,7 @@ readonly assoc_format="ukb_eur_wes_200k_maf0to5e-2_PHENO_ANNO"
 readonly min_mac=4
 readonly n_replicates=1000
 readonly n_start_shuffle=1000
-readonly n_cutoff_shuffle=10000 #1000000
+readonly n_cutoff_shuffle=10000000
 readonly n_slots_saige=1
 readonly n_slots_permute=1
 readonly tick_interval=30
@@ -57,8 +57,7 @@ readonly true_p_path="data/permute/overview/min_mac${min_mac}/overview_true_p.ts
 
 # count how many genes to submit for the given chromosome
 readonly n_genes="$( zcat ${genes_path} | grep "chr${chr}" | wc -l)"
-#readonly sge_tasks="1-${n_genes}"
-readonly sge_tasks="1-3"
+readonly sge_tasks="1-${n_genes}"
 
 set -x
 qsub -N "_chr${chr}_permute" \

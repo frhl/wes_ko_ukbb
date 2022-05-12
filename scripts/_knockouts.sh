@@ -42,6 +42,7 @@ evaluate_knockouts() {
       --input_type ${input_type} \
       --csqs_category ${in_category} \
       --use_loftee \
+      --export_all_gts \
       ${only_vcf:+--only_vcf} \
       ${aggr_method:+--aggr_method "${aggr_method}"} \
       ${af_min:+--af_min "$af_min"} \

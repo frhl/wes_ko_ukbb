@@ -8,7 +8,7 @@
 #$ -pe shmem 1
 #$ -q test.qc
 #$ -t 1-44
-#$ -tc 10
+#$ -tc 22
 #$ -V
 
 set -o errexit
@@ -119,8 +119,8 @@ submit_merge_job()
 
 # parameters
 readonly conditioning_markers=""
-readonly use_prs="1"
-readonly min_mac=6
+readonly use_prs="0"
+readonly min_mac=4
 readonly tasks=1-22
 readonly queue="short.qe"
 readonly nslots=1

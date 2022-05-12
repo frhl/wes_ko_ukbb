@@ -5,9 +5,9 @@
 #$ -o logs/spa_null.log
 #$ -e logs/spa_null.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 2
-#$ -q test.qc
-#$ -t 1
+#$ -pe shmem 1
+#$ -q short.qc
+#$ -t 1-80
 #$ -tc 1
 #$ -V
 
@@ -78,7 +78,7 @@ set_up_prs() {
         --outfile ${out_pheno_prs}
     fi
     pheno_file=${out_pheno_prs}
-    tasks=21
+    tasks=1-22
   fi
 }
 
@@ -115,7 +115,7 @@ submit_spa_null() {
 }
 
 # Fit null model for binary/cts traits
-#fit_binary_traits
+fit_binary_traits
 fit_cts_traits
 
 

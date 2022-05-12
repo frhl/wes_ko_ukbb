@@ -47,6 +47,13 @@ make_vcf_dosage_rows <- function(chrom, positions, marker, use_random_alleles = 
     ))
 }
 
+# read conditional variants
+read_conditional_row <- function(path){
+
+
+}
+
+
 main <- function(args){
 
     #print(args)  
