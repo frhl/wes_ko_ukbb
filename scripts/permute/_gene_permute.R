@@ -26,7 +26,7 @@ make_vcf_dosage_header <- function(chrom){
 
 # make a random string of n characters and numbers
 random_string <- function(n){
-    return(paste0(sample(c(0:9, LETTERS), n, replace = TRUE), collapse = ""))
+    return(paste0(sample(c(letters, LETTERS), n, replace = TRUE), collapse = ""))
 } 
 
 # make vcf-like rows for dosage entries
