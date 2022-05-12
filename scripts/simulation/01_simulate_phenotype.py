@@ -82,7 +82,7 @@ def main(args):
             alpha = ko.simulate_effect_size(mt_nc, h2_nc, pi_nc)
         mt_nc = mt_nc.annotate_rows(alpha = alpha)
         mt_nc = hl.experimental.ldscsim.normalize_genotypes(mt_nc.GT)
-        mt_nc = mt.annotate_cols(y_no_noise_nc=hl.agg.sum(mt_nc.alpha * mt_nc['norm_gt']))
+        mt_nc = mt_nc.annotate_cols(y_no_noise_nc=hl.agg.sum(mt_nc.alpha * mt_nc['norm_gt']))
         mt = mt.annotate_cols(y_no_noise_nc = mt_nc.index_cols(mt.col_key).y_no_noise_nc) 
 
     if h2_co > 0 or beta:
@@ -95,7 +95,7 @@ def main(args):
         mt_co = mt_co.annotate_rows(beta = beta)
         mt_co = hl.experimental.ldscsim.normalize_genotypes(mt_co.GT)
         mt_co = mt_co.annotate_cols(y_no_noise_co=hl.agg.sum(mt_co.beta * mt_co['norm_gt']))
-        mt = mt.annotate_cols(y_no_noise_nc = mt_co.index_cols(mt.col_key).y_no_noise_co) 
+        mt = mt.annotate_cols(y_no_noise_co = mt_co.index_cols(mt.col_key).y_no_noise_co) 
 
     # annotate with CH effect
     if h2_ko > 0 or theta:
@@ -150,23 +150,19 @@ def main(args):
     if h2_ko == 0 and h2_co == 0 and h2_nc == 0:
            mt = mt.annotate_cols(y_cts=hl.rand_norm(0, hl.sqrt(1)))
     elif h2_ko > 0 and h2_co > 0 and h2_nc == 0:
-        mt = mt.annotate_cols(y_cts=mt.y_no_noise_co +
-                    mt.y_no_noise_ko + hl.rand_norm(0, hl.sqrt(1-h2_ko-h2_co)))
+        mt = mt.annotate_cols(y_cts=mt.y_no_noise_co + mt.y_no_noise_ko + hl.rand_norm(0, hl.sqrt(1-h2_ko-h2_co)))
     elif h2_ko > 0 and h2_co == 0 and h2_nc == 0:
-        mt = mt.annotate_cols(y_cts = mt.y_no_noise_ko +
-                    hl.rand_norm(0, hl.sqrt(1-h2_ko)))
+        mt = mt.annotate_cols(y_cts = mt.y_no_noise_ko + hl.rand_norm(0, hl.sqrt(1-h2_ko)))
     elif h2_ko == 0 and h2_co > 0 and h2_nc == 0:
-        mt = mt.annotate_cols(y_cts = mt.y_no_noise_co +
-                    hl.rand_norm(0, hl.sqrt(1-h2_co)))
+        mt = mt.annotate_cols(y_cts = mt.y_no_noise_co + hl.rand_norm(0, hl.sqrt(1-h2_co)))
     elif h2_ko > 0 and h2_co > 0 and h2_nc > 0:
-        mt = mt.annotate_cols(y_cts=mt.y_no_noise_co +
-                    mt.y_no_noise_ko + hl.rand_norm(0, hl.sqrt(1-h2_ko-h2_co-h2_nc)))
+        mt = mt.annotate_cols(y_cts=mt.y_no_noise_nc + mt.y_no_noise_co + mt.y_no_noise_ko + hl.rand_norm(0, hl.sqrt(1-h2_ko-h2_co-h2_nc)))
     elif h2_ko > 0 and h2_co == 0 and h2_nc > 0:
-        mt = mt.annotate_cols(y_cts = mt.y_no_noise_ko +
-                    hl.rand_norm(0, hl.sqrt(1-h2_ko-h2_nc)))
+        mt = mt.annotate_cols(y_cts = mt.y_no_noise_ko + mt.y_no_noise_ko + hl.rand_norm(0, hl.sqrt(1-h2_ko-h2_nc)))
     elif h2_ko == 0 and h2_co > 0 and h2_nc > 0:
-        mt = mt.annotate_cols(y_cts = mt.y_no_noise_co +
-                    hl.rand_norm(0, hl.sqrt(1-h2_co-h2_nc)))
+        mt = mt.annotate_cols(y_cts = mt.y_no_noise_co + mt.y_no_noise_nc + hl.rand_norm(0, hl.sqrt(1-h2_co-h2_nc)))
+    elif h2_ko == 0 and h2_co == 0 and h2_nc > 0:
+        mt = mt.annotate_cols(y_cts = mt.y_no_noise_nc + hl.rand_norm(0, hl.sqrt(1-h2_nc)))
     else:
         raise TypeError("Invalid use of h2_ko, h2_co and h2_nc! Are some of them None?")
 

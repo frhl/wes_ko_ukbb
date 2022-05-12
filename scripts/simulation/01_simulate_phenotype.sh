@@ -106,9 +106,9 @@ readonly seed=42
 
 # simulate absence of CH effects
 #simulate_phenotypes 0.00 0.00 0.00 0.00 0.00 0.00 NA NA NA
-#simulate_phenotypes 0.10 0.00 0.00 0.00 0.00 0.00 NA NA NA
+simulate_phenotypes 0.10 0.00 0.00 0.00 0.00 0.00 NA NA NA
 #simulate_phenotypes 0.00 0.10 0.00 0.00 0.00 0.00 NA NA NA
-simulate_phenotypes 0.10 0.10 0.00 0.00 0.00 0.00 NA NA NA
+#simulate_phenotypes 0.10 0.10 0.00 0.00 0.00 0.00 NA NA NA
 
 # simualte CH effect
 #simulate_phenotypes 0.00 0.00 0.02 0.00 0.00 0.10 NA NA NA
