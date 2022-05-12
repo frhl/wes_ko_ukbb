@@ -54,6 +54,7 @@ submit_knockout_job()
   local aggr_method=${3}
   #local input_path="${in_prefix}_chrCHR_maf${maf_lb}to${maf_ub}_${annotation}.mt"
   local out_prefix_csqs="${out_prefix}_chrCHR_maf${maf_lb}to${maf_ub}_${annotation/,/_}"
+  local out_checkpoint="${out_prefix_csqs}_checkpoint.mt"
   set -x
   qsub -N "_ko_${annotation}" \
     -o "logs/_knockouts.log" \
@@ -76,6 +77,12 @@ submit_knockout_job()
     "${out_prefix_csqs}" \
     "${out_type}" 
   set +x
+
+  # clean up after checkpints when
+  # aggr_method="collect"
+  if [ -f "${out_checkpoint}" ]; then
+    rm -rf ${out_checkpoint}
+  fi
 }
 
 #submit_knockout_job "synonymous" "5" "fast"
