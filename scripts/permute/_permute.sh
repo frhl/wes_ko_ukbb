@@ -310,21 +310,9 @@ resubmit_loop() {
 
 check_if_done() {
   local file="${out_prefix}.permuted"
-  local fcount="$(cat ${file} | grep "OK" | awk -v var="${phenotype}" '$2 == var' | wc -l)"
-  if [ ${fcount} -ge "1" ]; then
-    echo "1"
-  else
-    echo "0"
-  fi
-}
-
-
-check_if_all_done() {
-  local file="${out_prefix}.permuted"
-  local obs_count="$(cat ${file} | grep "OK" | cut -f2 | sort | uniq | wc -l)"
-  local expt_count="$(cat ${tested_phenos} | sort | uniq | wc -l)"
-  if [ ${obs_count} -ge 1 ]; then
-    if [ ${expt_count} -eq ${obs_count} ]; then
+  if [ -f ${file} ]; then
+    local fcount="$(cat ${file} | grep "OK" | awk -v var="${phenotype}" '$2 == var' | wc -l)"
+    if [ ${fcount} -ge "1" ]; then
       echo "1"
     else
       echo "0"
@@ -335,8 +323,28 @@ check_if_all_done() {
 }
 
 
+check_if_all_done() {
+  local file="${out_prefix}.permuted"
+  if [ -f ${file} ]; then
+    local obs_count="$(cat ${file} | grep "OK" | cut -f2 | sort | uniq | wc -l)"
+    local expt_count="$(cat ${tested_phenos} | sort | uniq | wc -l)"
+    if [ ${obs_count} -ge 1 ]; then
+      if [ ${expt_count} -eq ${obs_count} ]; then
+        echo "1"
+      else
+        echo "0"
+      fi
+    else
+      echo "0"
+    fi
+  else
+    echo 0
+  fi
+}
+
+
 get_saige_supply() {
-  echo "$( ls "${out_prefix}_${phenotype}_"[0-9]*.txt.gz | wc -l )"
+  echo "$( ls $write_dir | grep -E "${out_prefix}_${phenotype}_[0-9]*.txt.gz" | wc -l )"
 }
 
 SECONDS=0
@@ -385,7 +393,7 @@ if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then
   fi
 else
   touch ${file_cutoff}
-  echo "Reached cutoff (${n_cutoff_shuffle}. Last phenotype: ${phenotype}). Ending loop.."
+  echo "Reached cutoff (${n_cutoff_shuffle}). Ending loop.."
 fi
 
 
