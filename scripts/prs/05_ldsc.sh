@@ -5,9 +5,9 @@
 #$ -o logs/ldsc.log
 #$ -e logs/ldsc.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 1
+#$ -pe shmem 4
 #$ -q short.qc
-#$ -t 1-45
+#$ -t 1-80
 #$ -V
 
 set -o errexit

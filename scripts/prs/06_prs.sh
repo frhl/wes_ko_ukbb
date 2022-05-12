@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1
+#$ -t 1-80
 #$ -tc 1
 #$ -V
 
@@ -38,7 +38,7 @@ readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
 readonly file_binary="${pheno_dir}/filtered_phenotypes_binary.tsv"
 readonly pheno_list_binary="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
 readonly phenotype_binary=$( sed "${index}q;d" ${pheno_list_binary} )
-readonly impute="mean0"
+readonly impute="mean2"
 
 mkdir -p ${out_dir}
 
@@ -117,6 +117,6 @@ clean_pgs()
 }
 
 
-submit_ldpred2 "auto" "4" "${phenotype_cts}"
-submit_ldpred2 "auto" "4" "${phenotype_binary}"
+submit_ldpred2 "auto" "10" "${phenotype_cts}"
+submit_ldpred2 "auto" "10" "${phenotype_binary}"
 
