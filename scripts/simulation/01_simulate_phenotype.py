@@ -16,7 +16,7 @@ def try_param_h2(x):
     return float(x) if x not in [None, "NA","None"] else None
 
 def try_param_pi(x):
-    return float(x) if x not in [0, None, "NA","None", "0.0", "0"] else None
+    return float(x) if x not in [0, None, "NA","None", "0.0", "0.00", "0.000", "0"] else None
 
 class SplitArgs(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
@@ -67,6 +67,11 @@ def main(args):
     items_nc = ['non_coding'] 
     mt_co = mt.filter_rows(hl.literal(set(items_co)).contains(mt.consequence_category))
     mt_nc = mt.filter_rows(hl.literal(set(items_nc)).contains(mt.consequence_category))
+
+    c1 = mt.count()
+    c_nc = mt_nc.count()
+    c_co = mt_co.count()
+    print("c1 = %s .. nc = %s .. co = %s" % (c1, c_nc, c_co))
 
     if h2_nc > 0 or alpha:
         # simulate alphas (coding region)
