@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-71
+#$ -t 1-80
 #$ -tc 1
 #$ -V
 
@@ -34,11 +34,11 @@ readonly input_path="${in_dir}/ukb_hapmap_500k_eur_chrCHR"
 
 readonly index=${SGE_TASK_ID}
 
-readonly file_cts="${pheno_dir}/filtered_phenotypes_cts.txt" 
+readonly file_cts="${pheno_dir}/filtered_covar_phenotypes_cts.tsv.gz" 
 readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
 readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
 
-readonly file_binary="${pheno_dir}/filtered_phenotypes_binary.txt" 
+readonly file_binary="${pheno_dir}/filtered_covar_phenotypes_binary.tsv.gz"
 readonly pheno_list_binary="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
 readonly phenotype_binary=$( sed "${index}q;d" ${pheno_list_binary} )
 
@@ -59,7 +59,7 @@ submit_gwas_job()
         -t 1-22 \
         -tc 11 \
         -q short.qc@@short.hge \
-        -pe shmem 1 \
+        -pe shmem 3 \
         "${bash_script}" \
         "${hail_script}" \
         "${input_path}" \

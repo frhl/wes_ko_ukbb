@@ -36,10 +36,10 @@ def main(args):
         ht = genotypes.get_ukb_parsed_imputed_v3_mfi(chroms)
         mt_mac = mt.annotate_rows(info = ht[mt.row_key].info)
         mt_mac = mt_mac.annotate_rows(MAC = variants.get_mac_expr(mt_mac))
-        mt_mac = mt_mac.filter_rows((mt_mac.MAC <= 20) & (mt_mac.info > 0.6))
+        mt_mac = mt_mac.filter_rows( (mt_mac.MAC >= 5)  & (mt_mac.MAC <= 20) & (mt_mac.info >= 0.5))
         mac_markers = mt_mac.rsid.collect()
         min_markers = min(int(use_markers_by_mac), len(mac_markers)) 
-        print(f"min_markers={min_markers}")
+        print(f"(new) min_markers={min_markers}")
         markers.extend(random.sample(mac_markers, min_markers))
 
     if use_markers_by_kinship:

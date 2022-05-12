@@ -2,6 +2,7 @@
 
 import hail as hl
 import argparse
+import pandas as pd
 
 from ukb_utils import hail_init
 from ukb_utils import samples
@@ -11,9 +12,15 @@ from ko_utils import ko
 
 
 class SplitArgs(argparse.Action):
+    r"""Method for splitting input csv into a list"""
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, values.split(','))
 
+
+def get_tid(length=5):
+    r"""method for getting random ID string for alleles"""
+    return ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase, 
+                                  k=length))
 
 def main(args):
 
@@ -31,6 +38,7 @@ def main(args):
     maf_min = args.maf_min
     exclude = args.exclude
     use_loftee = args.use_loftee
+    export_all_gts = args.export_all_gts
     csqs_category = args.csqs_category
 
     # import phased/unphased data
@@ -58,41 +66,68 @@ def main(args):
     mt = mt.filter_rows(hl.literal(set(csqs_category)).contains(mt.consequence_category))
 
     # perform an aggregation based on "collect", which requires a lot
-    # of memory but allows the variant ID to be returned as well?
+    # of memory but allows the variant ID to be returned as well alongside
+    # with information of cis/trans-CHs and heterozygotes.
     gene_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
     if aggr_method in "fast":
         genes = ko.aggr_phase_count_by_expr(mt, gene_expr)
+        expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased)
+        expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko)
     elif aggr_method in "collect":
         genes = ko.collect_phase_count_by_expr(mt, gene_expr)
         genes = ko.sum_gts_entries(genes)
+        expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased)
+        expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko, genes.phased)
     else:
         raise TypeError(str(aggr_method) + " is not allowed!")
 
     # calculate probability of being knocked out based on phased counts
-    expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased)
-    expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko)
-    genes = genes.annotate_entries(
-            pKO=expr_pko,
-            knockout=expr_ko)
+    genes = genes.annotate_entries(pKO=expr_pko, knockout=expr_ko)
 
     # checkpoint for more effecient data use
     if checkpoint or aggr_method in "collect":
         genes = genes.checkpoint(out_prefix + "_checkpoint.mt", overwrite=True)
 
-    # get probabilistic matrix for knockouts
+    # setup sites and alleles
+    rows = genes.count()[0]
+    locus = [ "chr%s:%s" % (chrom, str(i+1)) for i in range(rows)]
+    ref = [ get_tid(4) for i in range(rows)]
+    alt = [ get_tid(4) for i in range(rows)]
+
+    # convert to HailTable
+    df = pd.DataFrame({'locus':locus, 'ref':ref, 'alt':alt})
+    ht = hl.Table.from_pandas(df)
+    ht = ht.add_index()
+    ht = ht.key_by('idx')
+
+    # annotate knockout matrix
     prob = genes.annotate_entries(DS=genes.pKO * 2)
     prob = prob.select_entries(prob.DS)
+    prob = prob.add_row_index()
     prob = prob.annotate_rows(
-            locus=hl.parse_locus('chr' + str(chrom) + ':1'),
-            alleles=hl.literal(['0', '1']),
-            rsid=prob.gene_id)
+        locus = ht[prob.row_idx].locus,
+        tmp_ref = ht[prob.row_idx].ref, 
+        tmp_alt = ht[prob.row_idx].alt,
+        rsid=prob.gene_id
+    )
+
+    # conver to hail locus
+    prob = prob.annotate_rows(
+            locus=hl.parse_locus(prob.locus),
+            alleles=[prob.tmp_ref, prob.tmp_alt]
+    )
+
+    # clean up and key appropiately
     prob = prob.key_rows_by(prob.locus, prob.alleles)
-    prob = prob.drop('gene_id')
-    
+    prob = prob.drop(*['gene_id','tmp_ref','tmp_alt','row_idx'])
+
     # write out variants involved and vcf
     io.export_table(prob, out_prefix, out_type)
     if not only_vcf:
-        genes.filter_entries(genes.pKO > 0).entries().flatten().export(out_prefix + ".tsv.gz")
+        if export_all_gts:
+            genes.filter_entries(hl.is_defined(genes.knockout)).entries().flatten().export(out_prefix + "_all.tsv.gz")
+        else:
+            genes.filter_entries(genes.pKO > 0).entries().flatten().export(out_prefix + ".tsv.gz")
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
@@ -111,6 +146,7 @@ if __name__=='__main__':
     parser.add_argument('--maf_max', default=None, help='Select all variants with a maf less than the indicated value')
     parser.add_argument('--exclude', default=None, help='exclude variants by rsid and/or variant id')
     parser.add_argument('--use_loftee', default=False, action='store_true', help='use LOFTEE to distinghiush between high confidence PTVs')
+    parser.add_argument('--export_all_gts', default=False, action='store_true', help='Exports a table of all csqs')
     parser.add_argument('--csqs_category', default=None, action=SplitArgs, help='What categories should be subsetted to?')
 
     args = parser.parse_args()

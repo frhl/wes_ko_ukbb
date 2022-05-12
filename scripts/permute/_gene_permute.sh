@@ -22,39 +22,39 @@ readonly rscript="scripts/permute/_gene_permute.R"
 
 readonly chr=${1?Error: Missing arg1 (phenotype)}
 readonly input_path=${2?Error: Missing arg1 (phenotype)}
-readonly input_type=${3?Error: Missing arg1 (phenotype)}
-readonly out_prefix=${4?Error: Missing arg2 (in_vcf)}
-readonly out_type=${5?Error: Missing arg3 (in_csi)}
-readonly seed=${6?Error: Missing arg6 (path prefix for saige output)}
-readonly gene=${7?Error: Missing arg6 (path prefix for saige output)}
-readonly replicates=${8?Error: Missing arg6 (path prefix for saige output)}
-readonly n_tasks=${9?Error: Missing arg6 (path prefix for saige output)}
+readonly out_prefix=${3?Error: Missing arg2 (in_vcf)}
+readonly out_prefix_success=${4?Error: Missing arg2 (in_vcf)}
+readonly seed=${5?Error: Missing arg6 (path prefix for saige output)}
+readonly gene=${6?Error: Missing arg6 (path prefix for saige output)}
+readonly replicates=${7?Error: Missing arg6 (path prefix for saige output)}
 
 readonly id=${SGE_TASK_ID}
 readonly sge_seed=$(( ${id} * ${seed}))
-readonly out_prefix_gene="${out_prefix}_${gene}_${id}of${n_tasks}"
-readonly checkpoint="${out_prefix_gene}_${sge_seed}_checkpoint.mt"
-readonly input_path_gene=$(echo ${input_path} | sed -e "s/GENE/${gene}/g")
+readonly out_prefix_id="${out_prefix}_${id}"
+readonly out_file_success="${out_prefix_success}_${id}.SUCCESS"
 
-if [ ! -f "${out_prefix_gene}.vcf.gz" ]; then
-  set_up_rpy
-  Rscript ${rscript} \
-    --chrom "chr${chr}" \
-    --input_path ${input_path_gene} \
-    --permutations ${replicates} \
-    --out_prefix ${out_prefix_gene} \
-    --vcf_id ${gene} \
-    --seed ${sge_seed} \
-    && print_update "Finished permuting phase for chr${chr}" ${SECONDS} \
-    || raise_error "Permuting phase for chr${chr} failed"
-  module purge
-  module load BCFtools/1.12-GCC-10.3.0
-  bgzip "${out_prefix_gene}.vcf"
-  rm -f "${out_prefix_gene}.vcf"
-  make_tabix "${out_prefix_gene}.vcf.gz" "csi"
+if [ -f "${input_path}" ]; then
+  if [ ! -f "${out_prefix_id}.vcf.gz" ]; then
+    set_up_rpy
+    Rscript ${rscript} \
+      --chrom "chr${chr}" \
+      --input_path ${input_path} \
+      --permutations ${replicates} \
+      --out_prefix ${out_prefix_id} \
+      --vcf_id ${gene} \
+      --seed ${sge_seed} \
+      && print_update "Finished permuting phase for chr${chr}" ${SECONDS} \
+      || raise_error "Permuting phase for chr${chr} failed"
+    module purge
+    module load BCFtools/1.12-GCC-10.3.0
+    bgzip "${out_prefix_id}.vcf"
+    rm -f "${out_prefix_id}.vcf"
+    make_tabix "${out_prefix_id}.vcf.gz" "csi"
+  else
+    >&2 echo "Error: ${out_prefix_id}.vcf.bgz already exists. Skipping.."
+  fi
 else
-  >&2 echo "Error: ${out_prefix_gene}.vcf.bgz already exists. Skipping.."
+  >&2 echo "Error: ${input_path} does not exist!"
 fi
-
 
 

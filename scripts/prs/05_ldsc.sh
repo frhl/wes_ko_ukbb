@@ -5,10 +5,9 @@
 #$ -o logs/ldsc.log
 #$ -e logs/ldsc.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 1
+#$ -pe shmem 4
 #$ -q short.qc
-#$ -t 1-71
-#$ -tc 10
+#$ -t 1-80
 #$ -V
 
 set -o errexit
@@ -64,6 +63,6 @@ estimate_heritability(){
   fi
 }
 
-estimate_heritability "${phenotype_binary}" "binary"
 estimate_heritability "${phenotype_cts}" "cts"
+estimate_heritability "${phenotype_binary}" "binary"
 

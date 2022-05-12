@@ -13,11 +13,15 @@ source utils/bash_utils.sh
 source utils/hail_utils.sh
 
 readonly hail_script="scripts/00_phenotypes.py"
+readonly r_script="scripts/00_phenotypes.R"
 readonly spark_dir="data/tmp/spark"
 
 readonly in_dir="data/phenotypes"
-readonly in_bin="${in_dir}/curated_phenotypes_binary.tsv"
-readonly in_cts="${in_dir}/curated_phenotypes_cts.tsv"
+readonly in_bin="${in_dir}/filtered_phenotypes_binary.tsv.gz"
+readonly in_cts="${in_dir}/filtered_phenotypes_cts.tsv.gz"
+
+readonly tmp_bin="${in_dir}/filtered_covar_phenotypes_binary.tsv.gz"
+readonly tmp_cts="${in_dir}/filtered_covar_phenotypes_cts.tsv.gz"
 
 readonly out_dir="data/phenotypes"
 readonly out_bin="${out_dir}/filtered_phenotypes_binary"
@@ -25,9 +29,23 @@ readonly out_cts="${out_dir}/filtered_phenotypes_cts"
 
 readonly final_sample_list="/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list"
 
+# add age2, age3 and sex-age covariates
+set_up_rpy
+Rscript ${r_script} \
+  --input_path ${in_bin} \
+  --out_path ${tmp_bin}
+
+Rscript ${r_script} \
+  --input_path ${in_cts} \
+  --out_path ${tmp_cts}
+
+conda deactivate
+module purge
+
+
+# get headers and case / control ratio
 set_up_hail
 set_up_pythonpath_legacy  
-
 python3 "${hail_script}" \
      --input_path "${in_bin}" \
      --extract_samples "${final_sample_list}" \

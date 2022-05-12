@@ -8,24 +8,28 @@
 #$ -pe shmem 1
 #$ -q lindgren.qe
 
+set -o errexit
+set -o nounset
+
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
-readonly plink_file=${1?Error: Missing arg1 (phenotype)}
-readonly pheno_file=${2?Error: Missing arg2 (in_vcf)}
-readonly phenotype=${3?Error: Missing arg3 (in_csi)}
-readonly covariates=${4?Error: Missing arg4 (in_gmat)} 
-readonly trait_type=${5?Error: Missing arg5 (in_var)} 
-readonly grm_mtx=${6?Error: Missing arg6 (path prefix for saige output)}
-readonly grm_sam=${7?Error: Missing arg7 (Optional file with conditioning markers)}
-readonly inv_normalize=${8?Error: Missing arg8(Should input be inverse normalized)}
-readonly out_prefix=${9?Error: Missing arg7 (Optional file with conditioning markers)}
+readonly plink_file=${1?Error: Missing arg1 (plink_file)}
+readonly pheno_file=${2?Error: Missing arg2 (pheno_file)}
+readonly phenotype=${3?Error: Missing arg3 (phenotype)}
+readonly in_covariates=${4?Error: Missing arg4 (covariates)}
+readonly trait_type=${5?Error: Missing arg5 (trait_type)}
+readonly grm_mtx=${6?Error: Missing arg6 (grm_mtx)}
+readonly grm_sam=${7?Error: Missing arg7 (grm_sam)}
+readonly inv_normalize=${8?Error: Missing arg8(inv_normalize)}
+readonly use_loco_prs=${9?Error: Missing arg8(inv_normalize)}
+readonly out_prefix=${10?Error: Missing arg10 (out_prefix)}
 
 readonly step1_fitNULLGLMM="utils/saige/step1_fitNULLGLMM.R"
 readonly threads=$(( ${NSLOTS}-1 ))
 
 fit_null() {
-   if [ ! -f "${out_prefix}.rda" ]; then
+   if [ ! -f "${real_out_prefix}.rda" ]; then
      SECONDS=0
      Rscript "${step1_fitNULLGLMM}" \
        --plinkFile="${plink_file}" \
@@ -35,9 +39,10 @@ fit_null() {
        --sampleIDColinphenoFile="eid" \
        --traitType="${trait_type}" \
        --invNormalize="${inv_normalize}" \
-       --outputPrefix="${out_prefix}" \
-       --outputPrefix_varRatio="${out_prefix}" \
+       --outputPrefix="${real_out_prefix}" \
+       --outputPrefix_varRatio="${real_out_prefix}" \
        --IsOverwriteVarianceRatioFile=TRUE \
+       --isCovariateOffset=FALSE \
        --sparseGRMFile=${grm_mtx} \
        --sparseGRMSampleIDFile=${grm_sam}  \
        --nThreads=${threads} \
@@ -45,15 +50,39 @@ fit_null() {
        --useSparseGRMtoFitNULL=TRUE \
        --isCateVarianceRatio=TRUE \
        && print_update "Finished running SAIGE NULL model for ${phenotype}" ${SECONDS} \
-       || raise_error "SAIGE NULL model failed for ${phenptype}"
+       || raise_error "SAIGE NULL model failed for ${phenotype}"
        #--isCateVarianceRatio=FALSE  Only needed for SAIGE-GENE+ (geneset)
    else
-     >&2 echo "Warning: Null model at ${out_prefix} already exists. Skipping!"
+     >&2 echo "Warning: Null model at ${real_out_prefix} already exists. Skipping!"
    fi
  }
 
 
-# run NULL model
+# generate string of parmaeters used for off-chromosome PRS
+get_loco_seq(){
+  local target=${1}
+  local sequence=$( for i in `seq 1 22`; do echo "chr$i"; done )
+  if [ "$( echo ${sequence} | grep ${target} | wc -l)" -eq "1" ];then 
+    local loco=$( echo ${sequence/"${target}"/""} | tr " " "," )
+    echo ${loco}
+  else
+    raise_error "${target} is not a valid chromosome!"
+  fi
+}
+
+
+# set up LOCO PRS conditioning
+if [ "${use_loco_prs}" -eq "1" ]; then
+  readonly chr="chr${SGE_TASK_ID}"
+  readonly loco=$( get_loco_seq ${chr} )
+  readonly covariates="${in_covariates},${loco}"
+  readonly real_out_prefix="${out_prefix}_${chr}"
+else
+  readonly covariates="${in_covariates}"
+  readonly real_out_prefix="${out_prefix}"
+fi
+
+# run model
 set_up_RSAIGE
 fit_null
 

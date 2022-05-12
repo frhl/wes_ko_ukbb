@@ -94,6 +94,29 @@ def rand_flip_call(gt: hl.call, P: float = 0.5, seed = None):
     )
 
 
+def rand_hom_to_het(gt: hl.call, P: float = 0.9, seed = None, phase = "|"):
+    """ Randomize genotype phase of call
+    :param gt: genotype call to be flipped
+    :param P: probabily of flipping hom to het
+    :param seed: seed for random
+    """
+    assert str(gt.dtype) == 'call'
+
+    return hl.if_else(
+        (gt.n_alt_alleles() == 2),
+        hl.if_else(
+            (hl.rand_bool(P, seed=seed)),
+            hl.if_else(
+                (hl.rand_bool(0.5, seed=seed)),
+                hl.parse_call("1" + str(phase) + "0"),
+                hl.parse_call("0" + str(phase) + "1")
+            ),
+            gt
+        ),
+        gt
+    )
+
+
 def aggr_count_calls(mt: hl.MatrixTable, phased: bool = True):
     """ Count number of phased/unphased hetz and what haplotype they reside on
 
@@ -202,13 +225,14 @@ def calc_prob_ko(hom_expr, phased_expr, unphased_expr):
             )
 
 
-def calc_prop_het_ko(ko_expr, phased_expr, unphased_expr):
+def calc_prob_ko_by_count(ko_expr, phased_expr, unphased_expr):
     """Calculate probability of knockout based on a knockout expression
     and a count of phased and unphased het sites. Unlike calc_prop_ko,
-    this function is designed to take in a knockout expression and then
-    add deal with the uncertainity of unphased het sites.
+    this function is designed to take in an expression containing counts
+    and from this calculate the probability of the locus being knocked out.
     
-    :param hom_expr: integer for homozygous count 
+    :param ko_expr: integer for knockout count (either homozygous
+    or compound heterozygous knockouts)
     :param phased_expr: count of phased heterozygous sites
     :param unphased_expr: count of unphased heterozygous sites
     """
@@ -226,18 +250,77 @@ def calc_prop_het_ko(ko_expr, phased_expr, unphased_expr):
     
 
 
-def annotate_knockout(hom_expr, pko_expr):
-    """Annotate entry knockout type
+def annotate_knockout(hom_expr, pko_expr, phased_expr = None):
+    """Annotate entry knockout type 
    
     :param hom_expr: integer for homozygous count 
     :param pko_expr: probability of knockout (see calc_prob_ko)
+    :param phased_expr: struct with integers a1 and a2. 
     """
-   
-    return (hl.case()
-           .when((hom_expr > 0) & (pko_expr == 1), 'Homozygote')
-           .when((hom_expr == 0) & (pko_expr == 1),'Compound heterozygote')
-           .when((hom_expr == 0) & (pko_expr >= 0.5),'Possible Compound heterozygote')
-           .or_missing()
-            )
+    if phased_expr:
+        return (hl.case()
+               .when((hom_expr > 0) & (pko_expr == 1), 'Homozygote')
+               .when((hom_expr == 0) & (pko_expr == 1),'Compound heterozygote')
+               .when((hom_expr == 0) & (pko_expr >= 0.5),'Possible Compound heterozygote')
+               .when((hom_expr == 0) & (pko_expr == 0) & (phased_expr.a1 > 1),'Compound heterozygote (cis)')
+               .when((hom_expr == 0) & (pko_expr == 0) & (phased_expr.a2 > 1),'Compound heterozygote (cis)')
+               .when((hom_expr == 0) & (pko_expr == 0) & (phased_expr.a1 == 1),'Heterozygote')
+               .when((hom_expr == 0) & (pko_expr == 0) & (phased_expr.a2 == 1),'Heterozygote')
+               .or_missing()
+                )
+    else:
+        return (hl.case()
+               .when((hom_expr > 0) & (pko_expr == 1), 'Homozygote')
+               .when((hom_expr == 0) & (pko_expr == 1),'Compound heterozygote')
+               .when((hom_expr == 0) & (pko_expr >= 0.5),'Possible Compound heterozygote')
+               .or_missing()
+                )
+
+
+def normalize_by_name(mt, name):
+    """Normalize entry to have mean of zero and variance of 1"""
+    mt = mt.annotate_rows(**{'stats': hl.agg.stats(mt[name])})
+    mt = mt.annotate_entries(
+        norm=(mt[name]-mt.stats.mean)/mt.stats.stdev)
+    mt = mt.rename({"norm" : "norm_" + str(name)})
+    return(mt)
+
+
+def make_thetas(mt, h2, pi = None):
+    """ Make thetas (effect sizes) for genes (gene x sample matrix) with
+    either infintesimal or spike and slab model. 
+    """
+    
+    M = mt.count()[0]
+    pi_temp = 1 if pi == None else pi
+    mt = mt.annotate_rows(
+        theta = hl.rand_bool(pi_temp)*hl.rand_norm(0, hl.sqrt(h2/(M*pi_temp))))
+    return(mt)
+
+def simulate_effect_size(mt, h2, pi = None):
+    """ Simulate effect sizes for either variants/genes under 
+    the infintesimal or spike and slab model. 
+    :param mt: MatrixTable
+    :param h2: Heritability
+    :param pi: probability of a gene/variant being causal
+    """
+    
+    M = mt.count()[0]
+    pi_temp = 1 if pi == None else pi
+    return(hl.rand_bool(pi_temp)*hl.rand_norm(0, hl.sqrt(h2/(M*pi_temp))))
+
+
+def make_effect_size(mt, beta, pi = None):
+    """ Make specified effect sizes for genes (gene x sample matrix)
+    regardless of final heritability.
+    :param mt: MatrixTable
+    :param beta: float for pre-specified effect size.   
+    :param pi: probability that a gene is causal.
+    """
+    
+    pi_temp = 1 if pi == None else pi
+    return(hl.rand_bool(pi_temp)*beta)
+
+
 
 

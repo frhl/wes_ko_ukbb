@@ -22,39 +22,51 @@ readonly step2_SPAtests="utils/saige/step2_SPAtests.R"
 readonly chr=${1?Error: Missing arg1 (chr)}
 readonly in_vcf=${2?Error: Missing arg2 (in_vcf)}
 readonly out_gene=${3?Error: Missing arg3 (out_gene)}
-readonly in_gmat=${4?Error: Missing arg4 (in_gmat)}
-readonly in_var=${5?Error: Missing arg5 (in_var)}
-readonly phenotype=${6?Error: Missing arg6 (phenotype)}
-readonly gene=${7?Error: Missing arg7 (gene)}
-readonly n_tasks=${8?Error: Missing arg8 (n_tasks)}
+readonly out_spa_success=${4?Error: Missing arg3 (out_gene)}
+readonly in_gmat=${5?Error: Missing arg4 (in_gmat)}
+readonly in_var=${6?Error: Missing arg5 (in_var)}
+readonly phenotype=${7?Error: Missing arg6 (phenotype)}
+readonly gene=${8?Error: Missing arg7 (gene)}
 readonly min_mac=${9?Error: Missing arg9 (min_mac)}
 
-readonly id=${SGE_TASK_ID}
-readonly vcf="${in_vcf}_${id}of${n_tasks}.vcf.gz"
-readonly csi="${vcf}.csi"
-readonly out_gene_task="${out_gene}_${id}of${n_tasks}.txt"
+readonly var_bytes=$( file_size ${in_var} )
+readonly gmat_bytes=$( file_size ${in_gmat} )
 
-set_up_RSAIGE
+readonly id=${SGE_TASK_ID}
+readonly vcf="${in_vcf}_${id}.vcf.gz"
+readonly csi="${vcf}_${id}.csi"
+readonly out_gene_task="${out_gene}_${id}.txt"
+readonly out_file_success="${out_spa_success}_${id}.SUCCESS"
+readonly out_file_failure="${out_spa_success}_${id}.FAILURE"
 
 if [ ! -f ${out_gene_task} ]; then
-  SECONDS=0
-  Rscript "${step2_SPAtests}"  \
-     --vcfFile=${vcf} \
-     --vcfFileIndex=${csi} \
-     --vcfField="DS" \
-     --chrom="chr${chr}" \
-     --minMAF=0.000000001 \
-     --minMAC=${min_mac} \
-     --GMMATmodelFile=${in_gmat} \
-     --varianceRatioFile=${in_var} \
-     --SAIGEOutputFile=${out_gene_task} \
-     --LOCO=FALSE\
-     && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
-     || raise_error "Saddle-point approximation for chr${chr} failed"
-  rm -f "${out_gene_task}.index"
+  echo "var_bytes=${var_bytes} at ${in_var}"
+  echo "gmat_bytes=${gmat_bytes} at ${in_gmat}"
+  if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then 
+    SECONDS=0
+    set_up_RSAIGE
+    set -x
+    Rscript "${step2_SPAtests}"  \
+       --vcfFile=${vcf} \
+       --vcfFileIndex=${csi} \
+       --vcfField="DS" \
+       --chrom="chr${chr}" \
+       --minMAF=0.0000001 \
+       --minMAC=${min_mac} \
+       --GMMATmodelFile=${in_gmat} \
+       --varianceRatioFile=${in_var} \
+       --SAIGEOutputFile=${out_gene_task} \
+       --LOCO=FALSE\
+       && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
+       || raise_error "Saddle-point approximation for chr${chr} failed"
+    set +x
+    rm -f "${out_gene_task}.index"
+    gzip ${out_gene_task}
+  else
+    touch ${out_file_failure}
+  fi
 else
   >&2 echo "${out_gene_task} already exists. Skipping.."
 fi
-
 
 

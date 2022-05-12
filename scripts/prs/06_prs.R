@@ -11,7 +11,10 @@ main <- function(args){
 
   stopifnot(file.exists(args$pred))
   stopifnot(file.exists(args$ldsc))
+  stopifnot(!file.exists(args$tmp_bfile))
   stopifnot(dir.exists(args$ld_dir))
+  stopifnot(args$chrom %in% paste0("chr",1:22))
+  stopifnot(dir.exists(dirname(args$out_prefix)))
   stopifnot(args$method %in% c('inf', 'auto'))
 
   # setup parallel environment
@@ -27,7 +30,7 @@ main <- function(args){
 
   # Estimate h2 chromosome-wide
   N_total <- nrow(gwas)
-  N_chr <- sum(gwas$chr == args$chr)
+  N_chr <- sum(gwas$chr == args$chrom)
   h2_init <- h2 * (N_chr / N_total)
   
   # check estimates
@@ -46,14 +49,33 @@ main <- function(args){
   stopifnot(all(snp$map$marker %in% gwas$marker)) 
   stopifnot(sum(gwas$marker == snp$map$marker) / nrow(gwas) == 1)
   
-   # load data to be used for prediction 
+  # load data to be used for prediction 
+  bfile <- tempfile(tmpdir = dirname(args$out_prefix))
   pred <- load_bigsnp_from_bed(args$pred)
-  pred <- match_bigsnp_with_gwas(pred, gwas)
+  pred <- match_bigsnp_with_gwas(obj=pred, gwas=gwas, bfile=args$tmp_bfile)
   genotypes <- pred$genotypes  
   indicies <- pred$gwas_indicies
 
   stopifnot(!is.null(genotypes))
   stopifnot(!is.null(indicies))
+
+  # need to impute missing SNPs
+  if (!is.null(args$impute)){
+    
+    # count variants with missing GTs
+    cols <- genotypes$`.->ncol`
+    rows <- genotypes$`.->nrow`
+    lst <- lapply(1:rows, function(i)
+        return(sum(is.na(genotypes[i,])))
+    )
+    missing_gt <- sum(unlist(lst))
+    pct <- round(missing_gt/rows, 4)*100
+    msg <- paste0(missing_gt,"/",rows," (",pct,") variants with at least one missing GT")
+    write(msg, stderr())
+
+    # impute missing genotypes
+    genotypes <- snp_fastImputeSimple(genotypes, method = args$impute) 
+  }
 
   if (args$method %in% "inf"){
 
@@ -72,7 +94,7 @@ main <- function(args){
         corr = snp$corr,
         df_beta = gwas,
         h2_init = h2_init,
-        vec_p_init = seq_log(1e-4, 0.5, 30),
+        vec_p_init = seq_log(1e-4, 0.9, 30),
         ncores = NCORES)
 
      # save data chains
@@ -89,13 +111,8 @@ main <- function(args){
         beta_auto,
         ncores = NCORES)
 
+
      # quality controls on chains
-     na_rows <- rowSums(is.na(pred_auto)) > 0 
-     if (any(na_rows)) {
-        na_rows_pct <- round(100*(sum(na_rows) / nrow(pred_auto)), 2)
-        write(paste0(na_rows_pct,"% of chain rows contains NAs"), stderr())
-     }
-     
      sc <- apply(pred_auto, 2, sd, na.rm = TRUE)
      keep <- abs(sc - median(sc)) < 3 * mad(sc)
      final_beta_auto <- rowMeans(beta_auto[, keep], na.rm = TRUE) 
@@ -130,6 +147,7 @@ main <- function(args){
   write(paste0(args$pred, ".. done! Writing to ", args$out_prefix, ".txt.gz"), stdout())
   fwrite(PGS, file = paste0(args$out_prefix,".txt.gz"), sep = '\t')
   fwrite(model, file = paste0(args$out_prefix,".model"), sep = '\t')
+
   
 }
 
@@ -139,7 +157,9 @@ parser$add_argument("--chrom", default=NULL, required = TRUE, help = "chromosome
 parser$add_argument("--method", default=NULL, required = TRUE, help = "either 'inf' or 'auto'")
 parser$add_argument("--pred", default=NULL, required = TRUE, help = "Path to plink (bed) for PGS prediction")
 parser$add_argument("--ldsc", default=NULL, required = TRUE, help = ".rds object containing QCed GWAS and ldsc heritability estimates")
+parser$add_argument("--tmp_bfile", default=NULL, required = TRUE, help = "File path to temporary backing files")
 parser$add_argument("--ld_dir", default=NULL, required = TRUE, help = "Path to directory with pre-calcualted SNP correlations and LD (.rds files)")
+parser$add_argument("--impute", default=NULL, required = TRUE, help = "Should missing genotypes be imputed? (See https://privefl.github.io/bigsnpr/reference/snp_fastImputeSimple.html)")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()
 

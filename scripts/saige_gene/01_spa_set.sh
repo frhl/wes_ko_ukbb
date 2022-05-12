@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-44
+#$ -t 40-44
 #$ -tc 1
 #$ -V
 
@@ -26,16 +26,10 @@ readonly spark_dir="data/tmp/spark"
 
 readonly spa_script="scripts/saige_gene/_spa_set.sh"
 readonly merge_script="scripts/_spa_merge.sh"
-readonly in_prefix="ukb_eur_wes_200k_annot_chrCHR"
+readonly in_prefix="ukb_eur_wes_200k_annot"
 
 readonly group_dir="data/mt/vep"
 readonly group="${group_dir}/ukb_eur_wes_200k_csqs_chrCHR.saige"
-
-readonly min_mac=4
-
-readonly tasks=1-22
-readonly queue="short.qf"
-readonly nslots=1
 
 submit_spa_set_binary()
 {
@@ -60,23 +54,35 @@ submit_spa_pair()
   local phenotype=${2?Error: Missing arg2 (phenotype)}
   local trait=${3?Error: Missing arg3 (trait)}
 
-  local step1_dir="data/saige/output/${trait}/step1"
-  local step2_dir="data/saige/output/${trait}/step2_set/test"
-  local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
-  local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
-  local out_prefix="${step2_dir}/${in_prefix}_${phenotype}_${annotation}"
-  local in_vcf="${vcf_dir}/${in_prefix}.vcf.bgz"
-  #if [ ! -f ${out_prefix}
-  #submit_spa_set_job
-  submit_merge_job
+  if [ "${use_prs}" -eq "0" ]; then
+      local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
+      local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
+      local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}"
+      local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}.txt.gz"
+    else
+      local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.rda"
+      local in_var="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.varianceRatio.txt"
+      local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}_locoprs"
+      local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}_locoprs.txt.gz"
+  fi 
+
+  local in_vcf="${vcf_dir}/${in_prefix}_chrCHR.vcf.bgz"
+  mkdir -p ${step2_dir}
+  if [ ! -f ${out_mrg} ]; then
+    local qsub_spa_name="sspa_${phenotype}_${annotation}"
+    local qsub_merge_name="_smrg_${phenotype}_${annotation}"  
+    submit_spa_set_job
+    submit_merge_job
+  else
+    >&2 echo "${out_mrg} already exists. Skipping.."
+  fi
 }
 
 
 submit_spa_set_job() 
 {
-  mkdir -p ${step2_dir}
   set -x
-  qsub -N "spa_${phenotype}_${annotation}" \
+  qsub -N "${qsub_spa_name}" \
     -t ${tasks} \
     -q "${queue}" \
     -pe shmem ${nslots} \
@@ -95,29 +101,30 @@ submit_spa_set_job()
 
 submit_merge_job()
 {
-  readonly remove_by_chr="Y"
+  local remove_by_chr="Y"
   set -x
-  qsub -N "_mrg_${phenotype}" \
+  qsub -N "${qsub_merge_name}" \
     -q short.qc@@short.hge \
     -pe shmem 1 \
-    -hold_jid "spa_${phenotype}_${annotation}" \
+    -hold_jid "${qsub_spa_name}" \
     "${merge_script}" \
     "${out_prefix}" \
     "${step2_dir}" \
-    "${out_prefix}.txt.gz" \
+    "${out_mrg}" \
     "${remove_by_chr}"
   set +x
 
 }
 
-
-maf="maf0to5e-2"
-#submit_spa_binary_with_csqs "pLoF"
-#submit_spa_binary_with_csqs "pLoF_damaging_missense"
-#submit_spa_binary_with_csqs "synonymous"
+readonly maf="maf0to5e-2"
+readonly min_mac=4
+readonly tasks=1-22
+readonly queue="short.qf"
+readonly nslots=1
+readonly use_prs="1"
 
 # cts traits
 submit_spa_set_cts "pLoF_damaging_missense"
-submit_spa_binary_with_csqs "pLoF_damaging_missense"
+#submit_spa_set_binary "pLoF"
 
 

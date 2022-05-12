@@ -24,7 +24,7 @@ readonly fit_script="scripts/_fit_grm.sh"
 
 readonly spark_dir="data/tmp/spark"
 readonly out_dir="data/saige/grm/input/combined"
-readonly out_prefix="${out_dir}/ukb_wes_200k_sparse_autosomes"
+readonly out_prefix="${out_dir}/ukb_wes_200k_sparse_autosomes_extra_MACmarkers"
 readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
 
 
@@ -95,7 +95,7 @@ create_grm ${out_prefix}
 merge_grm "${prefix_chr}" "${prefix_mrg}"
 
 # git GRM using SAIGE
-fit_grm "${prefix_mrg}" "${prefix_fit}"
+#fit_grm "${prefix_mrg}" "${prefix_fit}"
 
 
 

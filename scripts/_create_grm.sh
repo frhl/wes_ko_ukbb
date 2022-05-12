@@ -16,6 +16,7 @@ source utils/hail_utils.sh
 readonly out_prefix=${1?Error: Missing arg2 (in_vcf)}
 readonly out_type=${2?Error: Missing arg2 (in_vcf)}
 readonly final_sample_list=${3?Error: Missing arg3 (in_csi)}
+#readonly markers_by_mac=${4?Error: Missing arg4 (in_csi)}
 
 readonly chr="${SGE_TASK_ID}"
 readonly out="${out_prefix}_chr${chr}"
@@ -31,7 +32,7 @@ python3 "${hail_script}" \
   --out_type ${out_type} \
   --final_sample_list ${final_sample_list} \
   --use_markers_by_kinship \
-  --use_markers_by_mac 200 \
+  --use_markers_by_mac 500 \
   && print_update "Finished writing samples for relatedness matrix (GRM)" ${SECONDS} \
   || raise_error "Writing samples for GRM failed"
 

@@ -23,6 +23,16 @@ readonly out_prefix=${8?Error: Missing arg6 (path prefix for saige output)}
 readonly in_markers=${9} # optional conditioning markers
 readonly chr=${SGE_TASK_ID}
 
+# chromosome specified at in_gmat and in_var
+# when off chromosome PRS will beused
+readonly gmat=$(echo ${in_gmat} | sed -e "s/CHR/${chr}/g")
+readonly var=$(echo ${in_var} | sed -e "s/CHR/${chr}/g")
+
+>&2 echo "${gmat} and ${var} with ${phenotype}"
+
+readonly var_bytes=$( file_size ${var} )
+readonly gmat_bytes=$( file_size ${gmat} )
+
 readonly vcf=$(echo ${in_vcf} | sed -e "s/CHR/${chr}/g")
 readonly csi=$(echo ${in_csi} | sed -e "s/CHR/${chr}/g")
 readonly group=$(echo ${in_group} | sed -e "s/CHR/${chr}/g")
@@ -31,34 +41,36 @@ readonly out=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
 
 readonly threads=$(( ${NSLOTS}-1 ))
 readonly step2_SPAtests="utils/saige/step2_SPAtests.R"
-#readonly out="${out_prefix}" # assuming out_prefix has chrCHR
 
 spa_set_test() {
-   SECONDS=0
-   set -x
-   Rscript "${step2_SPAtests}"	\
-     --vcfFile=${vcf} \
-     --vcfFileIndex=${csi} \
-     --vcfField="GT" \
-     --chrom="chr${chr}" \
-     --minMAF=0 \
-     --minMAC=${min_mac} \
-     --GMMATmodelFile=${in_gmat} \
-     --varianceRatioFile=${in_var} \
-     --SAIGEOutputFile=${out} \
-     --LOCO=FALSE \
-     --groupFile=${group} \
-     --annotation_in_groupTest=pLoF,damaging_missense,synonymous,damaging_missense:pLoF,synonymous:damaging_missense:pLoF \
-     --maxMAF_in_groupTest=0.001,0.01
-     ${markers:+--condition "$markers"} 
-   set +x
-     #\
-     #&& print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
-     #|| raise_error "Saddle-point approximation for chr${chr} failed"
+   echo "var_bytes=${var_bytes} at ${var}"
+   echo "gmat_bytes=${gmat_bytes} at ${gmat}"
+   if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then 
+     SECONDS=0
+     set -x
+     Rscript "${step2_SPAtests}"	\
+       --vcfFile=${vcf} \
+       --vcfFileIndex=${csi} \
+       --vcfField="GT" \
+       --chrom="chr${chr}" \
+       --minMAF=0 \
+       --minMAC=${min_mac} \
+       --GMMATmodelFile=${gmat} \
+       --varianceRatioFile=${var} \
+       --SAIGEOutputFile=${out} \
+       --LOCO=FALSE \
+       --groupFile=${group} \
+       --annotation_in_groupTest=pLoF,damaging_missense,synonymous,damaging_missense:pLoF,synonymous:damaging_missense:pLoF \
+       --maxMAF_in_groupTest=0.001,0.01
+       ${markers:+--condition "$markers"} 
+     set +x
+   else
+     raise_error "${var} or ${gmat} does not contain any bytes!"
+   fi
 }
 
 if [ ! -f ${out} ]; then
-   set_up_RSAIGE
+   set_up_RSAIGE 1.0.0
    spa_set_test
 else
   >&2 echo "${out} already exists. Skipping.."

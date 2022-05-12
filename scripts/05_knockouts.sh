@@ -21,7 +21,7 @@ readonly spark_dir="data/tmp/spark"
 readonly bash_script="scripts/_knockouts.sh"
 
 readonly in_dir="data/mt/annotated"
-readonly out_dir="data/knockouts/alt"
+readonly out_dir="data/knockouts/test_cis"
 readonly in_prefix="${in_dir}/ukb_eur_wes_200k_annot_chrCHR.mt"
 readonly in_type="mt"
 
@@ -32,10 +32,10 @@ readonly out_type="vcf"
 # when using aggr_method="collect" on short.qe
 readonly tasks="21"
 readonly queue="short.qa"
-readonly nslots=16
+#readonly nslots=16
 
 readonly only_vcf=""
-readonly aggr_method="collect" # either fasts or collect
+#readonly aggr_method="collect" # either fasts or collect
 
 # variant and sample parameters
 readonly exclude="data/genes/220310_common_plofs_to_exclude.txt"
@@ -50,8 +50,11 @@ mkdir -p ${out_dir}
 submit_knockout_job() 
 {
   local annotation=${1}
+  local nslots=${2}
+  local aggr_method=${3}
   #local input_path="${in_prefix}_chrCHR_maf${maf_lb}to${maf_ub}_${annotation}.mt"
-  local out_prefix_csqs="${out_prefix}_chrCHR_maf${maf_lb}to${maf_ub}_${annotation}"
+  local out_prefix_csqs="${out_prefix}_chrCHR_maf${maf_lb}to${maf_ub}_${annotation/,/_}"
+  local out_checkpoint="${out_prefix_csqs}_checkpoint.mt"
   set -x
   qsub -N "_ko_${annotation}" \
     -o "logs/_knockouts.log" \
@@ -74,10 +77,21 @@ submit_knockout_job()
     "${out_prefix_csqs}" \
     "${out_type}" 
   set +x
+
+  # clean up after checkpints when
+  # aggr_method="collect"
+  if [ -f "${out_checkpoint}" ]; then
+    rm -rf ${out_checkpoint}
+  fi
 }
 
-#submit_knockout_job "pLoF_damaging_missense"
-submit_knockout_job "pLoF"
+#submit_knockout_job "synonymous" "5" "fast"
+#submit_knockout_job "other_missense" "5" "fast"
+#submit_knockout_job "pLoF" "20" "collect"
+#submit_knockout_job "damaging_missense" "5" "fast"
+#
+submit_knockout_job "pLoF,damaging_missense" "16" "collect"
+
 #submit_knockout_job "0" "5e-2" "" "damaging_missense"
 #submit_knockout_job "0" "5e-2" "" "synonymous"
 #submit_knockout_job "0" "5e-2" "" "pLoF,LC,damaging_missense"

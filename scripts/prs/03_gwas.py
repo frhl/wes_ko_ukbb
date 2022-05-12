@@ -29,6 +29,7 @@ def main(args):
                      types={'eid': hl.tstr},
                      missing=["",'""',"NA"],
                      impute=True,
+                     force=True,
                      key='eid'
                      ) 
         mt = mt.annotate_cols(pheno=ht[mt.s])

@@ -7,7 +7,8 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1
+#$ -t 1-80
+#$ -tc 1
 #$ -V
 
 set -o errexit
@@ -18,12 +19,15 @@ source utils/qsub_utils.sh
 
 readonly bash_script="scripts/prs/_prs.sh"
 readonly rscript="scripts/prs/06_prs.R"
+readonly clean_script="scripts/prs/_prs_clean.sh"
+readonly aggr_script="scripts/prs/_prs_aggr.sh"
 
 readonly ldsc_dir="data/prs/ldsc"
 readonly pred_dir="data/prs/hapmap/ukb_500k"
 readonly ld_dir="data/prs/hapmap/ld/matrix"
 readonly pheno_dir="data/phenotypes"
 readonly out_dir="data/prs/scores/auto"
+readonly mrg_dir="data/prs/scores"
 
 readonly index=${SGE_TASK_ID}
 
@@ -34,6 +38,7 @@ readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
 readonly file_binary="${pheno_dir}/filtered_phenotypes_binary.tsv"
 readonly pheno_list_binary="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
 readonly phenotype_binary=$( sed "${index}q;d" ${pheno_list_binary} )
+readonly impute="mean2"
 
 mkdir -p ${out_dir}
 
@@ -45,8 +50,27 @@ submit_ldpred2()
   local pred="${pred_dir}/ukb_hapmap_500k_eur_chrCHR.bed"
   local ldsc="${ldsc_dir}/ldsc_${phenotype}.rds"
   local out_prefix="${out_dir}/prs_${method}_${phenotype}_chrCHR"
+
+  local qsub_fit="_prs_${phenotype}"
+  local qsub_aggr="_aggr_${phenotype}"
+  local qsub_clean="_clean_${phenotype}"
+
+  # fit actual pgs
+  fit_pgs
+
+  # aggregate into matrix
+  aggr_pgs
+
+  # remove disk backing files
+  clean_pgs
+
+}
+
+
+fit_pgs()
+{
   set -x
-  qsub -N "_prs_${phenotype}" \
+  qsub -N "${qsub_fit}" \
     -t 1-22 \
     -q short.qc@@short.hga \
     -pe shmem "${cores}" \
@@ -56,11 +80,43 @@ submit_ldpred2()
     "${ldsc}" \
     "${ld_dir}" \
     "${method}" \
+    "${impute}" \
+    "${out_prefix}"
+  set +x
+}
+
+
+aggr_pgs()
+{
+  set -x
+  qsub -N "${qsub_aggr}" \
+    -q test.qc \
+    -pe shmem 1 \
+    -hold_jid "_prs_${phenotype}" \
+    "${aggr_script}" \
+    "${phenotype}" \
+    "${out_dir}" \
+    "${mrg_dir}"
+  set +x
+
+}
+
+
+clean_pgs()
+{
+  set -x
+  qsub -N "${qsub_clean}" \
+    -t 1-22 \
+    -q test.qc \
+    -pe shmem 1 \
+    -hold_jid_ad "_prs_${phenotype}" \
+    "${clean_script}" \
+    "${pred}" \
     "${out_prefix}"
   set +x 
 }
 
 
-submit_ldpred2 "auto" "4" "${phenotype_cts}"
-#submit_ldpred2 "inf" "1" "${phenotype_binary}"
+submit_ldpred2 "auto" "10" "${phenotype_cts}"
+submit_ldpred2 "auto" "10" "${phenotype_binary}"
 
