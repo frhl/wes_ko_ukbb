@@ -201,11 +201,11 @@ submit_saige() {
     local out_spa_success="${out_gene_spa}_${tasks_spa}"
     local out_spa_upper_bound="${out_gene_spa}_${tasks_upper_bound}"
 
-    local spa_name="spa_${gene}_${tasks_spa}"
+    #local spa_name="spa_${gene}_${tasks_spa}_${phenotype}"
 
     # if the SPA has already been performed. Skip it.
     if [ ! -f "${out_spa_upper_bound}.txt" ]; then
-      qsub -N "${name_saige}" \
+      qsub -N "${name_saige_pheno}" \
         -o ${log_saige} \
         -e ${log_saige_errors} \
         -t ${tasks_spa} \
@@ -234,12 +234,12 @@ submit_saige() {
 
 submit_merge() {
   set -x
-  qsub -N "${name_merge}" \
+  qsub -N "${name_merge_pheno}" \
     -o ${log} \
     -e ${log_errors} \
     -q ${queue_merge} \
     -pe shmem 1 \
-    -hold_jid "${name_saige}" \
+    -hold_jid "${name_saige_pheno}" \
     "${merge_script}" \
     "${n_shuffle}" \
     "${replicates}" \
@@ -252,12 +252,12 @@ submit_merge() {
 submit_calc_p() {
   echo "Calculating empirical P."
   set -x
-  qsub -N "${name_calc}" \
+  qsub -N "${name_calc_pheno}" \
     -o ${log} \
     -e ${log_errors} \
     -q ${queue_merge} \
     -pe shmem 1 \
-    -hold_jid "${name_merge}" \
+    -hold_jid "${name_merge_pheno}" \
     "${calc_script}" \
     "${gene}" \
     "${phenotype}" \
@@ -279,7 +279,7 @@ resubmit_loop() {
     -q "${queue_master}" \
     -pe shmem "1" \
     -t ${SGE_TASK_ID} \
-    -hold_jid "${name_calc}" \
+    -hold_jid "${name_calc_pheno}" \
     "${this_script}" \
     "${chr}" \
     "${input_path}" \
@@ -343,13 +343,18 @@ SECONDS=0
 do_extra_loop=0
 iteration=$((${iteration} + 1))
 set_arr_phenos "cts"
-arr_phenos=( "Alanine_aminotransferase_residual" )
+arr_phenos=( "Alanine_aminotransferase_residual" "Calcium_residual" "WHR_adj_BMI" "BMI" "Apolipoprotein_B_residual")
+#arr_phenos=( "Alanine_aminotransferase_residual" )
+
 
 echo "Starting iteration ${iteration}"
 if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then
   if [ $(check_if_all_done) -eq "0" ]; then
     submit_shuffle_phase ${n_shuffle}
     for phenotype in "${arr_phenos[@]}"; do
+      name_saige_pheno="_spa_${gene}_${phenotype}"
+      name_merge_pheno="_mrg_${gene}_${phenotype}"
+      name_calc_pheno="_p_${gene}_${phenotype}"
       if [ $(check_if_done) -eq "0" ]; then
         set_arr_saige ${phenotype}
         in_gmat=${arr_saige[2]}

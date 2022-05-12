@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-22
+#$ -t 21
 #$ -tc 10
 #$ -V
 
@@ -32,20 +32,11 @@ readonly input_path="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_chr${chr}
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_permuted_chr${chr}_GENE"
 readonly assoc_format="ukb_eur_wes_200k_maf0to5e-2_PHENO_ANNO"
 
-# get path to true P-value and t-stats
-readonly genes_path="data/permute/overview/overview_genes.tsv.gz"
-readonly true_p_path="data/permute/overview/overview_true_p.tsv.gz"
-
-# count how many genes to submit for the given chromosome
-readonly n_genes="$( zcat ${genes_path} | grep "chr${chr}" | wc -l)"
-readonly sge_tasks="1-${n_genes}"
-#readonly sge_tasks="30"
-
 # parameters for master script
-readonly min_mac=6
+readonly min_mac=4
 readonly n_replicates=1000
 readonly n_start_shuffle=1000
-readonly n_cutoff_shuffle=100000
+readonly n_cutoff_shuffle=10000 #1000000
 readonly n_slots_saige=1
 readonly n_slots_permute=1
 readonly tick_interval=30
@@ -59,6 +50,15 @@ readonly iteration=1
 readonly permutation_supply=0
 readonly initial_top_p=10
 readonly use_prs=0
+
+# get path to true P-value and t-stats
+readonly genes_path="data/permute/overview/min_mac${min_mac}/overview_genes.tsv.gz"
+readonly true_p_path="data/permute/overview/min_mac${min_mac}/overview_true_p.tsv.gz"
+
+# count how many genes to submit for the given chromosome
+readonly n_genes="$( zcat ${genes_path} | grep "chr${chr}" | wc -l)"
+#readonly sge_tasks="1-${n_genes}"
+readonly sge_tasks="1-2"
 
 set -x
 qsub -N "_chr${chr}_permute" \

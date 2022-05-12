@@ -10,12 +10,16 @@ main <- function(args){
     o <- as.character(args$o)
     stopifnot(is.numeric(a))
     stopifnot(is.numeric(b))
-    stopifnot(o %in% c("ge","le"))
+    stopifnot(o %in% c("ge","le", "gt", "lt"))
 
     if (o %in% "ge"){
         result <- as.numeric(a >= b)
+    } else if ( o %in% "gt"){
+        result <- as.numeric(a > b)
     } else if ( o %in% "le"){
         result <- as.numeric(a <= b)
+    } else if ( o %in% "lt"){
+        result <- as.numeric(a < b)
     } else {
         stop("operator not yet implemnted")
     }

@@ -28,7 +28,7 @@ readonly n_shuffle=${9?Error: Missing arg1 (prefix)}
 readonly out_prefix=${10?Error: Missing arg1 (prefix)}
 
 readonly outfile="${out_prefix}.permuted"
-readonly pfile="${out_prefix}.pvalues"
+readonly pfile="${out_prefix}_${phenotype}.pvalues"
 
 # use a table to lookup the true P-value from the primary analysis.
 # problematic when you are using strings that are subsets of otuer strings,

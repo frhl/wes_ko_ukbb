@@ -45,6 +45,7 @@ if [ ! -f ${out_gene_task} ]; then
   if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then 
     SECONDS=0
     set_up_RSAIGE
+    set -x
     Rscript "${step2_SPAtests}"  \
        --vcfFile=${vcf} \
        --vcfFileIndex=${csi} \
@@ -58,6 +59,7 @@ if [ ! -f ${out_gene_task} ]; then
        --LOCO=FALSE\
        && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
        || raise_error "Saddle-point approximation for chr${chr} failed"
+    set +x
     rm -f "${out_gene_task}.index"
     gzip ${out_gene_task}
   else

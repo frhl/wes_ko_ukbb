@@ -29,8 +29,8 @@ make_vcf_dosage_rows <- function(chrom, positions, marker){
       "#CHROM" = chrom, 
       POS = positions,
       ID = marker,
-      REF = 'X',
-      ALT = 'Y',
+      REF = '0',
+      ALT = '1',
       QUAL = '.',
       FILTER = '.',
       INFO = '.',
@@ -82,7 +82,7 @@ parser <- ArgumentParser()
 parser$add_argument("--chrom", default=NULL, help = "chromosome")
 parser$add_argument("--input_path", default=NULL, help = "path to the input")
 parser$add_argument("--permutations", default=NULL, help = "number of times the gene should be permuted")
-parser$add_argument("--only_non_prob_ko", action="store_true", default=NULL, help = "Only keep knockouts of phased heterozygotes.")
+parser$add_argument("--only_non_prob_ko", action="store_true", default=FALSE, help = "Only keep knockouts of phased heterozygotes.")
 parser$add_argument("--seed", default=NULL, help = "seed for randomizer")
 parser$add_argument("--vcf_id", default="GENE", help = "Substitute for rsid")
 parser$add_argument("--out_prefix", default=NULL, help = "prefix for out file")

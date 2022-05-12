@@ -28,7 +28,9 @@ main <- function(args){
     fwrite(dt, outfile, sep = "\t")
 
     # calculate empirical P-value
-    empirical_p <- sum(true_p >= pvalue)/length(pvalue) 
+    empirical_p_gt <- sum(true_p >= pvalue)/length(pvalue) 
+    empirical_p_ge <- sum(true_p > pvalue)/length(pvalue) 
+    empirical_p <- (empirical_p_gt + empirical_p_ge) / 2
     write(empirical_p, stdout())
 
 }
