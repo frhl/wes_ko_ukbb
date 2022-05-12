@@ -8,7 +8,7 @@
 #$ -e logs/filter_genotypes.errors.log
 #$ -P lindgren.prjc
 #$ -q test.qc
-#$ -t 1-5
+#$ -t 1-2
 #$ -V
 
 
@@ -25,12 +25,15 @@ readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc
 readonly padding=10e+6
 readonly min_maf=0.01
 readonly min_info=0.8
+readonly min_mac=4
 
-readonly in_dir="data/conditional/common/intervals"
-readonly out_dir="data/conditional/common/intervals"
+readonly in_dir="data/conditional/common/gene_positions/min_mac${min_mac}"
+readonly out_dir="data/conditional/common/intervals/min_mac${min_mac}"
 readonly pheno_dir="data/phenotypes"
 readonly in_prefix="ukb_eur_wes_200k"
 readonly maf="0to5e-2"
+
+mkdir -p ${out_dir}
 
 submit_binary_analysis()
 {
@@ -53,12 +56,8 @@ submit_intervals()
   local annotation=${1?Error: Missing arg1 (consequence)}
   local phenotype=${2?Error: Missing arg2 (phenotype)}
   local trait=${3?Error: Missing arg3 (trait)}
-
   local genes="${in_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}.tsv.gz"
   local out_prefix="${out_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}"
-
-  mkdir -p ${out_dir}
-  
   if [ -f ${genes} ]; then
     set -x
     qsub -N "_filter_genotypes_${1}" \
@@ -74,7 +73,7 @@ submit_intervals()
       "${min_info}"
     set +x
   else
-    >&2 echo "${genes} (${phenotype}) did not pass significance threshold. Skipping.."
+    >&2 echo "${genes} (${phenotype}) did not pass significance threshols or does not exist. Skipping.."
   fi
 }
 
