@@ -52,7 +52,7 @@ main <- function(args){
 
   # write samples file
   by_samples$infile <- args$ko_file
-  outfile_samples <- paste0(out_prefix, "_by_samples.txt.gz")
+  outfile_samples <- paste0(args$out_prefix, "_by_samples.txt.gz")
   fwrite(by_samples, outfile_samples, append = TRUE, quote = FALSE, sep = '\t', col.names = TRUE)
  
   by_genes <- do.call(rbind, lapply(binary_names, function(p){
@@ -84,7 +84,7 @@ main <- function(args){
   
   # write samples file
   by_genes$infile <- args$ko_file
-  outfile_genes <- paste0(out_prefix, "_by_genes.txt.gz")
+  outfile_genes <- paste0(args$out_prefix, "_by_genes.txt.gz")
   fwrite(by_genes, outfile_genes, append = TRUE, quote = FALSE, sep = '\t', col.names = TRUE)
  
 }
