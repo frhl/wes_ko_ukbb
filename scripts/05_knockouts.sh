@@ -30,7 +30,7 @@ readonly out_type="vcf"
 
 # Note: ~20 slots are needed for running chr1 
 # when using aggr_method="collect" on short.qe
-readonly tasks="21"
+readonly tasks="1-22"
 readonly queue="short.qa"
 #readonly nslots=16
 
@@ -90,7 +90,7 @@ submit_knockout_job()
 #submit_knockout_job "pLoF" "20" "collect"
 #submit_knockout_job "damaging_missense" "5" "fast"
 #
-submit_knockout_job "pLoF,damaging_missense" "16" "collect"
+submit_knockout_job "pLoF,damaging_missense" "20" "collect"
 
 #submit_knockout_job "0" "5e-2" "" "damaging_missense"
 #submit_knockout_job "0" "5e-2" "" "synonymous"

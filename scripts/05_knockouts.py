@@ -3,6 +3,7 @@
 import hail as hl
 import argparse
 import pandas as pd
+import random
 
 from ukb_utils import hail_init
 from ukb_utils import samples
