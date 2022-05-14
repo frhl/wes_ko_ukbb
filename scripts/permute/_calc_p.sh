@@ -69,6 +69,19 @@ lookup_true() {
  fi
 }
 
+get_last_permuted_p() {
+  if [ -f ${outfile} ]; then
+    local last_p=$(cat ${outfile} | awk -v g="${gene}" -v p="${phenotype}" '$1==g && $2==p' | cut -f5 | tail -n1)
+    #local obs_count=$(cat ${outfile} | awk -v g="${gene}" -v p="${phenotype}" '$1==g && $2==p' | cut -f5 | tail -n1 | wc -l)
+    if [ ! -z ${last_p} ]; then # && [ ${obs_count} -gt 0 ]; then
+      echo ${last_p}
+    else
+      echo "NULL"
+    fi
+  else
+    echo "NULL"
+  fi
+}
 
 if [ -f ${saige_merged} ]; then
   readonly true_p=$( lookup_true "p" )
@@ -76,6 +89,7 @@ if [ -f ${saige_merged} ]; then
   if [ $(zcat ${saige_merged} | wc -l) -gt 1 ]; then
     if [[ "${true_p}" != "NA" ]]; then
       set_up_rpy
+      readonly last_p=$(get_last_permuted_p)
       readonly permuted_p=$(Rscript ${r_get_spa_p} --input_path "${saige_merged}" --select_min_p ${top_p} )
       readonly done=$(Rscript ${rlogic} --a ${true_p} --o "ge" --b ${permuted_p})
       readonly tmp_empirical_p=$(
@@ -84,13 +98,22 @@ if [ -f ${saige_merged} ]; then
             --true_tstat ${true_t} \
             --true_p ${true_p} \
             --out_prefix "${pfile}.tmp")
-      if [ ${done} -eq 1 ]; then
-        readonly the_status="OK"
-        readonly empirical_p=${tmp_empirical_p}
-        mv "${pfile}.tmp.txt.gz" "${pfile}.txt.gz"
+      >&2 echo "${phenotype} ${gene}. Last P = ${last_p}"
+      >&2 echo "${phenotype} ${gene}. Permuted P = ${permuted_p}"
+      if [[ "${last_p}" != "${permuted_p}" ]]; then
+        if [ ${done} -eq 1 ]; then
+          readonly the_status="OK"
+          readonly empirical_p=${tmp_empirical_p}
+          mv "${pfile}.tmp.txt.gz" "${pfile}.txt.gz"
+        else
+          readonly empirical_p="NA"
+          readonly the_status="NA"
+        fi
       else
+        # P-value is not changing which
+        # should result in termination of script
         readonly empirical_p="NA"
-        readonly the_status="NA"
+        readonly the_status="OK (permuted_p not changing)"
       fi
     else
       # gene not present in saige 

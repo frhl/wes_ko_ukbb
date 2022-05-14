@@ -363,6 +363,7 @@ if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then
       name_saige_pheno="_spa_${gene}_${phenotype}"
       name_merge_pheno="_mrg_${gene}_${phenotype}"
       name_calc_pheno="_p_${gene}_${phenotype}"
+      echo ${phenotype} >> ${tested_phenos}
       if [ $(check_if_done) -eq "0" ]; then
         set_arr_saige ${phenotype}
         in_gmat=${arr_saige[2]}
@@ -371,7 +372,6 @@ if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then
           gmat_bytes=$( file_size ${in_gmat} )
           var_bytes=$( file_size ${in_var} )
           if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then
-            echo ${phenotype} >> ${tested_phenos}
             path_merged="${out_prefix}_${phenotype}_merged.txt"
             if [ ! -f ${path_merged} ]; then
               submit_saige ${n_shuffle}
