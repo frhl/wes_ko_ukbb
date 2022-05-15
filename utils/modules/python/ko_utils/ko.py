@@ -247,7 +247,7 @@ def calc_prob_ko_by_count(ko_expr, phased_expr, unphased_expr):
             (phased_expr == 0) & (unphased_expr > 1), 
             (1 - 2 * (1 / 2) ** unphased_expr))
         .default(0))
-    
+
 
 
 def annotate_knockout(hom_expr, pko_expr, phased_expr = None):
@@ -275,6 +275,14 @@ def annotate_knockout(hom_expr, pko_expr, phased_expr = None):
                .when((hom_expr == 0) & (pko_expr >= 0.5),'Possible Compound heterozygote')
                .or_missing()
                 )
+
+def remove_prob_DS(ds):
+    """remove any compound het owed to unphased
+    singletons. Will return either 0 or 2.
+    :param ds: DOSAGE float between 0 and 2. 
+    """
+    return (hl.case().when(ds == 2, 2).default(0))
+
 
 
 def normalize_by_name(mt, name):
