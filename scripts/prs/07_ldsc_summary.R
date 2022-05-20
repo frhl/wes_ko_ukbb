@@ -8,16 +8,18 @@ main <- function(args){
   stopifnot(dir.exists(dirname(args$out_prefix)))
   files <- list.files(args$in_dir, full.names = TRUE, pattern = 'ldsc.+\\.rds')
 
-  d <- do.call(rbind, lapply(files[1:3], function(rds){
+  d <- do.call(rbind, lapply(files, function(rds){
     phenotype <- gsub("ldsc_","",tools::file_path_sans_ext(basename(rds)))
     d <- readRDS(rds)
     qc <- d$qc
     ldsc <- d$coefficients
     ldsc$n_snps <- qc$well_behaved_snps
     ldsc$phenotype <- phenotype
+    ldsc$coef <- rownames(ldsc)
     return(ldsc)
   }))
- 
+
+   
   outfile <- paste0(args$out_prefix, ".txt")
   fwrite(d, outfile, sep = "\t") 
  

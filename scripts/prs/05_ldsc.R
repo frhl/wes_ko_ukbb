@@ -108,7 +108,7 @@ main <- function(args){
   )
 
   # rename table
-  colnames(coeffecients) <- c("estimate", "std_error", "zstat", "pvalue")
+  colnames(coefficients) <- c("estimate", "std_error", "zstat", "pvalue")
   rownames(coefficients) <- c("intercept", "h2")
 
   # what SNPS are used
