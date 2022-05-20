@@ -1,6 +1,14 @@
 
 # details: https://privefl.github.io/bigsnpr-extdoc/polygenic-scores-pgs.html
 
+
+writelog <- function(msg, log) {
+    stopifnot(file.exists(log))
+    time <- Sys.time()
+    msg <- paste0(time,": ", msg, "\n")
+    write(msg, log)
+}
+
 # wrote a package that contain all dependencies for runnign LDpred2
 # and combining various functions into easy to use pipelines. Note,
 # that this will also load libraries, e.g. bigsnpr, bigassert
@@ -17,24 +25,32 @@ main <- function(args){
   stopifnot(dir.exists(dirname(args$out_prefix)))
   stopifnot(args$method %in% c('inf', 'auto'))
 
+  log <- paste0(args$out_prefix,".log")
+
   # setup parallel environment
   NCORES <- max(1, nb_cores())
   bigparallelr::assert_cores(NCORES)
-  msg <- paste0("Running ldpred2 with ",NCORES," cores [",Sys.time(),"]") 
-  write(msg,stdout())
+  writelog(paste("ldsc:", args$ldsc), log)
+  writelog(paste("NCORES:", NCORES), log)
+  writelog(paste("method:", args$method), log)
 
   # laod ldsc and qced GWAS
   ldsc <- readRDS(args$ldsc)
   gwas <- ldsc$gwas
   h2 <- ldsc$h2_est
+  stopifnot(h2 >= args$h2_cut
 
   # Estimate h2 chromosome-wide
   N_total <- nrow(gwas)
   N_chr <- sum(gwas$chr == args$chrom)
   h2_init <- h2 * (N_chr / N_total)
-  
-  # check estimates
-  stopifnot(h2_init > 0)
+  writelog(paste("N_total:", N_total), log)
+  writelog(paste("N_chr:", N_chr), log)
+  writelog(paste("h2_init:", h2_init), log)
+
+  # check estimates and esure
+  if (h2 < 0) stop("Heritability is negative. Stopping..")
+  if (h2 < args$h2_cutoff) stop("Heritability is less than cutoff. Stopping..")
   stopifnot(!is.null(gwas)) 
 
   # get SNP correlations and LD
@@ -65,13 +81,14 @@ main <- function(args){
     # count variants with missing GTs
     cols <- genotypes$`.->ncol`
     rows <- genotypes$`.->nrow`
-    lst <- lapply(1:rows, function(i)
+    sum_rows <- lapply(1:rows, function(i)
         return(sum(is.na(genotypes[i,])))
     )
-    missing_gt <- sum(unlist(lst))
-    pct <- round(missing_gt/rows, 4)*100
-    msg <- paste0(missing_gt,"/",rows," (",pct,") variants with at least one missing GT")
-    write(msg, stderr())
+   
+    missing_gt <- sum(unlist(sum_rows))
+    pct <- paste0("(", round(missing_gt/rows, 4)*100,")")
+    writelog(paste("GT Matrix:", rows, "x", cols), log)
+    writelog(paste("missing GTs:", missing_gt, pct ), log)
 
     # impute missing genotypes
     genotypes <- snp_fastImputeSimple(genotypes, method = args$impute) 
@@ -157,6 +174,7 @@ parser$add_argument("--chrom", default=NULL, required = TRUE, help = "chromosome
 parser$add_argument("--method", default=NULL, required = TRUE, help = "either 'inf' or 'auto'")
 parser$add_argument("--pred", default=NULL, required = TRUE, help = "Path to plink (bed) for PGS prediction")
 parser$add_argument("--ldsc", default=NULL, required = TRUE, help = ".rds object containing QCed GWAS and ldsc heritability estimates")
+parser$add_argument("--h2_cutoff", default=0.02, required = TRUE, help = "If estimated heritability is lower than cutoff, the script will stop.")
 parser$add_argument("--tmp_bfile", default=NULL, required = TRUE, help = "File path to temporary backing files")
 parser$add_argument("--ld_dir", default=NULL, required = TRUE, help = "Path to directory with pre-calcualted SNP correlations and LD (.rds files)")
 parser$add_argument("--impute", default=NULL, required = TRUE, help = "Should missing genotypes be imputed? (See https://privefl.github.io/bigsnpr/reference/snp_fastImputeSimple.html)")

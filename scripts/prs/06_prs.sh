@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-80
+#$ -t 12-13
 #$ -tc 1
 #$ -V
 
@@ -117,6 +117,6 @@ clean_pgs()
 }
 
 
-submit_ldpred2 "auto" "10" "${phenotype_cts}"
-submit_ldpred2 "auto" "10" "${phenotype_binary}"
+submit_ldpred2 "auto" "8" "${phenotype_cts}"
+submit_ldpred2 "auto" "8" "${phenotype_binary}"
 
