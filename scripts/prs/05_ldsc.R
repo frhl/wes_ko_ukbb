@@ -51,7 +51,7 @@ main <- function(args){
 
   # get qc data.frame
   d_qc <- data.frame(
-    well_behaved_snps, 
+    well_behaved_snps = sum(well_behaved_snps), 
     total_snps = nrow(gwas)
   )
 
@@ -101,11 +101,14 @@ main <- function(args){
 
   # organize in table
   coefficients <- data.frame(
-    estimate <- c(int_est, h2_est),
-    std_error <- c(int_se, h2_se),
-    zstat <- c(int_z, h2_z),
-    pvalue <- c(int_pval, h2_oval)
+    estimate = c(int_est, h2_est),
+    std_error = c(int_se, h2_se),
+    zstat = c(int_z, h2_z),
+    pvalue = c(int_pval, h2_pval)
   )
+
+  # rename table
+  colnames(coeffecients) <- c("estimate", "std_error", "zstat", "pvalue")
   rownames(coefficients) <- c("intercept", "h2")
 
   # what SNPS are used
