@@ -103,7 +103,7 @@ main <- function(args){
   coefficients <- data.frame(
     estimate <- c(int_est, h2_est),
     std_error <- c(int_se, h2_se),
-    zstat <- c(int_t, h2_t),
+    zstat <- c(int_z, h2_z),
     pvalue <- c(int_pval, h2_oval)
   )
   rownames(coefficients) <- c("intercept", "h2")
