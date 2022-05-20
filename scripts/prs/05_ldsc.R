@@ -44,13 +44,13 @@ main <- function(args){
     qc <- qc_sumstat_cts(ld_data$G, info_snp, sd_y, ncores = NCORES)
   }  
   
-  
+  # what SNPs should be kept?
   well_behaved_snps <- (!qc$is_bad)
   gwas <- info_snp[well_behaved_snps, ]
   gwas$marker <- get_ldpred_marker(gwas)
 
   # get qc data.frame
-  d_qc <- dat.frame(
+  d_qc <- data.frame(
     well_behaved_snps, 
     total_snps = nrow(gwas)
     )
@@ -81,28 +81,29 @@ main <- function(args){
                    length(snp$ld), 
                    chi2 = chi2,
                    sample_size = gwas$n_eff, 
-                   blocks = NULL)
+                   blocks = NULL,
+                   ncores = NCORES,
+                   )
                )  
-  
 
   # extract coeffecients
+  print(str(ldsc))
   int_est <- ldsc[["int"]]
   h2_est <- ldsc[["h2"]]
-  int_se <- ldsc[["int_se"]]
   h2_se <- ldsc[["h2_se"]]
+  int_se <- ldsc[["int_se"]]
  
   # calculate P-values for linear fit
-  df <- length(chi2) - 2
-  h2_t <- h2_est / h2_se
-  int_t <- int_est / int_se
-  h2_pval <- 2 * pt(abs(h2_t), df, lower.tail = FALSE)
-  int_pval <- 2 * pt(abs(int_t), df, lower.tail = FALSE)
+  h2_z <- h2_est / h2_se
+  int_z <- int_est / int_se
+  h2_pval <- 2 * pnorm(abs(h2_z), lower.tail = FALSE)
+  int_pval <- 2 * pnorm(abs(int_z), lower.tail = FALSE)
 
   # organize in table
   coefficients <- data.frame(
     estimate <- c(int_est, h2_est),
     std_error <- c(int_se, h2_se),
-    t_value <- c(int_t, h2_t),
+    zstat <- c(int_t, h2_t),
     pvalue <- c(int_pval, h2_oval)
   )
   rownames(coefficients) <- c("intercept", "h2")

@@ -27,7 +27,7 @@ export OPENBLAS_NUM_THREADS=1 # avoid two levels of parallelization
 fit_ld_matrix() 
 {
   SECONDS=0
-  set_up_rpy
+  set_up_ldpred2
   set -x
   Rscript "${rscript}" \
    --bed "${bed_file}" \

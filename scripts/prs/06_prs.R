@@ -9,6 +9,7 @@ writelog <- function(msg, log) {
     write(msg, log)
 }
 
+
 # wrote a package that contain all dependencies for runnign LDpred2
 # and combining various functions into easy to use pipelines. Note,
 # that this will also load libraries, e.g. bigsnpr, bigassert
@@ -37,20 +38,18 @@ main <- function(args){
   # laod ldsc and qced GWAS
   ldsc <- readRDS(args$ldsc)
   gwas <- ldsc$gwas
-  h2 <- ldsc$h2_est
-  stopifnot(h2 >= args$h2_cut
+  h2 <- ldsc$coefficients$estimate[2]
+  pvalue <- ldsc$coefficients$pvalue[2]
 
   # Estimate h2 chromosome-wide
   N_total <- nrow(gwas)
   N_chr <- sum(gwas$chr == args$chrom)
   h2_init <- h2 * (N_chr / N_total)
-  writelog(paste("N_total:", N_total), log)
-  writelog(paste("N_chr:", N_chr), log)
-  writelog(paste("h2_init:", h2_init), log)
-
-  # check estimates and esure
-  if (h2 < 0) stop("Heritability is negative. Stopping..")
-  if (h2 < args$h2_cutoff) stop("Heritability is less than cutoff. Stopping..")
+  
+  # check estimates and ensure that
+  # the trait is actually heritable 
+  stopifnot(h2_init > 0)
+  stopifnot(pvalue < 1e-5)
   stopifnot(!is.null(gwas)) 
 
   # get SNP correlations and LD
@@ -72,19 +71,22 @@ main <- function(args){
   genotypes <- pred$genotypes  
   indicies <- pred$gwas_indicies
 
+  # check that we have genotypes
   stopifnot(!is.null(genotypes))
   stopifnot(!is.null(indicies))
-
+  
+  # dimensions  
+  cols <- genotypes$`.->ncol`
+  rows <- genotypes$`.->nrow`
+ 
   # need to impute missing SNPs
   if (!is.null(args$impute)){
     
     # count variants with missing GTs
-    cols <- genotypes$`.->ncol`
-    rows <- genotypes$`.->nrow`
-    sum_rows <- lapply(1:rows, function(i)
-        return(sum(is.na(genotypes[i,])))
-    )
-   
+       sum_rows <- lapply(1:rows, function(i)
+        return(sum(is.na(genotypes[i,])))) 
+    
+    # write to log
     missing_gt <- sum(unlist(sum_rows))
     pct <- paste0("(", round(missing_gt/rows, 4)*100,")")
     writelog(paste("GT Matrix:", rows, "x", cols), log)
@@ -94,6 +96,13 @@ main <- function(args){
     genotypes <- snp_fastImputeSimple(genotypes, method = args$impute) 
   }
 
+  # standardize genotypes 
+  means <- NULL; sds <- NULL
+  if (args$standardized_gt){
+     means <- as.numeric(unlist(lapply(1:rows, mean)))
+     sds <- as.numeric(unlist(lapply(1:rows, sd)))
+  }
+
   if (args$method %in% "inf"){
 
     beta_inf <- snp_ldpred2_inf(snp$corr, gwas, h2_init)
@@ -101,6 +110,8 @@ main <- function(args){
     final_pred_inf <- big_prodVec(
           genotypes, 
           beta_inf,
+          center = means,
+          scale = sds,
           ncores = NCORES)  
     final_pred <- final_pred_inf
 
@@ -121,13 +132,14 @@ main <- function(args){
      # get estimates with indicies corresponding to pred genotypes
      beta_auto <- sapply(multi_auto, function(auto){
           auto$beta_est})
-     
+
      # perform matrix multiplication
      pred_auto <- big_prodMat(
         genotypes,
         beta_auto,
+        center = means,
+        scale = sds,
         ncores = NCORES)
-
 
      # quality controls on chains
      sc <- apply(pred_auto, 2, sd, na.rm = TRUE)
@@ -138,6 +150,8 @@ main <- function(args){
      final_pred_auto <- big_prodVec(
        genotypes, 
        final_beta_auto,
+       center = means,
+       scale = sds,
        ncores = NCORES)
 
      final_pred <- final_pred_auto
@@ -152,7 +166,8 @@ main <- function(args){
      n_snps = nrow(gwas),
      ldsc_h2_genome_wide_est = h2,
      h2_init_est = h2_init,
-     inflation = calc_inflation(gwas$P)
+     inflation = calc_inflation(gwas$P),
+     standardized_gt = args$standardized_gt
      )
   
   # save results
@@ -174,7 +189,7 @@ parser$add_argument("--chrom", default=NULL, required = TRUE, help = "chromosome
 parser$add_argument("--method", default=NULL, required = TRUE, help = "either 'inf' or 'auto'")
 parser$add_argument("--pred", default=NULL, required = TRUE, help = "Path to plink (bed) for PGS prediction")
 parser$add_argument("--ldsc", default=NULL, required = TRUE, help = ".rds object containing QCed GWAS and ldsc heritability estimates")
-parser$add_argument("--h2_cutoff", default=0.02, required = TRUE, help = "If estimated heritability is lower than cutoff, the script will stop.")
+parser$add_argument("--standardized_gt", default=1, required = TRUE, help = "Should genotypes be standardized?")
 parser$add_argument("--tmp_bfile", default=NULL, required = TRUE, help = "File path to temporary backing files")
 parser$add_argument("--ld_dir", default=NULL, required = TRUE, help = "Path to directory with pre-calcualted SNP correlations and LD (.rds files)")
 parser$add_argument("--impute", default=NULL, required = TRUE, help = "Should missing genotypes be imputed? (See https://privefl.github.io/bigsnpr/reference/snp_fastImputeSimple.html)")

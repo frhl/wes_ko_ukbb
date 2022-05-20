@@ -5,7 +5,7 @@
 #$ -o logs/ldsc.log
 #$ -e logs/ldsc.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 4
+#$ -pe shmem 3
 #$ -q short.qc
 #$ -t 30-31
 #$ -V
@@ -42,7 +42,7 @@ mkdir -p ${out_dir}
 export OPENBLAS_NUM_THREADS=1 # avoid two levels of parallelization
 
 estimate_heritability(){
-  set_up_rpy
+  set_up_ldpred2
   local phenotype="${1}" 
   local trait="${2}"
   local out_prefix="${out_dir}/ldsc_${phenotype}"
@@ -64,5 +64,5 @@ estimate_heritability(){
 }
 
 estimate_heritability "${phenotype_cts}" "cts"
-estimate_heritability "${phenotype_binary}" "binary"
+#estimate_heritability "${phenotype_binary}" "binary"
 
