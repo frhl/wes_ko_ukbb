@@ -53,7 +53,7 @@ main <- function(args){
   d_qc <- data.frame(
     well_behaved_snps, 
     total_snps = nrow(gwas)
-    )
+  )
 
   # Get LD matrix for final SNPs
   snp <- get_ld_matrix(gwas, chrs = 1:22, ld_dir = args$ld_dir, verbose = TRUE)
@@ -81,7 +81,7 @@ main <- function(args){
                    length(snp$ld), 
                    chi2 = chi2,
                    sample_size = gwas$n_eff, 
-                   blocks = NULL,
+                   blocks = 200, # if NULL, then SE's are not estimated
                    ncores = NCORES,
                    )
                )  

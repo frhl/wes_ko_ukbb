@@ -25,7 +25,7 @@ readonly tmp_bfile="${out_prefix_chr}.bfile"
 export OPENBLAS_NUM_THREADS=1 # avoid two levels of parallelization
 
 if [ ! -f "${out_prefix_chr}.txt.gz" ]; then
-  set_up_ldpred2
+  set_up_rpy
   duration=SECONDS
   set -x
   Rscript "${r_script}" \
