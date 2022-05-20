@@ -49,6 +49,12 @@ main <- function(args){
   gwas <- info_snp[well_behaved_snps, ]
   gwas$marker <- get_ldpred_marker(gwas)
 
+  # get qc data.frame
+  d_qc <- dat.frame(
+    well_behaved_snps, 
+    total_snps = nrow(gwas)
+    )
+
   # Get LD matrix for final SNPs
   snp <- get_ld_matrix(gwas, chrs = 1:22, ld_dir = args$ld_dir, verbose = TRUE)
  
@@ -78,10 +84,34 @@ main <- function(args){
                    blocks = NULL)
                )  
   
+
+  # extract coeffecients
+  int_est <- ldsc[["int"]]
+  h2_est <- ldsc[["h2"]]
+  int_se <- ldsc[["int_se"]]
+  h2_se <- ldsc[["h2_se"]]
+ 
+  # calculate P-values for linear fit
+  df <- length(chi2) - 2
+  h2_t <- h2_est / h2_se
+  int_t <- int_est / int_se
+  h2_pval <- 2 * pt(abs(h2_t), df, lower.tail = FALSE)
+  int_pval <- 2 * pt(abs(int_t), df, lower.tail = FALSE)
+
+  # organize in table
+  coefficients <- data.frame(
+    estimate <- c(int_est, h2_est),
+    std_error <- c(int_se, h2_se),
+    t_value <- c(int_t, h2_t),
+    pvalue <- c(int_pval, h2_oval)
+  )
+  rownames(coefficients) <- c("intercept", "h2")
+
   # what SNPS are used
   ldsc_out <- list(  
-    h2_est = ldsc[["h2"]],
-    int_est = ldsc[['int']],
+    coefficients = coefficients,
+    qc = d_qc,
+    ldsc = ldsc,
     ld_map = snp$map,
     gwas = gwas
   ) 
