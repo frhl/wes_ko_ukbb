@@ -135,8 +135,8 @@ parser$add_argument("--trait", default=NULL, required = TRUE, help = "either 'bi
 parser$add_argument("--gwas", default=NULL, required = TRUE, help = "Path to QCed SNPs")
 parser$add_argument("--ld_bed", default=NULL, required = TRUE, help = "Path to plink file (bed) used to design LD-matrix")
 parser$add_argument("--ld_dir", default=NULL, required = TRUE, help = "Path to directory with pre-calcualted SNP correlations and LD (.rds files)")
-parser$add_argument("--phenotype", default=NULL, required = TRUE, help = "Where should the results be written?")
-parser$add_argument("--path_cts_phenotypes", default=NULL, required = TRUE, help = "Where should the results be written?")
+parser$add_argument("--phenotype", default=NULL, required = TRUE, help = "String. Current phenotype")
+parser$add_argument("--path_cts_phenotypes", default=NULL, required = TRUE, help = "Path to cts phenotypes")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()
 
