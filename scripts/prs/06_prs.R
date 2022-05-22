@@ -3,7 +3,6 @@
 
 
 writelog <- function(msg, log) {
-    stopifnot(file.exists(log))
     time <- Sys.time()
     msg <- paste0(time,": ", msg, "\n")
     write(msg, log)
@@ -31,9 +30,6 @@ main <- function(args){
   # setup parallel environment
   NCORES <- max(1, nb_cores())
   bigparallelr::assert_cores(NCORES)
-  writelog(paste("ldsc:", args$ldsc), log)
-  writelog(paste("NCORES:", NCORES), log)
-  writelog(paste("method:", args$method), log)
 
   # laod ldsc and qced GWAS
   ldsc <- readRDS(args$ldsc)
@@ -48,7 +44,6 @@ main <- function(args){
   
   # check estimates and ensure that
   # the trait is actually heritable 
-  stopifnot(h2_init > 0)
   stopifnot(pvalue < 1e-5)
   stopifnot(!is.null(gwas)) 
 
@@ -78,21 +73,12 @@ main <- function(args){
   # dimensions  
   cols <- genotypes$`.->ncol`
   rows <- genotypes$`.->nrow`
- 
+  missing_gt <- NA
+
   # need to impute missing SNPs
   if (!is.null(args$impute)){
-    
-    # count variants with missing GTs
-       sum_rows <- lapply(1:rows, function(i)
-        return(sum(is.na(genotypes[i,])))) 
-    
-    # write to log
+    sum_rows <- lapply(1:rows, function(i) return(sum(is.na(genotypes[i,])))) 
     missing_gt <- sum(unlist(sum_rows))
-    pct <- paste0("(", round(missing_gt/rows, 4)*100,")")
-    writelog(paste("GT Matrix:", rows, "x", cols), log)
-    writelog(paste("missing GTs:", missing_gt, pct ), log)
-
-    # impute missing genotypes
     genotypes <- snp_fastImputeSimple(genotypes, method = args$impute) 
   }
 
@@ -101,6 +87,8 @@ main <- function(args){
   if (args$standardized_gt){
      means <- as.numeric(unlist(lapply(1:rows, mean)))
      sds <- as.numeric(unlist(lapply(1:rows, sd)))
+     write(means, paste0(args$out_prefix, ".means"))
+     write(sds, paste0(args$out_prefix, ".sds"))
   }
 
   if (args$method %in% "inf"){
@@ -167,7 +155,10 @@ main <- function(args){
      ldsc_h2_genome_wide_est = h2,
      h2_init_est = h2_init,
      inflation = calc_inflation(gwas$P),
-     standardized_gt = args$standardized_gt
+     standardized_gt = args$standardized_gt,
+     gt_rows = rows,
+     gt_cols = cols,
+     missing_gt = missing_gt
      )
   
   # save results
