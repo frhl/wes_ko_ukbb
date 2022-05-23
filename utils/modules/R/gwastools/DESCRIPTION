@@ -1,7 +1,7 @@
 Package: gwastools
 Type: Package
 Title: package for processing genetic analysis for compound hetz
-Version: 0.1.1
+Version: 0.1.2
 Author: Frederik Lassen 
 Maintainer: The package maintainer <yourself@somewhere.net>
 Description: Package for running phasing evaluation funcs.
@@ -19,5 +19,6 @@ Suggests:
 RoxygenNote: 7.1.2
 Collate:
     'get_expected_p.R'
+    'inv_rank_norm.R'
     'residualize_trait.R'
     'residualize_trait_by_sex.R'
