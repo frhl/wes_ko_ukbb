@@ -68,13 +68,11 @@ def main(args):
 
     if random_samples:
         mt = samples.choose_col_subset(mt, int(random_samples), seed = int(random_seed))
-        print("Finished selecting random samples") 
 
     if hapmap:
         ht = hl.read_table(hapmap)
         ht = ht.key_by('locus_grch37')
         mt = mt.filter_rows(hl.is_defined(ht[mt.locus]))
-        print("Finished filter variants by hapmap SNPs")
     
     if filter_missing:
         missing = hl.agg.mean(hl.is_missing(mt.GT)) <= float(filter_missing)
@@ -82,16 +80,13 @@ def main(args):
 
     if min_maf:
         mt = mt.filter_rows(variants.get_maf_expr(mt) > float(min_maf))
-        print("Finished subsetting by MAF")
 
     if liftover:
         mt = variants.liftover(mt, from_build='GRCh37', to_build='GRCh38', drop_annotations=True)
-        print("Finished performing liftover")
 
     if dbsnp:
         ht = variants.get_dbsnp_table(version=155, build='GRCh38')
         mt = mt.annotate_rows(rsid = ht.rows()[mt.row_key].rsid)
-        print("Finished annotating with dbsnp")
 
     if only_valid_contigs:
         chroms = [f'chr{x}' for x in range(1,23)]
