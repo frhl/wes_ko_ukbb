@@ -1,8 +1,10 @@
-#' @title quality control of binary summary statistics
-#' @param G genotypes from bigsnpr
-#' @param info_snp info from bigsnpr
-#' @param trait either "binary" or"cts"
-#' @param sd_y standard deviation of cts phenotype (assuming inverse rank normalisation)
+#' @title quality control of cts summary statistics
+#' @param G genotypes object from bigsnpr
+#' @param info_snp info object from bigsnpr (see 
+#' @param sd_y standard deviation of cts phenotype
+#' @param ncores cores to be used for parallel.
+#' @references code from \url{https://privefl.github.io/bigsnpr-extdoc/polygenic-scores-pgs.html}
+#' @return a list of vectors and numerics.
 #' @export
 
 qc_sumstat_cts <- function(G, info_snp, sd_y, ncores = 1) {
@@ -15,7 +17,6 @@ qc_sumstat_cts <- function(G, info_snp, sd_y, ncores = 1) {
     is_bad <- (is_bad_sd | is_bad_maf)
     sum_is_bad <- sum(is_bad, na.rm = TRUE)
     sum_n <- length(is_bad)
-    write(paste(sum_is_bad, 'of', sum_n, 'SNPs fail QC'), stderr())
-    return(list(is_bad = is_bad, sd_val = sd_val, sd_ss = sd_ss))
+    return(list(is_bad = is_bad, is_bad_maf = is_bad_maf, sd_val = sd_val, sd_ss = sd_ss))
 }
 
