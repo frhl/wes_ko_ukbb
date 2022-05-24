@@ -71,7 +71,7 @@ fit_pgs()
 {
   set -x
   qsub -N "${qsub_fit}" \
-    -t 1-22 \
+    -t 20-22 \
     -q short.qc@@short.hga \
     -pe shmem "${cores}" \
     "${bash_script}" \
@@ -106,7 +106,7 @@ clean_pgs()
 {
   set -x
   qsub -N "${qsub_clean}" \
-    -t 1-22 \
+    -t 20-22 \
     -q test.qc \
     -pe shmem 1 \
     -hold_jid_ad "_prs_${phenotype}" \

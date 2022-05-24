@@ -71,22 +71,22 @@ main <- function(args){
   stopifnot(!is.null(indicies))
   
   # dimensions  
-  cols <- genotypes$`.->ncol`
-  rows <- genotypes$`.->nrow`
+  cols <- genotypes$`.->ncol` # variants
+  rows <- genotypes$`.->nrow` # samples
   missing_gt <- NA
 
   # need to impute missing SNPs
   if (!is.null(args$impute)){
-    sum_rows <- lapply(1:rows, function(i) return(sum(is.na(genotypes[i,])))) 
-    missing_gt <- sum(unlist(sum_rows))
+    sum_cols <- lapply(1:cols, function(i) return(sum(is.na(genotypes[,i])))) 
+    missing_gt <- sum(unlist(sum_cols))
     genotypes <- snp_fastImputeSimple(genotypes, method = args$impute) 
   }
 
   # standardize genotypes 
   means <- NULL; sds <- NULL
   if (args$standardized_gt){
-     means <- as.numeric(unlist(lapply(1:rows, mean)))
-     sds <- as.numeric(unlist(lapply(1:rows, sd)))
+     means <- as.numeric(unlist(lapply(1:cols, function(i) mean(genotypes[,i], na.rm = TRUE))))
+     sds <- as.numeric(unlist(lapply(1:cols, function(i) sd(genotypes[,i], na.rm = TRUE))))
      write(means, paste0(args$out_prefix, ".means"))
      write(sds, paste0(args$out_prefix, ".sds"))
   }
