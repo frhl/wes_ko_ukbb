@@ -7,7 +7,7 @@ fread_ko <- function(f, samples, labels){
     
     # read file and 
     d <- fread(f)
-    d <- d[,c(2,1,4,10), with = FALSE]
+    d <- d[,c(2,1,4,9,10), with = FALSE]
     d <- d[d$s %in% samples]
     d$varid <- format_from_hail(d$varid)
 
@@ -30,6 +30,7 @@ fread_ko <- function(f, samples, labels){
     new_grid <- new_grid[!duplicated(new_grid),]
     stopifnot(nrow(new_grid)-nrow(grid)==nrow(d))
     new_grid$varid <- NA
+    new_grid$pKO <- NA 
     new_grid$csqs <- NA 
 
     # output data
@@ -95,14 +96,14 @@ main <- function(args){
   for (f in fs){
     d <- fread_ko(f, samples, labels)
     chrom <- stringr::str_extract(f, "chr[0-9]+")
-    genes <- unique(d$ensensembl_gene_id)
+    genes <- unique(d$ensembl_gene_id)
     
     # table containing all mutations for affected indiviudals
     d_minimal <- d[!is.na(d$csqs),]
     d_minimal$hgnc_symbol <- ensg_to_hgnc[d_minimal$ensembl_gene_id]
     d_minimal$loeuf <- ensg_to_loeuf[d_minimal$ensembl_gene_id]
     d_minimal$loeuf_decile <- ensg_to_loeuf_decile[d_minimal$ensembl_gene_id]
-    d_minimal <- d_minimal[,c(1,5,2,3,4,6,7)]
+    d_minimal <- d_minimal[,c(1,6,2,3,5,4,7,8)]
 
     # write to main folder
     outfile <- paste0(args$out_dir, "_knockouts_",chrom,".txt.gz")
@@ -112,11 +113,26 @@ main <- function(args){
     thedir <- paste0(args$out_dir,"/",chrom)
     dir.create(thedir)
     for (g in genes){
-        d_gene <- d[d$gene_id %in% g,]
+
+        keep <- TRUE
+        g_loeuf <-  ensg_to_loeuf[g]
+
+        # annotate gene 
+        d_gene <- d[d$ensembl_gene_id %in% g,]
         d_gene$hgnc_symbol <-  ensg_to_hgnc[d_gene$ensembl_gene_id]
-        d_gene$loeuf_decile <-  ensg_to_loeuf_decile[d_gene$ensembl_gene_id]
-        if (sum(d_gene$pKO) >= 4){
-            outfile = paste0(thedir,"/",g,".txt.gz")
+        
+        # lower quantile of LOEUF
+        if (!is.null(args$loeuf_lower_quantile)){
+            lower_quantile <- quantile(na.omit(constraints$loeuf), probs = args$loeuf_lower_quantile)
+            if (g_loeuf <= lower_quantile) keep <- FALSE
+        } 
+        # Upper quantile of LOEUF
+        if (!is.null(args$loeuf_upper_quantile)){
+            lower_quantile <- quantile(na.omit(constraints$loeuf), probs = args$loeuf_upper_quantile)
+            if (g_loeuf >= upper_quantile) keep <- FALSE
+        } 
+        if (sum(d_gene$pKO, na.rm = TRUE) >= 4 & keep == TRUE){
+            outfile <- paste0(thedir,"/",g,".txt.gz")
             fwrite(d_gene, outfile, sep = '\t', quote = FALSE)
         }
     }
@@ -129,6 +145,8 @@ parser <- ArgumentParser()
 parser$add_argument("--in_dir", default=NULL, required = TRUE, help = "Directory in which to search for knockouts")
 parser$add_argument("--in_pattern", default="pLoF_damaging_missense_all.tsv.gz", required = TRUE, help = "Pattern for grepping files.")
 parser$add_argument("--out_dir", default=NULL, required = TRUE, help = "Directory for which to output results (will create a file for each gene)")
+parser$add_argument("--loeuf_lower_quantile", default=NULL, required = FALSE, help = "What lower quantile to keep (e.g 0.1)")
+parser$add_argument("--loeuf_upper_quantile", default=NULL, required = FALSE, help = "What upper quantile to keep (e.g 0.95)")
 args <- parser$parse_args()
 
 main(args)
