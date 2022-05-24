@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 3
 #$ -q short.qe
-#$ -t 1-84
+#$ -t 45
 #$ -V
 
 set -o errexit
@@ -28,11 +28,11 @@ readonly ld_dir="data/prs/hapmap/ld/matrix"
 
 readonly index=${SGE_TASK_ID}
 
-readonly file_cts="${pheno_dir}/filtered_phenotypes_cts.txt"
+readonly file_cts="${pheno_dir}/filtered_covar_phenotypes_cts.tsv.gz"
 readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
 readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
 
-readonly file_binary="${pheno_dir}/filtered_phenotypes_binary.txt"
+readonly file_binary="${pheno_dir}/filtered_covar_phenotypes_binary.tsv.gz"
 readonly pheno_list_binary="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
 readonly phenotype_binary=$( sed "${index}q;d" ${pheno_list_binary} )
 
@@ -64,5 +64,5 @@ estimate_heritability(){
 }
 
 estimate_heritability "${phenotype_cts}" "cts"
-estimate_heritability "${phenotype_binary}" "binary"
+#estimate_heritability "${phenotype_binary}" "binary"
 

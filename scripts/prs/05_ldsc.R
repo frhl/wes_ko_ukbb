@@ -52,7 +52,7 @@ main <- function(args){
   # get qc data.frame
   d_qc <- data.frame(
     well_behaved_snps = sum(well_behaved_snps), 
-    total_snps = length(well_behave_snps),
+    total_snps = length(well_behaved_snps),
     sd_ss = qc$sd_ss,
     sd_val = qc$sd_val
   )
