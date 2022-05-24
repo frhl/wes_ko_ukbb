@@ -18,10 +18,10 @@ readonly rscript="scripts/post_hoc/02_count_ko_case_control.R"
 
 readonly pheno_dir="data/phenotypes"
 readonly phenos="${pheno_dir}/filtered_phenotypes_binary.tsv"
-readonly ko_dir="data/knockouts/alt/old"
-readonly ko_file="${ko_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_damaging_missense.tsv.gz"
+readonly ko_dir="data/knockouts/alt"
+readonly ko_file="${ko_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense.tsv.gz"
 readonly out_dir="data/post_hoc/results"
-readonly out_prefix="${out_dir}/count_ko_case_control"
+readonly out_prefix="${out_dir}/knockouts"
 
 mkdir -p ${out_dir}
 
