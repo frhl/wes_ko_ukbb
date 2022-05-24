@@ -87,8 +87,6 @@ main <- function(args){
   if (args$standardized_gt){
      means <- as.numeric(unlist(lapply(1:cols, function(i) mean(genotypes[,i], na.rm = TRUE))))
      sds <- as.numeric(unlist(lapply(1:cols, function(i) sd(genotypes[,i], na.rm = TRUE))))
-     write(means, paste0(args$out_prefix, ".means"))
-     write(sds, paste0(args$out_prefix, ".sds"))
   }
 
   if (args$method %in% "inf"){
