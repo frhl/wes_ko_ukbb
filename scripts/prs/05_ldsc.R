@@ -46,15 +46,16 @@ main <- function(args){
   
   # what SNPs should be kept?
   well_behaved_snps <- (!qc$is_bad)
-  gwas <- info_snp[well_behaved_snps, ]
+  keep_snps <- well_behaved_snps
+  if (args$disable_qc) keep_snps <- TRUE
+  gwas <- info_snp[keep_snps, ]
   gwas$marker <- get_ldpred_marker(gwas)
 
   # get qc data.frame
   d_qc <- data.frame(
     well_behaved_snps = sum(well_behaved_snps), 
     total_snps = length(well_behaved_snps),
-    sd_ss = qc$sd_ss,
-    sd_val = qc$sd_val
+    disable_qc = args$disable_qc
   )
 
   # Get LD matrix for final SNPs
@@ -138,6 +139,7 @@ parser$add_argument("--gwas", default=NULL, required = TRUE, help = "Path to QCe
 parser$add_argument("--ld_bed", default=NULL, required = TRUE, help = "Path to plink file (bed) used to design LD-matrix")
 parser$add_argument("--ld_dir", default=NULL, required = TRUE, help = "Path to directory with pre-calcualted SNP correlations and LD (.rds files)")
 parser$add_argument("--phenotype", default=NULL, required = TRUE, help = "String. Current phenotype")
+parser$add_argument("--disable_qc", default = FALSE, action='store_true', required = FALSE, help = "String. Current phenotype")
 parser$add_argument("--path_cts_phenotypes", default=NULL, required = TRUE, help = "Path to cts phenotypes")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()

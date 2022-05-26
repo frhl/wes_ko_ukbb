@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 3
 #$ -q short.qe
-#$ -t 45
+#$ -t 1-44
 #$ -V
 
 set -o errexit
@@ -56,7 +56,8 @@ estimate_heritability(){
         --trait "${trait}" \
         --phenotype "${phenotype}" \
         --path_cts_phenotypes "${file_cts}" \
-        --out_prefix "${out_prefix}"
+        --out_prefix "${out_prefix}" \
+        --disable_qc # we have already QCed Sumstats/SNPs
     set +x
   else
     echo "Note: ${out_prefix} already exists. Skipping.."
