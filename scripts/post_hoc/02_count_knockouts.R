@@ -64,7 +64,7 @@ main <- function(args){
   }))
 
   # write samples file
-  by_samples$infile <- args$ko_file
+  #by_samples$infile <- args$ko_file
   outfile_samples <- paste0(args$out_prefix, "_by_phenotypes.txt.gz")
   fwrite(by_samples, outfile_samples, append = TRUE, quote = FALSE, sep = '\t', col.names = TRUE)
 
@@ -72,7 +72,7 @@ main <- function(args){
   ko_tmp <- ko[,c('s','knockout'), with = FALSE]
   ko_samples <- dcast(s ~ knockout, data = ko_tmp, fun.aggregate = length)
   
-  ko_samples$infile <- args$ko_file
+  #ko_samples$infile <- args$ko_file
   outfile_ko_samples <- paste0(args$out_prefix, "_by_samples.txt.gz")
   fwrite(ko_samples, outfile_ko_samples, append = TRUE, quote = FALSE, sep = '\t', col.names = TRUE)
  
@@ -87,7 +87,7 @@ main <- function(args){
   last_col <- ncol(ko_genes)
   ko_genes <- ko_genes[,c(last_col,1:(last_col-1)), with = FALSE]
 
-  ko_genes$infile <- args$ko_file
+  #ko_genes$infile <- args$ko_file
   outfile_ko_genes <- paste0(args$out_prefix, "_by_genes.txt.gz")
   fwrite(ko_genes, outfile_ko_genes, append = TRUE, quote = FALSE, sep = '\t', col.names = TRUE)
  
