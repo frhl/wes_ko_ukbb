@@ -10,9 +10,10 @@ from ukb_utils import samples
 from ukb_utils import variants
 from ko_utils import io
 
+AUTOSOMES = list(map(str, range(1, 23)))
+
 def main(args):
     
-    chrom = args.chrom
     ko_path = args.ko_path
     ko_type = args.ko_type
     markers = args.markers
@@ -66,7 +67,6 @@ def main(args):
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--chrom', default=None, help='')
     parser.add_argument('--ko_path', default=None, help='')
     parser.add_argument('--ko_type', default=None, help='')
     parser.add_argument('--markers', default=None, help='')

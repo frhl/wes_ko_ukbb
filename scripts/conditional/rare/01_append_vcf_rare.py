@@ -53,17 +53,17 @@ def main(args):
     mt = mt.filter_rows(hl.literal(set(csqs_category)).contains(mt.consequence_category)) 
     
     # export list of variants for later conditional analysis
-    #ht = mt.rows()
-    #varid = hl.delimit([
-    #    hl.str(ht.locus.contig),
-    #    hl.str(ht.locus.position),
-    #    ht.alleles[0],
-    #    ht.alleles[1]],':')
-    #ht = ht.annotate(
-    #    varid = varid,
-    #    csqs = csqs)
-    #ht = ht.select('rsid','info','MAF', 'MAC', 'varid', 'consequence_category')
-    #ht.flatten().export(out_prefix + "_variants.txt.gz")
+    ht = mt.rows()
+    varid = hl.delimit([
+        hl.str(ht.locus.contig),
+        hl.str(ht.locus.position),
+        ht.alleles[0],
+        ht.alleles[1]],':')
+    ht = ht.annotate(
+        rsid = varid,
+        csqs = ht.consequence_category)
+    ht = ht.select('rsid', 'varid', 'consequence_category')
+    ht.flatten().export(out_prefix + "_markers.txt.gz")
 
     # load knockouts
     ko_mt = io.import_table(ko_path, ko_type, calc_info=False)
