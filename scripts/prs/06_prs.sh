@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1
+#$ -t 1-80
 #$ -tc 1
 #$ -V
 
@@ -63,7 +63,6 @@ submit_ldpred2()
 
   # remove disk backing files
   clean_pgs
-
 }
 
 
@@ -71,7 +70,7 @@ fit_pgs()
 {
   set -x
   qsub -N "${qsub_fit}" \
-    -t 20-22 \
+    -t ${tasks} \
     -q short.qc@@short.hga \
     -pe shmem "${cores}" \
     "${bash_script}" \
@@ -106,7 +105,7 @@ clean_pgs()
 {
   set -x
   qsub -N "${qsub_clean}" \
-    -t 20-22 \
+    -t ${tasks} \
     -q test.qc \
     -pe shmem 1 \
     -hold_jid_ad "_prs_${phenotype}" \
@@ -116,7 +115,7 @@ clean_pgs()
   set +x 
 }
 
-
+readonly tasks=1-22
 submit_ldpred2 "auto" "8" "${phenotype_cts}"
-#submit_ldpred2 "auto" "8" "${phenotype_binary}"
+submit_ldpred2 "auto" "8" "${phenotype_binary}"
 
