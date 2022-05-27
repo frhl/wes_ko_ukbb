@@ -4,6 +4,7 @@ import hail as hl
 import argparse
 import pandas as pd
 import random
+import string
 
 from ukb_utils import hail_init
 from ukb_utils import samples
@@ -41,6 +42,7 @@ def main(args):
     use_loftee = args.use_loftee
     export_all_gts = args.export_all_gts
     csqs_category = args.csqs_category
+    discard_prob_dosages = args.discard_prob_dosages
 
     # import phased/unphased data
     hail_init.hail_bmrc_init('logs/hail/knockout.log', 'GRCh38')
@@ -122,6 +124,11 @@ def main(args):
     prob = prob.key_rows_by(prob.locus, prob.alleles)
     prob = prob.drop(*['gene_id','tmp_ref','tmp_alt','row_idx'])
 
+    # discard effects owed to unphased singletons
+    if discard_prob_dosages:
+        new_DS = ko.discard_prob_dosages(prob.DS)
+        prob = prob.transmute_entries(DS = new_DS)
+
     # write out variants involved and vcf
     io.export_table(prob, out_prefix, out_type)
     if not only_vcf:
@@ -148,6 +155,7 @@ if __name__=='__main__':
     parser.add_argument('--exclude', default=None, help='exclude variants by rsid and/or variant id')
     parser.add_argument('--use_loftee', default=False, action='store_true', help='use LOFTEE to distinghiush between high confidence PTVs')
     parser.add_argument('--export_all_gts', default=False, action='store_true', help='Exports a table of all csqs')
+    parser.add_argument('--discard_prob_dosages', default=False, action='store_true', help='Discard any dosages < 2 by setting them to zero.')
     parser.add_argument('--csqs_category', default=None, action=SplitArgs, help='What categories should be subsetted to?')
 
     args = parser.parse_args()

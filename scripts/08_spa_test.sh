@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-44
+#$ -t 1-88
 #$ -tc 22
 #$ -V
 
@@ -17,7 +17,7 @@ set -o nounset
 module purge
 source utils/bash_utils.sh
 
-readonly vcf_dir="data/knockouts/alt"
+readonly vcf_dir="data/knockouts/alt/old"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
 
@@ -132,7 +132,7 @@ maf="maf0to5e-2"
 
 # cts traits
 submit_spa_cts_with_csqs "pLoF_damaging_missense"
-#submit_spa_binary_with_csqs "pLoF_damaging_missense"
+submit_spa_binary_with_csqs "pLoF_damaging_missense"
 
 #sleep 10
 #submit_spa_cts_with_csqs "pLoF"

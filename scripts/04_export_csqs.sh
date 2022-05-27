@@ -17,8 +17,8 @@ source utils/qsub_utils.sh
 source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark_dir"
-readonly hail_script="scripts/03_export_csqs.py"
-readonly rscript="scripts/03_export_csqs.R"
+readonly hail_script="scripts/04_export_csqs.py"
+readonly rscript="scripts/04_export_csqs.R"
 
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 
 readonly in_dir="data/mt/annotated"
@@ -48,6 +48,8 @@ else
 fi 
 
 
+# Generate SAIGE-GENE+ Group file consequence
+# annotations (SAIGE version > 0.99.2)
 module purge
 set_up_rpy
 Rscript ${rscript} \

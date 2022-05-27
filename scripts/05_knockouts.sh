@@ -21,20 +21,22 @@ readonly spark_dir="data/tmp/spark"
 readonly bash_script="scripts/_knockouts.sh"
 
 readonly in_dir="data/mt/annotated"
-readonly out_dir="data/knockouts/test_cis"
+readonly out_dir="data/knockouts/alt/test_dosages"
 readonly in_prefix="${in_dir}/ukb_eur_wes_200k_annot_chrCHR.mt"
 readonly in_type="mt"
 
-readonly out_prefix="${out_dir}/ukb_eur_wes_200k"
+readonly out_prefix="${out_dir}/ukb_eur_wes_200k_nosingletons"
 readonly out_type="vcf"
 
-# Note: ~20 slots are needed for running chr1 
-# when using aggr_method="collect" on short.qe
+# Note: ~24 slots are needed for running chr1. 
+# when using aggr_method="collect" on the e-queue.
+# Note: long queue may be required for chr1.
 readonly tasks="1-22"
-readonly queue="short.qa"
-#readonly nslots=16
+readonly queue="short.qc"
+#readonly nslots=5 # now set manually
 
 readonly only_vcf=""
+readonly discard_prob_dosages="Y"
 #readonly aggr_method="collect" # either fasts or collect
 
 # variant and sample parameters
@@ -87,10 +89,14 @@ submit_knockout_job()
 
 #submit_knockout_job "synonymous" "5" "fast"
 #submit_knockout_job "other_missense" "5" "fast"
-#submit_knockout_job "pLoF" "20" "collect"
+#submit_knockout_job "pLoF" "5" "fast"
+#submit_knockout_job "pLoF,LC" "5" "fast"
+#submit_knockout_job "pLoF,LC,damaging_missense" "5" "fast"
 #submit_knockout_job "damaging_missense" "5" "fast"
 #
-submit_knockout_job "pLoF,damaging_missense" "20" "collect"
+
+#submit_knockout_job "pLoF,damaging_missense" "24" "collect"
+submit_knockout_job "pLoF,damaging_missense" "6" "fast"
 
 #submit_knockout_job "0" "5e-2" "" "damaging_missense"
 #submit_knockout_job "0" "5e-2" "" "synonymous"

@@ -29,16 +29,23 @@ readonly out_cts="${out_dir}/filtered_phenotypes_cts"
 
 readonly final_sample_list="/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list"
 
-# add age2, age3 and sex-age covariates
+readonly path_covars="${in_dir}/covars1.csv"
+readonly covariates="$(cat ${path_covars})"
+
+# * add age2, age3 and sex-age covariates
+# * add sex-stratified residiuals"
 set_up_rpy
+echo "Running R for new phenotypes"
 Rscript ${r_script} \
   --input_path ${in_bin} \
   --out_path ${tmp_bin}
 
 Rscript ${r_script} \
   --input_path ${in_cts} \
+  --covariates ${covariates} \
   --out_path ${tmp_cts}
 
+set +eu
 conda deactivate
 module purge
 
@@ -46,6 +53,7 @@ module purge
 # get headers and case / control ratio
 set_up_hail
 set_up_pythonpath_legacy  
+echo "Running Python for case/ctrl ratios"
 python3 "${hail_script}" \
      --input_path "${in_bin}" \
      --extract_samples "${final_sample_list}" \
@@ -60,12 +68,13 @@ python3 "${hail_script}" \
      --out_prefix "${out_cts}"
 
 # create seperate header for Primary Care data
-cat "${in_bin}_"
+echo "Creating header files"
 cat "${in_bin}_header.tsv" | grep care > "${out_bin}_PC_header.tsv"
 cat "${in_bin}_header.tsv" | grep -v care > "${out_bin}_notPC_header.tsv"
 
 # create seperate header for non residuals (i.e. 
 # the signal that's left after conditioning
-cat "${in_cts}" | grep residual > "${out_cts}_residual.tsv"
+cat "${in_cts}" | grep residual | grep -v residual_sex > "${out_cts}_residual.tsv"
+cat "${in_cts}" | grep residual | grep residual_sex > "${out_cts}_residual.tsv"
 
 

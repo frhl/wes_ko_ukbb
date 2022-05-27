@@ -33,7 +33,7 @@ def main(args):
 
     # write a table with variants and consequences which
     # we can access in other coding languages
-    ht.
+    #ht.
 
 
 

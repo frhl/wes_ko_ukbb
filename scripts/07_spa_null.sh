@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 1-80
+#$ -t 45-88
 #$ -tc 1
 #$ -V
 
@@ -115,7 +115,7 @@ submit_spa_null() {
 }
 
 # Fit null model for binary/cts traits
-fit_binary_traits
+#fit_binary_traits
 fit_cts_traits
 
 
