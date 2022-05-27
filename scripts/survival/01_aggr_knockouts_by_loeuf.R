@@ -29,9 +29,9 @@ fread_ko <- function(f, samples, labels){
     new_grid <- rbind(d[,c(1,2)], grid[,c(1,2)])
     new_grid <- new_grid[!duplicated(new_grid),]
     stopifnot(nrow(new_grid)-nrow(grid)==nrow(d))
-    new_grid$varid <- NA
-    new_grid$pKO <- NA 
-    new_grid$csqs <- NA 
+    new_grid$varid <- "NA"
+    new_grid$pKO <- "NA"
+    new_grid$csqs <- "Wildtype" 
 
     # output data
     d <- rbind(d, new_grid)

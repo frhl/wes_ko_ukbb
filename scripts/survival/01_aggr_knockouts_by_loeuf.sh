@@ -20,7 +20,7 @@ readonly rscript="scripts/survival/01_aggr_knockouts_by_loeuf.R"
 
 readonly in_pattern="pLoF_damaging_missense_all.tsv.gz"
 readonly in_dir="data/knockouts/alt"
-readonly out_dir="data/survival/knockouts/eur_no_fin/pLoF_damaging_missense"
+readonly out_dir="data/survival/knockouts/eur_no_fin/loeuf/pLoF_damaging_missense"
 
 mkdir -p ${out_dir}
 
@@ -28,6 +28,8 @@ set_up_rpy
 Rscript ${rscript} \
   --in_pattern ${in_pattern} \
   --in_dir ${in_dir} \
+  --loeuf_lower_quantile 0.2 \
+  --loeuf_upper_quantile 0.8 \
   --out_dir ${out_dir}
 
 
