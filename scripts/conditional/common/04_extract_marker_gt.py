@@ -27,7 +27,7 @@ def main(args):
     if len(markers) == 0:
         raise TypeError("no markers are present after splitting on ','")
 
-    mt = genotypes.get_ukb_imputed_v3_bgen(chrom)
+    mt = genotypes.get_ukb_imputed_v3_bgen(AUTOSOMES)
     mt = variants.liftover(mt)
     mt = mt.annotate_rows(
             marker = hl.delimit([
@@ -53,7 +53,7 @@ def main(args):
     # select only relevant rows
     mt = mt.select_rows(*[mt.rsid, mt.varid])
     
-    # extract entries
+    # extract indiviudal GT entries
     mt.entries().flatten().export(out_prefix + ".tsv.gz")
 
     # export variants to be used for conditional analysis

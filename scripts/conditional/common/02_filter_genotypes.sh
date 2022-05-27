@@ -8,7 +8,7 @@
 #$ -e logs/filter_genotypes.errors.log
 #$ -P lindgren.prjc
 #$ -q test.qc
-#$ -t 1-2
+#$ -t 1-80
 #$ -V
 
 
@@ -80,14 +80,14 @@ submit_intervals()
 submit_binary_analysis "pLoF_damaging_missense"
 submit_cts_analysis "pLoF_damaging_missense"
 
-submit_binary_analysis "pLoF"
-submit_cts_analysis "pLoF"
+#submit_binary_analysis "pLoF"
+#submit_cts_analysis "pLoF"
 
-submit_binary_analysis "damaging_missense"
-submit_cts_analysis "damaging_missense"
+#submit_binary_analysis "damaging_missense"
+#submit_cts_analysis "damaging_missense"
 
-submit_binary_analysis "synonymous"
-submit_cts_analysis "synonymous"
+#submit_binary_analysis "synonymous"
+#submit_cts_analysis "synonymous"
 
 
 

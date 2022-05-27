@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N extract_markers
+#$ -N extract_marker_gt
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/extract_markers.log
-#$ -e logs/extract_markers.errors.log
+#$ -o logs/extract_marker_gt.log
+#$ -e logs/extract_markers_gt.errors.log
 #$ -P lindgren.prjc
 #$ -q short.qc
 #$ -pe shmem 2
@@ -19,11 +19,11 @@ source utils/bash_utils.sh
 source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/conditional/common/04_extract_markers.py"
+readonly hail_script="scripts/conditional/common/04_extract_marker_gt.py"
 
 readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
 
-readonly chr="${SGE_TASK_ID}"
+#readonly chr="${SGE_TASK_ID}"
 readonly out_dir="data/conditional/common/marker"
 readonly out_prefix="${out_dir}/conditional_markers_chr${chr}"
 readonly out_type="vcf"
