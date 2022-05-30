@@ -19,6 +19,7 @@ def main(args):
     markers = args.markers
     out_prefix = args.out_prefix
     out_type = args.out_type
+    chrom = args.chrom
     final_sample_list = args.final_sample_list
     
     hail_init.hail_bmrc_init('logs/hail/extract_markers.log', 'GRCh38')
@@ -28,7 +29,7 @@ def main(args):
     if len(markers) == 0:
         raise TypeError("no markers are present after splitting on ','")
 
-    mt = genotypes.get_ukb_imputed_v3_bgen(AUTOSOMES)
+    mt = genotypes.get_ukb_imputed_v3_bgen(chrom)
     mt = variants.liftover(mt)
     mt = mt.annotate_rows(
             marker = hl.delimit([
@@ -51,10 +52,21 @@ def main(args):
                 delimiter=',')
         mt = mt.filter_cols(hl.is_defined(ht_final_samples[mt.col_key])) 
 
-    # select only relevant rows
-    mt = mt.select_rows(*[mt.rsid, mt.varid])
-    
+    # make table of conditioning variants
+    ht = mt.rows()
+    varid = hl.delimit([
+        hl.str(ht.locus.contig),
+        hl.str(ht.locus.position),
+        ht.alleles[0],
+        ht.alleles[1]],':')
+    ht = ht.annotate(
+        rsid = varid,
+        csqs = "common")
+    ht = ht.select('rsid', 'csqs')
+    ht.flatten().export(out_prefix + "_markers.txt.gz")
+
     # extract indiviudal GT entries
+    mt = mt.select_rows(*[mt.rsid, mt.varid])
     mt.entries().flatten().export(out_prefix + ".tsv.gz")
 
     # export variants to be used for conditional analysis
@@ -67,6 +79,7 @@ def main(args):
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--chrom', default=None, help='')
     parser.add_argument('--ko_path', default=None, help='')
     parser.add_argument('--ko_type', default=None, help='')
     parser.add_argument('--markers', default=None, help='')
