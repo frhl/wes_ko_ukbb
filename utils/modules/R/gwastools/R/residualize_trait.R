@@ -9,9 +9,10 @@ residualize_trait <- function(trait, data, covars = c("age", "age2", "ukbb.centr
     stopifnot(!is.null(data))
     stopifnot(trait %in% colnames(data))
     stopifnot(all(covars %in% colnames(data)))
-    PCs <- paste0(paste0("PC",1:10), collapse = "+")
     covars <- paste0(covars, collapse = "+")
-    f <- as.formula(paste0(trait, "~", covars, "+", PCs))
+    #na_covar_rows <- rowSums(is.na(data[,covars, with = FALSE])) > 0
+    #na_pheno_rows <- 
+    f <- as.formula(paste0(trait, "~", covars))
     fit <- lm(f, data = data, na.action=na.exclude)
     return(resid(fit))
 }
