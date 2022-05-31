@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 40
+#$ -t 41
 #$ -tc 1
 #$ -V
 
@@ -57,16 +57,22 @@ submit_spa_pair()
   local step1_dir="data/saige/output/${trait}/step1"
   local step2_dir="data/saige/output/${trait}/step2_set/min_mac${min_mac}"
 
-  if [ "${use_prs}" -eq "0" ]; then
-      local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
-      local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
-      local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}"
-      local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}.txt.gz"
-    else
-      local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.rda"
-      local in_var="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.varianceRatio.txt"
+  local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
+  local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
+  local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}"
+  local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}.txt.gz"
+
+  if [ "${use_prs}" -eq "1" ]; then
+    local in_gmat_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.rda"
+    local in_var_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.varianceRatio.txt"
+    if [ -f "${in_gmat_prs/CHR/21}" ] & [ -f "${in_var_prs/CHR/21}" ]; then
+      local in_gmat=${in_gmat_prs}
+      local in_var=${in_var_prs}
       local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}_locoprs"
       local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}_locoprs.txt.gz"
+    else
+      >&2 echo "Saige NULL (PRS) ${in_gmat_prs} or ${in_var_prs} does not exist. Using without PRS."
+    fi
   fi 
 
   local in_vcf="${vcf_dir}/${in_prefix}_chrCHR.vcf.bgz"
@@ -74,7 +80,7 @@ submit_spa_pair()
   if [ ! -f ${out_mrg} ]; then
     local qsub_spa_name="sspa_${phenotype}_${annotation}"
     local qsub_merge_name="_smrg_${phenotype}_${annotation}"  
-    #submit_spa_set_job
+    submit_spa_set_job
     submit_merge_job
   else
     >&2 echo "${out_mrg} already exists. Skipping.."
@@ -123,10 +129,9 @@ readonly min_mac=4
 readonly tasks=1-22
 readonly queue="short.qf"
 readonly nslots=1
-readonly use_prs="0"
+readonly use_prs="1"
 
 # cts traits
 submit_spa_set_cts "pLoF_damaging_missense"
-#submit_spa_set_binary "pLoF"
 
 
