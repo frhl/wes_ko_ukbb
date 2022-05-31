@@ -120,9 +120,9 @@ set_arr_saige() {
     if [ "${use_prs}" -eq "1" ]; then
       local in_gmat_prs="${step1_dir}/${in_prefix}_${phenotype}_chr${chr}.rda"
       local in_var_prs="${step1_dir}/${in_prefix}_${phenotype}_chr${chr}.varianceRatio.txt"
-      if [ -f "${in_gmat_prs}" ] & [ -f "${in_var_prs}" ]; then
-        local in_gmat=in_gmat_prs
-        local in_var=in_var_prs
+      if [ -f "${in_gmat_prs/CHR/21}" ] & [ -f "${in_var_prs/CHR/21}" ]; then
+        local in_gmat=${in_gmat_prs}
+        local in_var=${in_var_prs}
       else
         >&2 echo "Saige NULL (PRS) ${in_gmat_prs}/${in_var_prs} does not exist. Using without PRS."
       fi
