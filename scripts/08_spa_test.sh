@@ -62,9 +62,9 @@ submit_spa_with_csqs()
     if [ "${use_prs}" -eq "1" ]; then
       local in_gmat_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.rda"
       local in_var_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.varianceRatio.txt"
-      if [ -f "${in_gmat_prs}" ] & [ -f "${in_var_prs}" ]; then
-        local in_gmat=in_gmat_prs
-        local in_var=in_var_prs
+      if [ -f "${in_gmat_prs/CHR/21}" ] & [ -f "${in_var_prs/CHR/21}" ]; then
+        local in_gmat=${in_gmat_prs}
+        local in_var=${in_var_prs}
         local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}_locoprs"
         local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}_locoprs.txt.gz"
       else
