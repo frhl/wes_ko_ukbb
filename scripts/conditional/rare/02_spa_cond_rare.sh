@@ -25,9 +25,9 @@ readonly spa_script="scripts/conditional/rare/_spa_cond_rare.sh"
 readonly merge_script="scripts/_spa_merge.sh"
 readonly in_prefix="ukb_eur_wes_200k"
 
-readonly cond_dir="data/mt/vep"
-readonly cond="${cond_dir}/ukb_eur_wes_200k_csqs_chrCHR.tsv.gz"
-readonly cond_cat="(pLoF)|(damaging_missense)" # regex
+readonly cond_dir="data/conditional/rare/combined"
+readonly cond="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_markers.txt.gz"
+readonly cond_cat="(pLoF)|(damaging_missense)" 
 
 submit_spa_binary_with_csqs()
 {
@@ -124,7 +124,7 @@ submit_merge_job()
 readonly conditioning_markers=""
 readonly use_prs="1"
 readonly min_mac=4
-readonly tasks=21
+readonly tasks=20
 readonly queue="short.qe"
 readonly nslots=2
 

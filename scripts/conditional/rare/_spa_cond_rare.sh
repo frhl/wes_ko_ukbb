@@ -49,12 +49,12 @@ readonly cond_chr=$(echo ${cond} | sed -e "s/CHR/${chr}/g")
 >&2 echo ${cond_chr}
 >&2 echo ${cond_cat}
 
-readonly markers_raw=$(zcat ${cond_chr} | grep -E "${cond_cat}" | cut -f9)
+readonly markers_raw=$(zcat ${cond_chr} | grep -E "${cond_cat}" | cut -f3)
 readonly markers_n=$(zcat ${cond_chr} | grep -E "${cond_cat}" | wc -l)
-readonly markers=$( echo ${markers_raw} | tr " " ",")
+#readonly markers=$( echo ${markers_raw} | tr " " ",")
 readonly markers_file="${out_prefix}.markers"
->&2 echo "Found ${markers_n} conditioning markers >${cond_cat}<."
-echo ${markers} > "${markers_file}"
+>&2 echo "Found ${markers_n} conditioning markers."
+echo ${markers_raw} > "${markers_file}"
 
 spa_test() {
   echo "var_bytes=${var_bytes} at ${var}"
