@@ -5,9 +5,8 @@
 #$ -o logs/extract_marker_gt.log
 #$ -e logs/extract_marker_gt.errors.log
 #$ -P lindgren.prjc
-#$ -q short.qc
-#$ -t 11
-#$ -pe shmem 2
+#$ -q short.qa
+#$ -pe shmem 3
 #$ -V
 
 
@@ -24,30 +23,28 @@ readonly hail_script="scripts/conditional/common/04_extract_marker_gt.py"
 readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
 
 readonly chr="${SGE_TASK_ID}"
-readonly out_dir="data/conditional/common/marker"
+readonly out_dir="data/conditional/common/marker_mt"
 readonly out_prefix="${out_dir}/conditional_markers_chr${chr}"
+readonly out_checkpoint="${out_prefix}_checkpoint.mt"
 readonly out_type="vcf"
 
 readonly markers_dir="data/conditional/common/spa_iter"
 readonly markers=$(cat ${markers_dir}/*.markers | sed '/^[[:space:]]*$/d' | tr "\n" ",")
-#readonly markers=$(cat ${markers_dir}/*.markers | sed '/^[[:space:]]*$/d' | grep "chr${chr}" | tr "\n" ",")
 readonly chroms=$(cat ${markers_dir}/*.markers | sed '/^[[:space:]]*$/d' | cut -d":" -f1)
 
 mkdir -p ${out_dir}
 
-if [ $(echo $chroms | grep "chr${chr}" | wc -l) -eq 1 ]; then
-  SECONDS=0
-  set_up_hail
-  set_up_pythonpath_legacy
-  python3 "${hail_script}" \
-     --chrom ${chr} \
-     --markers ${markers} \
-     --out_type ${out_type} \
-     --out_prefix ${out_prefix} \
-     && print_update "Finished filtering imputed genotypes ${out_prefix}" ${SECONDS} \
-     || raise_error "Filtering imputed genotypes for for ${out_prefix} failed!"
-else
-  >&2 echo "No markers on contig chr${chr}. Skipping.."
-fi
+SECONDS=0
+set_up_hail
+set_up_pythonpath_legacy
+python3 "${hail_script}" \
+   --markers ${markers} \
+   --out_type ${out_type} \
+   --out_prefix ${out_prefix} \
+   && print_update "Finished filtering imputed genotypes ${out_prefix}" ${SECONDS} \
+   || raise_error "Filtering imputed genotypes for for ${out_prefix} failed!"
 
+if [ -f "${out_checkpoint}" ]; then
+  rm -rf "${out_checkpoint}"
+fi
 

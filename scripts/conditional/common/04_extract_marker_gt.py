@@ -13,7 +13,6 @@ AUTOSOMES = list(map(str, range(1, 23)))
 
 def main(args):
     
-    chrom = args.chrom
     markers = args.markers
     out_prefix = args.out_prefix
     out_type = args.out_type
@@ -89,6 +88,12 @@ def main(args):
         mt = mt.filter_cols(hl.is_defined(ht_final_samples[mt.col_key]))
 
     # export variants to be used for conditional analysis
+    mt = mt.checkpoint(out_prefix + "_checkpoint.mt", overwrite = True)
+    
+    # write matrix table
+    if out_type not in "mt":
+        io.export_table(mt, out_prefix, "mt")
+    
     io.export_table(mt, out_prefix, out_type)
     
     # extract indiviudal GT entries
@@ -103,7 +108,6 @@ def main(args):
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--chrom', default=None, help='')
     parser.add_argument('--markers', default=None, help='')
     parser.add_argument('--out_prefix', default=None, help='')
     parser.add_argument('--out_type', default=None, help='')
