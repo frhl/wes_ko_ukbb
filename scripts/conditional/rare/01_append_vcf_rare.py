@@ -53,22 +53,30 @@ def main(args):
     mt = mt.filter_rows(hl.literal(set(csqs_category)).contains(mt.consequence_category)) 
     
     # export list of variants for later conditional analysis
-    ht = mt.rows()
     varid = hl.delimit([
-        hl.str(ht.locus.contig),
-        hl.str(ht.locus.position),
-        ht.alleles[0],
-        ht.alleles[1]],':')
-    ht = ht.annotate(
-        rsid = varid,
-        csqs = ht.consequence_category)
-    ht = ht.select('rsid', 'varid', 'consequence_category')
+        hl.str(mt.locus.contig),
+        hl.str(mt.locus.position),
+        mt.alleles[0],
+        mt.alleles[1]],':')
+    mt = mt.annotate_rows(rsid=varid)
+    ht = mt.rows()
+    ht = ht.select('rsid', 'consequence_category')
     ht.flatten().export(out_prefix + "_markers.txt.gz")
+
+    # annotate dosage
+    mt = mt.annotate_entries(DS = hl.float(mt.GT.n_alt_alleles()))
+    mt = mt.drop("GT")
 
     # load knockouts
     ko_mt = io.import_table(ko_path, ko_type, calc_info=False)
     ko_mt = tables.order_cols(ko_mt, mt)
-    final = io.rbind_matrix_tables(ko_mt, mt)
+    final = io.rbind_matrix_tables(mt, ko_mt )
+    
+    #ko_mt_n = ko_mt.count()
+    #mt_n = mt.count()
+    #final_n = final.count()
+    #print("ko_mt_n %s mt_count %s and final %s" % (ko_mt_n, mt_n, final_n)) 
+
     io.export_table(final, out_prefix, out_type)
 
 if __name__=='__main__':
