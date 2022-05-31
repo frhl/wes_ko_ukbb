@@ -16,6 +16,7 @@
 set -o errexit
 set -o nounset
 
+source utils/vcf_utils.sh
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
 source utils/hail_utils.sh
@@ -43,23 +44,31 @@ readonly exclude="data/genes/220310_common_plofs_to_exclude.txt"
 
 mkdir -p ${out_dir}
 
-SECONDS=0
-set_up_hail
-set_up_pythonpath_legacy
-python3 "${hail_script}" \
-   --ko_path ${input_path} \
-   --ko_type ${input_type} \
-   --var_path ${variants_path} \
-   --var_type ${variants_type} \
-   --out_type ${out_type} \
-   --out_prefix ${out_prefix} \
-   --csqs_category ${category} \
-   --maf_max $maf_max \
-   --maf_min $maf_min \
-   --exclude $exclude \
-   --sex $in_sex \
-   --use_loftee \
-   && print_update "Finished merging knockouts with markers ${out_prefix}" ${SECONDS} \
-   || raise_error "Merging knockouts with markers for ${out_prefix} failed!"
 
+if [ ! -f "${out_prefix}.vcf.bgz" ]; then
+  SECONDS=0
+  set_up_hail
+  set_up_pythonpath_legacy
+  python3 "${hail_script}" \
+     --ko_path ${input_path} \
+     --ko_type ${input_type} \
+     --var_path ${variants_path} \
+     --var_type ${variants_type} \
+     --out_type ${out_type} \
+     --out_prefix ${out_prefix} \
+     --csqs_category ${category} \
+     --maf_max $maf_max \
+     --maf_min $maf_min \
+     --exclude $exclude \
+     --sex $in_sex \
+     --use_loftee \
+     && print_update "Finished merging knockouts with markers ${out_prefix}" ${SECONDS} \
+     || raise_error "Merging knockouts with markers for ${out_prefix} failed!"
+fi
+
+if [ ! -f "${out_prefix}.vcf.csi" ]; then
+  module purge
+  module load BCFtools/1.12-GCC-10.3.0
+  make_tabix "${out_prefix}.vcf.bgz" "csi"
+else
 

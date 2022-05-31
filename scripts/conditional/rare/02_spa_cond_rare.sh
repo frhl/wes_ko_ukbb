@@ -17,7 +17,7 @@ set -o nounset
 module purge
 source utils/bash_utils.sh
 
-readonly vcf_dir="data/knockouts/alt"
+readonly vcf_dir="data/conditional/rare/combined"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
 
@@ -122,7 +122,7 @@ submit_merge_job()
 
 # parameters
 readonly conditioning_markers=""
-readonly use_prs="1"
+readonly use_prs="0"
 readonly min_mac=4
 readonly tasks=20
 readonly queue="short.qe"

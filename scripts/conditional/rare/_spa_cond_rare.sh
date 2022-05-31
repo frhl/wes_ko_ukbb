@@ -51,35 +51,33 @@ readonly cond_chr=$(echo ${cond} | sed -e "s/CHR/${chr}/g")
 
 readonly markers_raw=$(zcat ${cond_chr} | grep -E "${cond_cat}" | cut -f3)
 readonly markers_n=$(zcat ${cond_chr} | grep -E "${cond_cat}" | wc -l)
-#readonly markers=$( echo ${markers_raw} | tr " " ",")
 readonly markers_file="${out_prefix}.markers"
->&2 echo "Found ${markers_n} conditioning markers."
+>&2 echo "Note: Subsetted to ${markers_n} conditioning markers."
 echo ${markers_raw} > "${markers_file}"
 
 spa_test() {
   echo "var_bytes=${var_bytes} at ${var}"
   echo "gmat_bytes=${gmat_bytes} at ${gmat}"
   if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then 
-  SECONDS=0
-  Rscript "${step2_SPAtests}"	\
-     --vcfFile=${vcf} \
-     --vcfFileIndex=${csi} \
-     --vcfField="DS" \
-     --chrom="chr${chr}" \
-     --minMAF=0.0000001 \
-     --minMAC=${min_mac} \
-     --GMMATmodelFile=${gmat} \
-     --varianceRatioFile=${var} \
-     --SAIGEOutputFile=${out} \
-     --LOCO=FALSE \
-     --condition_file "${markers_file}" \
-     && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
-     || raise_error "Saddle-point approximation for chr${chr} failed"
+    SECONDS=0
+    Rscript "${step2_SPAtests}"	\
+       --vcfFile=${vcf} \
+       --vcfFileIndex=${csi} \
+       --vcfField="DS" \
+       --chrom="chr${chr}" \
+       --minMAF=0.0000001 \
+       --minMAC=${min_mac} \
+       --GMMATmodelFile=${gmat} \
+       --varianceRatioFile=${var} \
+       --SAIGEOutputFile=${out} \
+       --LOCO=FALSE \
+       && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
+       || raise_error "Saddle-point approximation for chr${chr} failed"
   else
     raise_error "${var} or ${gmat} does not contain any bytes!"
   fi
 }
-
+#--condition_file "${markers_file}" \
 if [ ! -f ${out} ]; then
    set_up_RSAIGE
    spa_test
