@@ -24,29 +24,34 @@ file=$(echo ${prefix} | sed -e "s/CHR/[0-9]+/g" )
 files="${file##*/}$"
 
 # count how many are present versus expected
-readonly n=$(ls -l "${out_dir}" | grep -E "${files}" | grep -v ".index" | wc -l)
+readonly n_files=$(ls -p ${out_dir} | grep -v / | wc -l)
+readonly n=$(ls -l ${out_dir} | grep -E "${files}" | grep -v ".index" | wc -l)
 readonly N=22
 
-# always expecting 22 autosomes
-if (( $(echo "$n == $N" | bc -l) )); then
-  for chr in {1..22}; do
-     file=$(echo ${prefix} | sed -e "s/CHR/${chr}/g")
-     if [ "${chr}" == "1" ]; then
-        cat "${file}" | head -n 1  >> "${out_without_gz}"
-     fi
-     cat "${file}" | tail -n +2  >> "${out_without_gz}"
-     if [ ${remove_by_chr} == "Y" ]; then
-        rm -f "${file}"
-        rm -f "${file}.index"
-     fi 
-  done
-  echo "Merge completed for ${out_without_gz}."
-  gzip "${out_without_gz}"
-  rm -f "${out_without_gz}" # remove existing file
- else
-  >&2 echo "Some chromosomes are missing for ${file} (found ${n} but expected ${N})."
+# check that the folder contains at least one file
+if [ "${n_files}" -gt "0" ]; then
+  # always expecting 22 autosomes
+  if (( $(echo "$n == $N" | bc -l) )); then
+    for chr in {1..22}; do
+       file=$(echo ${prefix} | sed -e "s/CHR/${chr}/g")
+       if [ "${chr}" == "1" ]; then
+          cat "${file}" | head -n 1  >> "${out_without_gz}"
+       fi
+       cat "${file}" | tail -n +2  >> "${out_without_gz}"
+       if [ ${remove_by_chr} == "Y" ]; then
+          rm -f "${file}"
+          rm -f "${file}.index"
+       fi 
+    done
+    echo "Merge completed for ${out_without_gz}."
+    gzip "${out_without_gz}"
+    rm -f "${out_without_gz}" # remove existing file
+   else
+    >&2 echo "Error! Some chromosomes are missing for ${file} (found ${n} but expected ${N})."
+  fi
+  else
+    >&2 echo "Error! Target directory ${out_dir} contains no files!"
 fi
-
 
 
 
