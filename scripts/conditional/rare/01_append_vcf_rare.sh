@@ -70,5 +70,7 @@ if [ ! -f "${out_prefix}.vcf.csi" ]; then
   module purge
   module load BCFtools/1.12-GCC-10.3.0
   make_tabix "${out_prefix}.vcf.bgz" "csi"
-else
+fi
+
+
 

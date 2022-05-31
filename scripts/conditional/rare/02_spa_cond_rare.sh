@@ -122,7 +122,7 @@ submit_merge_job()
 
 # parameters
 readonly conditioning_markers=""
-readonly use_prs="0"
+readonly use_prs="1"
 readonly min_mac=4
 readonly tasks=20
 readonly queue="short.qe"

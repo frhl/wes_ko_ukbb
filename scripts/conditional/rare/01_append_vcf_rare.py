@@ -71,12 +71,9 @@ def main(args):
     ko_mt = io.import_table(ko_path, ko_type, calc_info=False)
     ko_mt = tables.order_cols(ko_mt, mt)
     final = io.rbind_matrix_tables(mt, ko_mt )
-    
-    #ko_mt_n = ko_mt.count()
-    #mt_n = mt.count()
-    #final_n = final.count()
-    #print("ko_mt_n %s mt_count %s and final %s" % (ko_mt_n, mt_n, final_n)) 
-
+   
+    if out_type not in "mt":
+        io.export_table(final, out_prefix, "mt")
     io.export_table(final, out_prefix, out_type)
 
 if __name__=='__main__':
