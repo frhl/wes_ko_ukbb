@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-80
+#$ -t 1-44
 #$ -tc 1
 #$ -V
 
@@ -55,14 +55,15 @@ submit_ldpred2()
   local qsub_aggr="_aggr_${phenotype}"
   local qsub_clean="_clean_${phenotype}"
 
-  # fit actual pgs
-  fit_pgs
+  if [ ! z ${phenotype} ]; then
+    # fit actual pgs
+    fit_pgs
+    # aggregate into matrix
+    aggr_pgs
+    # remove disk backing files
+    clean_pgs
+  fi
 
-  # aggregate into matrix
-  aggr_pgs
-
-  # remove disk backing files
-  clean_pgs
 }
 
 
