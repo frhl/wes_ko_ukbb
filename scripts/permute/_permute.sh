@@ -109,13 +109,24 @@ set_arr_phenos() {
 
 # set array of paths to saige null models
 set_arr_saige() {
+  local in_prefix="ukb_wes_200k"
   local phenotype=${1}
   local trait=$( get_trait_from_pheno ${phenotype} )
   if [[ ( $trait == "cts" ) || ( $trait == "binary") ]]; then
     local step1_dir="data/saige/output/${trait}/step1"
-    local step2_dir="data/saige/output/set/${trait}/step2"
-    local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
-    local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
+    local step2_dir="data/saige/output/${trait}/step2"
+    local in_gmat="${step1_dir}/${in_prefix}_${phenotype}.rda"
+    local in_var="${step1_dir}/${in_prefix}_${phenotype}.varianceRatio.txt"
+    if [ "${use_prs}" -eq "1" ]; then
+      local in_gmat_prs="${step1_dir}/${in_prefix}_${phenotype}_chr${chr}.rda"
+      local in_var_prs="${step1_dir}/${in_prefix}_${phenotype}_chr${chr}.varianceRatio.txt"
+      if [ -f "${in_gmat_prs}" ] & [ -f "${in_var_prs}" ]; then
+        local in_gmat=in_gmat_prs
+        local in_var=in_var_prs
+      else
+        >&2 echo "Saige NULL (PRS) ${in_gmat_prs}/${in_var_prs} does not exist. Using without PRS."
+      fi
+    fi
     read -a arr_saige <<< "${step1_dir} ${step2_dir} ${in_gmat} ${in_var}"
   else
     raise_error "${1} is not a valid trait"
