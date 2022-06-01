@@ -55,7 +55,7 @@ submit_ldpred2()
   local qsub_aggr="_aggr_${phenotype}"
   local qsub_clean="_clean_${phenotype}"
 
-  if [ ! z ${phenotype} ]; then
+  if [ ! -z ${phenotype} ]; then
     # fit actual pgs
     fit_pgs
     # aggregate into matrix
