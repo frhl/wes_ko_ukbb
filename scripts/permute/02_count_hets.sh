@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc
-#$ -t 1-22
+#$ -t 20-22
 #$ -V
 
 set -o errexit
@@ -19,14 +19,15 @@ source utils/hail_utils.sh
 readonly spark_dir="data/tmp/spark"
 readonly hail_script="scripts/permute/02_count_hets.py"
 
-readonly in_dir="data/mt/csqs"
-readonly out_dir="data/permute/counts"
+readonly in_dir="data/mt/annotated"
+#readonly in_dir="data/mt/csqs"
+readonly out_dir="data/permute/counts_new"
 
 readonly chr="${SGE_TASK_ID}"
-readonly input_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense.mt"
+readonly input_path="${in_dir}/ukb_eur_wes_200k_annot_chr${chr}.mt"
 readonly input_type='mt'
 
-readonly annotation="pLoF_damaging_missense"
+readonly csqs="pLoF,damaging_missense"
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_counts_chr${chr}"
 readonly out_type="mt"
 
@@ -39,7 +40,9 @@ if [ ! -d "${out_prefix}.mt" ]; then
     --input_path ${input_path} \
     --input_type ${input_type} \
     --out_prefix ${out_prefix} \
-    --out_type ${out_type}
+    --out_type ${out_type} \
+    --csqs_category ${csqs} \
+    --use_loftee
 else
   >&2 echo "${out_prefix}.mt already exists. Skipping.."
 fi
