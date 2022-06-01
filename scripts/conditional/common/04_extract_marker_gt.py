@@ -88,12 +88,10 @@ def main(args):
         mt = mt.filter_cols(hl.is_defined(ht_final_samples[mt.col_key]))
 
     # export variants to be used for conditional analysis
-    mt = mt.checkpoint(out_prefix + "_checkpoint.mt", overwrite = True)
-    
-    # write matrix table
-    if out_type not in "mt":
-        io.export_table(mt, out_prefix, "mt")
-    
+    io.export_table(mt, out_prefix, "mt")
+    mt = io.import_table(out_prefix, "mt")
+
+    # write VCF
     io.export_table(mt, out_prefix, out_type)
     
     # extract indiviudal GT entries

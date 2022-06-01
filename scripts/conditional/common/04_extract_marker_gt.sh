@@ -9,6 +9,7 @@
 #$ -pe shmem 3
 #$ -V
 
+# Takes ~13h with 3a cores
 
 set -o errexit
 set -o nounset
@@ -24,7 +25,7 @@ readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc
 
 readonly chr="${SGE_TASK_ID}"
 readonly out_dir="data/conditional/common/marker_mt"
-readonly out_prefix="${out_dir}/conditional_markers_chr${chr}"
+readonly out_prefix="${out_dir}/conditional_markers_chrALL"
 readonly out_checkpoint="${out_prefix}_checkpoint.mt"
 readonly out_type="vcf"
 
