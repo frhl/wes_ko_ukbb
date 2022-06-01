@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
 #
-#$ -N _spa_cond_rare
+#$ -N _spa_cond_common_rare
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_spa_cond_rare.log
-#$ -e logs/_spa_cond_rare.errors.log
+#$ -o logs/_spa_cond_common_rare.log
+#$ -e logs/_spa_cond_common_rare.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q lindgren.qe
@@ -46,14 +46,13 @@ readonly step2_SPAtests="utils/saige/step2_SPAtests_cond.R"
 
 # condiitonal markers based on rare variants
 readonly cond_chr=$(echo ${cond} | sed -e "s/CHR/${chr}/g")
->&2 echo ${cond_chr}
->&2 echo ${cond_cat}
 
 readonly markers_raw=$(zcat ${cond_chr} | grep -E "${cond_cat}" | cut -f3)
 readonly markers_n=$(zcat ${cond_chr} | grep -E "${cond_cat}" | wc -l)
 readonly markers_file="${out_prefix}.markers"
 >&2 echo "Note: Subsetted to ${markers_n} conditioning markers."
 echo ${markers_raw} > "${markers_file}"
+
 
 spa_test() {
   echo "var_bytes=${var_bytes} at ${var}"

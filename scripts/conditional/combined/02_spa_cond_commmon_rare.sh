@@ -17,15 +17,15 @@ set -o nounset
 module purge
 source utils/bash_utils.sh
 
-readonly vcf_dir="data/conditional/combined/marker_mt"
+readonly vcf_dir="data/conditional/combined"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
 
-readonly spa_script="scripts/conditional/rare/_spa_cond_common_rare.sh"
+readonly spa_script="scripts/conditional/combined/_spa_cond_common_rare.sh"
 readonly merge_script="scripts/_spa_merge.sh"
 readonly in_prefix="ukb_eur_wes_200k"
 
-readonly cond_dir="data/conditional/common/combined"
+readonly cond_dir="data/conditional/combined"
 readonly cond="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_markers.txt.gz"
 readonly cond_cat="(pLoF)|(damaging_missense)" 
 
@@ -53,7 +53,7 @@ submit_spa_with_csqs()
   if [ ! -z ${phenotype} ]; then
 
     local step1_dir="data/saige/output/${trait}/step1"
-    local step2_dir="data/saige/output/${trait}/step2_rare_cond/min_mac${min_mac}"
+    local step2_dir="data/saige/output/${trait}/step2_common_rare_cond/min_mac${min_mac}"
     local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${maf}_${annotation}.vcf.bgz"
     mkdir -p ${step2_dir}
 
