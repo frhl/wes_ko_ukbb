@@ -47,10 +47,49 @@ make_vcf_dosage_rows <- function(chrom, positions, marker, use_random_alleles = 
     ))
 }
 
-# read conditional variants
-read_conditional_row <- function(path){
-
-
+# read real variant data in long format (exported from hail)
+format_real_variant_long_to_wide <- function(dt){
+    
+    stopifnot("s" %in% colnames(dt))
+    stopifnot("locus" %in% colnames(dt))
+    stopifnot("alleles" %in% colnames(dt))
+    
+    mapping <- dt[,c("locus","alleles")]
+    mapping <- mapping[!duplicated(mapping),]
+    
+    # create mapping rows that are to be combined with actual dosages
+    alleles <- as.data.frame(do.call(rbind, strsplit(gsub('(")|(\\])|(\\[)','',mapping$alleles), split = ',')))
+    colnames(alleles) <- c("REF","ALT")
+    mapping <- cbind(mapping, alleles)
+    mapping$chroms <- stringr::str_extract(mapping$locus, "chr[0-9]+")
+    mapping$positions <- gsub("chr[0-9]+\\:", "",mapping$locus)
+    mapping$marker <- paste0(mapping$locus, ":", mapping$REF, ":", mapping$ALT)
+    stopifnot(length(unique(mapping$positions)) == length(mapping$positions)) # can't handle SNPs at same pos
+    mapping_rows <- data.table(
+        "#CHROM" = mapping$chroms,
+          POS = mapping$positions,
+          ID = mapping$marker,
+          REF = mapping$REF,
+          ALT = mapping$ALT,
+          QUAL = '.',
+          FILTER = '.',
+          INFO = '.',
+          FORMAT = 'DS',
+          locus = mapping$locus
+    )
+    
+    # go from long to wide format
+    dt <- dt[,c('locus','s','DS')]
+    dt <- data.table::dcast(locus~s, data = dt, value.var = "DS")
+    
+    # match mapping rows with dt rows
+    new_index <- match(dt$locus, mapping$locus)
+    mapping_rows <- mapping_rows[new_index,]
+    mapping_rows$locus <- NULL
+    
+    #return(cbind(mapping_rows, dt))
+    return(list(rows = mapping_rows, dosages = dt))
+    
 }
 
 
@@ -58,6 +97,7 @@ main <- function(args){
 
     #print(args)  
     stopifnot(file.exists(args$input_path))
+    stopifnot(file.exists(args$input_path_cond))
     stopifnot(!is.na(as.numeric(args$permutations)))
     stopifnot(!is.null(args$permutations))
 
@@ -79,9 +119,49 @@ main <- function(args){
     # only keep non-probabilistic knockouts
     if (args$only_non_prob_ko) dosage[dosage < 2] <- 0
 
+    # load real conditioning variants
+    cond_dt <- fread(args$input_path_cond)
+    cond_dt$chr <- stringr::str_extract(cond_dt$locus, "chr[0-9]+")
+    cond_dt <- cond_dt[cond_dt$chr %in% args$chrom]
+    n_real_markers <- length(unique(cond_dt$locus)) 
+
+    # if there are conditioning markers available include them downstream.
+    if (n_real_markers > 0 & ){
+
+        # ensure that samples are overlapping
+        sample_overlap <- unique(intersect(cond_dt$s, d$s))
+
+        # subset dosage matrix (with permuted phased)
+        rows <- make_vcf_dosage_rows(args$chrom, 1:n, args$vcf_id)
+        dosage <- dosage[,colnames(dosage) %in% sample_overlap, with = FALSE]
+        rows_dosage <- cbind(rows, dosage)
+
+        # subset real dosage matrix (with actual calls/DS)
+        cond_dt <- cond_dt[cond_dt$s %in% sample_overlap,]
+        cond_lst <- format_real_variant_long_to_wide(cond_dt)
+
+        # get long format
+        cond_rows <- cond_lst$rows
+        cond_dosage <- cond_lst$dosage
+
+        # match columns
+        cond_dosage$locus <- NULL
+        cond_dosage <- cond_dosage[,colnames(dosage), with = FALSE]
+
+        # combine columns and rows
+        cond_rows_dosage <- cbind(cond_rows, cond_dosage)
+        final <- rbind(cond_rows_dosage, rows_dosage)
+
+    }  else {
+
+        rows <- make_vcf_dosage_rows(args$chrom, 1:n, args$vcf_id)
+        rows_dosage <- cbind(rows, dosage)
+        final <- rows_dosage
+    }
+
     # combine synthethic rows with knockout matrix
-    rows <- make_vcf_dosage_rows(args$chrom, 1:n, args$vcf_id)
-    final <- cbind(rows, dosage)
+    #rows <- make_vcf_dosage_rows(args$chrom, 1:n, args$vcf_id)
+    #final <- cbind(rows, dosage)
 
     # (1) write header of VCF
     vcf_out = make_vcf_dosage_header(args$chrom)
@@ -97,6 +177,7 @@ main <- function(args){
 parser <- ArgumentParser()
 parser$add_argument("--chrom", default=NULL, help = "chromosome")
 parser$add_argument("--input_path", default=NULL, help = "path to the input")
+parser$add_argument("--input_path_cond", default=NULL, help = "path to the input")
 parser$add_argument("--permutations", default=NULL, help = "number of times the gene should be permuted")
 parser$add_argument("--only_non_prob_ko", action="store_true", default=FALSE, help = "Only keep knockouts of phased heterozygotes.")
 parser$add_argument("--seed", default=NULL, help = "seed for randomizer")
