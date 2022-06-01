@@ -2,14 +2,14 @@
 #
 # Append pseudo variants with actual variants for downstream conditional analysis.
 #
-#$ -N append_vcf_rare
+#$ -N combine_ko_rare_common
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/append_vcf_rare.log
-#$ -e logs/append_vcf_rare.errors.log
+#$ -o logs/combine_ko_rare_common.log
+#$ -e logs/combine_ko_rare_common.errors.log
 #$ -P lindgren.prjc
 #$ -q short.qc
 #$ -pe shmem 3
-#$ -t 1-22
+#$ -t 12-13
 #$ -V
 
 
@@ -22,18 +22,18 @@ source utils/bash_utils.sh
 source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/conditional/rare/01_append_vcf_rare.py"
+readonly hail_script="scripts/conditional/combined/01_combine_ko_rare_common.py"
 
 readonly chr="${SGE_TASK_ID}"
 readonly variants_dir="data/mt/annotated"
 
 # note: assuming ko and rare variants have already been merged
 readonly ko_rare_dir="data/conditional/rare/combined"
-readonly common_dir="data/conditional/common/combined"
+readonly common_dir="data/conditional/common/marker_mt"
 readonly out_dir="data/conditional/combined"
 
 readonly ko_rare_path="${ko_rare_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense.mt"
-readonly common_path="${common_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense.mt"
+readonly common_path="${common_dir}/conditional_markers_chrundefined.mt"
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense"
 
 readonly ko_rare_type="mt"
@@ -54,6 +54,7 @@ if [ ! -f "${out_prefix}.vcf.bgz" ]; then
   set_up_hail
   set_up_pythonpath_legacy
   python3 "${hail_script}" \
+     --chrom ${chr} \
      --ko_rare_path ${ko_rare_path} \
      --ko_rare_type ${ko_rare_type} \
      --common_path ${common_path} \
@@ -68,5 +69,6 @@ if [ ! -f "${out_prefix}.vcf.csi" ]; then
   module purge
   module load BCFtools/1.12-GCC-10.3.0
   make_tabix "${out_prefix}.vcf.bgz" "csi"
-else
+fi
+
 

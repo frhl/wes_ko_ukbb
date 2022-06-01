@@ -9,6 +9,7 @@ from ko_utils import io
 
 def main(args):
     
+    chrom = args.chrom
     common_path = args.common_path
     common_type = args.common_type
     ko_rare_path = args.ko_rare_path
@@ -22,7 +23,12 @@ def main(args):
     # assuming ko_rare contains psuedo-variants and actual variants
     ko_rare = io.import_table(ko_rare_path, ko_rare_type, calc_info=False)
     common = io.import_table(common_path, common_type, calc_info=False)
-   
+ 
+    # filter to chromosomes (Assuing common 
+    # variants have already been combined).
+    contig = "chr" + chrom
+    common = common.filter_rows(common.locus.contig == contig)
+
     # merge tables and export
     ko_rare = tables.order_cols(ko_rare, common)
     final = io.rbind_matrix_tables(ko_rare, common)
@@ -30,6 +36,7 @@ def main(args):
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--chrom', default=None, help='')
     parser.add_argument('--common_path', default=None, help='')
     parser.add_argument('--common_type', default=None, help='')
     parser.add_argument('--ko_rare_path', default=None, help='')
