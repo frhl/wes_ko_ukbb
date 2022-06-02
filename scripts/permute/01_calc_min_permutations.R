@@ -33,8 +33,8 @@ main <- function(args){
     spa_bin_full <- do.call(rbind, lapply(spa_bin_files, fread_with_basename))
     write("Loaded all cts/binary files..", stdout())
 
-    print(head(spa_cts_full))
-    print(head(spa_bin_full))
+    print(head(spa_cts_full, n=2))
+    print(head(spa_bin_full, n=2))
 
     # write out gene-spa p-value pairs
     spa_full <- rbind(

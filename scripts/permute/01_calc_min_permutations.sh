@@ -18,7 +18,7 @@ source utils/qsub_utils.sh
 readonly rscript="scripts/permute/01_calc_min_permutations.R"
 
 # set parameters
-readonly min_mac=6
+readonly min_mac=4
 readonly p_cutoff="5e-7"
 
 # directories and out paths
