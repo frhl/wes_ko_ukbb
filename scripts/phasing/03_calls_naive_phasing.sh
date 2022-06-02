@@ -9,6 +9,8 @@
 #$ -q short.qc@@short.hga
 #$ -t 20-22
 
+
+source utils/vcf_utils.sh
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
 
@@ -22,15 +24,15 @@ readonly pedigree="${pedigree_dir}/ukb11867_pedigree.fam"
 readonly chr="${SGE_TASK_ID}"
 readonly in_file="${in_dir}/ukb_prefilter_calls_200k_chr${chr}.vcf.bgz"
 readonly out_prefix="${out_dir}/ukb_prefilter_calls_200k_chr${chr}"
-readonly out_file="${out_prefix}.vcf.gz"
+readonly out="${out_prefix}.vcf.gz"
 readonly trio="${out_prefix}.trio"
 
 readonly ref="${ref_dir}/ALL.chr${chr}.phase3_shapeit2_mvncall_integrated_v5.20130502.genotypes.vcf.bgz"
 readonly gmap="/well/lindgren/flassen/software/SHAPEIT4/b38.gmap/chr${chr}.b38.gmap.gz"
 
-mkdir -p ${out_dir}
+mkdir -p ${out}
 
-if [ ! -f ${out_file} ]; then
+if [ ! -f ${out} ]; then
   module load SHAPEIT4/4.2.2-foss-2021a
   SECONDS=0
   shapeit4.2 \
@@ -38,16 +40,16 @@ if [ ! -f ${out_file} ]; then
     --map ${gmap} \
     --region "chr${chr}" \
     --thread $(( ${NSLOTS}-1 )) \
-    --output ${out_file} \
+    --output ${out} \
     && print_update "Finished phasing variants for chr${chr}, out: ${out}" "${SECONDS}" \
     || raise_error "$( print_update "Phasing variants failed for chr${chr}" ${SECONDS} )"
     module purge
 fi
 
-if [ ! -f "${out_file}.tbi" ]; then
+if [ ! -f "${out}.tbi" ]; then
   module purge
   module load BCFtools/1.12-GCC-10.3.0
-  make_tabix "${out_file}" "tbi"
+  make_tabix "${out}" "tbi"
 fi
 
 if [ ! -f ${trio} ]; then
