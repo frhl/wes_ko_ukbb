@@ -126,7 +126,7 @@ main <- function(args){
     n_real_markers <- length(unique(cond_dt$locus)) 
 
     # if there are conditioning markers available include them downstream.
-    if (n_real_markers > 0 & ){
+    if (n_real_markers > 0){
 
         # ensure that samples are overlapping
         sample_overlap <- unique(intersect(cond_dt$s, d$s))

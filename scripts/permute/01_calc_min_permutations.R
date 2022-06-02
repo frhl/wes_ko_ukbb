@@ -53,6 +53,7 @@ main <- function(args){
     spa_genes <- spa_genes[!duplicated(spa_genes),]
     out_prefix_genes <- paste0(args$out_prefix, "_genes.tsv.gz")
     fwrite(spa_genes, out_prefix_genes, sep = '\t')
+    write(paste("wrote", out_prefix_genes),stderr())
 
 }
 

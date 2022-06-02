@@ -84,7 +84,7 @@ main <- function(args){
       return(d_out)
     })) 
   
-  outfile <- paste0(out_prefix, ".txt.gz")
+  outfile <- paste0(args$out_prefix, ".txt.gz")
   fwrite(final, outfile, append = TRUE, quote = FALSE, sep = '\t', col.names = TRUE)
 
 }

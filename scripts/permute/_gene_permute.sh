@@ -27,6 +27,7 @@ readonly out_prefix_success=${4?Error: Missing arg2 (in_vcf)}
 readonly seed=${5?Error: Missing arg6 (path prefix for saige output)}
 readonly gene=${6?Error: Missing arg6 (path prefix for saige output)}
 readonly replicates=${7?Error: Missing arg6 (path prefix for saige output)}
+readonly cond_markers=${8?Error: Missing arg6 (path prefix for saige output)}
 
 readonly id=${SGE_TASK_ID}
 readonly sge_seed=$(( ${id} * ${seed}))
@@ -39,6 +40,7 @@ if [ -f "${input_path}" ]; then
     Rscript ${rscript} \
       --chrom "chr${chr}" \
       --input_path ${input_path} \
+      --input_path_cond ${cond_markers} \
       --permutations ${replicates} \
       --out_prefix ${out_prefix_id} \
       --vcf_id ${gene} \

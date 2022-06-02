@@ -20,7 +20,7 @@ readonly target_dir="data/permute/permutations"
 readonly out_dir="data/permute/results"
 readonly out_prefix="${out_dir}/counts"
 
-
+mkdir -p ${out_dir}
 set_up_rpy
 Rscript ${rscript} \
   --target_dir ${target_dir} \

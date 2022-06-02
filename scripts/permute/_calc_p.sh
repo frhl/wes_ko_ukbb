@@ -38,11 +38,11 @@ lookup_true() {
   # read file and subset to current gene/pheno/annotation
   if [ -f ${true_p_path} ]; then
     if [ "${use_prs}" -eq "1" ]; then
-      local cur_assoc=$( echo ${static_assoc} | sed -e "s/PHENO/${phenotype}/g" | grep "locoprs" | sed -e "s/ANNO/${annotation}/g")
+      local cur_assoc=$( echo ${static_assoc} | sed -e "s/PHENO/${phenotype}/g" | sed -e "s/ANNO/${annotation}/g")
       local readfile=$( zcat ${true_p_path} | grep ${gene} | grep ${cur_assoc} | grep "locoprs" )
       local lines=$( zcat ${true_p_path} | grep ${gene} | grep ${cur_assoc} | grep "locoprs" | wc -l)
     else
-      local cur_assoc=$( echo ${static_assoc} | sed -e "s/PHENO/${phenotype}/g" | grep -v "locoprs" | sed -e "s/ANNO/${annotation}/g")
+      local cur_assoc=$( echo ${static_assoc} | sed -e "s/PHENO/${phenotype}/g" | sed -e "s/ANNO/${annotation}/g")
       local readfile=$( zcat ${true_p_path} | grep ${gene} | grep ${cur_assoc} | grep -v "locoprs" )
       local lines=$( zcat ${true_p_path} | grep ${gene} | grep ${cur_assoc} | grep -v "locoprs" | wc -l)
     fi

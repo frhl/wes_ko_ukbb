@@ -37,18 +37,17 @@ readonly n_shuffle=${9?Error: Missing arg9}
 readonly n_cutoff_shuffle=${10?Error: Missing arg9}
 readonly n_slots_saige=${11?Error: Missing arg10}
 readonly n_slots_permute=${12?Error: Missing arg11}
-readonly tick_interval=${13?Error: Missing arg12}
-readonly tick_timeout=${14?Error: Missing arg13}
-readonly queue_saige=${15?Error: Missing arg14}
-readonly queue_permute=${16?Error: Missing arg15}
-readonly queue_merge=${17?Error: Missing arg15}
-readonly queue_master=${18?Error: Missing arg15}
-readonly annotation=${19?Error: Missing arg17}
-readonly static_assoc=${20?Error: Missing arg18}
-readonly use_prs=${21?Error: Missing arg18}
-iteration=${22?Error: Missing arg18}
-permutation_supply=${23?Error: Missing arg18}
-top_p=${24?Error: Missing arg18}
+readonly queue_saige=${13?Error: Missing arg14}
+readonly queue_permute=${14?Error: Missing arg15}
+readonly queue_merge=${15?Error: Missing arg15}
+readonly queue_master=${16?Error: Missing arg15}
+readonly annotation=${17?Error: Missing arg17}
+readonly static_assoc=${18?Error: Missing arg18}
+readonly use_prs=${19?Error: Missing arg18}
+readonly cond_markers=${20?Error: Missing arg18}
+iteration=${21?Error: Missing arg18}
+permutation_supply=${22?Error: Missing arg18}
+top_p=${23?Error: Missing arg18}
 
 # set final paths depending on gene
 readonly gene="$(zcat ${genes_path} | grep "chr${chr}" | cut -f1 | sed ${index}'q;d' )"
@@ -121,6 +120,7 @@ set_arr_saige() {
       local in_gmat_prs="${step1_dir}/${in_prefix}_${phenotype}_chr${chr}.rda"
       local in_var_prs="${step1_dir}/${in_prefix}_${phenotype}_chr${chr}.varianceRatio.txt"
       if [ -f "${in_gmat_prs/CHR/21}" ] & [ -f "${in_var_prs/CHR/21}" ]; then
+        echo "Note: PRS files were found (${phenotype}). Using PRS NULL models as SAIGE input."
         local in_gmat=${in_gmat_prs}
         local in_var=${in_var_prs}
       else
@@ -150,6 +150,7 @@ get_trait_from_pheno() {
 # been completed. Will wait for the qsub script to run before proceeding.
 submit_shuffle_phase() {
 
+  
   local permutations_demand=${1}
   local n_tasks_required=$(( (${permutations_demand} / ${replicates}) - ${permutation_supply} ))
   local sge_seed=3
@@ -181,7 +182,8 @@ submit_shuffle_phase() {
           ${out_permute_success} \
           ${sge_seed} \
           ${gene} \
-          ${replicates}
+          ${replicates} \
+          ${cond_markers}
 
     else
       echo >&2 "${out_permute_upper_bound} already exists. Skipping.."
@@ -304,8 +306,6 @@ resubmit_loop() {
     "${n_cutoff_shuffle}" \
     "${n_slots_saige}" \
     "${n_slots_permute}" \
-    "${tick_interval}" \
-    "${tick_timeout}" \
     "${queue_saige}" \
     "${queue_permute}" \
     "${queue_merge}" \
@@ -313,6 +313,7 @@ resubmit_loop() {
     "${annotation}" \
     "${static_assoc}" \
     "${use_prs}" \
+    "${cond_markers}" \
     "${iteration}" \
     "${permutation_supply}" \
     "${new_top_p}" 
@@ -362,8 +363,8 @@ SECONDS=0
 do_extra_loop=0
 iteration=$((${iteration} + 1))
 set_arr_phenos "cts"
-arr_phenos=( "Alanine_aminotransferase_residual" "Calcium_residual" "WHR_adj_BMI" "BMI" "Apolipoprotein_B_residual")
-#arr_phenos=( "Alanine_aminotransferase_residual" )
+#arr_phenos=( "Alanine_aminotransferase_residual" "Calcium_residual" "WHR_adj_BMI" "BMI" "Apolipoprotein_B_residual")
+arr_phenos=( "Alanine_aminotransferase_residual" )
 
 
 echo "Starting iteration ${iteration}"
@@ -400,7 +401,7 @@ if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then
     new_n_shuffle=$(( ${n_shuffle} * 10 ))
     resubmit_loop
   else
-    echo "Done! Finished all inputted phenotypes."
+    echo "Done! Finished all (selected) phenotypes."
   fi
 else
   touch ${file_cutoff}
