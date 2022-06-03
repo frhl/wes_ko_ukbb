@@ -21,8 +21,8 @@ main <- function(args){
     true_p <- as.numeric(args$true_p)
     
     # Check for conditional
-    if ("p.value_cond" %in% colnames(d)){ 
-      pvalue <- as.numeric(d$p.value_cond)
+    if ("p.value_c" %in% colnames(d)){ 
+      pvalue <- as.numeric(d$p.value_c)
     } else {
       pvalue_orig <- rep(NA, length(pvalue_orig))
     }

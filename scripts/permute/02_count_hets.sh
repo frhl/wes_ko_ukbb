@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc
-#$ -t 1-19
+#$ -t 1-22
 #$ -V
 
 set -o errexit
@@ -20,8 +20,7 @@ readonly spark_dir="data/tmp/spark"
 readonly hail_script="scripts/permute/02_count_hets.py"
 
 readonly in_dir="data/mt/annotated"
-#readonly in_dir="data/mt/csqs"
-readonly out_dir="data/permute/counts_new"
+readonly out_dir="data/permute/counts"
 
 readonly chr="${SGE_TASK_ID}"
 readonly input_path="${in_dir}/ukb_eur_wes_200k_annot_chr${chr}.mt"

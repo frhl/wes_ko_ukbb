@@ -31,7 +31,8 @@ readonly maf="maf0to5e-2"
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_chr${chr}"
 readonly out_type="mt"
 
-readonly overview="data/permute/overview/overview_genes.tsv.gz"
+readonly min_mac=4
+readonly overview="data/permute/overview/min_mac${min_mac}/overview_genes.tsv.gz"
 readonly n_tasks="$( zcat ${overview} | grep "chr${chr}" | wc -l)"
 readonly tasks="1-${n_tasks}"
 

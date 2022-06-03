@@ -54,9 +54,10 @@ format_real_variant_long_to_wide <- function(dt, position_last = 20000){
     
     stopifnot("s" %in% colnames(dt))
     stopifnot("locus" %in% colnames(dt))
+    stopifnot("rsid" %in% colnames(dt))
     stopifnot("alleles" %in% colnames(dt))
     
-    mapping <- dt[,c("locus","alleles")]
+    mapping <- dt[,c("locus","alleles","rsid")]
     mapping <- mapping[!duplicated(mapping),]
 
     # create mapping rows that are to be combined with actual dosages
@@ -71,7 +72,7 @@ format_real_variant_long_to_wide <- function(dt, position_last = 20000){
     mapping_rows <- data.table(
         "#CHROM" = mapping$chroms,
           POS = mapping$positions,
-          ID = mapping$marker,
+          ID = mapping$rsid,
           REF = mapping$REF,
           ALT = mapping$ALT,
           QUAL = '.',
@@ -155,9 +156,10 @@ main <- function(args){
         cond_dosage$locus <- NULL
         cond_dosage <- cond_dosage[,colnames(dosage), with = FALSE]
 
-        # combine columns and rows
+        # combine columns and rows. Note: that rbind order
+        # matters here when using tabix!
         cond_rows_dosage <- cbind(cond_rows, cond_dosage)
-        final <- rbind(cond_rows_dosage, rows_dosage)
+        final <- rbind(rows_dosage, cond_rows_dosage)
 
     }  else {
 

@@ -32,7 +32,10 @@ readonly annotation="pLoF_damaging_missense"
 readonly input_path="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_chr${chr}_GENE.tsv.gz"
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_permuted_chr${chr}_GENE"
 readonly assoc_format="ukb_eur_wes_200k_maf0to5e-2_PHENO_ANNO"
+
+# The markers and actual genotypes/dosages for each sample respectively
 readonly cond_markers="${cond_dir}/conditional_markers_chrundefined_markers.txt.gz"
+readonly cond_genotypes="${cond_dir}/conditional_markers_chrundefined.tsv.gz"
 
 # parameters for master script
 readonly min_mac=4
@@ -58,7 +61,8 @@ readonly true_p_path="data/permute/overview/min_mac${min_mac}/overview_true_p.ts
 # count how many genes to submit for the given chromosome
 readonly n_genes="$( zcat ${genes_path} | grep "chr${chr}" | wc -l)"
 #readonly sge_tasks="1-${n_genes}"
-readonly sge_tasks="1-100"
+readonly sge_tasks="1-2"
+
 
 set -x
 qsub -N "_chr${chr}_permute" \
@@ -87,6 +91,7 @@ qsub -N "_chr${chr}_permute" \
     "${assoc_format}" \
     "${use_prs}" \
     "${cond_markers}" \
+    "${cond_genotypes}" \
     "${iteration}" \
     "${permutation_supply}" \
     "${initial_top_p}"

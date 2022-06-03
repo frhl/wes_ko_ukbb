@@ -39,7 +39,7 @@ readonly csi="${vcf}_${id}.csi"
 readonly out_gene_task="${out_gene}_${id}.txt"
 
 # read in conditional markers
-readonly markers=$(zcat ${cond_markers} | grep chr${chr} | paste -s -d ',')
+readonly markers=$(zcat ${cond_markers} | grep chr${chr} | cut -f3 | paste -s -d ',')
 
 if [ ! -f ${out_gene_task} ]; then
   echo "var_bytes=${var_bytes} at ${in_var}"
@@ -47,6 +47,7 @@ if [ ! -f ${out_gene_task} ]; then
   if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then 
     SECONDS=0
     set_up_RSAIGE
+    set -x
     Rscript "${step2_SPAtests}"  \
        --vcfFile=${vcf} \
        --vcfFileIndex=${csi} \
@@ -57,10 +58,9 @@ if [ ! -f ${out_gene_task} ]; then
        --GMMATmodelFile=${in_gmat} \
        --varianceRatioFile=${in_var} \
        --SAIGEOutputFile=${out_gene_task} \
-       --LOCO=FALSE\
-       ${markers:+--condition "$markers"} \
-       && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
-       || raise_error "Saddle-point approximation for chr${chr} failed"
+       --LOCO=FALSE \
+       ${markers:+--condition="${markers}"} 
+    set +x
     rm -f "${out_gene_task}.index"
     gzip ${out_gene_task}
   else
