@@ -16,21 +16,30 @@ main <- function(args){
     d <- fread(args$input_path)
     tstat <- as.numeric(d$Tstat)
     pvalue <- as.numeric(d$p.value)
+    pvalue_orig <- pvalue
     true_t <- as.numeric(args$true_tstat)
     true_p <- as.numeric(args$true_p)
+    
+    # Check for conditional
+    if ("p.value_cond" %in% colnames(d)){ 
+      pvalue <- as.numeric(d$p.value_cond)
+    } else {
+      pvalue_orig <- rep(NA, length(pvalue_orig))
+    }
 
     # write a matrix of t-statistics and p-values
     out_t <- c(true_t, tstat)
     out_p <- c(true_p, pvalue)
+    out_p_orig <- c(true_p, pvalue_orig)
     is_permuted <- c(rep(0, 1), rep(1, length(tstat)))
-    dt <- data.table(Tstat=out_t, p=out_p, is_permuted)
+    dt <- data.table(Tstat=out_t, p=out_p, p_orig=out_p_orig, is_permuted)
     outfile <- paste0(args$out_prefix, ".txt.gz")
     fwrite(dt, outfile, sep = "\t")
 
-    # calculate empirical P-value
-    empirical_p_gt <- sum(true_p >= pvalue)/length(pvalue) 
-    empirical_p_ge <- sum(true_p > pvalue)/length(pvalue) 
-    empirical_p <- (empirical_p_gt + empirical_p_ge) / 2
+    # calculate empirical P-value (note, need to ensure that
+    # the correct side is evaluated). 
+    count_p_ge_true <- sum(true_p >= pvalue)/length(pvalue) 
+    empirical_p <- 1-count_p_ge_true
     write(empirical_p, stdout())
 
 }
