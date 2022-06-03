@@ -29,25 +29,26 @@ readonly chr=${1?Error: Missing arg1}
 readonly input_path_prelim=${2?Error: Missing arg2}
 readonly out_prefix_prelim=${3?Error: Missing arg3}
 readonly pheno_dir=${4?Error: Missing arg4}
-readonly genes_path=${5?Error: Missing arg5} # <- new arg
-readonly true_p_path=${6?Error: Missing arg6}
-readonly min_mac=${7?Error: Missing arg7}
-readonly replicates=${8?Error: Missing arg8}
-readonly n_shuffle=${9?Error: Missing arg9}
-readonly n_cutoff_shuffle=${10?Error: Missing arg9}
-readonly n_slots_saige=${11?Error: Missing arg10}
-readonly n_slots_permute=${12?Error: Missing arg11}
-readonly queue_saige=${13?Error: Missing arg14}
-readonly queue_permute=${14?Error: Missing arg15}
-readonly queue_merge=${15?Error: Missing arg15}
-readonly queue_master=${16?Error: Missing arg15}
-readonly annotation=${17?Error: Missing arg17}
-readonly static_assoc=${18?Error: Missing arg18}
-readonly use_prs=${19?Error: Missing arg18}
-readonly cond_markers=${20?Error: Missing arg18}
-iteration=${21?Error: Missing arg18}
-permutation_supply=${22?Error: Missing arg18}
-top_p=${23?Error: Missing arg18}
+readonly genes_path=${5?Error: Missing arg5} 
+readonly true_p_path=${6?Error: Missing arg6 (Path to true non-permuted P-values)}
+readonly min_mac=${7?Error: Missing arg7 (Minimum number of knockouts)}
+readonly replicates=${8?Error: Missing arg8 (Shuffles per permute submission)}
+readonly n_shuffle=${9?Error: Missing arg9 (How many shuffles of of phase should be done) }
+readonly n_cutoff_shuffle=${10?Error: Missing arg10 (maximum allowed number of shuffles)}
+readonly n_slots_saige=${11?Error: Missing arg11 (compute slots flor saige script)}
+readonly n_slots_permute=${12?Error: Missing arg12 (compute slots for permute script)}
+readonly queue_saige=${13?Error: Missing arg13 (What queue should be used for SAIGE gwas)}
+readonly queue_permute=${14?Error: Missing arg14 (What queue should be used for permute script)}
+readonly queue_merge=${15?Error: Missing arg15 (What queue should be used for merge script)}
+readonly queue_master=${16?Error: Missing arg16 (What queue should be user for master script)}
+readonly annotation=${17?Error: Missing arg17 (Consequence annotation)}
+readonly static_assoc=${18?Error: Missing arg18 (Prefix for association file)}
+readonly use_prs=${19?Error: Missing arg19 (Should PRS be used)}
+readonly cond_markers=${20?Error: Missing arg20 (List of markers to condition on)}
+readonly cond_genotypes=${21?Error: Missing arg21 (Genotypes/dosages for conditioning markers)}
+iteration=${22?Error: Missing arg22 (What is the current iteration)}
+permutation_supply=${23?Error: Missing arg23 (How many permutations have been accomplished so far)}
+top_p=${24?Error: Missing arg24 (What index of the lowest P-value should be used to determien covergence (10 or 100)}
 
 # set final paths depending on gene
 readonly gene="$(zcat ${genes_path} | grep "chr${chr}" | cut -f1 | sed ${index}'q;d' )"
@@ -183,7 +184,7 @@ submit_shuffle_phase() {
           ${sge_seed} \
           ${gene} \
           ${replicates} \
-          ${cond_markers}
+          ${cond_genotypes}
 
     else
       echo >&2 "${out_permute_upper_bound} already exists. Skipping.."
@@ -234,7 +235,8 @@ submit_saige() {
         "${in_var}" \
         "${phenotype}" \
         "${gene}" \
-        "${min_mac}"
+        "${min_mac}" \
+        "${cond_markers}"
     else
       echo >&2 "${out_spa_upper_bound} already exists. Skipping.."
     fi
@@ -263,6 +265,8 @@ submit_merge() {
 }
 
 submit_calc_p() {
+  # check if actual PRS is used in SAIGE
+
   echo "Calculating empirical P."
   set -x
   qsub -N "${name_calc_pheno}" \
@@ -277,6 +281,7 @@ submit_calc_p() {
     "${annotation}" \
     "${static_assoc}" \
     "${use_prs}" \
+    "${prs_available}" \
     "${path_merged}.gz" \
     "${top_p}" \
     "${true_p_path}" \
@@ -363,8 +368,8 @@ SECONDS=0
 do_extra_loop=0
 iteration=$((${iteration} + 1))
 set_arr_phenos "cts"
-#arr_phenos=( "Alanine_aminotransferase_residual" "Calcium_residual" "WHR_adj_BMI" "BMI" "Apolipoprotein_B_residual")
-arr_phenos=( "Alanine_aminotransferase_residual" )
+arr_phenos=( "Alanine_aminotransferase_residual" "Calcium_residual" "WHR_adj_BMI" "BMI" "Apolipoprotein_B_residual")
+#arr_phenos=( "Alanine_aminotransferase_residual" )
 
 
 echo "Starting iteration ${iteration}"
@@ -383,6 +388,7 @@ if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then
         if [ -f ${in_gmat} ] && [ -f ${in_var} ]; then
           gmat_bytes=$( file_size ${in_gmat} )
           var_bytes=$( file_size ${in_var} )
+          prs_available=$( echo ${in_gmat} | grep chr | wc -l)
           if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then
             path_merged="${out_prefix}_${phenotype}_merged.txt"
             if [ ! -f ${path_merged} ]; then

@@ -21,11 +21,12 @@ readonly phenotype=${2?Error: Missing arg1 (prefix)}
 readonly annotation=${3?Error: Missing arg1 (prefix)}
 readonly static_assoc=${4?Error: Missing arg1 (prefix)}
 readonly use_prs=${5?Error: Missing arg1 (prefix)}
-readonly saige_merged=${6?Error: Missing arg1 (prefix)}
-readonly top_p=${7?Error: Missing arg1 (prefix)}
-readonly true_p_path=${8?Error: Missing arg1 (prefix)}
-readonly n_shuffle=${9?Error: Missing arg1 (prefix)}
-readonly out_prefix=${10?Error: Missing arg1 (prefix)}
+readonly prs_available=${6?Error: Missing arg1 (prefix)}
+readonly saige_merged=${7?Error: Missing arg1 (prefix)}
+readonly top_p=${8?Error: Missing arg1 (prefix)}
+readonly true_p_path=${9?Error: Missing arg1 (prefix)}
+readonly n_shuffle=${10?Error: Missing arg1 (prefix)}
+readonly out_prefix=${11?Error: Missing arg1 (prefix)}
 
 readonly outfile="${out_prefix}.permuted"
 readonly pfile="${out_prefix}_${phenotype}.pvalues"
@@ -37,7 +38,7 @@ lookup_true() {
   local column=${1}
   # read file and subset to current gene/pheno/annotation
   if [ -f ${true_p_path} ]; then
-    if [ "${use_prs}" -eq "1" ]; then
+    if [ "${use_prs}" -eq "1" ] & [ "${prs_available}" -eq "1" ]; then
       local cur_assoc=$( echo ${static_assoc} | sed -e "s/PHENO/${phenotype}/g" | sed -e "s/ANNO/${annotation}/g")
       local readfile=$( zcat ${true_p_path} | grep ${gene} | grep ${cur_assoc} | grep "locoprs" )
       local lines=$( zcat ${true_p_path} | grep ${gene} | grep ${cur_assoc} | grep "locoprs" | wc -l)
@@ -98,8 +99,9 @@ if [ -f ${saige_merged} ]; then
             --true_tstat ${true_t} \
             --true_p ${true_p} \
             --out_prefix "${pfile}.tmp")
-      >&2 echo "${phenotype} ${gene}. Last P = ${last_p}"
-      >&2 echo "${phenotype} ${gene}. Permuted P = ${permuted_p}"
+      echo "[msg]: ${phenotype} ${gene}. Last P = ${last_p}"
+      echo "[msg]: ${phenotype} ${gene}. Permuted P = ${permuted_p}"
+      echo "[msg]: ${phenotype} ${gene}. Empirical P = ${tmp_empirical_p}"
       if [[ "${last_p}" != "${permuted_p}" ]]; then
         if [ ${done} -eq 1 ]; then
           readonly the_status="OK"
@@ -129,7 +131,7 @@ if [ -f ${saige_merged} ]; then
     readonly empirical_p="NA"
     readonly the_status="OK (min_mac)"
   fi
-  echo -e "${gene}\t${phenotype}\t${n_shuffle}\t${true_p}\t${permuted_p}\t${empirical_p}\t${the_status}" >> ${outfile}
+  echo -e "${gene}\t${phenotype}\t${prs_available}\t${n_shuffle}\t${true_p}\t${permuted_p}\t${empirical_p}\t${the_status}" >> ${outfile}
 else
   raise_error "Missing saige_merged: ${saige_merged}"
 fi
