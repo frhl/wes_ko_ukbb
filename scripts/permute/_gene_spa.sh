@@ -17,7 +17,7 @@ source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
 readonly spark_dir="data/tmp/spark"
-readonly step2_SPAtests="utils/saige/step2_SPAtests.R"
+readonly step2_SPAtests="utils/saige/step2_SPAtests_cond.R"
 
 readonly chr=${1?Error: Missing arg1 (chr)}
 readonly in_vcf=${2?Error: Missing arg2 (in_vcf)}
@@ -28,6 +28,7 @@ readonly in_var=${6?Error: Missing arg5 (in_var)}
 readonly phenotype=${7?Error: Missing arg6 (phenotype)}
 readonly gene=${8?Error: Missing arg7 (gene)}
 readonly min_mac=${9?Error: Missing arg9 (min_mac)}
+readonly cond_markers=${10?Error: Missing arg10 (cond_markers)}
 
 readonly var_bytes=$( file_size ${in_var} )
 readonly gmat_bytes=$( file_size ${in_gmat} )
@@ -36,8 +37,9 @@ readonly id=${SGE_TASK_ID}
 readonly vcf="${in_vcf}_${id}.vcf.gz"
 readonly csi="${vcf}_${id}.csi"
 readonly out_gene_task="${out_gene}_${id}.txt"
-readonly out_file_success="${out_spa_success}_${id}.SUCCESS"
-readonly out_file_failure="${out_spa_success}_${id}.FAILURE"
+
+# read in conditional markers
+readonly markers=$(zcat ${cond_markers} | grep chr${chr} | paste -s -d ',')
 
 if [ ! -f ${out_gene_task} ]; then
   echo "var_bytes=${var_bytes} at ${in_var}"
@@ -45,7 +47,6 @@ if [ ! -f ${out_gene_task} ]; then
   if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then 
     SECONDS=0
     set_up_RSAIGE
-    set -x
     Rscript "${step2_SPAtests}"  \
        --vcfFile=${vcf} \
        --vcfFileIndex=${csi} \
@@ -57,9 +58,9 @@ if [ ! -f ${out_gene_task} ]; then
        --varianceRatioFile=${in_var} \
        --SAIGEOutputFile=${out_gene_task} \
        --LOCO=FALSE\
+       ${markers:+--condition "$markers"} \
        && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
        || raise_error "Saddle-point approximation for chr${chr} failed"
-    set +x
     rm -f "${out_gene_task}.index"
     gzip ${out_gene_task}
   else
