@@ -48,7 +48,9 @@ make_vcf_dosage_rows <- function(chrom, positions, marker, use_random_alleles = 
 }
 
 # read real variant data in long format (exported from hail)
-format_real_variant_long_to_wide <- function(dt){
+# note: need position_last argument, since make_tabix will otherwise complain
+# that the positions are not sorted.
+format_real_variant_long_to_wide <- function(dt, position_last = 20000){
     
     stopifnot("s" %in% colnames(dt))
     stopifnot("locus" %in% colnames(dt))
@@ -56,14 +58,15 @@ format_real_variant_long_to_wide <- function(dt){
     
     mapping <- dt[,c("locus","alleles")]
     mapping <- mapping[!duplicated(mapping),]
-    
+
     # create mapping rows that are to be combined with actual dosages
     alleles <- as.data.frame(do.call(rbind, strsplit(gsub('(")|(\\])|(\\[)','',mapping$alleles), split = ',')))
     colnames(alleles) <- c("REF","ALT")
     mapping <- cbind(mapping, alleles)
-    mapping$chroms <- stringr::str_extract(mapping$locus, "chr[0-9]+")
+    mapping$positions_recoded <- (position_last+1):(position_last+nrow(mapping))
     mapping$positions <- gsub("chr[0-9]+\\:", "",mapping$locus)
     mapping$marker <- paste0(mapping$locus, ":", mapping$REF, ":", mapping$ALT)
+    mapping$chroms <- stringr::str_extract(mapping$locus, "chr[0-9]+")
     stopifnot(length(unique(mapping$positions)) == length(mapping$positions)) # can't handle SNPs at same pos
     mapping_rows <- data.table(
         "#CHROM" = mapping$chroms,
@@ -83,9 +86,11 @@ format_real_variant_long_to_wide <- function(dt){
     dt <- data.table::dcast(locus~s, data = dt, value.var = "DS")
     
     # match mapping rows with dt rows
-    new_index <- match(dt$locus, mapping$locus)
-    mapping_rows <- mapping_rows[new_index,]
+    #new_index <- match(dt$locus, mapping$locus)
+    new_index <- match(mapping$locus, dt$locus)
     mapping_rows$locus <- NULL
+    #mapping_rows <- mapping_rows[new_index,]
+    dt <- dt[new_index,]
     
     #return(cbind(mapping_rows, dt))
     return(list(rows = mapping_rows, dosages = dt))
@@ -97,7 +102,7 @@ main <- function(args){
 
     #print(args)  
     stopifnot(file.exists(args$input_path))
-    stopifnot(file.exists(args$input_path_cond))
+    stopifnot(file.exists(args$input_path_cond_genotypes))
     stopifnot(!is.na(as.numeric(args$permutations)))
     stopifnot(!is.null(args$permutations))
 
@@ -119,8 +124,10 @@ main <- function(args){
     # only keep non-probabilistic knockouts
     if (args$only_non_prob_ko) dosage[dosage < 2] <- 0
 
-    # load real conditioning variants
-    cond_dt <- fread(args$input_path_cond)
+    # load real conditioning variants, i.e. the actual
+    # dosages/genotypes of the variants that we would like
+    # to condition on
+    cond_dt <- fread(args$input_path_cond_genotypes)
     cond_dt$chr <- stringr::str_extract(cond_dt$locus, "chr[0-9]+")
     cond_dt <- cond_dt[cond_dt$chr %in% args$chrom]
     n_real_markers <- length(unique(cond_dt$locus)) 
@@ -138,7 +145,7 @@ main <- function(args){
 
         # subset real dosage matrix (with actual calls/DS)
         cond_dt <- cond_dt[cond_dt$s %in% sample_overlap,]
-        cond_lst <- format_real_variant_long_to_wide(cond_dt)
+        cond_lst <- format_real_variant_long_to_wide(cond_dt, n)
 
         # get long format
         cond_rows <- cond_lst$rows
@@ -177,7 +184,7 @@ main <- function(args){
 parser <- ArgumentParser()
 parser$add_argument("--chrom", default=NULL, help = "chromosome")
 parser$add_argument("--input_path", default=NULL, help = "path to the input")
-parser$add_argument("--input_path_cond", default=NULL, help = "path to the input")
+parser$add_argument("--input_path_cond_genotypes", default=NULL, help = "path to the file of dosages/genotypes")
 parser$add_argument("--permutations", default=NULL, help = "number of times the gene should be permuted")
 parser$add_argument("--only_non_prob_ko", action="store_true", default=FALSE, help = "Only keep knockouts of phased heterozygotes.")
 parser$add_argument("--seed", default=NULL, help = "seed for randomizer")
