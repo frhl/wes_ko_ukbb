@@ -9,7 +9,7 @@
 #$ -P lindgren.prjc
 #$ -q short.qc
 #$ -pe shmem 3
-#$ -t 1-11
+#$ -t 1-22
 #$ -V
 
 
@@ -42,6 +42,7 @@ readonly common_path_vcf="${common_path_wo_ext}.vcf.bgz"
 
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense"
 readonly out_markers="${out_prefix}_markers.txt"
+readonly out_markers_sorted="${out_prefix}_markers_sorted.txt"
 
 readonly markers_rare="${ko_rare_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense_markers.txt.gz"
 readonly markers_common="${common_dir}/conditional_markers_chrundefined_markers.txt.gz"
@@ -49,13 +50,16 @@ readonly markers_common="${common_dir}/conditional_markers_chrundefined_markers.
 readonly ko_rare_type="mt"
 readonly common_type="mt"
 readonly out_type="vcf"
+readonly out="${out_prefix}.vcf.bgz"
 
 mkdir -p ${out_dir}
 
 # create new marker file (common markers + rare markers)
-zcat $markers_rare | head -n1 > ${out_markers}
-zcat $markers_common $markers_rare | grep -v locus | grep chr${chr} >> ${out_markers}
-gzip ${out_markers}
+if [ ! -f "${out_markers}.gz" ]; then
+  zcat $markers_rare | head -n1 > ${out_markers}
+  zcat $markers_common $markers_rare | grep -v locus | grep chr${chr} >> ${out_markers}
+  gzip ${out_markers}
+fi
 
 # count markers in each file
 readonly n_common_markers=$(zcat ${markers_common} | grep chr${chr} | wc -l )
@@ -65,12 +69,12 @@ readonly n_rare_markers=$(zcat ${markers_rare} | grep chr${chr} | wc -l )
 # note: we assume that rare markers always exists.
 if [ "${n_common_markers}" -eq "0" ]; then
   >&2 echo "Note: No common markers. Creating symlink to rare variants vcf."
-  ln -s "$(pwd)/${ko_rare_path_vcf}" "${out_prefix}.vcf.bgz"
-  ln -s "$(pwd)/${ko_rare_path_vcf}.csi" "${out_prefix}.vcf.bgz.csi"
+  #ln -s "$(pwd)/${ko_rare_path_vcf}" "${out_prefix}.vcf.bgz"
+  #ln -s "$(pwd)/${ko_rare_path_vcf}.csi" "${out_prefix}.vcf.bgz.csi"
 elif [ "${n_common_markers}" -eq "0" ]; then
   >&2 echo "Note: No rare markers. Creating symlink to common variants vcf."
-  ln -s "$(pwd)/${common_path_vcf}" "${out_prefix}.vcf.bgz"
-  ln -s "$(pwd)/${common_path_vcf}.csi" "${out_prefix}.vcf.bgz.csi"
+  #ln -s "$(pwd)/${common_path_vcf}" "${out_prefix}.vcf.bgz"
+  #ln -s "$(pwd)/${common_path_vcf}.csi" "${out_prefix}.vcf.bgz.csi"
 else 
   if [ ! -f "${out_prefix}.vcf.bgz" ]; then
     SECONDS=0
@@ -87,7 +91,6 @@ else
        && print_update "Finished merging knockouts with markers ${out_prefix}" ${SECONDS} \
        || raise_error "Merging knockouts with markers for ${out_prefix} failed!"
   fi
-
   # index the resulting file.
   if [ ! -f "${out_prefix}.vcf.csi" ] & [ "${out_type}" == "vcf" ]; then
     module purge
@@ -95,4 +98,14 @@ else
     make_tabix "${out_prefix}.vcf.bgz" "csi"
   fi
 fi
+
+# SAIGE needs markers to be sorted
+if [ ! -f "${out_markers_sorted}" ]; then
+  >&2 echo "Extracting sorted markers from VCF"
+  module purge
+  module load BCFtools/1.12-GCC-10.3.0
+  bcftools query -f '%ID\t%CHROM:%POS:%REF:%ALT\n' ${out} | grep -v ENS | cut -f1 > ${out_markers_sorted}
+  gzip ${out_markers_sorted}
+fi
+
 

@@ -27,6 +27,7 @@ readonly in_prefix="ukb_eur_wes_200k"
 
 readonly cond_dir="data/conditional/combined"
 readonly cond="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_markers.txt.gz"
+readonly sorted_markers="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_sorted_markers.txt"
 readonly cond_cat="(pLoF)|(damaging_missense)" 
 
 submit_spa_binary_with_csqs()
@@ -105,6 +106,7 @@ submit_spa_job() {
     "${in_var}" \
     "${min_mac}" \
     "${out_prefix}" \
+    "${sorted_markers}" \
     "${cond}" \
     "${cond_cat}"
   set +x
@@ -132,7 +134,7 @@ readonly conditioning_markers=""
 readonly use_prs="1"
 readonly min_mac=4
 readonly tasks=1-22
-readonly queue="short.qe"
+readonly queue="short.qa"
 readonly nslots=2
 
 

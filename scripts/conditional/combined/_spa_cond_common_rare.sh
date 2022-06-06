@@ -22,8 +22,9 @@ readonly in_gmat=${4?Error: Missing arg4 (in_gmat)}
 readonly in_var=${5?Error: Missing arg5 (in_var)} 
 readonly min_mac=${6?Error: Missing arg6 (min_mac)} 
 readonly out_prefix=${7?Error: Missing arg7 (path prefix for saige output)}
-readonly cond="${8}"
-readonly cond_cat="${9}"
+readonly sorted_markers=${8?Error: Missing arg7 (path prefix for saige output)}
+readonly cond="${9}"
+readonly cond_cat="${10}"
 readonly chr=${SGE_TASK_ID}
 
 
@@ -46,12 +47,9 @@ readonly step2_SPAtests="utils/saige/step2_SPAtests_cond.R"
 
 # condiitonal markers based on rare variants
 readonly cond_chr=$(echo ${cond} | sed -e "s/CHR/${chr}/g")
-
 readonly markers_raw=$(zcat ${cond_chr} | grep -E "${cond_cat}" | cut -f3)
 readonly markers_n=$(zcat ${cond_chr} | grep -E "${cond_cat}" | wc -l)
 readonly markers_file="${out_prefix}.markers"
->&2 echo "Note: Subsetted to ${markers_n} conditioning markers."
-echo ${markers_raw} > "${markers_file}"
 
 
 spa_test() {
@@ -70,13 +68,13 @@ spa_test() {
        --varianceRatioFile=${var} \
        --SAIGEOutputFile=${out} \
        --LOCO=FALSE \
+       --condition_file "${markers_file}" \
        && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
        || raise_error "Saddle-point approximation for chr${chr} failed"
   else
     raise_error "${var} or ${gmat} does not contain any bytes!"
   fi
 }
-#--condition_file "${markers_file}" \
 if [ ! -f ${out} ]; then
    set_up_RSAIGE
    spa_test
