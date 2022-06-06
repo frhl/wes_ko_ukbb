@@ -338,7 +338,7 @@ def get_gt_from_floor_ds(DS):
     return (hl.case()
      .when(hl.int(hl.floor(DS)) == 0, hl.parse_call("0/0"))
      .when(hl.int(hl.floor(DS)) == 1, hl.parse_call("1/0"))
-     .when(hl.int(hl.floor(DS)) == 2, hl.parse_call("1/0"))
+     .when(hl.int(hl.floor(DS)) == 2, hl.parse_call("1/1"))
      .default(hl.parse_call("0/0")))
  
 

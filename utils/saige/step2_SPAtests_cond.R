@@ -175,7 +175,10 @@ if (BLASctl_installed){
 if (opt$condition_file != ""){
     print(opt$condition_file)
     stopifnot(file.exists(opt$condition_file))
+    #markers <- read.table(opt$condition_file, header = FALSE)
     markers <- readLines(opt$condition_file)
+    markers <- gsub(" ", ",", markers)
+    #markers <- paste0(markers[,1], collapse = ",")
     print(head(markers))
     opt$condition <- markers
 }
