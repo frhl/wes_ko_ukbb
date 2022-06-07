@@ -180,7 +180,6 @@ main <- function(args){
         cond_dosage_af <- apply(cond_dosage, 1, mean)
         cond_rows$sd <- cond_dosage_sd
         cond_rows$af <- cond_dosage_af
-        print(cond_rows)
 
     }  else {
 
@@ -197,7 +196,7 @@ main <- function(args){
         n_invariant <- sum(bool_invariant)
         if (n_invariant > 0){
             final <- final[!bool_invariant,]
-            write(paste("Removed", n_invariant, "invariant markers."), stderr())
+            write(paste("[_gene_permute.R]: Removed", n_invariant, "invariant markers."), stderr())
         }
     }
 

@@ -53,7 +53,7 @@ readonly iteration=1
 readonly permutation_supply=0
 readonly initial_top_p=10
 readonly use_prs=0
-readonly use_cond_common=0
+readonly use_cond_common=1
 
 # get path to true P-value and t-stats
 readonly genes_path="data/permute/overview/min_mac${min_mac}/overview_genes.tsv.gz"
