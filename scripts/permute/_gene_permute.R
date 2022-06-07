@@ -101,17 +101,23 @@ format_real_variant_long_to_wide <- function(dt, position_last = 20000){
 
 main <- function(args){
 
-    #print(args)  
+    print(args)
+
+    autosomes <- paste0("chr",1:22)
     stopifnot(file.exists(args$input_path))
-    stopifnot(file.exists(args$input_path_cond_genotypes))
     stopifnot(!is.na(as.numeric(args$permutations)))
     stopifnot(!is.null(args$permutations))
-
+    stopifnot(!is.null(args$vcf_id))
+    stopifnot(args$chrom %in% autosomes)
+    stopifnot(!is.null(args$enable_cond_pipeline))
+    # conditional pipeline
+    if (args$enable_cond_pipeline) stopifnot(file.exists(args$input_path_cond_genotypes))
+    
     # seed for reproducibility
     seed <- as.numeric(args$seed)
     set.seed(seed)
-    
-    # replicate knockout 
+
+    # replicate knockout
     n <- as.numeric(args$permutations)
     d <- fread(args$input_path)
     stopifnot(nrow(d) > 0)
@@ -125,13 +131,18 @@ main <- function(args){
     # only keep non-probabilistic knockouts
     if (args$only_non_prob_ko) dosage[dosage < 2] <- 0
 
+
     # load real conditioning variants, i.e. the actual
     # dosages/genotypes of the variants that we would like
     # to condition on
-    cond_dt <- fread(args$input_path_cond_genotypes)
-    cond_dt$chr <- stringr::str_extract(cond_dt$locus, "chr[0-9]+")
-    cond_dt <- cond_dt[cond_dt$chr %in% args$chrom]
-    n_real_markers <- length(unique(cond_dt$locus)) 
+    if (args$enable_cond_pipeline) {
+      cond_dt <- fread(args$input_path_cond_genotypes)
+      cond_dt$chr <- stringr::str_extract(cond_dt$locus, "chr[0-9]+")
+      cond_dt <- cond_dt[cond_dt$chr %in% args$chrom]
+      n_real_markers <- length(unique(cond_dt$locus))
+    } else {
+      n_real_markers <- 0
+    }
 
     # if there are conditioning markers available include them downstream.
     if (n_real_markers > 0){
@@ -142,7 +153,6 @@ main <- function(args){
         # subset dosage matrix (with permuted phased)
         rows <- make_vcf_dosage_rows(args$chrom, 1:n, args$vcf_id)
         dosage <- dosage[,colnames(dosage) %in% sample_overlap, with = FALSE]
-        rows_dosage <- cbind(rows, dosage)
 
         # subset real dosage matrix (with actual calls/DS)
         cond_dt <- cond_dt[cond_dt$s %in% sample_overlap,]
@@ -158,19 +168,38 @@ main <- function(args){
 
         # combine columns and rows. Note: that rbind order
         # matters here when using tabix!
-        cond_rows_dosage <- cbind(cond_rows, cond_dosage)
-        final <- rbind(rows_dosage, cond_rows_dosage)
+        stopifnot(ncol(rows) == ncol(cond_rows))
+        combined_dosages <- rbind(dosage, cond_dosage) 
+        combined_meta <- rbind(rows, cond_rows)
+        final <- cbind(combined_meta, combined_dosages)
+        AC <- rowSums(combined_dosages)
+
+        # debugging - are SNPs monoprhic and thus
+        # the resulting matrix not invertible?
+        cond_dosage_sd <- apply(cond_dosage, 1, sd)
+        cond_dosage_af <- apply(cond_dosage, 1, mean)
+        cond_rows$sd <- cond_dosage_sd
+        cond_rows$af <- cond_dosage_af
+        print(cond_rows)
 
     }  else {
 
         rows <- make_vcf_dosage_rows(args$chrom, 1:n, args$vcf_id)
         rows_dosage <- cbind(rows, dosage)
         final <- rows_dosage
+        AC <- rowSums(dosage)
     }
 
-    # combine synthethic rows with knockout matrix
-    #rows <- make_vcf_dosage_rows(args$chrom, 1:n, args$vcf_id)
-    #final <- cbind(rows, dosage)
+    # Sometimes markers with zero AC are crated,
+    # let's remove them before entering SAIGE.
+    if (args$remove_invariant_markers){
+        bool_invariant <- AC == 0
+        n_invariant <- sum(bool_invariant)
+        if (n_invariant > 0){
+            final <- final[!bool_invariant,]
+            write(paste("Removed", n_invariant, "invariant markers."), stderr())
+        }
+    }
 
     # (1) write header of VCF
     vcf_out = make_vcf_dosage_header(args$chrom)
@@ -189,6 +218,8 @@ parser$add_argument("--input_path", default=NULL, help = "path to the input")
 parser$add_argument("--input_path_cond_genotypes", default=NULL, help = "path to the file of dosages/genotypes")
 parser$add_argument("--permutations", default=NULL, help = "number of times the gene should be permuted")
 parser$add_argument("--only_non_prob_ko", action="store_true", default=FALSE, help = "Only keep knockouts of phased heterozygotes.")
+parser$add_argument("--remove_invariant_markers", action="store_true", default=FALSE, help = "Remove markers with AC == 0.")
+parser$add_argument("--enable_cond_pipeline", action="store_true", default=FALSE, help = "Allow the use of conditional markers")
 parser$add_argument("--seed", default=NULL, help = "seed for randomizer")
 parser$add_argument("--vcf_id", default="GENE", help = "Substitute for rsid")
 parser$add_argument("--out_prefix", default=NULL, help = "prefix for out file")

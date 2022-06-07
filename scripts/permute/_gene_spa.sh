@@ -29,6 +29,7 @@ readonly phenotype=${7?Error: Missing arg6 (phenotype)}
 readonly gene=${8?Error: Missing arg7 (gene)}
 readonly min_mac=${9?Error: Missing arg9 (min_mac)}
 readonly cond_markers=${10?Error: Missing arg10 (cond_markers)}
+readonly use_cond_common=${11?Error: Missing arg11 (1 or 0 - condition on common markers?)}
 
 readonly var_bytes=$( file_size ${in_var} )
 readonly gmat_bytes=$( file_size ${in_gmat} )
@@ -39,7 +40,11 @@ readonly csi="${vcf}_${id}.csi"
 readonly out_gene_task="${out_gene}_${id}.txt"
 
 # read in conditional markers
-readonly markers=$(zcat ${cond_markers} | grep chr${chr} | cut -f3 | paste -s -d ',')
+if [ "${use_cond_common}" -eq "1" ]; then
+  readonly markers=$(zcat ${cond_markers} | grep chr${chr} | cut -f3 | paste -s -d ',')
+else 
+  readonly markers=""
+fi
 
 if [ ! -f ${out_gene_task} ]; then
   echo "var_bytes=${var_bytes} at ${in_var}"

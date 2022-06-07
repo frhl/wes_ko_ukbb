@@ -12,7 +12,7 @@ main <- function(args){
     stopifnot(is.numeric(as.numeric(args$true_tstat)))
     stopifnot(is.numeric(as.numeric(args$true_p)))
 
-    # read input 
+    # read input
     d <- fread(args$input_path)
     tstat <- as.numeric(d$Tstat)
     pvalue <- as.numeric(d$p.value)

@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 12
+#$ -t 12-13
 #$ -tc 10
 #$ -V
 
@@ -52,7 +52,8 @@ readonly n_concurrent_jobs=30
 readonly iteration=1
 readonly permutation_supply=0
 readonly initial_top_p=10
-readonly use_prs=1
+readonly use_prs=0
+readonly use_cond_common=0
 
 # get path to true P-value and t-stats
 readonly genes_path="data/permute/overview/min_mac${min_mac}/overview_genes.tsv.gz"
@@ -91,6 +92,7 @@ qsub -N "_chr${chr}_permute" \
     "${assoc_format}" \
     "${use_prs}" \
     "${cond_markers}" \
+    "${use_cond_common}" \
     "${cond_genotypes}" \
     "${iteration}" \
     "${permutation_supply}" \

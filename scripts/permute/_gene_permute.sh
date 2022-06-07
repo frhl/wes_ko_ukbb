@@ -28,11 +28,18 @@ readonly seed=${5?Error: Missing arg6 (path prefix for saige output)}
 readonly gene=${6?Error: Missing arg6 (path prefix for saige output)}
 readonly replicates=${7?Error: Missing arg6 (path prefix for saige output)}
 readonly cond_genotypes=${8?Error: Missing arg6 (path prefix for saige output)}
+readonly use_cond_common=${9?Error: Missing arg6 (path prefix for saige output)}
 
 readonly id=${SGE_TASK_ID}
 readonly sge_seed=$(( ${id} * ${seed}))
 readonly out_prefix_id="${out_prefix}_${id}"
 readonly out_file_success="${out_prefix_success}_${id}.SUCCESS"
+
+if [ "${use_cond_common}" -eq "1" ]; then
+  readonly enable_cond_pipeline="YES"
+else
+  readonly enable_cond_pipeline=""
+fi
 
 if [ -f "${input_path}" ]; then
   if [ ! -f "${out_prefix_id}.vcf.gz" ]; then
@@ -42,6 +49,8 @@ if [ -f "${input_path}" ]; then
       --input_path ${input_path} \
       --input_path_cond_genotypes ${cond_genotypes} \
       --permutations ${replicates} \
+      --remove_invariant_markers \
+      ${enable_cond_pipeline:+--enable_cond_pipeline} \
       --out_prefix ${out_prefix_id} \
       --vcf_id ${gene} \
       --seed ${sge_seed} \

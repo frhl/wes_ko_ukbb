@@ -45,10 +45,11 @@ readonly annotation=${17?Error: Missing arg17 (Consequence annotation)}
 readonly static_assoc=${18?Error: Missing arg18 (Prefix for association file)}
 readonly use_prs=${19?Error: Missing arg19 (Should PRS be used)}
 readonly cond_markers=${20?Error: Missing arg20 (List of markers to condition on)}
-readonly cond_genotypes=${21?Error: Missing arg21 (Genotypes/dosages for conditioning markers)}
-iteration=${22?Error: Missing arg22 (What is the current iteration)}
-permutation_supply=${23?Error: Missing arg23 (How many permutations have been accomplished so far)}
-top_p=${24?Error: Missing arg24 (What index of the lowest P-value should be used to determien covergence (10 or 100)}
+readonly use_cond_common=${21?Error: Missing arg20 (List of markers to condition on)}
+readonly cond_genotypes=${22?Error: Missing arg21 (Genotypes/dosages for conditioning markers)}
+iteration=${23?Error: Missing arg22 (What is the current iteration)}
+permutation_supply=${24?Error: Missing arg23 (How many permutations have been accomplished so far)}
+top_p=${25?Error: Missing arg24 (What index of the lowest P-value should be used to determien covergence (10 or 100)}
 
 # set final paths depending on gene
 readonly gene="$(zcat ${genes_path} | grep "chr${chr}" | cut -f1 | sed ${index}'q;d' )"
@@ -184,7 +185,8 @@ submit_shuffle_phase() {
           ${sge_seed} \
           ${gene} \
           ${replicates} \
-          ${cond_genotypes}
+          ${cond_genotypes} \
+          ${use_cond_common}
 
     else
       echo >&2 "${out_permute_upper_bound} already exists. Skipping.."
@@ -236,7 +238,8 @@ submit_saige() {
         "${phenotype}" \
         "${gene}" \
         "${min_mac}" \
-        "${cond_markers}"
+        "${cond_markers}" \
+        "${use_cond_common}"
     else
       echo >&2 "${out_spa_upper_bound} already exists. Skipping.."
     fi
@@ -368,8 +371,8 @@ SECONDS=0
 do_extra_loop=0
 iteration=$((${iteration} + 1))
 set_arr_phenos "cts"
-arr_phenos=( "Alanine_aminotransferase_residual" "Calcium_residual" "WHR_adj_BMI" "BMI" "Apolipoprotein_B_residual")
-#arr_phenos=( "Alanine_aminotransferase_residual" )
+#arr_phenos=( "Alanine_aminotransferase_residual" "Calcium_residual" "WHR_adj_BMI" "BMI" "Apolipoprotein_B_residual")
+arr_phenos=( "Alanine_aminotransferase_residual" )
 
 
 echo "Starting iteration ${iteration}"
