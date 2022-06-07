@@ -51,7 +51,12 @@ def main(args):
 
     # subset to current csqs category
     mt = mt.filter_rows(hl.literal(set(csqs_category)).contains(mt.consequence_category)) 
-    
+
+    # filter invariant sites
+    mt = mt.annotate_entries(DS = hl.float(mt.GT.n_alt_alleles()))
+    mt = mt.annotate_rows(stdev = hl.agg.stats(mt.DS).stdev)
+    mt = mt.filter_rows(mt.stdev > 0)
+
     # export list of variants for later conditional analysis
     varid = hl.delimit([
         hl.str(mt.locus.contig),
@@ -63,8 +68,8 @@ def main(args):
     ht = ht.select('rsid', 'consequence_category')
     ht.flatten().export(out_prefix + "_markers.txt.gz")
 
+
     # annotate dosage
-    mt = mt.annotate_entries(DS = hl.float(mt.GT.n_alt_alleles()))
     mt = mt.drop("GT")
 
     # load knockouts

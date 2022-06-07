@@ -71,13 +71,13 @@ spa_test() {
        --varianceRatioFile=${var} \
        --SAIGEOutputFile=${out} \
        --LOCO=FALSE \
+       --condition_file "${markers_file}" \
        && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
        || raise_error "Saddle-point approximation for chr${chr} failed"
   else
     raise_error "${var} or ${gmat} does not contain any bytes!"
   fi
 }
-#--condition_file "${markers_file}" \
 if [ ! -f ${out} ]; then
    set_up_RSAIGE
    spa_test
