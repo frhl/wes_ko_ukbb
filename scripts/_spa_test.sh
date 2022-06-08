@@ -20,9 +20,12 @@ readonly in_vcf=${2?Error: Missing arg2 (in_vcf)}
 readonly in_csi=${3?Error: Missing arg3 (in_csi)}
 readonly in_gmat=${4?Error: Missing arg4 (in_gmat)} 
 readonly in_var=${5?Error: Missing arg5 (in_var)} 
-readonly min_mac=${6?Error: Missing arg6 (min_mac)} 
-readonly out_prefix=${7?Error: Missing arg7 (path prefix for saige output)}
-readonly in_markers="${8}" # optional conditioning markers
+readonly grm_mtx=${6?Error: Missing arg6 (grm_mtx)}
+readonly grm_sam=${7?Error: Missing arg7 (grm_sam)}
+readonly min_mac=${8?Error: Missing arg6 (min_mac)} 
+readonly use_logistf=${9?Error: Missing arg6 (min_mac)} 
+readonly out_prefix=${10?Error: Missing arg7 (path prefix for saige output)}
+readonly in_markers="${11}" # optional conditioning markers
 readonly chr=${SGE_TASK_ID}
 
 
@@ -53,14 +56,19 @@ spa_test() {
      --vcfFile=${vcf} \
      --vcfFileIndex=${csi} \
      --vcfField="DS" \
+     --sparseGRMFile=${grm_mtx} \
+     --sparseGRMSampleIDFile=${grm_sam}  \
      --chrom="chr${chr}" \
      --minMAF=0.0000001 \
      --minMAC=${min_mac} \
      --GMMATmodelFile=${gmat} \
      --varianceRatioFile=${var} \
      --SAIGEOutputFile=${out} \
+     --is_output_moreDetails=TRUE \
      --LOCO=FALSE\
      ${markers:+--condition "$markers"} \
+     ${use_logistf:+--is_Firth_beta=TRUE} \
+     ${use_logistf:+--pCutoffforFirth=0.05} \
      && print_update "Finished saddle-point approximation. Writing to ${out}" ${SECONDS} \
      || raise_error "Saddle-point approximation for chr${chr} failed"
   else

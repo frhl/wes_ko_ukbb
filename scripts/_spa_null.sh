@@ -31,11 +31,13 @@ readonly threads=$(( ${NSLOTS}-1 ))
 fit_null() {
    if [ ! -f "${real_out_prefix}.rda" ]; then
      SECONDS=0
+     set -x
      Rscript "${step1_fitNULLGLMM}" \
        --plinkFile="${plink_file}" \
        --phenoFile="${pheno_file}" \
        --phenoCol="${phenotype}" \
        --covarColList=${covariates} \
+       --qCovarColList="sex,ukbb.centre"\
        --sampleIDColinphenoFile="eid" \
        --traitType="${trait_type}" \
        --invNormalize="${inv_normalize}" \
@@ -48,15 +50,12 @@ fit_null() {
        --nThreads=${threads} \
        --LOCO=FALSE \
        --useSparseGRMtoFitNULL=TRUE \
-       --isCateVarianceRatio=TRUE \
-       && print_update "Finished running SAIGE NULL model for ${phenotype}" ${SECONDS} \
-       || raise_error "SAIGE NULL model failed for ${phenotype}"
-       #--isCateVarianceRatio=FALSE  Only needed for SAIGE-GENE+ (geneset)
+       --isCateVarianceRatio=TRUE
+   set +x
    else
      >&2 echo "Warning: Null model at ${real_out_prefix} already exists. Skipping!"
    fi
  }
-
 
 # generate string of parmaeters used for off-chromosome PRS
 get_loco_seq(){

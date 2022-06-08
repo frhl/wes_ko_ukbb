@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-88
+#$ -t 1-5
 #$ -tc 22
 #$ -V
 
@@ -20,6 +20,10 @@ source utils/bash_utils.sh
 readonly vcf_dir="data/knockouts/alt/old"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
+readonly grm_dir="data/saige/grm/input"
+
+readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+readonly grm_sam="${grm_mtx}.sampleIDs.txt"
 
 readonly spa_script="scripts/_spa_test.sh"
 readonly merge_script="scripts/_spa_merge.sh"
@@ -100,7 +104,10 @@ submit_spa_job() {
     "${in_vcf}.csi" \
     "${in_gmat}" \
     "${in_var}" \
+    "${grm_mtx}" \
+    "${grm_sam}" \
     "${min_mac}" \
+    "${use_logistf}" \
     "${out_prefix}" \
     "${conditioning_markers}"
   set +x
@@ -124,14 +131,13 @@ submit_merge_job()
 }
 
 # parameters
+readonly use_logistf="1"
 readonly conditioning_markers=""
 readonly use_prs="0"
 readonly min_mac=4
 readonly tasks=1-22
 readonly queue="short.qe"
 readonly nslots=1
-
-
 
 # Binary traits
 maf="maf0to5e-2"

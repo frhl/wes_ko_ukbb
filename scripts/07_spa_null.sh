@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 45-88
+#$ -t 1-5
 #$ -tc 1
 #$ -V
 
@@ -33,10 +33,6 @@ readonly covar_file="${covar_dir}/covars1.csv"
 readonly covariates=$( cat ${covar_file} )
 
 readonly out_prefix="ukb_wes_200k"
-
-readonly use_prs=1
-readonly nslots=2
-readonly queue="short.qe"
 readonly index=${SGE_TASK_ID}
 
 
@@ -68,7 +64,7 @@ set_up_prs() {
   local prs="${prs_dir}/${phenotype}_pgs_chrom.txt.gz"
   local out_pheno_prs="${out_dir}/${phenotype}_prs.txt.gz"
   if [[ -f "${prs}"  && "${use_prs}" -eq "1" ]]; then
-    if [ ! -f ${out_pheno_prs} ]; then
+    if [ ! -f "${out_pheno_prs}" ]; then
       set_up_rpy
       Rscript ${rscript} \
         --phenotype ${phenotype} \
@@ -91,7 +87,7 @@ submit_spa_null() {
     if [ ! -f "${out_prefix}.rda" ]; then
       set -x
       qsub -N "_null_${phenotype}" \
-        -t "${tasks}" \
+       -t "${tasks}" \
         -q "${queue}" \
         -pe shmem ${nslots} \
         "${spa_null_script}" \
@@ -114,8 +110,13 @@ submit_spa_null() {
   fi
 }
 
+# Parameters
+readonly use_prs=1
+readonly nslots=2
+readonly queue="short.qe"
+
 # Fit null model for binary/cts traits
-#fit_binary_traits
+fit_binary_traits
 fit_cts_traits
 
 
