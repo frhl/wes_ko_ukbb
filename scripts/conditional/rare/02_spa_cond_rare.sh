@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 2
+#$ -t 1
 #$ -tc 10
 #$ -V
 
@@ -20,6 +20,9 @@ source utils/bash_utils.sh
 readonly vcf_dir="data/conditional/rare/combined"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
+readonly grm_dir="data/saige/grm/input"
+readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+readonly grm_sam="${grm_mtx}.sampleIDs.txt"
 
 readonly spa_script="scripts/conditional/rare/_spa_cond_rare.sh"
 readonly merge_script="scripts/_spa_merge.sh"
@@ -28,6 +31,7 @@ readonly in_prefix="ukb_eur_wes_200k"
 readonly cond_dir="data/conditional/rare/combined"
 readonly cond="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_markers.txt.gz"
 readonly cond_cat="(pLoF)|(damaging_missense)" 
+
 
 submit_spa_binary_with_csqs()
 {
@@ -103,6 +107,8 @@ submit_spa_job() {
     "${in_vcf}.csi" \
     "${in_gmat}" \
     "${in_var}" \
+    "${grm_mtx}" \
+    "${grm_sam}" \
     "${min_mac}" \
     "${out_prefix}" \
     "${cond}" \
@@ -133,7 +139,7 @@ readonly use_prs="0"
 readonly min_mac=4
 readonly tasks=21
 readonly queue="short.qe"
-readonly nslots=2
+readonly nslots=4
 
 
 

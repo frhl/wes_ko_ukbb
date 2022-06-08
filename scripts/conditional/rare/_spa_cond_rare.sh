@@ -20,10 +20,12 @@ readonly in_vcf=${2?Error: Missing arg2 (in_vcf)}
 readonly in_csi=${3?Error: Missing arg3 (in_csi)}
 readonly in_gmat=${4?Error: Missing arg4 (in_gmat)} 
 readonly in_var=${5?Error: Missing arg5 (in_var)} 
-readonly min_mac=${6?Error: Missing arg6 (min_mac)} 
-readonly out_prefix=${7?Error: Missing arg7 (path prefix for saige output)}
-readonly cond="${8}"
-readonly cond_cat="${9}"
+readonly grm_mtx=${6?Error: Missing arg6 (grm_mtx)}
+readonly grm_sam=${7?Error: Missing arg7 (grm_sam)}
+readonly min_mac=${8?Error: Missing arg6 (min_mac)} 
+readonly out_prefix=${9?Error: Missing arg7 (path prefix for saige output)}
+readonly cond="${10}"
+readonly cond_cat="${11}"
 readonly chr=${SGE_TASK_ID}
 
 
@@ -51,7 +53,7 @@ readonly cond_chr=$(echo ${cond} | sed -e "s/CHR/${chr}/g")
 
 readonly markers_raw=$(zcat ${cond_chr} | grep -E "${cond_cat}" | cut -f3)
 readonly markers_n=$(zcat ${cond_chr} | grep -E "${cond_cat}" | wc -l)
-readonly markers_file="${out_prefix}.markers"
+readonly markers_file="${out_prefix/CHR/${chr}}.markers"
 >&2 echo "Note: Subsetted to ${markers_n} conditioning markers."
 echo ${markers_raw} > "${markers_file}"
 
@@ -64,6 +66,8 @@ spa_test() {
        --vcfFile=${vcf} \
        --vcfFileIndex=${csi} \
        --vcfField="DS" \
+       --sparseGRMFile=${grm_mtx} \
+       --sparseGRMSampleIDFile=${grm_sam}  \
        --chrom="chr${chr}" \
        --minMAF=0.0000001 \
        --minMAC=${min_mac} \

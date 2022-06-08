@@ -9,7 +9,7 @@
 #$ -P lindgren.prjc
 #$ -q short.qc
 #$ -pe shmem 3
-#$ -t 1-22
+#$ -t 21
 #$ -V
 
 
@@ -27,7 +27,7 @@ readonly hail_script="scripts/conditional/rare/01_append_vcf_rare.py"
 readonly chr="${SGE_TASK_ID}"
 readonly variants_dir="data/mt/annotated"
 readonly ko_dir="data/knockouts/alt"
-readonly out_dir="data/conditional/rare/combined"
+readonly out_dir="data/conditional/rare/combined/test"
 
 readonly variants_path="${variants_dir}/ukb_eur_wes_200k_annot_chr${chr}.mt"
 readonly input_path="${ko_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense.mt"

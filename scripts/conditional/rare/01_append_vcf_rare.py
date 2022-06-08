@@ -54,10 +54,7 @@ def main(args):
 
     # filter invariant sites
     mt = mt.annotate_entries(DS = hl.float(mt.GT.n_alt_alleles()))
-    mt = mt.annotate_rows(stdev = hl.agg.stats(mt.DS).stdev)
-    mt = mt.filter_rows(mt.stdev > 0)
-
-    # export list of variants for later conditional analysis
+     # export list of variants for later conditional analysis
     varid = hl.delimit([
         hl.str(mt.locus.contig),
         hl.str(mt.locus.position),
@@ -76,7 +73,12 @@ def main(args):
     ko_mt = io.import_table(ko_path, ko_type, calc_info=False)
     ko_mt = tables.order_cols(ko_mt, mt)
     final = io.rbind_matrix_tables(mt, ko_mt )
-   
+
+    # Filter out invariant sites
+    final = final.annotate_rows(stdev = hl.agg.stats(final.DS).stdev)
+    final = final.filter_rows(final.stdev > 0)
+
+    # return MatrixTable
     if out_type not in "mt":
         io.export_table(final, out_prefix, "mt")
     io.export_table(final, out_prefix, out_type)
