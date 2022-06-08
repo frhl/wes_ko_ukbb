@@ -26,12 +26,16 @@ readonly in_dir="data/permute/genes/chr${chr}"
 readonly out_dir="data/permute/permutations/chr${chr}/GENE"
 readonly pheno_dir="data/phenotypes"
 readonly cond_dir="data/conditional/common/marker_mt"
+readonly grm_dir="data/saige/grm/input"
 
 # setup input and output paths
 readonly annotation="pLoF_damaging_missense"
 readonly input_path="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_chr${chr}_GENE.tsv.gz"
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_permuted_chr${chr}_GENE"
 readonly assoc_format="ukb_eur_wes_200k_maf0to5e-2_PHENO_ANNO"
+readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+readonly grm_sam="${grm_mtx}.sampleIDs.txt"
+
 
 # The markers and actual genotypes/dosages for each sample respectively
 readonly cond_markers="${cond_dir}/conditional_markers_chrundefined_markers.txt.gz"
@@ -73,6 +77,8 @@ qsub -N "_chr${chr}_permute" \
     -tc ${n_concurrent_jobs} \
     "${bash_script}" \
     "${chr}" \
+    "${grm_mtx}" \
+    "${grm_sam}" \
     "${input_path}" \
     "${out_prefix}" \
     "${pheno_dir}" \

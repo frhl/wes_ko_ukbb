@@ -172,7 +172,7 @@ main <- function(args){
         combined_dosages <- rbind(dosage, cond_dosage) 
         combined_meta <- rbind(rows, cond_rows)
         final <- cbind(combined_meta, combined_dosages)
-        sds <- unlist(lapply(combined_dosages, 1, sd))
+        sds <- unlist(apply(combined_dosages, 1, sd))
 
         # debugging - are SNPs monoprhic and thus
         # the resulting matrix not invertible?
@@ -186,7 +186,7 @@ main <- function(args){
         rows <- make_vcf_dosage_rows(args$chrom, 1:n, args$vcf_id)
         rows_dosage <- cbind(rows, dosage)
         final <- rows_dosage
-        sds <- unlist(lapply(dosage, 1, sd))
+        sds <- unlist(apply(dosage, 1, sd))
     }
 
     # Sometimes markers with zero AC are crated,

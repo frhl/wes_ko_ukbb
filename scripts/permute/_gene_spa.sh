@@ -25,11 +25,13 @@ readonly out_gene=${3?Error: Missing arg3 (out_gene)}
 readonly out_spa_success=${4?Error: Missing arg3 (out_gene)}
 readonly in_gmat=${5?Error: Missing arg4 (in_gmat)}
 readonly in_var=${6?Error: Missing arg5 (in_var)}
-readonly phenotype=${7?Error: Missing arg6 (phenotype)}
-readonly gene=${8?Error: Missing arg7 (gene)}
-readonly min_mac=${9?Error: Missing arg9 (min_mac)}
-readonly cond_markers=${10?Error: Missing arg10 (cond_markers)}
-readonly use_cond_common=${11?Error: Missing arg11 (1 or 0 - condition on common markers?)}
+readonly grm_mtx=${7?Error: Missing arg6 (grm_mtx)}
+readonly grm_sam=${8?Error: Missing arg7 (grm_sam)}
+readonly phenotype=${9?Error: Missing arg6 (phenotype)}
+readonly gene=${10?Error: Missing arg7 (gene)}
+readonly min_mac=${11?Error: Missing arg9 (min_mac)}
+readonly cond_markers=${12?Error: Missing arg10 (cond_markers)}
+readonly use_cond_common=${13?Error: Missing arg11 (1 or 0 - condition on common markers?)}
 
 readonly var_bytes=$( file_size ${in_var} )
 readonly gmat_bytes=$( file_size ${in_gmat} )
@@ -57,6 +59,8 @@ if [ ! -f ${out_gene_task} ]; then
        --vcfFile=${vcf} \
        --vcfFileIndex=${csi} \
        --vcfField="DS" \
+       --sparseGRMFile=${grm_mtx} \
+       --sparseGRMSampleIDFile=${grm_sam}  \
        --chrom="chr${chr}" \
        --minMAF=0.0000001 \
        --minMAC=${min_mac} \
