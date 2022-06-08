@@ -105,6 +105,8 @@ def main(args):
 
     # annotate knockout matrix
     prob = genes.annotate_entries(DS=genes.pKO * 2)
+    prob = prob.annotate_entries(GT=ko.get_gt_from_floor_ds(prob.DS))
+    prob = prob.select_entries(*[prob.DS, prob.GT])
     prob = prob.select_entries(prob.DS)
     prob = prob.add_row_index()
     prob = prob.annotate_rows(
@@ -124,18 +126,27 @@ def main(args):
     prob = prob.key_rows_by(prob.locus, prob.alleles)
     prob = prob.drop(*['gene_id','tmp_ref','tmp_alt','row_idx'])
 
+    # remove invariant sites
+    prob = prob.annotate_rows(stdev = hl.agg.stats(prob.DS).stdev)
+    prob = prob.filter_rows(prob.stdev > 0)
+
     # discard effects owed to unphased singletons
     if discard_prob_dosages:
         new_DS = ko.discard_prob_dosages(prob.DS)
         prob = prob.transmute_entries(DS = new_DS)
 
+    # write matrix-table which contains dosages. VCF with only
+    # dosages can't be re-read in HAIL, so we write a MatrixTable
+    if out_prefix not in "mt":
+        io.export_table(prob, out_prefix, "mt")
+    
     # write out variants involved and vcf
-    io.export_table(prob, out_prefix, out_type)
-    if not only_vcf:
-        if export_all_gts:
-            genes.filter_entries(hl.is_defined(genes.knockout)).entries().flatten().export(out_prefix + "_all.tsv.gz")
-        else:
-            genes.filter_entries(genes.pKO > 0).entries().flatten().export(out_prefix + ".tsv.gz")
+    #io.export_table(prob, out_prefix, out_type)
+    #if not only_vcf:
+    #    if export_all_gts:
+    #        genes.filter_entries(hl.is_defined(genes.knockout)).entries().flatten().export(out_prefix + "_all.tsv.gz")
+    #    else:
+    #        genes.filter_entries(genes.pKO > 0).entries().flatten().export(out_prefix + ".tsv.gz")
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
