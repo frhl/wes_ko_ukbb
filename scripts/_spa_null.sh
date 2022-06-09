@@ -72,9 +72,12 @@ get_loco_seq(){
 
 # set up LOCO PRS conditioning
 if [ "${use_loco_prs}" -eq "1" ]; then
-  readonly chr="chr${SGE_TASK_ID}"
-  readonly loco=$( get_loco_seq ${chr} )
-  readonly covariates="${in_covariates},${loco}"
+  
+  #readonly chr="chr${SGE_TASK_ID}"
+  #readonly loco=$( get_loco_seq ${chr} )
+  #readonly covariates="${in_covariates},${loco}"
+  readonly prs_covs="loco_${chr}"
+  readonly covariates="${in_covariates},prs_covs}"
   readonly real_out_prefix="${out_prefix}_${chr}"
 else
   readonly covariates="${in_covariates}"
