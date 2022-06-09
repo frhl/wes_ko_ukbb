@@ -42,6 +42,19 @@ main <- function(args){
         stacked <- data.table(do.call(cbind, lst))
         dt <- cbind(dt, stacked)
     }
+
+    # perform transformation
+    if (!is.null(args$transform_method)){
+        grep_phenos <- colnames(dt)
+        grep_phenos <- grep_phenos[grepl('residual', grep_phenos)]
+        f <- ifelse(args$transform_method == "int", gwastools::get_int, gwastools::get_rint)
+        transformed_phenos <- lapply(grep_phenos, function(ph){ return(f(dt[[ph]])) })
+        transformed_phenos <- do.call(cbind, transformed_phenos)
+        colnames(transformed_phenos) <- paste0(grep_phenos, "_",args$transform_method)
+        dt <- cbind(dt, transformed_phenos)
+    }
+
+
     fwrite(dt, args$out_path, sep = "\t")
 }
 
@@ -49,6 +62,7 @@ main <- function(args){
 parser <- ArgumentParser()
 parser$add_argument("--out_path", default=NULL, help = "?")
 parser$add_argument("--input_path", default=NULL, help = "?")
+parser$add_argument("--transform_method", default=NULL, help = "?")
 parser$add_argument("--covariates", default=NULL, help = "?")
 args <- parser$parse_args()
 

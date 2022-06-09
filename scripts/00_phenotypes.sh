@@ -23,7 +23,7 @@ readonly in_cts="${in_dir}/filtered_phenotypes_cts.tsv.gz"
 readonly tmp_bin="${in_dir}/filtered_covar_phenotypes_binary.tsv.gz"
 readonly tmp_cts="${in_dir}/filtered_covar_phenotypes_cts.tsv.gz"
 
-readonly out_dir="data/phenotypes"
+readonly out_dir="data/phenotypes/test"
 readonly out_bin="${out_dir}/filtered_phenotypes_binary"
 readonly out_cts="${out_dir}/filtered_phenotypes_cts"
 
@@ -31,6 +31,9 @@ readonly final_sample_list="/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc
 
 readonly path_covars="${in_dir}/covars1.csv"
 readonly covariates="$(cat ${path_covars})"
+readonly transform_method="int" # inverse normalisation
+
+mkdir -p ${out_dir}
 
 # * add age2, age3 and sex-age covariates
 # * add sex-stratified residiuals"
@@ -43,6 +46,7 @@ Rscript ${r_script} \
 Rscript ${r_script} \
   --input_path ${in_cts} \
   --covariates ${covariates} \
+  --transform_method ${transform_method} \
   --out_path ${tmp_cts}
 
 set +eu
