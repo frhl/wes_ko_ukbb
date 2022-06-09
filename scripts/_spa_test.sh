@@ -7,7 +7,6 @@
 #$ -e logs/_spa_test.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q lindgren.qe
 
 set -o errexit
 set -o nounset
@@ -67,15 +66,13 @@ spa_test() {
      --is_output_moreDetails=TRUE \
      --LOCO=FALSE\
      ${markers:+--condition "$markers"} \
-     ${use_logistf:+--is_Firth_beta=TRUE} \
-     ${use_logistf:+--pCutoffforFirth=0.05} \
-     && print_update "Finished saddle-point approximation. Writing to ${out}" ${SECONDS} \
+    && print_update "Finished saddle-point approximation. Writing to ${out}" ${SECONDS} \
      || raise_error "Saddle-point approximation for chr${chr} failed"
   else
     raise_error "${var} or ${gmat} does not contain any bytes!"
   fi
 }
-
+ 
 if [ ! -f ${out} ]; then
    set_up_RSAIGE
    spa_test

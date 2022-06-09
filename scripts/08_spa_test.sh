@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-5
+#$ -t 1
 #$ -tc 22
 #$ -V
 
@@ -79,7 +79,9 @@ submit_spa_with_csqs()
     if [ ! -f "${out_mrg}" ]; then
       local qsub_spa_name="spa_${phenotype}_${annotation}"
       local qsub_merge_name="_mrg_${phenotype}_${annotation}"
+      >&2 echo "Submitting ${qsub_spa_name}.."
       submit_spa_job
+      >&2 echo "Submitting ${qsub_merge_name}.."
       submit_merge_job
     else
       >&2 echo "Phenotype ${phenotype} with annotation ${annotation} already exists! Skipping.." 
@@ -94,10 +96,9 @@ submit_spa_job() {
   mkdir -p ${step2_dir}
   set -x
   qsub -N "${qsub_spa_name}" \
-    -t ${tasks} \
     -q "${queue}" \
-    -tc 11 \
-    -pe shmem ${nslots} \
+    -t "${tasks}" \
+    -pe shmem "${nslots}" \
     "${spa_script}" \
     "${phenotype}" \
     "${in_vcf}" \
@@ -107,7 +108,6 @@ submit_spa_job() {
     "${grm_mtx}" \
     "${grm_sam}" \
     "${min_mac}" \
-    "${use_logistf}" \
     "${out_prefix}" \
     "${conditioning_markers}"
   set +x
@@ -131,7 +131,6 @@ submit_merge_job()
 }
 
 # parameters
-readonly use_logistf="1"
 readonly conditioning_markers=""
 readonly use_prs="0"
 readonly min_mac=4
