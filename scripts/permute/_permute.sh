@@ -155,6 +155,7 @@ get_trait_from_pheno() {
 submit_shuffle_phase() {
 
   
+  permutation_supply=$( get_permutation_supply )
   local permutations_demand=${1}
   local n_tasks_required=$(( (${permutations_demand} / ${replicates}) - ${permutation_supply} ))
   local sge_seed=3
@@ -165,7 +166,7 @@ submit_shuffle_phase() {
     local tasks_lower_bound=$(( ${permutation_supply} + 1 ))
     local tasks_upper_bound=$(( ${permutation_supply} + ${n_tasks_required} ))
     local tasks_permute=${tasks_lower_bound}-${tasks_upper_bound}
-    permutation_supply=$(( ${permutation_supply} + ${n_tasks_required}))
+    #permutation_supply=$(( ${permutation_supply} + ${n_tasks_required}))
 
     local out_permute_success="${out_prefix}_${tasks_permute}"
     local out_permute_upper_bound="${out_prefix}_${tasks_upper_bound}"
@@ -307,6 +308,8 @@ resubmit_loop() {
     -hold_jid "${name_calc_pheno}" \
     "${this_script}" \
     "${chr}" \
+    "${grm_mtx}" \
+    "${grm_sam}" \
     "${input_path}" \
     "${out_prefix}" \
     "${pheno_dir}" \
@@ -326,6 +329,8 @@ resubmit_loop() {
     "${static_assoc}" \
     "${use_prs}" \
     "${cond_markers}" \
+    "${use_cond_common}" \
+    "${cond_genotypes}" \
     "${iteration}" \
     "${permutation_supply}" \
     "${new_top_p}" 
@@ -367,16 +372,25 @@ check_if_all_done() {
 }
 
 
+# a function that counts the number of permuted VCFs created
+get_permutation_supply() {
+  local prefix_basename="$( basename "${out_prefix}_[0-9]*.vcf.gz$" )"
+  echo "$( ls $write_dir | grep -E "${prefix_basename}" | wc -l )"
+}
+
+# A function that counts the number of SAIGE associations created
 get_saige_supply() {
-  echo "$( ls $write_dir | grep -E "${out_prefix}_${phenotype}_[0-9]*.txt.gz" | wc -l )"
+  local prefix_basename="$( basename "${out_prefix}_${phenotype}_[0-9]*.txt.gz" )"
+  echo "$( ls $write_dir | grep -E "${prefix_basename}" | wc -l )"
 }
 
 SECONDS=0
 do_extra_loop=0
 iteration=$((${iteration} + 1))
-set_arr_phenos "cts"
-#arr_phenos=( "Alanine_aminotransferase_residual" "Calcium_residual" "WHR_adj_BMI" "BMI" "Apolipoprotein_B_residual")
-arr_phenos=( "Alanine_aminotransferase_residual" )
+set_arr_phenos "both"
+arr_phenos=( "Alanine_aminotransferase_residual" "Calcium_residual" "WHR_adj_BMI" "BMI" "Apolipoprotein_B_residual")
+#arr_phenos=( "Alanine_aminotransferase_residual" )
+#arr_phenos=( "Alanine_aminotransferase_residual" "BMI" )
 
 
 echo "Starting iteration ${iteration}"
@@ -409,7 +423,7 @@ if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then
       fi
     done
   fi
-  if [ ${do_extra_loop} -eq "1" ]; then
+  if [ "${do_extra_loop}" -eq "1" ]; then
     new_top_p=100
     new_n_shuffle=$(( ${n_shuffle} * 10 ))
     resubmit_loop

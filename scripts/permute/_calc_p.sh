@@ -92,7 +92,6 @@ if [ -f ${saige_merged} ]; then
       set_up_rpy
       readonly last_p=$(get_last_permuted_p)
       readonly permuted_p=$(Rscript ${r_get_spa_p} --input_path "${saige_merged}" --select_min_p ${top_p} )
-      echo "Permuted P: ${permuted_p}"
       readonly done=$(Rscript ${rlogic} --a ${true_p} --o "ge" --b ${permuted_p})
       readonly tmp_empirical_p=$(
           Rscript ${r_calc_emp_p} \

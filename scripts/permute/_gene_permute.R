@@ -101,7 +101,7 @@ format_real_variant_long_to_wide <- function(dt, position_last = 20000){
 
 main <- function(args){
 
-    print(args)
+    #print(args)
 
     autosomes <- paste0("chr",1:22)
     stopifnot(file.exists(args$input_path))

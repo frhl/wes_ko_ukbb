@@ -21,14 +21,14 @@ readonly hail_script="scripts/permute/_gene_permute.py"
 readonly rscript="scripts/permute/_gene_permute.R"
 
 readonly chr=${1?Error: Missing arg1 (phenotype)}
-readonly input_path=${2?Error: Missing arg1 (phenotype)}
-readonly out_prefix=${3?Error: Missing arg2 (in_vcf)}
-readonly out_prefix_success=${4?Error: Missing arg2 (in_vcf)}
-readonly seed=${5?Error: Missing arg6 (path prefix for saige output)}
-readonly gene=${6?Error: Missing arg6 (path prefix for saige output)}
-readonly replicates=${7?Error: Missing arg6 (path prefix for saige output)}
-readonly cond_genotypes=${8?Error: Missing arg6 (path prefix for saige output)}
-readonly use_cond_common=${9?Error: Missing arg6 (path prefix for saige output)}
+readonly input_path=${2?Error: Missing arg2 (input_path)}
+readonly out_prefix=${3?Error: Missing arg3 (out_prefix)}
+readonly out_prefix_success=${4?Error: Missing arg4 (out_prefix_success)}
+readonly seed=${5?Error: Missing arg5 (seed)}
+readonly gene=${6?Error: Missing arg6 (gene)}
+readonly replicates=${7?Error: Missing arg7 (replicates)}
+readonly cond_genotypes=${8?Error: Missing arg8 (cond_genotypes)}
+readonly use_cond_common=${9?Error: Missing arg9 (use_cond_common)}
 
 readonly id=${SGE_TASK_ID}
 readonly sge_seed=$(( ${id} * ${seed}))
@@ -54,7 +54,7 @@ if [ -f "${input_path}" ]; then
       --out_prefix ${out_prefix_id} \
       --vcf_id ${gene} \
       --seed ${sge_seed} \
-      && print_update "Finished permuting phase for chr${chr}" ${SECONDS} \
+      && print_update "Finished permuting phase for chr${chr}-${gene} using seed ${sge_seed}" ${SECONDS} \
       || raise_error "Permuting phase for chr${chr} failed"
     module purge
     module load BCFtools/1.12-GCC-10.3.0

@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 12-13
+#$ -t 21
 #$ -tc 10
 #$ -V
 
@@ -45,7 +45,7 @@ readonly cond_genotypes="${cond_dir}/conditional_markers_chrundefined.tsv.gz"
 readonly min_mac=4
 readonly n_replicates=1000
 readonly n_start_shuffle=1000
-readonly n_cutoff_shuffle=10000 #10000000
+readonly n_cutoff_shuffle=10000000
 readonly n_slots_saige=1
 readonly n_slots_permute=1
 readonly queue_saige="short.qf"
@@ -56,7 +56,7 @@ readonly n_concurrent_jobs=30
 readonly iteration=1
 readonly permutation_supply=0
 readonly initial_top_p=10
-readonly use_prs=0
+readonly use_prs=1
 readonly use_cond_common=1
 
 # get path to true P-value and t-stats
@@ -65,8 +65,8 @@ readonly true_p_path="data/permute/overview/min_mac${min_mac}/overview_true_p.ts
 
 # count how many genes to submit for the given chromosome
 readonly n_genes="$( zcat ${genes_path} | grep "chr${chr}" | wc -l)"
-#readonly sge_tasks="1-${n_genes}"
-readonly sge_tasks="1-2"
+readonly sge_tasks="1-${n_genes}"
+#readonly sge_tasks="1-2"
 
 
 set -x
