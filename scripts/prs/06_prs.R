@@ -115,6 +115,24 @@ main <- function(args){
      multi_auto_path <- paste0(args$out_prefix,'_chains.rda')
      saveRDS(multi_auto, multi_auto_path, compress = 'xz')
 
+     # plot chains
+     auto <- multi_auto[[1]]
+     p <- plot_grid(
+        qplot(y = auto$path_p_est) + 
+          theme_bigstatsr() + 
+          geom_hline(yintercept = auto$p_est, col = "blue") +
+          scale_y_log10() +
+          labs(y = "p"),
+        qplot(y = auto$path_h2_est) + 
+          theme_bigstatsr() + 
+          geom_hline(yintercept = auto$h2_est, col = "blue") +
+          labs(y = "h2"),
+        ncol = 1, align = "hv"
+      )
+     # save plot
+     outplot <-
+     ggsave(plot=p,filename=paste0(args$outfile, "_chains.png"))
+
      # get estimates with indicies corresponding to pred genotypes
      beta_auto <- sapply(multi_auto, function(auto){
           auto$beta_est})
@@ -140,8 +158,10 @@ main <- function(args){
        scale = sds,
        ncores = NCORES)
 
+     # keep 
      final_pred <- final_pred_auto
      beta_out <- cbind(gwas, final_beta_auto)
+     fwrite(beta_out, file = paste0(args$out_prefix,"_betas.txt.gz"), sep = '\t')
 
     }
 
@@ -169,7 +189,6 @@ main <- function(args){
 
   write(paste0(args$pred, ".. done! Writing to ", args$out_prefix, ".txt.gz"), stdout())
   fwrite(PGS, file = paste0(args$out_prefix,".txt.gz"), sep = '\t')
-  fwrite(beta_out, file = paste0(args$out_prefix,"_betas.txt.gz"), sep = '\t')
   fwrite(model, file = paste0(args$out_prefix,".model"), sep = '\t')
 
   

@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-44
+#$ -t 1
 #$ -tc 1
 #$ -V
 
@@ -26,8 +26,8 @@ readonly ldsc_dir="data/prs/ldsc"
 readonly pred_dir="data/prs/hapmap/ukb_500k"
 readonly ld_dir="data/prs/hapmap/ld/matrix"
 readonly pheno_dir="data/phenotypes"
-readonly out_dir="data/prs/scores/auto"
-readonly mrg_dir="data/prs/scores"
+readonly out_dir="data/prs/scores/auto/tmp"
+readonly mrg_dir="data/prs/scores/tmp"
 
 readonly index=${SGE_TASK_ID}
 
