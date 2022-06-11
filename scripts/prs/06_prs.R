@@ -141,6 +141,8 @@ main <- function(args){
        ncores = NCORES)
 
      final_pred <- final_pred_auto
+     beta_out <- cbind(gwas, final_beta_auto)
+
     }
 
   
@@ -167,6 +169,7 @@ main <- function(args){
 
   write(paste0(args$pred, ".. done! Writing to ", args$out_prefix, ".txt.gz"), stdout())
   fwrite(PGS, file = paste0(args$out_prefix,".txt.gz"), sep = '\t')
+  fwrite(beta_out, file = paste0(args$out_prefix,"_betas.txt.gz"), sep = '\t')
   fwrite(model, file = paste0(args$out_prefix,".model"), sep = '\t')
 
   
