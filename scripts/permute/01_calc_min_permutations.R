@@ -47,13 +47,14 @@ main <- function(args){
     spa_full$Tstat <- format(spa_full$Tstat, scientific = FALSE)
     out_prefix_true_p <- paste0(args$out_prefix, "_true_p.tsv.gz")
     fwrite(spa_full, out_prefix_true_p, sep = '\t', quote = FALSE)
+    write(paste("Note: wrote", out_prefix_true_p),stderr())
     
     # write out genes and chromosomes used 
     spa_genes <- spa_full[,c("MarkerID","CHR")]
     spa_genes <- spa_genes[!duplicated(spa_genes),]
     out_prefix_genes <- paste0(args$out_prefix, "_genes.tsv.gz")
     fwrite(spa_genes, out_prefix_genes, sep = '\t')
-    write(paste("wrote", out_prefix_genes),stderr())
+    write(paste("Note: wrote", out_prefix_genes),stderr())
 
 }
 
@@ -62,7 +63,6 @@ parser <- ArgumentParser()
 parser$add_argument("--spa_cts_dir", default=NULL, required = TRUE, help = "Path to QCed SNPs")
 parser$add_argument("--spa_bin_dir", default=NULL, required = TRUE, help = "Path to QCed SNPs")
 parser$add_argument("--tsv_path", default=NULL, required = TRUE, help = "Path to QCed SNPs")
-parser$add_argument("--p_cutoff", default=10e-12, required = TRUE, help = "Path to QCed SNPs")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()
 
