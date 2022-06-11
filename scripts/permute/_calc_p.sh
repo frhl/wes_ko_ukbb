@@ -72,8 +72,7 @@ lookup_true() {
 
 get_last_permuted_p() {
   if [ -f ${outfile} ]; then
-    local last_p=$(cat ${outfile} | awk -v g="${gene}" -v p="${phenotype}" '$1==g && $2==p' | cut -f5 | tail -n1)
-    #local obs_count=$(cat ${outfile} | awk -v g="${gene}" -v p="${phenotype}" '$1==g && $2==p' | cut -f5 | tail -n1 | wc -l)
+    local last_p=$(cat ${outfile} | awk -v g="${gene}" -v p="${phenotype}" '$1==g && $2==p' | cut -f6 | tail -n1)
     if [ ! -z ${last_p} ]; then # && [ ${obs_count} -gt 0 ]; then
       echo ${last_p}
     else
