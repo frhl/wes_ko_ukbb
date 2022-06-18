@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
-#$ -N sample_bed
+#$ -N bed_gen_val
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/sample_bed.log
-#$ -e logs/sample_bed.errors.log
+#$ -o logs/bed_gen_val.log
+#$ -e logs/bed_gen_val.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 3
-#$ -q long.qc@@long.hga
-#$ -t 21
+#$ -q long.qc@@long.hge
+#$ -t 1-22
 #$ -V
 
 source utils/qsub_utils.sh
@@ -19,8 +19,8 @@ readonly spark_dir="data/tmp/spark_dir"
 readonly hap_dir="/well/lindgren/flassen/ressources/hapmap"
 
 readonly chr=$( get_chr ${SGE_TASK_ID} )
-readonly out_dir="data/prs/hapmap/ld/unrel_eur_10k"
-readonly out_prefix="${out_dir}/short_ukb_hapmap_rand_10k_eur_chr${chr}"
+readonly out_dir="data/prs/hapmap/ukb_500k/validation"
+readonly out_prefix="${out_dir}/ukb_hapmap_500k_eur_chr${chr}"
 readonly hap_file="${hap_dir}/weights.l2.ldscore.liftover.ht"
 
 readonly sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
@@ -35,19 +35,17 @@ if [ ! -f "${out_prefix}.bed" ]; then
   python3 "${hail_script}" \
      --chrom "${chr}" \
      --dataset "imp" \
-     --extract_samples "${sample_list}" \
+     --ancestry "eur" \
+     --hapmap ${hap_file} \
+     --filter_missing 0.01 \
      --exclude_related \
-     --filter_missing 0.05 \
-     --random_samples 10000 \
      --filter_to_unrelated_using_kinship_coef \
-     --write_samples \
-     --hapmap "${hap_file}" \
+     --extract_samples "${sample_list}" \
      --min_maf 0.01 \
      --liftover \
      --dbsnp \
-     --only_valid_contigs \
-     --out_prefix "${out_prefix}"
-     #--out_type "plink" 
+     --out_prefix "${out_prefix}" \
+     --out_type "plink" 
   set +x
 else
   print_update "file ${out} already exists. Skipping!"
