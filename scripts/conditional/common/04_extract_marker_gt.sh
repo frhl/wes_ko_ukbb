@@ -6,7 +6,7 @@
 #$ -e logs/extract_marker_gt.errors.log
 #$ -P lindgren.prjc
 #$ -q short.qa
-#$ -pe shmem 3
+#$ -pe shmem 4
 #$ -V
 
 # Takes ~13h with 3a cores
@@ -24,7 +24,7 @@ readonly hail_script="scripts/conditional/common/04_extract_marker_gt.py"
 readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
 
 readonly chr="${SGE_TASK_ID}"
-readonly out_dir="data/conditional/common/marker_mt"
+readonly out_dir="data/conditional/common/marker_new"
 readonly out_prefix="${out_dir}/conditional_markers_chrALL"
 readonly out_checkpoint="${out_prefix}_checkpoint.mt"
 readonly out_type="vcf"
@@ -45,7 +45,4 @@ python3 "${hail_script}" \
    && print_update "Finished filtering imputed genotypes ${out_prefix}" ${SECONDS} \
    || raise_error "Filtering imputed genotypes for for ${out_prefix} failed!"
 
-if [ -f "${out_checkpoint}" ]; then
-  rm -rf "${out_checkpoint}"
-fi
 

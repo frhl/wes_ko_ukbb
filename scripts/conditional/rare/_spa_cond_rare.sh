@@ -3,8 +3,8 @@
 #
 #$ -N _spa_cond_rare
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_spa_cond_rare.log
-#$ -e logs/_spa_cond_rare.errors.log
+#$ -o logs/_spa_cond_rare3.log
+#$ -e logs/_spa_cond_rare3.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q lindgren.qe

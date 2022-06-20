@@ -70,7 +70,8 @@ spa_set_test() {
 }
 
 if [ ! -f ${out} ]; then
-   set_up_RSAIGE 1.0.0
+   #set_up_RSAIGE 1.0.0
+   set_up_RSAIGE
    spa_set_test
 else
   >&2 echo "${out} already exists. Skipping.."

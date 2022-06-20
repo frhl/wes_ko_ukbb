@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 41
+#$ -t 1-5
 #$ -tc 1
 #$ -V
 
@@ -55,7 +55,7 @@ submit_spa_pair()
   local trait=${3?Error: Missing arg3 (trait)}
 
   local step1_dir="data/saige/output/${trait}/step1"
-  local step2_dir="data/saige/output/${trait}/step2_set/min_mac${min_mac}"
+  local step2_dir="data/saige/output/${trait}/step2_set_JUNE/min_mac${min_mac}"
 
   local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
   local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
@@ -129,7 +129,7 @@ readonly min_mac=4
 readonly tasks=1-22
 readonly queue="short.qf"
 readonly nslots=1
-readonly use_prs="1"
+readonly use_prs="0"
 
 # cts traits
 submit_spa_set_cts "pLoF_damaging_missense"

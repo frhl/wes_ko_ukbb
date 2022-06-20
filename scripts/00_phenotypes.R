@@ -52,9 +52,11 @@ main <- function(args){
         transformed_phenos <- do.call(cbind, transformed_phenos)
         colnames(transformed_phenos) <- paste0(grep_phenos, "_",args$transform_method)
         dt <- cbind(dt, transformed_phenos)
+        write("Normalized residaulized phenotypes!", stdout())
     }
 
 
+    write(paste0("Done! Writing to",args$out_path), stdout())
     fwrite(dt, args$out_path, sep = "\t")
 }
 

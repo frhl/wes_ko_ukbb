@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 21
+#$ -t 12,21
 #$ -tc 10
 #$ -V
 
@@ -65,8 +65,8 @@ readonly true_p_path="data/permute/overview/min_mac${min_mac}/overview_true_p.ts
 
 # count how many genes to submit for the given chromosome
 readonly n_genes="$( zcat ${genes_path} | grep "chr${chr}" | wc -l)"
-readonly sge_tasks="1-${n_genes}"
-#readonly sge_tasks="1-2"
+#readonly sge_tasks="1-${n_genes}"
+readonly sge_tasks="1-20"
 
 
 set -x

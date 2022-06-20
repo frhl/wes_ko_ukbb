@@ -13,7 +13,7 @@ source utils/qsub_utils.sh
 source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
-readonly in_dir="data/prs/hapmap/ld/unrel_eur_10k"
+readonly in_dir="data/prs/hapmap/ld/unrel_kin_eur_10k"
 readonly in_prefix="${in_dir}/short_ukb_hapmap_rand_10k_eur_chr"
 
 readonly out_dir="data/prs/hapmap/ld/unrel_eur_10k"

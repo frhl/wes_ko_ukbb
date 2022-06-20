@@ -17,10 +17,9 @@ def main(args):
     out_prefix = args.out_prefix
 
     # setup flags
-    hail_init.hail_bmrc_init_local('logs/hail/hail_format.log', 'GRCh38')
-    hl._set_flags(no_whole_stage_codegen='1') # from zulip
+    hail_init.hail_bmrc_init_local('logs/hail/phenotypes.log', 'GRCh38')
 
-    ht = hl.import_table(input_path, impute = True, key = 'eid', missing = ["NA",""], types = {"eid": hl.tstr})
+    ht = hl.import_table(input_path, impute = True, key = 'eid', missing = ["NA",""], types = {"eid": hl.tstr}, force = True)
 
     if extract_samples:
         samples = hl.import_table(extract_samples,no_header=True, key='f0',delimiter=',')

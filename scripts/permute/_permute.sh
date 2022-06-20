@@ -357,7 +357,7 @@ check_if_all_done() {
   if [ -f ${file} ]; then
     local obs_count="$(cat ${file} | grep "OK" | cut -f2 | sort | uniq | wc -l)"
     local expt_count="$(cat ${tested_phenos} | sort | uniq | wc -l)"
-    if [ ${obs_count} -ge 1 ]; then
+    if [ "${obs_count}" -ge "1" ]; then
       if [ ${expt_count} -eq ${obs_count} ]; then
         echo "1"
       else

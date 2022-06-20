@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc@@short.hga
-#$ -t 22
+#$ -t 1-21
 
 
 # Note: long.qc@@long.hga with 4 slots required to run full pipeline

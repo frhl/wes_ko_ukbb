@@ -22,9 +22,8 @@ readonly in_var=${5?Error: Missing arg5 (in_var)}
 readonly grm_mtx=${6?Error: Missing arg6 (grm_mtx)}
 readonly grm_sam=${7?Error: Missing arg7 (grm_sam)}
 readonly min_mac=${8?Error: Missing arg6 (min_mac)} 
-readonly use_logistf=${9?Error: Missing arg6 (min_mac)} 
-readonly out_prefix=${10?Error: Missing arg7 (path prefix for saige output)}
-readonly in_markers="${11}" # optional conditioning markers
+readonly out_prefix=${9?Error: Missing arg7 (path prefix for saige output)}
+readonly in_markers="${10}" # optional conditioning markers
 readonly chr=${SGE_TASK_ID}
 
 
