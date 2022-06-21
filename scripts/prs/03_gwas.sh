@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 45-88
+#$ -t 1-10
 #$ -tc 1
 #$ -V
 
@@ -19,7 +19,7 @@ module purge
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
-readonly in_dir="data/prs/hapmap/ukb_500k"
+readonly in_dir="data/prs/hapmap/ukb_500k/fitting"
 readonly pheno_dir="data/phenotypes"
 
 readonly bash_script="scripts/prs/_gwas.sh"
@@ -93,7 +93,7 @@ submit_merge_job()
 }
 
 
-#submit_gwas_job "data/prs/sumstat/binary" "${phenotype_binary}" "${file_binary}"
+submit_gwas_job "data/prs/sumstat/binary" "${phenotype_binary}" "${file_binary}"
 submit_gwas_job "data/prs/sumstat/cts" "${phenotype_cts}" "${file_cts}"
 
 
