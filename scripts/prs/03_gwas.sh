@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-10
+#$ -t 1-2
 #$ -tc 1
 #$ -V
 
@@ -20,7 +20,8 @@ source utils/bash_utils.sh
 source utils/hail_utils.sh
 
 readonly in_dir="data/prs/hapmap/ukb_500k/fitting"
-readonly pheno_dir="data/phenotypes"
+readonly pheno_header_dir="data/phenotypes"
+readonly pheno_dir="/well/lindgren/UKBIOBANK/dpalmer/ukb_wes_phenotypes"
 
 readonly bash_script="scripts/prs/_gwas.sh"
 readonly hail_script="scripts/prs/03_gwas.py"
@@ -34,12 +35,12 @@ readonly input_path="${in_dir}/ukb_hapmap_500k_eur_chrCHR"
 
 readonly index=${SGE_TASK_ID}
 
-readonly file_cts="${pheno_dir}/filtered_covar_phenotypes_cts.tsv.gz" 
-readonly pheno_list_cts="${pheno_dir}/filtered_covar_phenotypes_cts_manual.tsv"
+readonly file_cts="${pheno_dir}/curated_phenotypes_cts.tsv" 
+readonly pheno_list_cts="${pheno_header_dir}/filtered_phenotypes_cts_manual.tsv"
 readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
 
-readonly file_binary="${pheno_dir}/filtered_covar_phenotypes_binary.tsv.gz"
-readonly pheno_list_binary="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
+readonly file_binary="${pheno_dir}/curated_phenotypes_binary.tsv"
+readonly pheno_list_binary="${pheno_header_dir}/filtered_phenotypes_binary_header.tsv"
 readonly phenotype_binary=$( sed "${index}q;d" ${pheno_list_binary} )
 
 readonly min_cases=100
@@ -54,23 +55,29 @@ submit_gwas_job()
   mkdir -p ${out_dir}
   if [ ! -f "${out_prefix}.txt.gz" ]; then
     if [ ! -z ${phenotype} ]; then
-      set -x
-      qsub -N "_${phenotype}_sumstat" \
-        -t 1-22 \
-        -tc 11 \
-        -q short.qc@@short.hge \
-        -pe shmem 3 \
-        "${bash_script}" \
-        "${hail_script}" \
-        "${input_path}" \
-        "${input_type}" \
-        "${pheno_file}" \
-        "${phenotype}" \
-        "${covariates}" \
-        "${min_cases}" \
-        "${prefix}"
-      set +x
-      submit_merge_job
+      if [ ! -z ${covariates} ]; then
+        set -x
+        qsub -N "_${phenotype}_sumstat" \
+          -t 1-22 \
+          -tc 11 \
+          -q short.qc@@short.hge \
+          -pe shmem 3 \
+          "${bash_script}" \
+          "${hail_script}" \
+          "${input_path}" \
+          "${input_type}" \
+          "${pheno_file}" \
+          "${phenotype}" \
+          "${covariates}" \
+          "${min_cases}" \
+          "${prefix}"
+        set +x
+        submit_merge_job
+      else
+      >&2 echo "Covariate argument is emtpy! Exiting.."
+      fi
+    else
+      >&2 echo "Phenotype argument is empty. Exiting.."  
     fi
   else
     >&2 echo "${out_prefix}.tsv.gz already exists. Skipping.."
