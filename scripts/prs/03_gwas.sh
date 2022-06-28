@@ -42,6 +42,7 @@ readonly file_binary="${pheno_dir}/curated_covar_phenotypes_binary.tsv.gz"
 readonly pheno_list_binary="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
 readonly phenotype_binary=$( sed "${index}q;d" ${pheno_list_binary} )
 
+
 readonly min_cases=100
 
 submit_gwas_job()
@@ -57,7 +58,7 @@ submit_gwas_job()
       if [ ! -z ${covariates} ]; then
         set -x
         qsub -N "_${phenotype}_sumstat" \
-          -t 1-22 \
+          -t ${tasks} \
           -tc 11 \
           -q short.qc@@short.hge \
           -pe shmem 3 \
@@ -99,8 +100,9 @@ submit_merge_job()
 }
 
 
+readonly tasks="1-22"
 submit_gwas_job "data/prs/sumstat/binary" "${phenotype_binary}" "${file_binary}"
-submit_gwas_job "data/prs/sumstat/cts" "${phenotype_cts}" "${file_cts}"
+submit_gwas_job "data/prs/sumstat/cts" "${phenotype_cts}_int" "${file_cts}"
 
 
 
