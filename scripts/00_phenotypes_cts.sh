@@ -18,10 +18,10 @@ readonly spark_dir="data/tmp/spark"
 
 readonly in_dir="/well/lindgren/UKBIOBANK/dpalmer/ukb_wes_phenotypes"
 readonly covar_dir="data/phenotypes"
-readonly out_dir="data/phenotypes/test2"
+readonly out_dir="data/phenotypes"
 
 readonly in_bin="${in_dir}/curated_phenotypes_cts.tsv"
-readonly tmp_bin="${out_dir}/curated_covar_phenotypes_binary.tsv.gz"
+readonly tmp_bin="${out_dir}/curated_covar_phenotypes_cts.tsv.gz"
 readonly out_bin_500k="${out_dir}/curated_covar_phenotypes_cts_500k"
 readonly out_bin_200k="${out_dir}/curated_covar_phenotypes_cts_200k"
 
@@ -60,7 +60,6 @@ python3 "${hail_script}" \
 python3 "${hail_script}" \
      --input_path "${tmp_bin}" \
      --export_header \
-     --count_case_control \
      --out_prefix "${out_bin_500k}"
 
 

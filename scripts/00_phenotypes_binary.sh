@@ -18,7 +18,7 @@ readonly spark_dir="data/tmp/spark"
 
 readonly in_dir="/well/lindgren/UKBIOBANK/dpalmer/ukb_wes_phenotypes"
 readonly covar_dir="data/phenotypes"
-readonly out_dir="data/phenotypes/test2"
+readonly out_dir="data/phenotypes"
 
 readonly in_bin="${in_dir}/curated_phenotypes_binary.tsv"
 readonly tmp_bin="${out_dir}/curated_covar_phenotypes_binary.tsv.gz"
@@ -29,7 +29,6 @@ readonly final_sample_list="/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc
 
 readonly path_covars="${covar_dir}/covars1.csv"
 readonly covariates="$(cat ${path_covars})"
-#readonly transform_method="int" # inverse normalisation
 
 mkdir -p ${out_dir}
 
@@ -48,6 +47,14 @@ set_up_hail
 set_up_pythonpath_legacy
 set -eu
 
+# get 500k IMP samples
+python3 "${hail_script}" \
+     --input_path "${tmp_bin}" \
+     --export_header \
+     --count_case_control \
+     --out_prefix "${out_bin_500k}"
+
+
 # Get 200k WES samples
 python3 "${hail_script}" \
      --input_path "${tmp_bin}" \
@@ -55,13 +62,6 @@ python3 "${hail_script}" \
      --export_header \
      --count_case_control \
      --out_prefix "${out_bin_200k}"
-
-# get 500k IMP samples
-python3 "${hail_script}" \
-     --input_path "${tmp_bin}" \
-     --export_header \
-     --count_case_control \
-     --out_prefix "${out_bin_500k}"
 
 
 

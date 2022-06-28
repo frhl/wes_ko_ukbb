@@ -52,7 +52,11 @@ def main(args):
             for pheno in phenos:
                 cases = ht.aggregate(hl.agg.sum(ht[pheno] == True))
                 controls = ht.aggregate(hl.agg.sum(ht[pheno] == False))
-                fraction = cases / (cases + controls)
+                # avoid division by zero
+                if (cases + controls) > 0:
+                    fraction = cases / (cases + controls)
+                else:
+                    fraction = "div0"
                 line = ("%s\t%d\t%d\t%f" % (pheno, cases, controls, fraction))  
                 outfile.write(line + "\n")
 
