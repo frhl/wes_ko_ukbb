@@ -11,39 +11,24 @@ main <- function(args){
     print(args)  
     stopifnot(file.exists(args$input_path))
     stopifnot(dir.exists(dirname(args$out_path)))
-
+    stopifnot(!is.null(args$covariates))
+ 
+    # append new covariates
     dt <- fread(args$input_path)
     dt$age2 <- dt$age ^ 2
     dt$age3 <- dt$age ^ 3
     dt$sex_age <- dt$age * ifelse(dt$sex == 1, 1, -1)
-    if (!is.null(args$covariates)){
-        # extract raw phenotypes
-        skip_cols <- c("sequencing.batch", "age3", "WHR_adj_BMI_M", "WHR_adj_BMI_F")
-        covars <- unlist(strsplit(args$covariate, split = ","))
-        bool_keep <- as.logical(sapply(dt, function(x) is.numeric(x) & length(unique(x) > 100)) & 
-            !(colnames(dt) %in% unique(c("eid", covars, skip_cols))) &
-            !(grepl("residual",colnames(dt))) &
-            !(grepl("PC", colnames(dt)))) 
-        phenos <- colnames(dt)
-        phenos_keep <- phenos[bool_keep]
-        print(phenos_keep)
-        # get rows with N/A
-        na_covar_rows <- rowSums(is.na(dt[,covars, with = FALSE])) > 0
-        total_rows <- nrow(dt)
-        lst <- lapply(phenos_keep, function(ph){
-           na_pheno_rows <- is.na(dt[[ph]])
-           na_rows <- sum(na_covar_rows | na_pheno_rows)
-           if (na_rows < total_rows) {
-              residualize_trait_by_sex(ph, dt, "sex", covars)
-           }
-        })
-        # append to data
-        names(lst) <- paste0(phenos_keep, "_residual_sex_strat")
-        stacked <- data.table(do.call(cbind, lst))
-        dt <- cbind(dt, stacked)
+
+    # only keep samples in which we have no missing covariates 
+    covars <- unlist(strsplit(args$covariates, split = ","))
+    missing <- rowSums(do.call(cbind, lapply(covars, function(col) is.na(dt[[col]]) ))) > 0
+    n_missing <- sum(missing)
+    if ((n_missing > 0) & (args$row_na_action == "remove")) {
+        write(paste("Note: dropping", n_missing, "sample(s) with missing covariates."),stderr())
+        dt <- dt[!missing, ]
     }
 
-    # perform transformation
+    # transform phenotypes (either RINT or INT)
     if (!is.null(args$transform_method)){
         grep_phenos <- colnames(dt)
         grep_phenos <- grep_phenos[grepl('residual', grep_phenos)]
@@ -52,20 +37,20 @@ main <- function(args){
         transformed_phenos <- do.call(cbind, transformed_phenos)
         colnames(transformed_phenos) <- paste0(grep_phenos, "_",args$transform_method)
         dt <- cbind(dt, transformed_phenos)
-        write("Normalized residaulized phenotypes!", stdout())
     }
 
-
+    # Finally write file
     write(paste0("Done! Writing to",args$out_path), stdout())
     fwrite(dt, args$out_path, sep = "\t")
 }
 
 # add arguments
 parser <- ArgumentParser()
-parser$add_argument("--out_path", default=NULL, help = "?")
-parser$add_argument("--input_path", default=NULL, help = "?")
-parser$add_argument("--transform_method", default=NULL, help = "?")
-parser$add_argument("--covariates", default=NULL, help = "?")
+parser$add_argument("--out_path", default=NULL, help = "Where should the file be written")
+parser$add_argument("--input_path", default=NULL, help = "Curated phenotypes input path")
+parser$add_argument("--transform_method", default=NULL, help = "Transformation of residuals, either INT or RINT")
+parser$add_argument("--row_na_action", default="keep", help = "set to 'remove' to delete rows with missing covariates")
+parser$add_argument("--covariates", default=NULL, help = "comma seperated string of covariates")
 args <- parser$parse_args()
 
 main(args)
