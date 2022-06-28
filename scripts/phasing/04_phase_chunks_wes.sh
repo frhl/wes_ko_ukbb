@@ -9,7 +9,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qe
-#$ -t 1
+#$ -t 20-22
 #$ -V
 
 set -o errexit
@@ -48,19 +48,21 @@ readonly queue="short.qe"
 readonly nslots=18
 
 # what vcf should be phased
-readonly vcf_dir=" data/unphased/wes_union_calls"
-readonly vcf_to_phase="${vcf_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.vcf.bgz" # <--- change this back to eur!
+readonly vcf_dir=" data/unphased/wes/prefilter"
+readonly vcf_to_phase="${vcf_dir}/ukb_eur_wes_prefilter_200k_chr${chr}.vcf.bgz" # <--- change this back to eur!
 
 # fam file for calculating switch errors
 readonly pedigree_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 readonly pedigree="${pedigree_dir}/ukb11867_pedigree.fam"
 
 # Output paths
-readonly out_dir="data/phased/wes_union_calls/chunks/final_longer"
-readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
+readonly out_dir="data/phased/wes/chunks/final"
+readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}"
 readonly out_prefix_w_job_config="${out_prefix}-${nslots}x${queue}/${software}_prs${phasing_region_size}_pro${phasing_region_overlap}_mprs${max_phasing_region_size}"
 readonly out="${out_prefix_w_job_config}.vcf.gz"
 readonly out_symlink="${out_prefix}.vcf.gz"
+
+mkdir -p ${out_dir}
 
 readonly interval_dir="${out_dir}/intervals"
 readonly interval_path="${interval_dir}/intervals_min_${min_interval_unit}_chr${chr}.tsv"
