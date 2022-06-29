@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 3
 #$ -q short.qe
-#$ -t 44-88
+#$ -t 1
 #$ -V
 
 set -o errexit
@@ -19,12 +19,12 @@ source utils/qsub_utils.sh
 readonly rscript="scripts/prs/05_ldsc.R"
 
 readonly gwas_dir="data/prs/sumstat"
-readonly bed_dir="data/prs/hapmap/ld/unrel_eur_10k"
+readonly bed_dir="data/prs/hapmap/ld/unrel_kin_eur_10k"
 readonly out_dir="data/prs/ldsc"
 readonly pheno_dir="data/phenotypes"
 
 readonly ld_bed="${bed_dir}/short_merged_ukb_hapmap_rand_10k_eur.bed"
-readonly ld_dir="data/prs/hapmap/ld/matrix"
+readonly ld_dir="data/prs/hapmap/ld/matrix_unrel_kin"
 
 readonly index=${SGE_TASK_ID}
 
@@ -42,7 +42,7 @@ mkdir -p ${out_dir}
 export OPENBLAS_NUM_THREADS=1 # avoid two levels of parallelization
 
 estimate_heritability(){
-  set_up_rpy
+  set_up_ldpred2
   local phenotype="${1}" 
   local trait="${2}"
   local out_prefix="${out_dir}/ldsc_${phenotype}"
@@ -64,6 +64,7 @@ estimate_heritability(){
   fi
 }
 
-estimate_heritability "${phenotype_cts}" "cts"
-#estimate_heritability "${phenotype_binary}" "binary"
+
+estimate_heritability "${phenotype_cts}_int" "cts"
+estimate_heritability "${phenotype_binary}" "binary"
 
