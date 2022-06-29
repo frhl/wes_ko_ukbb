@@ -60,8 +60,9 @@ main <- function(args){
   write(paste("running parallel with",cores,"cores."), stdout())
 
   # easy to switch to non-parallel workflow with lapply
-  lst <- (foreach (i=1:length(phenotypes)) %dopar% {
-    geno_row_sums(G, pheno_df, phenotypes[i])
+  #lst <- (foreach (i=1:length(phenotypes)) %dopar% {
+  lst <- lapply(1:length(phenotypes), function(i){
+     geno_row_sums(G, pheno_df, phenotypes[i])
   }) 
 
   M <- data.table(do.call(cbind, lst))
