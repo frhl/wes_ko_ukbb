@@ -45,17 +45,27 @@ readonly out=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
 
 readonly threads=$(( ${NSLOTS}-1 ))
 readonly step2_SPAtests="utils/saige/step2_SPAtests_cond.R"
+readonly rscript="scripts/conditional/rare/_variants_with_ac.R"
 
 # condiitonal markers based on rare variants
 readonly cond_chr=$(echo ${cond} | sed -e "s/CHR/${chr}/g")
 >&2 echo ${cond_chr}
 >&2 echo ${cond_cat}
 
+# subset first by consequence
 readonly markers_raw=$(zcat ${cond_chr} | grep -E "${cond_cat}" | cut -f3)
 readonly markers_n=$(zcat ${cond_chr} | grep -E "${cond_cat}" | wc -l)
 readonly markers_file="${out_prefix/CHR/${chr}}.markers"
->&2 echo "Note: Subsetted to ${markers_n} conditioning markers."
 echo ${markers_raw} > "${markers_file}"
+
+# subset by non-monomorphic markers
+readonly markers_pheno_file="${out_prefix/CHR/${chr}}.${phenotype}.markers"
+echo >&2 "NEED TO SET UP ALLELE COUNT FILE ARGUMENT!"
+Rscript "${Rscript}" \
+  --phenotype ${phenotype} \
+  --current_marker_file ${markers_file} \
+  --allele_count_file ${allele_count_file} \
+  --outfile ${markers_pheno_file}
 
 spa_test() {
   echo "var_bytes=${var_bytes} at ${var}"
@@ -75,7 +85,7 @@ spa_test() {
        --varianceRatioFile=${var} \
        --SAIGEOutputFile=${out} \
        --LOCO=FALSE \
-       --condition_file "${markers_file}" \
+       --condition_file "${markers_pheno_file}" \
        && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
        || raise_error "Saddle-point approximation for chr${chr} failed"
   else
