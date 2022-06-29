@@ -17,6 +17,7 @@ def main(args):
     pheno_path = args.pheno_path
     phenotypes = args.phenotypes
     out_prefix = args.out_prefix
+    out_type = args.out_type
 
     hail_init.hail_bmrc_init('logs/hail/append_vcf_rare.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1')
@@ -48,11 +49,16 @@ def main(args):
     ht = mt.select_rows(mt.rsid, mt.pheno_mac).rows()
     ht.flatten().export(out_prefix + ".txt.gz")
 
+    # rename to info field 
+    mt = mt.rename({"pheno_mac" : "info" })
+    io.export_table(mt, out_prefix, out_type)
+
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--input_path', default=None, help='')
     parser.add_argument('--input_type', default=None, help='')
     parser.add_argument('--out_prefix', default=None, help='')
+    parser.add_argument('--out_type', default=None, help='')
     parser.add_argument('--pheno_path', default=None, help='')
     parser.add_argument('--phenotypes', default=None, action=SplitArgsByComma, help='String of phenotypes to be processed')
     
