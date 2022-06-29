@@ -23,19 +23,19 @@ readonly clean_script="scripts/prs/_prs_clean.sh"
 readonly aggr_script="scripts/prs/_prs_aggr.sh"
 
 readonly ldsc_dir="data/prs/ldsc"
-readonly pred_dir="data/prs/hapmap/ukb_500k"
-readonly ld_dir="data/prs/hapmap/ld/matrix"
+readonly pred_dir="data/prs/hapmap/ukb_500k/validation"
+readonly ld_dir="data/prs/hapmap/ld/matrix_unrel_kin"
 readonly pheno_dir="data/phenotypes"
 readonly out_dir="data/prs/scores/auto/tmp"
 readonly mrg_dir="data/prs/scores/tmp"
 
 readonly index=${SGE_TASK_ID}
 
-readonly file_cts="${pheno_dir}/filtered_phenotypes_cts.tsv"
+readonly file_cts="${pheno_dir}/filtered_covar_phenotypes_cts.tsv"
 readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
 readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
 
-readonly file_binary="${pheno_dir}/filtered_phenotypes_binary.tsv"
+readonly file_binary="${pheno_dir}/filtered_covar_phenotypes_binary.tsv"
 readonly pheno_list_binary="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
 readonly phenotype_binary=$( sed "${index}q;d" ${pheno_list_binary} )
 readonly impute="mean2"
@@ -116,7 +116,7 @@ clean_pgs()
   set +x 
 }
 
-readonly tasks=1-22
-submit_ldpred2 "auto" "8" "${phenotype_cts}"
+readonly tasks=21
+submit_ldpred2 "auto" "8" "${phenotype_cts}_int"
 submit_ldpred2 "auto" "8" "${phenotype_binary}"
 

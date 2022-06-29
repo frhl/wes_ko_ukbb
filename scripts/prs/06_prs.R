@@ -14,6 +14,7 @@ writelog <- function(msg, log) {
 # that this will also load libraries, e.g. bigsnpr, bigassert
 devtools::load_all('utils/modules/R/prstools')
 library(argparse)
+library(ggplot2)
 
 main <- function(args){
 
