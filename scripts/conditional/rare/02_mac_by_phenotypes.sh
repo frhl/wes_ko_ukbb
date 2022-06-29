@@ -6,7 +6,7 @@
 #$ -e logs/rmac_by_phenotypes.errors.log
 #$ -P lindgren.prjc
 #$ -q short.qc
-#$ -pe shmem 4
+#$ -pe shmem 10
 #$ -t 21
 #$ -V
 

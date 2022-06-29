@@ -6,6 +6,23 @@ library(parallel)
 library(doParallel)
 
 
+geno_row_sums <- function(G, pheno_df, pheno){
+    #' @param G matrix of genotypes (numerics)
+    #' @param pheno_df data.table of phenotypes
+    #' @param pheno current phenotype (string)
+    
+    # get defined phenotypes
+    defined_phenos <- !is.na(pheno_df[[pheno]])
+    eid_with_defined_phenos <- pheno_df$eid[defined_phenos]
+    
+    # get subset of G which contains defiend phenotypes
+    G_with_defined_phenos <- colnames(G) %in% eid_with_defined_phenos
+    G_subset <- G[,G_with_defined_phenos, with = FALSE]
+    sums <- rowSums(G_subset, na.rm = TRUE)
+    return(sums)
+    
+}
+
 main <- function(args){
 
 
@@ -21,8 +38,12 @@ main <- function(args){
   genotype_cols <- suppressWarnings(!is.na(as.numeric(colnames(d))))
   id_cols <- suppressWarnings(is.na(as.numeric(colnames(d))))
 
-  # get data with genotypes and ID
+  # Need to ensure that G is all numerics
   G <- d[,genotype_cols, with = FALSE]
+  G[, names(G) := lapply(.SD, as.numeric)]
+  #G <- data.table(apply(G, 2, as.numeric))
+  
+  # get ID columns
   id <- d[,id_cols, with = FALSE]
   id_simple <- data.table(chr = id$`#CHROM`, pos = id$POS, id = id$ID, ref = id$REF, alt = id$alt)
 
@@ -35,22 +56,13 @@ main <- function(args){
   }
 
   cores <- detectCores()
-  registerDoParallel(cores-1)
+  registerDoParallel(8)
   write(paste("running parallel with",cores,"cores."), stdout())
-    
+
+  # easy to switch to non-parallel workflow with lapply
   lst <- (foreach (i=1:length(phenotypes)) %dopar% {
-    
-    # get defined phenotypes
-    pheno <- phenotypes[[i]]
-    defined_phenos <- !is.na(pheno_df[[pheno]])
-    eid_with_defined_phenos <- pheno_df$eid[defined_phenos]
-    
-    # get subset of G which contains defiend phenotypes
-    G_with_defined_phenos <- colnames(G) %in% eid_with_defined_phenos
-    G_subset <- G[,G_with_defined_phenos, with = FALSE]
-    sums <- rowSums(G_subset)
-    return(sums)
-  })
+    geno_row_sums(G, pheno_df, phenotypes[i])
+  }) 
 
   M <- data.table(do.call(cbind, lst))
   stopifnot(nrow(M) == nrow(G))
