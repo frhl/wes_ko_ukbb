@@ -22,7 +22,7 @@ main <- function(args){
   dname <- dirname(args$input_path)
   files <- list.files(dname, pattern = bname, full.names = TRUE)
   if (length(files) == 0) stop(paste("no files with pattern",bname,"in directory",dname))
-  files <- files[!grepl('_genes',files)]
+  files <- files[!grepl('_entries',files)]
   files <- files[!grepl('_phenos',files)]
 
   # merge prefixes
