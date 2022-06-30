@@ -54,6 +54,7 @@ def main(args):
         mt = filter_to_females(mt)
     if liftover:
         mt = variants.liftover(mt, from_build='GRCh37', to_build='GRCh38', drop_annotations=True)
+        mt = mt.filter_rows(mt.locus.contig == "chr" + str(chrom))
 
     if input_path and input_type:
 
