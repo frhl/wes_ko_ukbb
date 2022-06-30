@@ -48,6 +48,12 @@ main <- function(args){
   stopifnot(pvalue < 1e-5)
   stopifnot(!is.null(gwas)) 
 
+  # load prediction file (note, that this needs to be done before loading
+  # LD-matrix, so that it can be subsetted accordinly).
+  pred <- load_bigsnp_from_bed(args$pred)
+  pred$map$rsid <- gsub("_",":", pred$map$rsid.ss)
+  gwas <- gwas[gwas$rsid %in% pred$map$rsid,]
+
   # get SNP correlations and LD
   snp <- get_single_ld_matrix(gwas, chr = args$chrom, ld_dir = args$ld_dir)
  
@@ -62,7 +68,6 @@ main <- function(args){
   
   # load data to be used for prediction 
   bfile <- tempfile(tmpdir = dirname(args$out_prefix))
-  pred <- load_bigsnp_from_bed(args$pred)
   pred <- match_bigsnp_with_gwas(obj=pred, gwas=gwas, bfile=args$tmp_bfile)
   genotypes <- pred$genotypes  
   indicies <- pred$gwas_indicies
@@ -70,7 +75,11 @@ main <- function(args){
   # check that we have genotypes
   stopifnot(!is.null(genotypes))
   stopifnot(!is.null(indicies))
-  
+    
+  # check that things are mathced
+  stopifnot(pred$map$rsid == snp$map$rsid)
+  stopifnot(pred$map$rsid == gwas$rsid)
+
   # dimensions  
   cols <- genotypes$`.->ncol` # variants
   rows <- genotypes$`.->nrow` # samples

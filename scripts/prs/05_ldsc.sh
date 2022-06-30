@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 3
 #$ -q short.qe
-#$ -t 1
+#$ -t 1-100
 #$ -V
 
 set -o errexit
