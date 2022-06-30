@@ -84,6 +84,7 @@ def main(args):
 
     # normalize haplotypes by total
     mt = mt.annotate_rows(**{'stats': hl.agg.stats(mt.DS)})
+    mt = mt.filter_rows(mt.stats.stdev > 0)
     mt = mt.annotate_entries(
         H1_norm=(mt.H1-mt.stats.mean)/mt.stats.stdev,
         H2_norm=(mt.H2-mt.stats.mean)/mt.stats.stdev,
