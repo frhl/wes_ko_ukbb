@@ -118,17 +118,17 @@ def main(args):
 
     # binarize phenotype
     if K is not None:
-        y_stats = mt.aggregate_cols(hl.agg.stats(mt.y_cts))
+        y_stats = mt.aggregate_cols(hl.agg.stats(mt.y))
         threshold = stats.norm.ppf(1-K, loc=y_stats.mean, scale=y_stats.stdev)
-        mt = mt.annotate_cols(y_bin=mt.y_cts > threshold)   
+        mt = mt.annotate_cols(case=mt.y > threshold)   
 
     # export effect sizes
-    ht = genes.select_rows(*['beta','theta']).select_entries(*['pKO','knockout'])
-    ht.entries().flatten().export(out_prefix + "_genes.tsv.gz")
+    ht = mt.select_rows(*['beta','theta']).select_entries(*['pKO','knockout'])
+    ht.entries().flatten().export(out_prefix + "_entries.tsv.gz")
 
     # export simulated phenotypes
     ht = mt.cols()
-    ht.flatten().export(out_prefix + ".tsv.gz")
+    ht.flatten().export(out_prefix + "_cols.tsv.gz")
 
 if __name__=='__main__':
 

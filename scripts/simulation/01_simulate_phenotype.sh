@@ -90,7 +90,7 @@ simulate_phenotypes() {
 
 readonly queue="short.qc"
 readonly nslots="3"
-readonly tasks=1-2
+readonly tasks=1-10
 readonly seed=42
 
 # simulate absence of CH effects
