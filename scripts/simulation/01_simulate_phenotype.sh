@@ -38,25 +38,19 @@ mkdir -p ${out_dir}
 simulate_phenotypes() {
 
   local K=0.1
-  local h2_nc=${1}
-  local h2_co=${2}
-  local h2_ko=${3}
-  local pi_nc=${4}
-  local pi_co=${5}
-  local pi_ko=${6}
-  local alpha=${7}
-  local beta=${8}
-  local theta=${9}
+  local h2_beta=${1}
+  local h2_theta=${2}
+  local pi_beta=${4}
+  local pi_theta=${5}
 
-  local h2s="${h2_nc}_${h2_co}_${h2_ko}"
-  local pis="${pi_nc}_${pi_co}_${pi_ko}"
-  local effects="a${alpha}_b${beta}_t${theta}"
+  local h2s="${h2_beta}_${h2_theta}"
+  local pis="${pi_beta}_${pi_theta}"
 
-  local out_prefix="${out_dir}/ukb_eur_h2_${h2s}_pi_${pis}_K${K}_${effects}_chr${chr}"
+  local out_prefix="${out_dir}/ukb_eur_h2_${h2s}_pi_${pis}_K${K}_chr${chr}"
   local out_phenotypes="${out_prefix}_phenos.tsv.gz"
   
-  local sim_name="sim_c${SGE_TASK_ID}_h2_${h2s}_pi_${pis}_${effects}"
-  local mrg_name="mrg_c${SGE_TASK_ID}_h2_${h2s}_pi_${pis}_${effects}"
+  local sim_name="sim_c${SGE_TASK_ID}_h2_${h2s}_pi_${pis}"
+  local mrg_name="mrg_c${SGE_TASK_ID}_h2_${h2s}_pi_${pis}"
 
   set -x
   if [ 1 -eq 1 ]; then
@@ -67,15 +61,10 @@ simulate_phenotypes() {
        ${bash_script} \
        ${in_prefix}\
        ${in_type} \
-       ${h2_nc} \
-       ${h2_co} \
-       ${h2_ko} \
-       ${pi_nc} \
-       ${pi_co} \
-       ${pi_ko} \
-       ${alpha} \
-       ${beta} \
-       ${theta} \
+       ${h2_beta} \
+       ${h2_theta} \
+       ${pi_beta} \
+       ${pi_theta} \
        ${K} \
        ${seed} \
        ${out_prefix}
@@ -101,12 +90,12 @@ simulate_phenotypes() {
 
 readonly queue="short.qc"
 readonly nslots="3"
-readonly tasks=1
+readonly tasks=1-2
 readonly seed=42
 
 # simulate absence of CH effects
 #simulate_phenotypes 0.00 0.00 0.00 0.00 0.00 0.00 NA NA NA
-simulate_phenotypes 0.10 0.00 0.00 0.00 0.00 0.00 NA NA NA
+simulate_phenotypes 0.10 0.10 0.10 0.50 0.00 0.00 NA NA NA
 #simulate_phenotypes 0.00 0.10 0.00 0.00 0.00 0.00 NA NA NA
 #simulate_phenotypes 0.10 0.10 0.00 0.00 0.00 0.00 NA NA NA
 
