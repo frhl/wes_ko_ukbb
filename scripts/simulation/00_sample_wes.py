@@ -13,8 +13,6 @@ from ukb_utils import samples
 def main(args):
 
     # parser
-    chrom = args.chrom
-    dataset = args.dataset
     extract_samples = args.extract_samples
     exclude_samples = args.exclude_samples
     ancestry = args.ancestry
@@ -25,10 +23,14 @@ def main(args):
     out_prefix = args.out_prefix
     out_type = args.out_type
     filter_to_unrelated_using_kinship_coef = args.filter_to_unrelated_using_kinship_coef
+    filter_missing = args.filter_missing
+    in_prefix = args.in_prefix
+    in_type = args.in_type
 
     hail_init.hail_bmrc_init_local('logs/hail/hail_format.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
-   
+    mt = io.import_table(in_prefix, in_type)
+
     if extract_samples:
         ht_samples = hl.import_table(extract_samples, no_header=True, key='f0', delimiter=',')
         mt = mt.filter_cols(hl.is_defined(ht_samples[mt.col_key]))
@@ -50,11 +52,6 @@ def main(args):
     if random_samples:
         mt = samples.choose_col_subset(mt, int(random_samples), seed = int(random_seed))
 
-    if hapmap:
-        ht = hl.read_table(hapmap)
-        ht = ht.key_by('locus_grch37')
-        mt = mt.filter_rows(hl.is_defined(ht[mt.locus]))
-    
     if filter_missing:
         missing = hl.agg.mean(hl.is_missing(mt.GT)) <= float(filter_missing)
         mt = mt.filter_rows(missing)
@@ -69,7 +66,8 @@ def main(args):
 if __name__=='__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--chrom', default=None, help='chromosome')
+    parser.add_argument('--in_prefix', default=None, help='')
+    parser.add_argument('--in_type', default=None, help='')
     parser.add_argument('--exclude_related', default=None, action='store_true', help='Exclude any related individuals.')
     parser.add_argument('--filter_to_unrelated_using_kinship_coef', default=None, action='store_true', help='Exclude any related individuals.')
     parser.add_argument('--filter_missing', default=None, help='Filter to variants with lt value in genotype missingness.')

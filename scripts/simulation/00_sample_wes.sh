@@ -1,47 +1,47 @@
 #!/usr/bin/env bash
 #
-#$ -N sample_bed
+#$ -N sample_wes
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/sample_bed.log
-#$ -e logs/sample_bed.errors.log
+#$ -o logs/sample_wes.log
+#$ -e logs/sample_wes.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 3
-#$ -q long.qc@@long.hga
-#$ -t 1-21
+#$ -q short.qa
+#$ -t 21
 #$ -V
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
-readonly hail_script="scripts/prs/00_bed_gen.py"
+readonly hail_script="scripts/simulation/00_sample_wes.py"
 readonly spark_dir="data/tmp/spark_dir"
-readonly hap_dir="/well/lindgren/flassen/ressources/hapmap"
 
 readonly chr=$( get_chr ${SGE_TASK_ID} )
-readonly out_dir="data/prs/hapmap/ld/unrel_kin_eur_10k"
-readonly out_prefix="${out_dir}/short_ukb_hapmap_rand_10k_eur_chr${chr}"
-readonly hap_file="${hap_dir}/weights.l2.ldscore.liftover.ht"
 
-readonly sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
+readonly in_dir="data/mt/annotated"
+readonly in_file="${in_dir}/ukb_eur_wes_200k_annot_chr${chr}.mt"
+readonly in_type="mt"
+
+readonly out_dir="data/simulation/mt"
+readonly out_prefix="${out_dir}/ukb_eur_100k_chr${chr}"
+readonly out_type="mt"
+
+readonly seed="1995"
 
 mkdir -p ${spark_dir}
 mkdir -p ${out_dir}
 
-if [ ! -f "${out_prefix}.bed" ]; then
-  set_up_hail
-  set_up_pythonpath_legacy
-  set -x
-  python3 "${hail_script}" \
-     --in_file "${in_file}"\
-     --in_type "mt" \
-     --random_samples 10000 \
-     --out_prefix "${out_prefix}" \
-     --out_type "plink" 
-  set +x
-else
-  print_update "file ${out} already exists. Skipping!"
-fi
+set_up_hail
+set_up_pythonpath_legacy
+python3 "${hail_script}" \
+   --in_prefix "${in_file}"\
+   --in_type "mt" \
+   --random_samples 100000 \
+   --random_seed 1995 \
+   --filter_to_unrelated_using_kinship_coef \
+   --out_prefix "${out_prefix}" \
+   --out_type "mt" 
 
 
 
