@@ -116,7 +116,7 @@ clean_pgs()
   set +x 
 }
 
-readonly tasks=21
-submit_ldpred2 "auto" "8" "${phenotype_cts}_int"
-submit_ldpred2 "auto" "8" "${phenotype_binary}"
+readonly tasks=1-22
+submit_ldpred2 "auto" "6" "${phenotype_cts}_int"
+#submit_ldpred2 "auto" "6" "${phenotype_binary}"
 

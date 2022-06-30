@@ -51,7 +51,6 @@ main <- function(args){
   # load prediction file (note, that this needs to be done before loading
   # LD-matrix, so that it can be subsetted accordinly).
   pred <- load_bigsnp_from_bed(args$pred)
-  pred$map$rsid <- gsub("_",":", pred$map$rsid.ss)
   gwas <- gwas[gwas$rsid %in% pred$map$rsid,]
 
   # get SNP correlations and LD
@@ -77,7 +76,6 @@ main <- function(args){
   stopifnot(!is.null(indicies))
     
   # check that things are mathced
-  stopifnot(pred$map$rsid == snp$map$rsid)
   stopifnot(pred$map$rsid == gwas$rsid)
 
   # dimensions  
@@ -140,8 +138,7 @@ main <- function(args){
         ncol = 1, align = "hv"
       )
      # save plot
-     outplot <-
-     ggsave(plot=p,filename=paste0(args$outfile, "_chains.png"))
+     ggsave(plot=p,filename=paste0(args$out_prefix, "_chains.png"))
 
      # get estimates with indicies corresponding to pred genotypes
      beta_auto <- sapply(multi_auto, function(auto){
