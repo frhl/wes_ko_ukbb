@@ -14,9 +14,7 @@
 
 set -o errexit
 set -o nounset
-module purge
 
-# Set up
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
 source utils/vcf_utils.sh
@@ -24,8 +22,12 @@ source utils/vcf_utils.sh
 readonly hail_script="scripts/phasing/04_phase_chunks.py"
 readonly phasing_script="scripts/phasing/_phase_chunks.sh"
 readonly spark_dir="data/tmp/spark"
+
+# set +eu to avoid conda err
+set +eu
 set_up_hail
 set_up_pythonpath_legacy
+set -eu
 
 # Version of chrX-specific filter to use (options: females_only, both_sexes)
 readonly chrX_filter_version="females_only"
