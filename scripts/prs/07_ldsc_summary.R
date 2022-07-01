@@ -13,14 +13,17 @@ main <- function(args){
     d <- readRDS(rds)
     qc <- d$qc
     ldsc <- d$coefficients
+    gwas <- d$gwas
     ldsc$n_snps <- qc$well_behaved_snps
     ldsc$phenotype <- phenotype
     ldsc$coef <- rownames(ldsc)
+    ldsc$n <- gwas$n[1]
+    ldsc$n_eff <- gwas$n_eff[1]
     return(ldsc)
   }))
 
-   
-  outfile <- paste0(args$out_prefix, ".txt")
+  # write outfile
+  outfile <- paste0(args$out_prefix, ".txt.gz")
   fwrite(d, outfile, sep = "\t") 
  
 }
