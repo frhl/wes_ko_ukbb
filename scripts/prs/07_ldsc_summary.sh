@@ -18,8 +18,10 @@ source utils/qsub_utils.sh
 readonly rscript="scripts/prs/07_ldsc_summary.R"
 
 readonly ldsc_dir="data/prs/ldsc"
-readonly out_dir="data/prs/scores"
+readonly out_dir="data/prs/validation"
 readonly out_prefix="${out_dir}/ldsc_summary"
+
+mkdir -p ${out_dir}
 
 set_up_rpy
 Rscript "${rscript}" \

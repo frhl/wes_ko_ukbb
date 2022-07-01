@@ -57,10 +57,10 @@ main <- function(args){
     })
 
     # write final file
-    final <- do.call(rbind, lst)
+    final <- data.table(do.call(rbind, lst))
     outfile <- paste0(args$out_prefix, ".txt.gz")
     write(paste("writing",outfile),stdout())
-    fwrite(outfile, final, sep = "\t")
+    fwrite(final, outfile, sep = "\t")
 
 }
 
