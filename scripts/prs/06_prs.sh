@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1
+#$ -t 10-30
 #$ -tc 1
 #$ -V
 
@@ -26,16 +26,16 @@ readonly ldsc_dir="data/prs/ldsc"
 readonly pred_dir="data/prs/hapmap/ukb_500k/validation"
 readonly ld_dir="data/prs/hapmap/ld/matrix_unrel_kin"
 readonly pheno_dir="data/phenotypes"
-readonly out_dir="data/prs/scores/auto/tmp"
-readonly mrg_dir="data/prs/scores/tmp"
+readonly out_dir="data/prs/scores/auto"
+readonly mrg_dir="data/prs/scores"
 
 readonly index=${SGE_TASK_ID}
 
-readonly file_cts="${pheno_dir}/filtered_covar_phenotypes_cts.tsv"
+readonly file_cts="${pheno_dir}/curated_covar_phenotypes_cts.tsv.gz"
 readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
 readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
 
-readonly file_binary="${pheno_dir}/filtered_covar_phenotypes_binary.tsv"
+readonly file_binary="${pheno_dir}/curated_covar_phenotypes_binary.tsv.gz"
 readonly pheno_list_binary="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
 readonly phenotype_binary=$( sed "${index}q;d" ${pheno_list_binary} )
 readonly impute="mean2"
@@ -118,5 +118,5 @@ clean_pgs()
 
 readonly tasks=1-22
 submit_ldpred2 "auto" "6" "${phenotype_cts}_int"
-#submit_ldpred2 "auto" "6" "${phenotype_binary}"
+submit_ldpred2 "auto" "6" "${phenotype_binary}"
 
