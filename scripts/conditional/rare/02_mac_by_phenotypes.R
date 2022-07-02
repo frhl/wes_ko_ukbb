@@ -45,7 +45,7 @@ main <- function(args){
   
   # get ID columns
   id <- d[,id_cols, with = FALSE]
-  id_simple <- data.table(chr = id$`#CHROM`, pos = id$POS, id = id$ID, ref = id$REF, alt = id$alt)
+  id_simple <- data.table(chr = id$`#CHROM`, pos = id$POS, id = id$ID, ref = id$REF, alt = id$ALT)
 
   # read in phenotypes
   pheno_df <- fread(args$phenotypes)
