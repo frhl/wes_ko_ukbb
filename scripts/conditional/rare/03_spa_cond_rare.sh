@@ -30,6 +30,7 @@ readonly in_prefix="ukb_eur_wes_200k"
 
 readonly cond_dir="data/conditional/rare/combined"
 readonly cond="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_markers.txt.gz"
+readonly markers_allele_count="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_AC.txt.gz"
 readonly cond_cat="(pLoF)|(damaging_missense)" 
 
 
