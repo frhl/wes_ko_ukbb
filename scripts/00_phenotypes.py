@@ -56,7 +56,7 @@ def main(args):
                 if (cases + controls) > 0:
                     fraction = cases / (cases + controls)
                 else:
-                    fraction = "div0"
+                    fraction = 0
                 line = ("%s\t%d\t%d\t%f" % (pheno, cases, controls, fraction))  
                 outfile.write(line + "\n")
 

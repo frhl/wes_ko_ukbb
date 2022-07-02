@@ -29,13 +29,18 @@ main <- function(args){
     }
 
     # transform phenotypes (either RINT or INT)
-    if (!is.null(args$transform_method)){
-        grep_phenos <- colnames(dt)
-        grep_phenos <- grep_phenos[grepl('residual', grep_phenos)]
+    if (!is.null(args$transform_method) & !is.null(args$transform)){
+       
+        # only transform selected phenotypes 
+        phenotypes <- unlist(strsplit(args$transform, split = ","))
+        phenotypes <- phenotypes[phenotypes %in% colnames(dt)]
+        stopifnot(length(phenotypes) > 0)
+
+        # do transformation and aggregate
         f <- ifelse(args$transform_method == "int", gwastools::get_int, gwastools::get_rint)
-        transformed_phenos <- lapply(grep_phenos, function(ph){ return(f(dt[[ph]])) })
+        transformed_phenos <- lapply(phenotypes, function(ph){ return(f(dt[[ph]])) })
         transformed_phenos <- do.call(cbind, transformed_phenos)
-        colnames(transformed_phenos) <- paste0(grep_phenos, "_",args$transform_method)
+        colnames(transformed_phenos) <- paste0(phenotypes, "_",args$transform_method)
         dt <- cbind(dt, transformed_phenos)
     }
 
@@ -49,6 +54,7 @@ parser <- ArgumentParser()
 parser$add_argument("--out_path", default=NULL, help = "Where should the file be written")
 parser$add_argument("--input_path", default=NULL, help = "Curated phenotypes input path")
 parser$add_argument("--transform_method", default=NULL, help = "Transformation of residuals, either INT or RINT")
+parser$add_argument("--transform", default=NULL, help = "What phenotypes should be transformed?")
 parser$add_argument("--row_na_action", default="keep", help = "set to 'remove' to delete rows with missing covariates")
 parser$add_argument("--covariates", default=NULL, help = "comma seperated string of covariates")
 args <- parser$parse_args()
