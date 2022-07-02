@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N rmac_by_phenotypes
+#$ -N mac_by_phenotypes
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/rmac_by_phenotypes.log
-#$ -e logs/rmac_by_phenotypes.errors.log
+#$ -o logs/mac_by_phenotypes.log
+#$ -e logs/mac_by_phenotypes.errors.log
 #$ -P lindgren.prjc
 #$ -q short.qc
 #$ -pe shmem 10
