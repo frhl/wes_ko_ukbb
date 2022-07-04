@@ -51,9 +51,10 @@ main <- function(args){
             phenotype = col,
             correlation = correlation,
             estimate = estimate,
-            stderr = stderr,
-            p = pvalue,
-            log_p = log_pvalue,
+            std_error = stderr,
+            zstat = zscore,
+            pvalue = pvalue,
+            log_pvalue = log_pvalue,
             pred_n = nrow(cur_dt)
         )
         return(d_out) 
