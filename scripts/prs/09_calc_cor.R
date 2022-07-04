@@ -54,7 +54,7 @@ main <- function(args){
             stderr = stderr,
             p = pvalue,
             log_p = log_pvalue,
-            pred_n = nrow(d_cur)
+            pred_n = nrow(cur_dt)
         )
         return(d_out) 
     })
