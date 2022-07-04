@@ -10,7 +10,7 @@ main <- function(args){
   stopifnot(file.exists(args$file_bin)) 
   d1 <- fread(args$file_cts)
   d2 <- fread(args$file_bin)
-  d <- merge(d1, d2, by = c("chr","pos","id","ref") 
+  d <- merge(d1, d2, by = c("chr","pos","id","ref","alt")) 
   outfile <- paste0(args$out_prefix, ".txt.gz")
   fwrite(d, outfile, sep = "\t")
 

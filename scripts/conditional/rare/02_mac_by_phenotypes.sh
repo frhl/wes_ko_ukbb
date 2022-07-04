@@ -6,10 +6,12 @@
 #$ -e logs/mac_by_phenotypes.errors.log
 #$ -P lindgren.prjc
 #$ -q short.qc
-#$ -pe shmem 10
-#$ -t 20-22
+#$ -pe shmem 2
+#$ -t 22
 #$ -V
 
+# Note: this script requires at least 10 A cores. For chromosome
+# one, up to 20 A cores will be needed to run calc_allele_count_by_phenotype
 
 set -o errexit
 set -o nounset
@@ -55,7 +57,8 @@ calc_allele_count_by_phenotype() {
   fi
 }
 
-# run pipeline for cts and binary traits
+
+# calc AC for binary/cts 
 calc_allele_count_by_phenotype ${out_prefix_cts} ${pheno_cts_path} ${phenotypes_cts}
 calc_allele_count_by_phenotype ${out_prefix_bin} ${pheno_bin_path} ${phenotypes_bin}
 
@@ -64,6 +67,8 @@ Rscript "${rcombine}" \
   --file_bin "${out_prefix_bin}.txt.gz" \
   --file_cts "${out_prefix_cts}.txt.gz" \
   --out_prefix "${out_prefix_combined}"
+
+
 
 
 
