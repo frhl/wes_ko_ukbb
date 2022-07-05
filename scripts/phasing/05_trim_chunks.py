@@ -4,9 +4,18 @@ import hail as hl
 import argparse
 import math
 import os
+import re
 
 from ko_utils import io
 from ukb_utils import hail_init
+
+
+def sort_by_chunks(chunks):
+    ''' sort by X in XofY with regex '''
+    n = len(chunks)
+    lst = { int(re.findall(r'\d+of\d+', c)[0].split("of")[0])-1 : c for c in chunks }
+    chunks = [lst[i] for i in range(n)]
+    return chunks
 
 def main(args):
     
@@ -28,10 +37,10 @@ def main(args):
     if in_prefix:
         files = [f for f in files if in_prefix in f]
     if len(files) == 0:
-        raise ValueError("No files were found after filtering")
+        raise ValueError("Files were found. But no file with input prefix were found. Exiting!")
     
     # import each table as a matrix-table:
-    files.sort()
+    files = sort_by_chunks(files)
     mts = [hl.import_vcf(f, force_bgz = True) for f in files]
     n = len(mts)
 
