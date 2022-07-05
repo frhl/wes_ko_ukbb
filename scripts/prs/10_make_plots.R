@@ -6,72 +6,122 @@ library(bigstatsr)
 main <- function(args){
 
     print(args)
-    stopifnot(file.exists(args$phenotype_cts)) 
-    stopifnot(dir.exists(args$directory))
+    stopifnot(file.exists(args$summary_ldsc)) 
+    stopifnot(file.exists(args$summary_prs_cts))
+    stopifnot(file.exists(args$summary_prs_bin))
     stopifnot(dir.exists(dirname(args$out_prefix)))
  
-    # Load polygenic risk scores
-    files <- list.files(args$directory, pattern = ".txt.gz", full.names = TRUE)
-    files <- files[!grepl("chrom",files)]
+    ldsc <- fread(args$summary_ldsc)
+    cts <- fread(args$summary_prs_cts)
+    bin <- fread(args$summary_prs_bin) 
 
-    # comctse files
-    lst <- lapply(files, fread)
-    mrg <- Reduce(merge, lst)
-    mrg$eid <- mrg$sid
+    bin_header <- unlist(strsplit(args$bin_header, split = ",")
+    cts_header <- unlist(strsplit(args$cts_header, split = ",")
+    
+    # rename ldsc so that it can be used for merging
+    colnames(ldsc) <- paste0("ldsc_",colnames(ldsc))
+    colnames(ldsc)[colnames(ldsc) == "ldsc_phenotype"] <- "phenotype"
 
-    # read ctsary phenotypes
-    d_cts <- fread(args$phenotype_cts)
-    d_cts <- d_cts[d_cts$eid %in% mrg$eid,]
-    cols_cts <- colnames(d_cts)
+    # merge files
+    res_bin <- merge(ldsc, bin, all.x = TRUE)
+    res_bin <- res_bin[res_bin$phenotype %in% binary_header,]
+    res_cts <- merge(ldsc, cts, all.x = TRUE)
+    res_cts <- res_cts[res_cts$phenotype %in% cts_header,]
 
-    # subset cols to ctsary
-    cols <- gsub("_pgs","",colnames(mrg))
-    cols <- cols[cols %in% cols_cts]
-    d_cts <- d_cts[,colnames(d_cts) %in% cols, with = FALSE]
-    dt <- merge(mrg, d_cts, by = 'eid')
+    # are they used for prs?
+    res_bin$included <- ifelse(!is.na(res_bin$auc_mean), "Yes", "No")
+    res_cts$included <- ifelse(!is.na(res_cts$correlation), "Yes", "No")
 
-    # calculate AUC 
-    cols <- cols[!cols %in% "eid"]
-    lst <- lapply(cols, function(col){
-        print(col)
-        col_pgs <- paste0(col,'_pgs')
-        cur_dt <- dt[,colnames(dt) %in% c('eid',col,col_pgs), with = FALSE]
-        cur_dt <- cur_dt[!is.na(cur_dt[[col]]) & !is.na(cur_dt[[col_pgs]]),]
-        f <- as.formula(paste0(col, "~", col_pgs))
-        fit <- summary(lm(f, data = cur_dt))
-        correlation <- cor(cur_dt[[col]], cur_dt[[col_pgs]])
-        
-        # perform Z-test
-        estimate <- fit$coefficients[2,1]
-        stderr <- fit$coefficients[2,2]
-        zscore <- estimate / stderr
-        pvalue <- 2 * pnorm(abs(zscore), lower.tail = FALSE, log.p = FALSE)
-        log_pvalue <- 2 * pnorm(abs(zscore), lower.tail = FALSE, log.p = TRUE)
-        d_out <- data.frame(
-            phenotype = col,
-            correlation = correlation,
-            estimate = estimate,
-            std_error = stderr,
-            zstat = zscore,
-            pvalue = pvalue,
-            log_pvalue = log_pvalue,
-            pred_n = nrow(cur_dt)
-        )
-        return(d_out) 
-    })
+    stopifnot(nrow(res_cts) > 0)
+    stopifnot(nrow(res_bin) > 0)
 
-    # write final file
-    final <- data.table(do.call(rbind, lst))
-    outfile <- paste0(args$out_prefix, ".txt.gz")
-    write(paste("writing",outfile),stdout())
-    fwrite(final, outfile, sep = "\t")
+    # ** binary traits **
+    p1 <- ggplot(res_bin[res_bin$ldsc_coef == "h2",], 
+       aes(
+           x=phenotype, #reorder(phenotype, ldsc_estimate),
+           y=ldsc_estimate, 
+           ymax=ldsc_estimate+ldsc_std_error,
+           ymin=ldsc_estimate-ldsc_std_error,
+           fill = included
+           )
+      ) + 
+      geom_bar(stat="identity", position = 'dodge') +
+      geom_point() +
+      geom_errorbar() +
+      ylab(bquote(~h^2)) + 
+      xlab("") +
+      labs(fill="PRS") +
+      theme_bw() +
+      coord_cartesian(ylim=c(0, 1)) +
+      theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+    p2 <- ggplot(res_bin[!is.na(res_bin$auc_mean),], 
+       aes(
+           x=phenotype, 
+           y=auc_mean,
+           ymax=auc_97_5_pct,
+           ymin=auc_2_5_pct
+           )
+      ) + 
+      geom_point() +
+      geom_errorbar() +
+      geom_hline(yintercept = 0.5, linetype = 'dashed') +
+      xlab("") + 
+      ylab("AUC") +
+      theme_bw() +
+      theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+    out_p1 <- paste0(args$out_prefix,"_bin_h2.png")
+    out_p2 <- paste0(args$out_prefix,"_bin_auc.png")
+    ggsave(p1, out_p1, width = 14, height = 7)
+    ggsave(p2, out_p2, width = 7, height = 6)
+
+    p3 <- ggplot(res_cts[res_cts$ldsc_coef == "h2",], 
+           aes(
+               x=phenotype, #reorder(phenotype, ldsc_estimate),
+               y=ldsc_estimate, 
+               ymax=ldsc_estimate+ldsc_std_error,
+               ymin=ldsc_estimate-ldsc_std_error,
+               fill = included
+               )
+          ) + 
+        geom_bar(stat="identity", position = 'dodge') +
+        geom_point() +
+        geom_errorbar() +
+        ylab(bquote(~h^2)) + 
+        xlab("") +
+        labs(fill="PRS") +
+        theme_bw() +
+        coord_cartesian(ylim=c(0, 1)) +
+        theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+    p4 <- ggplot(res_cts[!is.na(res_cts$correlation),], 
+           aes(
+               x=phenotype, 
+               y=correlation
+               )
+          ) + 
+        geom_point() +
+        geom_hline(yintercept = 0, linetype = 'dashed') +
+        xlab("") + 
+        ylab("Pearson R2") +
+        theme_bw() +
+        theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+ 
+    out_p3 <- paste0(args$out_prefix,"_cts_h2.png")
+    out_p4 <- paste0(args$out_prefix,"_cts_pearson.png")
+    ggsave(p3, out_p3, width = 14, height = 7)
+    ggsave(p4, out_p4, width = 7, height = 6)
 
 }
 
 # add arguments
 parser <- ArgumentParser()
-parser$add_argument("--directory", default=NULL, required = TRUE, help = "Path to QCed SNPs")
-parser$add_argument("--phenotype_cts", default=NULL, required = TRUE, help = "Path to QCed SNPs")
+parser$add_argument("--summary_ldsc", default=NULL, required = TRUE, help = "LDSC summary file")
+parser$add_argument("--summary_prs_cts", default=NULL, required = TRUE, help = "PRS cts validation file")
+parser$add_argument("--summary_prs_bin", default=NULL, required = TRUE, help = "PRS binary validation file")
+parser$add_argument("--bin_header", default=NULL, required = TRUE, help = "comma-seperated list of phenotypes")
+parser$add_argument("--cts_header", default=NULL, required = TRUE, help = "comma-seperated list of phenotypes")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()
 

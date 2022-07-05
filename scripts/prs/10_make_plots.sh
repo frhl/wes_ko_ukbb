@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N calc_cor
+#$ -N make_plots
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/calc_cor.log
-#$ -e logs/calc_cor.errors.log
+#$ -o logs/make_plots.log
+#$ -e logs/make_plots.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qf
@@ -26,10 +26,10 @@ readonly out_prefix="${out_dir}/pgs_cor_summary"
 
 mkdir -p ${out_dir}
 
+## still need to set up this script (R part is done though)
+
 set_up_rpy
 Rscript "${rscript}" \
-    --directory "${pgs_dir}" \
-    --phenotype_cts "${phenotypes}" \
     --out_prefix "${out_prefix}"
 
 
