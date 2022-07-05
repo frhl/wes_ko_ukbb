@@ -14,7 +14,7 @@ main <- function(args){
     qc <- d$qc
     ldsc <- d$coefficients
     gwas <- d$gwas
-    ldsc$n_snps <- qc$well_behaved_snps
+    ldsc$n_snps <- ifelse(qc$disable_qc, qc$total_snps, qc$well_behaved_snps)
     ldsc$phenotype <- phenotype
     ldsc$coef <- rownames(ldsc)
     ldsc$n <- gwas$n[1]

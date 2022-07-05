@@ -47,6 +47,8 @@ main <- function(args){
         controls <- sum(boot[[col]]==0)
         boot <- data.table(t(auc))
         colnames(boot) <- paste0("auc_",tolower(colnames(boot)))
+        colnames(boot) <- gsub("\\%","_pct", colnames(boot))
+        colnames(boot) <- gsub("\\.","_", colnames(boot))
         boot$pred_cases <- cases
         boot$pred_controls <- controls
         boot$pred_n <- cases + controls

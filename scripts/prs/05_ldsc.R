@@ -101,6 +101,9 @@ main <- function(args){
   int_z <- int_est / int_se
   h2_pval <- 2 * pnorm(abs(h2_z), lower.tail = FALSE)
   int_pval <- 2 * pnorm(abs(int_z), lower.tail = FALSE)
+  h2_log_pval <- 2 * pnorm(abs(h2_z), lower.tail = FALSE, log.p = TRUE)
+  int_log_pval <- 2 * pnorm(abs(int_z), lower.tail = FALSE, log.p = TRUE)
+
 
   # organize in table
   coefficients <- data.frame(
@@ -108,10 +111,11 @@ main <- function(args){
     std_error = c(int_se, h2_se),
     zstat = c(int_z, h2_z),
     pvalue = c(int_pval, h2_pval)
+    log_pvalue = c(int_pval, h2_pval)
   )
 
   # rename table
-  colnames(coefficients) <- c("estimate", "std_error", "zstat", "pvalue")
+  colnames(coefficients) <- c("estimate", "std_error", "zstat", "pvalue", "log_pvalue")
   rownames(coefficients) <- c("intercept", "h2")
 
   # what SNPS are used
