@@ -21,14 +21,18 @@ readonly vcf_dir="data/conditional/common/combined"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
 
-readonly spa_script="scripts/conditional/common/06_spa_cond_common.sh"
+readonly spa_script="scripts/conditional/common/_spa_cond_common.sh"
 readonly merge_script="scripts/_spa_merge.sh"
 readonly in_prefix="ukb_eur_wes_200k"
 
 readonly cond_dir="data/conditional/common/combined"
-readonly cond="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_markers.txt.gz"
-readonly sorted_markers="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_sorted_markers.txt"
-readonly cond_cat="(pLoF)|(damaging_missense)" 
+readonly cond_file="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_markers.txt.gz"
+readonly cond_cat="common" 
+
+readonly grm_dir="data/saige/grm/input"
+readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+readonly grm_sam="${grm_mtx}.sampleIDs.txt"
+
 
 submit_spa_binary_with_csqs()
 {
@@ -54,7 +58,7 @@ submit_spa_with_csqs()
   if [ ! -z ${phenotype} ]; then
 
     local step1_dir="data/saige/output/${trait}/step1"
-    local step2_dir="data/saige/output/${trait}/step2_common_rare_cond/min_mac${min_mac}"
+    local step2_dir="data/saige/output/${trait}/step2_common_cond/min_mac${min_mac}"
     local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${maf}_${annotation}.vcf.bgz"
     mkdir -p ${step2_dir}
 
@@ -104,10 +108,11 @@ submit_spa_job() {
     "${in_vcf}.csi" \
     "${in_gmat}" \
     "${in_var}" \
+    "${grm_mtx}" \
+    "${grm_sam}" \
     "${min_mac}" \
     "${out_prefix}" \
-    "${sorted_markers}" \
-    "${cond}" \
+    "${cond_file}" \
     "${cond_cat}"
   set +x
 }
@@ -130,10 +135,9 @@ submit_merge_job()
 }
 
 # parameters
-readonly conditioning_markers=""
-readonly use_prs="1"
+readonly use_prs="0"
 readonly min_mac=4
-readonly tasks=1-22
+readonly tasks=12 #1-22
 readonly queue="short.qa"
 readonly nslots=2
 
