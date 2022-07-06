@@ -9,15 +9,10 @@
 #$ -P lindgren.prjc
 #$ -q short.qc
 #$ -pe shmem 3
-#$ -t 12
+#$ -t 12-14
 #$ -V
 
-
-set -o errexit
-set -o nounset
-
 source utils/vcf_utils.sh
-source utils/qsub_utils.sh
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
@@ -53,12 +48,13 @@ mkdir -p ${out_dir}
 
 # create new marker file (common markers + rare markers)
 if [ ! -f "${out_markers}.gz" ]; then
-  zcat $markers_common | grep -v locus | grep chr${chr} >> ${out_markers}
+  zcat ${markers_common} | grep -v locus | grep chr${chr} > ${out_markers}
   gzip ${out_markers}
 fi
 
 # count markers in each file
-readonly n_common_markers=$(zcat ${markers_common} | grep chr${chr} | wc -l )
+readonly n_common_markers=$(zcat "${out_markers}.gz" | grep chr${chr} | wc -l )
+echo "Note: ${n_common_markers} common markers found."
 
 # symlink file if no common markers exist.
 if [ "${n_common_markers}" -eq "0" ]; then
