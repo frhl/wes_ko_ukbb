@@ -51,7 +51,7 @@ mkdir -p ${out_dir}
 if [ ${n} -gt 1 ] && [ ! -f ${out} ]; then 
   bcftools concat --ligate ${files} -O z -o ${out}
 else
-  ln -s ${in_prefix}*.vcf.bgz ${out}
+  ln -s "${PWD}/${in_prefix}"*.vcf.bgz ${out}
 fi
 
 
