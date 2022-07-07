@@ -2,12 +2,12 @@
 #
 #$ -N trim_chunks
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/trim_chunks19.log
-#$ -e logs/trim_chunks19.errors.log
+#$ -o logs/trim_chunks.log
+#$ -e logs/trim_chunks.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 8
 #$ -q short.qe
-#$ -t 19
+#$ -t 21
 #$ -V
 
 set -o errexit

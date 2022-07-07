@@ -106,7 +106,7 @@ def main(args):
             mt = mts[0]
             out = out_prefix + "_trim.1of1" 
             print(f"Writing {out}.vcf.gz ..")
-            io.export_table(mt, out_prefix, out_type)
+            io.export_table(mt, out, out_type)
 
 if __name__=='__main__':
 
