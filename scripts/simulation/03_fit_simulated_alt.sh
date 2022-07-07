@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-50
+#$ -t 1-10
 #$ -tc 5
 #$ -V
 
@@ -24,6 +24,10 @@ readonly spa_script="scripts/_spa_test.sh"
 readonly merge_script="scripts/_spa_merge.sh"
 readonly vcf_prefix="ukb_eur_wes_200k_chrCHR_maf0to5e-2"
 
+readonly grm_dir="data/saige/grm/input"
+readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+readonly grm_sam="${grm_mtx}.sampleIDs.txt"
+
 readonly conditioning_markers=""
 readonly min_mac=2
 readonly chr=21
@@ -34,23 +38,17 @@ readonly nslots=1
 submit_spa()
 {
   local K=0.1
-  local h2_nc=${1}
-  local h2_co=${2}
-  local h2_ko=${3}
-  local pi_nc=${4}
-  local pi_co=${5}
-  local pi_ko=${6}
-  local alpha=${7}
-  local beta=${8}
-  local theta=${9}
+  local h2_beta=${1}
+  local h2_theta=${2}
+  local pi_beta=${3}
+  local pi_theta=${4}
 
-  local h2s="${h2_nc}_${h2_co}_${h2_ko}"
-  local pis="${pi_nc}_${pi_co}_${pi_ko}"
-  local effects="a${alpha}_b${beta}_t${theta}"
+  local h2s="${h2_beta}_${h2_theta}"
+  local pis="${pi_beta}_${pi_theta}"
 
-  local prefix="ukb_eur_h2_${h2s}_pi_${pis}_K${K}_${effects}_chr${chr}"
-  local saige_prefix="${prefix}_y_cts_${SGE_TASK_ID}"
-  local phenotype="y_cts_${SGE_TASK_ID}"
+  local prefix="ukb_eur_h2_${h2s}_pi_${pis}_K${K}_chr${chr}" 
+  local saige_prefix="${prefix}_y_${SGE_TASK_ID}"
+  local phenotype="y_${SGE_TASK_ID}"
   submit_spa_with_csqs "${phenotype}" "${saige_prefix}" "cts"
 }
 
@@ -84,6 +82,8 @@ submit_spa_job() {
     "${in_vcf}.csi" \
     "${in_gmat}" \
     "${in_var}" \
+    "${grm_mtx}" \
+    "${grm_sam}" \
     "${min_mac}" \
     "${out_prefix}.txt" \
     "${conditioning_markers}"
@@ -92,19 +92,16 @@ submit_spa_job() {
 
 readonly annotation="pLoF_damaging_missense"
 
-# Absence of CH effects
-submit_spa 0.00 0.00 0.00 0.00 0.00 0.00 NA NA NA
-submit_spa 0.10 0.00 0.00 0.00 0.00 0.00 NA NA NA
-submit_spa 0.00 0.10 0.00 0.00 0.00 0.00 NA NA NA
-submit_spa 0.10 0.10 0.00 0.00 0.00 0.00 NA NA NA
+# simulate absence of CH effects
+submit_spa 0.00 0.00 0.00 0.00
 
-# simulate CH effects
-submit_spa 0.00 0.00 0.02 0.00 0.00 0.10 NA NA NA
-submit_spa 0.00 0.10 0.02 0.00 0.00 0.10 NA NA NA
-submit_spa 0.00 0.10 0.02 0.00 0.00 0.10 NA NA NA
+# standard additive effects
+#simulate_phenotypes 0.10 0.00 0.10 0.00
+#simulate_phenotypes 0.10 0.00 0.20 0.00
+#simulate_phenotypes 0.10 0.00 1.00 0.00
 
-# simulate effects with thetas
-submit_spa 0.00 0.00 0.00 0.00 0.00 0.10 NA NA 0.01
-submit_spa 0.00 0.00 0.00 0.00 0.00 0.10 NA NA 0.10
+# only domincance effects
+#simulate_phenotypes 0.00 0.10 0.00 0.50
+#simulate_phenotypes 0.10 0.10 0.10 0.50
 
 

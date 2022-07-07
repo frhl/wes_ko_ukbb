@@ -38,26 +38,20 @@ mkdir -p ${out_dir}
 fit_phenotypes() {
 
   local K=0.1
-  local h2_nc=${1}
-  local h2_co=${2}
-  local h2_ko=${3}
-  local pi_nc=${4}
-  local pi_co=${5}
-  local pi_ko=${6}
-  local alpha=${7}
-  local beta=${8}
-  local theta=${9}
+  local h2_beta=${1}
+  local h2_theta=${2}
+  local pi_beta=${3}
+  local pi_theta=${4}
 
-  local h2s="${h2_nc}_${h2_co}_${h2_ko}"
-  local pis="${pi_nc}_${pi_co}_${pi_ko}"
-  local effects="a${alpha}_b${beta}_t${theta}"
+  local h2s="${h2_beta}_${h2_theta}"
+  local pis="${pi_beta}_${pi_theta}"
 
-  local prefix="ukb_eur_h2_${h2s}_pi_${pis}_K${K}_${effects}_chr${chr}"
+  local prefix="ukb_eur_h2_${h2s}_pi_${pis}_K${K}_chr${chr}"
   local pheno_file="${pheno_dir}/${prefix}_phenos.tsv.gz"
 
   local trait_type="quantitative"
   local inv_normalize="TRUE"
-  local phenotype="y_cts"
+  local phenotype="y" # or "case" for binary
   fit_null
 }
 
@@ -83,23 +77,18 @@ fit_null() {
    set +x
  }
 
-readonly tasks="1-50"
+readonly tasks="1-10"
 
-# Absence of CH effects
-#fit_phenotypes 0.00 0.00 0.00 0.00 0.00 0.00 NA NA NA
-fit_phenotypes 0.10 0.00 0.00 0.00 0.00 0.00 NA NA NA
-#fit_phenotypes 0.00 0.10 0.00 0.00 0.00 0.00 NA NA NA
-fit_phenotypes 0.10 0.10 0.00 0.00 0.00 0.00 NA NA NA
+# simulate absence of CH effects
+fit_phenotypes 0.00 0.00 0.00 0.00
 
-# simulate CH effects
-#fit_phenotypes 0.00 0.00 0.02 0.00 0.00 0.10 NA NA NA
-#fit_phenotypes 0.00 0.10 0.02 0.00 0.00 0.10 NA NA NA
-#fit_phenotypes 0.00 0.10 0.02 0.00 0.00 0.10 NA NA NA
+# standard additive effects
+#simulate_phenotypes 0.10 0.00 0.10 0.00
+#simulate_phenotypes 0.10 0.00 0.20 0.00
+#simulate_phenotypes 0.10 0.00 1.00 0.00
 
-# simulate effects with thetas
-#fit_phenotypes 0.00 0.00 0.00 0.00 0.00 0.10 NA NA 0.01
-#fit_phenotypes 0.00 0.00 0.00 0.00 0.00 0.10 NA NA 0.10
-
-
+# only domincance effects
+#simulate_phenotypes 0.00 0.10 0.00 0.50
+#simulate_phenotypes 0.10 0.10 0.10 0.50
 
 

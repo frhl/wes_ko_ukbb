@@ -40,8 +40,8 @@ simulate_phenotypes() {
   local K=0.1
   local h2_beta=${1}
   local h2_theta=${2}
-  local pi_beta=${4}
-  local pi_theta=${5}
+  local pi_beta=${3}
+  local pi_theta=${4}
 
   local h2s="${h2_beta}_${h2_theta}"
   local pis="${pi_beta}_${pi_theta}"
@@ -89,15 +89,25 @@ simulate_phenotypes() {
 
 
 readonly queue="short.qc"
-readonly nslots="3"
+readonly nslots="2"
 readonly tasks=1-10
 readonly seed=42
 
 # simulate absence of CH effects
-#simulate_phenotypes 0.00 0.00 0.00 0.00 0.00 0.00 NA NA NA
-simulate_phenotypes 0.10 0.10 0.10 0.50 0.00 0.00 NA NA NA
-#simulate_phenotypes 0.00 0.10 0.00 0.00 0.00 0.00 NA NA NA
-#simulate_phenotypes 0.10 0.10 0.00 0.00 0.00 0.00 NA NA NA
+simulate_phenotypes 0.00 0.00 0.00 0.00
+
+# standard additive effects
+simulate_phenotypes 0.10 0.00 0.10 0.00
+simulate_phenotypes 0.10 0.00 0.20 0.00
+simulate_phenotypes 0.10 0.00 1.00 0.00
+
+# only domincance effects 
+simulate_phenotypes 0.00 0.10 0.00 0.50
+simulate_phenotypes 0.10 0.10 0.10 0.50
+
+
+
+
 
 # simualte CH effect
 #simulate_phenotypes 0.00 0.00 0.02 0.00 0.00 0.10 NA NA NA

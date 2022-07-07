@@ -41,7 +41,7 @@ python3 "${hail_script}" \
    --random_seed 1995 \
    --filter_to_unrelated_using_kinship_coef \
    --out_prefix "${out_prefix}" \
-   --out_type "mt" 
+   --out_type "vcf" 
 
 
 
