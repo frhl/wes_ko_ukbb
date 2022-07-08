@@ -9,7 +9,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qe
-#$ -t 1-22
+#$ -t 20-22
 #$ -V
 
 set -o errexit
@@ -37,7 +37,7 @@ readonly min_interval_unit=1000
 readonly phasing_region_size=100000
 # Minimum overlap between adjacent phasing windows
 #readonly phasing_region_overlap=$(( ${phasing_region_size}/4 ))  
-readonly phasing_region_overlap=$(( ${phasing_region_size}/4 ))  
+readonly phasing_region_overlap=$(( ${phasing_region_size}/2 ))  
 # Maximum size of phasing window allowed, only used at the end of a chromosome
 # Must be larger than phasing_region_size
 readonly max_phasing_region_size=100000
@@ -45,9 +45,9 @@ readonly max_phasing_region_size=100000
 readonly chr=$( get_chr ${SGE_TASK_ID} )
 
 # Cluster params
-readonly software="shapeit4" #"shapeit4" or "eagle2"
+readonly software="eagle2" #"shapeit4" or "eagle2"
 readonly queue="short.qe"
-readonly nslots=18
+readonly nslots=19
 
 # what vcf should be phased
 readonly vcf_dir=" data/unphased/wes_union_calls"
@@ -58,7 +58,7 @@ readonly pedigree_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 readonly pedigree="${pedigree_dir}/ukb11867_pedigree.fam"
 
 # Output paths
-readonly out_dir="data/phased/wes_union_calls/chunks/overlap_25k"
+readonly out_dir="data/phased/wes_union_calls/chunks/eagle"
 readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
 readonly out_prefix_w_job_config="${out_prefix}-${nslots}x${queue}/${software}_prs${phasing_region_size}_pro${phasing_region_overlap}_mprs${max_phasing_region_size}"
 readonly out="${out_prefix_w_job_config}.vcf.gz"
