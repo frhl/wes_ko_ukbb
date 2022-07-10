@@ -97,12 +97,12 @@ readonly seed=42
 simulate_phenotypes 0.00 0.00 0.00 0.00
 
 # standard additive effects
-simulate_phenotypes 0.10 0.00 0.10 0.00
+#simulate_phenotypes 0.10 0.00 0.10 0.00
 simulate_phenotypes 0.10 0.00 0.20 0.00
-simulate_phenotypes 0.10 0.00 1.00 0.00
+#simulate_phenotypes 0.10 0.00 1.00 0.00
 
 # only domincance effects 
-simulate_phenotypes 0.00 0.10 0.00 0.50
+#simulate_phenotypes 0.00 0.10 0.00 0.50
 simulate_phenotypes 0.10 0.10 0.10 0.50
 
 

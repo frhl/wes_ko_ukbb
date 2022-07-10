@@ -25,7 +25,7 @@ readonly in_type="mt"
 
 readonly out_dir="data/simulation/mt"
 readonly out_prefix="${out_dir}/ukb_eur_100k_chr${chr}"
-readonly out_type="mt"
+readonly out_type="vcf"
 
 readonly seed="1995"
 
@@ -41,7 +41,7 @@ python3 "${hail_script}" \
    --random_seed 1995 \
    --filter_to_unrelated_using_kinship_coef \
    --out_prefix "${out_prefix}" \
-   --out_type "vcf" 
+   --out_type "${out_type}" 
 
 
 
