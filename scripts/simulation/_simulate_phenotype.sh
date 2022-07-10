@@ -53,6 +53,7 @@ python3 "${hail_script}" \
    --K ${K} \
    --max_maf ${max_maf} \
    --seed ${sge_seed} \
+   --rescale_h2 \
    --out_prefix "${out_sge_prefix}" \
    && print_update "Finished simulating phenotypes for ${in_prefix}" ${SECONDS} \
    || raise_error "Simulating phenotypes for ${in_prefix} failed"

@@ -33,6 +33,7 @@ def main(args):
     h2_theta = try_param_h2(args.h2_theta)
     pi_beta = try_param_pi(args.pi_beta)
     pi_theta = try_param_pi(args.pi_theta)
+    rescale_h2 = args.rescale_h2
     K = float(args.K)
 
     # import table
@@ -101,21 +102,41 @@ def main(args):
     mt = mt.annotate_cols(y_no_noise_sign = 1*hl.sign(mt.y_no_noise_H1 + mt.y_no_noise_H2))
 
     # annotate final effects
-    if (h2_theta > 0):
-        mt = mt.annotate_cols(
-            y_no_noise_H=mt.y_no_noise_sign * hl.abs(hl.agg.sum(mt.theta * mt.H_norm)))
-        mt = mt.annotate_cols(
-            y = mt.y_no_noise_H1 + 
-                mt.y_no_noise_H2 +  
-                mt.y_no_noise_H +
-                hl.rand_norm(0, hl.sqrt(1-h2_beta-h2_theta))
-        )
+    if rescale_h2:
+        if (h2_theta > 0):
+            mt = mt.annotate_cols(
+                y_no_noise_H=mt.y_no_noise_sign * hl.abs(hl.agg.sum(mt.theta * mt.H_norm)))
+            mt = mt.annotate_cols(
+                y_no_noise = 
+                    mt.y_no_noise_H1 + 
+                    mt.y_no_noise_H2 +  
+                    mt.y_no_noise_H)
+        else:
+            mt = mt.annotate_cols(
+                y_no_noise = 
+                    mt.y_no_noise_H1 + 
+                    mt.y_no_noise_H2)
+
+        # re-scale genetic contribution to have a mean of zero and variance of 1
+        mt = mt.annotate_cols(**{'ystats': hl.agg.stats(mt.y_no_noise)})
+        mt = mt.annotate_cols(y_no_noise_rescaled = (mt.y_no_noise-mt.ystats.mean)/mt.ystats.stdev)
+        mt = mt.annotate_cols(y = mt.y_no_noise_rescaled + hl.rand_norm(0, hl.sqrt(1-h2_beta-h2_theta)))
     else:
-        mt = mt.annotate_cols(
-            y = mt.y_no_noise_H1 + 
-                mt.y_no_noise_H2 +  
-                hl.rand_norm(0, hl.sqrt(1-h2_beta))
-        )
+        if (h2_theta > 0):
+            mt = mt.annotate_cols(
+                y_no_noise_H=mt.y_no_noise_sign * hl.abs(hl.agg.sum(mt.theta * mt.H_norm)))
+            mt = mt.annotate_cols(
+                y = mt.y_no_noise_H1 + 
+                    mt.y_no_noise_H2 +  
+                    mt.y_no_noise_H +
+                    hl.rand_norm(0, hl.sqrt(1-h2_beta-h2_theta))
+            )
+        else:
+            mt = mt.annotate_cols(
+                y = mt.y_no_noise_H1 + 
+                    mt.y_no_noise_H2 +  
+                    hl.rand_norm(0, hl.sqrt(1-h2_beta))
+            )
 
     # binarize phenotype
     if K is not None:
@@ -145,6 +166,7 @@ if __name__=='__main__':
     parser.add_argument('--in_prefix', default=None, help='Path prefix for input dataset')
     parser.add_argument('--in_type', default=None, help='Either "mt", "vcf" or "plink"')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
+    parser.add_argument('--rescale_h2', default=False, action='store_true', help='rescale genetic contribution')
     args = parser.parse_args()
 
     main(args)
