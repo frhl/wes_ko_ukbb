@@ -6,8 +6,9 @@
 #$ -e logs/annotate.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 2
-#$ -q short.qc@@short.hga
-#$ -t 1-21
+# -q short.qc@@short.hga
+#$ -q long.qc@@long.hga
+#$ -t 1-22
 
 
 # Note: long.qc@@long.hga with 4 slots required to run full pipeline
@@ -26,10 +27,10 @@ readonly hail_script="scripts/03_annotate.py"
 
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 
 readonly in_dir="data/mt/union"
-readonly input_prefix="${in_dir}/ukb_eur_wes_200k_union_chr${chr}.mt"
+readonly input_prefix="${in_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.mt"
 
 readonly out_dir="data/mt/annotated"
-readonly out_prefix="${out_dir}/ukb_eur_wes_200k_annot_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
 readonly out_type="vcf"
 readonly out="${out_prefix}.vcf.bgz"
 readonly out_trio="${out_prefix}.trio"
@@ -64,6 +65,10 @@ if [ ! -f "${out}" ]; then
      || raise_error "Annotating MatrixTables for chr${chr} failed"
   set +x 
 fi
+
+
+
+
 
 if [ -f "${out}" ]; then
   module purge
