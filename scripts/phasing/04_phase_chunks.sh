@@ -9,7 +9,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qe
-#$ -t 23
+#$ -t 20
 #$ -V
 
 set -o errexit
@@ -45,9 +45,9 @@ readonly max_phasing_region_size=100000
 readonly chr=$( get_chr ${SGE_TASK_ID} )
 
 # Cluster params
-readonly software="shapeit4" #"shapeit4" or "eagle2"
+readonly software="eagle2" #"shapeit4" or "eagle2"
 readonly queue="short.qe"
-readonly nslots=18
+readonly nslots=19
 
 # what vcf should be phased
 readonly vcf_dir=" data/unphased/wes_union_calls"

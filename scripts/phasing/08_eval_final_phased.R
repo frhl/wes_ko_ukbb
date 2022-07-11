@@ -78,6 +78,7 @@ main <- function(args){
     maf_bins <- c(1, 10^-(1:6))
 
     files <- list.files(args$ligated_dir, pattern = ".txt", full.names = TRUE)
+    if (!is.null(args$files_regex)) files <- files[grepl(args$files_regex, files)]
     stopifnot(length(files) > 0)
     autosomes <- paste0("chr",1:22)
  
@@ -158,6 +159,7 @@ main <- function(args){
 parser <- ArgumentParser()
 parser$add_argument("--ligated_dir", default=NULL, required = TRUE, help = "The directory containing chunks (to be searched recursively)")
 parser$add_argument("--sites", default=NULL, required = TRUE, help = "path to quality controlled variant sites")
+parser$add_argument("--files_regex", default=NULL, required = TRUE, help = "Perform a subset (regex) based on a string")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 parser$add_argument("--img_width", default=8, help = "Where should the results be written?")
 parser$add_argument("--img_height", default=6, help = "Where should the results be written?")

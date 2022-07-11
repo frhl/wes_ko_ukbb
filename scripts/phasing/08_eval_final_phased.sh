@@ -34,6 +34,7 @@ readonly in_dir_merged="data/phased/wes_union_calls/merged"
 
 readonly out_dir="derived/phased/wes_union_calls/qc"
 readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls"
+readonly regex="18xshort.qe" # exclude any other files
 
 mkdir -p ${out_dir}
 
@@ -42,6 +43,7 @@ set_up_rpy
 set -x
 Rscript ${rscript} \
     --in_dir "${in_dir}" \
+    --files_regex "${regex}" \
     --in_dir_merged "${in_dir_merged}" \
     --out_prefix "${out_prefix}" \
     --img_height 12
