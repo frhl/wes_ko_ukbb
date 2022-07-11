@@ -39,8 +39,14 @@ main <- function(args){
         cur_dt <- cur_dt[!is.na(cur_dt[[col]]) & !is.na(cur_dt[[col_pgs]]),]
         f <- as.formula(paste0(col, "~", col_pgs))
         fit <- summary(lm(f, data = cur_dt))
-        correlation <- cor(cur_dt[[col]], cur_dt[[col_pgs]])
         
+        # calculate correlation and cofrresponding CIs
+        test <- cor.test(cur_dt[[col]], cur_dt[[col_pgs]], conf.level = args$conf_level)
+        #ci_lower_level <- 100*(0+(1-conf_level)/2)
+        #ci_upper_level <- 100*(1-(1-conf_level)/2)
+        #ci_lower_markerr <- paste0("cor_",gsub("\\.","_", as.character(ci_lower_level)),"_pct")
+        #ci_upper_marker <- paste0("cor_",gsub("\\.","_", as.character(ci_upper_level)),"_pct")
+
         # perform Z-test
         estimate <- fit$coefficients[2,1]
         stderr <- fit$coefficients[2,2]
@@ -49,7 +55,10 @@ main <- function(args){
         log_pvalue <- 2 * pnorm(abs(zscore), lower.tail = FALSE, log.p = TRUE)
         d_out <- data.frame(
             phenotype = col,
-            correlation = correlation,
+            corr = test$estimate[1],
+            corr_ci_lower = test$conf.int[1],
+            corr_ci_upper = test$conf.int[2],
+            corr_conf_level = args$conf_level,
             estimate = estimate,
             std_error = stderr,
             zstat = zscore,
@@ -57,6 +66,13 @@ main <- function(args){
             log_pvalue = log_pvalue,
             pred_n = nrow(cur_dt)
         )
+
+        # need to dynamically rename columns
+        #d_out[["cor"]] <- test$estimate[1]
+        #d_out[[ci_lower_marker]] <- test$conf.int[1]
+        #d_out[[ci_upper_marker]] <- test$conf.int[2]
+
+        
         return(d_out) 
     })
 
@@ -71,6 +87,7 @@ main <- function(args){
 # add arguments
 parser <- ArgumentParser()
 parser$add_argument("--directory", default=NULL, required = TRUE, help = "Path to QCed SNPs")
+parser$add_argument("--conf_level", default=0.95, required = FALSE, help = "confidence intervals for correlation")
 parser$add_argument("--phenotype_cts", default=NULL, required = TRUE, help = "Path to QCed SNPs")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()
