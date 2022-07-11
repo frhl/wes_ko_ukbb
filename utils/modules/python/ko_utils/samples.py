@@ -5,7 +5,7 @@ import hail as hl
 
 def get_phenotype_path():
     r''' returns the current path to Duncan's Phenotype table'''
-    return("/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/data/phenotypes/curated_phenotypes_cts.tsv")
+    return("/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/data/phenotypes/curated_covar_phenotypes_cts.tsv.gz")
 
 def translate_sample_ids(ht, from_app: int, to_app: int):
     r'''Translate sample IDs from one UKB application to another
@@ -80,10 +80,12 @@ def filter_to_females(mt):
     # Sex has been recoded to PLINK coding (2=female, 1=male, 0=unknown)
     # from UKB coding (0=female, 1=male).
     ht = hl.import_table(
-            samples.get_phenotype_path(), 
+            get_phenotype_path(), 
             impute = True, 
             key = 'eid', missing = ["NA",""], 
-            types = {"eid": hl.tstr})
+            types = {"eid": hl.tstr},
+            force = True
+            )
     # Filter to females
     return mt.filter_cols(ht[mt.s].sex == 0)
 
