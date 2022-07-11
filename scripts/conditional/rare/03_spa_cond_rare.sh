@@ -30,7 +30,9 @@ readonly in_prefix="ukb_eur_wes_200k"
 
 readonly cond_dir="data/conditional/rare/combined"
 readonly cond="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_markers.txt.gz"
-readonly markers_allele_count="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_AC.txt.gz"
+# path to file with allele count by phenotype (need to avoid conditioning on monomorphic SNPs)
+readonly markers_ac="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_AC.txt.gz"
+# regex for conditional category to use
 readonly cond_cat="(pLoF)|(damaging_missense)" 
 
 
@@ -111,6 +113,7 @@ submit_spa_job() {
     "${grm_mtx}" \
     "${grm_sam}" \
     "${min_mac}" \
+    "${markers_ac}" \
     "${out_prefix}" \
     "${cond}" \
     "${cond_cat}"
@@ -138,7 +141,7 @@ submit_merge_job()
 readonly conditioning_markers=""
 readonly use_prs="0"
 readonly min_mac=4
-readonly tasks=21
+readonly tasks=22
 readonly queue="short.qe"
 readonly nslots=4
 

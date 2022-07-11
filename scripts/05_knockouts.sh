@@ -22,7 +22,7 @@ readonly bash_script="scripts/_knockouts.sh"
 
 readonly in_dir="data/mt/annotated"
 readonly out_dir="data/knockouts/alt"
-readonly in_prefix="${in_dir}/ukb_eur_wes_200k_annot_chrCHR.mt"
+readonly in_prefix="${in_dir}/ukb_eur_wes_union_calls_200k_chrCHR.mt"
 readonly in_type="mt"
 
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k"
@@ -31,7 +31,7 @@ readonly out_type="vcf"
 # Note: ~24 slots are needed for running chr1. 
 # when using aggr_method="collect" on the e-queue.
 # Note: long queue may be required for chr1.
-readonly tasks="21"
+readonly tasks="1-22"
 readonly queue="short.qc"
 #readonly nslots=5 # now set manually
 
@@ -89,13 +89,13 @@ submit_knockout_job()
 
 #submit_knockout_job "synonymous" "5" "fast"
 #submit_knockout_job "other_missense" "5" "fast"
-submit_knockout_job "pLoF" "5" "fast"
+#submit_knockout_job "pLoF" "5" "fast"
 #submit_knockout_job "pLoF,LC" "5" "fast"
 #submit_knockout_job "pLoF,LC,damaging_missense" "5" "fast"
 #submit_knockout_job "damaging_missense" "5" "fast"
 #
 
-#submit_knockout_job "pLoF,damaging_missense" "24" "collect"
+submit_knockout_job "pLoF,damaging_missense" "24" "collect"
 #submit_knockout_job "pLoF" "20" "collect"
 #submit_knockout_job "pLoF,damaging_missense" "6" "fast"
 

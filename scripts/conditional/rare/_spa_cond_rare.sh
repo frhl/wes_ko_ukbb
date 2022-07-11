@@ -22,10 +22,11 @@ readonly in_gmat=${4?Error: Missing arg4 (in_gmat)}
 readonly in_var=${5?Error: Missing arg5 (in_var)} 
 readonly grm_mtx=${6?Error: Missing arg6 (grm_mtx)}
 readonly grm_sam=${7?Error: Missing arg7 (grm_sam)}
-readonly min_mac=${8?Error: Missing arg6 (min_mac)} 
-readonly out_prefix=${9?Error: Missing arg7 (path prefix for saige output)}
-readonly cond="${10}"
-readonly cond_cat="${11}"
+readonly min_mac=${8?Error: Missing arg8 (min_mac)} 
+readonly in_markers_ac=${9?Error: Missing arg9 (markers_ac)} 
+readonly out_prefix=${10?Error: Missing arg10 (out_prefix)}
+readonly cond="${11}"
+readonly cond_cat="${12}"
 readonly chr=${SGE_TASK_ID}
 
 
@@ -42,6 +43,7 @@ readonly gmat_bytes=$( file_size ${gmat} )
 readonly vcf=$(echo ${in_vcf} | sed -e "s/CHR/${chr}/g")
 readonly csi=$(echo ${in_csi} | sed -e "s/CHR/${chr}/g")
 readonly out=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
+readonly markers_ac=$(echo ${in_markers_ac} | sed -e "s/CHR/${chr}/g")
 
 readonly threads=$(( ${NSLOTS}-1 ))
 readonly step2_SPAtests="utils/saige/step2_SPAtests_cond.R"
@@ -59,13 +61,14 @@ readonly markers_file="${out_prefix/CHR/${chr}}.markers"
 echo ${markers_raw} > "${markers_file}"
 
 # subset by non-monomorphic markers
+set_up_rpy
 readonly markers_pheno_file="${out_prefix/CHR/${chr}}.${phenotype}.markers"
-echo >&2 "NEED TO SET UP ALLELE COUNT FILE ARGUMENT!"
-Rscript "${Rscript}" \
+Rscript "${rscript}" \
   --phenotype ${phenotype} \
   --current_marker_file ${markers_file} \
-  --allele_count_file ${allele_count_file} \
-  --outfile ${markers_pheno_file}
+  --allele_count_file ${markers_ac} \
+  --outfile ${markers_pheno_file} \
+  --allele_count_threshold 2 #{min_mac}
 
 spa_test() {
   echo "var_bytes=${var_bytes} at ${var}"
@@ -93,8 +96,11 @@ spa_test() {
   fi
 }
 if [ ! -f ${out} ]; then
-   set_up_RSAIGE
-   spa_test
+  set +eu
+  conda deactivate
+  set_up_RSAIGE
+  set -eu
+  spa_test
 else
   >&2 echo "${out} already exists. Skipping.."
 fi 

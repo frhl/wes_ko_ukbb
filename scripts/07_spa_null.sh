@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 21-80
+#$ -t 1-80
 #$ -tc 1
 #$ -V
 
@@ -111,7 +111,7 @@ submit_spa_null() {
 }
 
 # Parameters
-readonly use_prs=0
+readonly use_prs=1
 readonly nslots=2
 readonly queue="short.qe"
 
