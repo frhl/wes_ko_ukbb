@@ -15,21 +15,33 @@ set -o nounset
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
-readonly rscript="scripts/prs/09_calc_cor.R"
+readonly rscript="scripts/prs/10_make_plots.R"
 
-readonly pgs_dir="data/prs/scores"
+
+readonly pgs_dir="data/prs/validation"
 readonly out_dir="data/prs/validation"
 readonly pheno_dir="data/phenotypes"
 
+readonly summary_ldsc="${pgs_dir}/ldsc_summary.txt.gz"
+readonly summary_prs_cts="${pgs_dir}/pgs_cor_summary.txt.gz"
+readonly summary_prs_bin="${pgs_dir}/pgs_auc_summary.txt.gz"
+
+readonly bin_header="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
+readonly cts_header="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
+
 readonly phenotypes="${pheno_dir}/curated_covar_phenotypes_cts.tsv.gz"
-readonly out_prefix="${out_dir}/pgs_cor_summary"
+readonly out_prefix="${out_dir}/220612_pgs_results"
 
 mkdir -p ${out_dir}
 
-## still need to set up this script (R part is done though)
-
 set_up_rpy
 Rscript "${rscript}" \
-    --out_prefix "${out_prefix}"
+    --out_prefix "${out_prefix}" \
+    --summary_ldsc "${summary_ldsc}" \
+    --summary_prs_cts "${summary_prs_cts}" \
+    --summary_prs_bin "${summary_prs_bin}" \
+    --bin_header "${bin_header}" \
+    --cts_header "${cts_header}"
+
 
 

@@ -1,7 +1,11 @@
-
-library(argparse)
+library(ggplot2)
+library(dplyr)
+library(ggsci)
+library(ggrastr)
+library(ggrepel)
 library(data.table)
-library(bigstatsr)
+library(latex2exp)
+library(argparse)
 
 main <- function(args){
 
@@ -15,9 +19,13 @@ main <- function(args){
     cts <- fread(args$summary_prs_cts)
     bin <- fread(args$summary_prs_bin) 
 
-    bin_header <- unlist(strsplit(args$bin_header, split = ",")
-    cts_header <- unlist(strsplit(args$cts_header, split = ",")
+    # read in relevant headers of phenotypes
+    bin_header <- unlist(strsplit(args$bin_header, split = ","))
+    cts_header <- unlist(strsplit(args$cts_header, split = ","))
     
+    binary_header <- readLines(args$bin_header)
+    cts_header <- paste0(readLines(args$cts_header),"_int")
+
     # rename ldsc so that it can be used for merging
     colnames(ldsc) <- paste0("ldsc_",colnames(ldsc))
     colnames(ldsc)[colnames(ldsc) == "ldsc_phenotype"] <- "phenotype"
@@ -35,83 +43,186 @@ main <- function(args){
     stopifnot(nrow(res_cts) > 0)
     stopifnot(nrow(res_bin) > 0)
 
-    # ** binary traits **
-    p1 <- ggplot(res_bin[res_bin$ldsc_coef == "h2",], 
+    # ** cts traits **
+    p1 <- ggplot(res_cts[res_cts$ldsc_coef == "h2",], 
        aes(
-           x=phenotype, #reorder(phenotype, ldsc_estimate),
-           y=ldsc_estimate, 
-           ymax=ldsc_estimate+ldsc_std_error,
-           ymin=ldsc_estimate-ldsc_std_error,
-           fill = included
+           y=phenotype, #reorder(phenotype, ldsc_estimate),
+           x=ldsc_estimate, 
+           xmax=ldsc_estimate+ldsc_std_error,
+           xmin=ldsc_estimate-ldsc_std_error,
+           color=included
            )
       ) + 
-      geom_bar(stat="identity", position = 'dodge') +
-      geom_point() +
-      geom_errorbar() +
-      ylab(bquote(~h^2)) + 
-      xlab("") +
-      labs(fill="PRS") +
-      theme_bw() +
-      coord_cartesian(ylim=c(0, 1)) +
-      theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+    geom_pointrange() +
+    xlab(expression(~h^2 ~ "(SE)")) + 
+    ylab("Phenotypes") +
+    theme_bw() +
+    scale_x_continuous(breaks=scales::pretty_breaks(n=5)) +
+    scale_color_d3('category20c') +
+    coord_cartesian(xlim=c(0, 0.6)) +
+    guides(color="none")
 
-    p2 <- ggplot(res_bin[!is.na(res_bin$auc_mean),], 
+    p2 <- ggplot(res_cts[res_cts$ldsc_coef == "intercept",], 
+         aes(
+             y=phenotype,
+             x=ldsc_estimate, 
+             xmax=ldsc_estimate+ldsc_std_error,
+             xmin=ldsc_estimate-ldsc_std_error,
+             color=included
+             )
+        ) + 
+      theme_bw() +
+      geom_pointrange() +
+      xlab(expression("intercept (SE)")) + 
+      geom_vline(xintercept = 1, linetype = 'dashed') +
+      scale_x_continuous(breaks=scales::pretty_breaks(n=5)) +
+      scale_color_d3('category20c') + 
+      theme(axis.title.y=element_blank(),
+      axis.text.y=element_blank(),
+      axis.ticks.y=element_blank()) +
+      guides(color="none")
+
+    p3 <- ggplot(res_cts[res_cts$ldsc_coef == "h2",], 
+         aes(
+             y=phenotype, #y=reorder(phenotype, ldsc_estimate),
+             x=-log10(ldsc_pvalue),
+             xmax=-log10(ldsc_pvalue),
+             xmin=-log10(ldsc_pvalue),
+             color=included
+             )
+        ) + 
+      geom_pointrange() +
+      xlab(expression(log[10]*"(P-value)")) +
+      geom_vline(xintercept = -log10(1e-5), linetype = 'dashed') +
+      theme_bw() +
+      scale_x_continuous(breaks=scales::pretty_breaks(n=5)) +
+      scale_color_d3('category20c') +
+      theme(axis.title.y=element_blank(),
+      axis.text.y=element_blank(),
+      axis.ticks.y=element_blank()) +
+      guides(color="none")
+
+    p4 <- ggplot(res_cts, 
+         aes(
+             y=phenotype, #y=reorder(phenotype, ldsc_estimate),
+             x=corr,
+             xmax=corr_ci_upper,
+             xmin=corr_ci_lower,
+             color=included
+             )
+        ) + 
+      geom_point() +
+      geom_pointrange() +
+      theme_bw() +
+      scale_color_d3('category20c') +
+      geom_vline(xintercept = 0, linetype = 'dashed') +
+      xlab(expression("Pearson correlation (95% CI)")) + 
+      ylab("Phenotypes") +
+      scale_x_continuous(breaks=scales::pretty_breaks(n=5)) +
+      theme(axis.title.y=element_blank(),
+          axis.text.y=element_blank(),
+          axis.ticks.y=element_blank()) +
+      guides(color="none")
+ 
+    # save resulting as a cobmined plot     
+    out_p1 <- paste0(args$out_prefix, "_cts.png")
+    out_d1 <- paste0(args$out_prefix, "_cts.txt.gz")
+    fwrite(res_cts, out_d1, sep = "\t")
+    png(out_p1)
+    plt <- cowplot::plot_grid(p1, p2, p3, p4, rel_widths = (c(0.45, 0.2, 0.2, 0.2)), ncol = 4, nrow = 1)
+    print(plt)
+    graphics.off()
+
+    p1 <- ggplot(res_cts[res_cts$ldsc_coef == "h2",], 
        aes(
-           x=phenotype, 
-           y=auc_mean,
-           ymax=auc_97_5_pct,
-           ymin=auc_2_5_pct
+           y=phenotype, #reorder(phenotype, ldsc_estimate),
+           x=ldsc_estimate, 
+           xmax=ldsc_estimate+ldsc_std_error,
+           xmin=ldsc_estimate-ldsc_std_error,
+           color=included
            )
-      ) + 
-      geom_point() +
-      geom_errorbar() +
-      geom_hline(yintercept = 0.5, linetype = 'dashed') +
-      xlab("") + 
-      ylab("AUC") +
-      theme_bw() +
-      theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+        ) + 
+        geom_pointrange() +
+        xlab(expression(~h^2 ~ "(SE)")) + 
+        ylab("Phenotypes") +
+        theme_bw() +
+        scale_x_continuous(breaks=scales::pretty_breaks(n=5)) +
+        scale_color_d3('category20c') +
+        coord_cartesian(xlim=c(0, 0.6)) +
+        guides(color="none")
 
-    out_p1 <- paste0(args$out_prefix,"_bin_h2.png")
-    out_p2 <- paste0(args$out_prefix,"_bin_auc.png")
-    ggsave(p1, out_p1, width = 14, height = 7)
-    ggsave(p2, out_p2, width = 7, height = 6)
+    p2 <- ggplot(res_cts[res_cts$ldsc_coef == "intercept",], 
+           aes(
+               y=phenotype,
+               x=ldsc_estimate, 
+               xmax=ldsc_estimate+ldsc_std_error,
+               xmin=ldsc_estimate-ldsc_std_error,
+               color=included
+               )
+          ) + 
+        theme_bw() +
+        geom_pointrange() +
+        xlab(expression("intercept (SE)")) + 
+        geom_vline(xintercept = 1, linetype = 'dashed') +
+        scale_x_continuous(breaks=scales::pretty_breaks(n=5)) +
+        scale_color_d3('category20c') + 
+        theme(axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank()) +
+        guides(color="none")
 
     p3 <- ggplot(res_cts[res_cts$ldsc_coef == "h2",], 
            aes(
-               x=phenotype, #reorder(phenotype, ldsc_estimate),
-               y=ldsc_estimate, 
-               ymax=ldsc_estimate+ldsc_std_error,
-               ymin=ldsc_estimate-ldsc_std_error,
-               fill = included
+               y=phenotype, #y=reorder(phenotype, ldsc_estimate),
+               x=-log10(ldsc_pvalue),
+               xmax=-log10(ldsc_pvalue),
+               xmin=-log10(ldsc_pvalue),
+               color=included
                )
           ) + 
-        geom_bar(stat="identity", position = 'dodge') +
-        geom_point() +
-        geom_errorbar() +
-        ylab(bquote(~h^2)) + 
-        xlab("") +
-        labs(fill="PRS") +
+        geom_pointrange() +
+        xlab(expression(log[10]*"(P-value)")) +
+        geom_vline(xintercept = -log10(1e-5), linetype = 'dashed') +
         theme_bw() +
-        coord_cartesian(ylim=c(0, 1)) +
-        theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+        scale_x_continuous(breaks=scales::pretty_breaks(n=5)) +
+        scale_color_d3('category20c') +
+        theme(axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank()) +
+        guides(color="none")
 
-    p4 <- ggplot(res_cts[!is.na(res_cts$correlation),], 
+    p4 <- ggplot(res_cts, 
            aes(
-               x=phenotype, 
-               y=correlation
+               y=phenotype, #y=reorder(phenotype, ldsc_estimate),
+               x=corr,
+               xmax=corr_ci_upper,
+               xmin=corr_ci_lower,
+               color=included
                )
           ) + 
         geom_point() +
-        geom_hline(yintercept = 0, linetype = 'dashed') +
-        xlab("") + 
-        ylab("Pearson R2") +
+        geom_pointrange() +
         theme_bw() +
-        theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
- 
-    out_p3 <- paste0(args$out_prefix,"_cts_h2.png")
-    out_p4 <- paste0(args$out_prefix,"_cts_pearson.png")
-    ggsave(p3, out_p3, width = 14, height = 7)
-    ggsave(p4, out_p4, width = 7, height = 6)
+        scale_color_d3('category20c') +
+        geom_vline(xintercept = 0, linetype = 'dashed') +
+        xlab(expression("Pearson correlation (95% CI)")) + 
+        ylab("Phenotypes") +
+        scale_x_continuous(breaks=scales::pretty_breaks(n=5)) +
+        theme(axis.title.y=element_blank(),
+            axis.text.y=element_blank(),
+            axis.ticks.y=element_blank()) +
+        guides(color="none")
+
+    # save resulting as a cobmined plot     
+    out_p2 <- paste0(args$out_prefix, "_bin.png")
+    out_d2 <- paste0(args$out_prefix, "_bin.txt.gz")
+    fwrite(res_bin, out_d1, sep = "\t")
+    png(out_p2)
+    plt <- cowplot::plot_grid(p1, p2, p3, p4, rel_widths = (c(0.45, 0.2, 0.2, 0.2)), ncol = 4, nrow = 1)
+    print(plt)
+    graphics.off()
+
+
 
 }
 
