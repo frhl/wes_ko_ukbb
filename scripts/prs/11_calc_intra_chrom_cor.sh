@@ -6,7 +6,7 @@
 #$ -e logs/calc_intra_chrom_cor.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q short.qc
+#$ -q long.qc
 #$ -V
 
 set -o errexit

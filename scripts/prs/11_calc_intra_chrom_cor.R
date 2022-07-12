@@ -56,7 +56,7 @@ main <- function(args){
         # prepare writing file
         M <- data.table(M)
         M$filepath <- basename(f)
-        f_wo_ext <- tools::file_path_sans_ext(basename(f)) 
+        f_wo_ext <- tools::file_path_sens_ext(tools::file_path_sans_ext(basename(f))) 
         outfile <- file.path(args$out_dir, paste0(f_wo_ext,".txt.gz"))
         fwrite(M, outfile, sep = "\t")
         
