@@ -9,7 +9,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qe
-#$ -t 20
+#$ -t 23
 #$ -V
 
 set -o errexit
@@ -45,7 +45,7 @@ readonly max_phasing_region_size=100000
 readonly chr=$( get_chr ${SGE_TASK_ID} )
 
 # Cluster params
-readonly software="eagle2" #"shapeit4" or "eagle2"
+readonly software="shapeit4" #"shapeit4" or "eagle2"
 readonly queue="short.qe"
 readonly nslots=19
 

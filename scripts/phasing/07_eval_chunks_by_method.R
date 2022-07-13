@@ -70,19 +70,32 @@ main <- function(args){
 
     # get CIs for estimates
     counts_by_method <- calc_binom_ci(lst_by_method)
-    pd <- position_dodge(0.7)
-    p1 <- ggplot(counts_by_method,
-           aes(
-               y=switches,
-               x = factor(chunk_current), #factor(CHR, levels = autosomes),
-               fill = factor(wes_variant)
-           )) +
-        geom_bar(stat = 'identity', position = pd, color = 'black') +
-        ylab('Switch Error Rate (%)') + xlab('') +
-        labs(fill = "WES variant") +
-        theme_bw() +
-        facet_grid(factor(CHR, levels = autosomes)~method)
- 
+    counts_by_method$wes_label <- ifelse(counts_by_method$wes_variant, "Whole Exome Sequencing","Genotyping Array")
+    
+    # plot it
+    plt <- ggplot(counts_by_method,
+       aes(
+           y=factor(CHR, levels = autosomes),
+           x=100*pointest,
+           xmax = 100*upper,
+           xmin = 100*lower,
+           color = factor(wes_label)
+       )) +
+    theme_bw() +
+    geom_pointrange() + 
+    labs(color = "") +
+    xlab('% Switch Error Rate (95% CI)') + ylab('') +
+    scale_color_d3('category20c', limits=NULL) +
+    scale_x_continuous(breaks=scales::pretty_breaks(n=10)) +
+    theme(
+        legend.position = "top",
+        axis.text=element_text(size=10),
+        axis.title=element_text(size=10,face="bold"),
+        axis.title.x = element_text(margin=ggplot2::margin(t=10)),
+        axis.title.y = element_text(margin=ggplot2::margin(r=10)),
+        plot.title = element_text(hjust=0.5)
+    )
+
     out_p1 <- paste0(args$out_prefix,'_eagle_shapeit4.png')       
     out_d1 <- paste0(args$out_prefix,'_eagle_shapeit4.txt.gz')       
     write(paste0("writing to",out_p1), stdout())

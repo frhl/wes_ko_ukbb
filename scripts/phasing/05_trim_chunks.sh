@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 8
 #$ -q short.qe
-#$ -t 21
+#$ -t 23
 #$ -V
 
 set -o errexit
@@ -22,7 +22,7 @@ readonly spark_dir="data/tmp/spark"
 
 readonly chr=$( get_chr ${SGE_TASK_ID} )
 readonly main_dir="data/phased/wes_union_calls/chunks"
-readonly in_dir="${main_dir}/ukb_eur_wes_union_calls_200k_chr${chr}-18xshort.qe/"
+readonly in_dir="${main_dir}/ukb_eur_wes_union_calls_200k_chr${chr}-19xshort.qe/"
 readonly in_prefix="shapeit4_prs100000_pro50000_mprs100000"
 
 readonly pedigree_dir="/well/lindgren/UKBIOBANK/nbaya/resources"

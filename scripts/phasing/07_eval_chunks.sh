@@ -14,8 +14,8 @@ source utils/bash_utils.sh
 
 readonly rscript="scripts/phasing/07_eval_chunks.R"
 readonly main_dir="data/phased/wes_union_calls/chunks"
-readonly out_dir="derived/phased/wes_union_calls/validation"
-readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls"
+readonly out_dir="data/phased/validation"
+readonly out_prefix="${out_dir}/220713_ukb_eur_wes_union_calls"
 
 mkdir -p ${out_dir}
 

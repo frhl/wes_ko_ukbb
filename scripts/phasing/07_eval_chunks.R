@@ -56,25 +56,36 @@ main <- function(args){
     counts_ci <- do.call(rbind, lapply(1:nrow(counts), function(i) Hmisc::binconf(counts$switches[i], counts$tested[i])))
     colnames(counts_ci) <- tolower(colnames(counts_ci))
     counts <- cbind(counts, counts_ci)
+    counts$wes_label <- ifelse(counts$wes_variant, "Whole Exome Sequencing","Genotyping Array")
 
-    # plot chunk by switch error rate stratified by variant type (exome or genotyping)
+    # plot chunk by switch error rate stratified by variant type (exome or genotyping)i
     pd <- position_dodge(0.7)
-    p1 <- ggplot(counts,
-           aes(
-               y=100*pointest,
-               ymax = 100*upper,
-               ymin = 100*lower,
-               x = factor(chunk_current), #factor(CHR, levels = autosomes),
-               fill = factor(wes_variant)
-           )) +
-        geom_bar(stat = 'identity', position = pd, size = 1) +
-        geom_errorbar(stat='identity', position = pd,width = 0.75) +
-        labs(fill = "WES variant") +
-        ylab('Switch Errors (%)') + xlab('') +
-        theme_bw() +
-        facet_wrap(~factor(CHR, levels = autosomes))
+    plt <- ggplot(counts,
+       aes(
+           x=factor(chunk_current),
+           y=100*pointest,
+           ymax = 100*upper,
+           ymin = 100*lower,
+           fill = factor(wes_label)
+       )) +
+    theme_bw() +
+    geom_bar(stat = 'identity', position = pd, size = 1) +
+    geom_errorbar(stat='identity', position = pd,width = 0.75) +
+    labs(color = "") +
+    ylab('% Switch Error Rate (95% CI)') + xlab('Phasing chunks') +
+    scale_color_d3('category20c', limits=NULL) +
+    scale_x_continuous(breaks=scales::pretty_breaks(n=10)) +
+    facet_wrap(~factor(CHR, levels = autosomes)) +
+    theme(
+        legend.position = "top",
+        axis.text=element_text(size=10),
+        axis.title=element_text(size=10,face="bold"),
+        axis.title.x = element_text(margin=ggplot2::margin(t=10)),
+        axis.title.y = element_text(margin=ggplot2::margin(r=10)),
+        plot.title = element_text(hjust=0.5)
+    ) 
 
-    out_p1 <- paste0(args$out_prefix, "_chunk_by_ser.png")
+    out_p1 <- paste0(args$out_prefix, "_chunks_by_ser.png")
     write(paste0("writing to",out_p1), stdout())
     ggsave(p1, out_p1, width = args$img_width, height = args$img_height) 
 
