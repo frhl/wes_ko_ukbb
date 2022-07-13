@@ -137,8 +137,8 @@ def main(args):
 
     # write matrix-table which contains dosages. VCF with only
     # dosages can't be re-read in HAIL, so we write a MatrixTable
-    #if out_prefix not in "mt":
-    #    io.export_table(prob, out_prefix, "mt")
+    if out_prefix not in "mt":
+        io.export_table(prob, out_prefix, "mt")
     
     # write out variants involved and vcf
     io.export_table(prob, out_prefix, out_type)

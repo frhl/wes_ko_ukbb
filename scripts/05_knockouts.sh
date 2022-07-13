@@ -21,7 +21,7 @@ readonly spark_dir="data/tmp/spark"
 readonly bash_script="scripts/_knockouts.sh"
 
 readonly in_dir="data/mt/annotated"
-readonly out_dir="data/knockouts/alt"
+readonly out_dir="data/knockouts/alt/power_out"
 readonly in_prefix="${in_dir}/ukb_eur_wes_union_calls_200k_chrCHR.mt"
 readonly in_type="mt"
 
