@@ -29,16 +29,17 @@ main <- function(args){
                x=factor(col1, levels = autosomes), 
                y=factor(col2, levels = autosomes), 
                label = label,
-               fill=-log10(pvalue))) +
+               fill=correlation +
         geom_tile() + 
         geom_text() + 
         theme_bw() + 
         xlab("") +
         ylab("") +
-        labs(fill=expression(-log[10]~"(P-value)")) +
-        scale_fill_gradient(low = "white", high = 'red') +
-        #scale_fill_gradient2(mid="white",low = "blue", high = 'red') +
+        #labs(fill=expression(-log[10]~"(P-value)")) +
+        labs(fill="Pearson correlation") +
+        scale_fill_gradient2(mid="white",low = "blue", high = 'red', limits = c(-0.1, 0.1)) +
         theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+        theme(aspect.ratio = 1) +
         facet_wrap(~path, scales = "free")
 
     outfile = paste0(args$out_prefix,".png")
