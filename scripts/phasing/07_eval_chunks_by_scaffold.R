@@ -50,11 +50,11 @@ main <- function(args){
     stopifnot(file.exists(dirname(args$sites)))
 
  
-    out_p1 <- paste0(args$out_prefix,'_wes_vs_wes_union_calls.png')       
-    out_d1 <- paste0(args$out_prefix,'_wes_vs_wes_union_calls.txt.gz')       
-    write(paste0("writing to",out_p1), stdout())
-    ggsave(p1, out_p1, width = args$img_width, height = args$img_height) 
-    fwrite(counts_by_method, out_d1, sep = "\t")
+    #out_p1 <- paste0(args$out_prefix,'_wes_vs_wes_union_calls.png')       
+    #out_d1 <- paste0(args$out_prefix,'_wes_vs_wes_union_calls.txt.gz')       
+    #write(paste0("writing to",out_p1), stdout())
+    #ggsave(p1, out_p1, width = args$img_width, height = args$img_height) 
+    #fwrite(counts_by_method, out_d1, sep = "\t")
 
 }
 
