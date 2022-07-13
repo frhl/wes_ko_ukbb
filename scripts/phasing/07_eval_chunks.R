@@ -4,6 +4,7 @@ devtools::load_all('utils/modules/R/phasingtools')
 library(argparse)
 library(RColorBrewer)
 library(stringr)
+library(ggsci)
 
 fread_phased_sites <- function(file, ...){
     
