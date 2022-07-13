@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 1-3
+#$ -t 1
 #$ -tc 1
 #$ -V
 
@@ -47,6 +47,10 @@ fit_binary_traits() {
   local phenotype=$( sed "${index}q;d" ${pheno_list} )
   local out="${out_dir}/${out_prefix}_${phenotype}"
   pheno_file="${pheno_dir}/filtered_covar_phenotypes_binary.tsv.gz"
+  
+  local out_pheno_prs="${out_dir}/${phenotype}_prs.txt.gz"
+  local prs="${prs_dir}/${phenotype}_pgs_chrom.txt.gz"
+  local ldsc="${ldsc_dir}/ldsc_${phenotype}.rds"
   submit_spa_null
 }
 
@@ -58,19 +62,23 @@ fit_cts_traits() {
   local phenotype=$( sed "${index}q;d" ${pheno_list} )
   local out="${out_dir}/${out_prefix}_${phenotype}"
   pheno_file="${pheno_dir}/filtered_covar_phenotypes_cts.tsv.gz"
+
+  local out_pheno_prs="${out_dir}/${phenotype}_int_prs.txt.gz"
+  local prs="${prs_dir}/${phenotype}_int_pgs_chrom.txt.gz"
+  local ldsc="${ldsc_dir}/ldsc_${phenotype}_int.rds"
   submit_spa_null
 }
 
 set_up_prs() {
-  # create temporary phenotype file if heritability
+  # assuming that this function is called downstream of 
+  # fit_cts_traits/fit_binary_traits
   set_up_rpy
-  local out_pheno_prs="${out_dir}/${phenotype}_prs.txt.gz"
-  local prs="${prs_dir}/${phenotype}_pgs_chrom.txt.gz"
-  local ldsc="${ldsc_dir}/ldsc_${phenotype}.rds"
   prs_ok=0
-  if [ -f "${ldsc}" ]; then
-    if [[ -f "${prs}"  && "${use_prs}" -eq "1" ]]; then
+  if [[ -f "${prs}"  && "${use_prs}" -eq "1" ]]; then
+    echo "Note: Checking LDSC h2 estimates at ${ldsc}."
+    if [ -f "${ldsc}" ]; then
       local h2_pass_qc=$(Rscript ${rscript_ldsc} --ldsc ${ldsc})
+      echo "Note: PRS for ${phenotype} pass QC: ${h2_pass_qc}"
       if [ "${h2_pass_qc}" -eq "1" ]; then
         if [ ! -f "${out_pheno_prs}" ]; then
           Rscript ${rscript} \
@@ -132,8 +140,8 @@ readonly nslots=2
 readonly queue="short.qe"
 
 # Fit null model for binary/cts traits
-fit_binary_traits
 fit_cts_traits
+fit_binary_traits
 
 
 
