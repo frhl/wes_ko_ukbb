@@ -216,7 +216,7 @@ main <- function(args){
     # save resulting as a cobmined plot     
     out_p2 <- paste0(args$out_prefix, "_bin.png")
     out_d2 <- paste0(args$out_prefix, "_bin.txt.gz")
-    fwrite(res_bin, out_d1, sep = "\t")
+    fwrite(res_bin, out_d2, sep = "\t")
     png(out_p2, width = as.numeric(args$out_width), height = as.numeric(args$out_height))
     plt <- cowplot::plot_grid(p1, p2, p3, p4, rel_widths = (c(0.45, 0.2, 0.2, 0.2)), ncol = 4, nrow = 1)
     print(plt)
