@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 1-80
+#$ -t 1-3
 #$ -tc 1
 #$ -V
 
@@ -18,12 +18,14 @@ source utils/hail_utils.sh
 
 readonly spa_null_script="scripts/_spa_null.sh"
 readonly rscript="scripts/_spa_null.R"
+readonly rscript_ldsc="scripts/_check_prs_p.R"
 
 readonly plink_dir="data/saige/grm/input"
 readonly grm_dir="data/saige/grm/input"
 readonly covar_dir="data/phenotypes"
 readonly pheno_dir="data/phenotypes"
 readonly prs_dir="data/prs/scores"
+readonly ldsc_dir="data/prs/ldsc"
 
 readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
@@ -60,21 +62,31 @@ fit_cts_traits() {
 }
 
 set_up_prs() {
-  # create temporary phenotype file
-  local prs="${prs_dir}/${phenotype}_pgs_chrom.txt.gz"
+  # create temporary phenotype file if heritability
+  set_up_rpy
   local out_pheno_prs="${out_dir}/${phenotype}_prs.txt.gz"
-  if [[ -f "${prs}"  && "${use_prs}" -eq "1" ]]; then
-    if [ ! -f "${out_pheno_prs}" ]; then
-      set_up_rpy
-      Rscript ${rscript} \
-        --phenotype ${phenotype} \
-        --covariates ${covariates} \
-        --phenofile ${pheno_file} \
-        --prsfile ${prs} \
-        --outfile ${out_pheno_prs}
+  local prs="${prs_dir}/${phenotype}_pgs_chrom.txt.gz"
+  local ldsc="${ldsc_dir}/ldsc_${phenotype}.rds"
+  prs_ok=0
+  if [ -f "${ldsc}" ]; then
+    if [[ -f "${prs}"  && "${use_prs}" -eq "1" ]]; then
+      local h2_pass_qc=$(Rscript ${rscript_ldsc} --ldsc ${ldsc})
+      if [ "${h2_pass_qc}" -eq "1" ]; then
+        if [ ! -f "${out_pheno_prs}" ]; then
+          Rscript ${rscript} \
+            --phenotype ${phenotype} \
+            --covariates ${covariates} \
+            --phenofile ${pheno_file} \
+            --prsfile ${prs} \
+            --outfile ${out_pheno_prs}
+        fi
+        # if the pheno file has already been created
+        # ensure that chromosomal tasks are set up
+        prs_ok=1
+        pheno_file=${out_pheno_prs}
+        tasks=1-22
+      fi
     fi
-    pheno_file=${out_pheno_prs}
-    tasks=1-22
   fi
 }
 
@@ -82,31 +94,35 @@ set_up_prs() {
 submit_spa_null() {
   mkdir -p ${out_dir}
   tasks=${SGE_TASK_ID}
-  set_up_prs 
-  if [ ! -z ${phenotype} ]; then
-    if [ ! -f "${out_prefix}.rda" ]; then
-      set -x
-      qsub -N "_null_${phenotype}" \
-       -t "${tasks}" \
-        -q "${queue}" \
-        -pe shmem ${nslots} \
-        "${spa_null_script}" \
-        "${plink_file}" \
-        "${pheno_file}" \
-        "${phenotype}" \
-        "${covariates}" \
-        "${trait_type}" \
-        "${grm_mtx}" \
-        "${grm_sam}" \
-        "${inv_normalize}" \
-        "${use_prs}" \
-        "${out}"
-      set +x
-    else
-      >&2 echo "${out_prefix} already exists. Skipping.."
-    fi
+  set_up_prs
+  if [[ "${prs_ok}" -eq "0"  && "${use_prs}" -eq "1" ]]; then
+    >&2 echo "Note: PRS could not be started for ${phenotype}. Skipping."
   else
-    >&2 echo "No phenotype at index ${SGE_TASK_ID}. Exiting.." 
+    if [ ! -z ${phenotype} ]; then
+      if [ ! -f "${out_prefix}.rda" ]; then
+        set -x
+        qsub -N "_null_${phenotype}" \
+         -t "${tasks}" \
+          -q "${queue}" \
+          -pe shmem ${nslots} \
+          "${spa_null_script}" \
+          "${plink_file}" \
+          "${pheno_file}" \
+          "${phenotype}" \
+          "${covariates}" \
+          "${trait_type}" \
+          "${grm_mtx}" \
+          "${grm_sam}" \
+          "${inv_normalize}" \
+          "${use_prs}" \
+          "${out}"
+        set +x
+      else
+        >&2 echo "${out_prefix} already exists. Skipping.."
+      fi
+    else
+      >&2 echo "No phenotype at index ${SGE_TASK_ID}. Exiting.." 
+    fi
   fi
 }
 
