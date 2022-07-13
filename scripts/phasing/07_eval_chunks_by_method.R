@@ -4,6 +4,7 @@ devtools::load_all('utils/modules/R/phasingtools')
 library(argparse)
 library(RColorBrewer)
 library(stringr)
+library(ggsci)
 
 fread_phased_sites <- function(file, ...){
     
@@ -99,7 +100,7 @@ main <- function(args){
     out_p1 <- paste0(args$out_prefix,'_eagle_shapeit4.png')       
     out_d1 <- paste0(args$out_prefix,'_eagle_shapeit4.txt.gz')       
     write(paste0("writing to",out_p1), stdout())
-    ggsave(p1, out_p1, width = args$img_width, height = args$img_height) 
+    ggsave(out_p1, plt, width = args$img_width, height = args$img_height) 
     fwrite(counts_by_method, out_d1, sep = "\t")
 
 }

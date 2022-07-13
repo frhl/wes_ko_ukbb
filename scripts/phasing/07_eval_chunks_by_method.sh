@@ -16,7 +16,7 @@ readonly rscript="scripts/phasing/07_eval_chunks_by_method.R"
 readonly main_dir="data/phased/wes_union_calls/chunks"
 readonly out_dir="derived/phased/validation"
 readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_phasing"
-readonly qc_sites="/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list"
+readonly wes_variants="/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list"
 
 mkdir -p ${out_dir}
 
@@ -24,7 +24,7 @@ set_up_rpy
 Rscript ${rscript} \
     --master_chunk_dir "${main_dir}" \
     --out_prefix "${out_prefix}" \
-    --sites "${qc_sites}" \
+    --sites "${wes_variants}" \
     --img_height 5 \
     --img_width 8
 
