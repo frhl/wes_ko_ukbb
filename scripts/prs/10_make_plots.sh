@@ -30,7 +30,7 @@ readonly bin_header="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
 readonly cts_header="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
 
 readonly phenotypes="${pheno_dir}/curated_covar_phenotypes_cts.tsv.gz"
-readonly out_prefix="${out_dir}/220612_pgs_results"
+readonly out_prefix="${out_dir}/220712_pgs_results"
 
 mkdir -p ${out_dir}
 

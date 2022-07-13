@@ -217,12 +217,10 @@ main <- function(args){
     out_p2 <- paste0(args$out_prefix, "_bin.png")
     out_d2 <- paste0(args$out_prefix, "_bin.txt.gz")
     fwrite(res_bin, out_d1, sep = "\t")
-    png(out_p2)
+    png(out_p2, width = as.numeric(args$out_width), height = as.numeric(args$out_height))
     plt <- cowplot::plot_grid(p1, p2, p3, p4, rel_widths = (c(0.45, 0.2, 0.2, 0.2)), ncol = 4, nrow = 1)
     print(plt)
     graphics.off()
-
-
 
 }
 
@@ -234,6 +232,8 @@ parser$add_argument("--summary_prs_bin", default=NULL, required = TRUE, help = "
 parser$add_argument("--bin_header", default=NULL, required = TRUE, help = "comma-seperated list of phenotypes")
 parser$add_argument("--cts_header", default=NULL, required = TRUE, help = "comma-seperated list of phenotypes")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
+parser$add_argument("--out_width", default=12, required = FALSE, help = "plot size")
+parser$add_argument("--out_height", default=14, required = FALSE, help = "plot size")
 args <- parser$parse_args()
 
 main(args)
