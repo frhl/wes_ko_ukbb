@@ -34,9 +34,15 @@ main <- function(args){
     # parser
     print(args)
     stopifnot(dir.exists(args$master_chunk_dir))
+    stopifnot(file.exists(args$sites))
     stopifnot(dir.exists(dirname(args$out_prefix)))
+    autosomes <- paste0("chr",1:22)
 
-    
+    # load files   
+    files <- list.files(args$master_chunk_dir, recursive = TRUE, pattern = ".txt", full.names = TRUE)
+    files <- files[grepl("shapeit", files)]
+    variants <- fread(args$sites)
+
     lst <- lapply(autosomes, function(chr){
         
         # subset by chromosome (if we read in all at the same time it takes too long)
@@ -87,7 +93,7 @@ main <- function(args){
 
     out_p1 <- paste0(args$out_prefix, "_chunks_by_ser.png")
     write(paste0("writing to",out_p1), stdout())
-    ggsave(p1, out_p1, width = args$img_width, height = args$img_height) 
+    ggsave(out_p1, p1, width = as.numeric(args$img_width), height = as.numeric(args$img_height)) 
 
 }
 
