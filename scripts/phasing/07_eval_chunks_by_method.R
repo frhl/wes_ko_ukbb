@@ -96,12 +96,16 @@ main <- function(args){
         axis.title.y = element_text(margin=ggplot2::margin(r=10)),
         plot.title = element_text(hjust=0.5)
     )
-
+   
+    # details for output
+    h = as.numeric(args$img_height)
+    w = as.numeric(args$img_width)
     out_p1 <- paste0(args$out_prefix,'_eagle_shapeit4.png')       
     out_d1 <- paste0(args$out_prefix,'_eagle_shapeit4.txt.gz')       
-    write(paste0("writing to",out_p1), stdout())
-    ggsave(out_p1, plt, width = args$img_width, height = args$img_height) 
+    write(paste0("writing ", h, "x", w, " png to",out_p1), stdout())
+    ggsave(out_p1, plt, width = w, height = h) 
     fwrite(counts_by_method, out_d1, sep = "\t")
+
 
 }
 

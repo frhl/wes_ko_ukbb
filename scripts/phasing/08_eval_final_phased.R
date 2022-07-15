@@ -30,7 +30,7 @@ fread_phased_sites <- function(file, ...){
 }
 
 # aggregate switch errors by chromosome and minor allele frequency bins
-aggregate_by_chrom <- function(files){
+aggregate_by_chrom <- function(files, variants){
     lst <- lapply(files, function(file){
         d <- fread_phased_sites(file)
         d$wes_variant <- d$locus %in% variants$locus
@@ -43,7 +43,7 @@ aggregate_by_chrom <- function(files){
 }
 
 # same as above, but also aggregate my selected MAF bin
-aggregate_by_chrom_and_maf_bin <- function(files, maf_bin){
+aggregate_by_chrom_and_maf_bin <- function(files, maf_bin, variants){
     lst <- lapply(files, function(file){
         d <- fread_phased_sites(file)
         d$wes_variant <- d$locus %in% variants$locus
@@ -75,16 +75,20 @@ main <- function(args){
     print(args)
     stopifnot(dir.exists(args$ligated_dir))
     stopifnot(dir.exists(dirname(args$out_prefix)))
+    stopifnot(file.exists(args$sites))
     maf_bins <- c(1, 10^-(1:6))
 
+    # get WES sites 
+    variants <- fread(args$sites) 
+   
+    # get files 
     files <- list.files(args$ligated_dir, pattern = ".txt", full.names = TRUE)
     if (!is.null(args$files_regex)) files <- files[grepl(args$files_regex, files)]
     stopifnot(length(files) > 0)
     autosomes <- paste0("chr",1:22)
-    print(files)
-    
+   
 
-    lst_by_chrom <- aggregate_by_chromsome(files)
+    lst_by_chrom <- aggregate_by_chrom(files, variants = variants)
     counts_by_chrom <- calc_binom_ci(lst_by_chrom)
     counts_by_chrom$wes_label <- ifelse(counts_by_chrom$wes_variant, "Whole Exome Sequencing","Genotyping Array")
 
@@ -119,7 +123,7 @@ main <- function(args){
     fwrite(counts_by_chrom, out_p1_txt, sep = "\t")
 
     # *** plot switch errors by chrom and MAF ****
-    lst_by_chrom_by_maf = aggregate_by_chrom_and_maf_bin(files, maf_bins) 
+    lst_by_chrom_by_maf = aggregate_by_chrom_and_maf_bin(files, maf_bins, variants) 
     counts_by_chrom_by_maf <- calc_binom_ci(lst_by_chrom_by_maf)
     counts_by_chrom_by_maf <- counts_by_chrom_by_maf[counts_by_chrom_by_maf$wes_variant == TRUE,]
     counts_by_chrom_by_maf$wes_label <- ifelse(counts_by_chrom_by_maf$wes_variant, "Whole Exome Sequencing","Genotyping Array")

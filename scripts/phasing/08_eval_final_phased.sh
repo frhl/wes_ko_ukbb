@@ -12,7 +12,7 @@
 
 source utils/bash_utils.sh
 
-readonly rscript="data/phasing/08_eval_final_phased.R"
+readonly rscript="scripts/phasing/08_eval_final_phased.R"
 readonly ligated_dir="data/phased/wes_union_calls/ligated"
 readonly out_dir="data/phased/validation"
 
@@ -26,7 +26,7 @@ set_up_rpy
 Rscript ${rscript} \
     --ligated_dir "${ligated_dir}" \
     --sites "${wes_variants}" \
-    --out_prefix "${out_prefix}"
+    --out_prefix "${out_prefix}" 
 
 
 

@@ -67,7 +67,7 @@ main <- function(args){
 
     # plot chunk by switch error rate stratified by variant type (exome or genotyping)i
     pd <- position_dodge(0.7)
-    plt <- ggplot(counts,
+    p1 <- ggplot(counts,
        aes(
            x=factor(chunk_current),
            y=100*pointest,
@@ -92,9 +92,13 @@ main <- function(args){
         plot.title = element_text(hjust=0.5)
     ) 
 
+    h = as.numeric(args$img_height)
+    w = as.numeric(args$img_width) 
     out_p1 <- paste0(args$out_prefix, "_chunks_by_ser.png")
-    write(paste0("writing to",out_p1), stdout())
-    ggsave(out_p1, p1, width = as.numeric(args$img_width), height = as.numeric(args$img_height)) 
+    out_d1 <- paste0(args$out_prefix, "_chunks_by_ser.txt.gz")
+    write(paste0("writing ",h,"x", w," png to",out_p1,), stdout())
+    ggsave(out_p1, p1, width = w, height = h)
+    fwrite(counts, out_d1, sep = "\t") 
 
 }
 
