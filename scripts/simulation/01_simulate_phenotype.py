@@ -118,8 +118,8 @@ def main(args):
                     mt.y_no_noise_H2)
 
         # re-scale genetic contribution to have a mean of zero and variance of 1
-        mt = mt.annotate_cols(**{'ystats': hl.agg.stats(mt.y_no_noise)})
-        mt = mt.annotate_cols(y_no_noise_rescaled = (mt.y_no_noise-mt.ystats.mean)/mt.ystats.stdev)
+        ystats = mt.aggregate_cols(hl.agg.stats(mt.y_no_noise))
+        mt = mt.annotate_cols(y_no_noise_rescaled = (mt.y_no_noise-ystats.mean)/ystats.stdev)
         mt = mt.annotate_cols(y = mt.y_no_noise_rescaled + hl.rand_norm(0, hl.sqrt(1-h2_beta-h2_theta)))
     else:
         if (h2_theta > 0):
@@ -142,7 +142,8 @@ def main(args):
     if K is not None:
         y_stats = mt.aggregate_cols(hl.agg.stats(mt.y))
         threshold = stats.norm.ppf(1-K, loc=y_stats.mean, scale=y_stats.stdev)
-        mt = mt.annotate_cols(case=mt.y > threshold)   
+        mt = mt.annotate_cols(case=mt.y > threshold)
+        
 
     # export effect sizes
     ht = mt.select_rows(*['beta','theta']).select_entries(*['pKO','knockout'])
