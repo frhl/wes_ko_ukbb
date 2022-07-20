@@ -6,8 +6,7 @@
 #$ -e logs/export_ko_geneset.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q short.qc@@short.hga
-#$ -t 22
+#$ -q short.qf
 
 set -o errexit
 set -o nounset
@@ -16,27 +15,25 @@ source utils/bash_utils.sh
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
 
-readonly rscript="scripts/geneset/02_export_ko_geneset.R"
+readonly rscript="scripts/geneset/03_export_ko_geneset.R"
 
-readonly chr=$( get_chr ${SGE_TASK_ID} ) 
-readonly in_dir="data/knockout/alt"
-readonly in_vcf="${in_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense.vcf.bgz"
+readonly in_dir="data/geneset/knockouts"
+readonly in_vcf="${in_dir}/ukb_eur_wes_200k_maf0to5e-2_pLoF_damaging_missense_combined.vcf.bgz"
 
-readonly out_dir="data/mt/vep"
-readonly out_prefix="${out_dir}/ukb_eur_wes_200k_csqs_chrALL_test"
-readonly out_saige="${out_prefix}.saige"
+readonly out_dir="data/geneset/knockouts"
+readonly out="${out_dir}/ukb_eur_wes_200k_maf0to5e-2_pLoF_damaging_missense_msigdb_h.saige"
 
+readonly bridge="/well/lindgren/flassen/ressources/genesets/genesets/data/biomart/220524_hgnc_ensg_enst_chr_pos.txt.gz"
 
 mkdir -p ${out_dir}
-
 
 # Generate SAIGE-GENE+ Group file consequence
 # annotations (SAIGE version > 0.99.2)
 module purge
 set_up_rpy
 Rscript ${rscript} \
-  --input_path "${out_prefix}.tsv.gz" \
-  --output_path "${out_saige}" \
-  --delimiter " "
+  --in_vcf "${in_vcf}" \
+  --output_path "${out}" \
+  --bridge "${bridge}"
 
 

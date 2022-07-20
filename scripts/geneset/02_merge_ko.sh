@@ -38,6 +38,7 @@ else
   print_update "file ${out} already exists. Skipping!"
 fi
 
+## still need to index out vcf
 
 
 
