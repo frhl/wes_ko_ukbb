@@ -26,8 +26,9 @@ readonly covar_file="${pheno_dir}/covars2.csv"
 readonly covariates=$( cat ${covar_file} )
 
 readonly chr=$( get_chr ${SGE_TASK_ID} )
-readonly in_dir="data/simulation/mt"
-readonly in_prefix="${in_dir}/ukb_eur_100k_chr${chr}.mt"
+readonly in_dir="data/simulation/data"
+#readonly in_prefix="${in_dir}/ukb_eur_100k_chr${chr}.mt"
+readonly in_prefix="${in_dir}/ukb_eur_10000_samples_chr${chr}.mt"
 readonly in_type="mt"
 
 readonly out_dir="data/simulation/phenotypes"
