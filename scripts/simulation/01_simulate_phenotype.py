@@ -11,6 +11,24 @@ from ukb_utils import variants
 import scipy.stats as stats
 
 
+def rescale_variances_hail(X, mt, target_variance):
+    stats = mt.aggregate_cols(hl.agg.stats(X))
+    return(rescale_variances(X, stats.stdev ** 2, target_variance))
+    
+def rescale_variances(X, X_variance, Y_variance):
+    X_sd = X_variance ** (1/2)
+    Y_sd = Y_variance ** (1/2)
+    K = Y_sd / X_sd
+    Y = K*X
+    return(Y)
+
+def make_effect(mt, h2, pi = None):
+    """ Make effect sizes for either infintesimal or spike and slab model. """
+    M = mt.count()[0]
+    pi_temp = 1 if pi == None else pi
+    return(hl.rand_bool(pi_temp)*hl.rand_norm(0, hl.sqrt(h2/(M*pi_temp))))
+
+
 
 def try_param_h2(x):
     return float(x) if x not in [None, "NA","None"] else None
@@ -29,11 +47,11 @@ def main(args):
     out_prefix = args.out_prefix
     seed = args.seed
     max_maf = args.max_maf
-    h2_beta = try_param_h2(args.h2_beta)
-    h2_theta = try_param_h2(args.h2_theta)
+    h2 = try_param_h2(args.h2)
+    var_beta = try_param_h2(args.var_beta)
+    var_theta = try_param_h2(args.var_theta)
     pi_beta = try_param_pi(args.pi_beta)
     pi_theta = try_param_pi(args.pi_theta)
-    rescale_h2 = args.rescale_h2
     K = float(args.K)
 
     # import table
@@ -85,37 +103,44 @@ def main(args):
         G_norm=(mt.G-mt.stats.mean)/mt.stats.stdev
     )
     
-    # generate thetas and betas (non-additive and additive effects)
-    mt = hl.experimental.ldscsim.make_betas(mt, h2=h2_theta, pi=pi_theta)[0].rename({"beta":"theta_nosign"})
-    mt = hl.experimental.ldscsim.make_betas(mt, h2=h2_beta, pi=pi_beta)[0]
+    print("h2:", str(h2))
+    print("var_beta:", str(var_beta))
+    print("var_theta:", str(var_theta))
+    # setup effects
+    mt = mt.annotate_rows(beta = make_effect(mt, h2=var_beta, pi=pi_beta))
+    mt = mt.annotate_rows(theta_nosign = make_effect(mt, h2=var_theta, pi=pi_theta))
 
-    # What is the sign(beta)
+    # keep the sign to ensure that effects are always in the same direction
     mt = mt.annotate_rows(
         beta_sign = hl.case().when(hl.sign(mt.beta) == 0, 1).default(hl.sign(mt.beta))
     )
 
-    # convert theta to the sign(beta)
-    mt = mt.annotate_rows(
-        theta = mt.theta_nosign * mt.beta_sign
-    )
-
-    # we would like to operate on the same genotype scale as on beta.
+    # we would like to operate on the same genotype scale as the additive effects,
+    # so use the original scaled matrix, but only keep hom/ch alt alleles sites
     mt = mt.annotate_entries(
         G_norm_alt = (hl.case().when(mt.G == 2, mt.G_norm).default(0))
     )
 
-    print(sum(mt.G_norm_alt.collect()))
+    # set sign
+    mt = mt.annotate_rows(
+        theta = mt.theta_nosign * mt.beta_sign
+    )
 
-    # add up contribution to phenotype
+    # sum up effect from domincance
     mt = mt.annotate_cols(y_no_noise_add=hl.agg.sum(mt.beta * mt.G_norm))
     mt = mt.annotate_cols(y_no_noise_dom=hl.agg.sum(mt.theta * mt.G_norm_alt))
-    mt = mt.annotate_cols(y_no_noise=mt.y_no_noise_add + mt.y_no_noise_dom)
+    mt = mt.annotate_cols(y_no_noise=mt.y_no_noise_add+mt.y_no_noise_dom)
 
-    # re-scale phenotyoe ot have variance of 1 and mean of zero
-    mt = mt.annotate_cols(y_noise = hl.rand_norm(0, hl.sqrt(1-h2_beta-h2_theta)))
-    mt = mt.annotate_cols(y_unscaled = mt.y_no_noise + mt.y_noise)
-    ystats = mt.aggregate_cols(hl.agg.stats(mt.y_unscaled))
-    mt = mt.annotate_cols(y = (mt.y_unscaled-ystats.mean)/ystats.stdev)
+    # re-scale effects
+    if h2 > 0 and (var_beta + var_theta) > 0:
+        mt = mt.annotate_cols(y_no_noise_rescaled = rescale_variances_hail(mt.y_no_noise, mt, h2))
+    else:
+        mt = mt.annotate_cols(y_no_noise_rescaled = 0)    
+
+    # add up all effects
+    mt = mt.annotate_cols(y_noise = hl.rand_norm(0, hl.sqrt(1-h2)))
+    mt = mt.annotate_cols(y = mt.y_noise + mt.y_no_noise_rescaled)
+    mt = mt.annotate_cols(dom_add_frac = mt.y_no_noise_dom / (mt.y_no_noise_dom + mt.y_no_noise_add))
 
     # binarize phenotype
     if K is not None:
@@ -135,8 +160,9 @@ if __name__=='__main__':
 
     parser = argparse.ArgumentParser()
     #parser.add_argument('--chrom', default=None, help='chromosome')
-    parser.add_argument('--h2_beta', default=0, help='Heritability for coding region')
-    parser.add_argument('--h2_theta', default=0, help='Heritability for knockouts')
+    parser.add_argument('--h2', default=0, help='Heritability for coding region')
+    parser.add_argument('--var_beta', default=0, help='Heritability for coding region')
+    parser.add_argument('--var_theta', default=0, help='Heritability for knockouts')
     parser.add_argument('--pi_beta', default=0, help='Probability of variant being causal in coding region')
     parser.add_argument('--pi_theta', default=0, help='Probability of variant being causal in non-coding region')
     parser.add_argument('--K', default=0, help='Prevalence of phenotype: cases / (cases + controls)')
@@ -145,7 +171,6 @@ if __name__=='__main__':
     parser.add_argument('--in_prefix', default=None, help='Path prefix for input dataset')
     parser.add_argument('--in_type', default=None, help='Either "mt", "vcf" or "plink"')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
-    parser.add_argument('--rescale_h2', default=False, action='store_true', help='rescale genetic contribution')
     args = parser.parse_args()
 
     main(args)

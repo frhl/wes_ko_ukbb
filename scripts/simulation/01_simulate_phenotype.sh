@@ -39,19 +39,20 @@ mkdir -p ${out_dir}
 simulate_phenotypes() {
 
   local K=0.1
-  local h2_beta=${1}
-  local h2_theta=${2}
-  local pi_beta=${3}
-  local pi_theta=${4}
+  local h2=${1}
+  local var_beta=${2}
+  local var_theta=${3}
+  local pi_beta=${4}
+  local pi_theta=${5}
 
-  local h2s="${h2_beta}_${h2_theta}"
+  local vars="${var_beta}_${var_theta}"
   local pis="${pi_beta}_${pi_theta}"
 
-  local out_prefix="${out_dir}/ukb_eur_h2_${h2s}_pi_${pis}_K${K}_chr${chr}"
+  local out_prefix="${out_dir}/ukb_eur_h2_${h2}_var_${vars}_pi_${pis}_K${K}_chr${chr}"
   local out_phenotypes="${out_prefix}_phenos.tsv.gz"
   
-  local sim_name="sim_c${SGE_TASK_ID}_h2_${h2s}_pi_${pis}"
-  local mrg_name="mrg_c${SGE_TASK_ID}_h2_${h2s}_pi_${pis}"
+  local sim_name="sim_c${SGE_TASK_ID}_h2_${h2}_var_${vars}_pi_${pis}"
+  local mrg_name="mrg_c${SGE_TASK_ID}_h2_${h2}_var_${vars}_pi_${pis}"
 
   set -x
   if [ 1 -eq 1 ]; then
@@ -62,8 +63,9 @@ simulate_phenotypes() {
        ${bash_script} \
        ${in_prefix}\
        ${in_type} \
-       ${h2_beta} \
-       ${h2_theta} \
+       ${h2} \
+       ${var_beta} \
+       ${var_theta} \
        ${pi_beta} \
        ${pi_theta} \
        ${K} \
@@ -91,44 +93,19 @@ simulate_phenotypes() {
 
 readonly queue="short.qc"
 readonly nslots="2"
-readonly tasks=1-10
+readonly tasks=1-3
 readonly seed=42
 
 # simulate absence of CH effects
-#simulate_phenotypes 0.00 0.00 0.00 0.00
+#simulate_phenotypes 0.01 0.01 0.01 0.01 0.01
 
-# standard additive effects
-#simulate_phenotypes 0.10 0.00 0.10 0.00
-#simulate_phenotypes 0.10 0.00 0.20 0.00
-#simulate_phenotypes 0.10 0.00 1.00 0.00
-
-# only domincance effects 
-#simulate_phenotypes 0.00 0.10 0.00 0.50
-simulate_phenotypes 0.10 0.20 0.50 0.50
-simulate_phenotypes 0.01 0.05 1.00 1.00
-#simulate_phenotypes 0.01 0.05 0.90 0.10
-#simulate_phenotypes 0.01 0.05 0.90 0.40
-#simulate_phenotypes 0.01 0.10 0.01 0.10
-#simulate_phenotypes 0.10 0.20 1.00 1.00
-
-
-
-
-
-# simualte CH effect
-#simulate_phenotypes 0.00 0.00 0.02 0.00 0.00 0.10 NA NA NA
-#simulate_phenotypes 0.00 0.10 0.02 0.00 0.00 0.10 NA NA NA
-#simulate_phenotypes 0.00 0.10 0.02 0.00 0.00 0.10 NA NA NA
-
-# simulate effects with betas
-#simulate_phenotypes 0.00 0.00 0.00 0.00 0.00 0.10 NA NA 0.01
-#simulate_phenotypes 0.00 0.00 0.00 0.00 0.00 0.10 NA NA 0.10
-
-
-#simulate_phenotypes 0.10 0.10 0.10 0.10 0.10 0.10 NA NA NA
-#simulate_phenotypes 0.00 0.00 0.00 0.10 0.10 0.10 0.01 0.01 0.01
-#simulate_phenotypes 0.00 0.00 0.00 0.10 0.10 0.10 0.0 0.0 0.01
-#simulate_phenotypes 0.00 0.00 0.00 0.10 0.10 0.10 0.01 0.01 0.00
+#simulate_phenotypes 0.30 0.01 5.00 0.50 0.80
+simulate_phenotypes 0.30 0.01 10.0 1.00 1.00
+simulate_phenotypes 0.30 0.05 10.0 1.00 1.00
+simulate_phenotypes 0.30 0.05 20.0 1.00 1.00
+simulate_phenotypes 0.30 0.05 40.0 1.00 1.00
+simulate_phenotypes 0.30 0.05 100.0 1.00 1.00
+simulate_phenotypes 0.30 0.05 200.0 1.00 1.00
 
 
 

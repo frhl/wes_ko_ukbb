@@ -23,15 +23,16 @@ readonly spark_dir="data/tmp/spark_dir"
 
 readonly in_prefix=${1?Error: Missing arg1 (phenotype)}
 readonly in_type=${2?Error: Missing arg2 (in_vcf)}
-readonly h2_beta=${3?Error: Missing arg3 ()}
-readonly h2_theta=${4?Error: Missing arg3 ()}
-readonly pi_beta=${5?Error: Missing arg3 ()}
-readonly pi_theta=${6?Error: Missing arg3 ()}
-readonly K=${7?Error: Missing arg3 ()}
-readonly seed=${8?Error: Missing arg3 ()}
-readonly out_prefix=${9?Error: Missing arg3 ()}
+readonly h2=${3?Error: Missing arg3 ()}
+readonly var_beta=${4?Error: Missing arg3 ()}
+readonly var_theta=${5?Error: Missing arg3 ()}
+readonly pi_beta=${6?Error: Missing arg3 ()}
+readonly pi_theta=${7?Error: Missing arg3 ()}
+readonly K=${8?Error: Missing arg3 ()}
+readonly seed=${9?Error: Missing arg3 ()}
+readonly out_prefix=${10?Error: Missing arg3 ()}
 
-readonly max_maf="0.01"
+readonly max_maf="0.10"
 
 readonly out_sge_prefix="${out_prefix}_${SGE_TASK_ID}"
 readonly sge_seed=$(( ${SGE_TASK_ID} * ${seed}))
@@ -46,14 +47,14 @@ set -x
 python3 "${hail_script}" \
    --in_prefix "${in_prefix}"\
    --in_type "${in_type}" \
-   --h2_beta ${h2_beta} \
-   --h2_theta ${h2_theta} \
+   --h2 ${h2} \
+   --var_beta ${var_beta} \
+   --var_theta ${var_theta} \
    --pi_beta ${pi_beta} \
    --pi_theta ${pi_theta} \
    --K ${K} \
    --max_maf ${max_maf} \
    --seed ${sge_seed} \
-   --rescale_h2 \
    --out_prefix "${out_sge_prefix}" \
    && print_update "Finished simulating phenotypes for ${in_prefix}" ${SECONDS} \
    || raise_error "Simulating phenotypes for ${in_prefix} failed"
