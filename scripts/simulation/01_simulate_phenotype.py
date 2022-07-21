@@ -108,7 +108,7 @@ def main(args):
     print("var_theta:", str(var_theta))
     # setup effects
     mt = mt.annotate_rows(beta = make_effect(mt, h2=var_beta, pi=pi_beta))
-    mt = mt.annotate_rows(theta_nosign = make_effect(mt, h2=var_theta, pi=pi_theta))
+    mt = mt.annotate_rows(theta_nosign = hl.abs(make_effect(mt, h2=var_theta, pi=pi_theta)))
 
     # keep the sign to ensure that effects are always in the same direction
     mt = mt.annotate_rows(
@@ -140,7 +140,6 @@ def main(args):
     # add up all effects
     mt = mt.annotate_cols(y_noise = hl.rand_norm(0, hl.sqrt(1-h2)))
     mt = mt.annotate_cols(y = mt.y_noise + mt.y_no_noise_rescaled)
-    mt = mt.annotate_cols(dom_add_frac = mt.y_no_noise_dom / (mt.y_no_noise_dom + mt.y_no_noise_add))
 
     # binarize phenotype
     if K is not None:

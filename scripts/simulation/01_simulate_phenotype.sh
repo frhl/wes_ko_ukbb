@@ -93,19 +93,23 @@ simulate_phenotypes() {
 
 readonly queue="short.qc"
 readonly nslots="2"
-readonly tasks=1-3
+readonly tasks=1-20
 readonly seed=42
 
 # simulate absence of CH effects
-#simulate_phenotypes 0.01 0.01 0.01 0.01 0.01
+simulate_phenotypes 0.00 0.00 0.00 0.01 0.01
 
-#simulate_phenotypes 0.30 0.01 5.00 0.50 0.80
+# gradually greater recessive effects (polygenic model)
+simulate_phenotypes 0.30 0.01 0.01 1.00 1.00
+simulate_phenotypes 0.30 0.01 0.10 1.00 1.00
+simulate_phenotypes 0.30 0.01 0.50 1.00 1.00
+simulate_phenotypes 0.30 0.01 1.00 1.00 1.00
 simulate_phenotypes 0.30 0.01 10.0 1.00 1.00
-simulate_phenotypes 0.30 0.05 10.0 1.00 1.00
-simulate_phenotypes 0.30 0.05 20.0 1.00 1.00
-simulate_phenotypes 0.30 0.05 40.0 1.00 1.00
-simulate_phenotypes 0.30 0.05 100.0 1.00 1.00
-simulate_phenotypes 0.30 0.05 200.0 1.00 1.00
+simulate_phenotypes 0.30 0.01 20.0 1.00 1.00
+simulate_phenotypes 0.30 0.01 40.0 1.00 1.00
+simulate_phenotypes 0.30 0.01 100.0 1.00 1.00
+simulate_phenotypes 0.30 0.01 500.0 1.00 1.00
+simulate_phenotypes 0.30 0.01 1000.0 1.00 1.00
 
 
 

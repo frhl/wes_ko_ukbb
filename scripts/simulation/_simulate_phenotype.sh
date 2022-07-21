@@ -32,7 +32,7 @@ readonly K=${8?Error: Missing arg3 ()}
 readonly seed=${9?Error: Missing arg3 ()}
 readonly out_prefix=${10?Error: Missing arg3 ()}
 
-readonly max_maf="0.10"
+readonly max_maf="0.50"
 
 readonly out_sge_prefix="${out_prefix}_${SGE_TASK_ID}"
 readonly sge_seed=$(( ${SGE_TASK_ID} * ${seed}))
