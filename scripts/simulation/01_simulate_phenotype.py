@@ -71,79 +71,57 @@ def main(args):
         knockout=expr_ko
     )   
 
-    # haplotypes 1 and 2
+    # What haplotypes are affected?
     mt = mt.annotate_entries(
         H1 = 1*((mt.phased.a1 > 0) | (mt.hom_alt_n > 0)),
         H2 = 1*((mt.phased.a2 > 0) | (mt.hom_alt_n > 0)),
     )
 
-    # combined dosage on a gene
-    mt = mt.annotate_entries(
-        DS = mt.H1 + mt.H2,
-        H = 2*(mt.H1 * mt.H2)
-    )
-
-    # normalize haplotypes by total
-    mt = mt.annotate_rows(**{'stats': hl.agg.stats(mt.DS)})
+    # combine into single dosage (G) matrix 
+    mt = mt.annotate_entries(G=hl.int32(mt.H1+mt.H2))
+    mt = mt.annotate_rows(**{'stats': hl.agg.stats(mt.G)})
     mt = mt.filter_rows(mt.stats.stdev > 0)
     mt = mt.annotate_entries(
-        H1_norm=(mt.H1-mt.stats.mean)/mt.stats.stdev,
-        H2_norm=(mt.H2-mt.stats.mean)/mt.stats.stdev,
-        H_norm=(mt.H-mt.stats.mean)/mt.stats.stdev
+        G_norm=(mt.G-mt.stats.mean)/mt.stats.stdev
     )
-
-    # make betas (additive effects) and thetas (domincance effects)
-    mt = hl.experimental.ldscsim.make_betas(mt, h2=h2_theta, pi=pi_theta)[0].rename({"beta":"theta"})
+    
+    # generate thetas and betas (non-additive and additive effects)
+    mt = hl.experimental.ldscsim.make_betas(mt, h2=h2_theta, pi=pi_theta)[0].rename({"beta":"theta_nosign"})
     mt = hl.experimental.ldscsim.make_betas(mt, h2=h2_beta, pi=pi_beta)[0]
 
-    # additive effetcs from each haplotype
-    mt = mt.annotate_cols(y_no_noise_H1=hl.agg.sum(mt.beta * mt.H1_norm))
-    mt = mt.annotate_cols(y_no_noise_H2=hl.agg.sum(mt.beta * mt.H2_norm))
-    mt = mt.annotate_cols(y_no_noise_sign = 1*hl.sign(mt.y_no_noise_H1 + mt.y_no_noise_H2))
+    # What is the sign(beta)
+    mt = mt.annotate_rows(
+        beta_sign = hl.case().when(hl.sign(mt.beta) == 0, 1).default(hl.sign(mt.beta))
+    )
 
-    # annotate final effects
-    if rescale_h2:
-        if (h2_theta > 0):
-            mt = mt.annotate_cols(
-                y_no_noise_H=mt.y_no_noise_sign * hl.abs(hl.agg.sum(mt.theta * mt.H_norm)))
-            mt = mt.annotate_cols(
-                y_no_noise = 
-                    mt.y_no_noise_H1 + 
-                    mt.y_no_noise_H2 +  
-                    mt.y_no_noise_H)
-        else:
-            mt = mt.annotate_cols(
-                y_no_noise = 
-                    mt.y_no_noise_H1 + 
-                    mt.y_no_noise_H2)
+    # convert theta to the sign(beta)
+    mt = mt.annotate_rows(
+        theta = mt.theta_nosign * mt.beta_sign
+    )
 
-        # re-scale genetic contribution to have a mean of zero and variance of 1
-        ystats = mt.aggregate_cols(hl.agg.stats(mt.y_no_noise))
-        mt = mt.annotate_cols(y_no_noise_rescaled = (mt.y_no_noise-ystats.mean)/ystats.stdev)
-        mt = mt.annotate_cols(y = mt.y_no_noise_rescaled + hl.rand_norm(0, hl.sqrt(1-h2_beta-h2_theta)))
-    else:
-        if (h2_theta > 0):
-            mt = mt.annotate_cols(
-                y_no_noise_H=mt.y_no_noise_sign * hl.abs(hl.agg.sum(mt.theta * mt.H_norm)))
-            mt = mt.annotate_cols(
-                y = mt.y_no_noise_H1 + 
-                    mt.y_no_noise_H2 +  
-                    mt.y_no_noise_H +
-                    hl.rand_norm(0, hl.sqrt(1-h2_beta-h2_theta))
-            )
-        else:
-            mt = mt.annotate_cols(
-                y = mt.y_no_noise_H1 + 
-                    mt.y_no_noise_H2 +  
-                    hl.rand_norm(0, hl.sqrt(1-h2_beta))
-            )
+    # we would like to operate on the same genotype scale as on beta.
+    mt = mt.annotate_entries(
+        G_norm_alt = (hl.case().when(mt.G == 2, mt.G_norm).default(0))
+    )
+
+    print(sum(mt.G_norm_alt.collect()))
+
+    # add up contribution to phenotype
+    mt = mt.annotate_cols(y_no_noise_add=hl.agg.sum(mt.beta * mt.G_norm))
+    mt = mt.annotate_cols(y_no_noise_dom=hl.agg.sum(mt.theta * mt.G_norm_alt))
+    mt = mt.annotate_cols(y_no_noise=mt.y_no_noise_add + mt.y_no_noise_dom)
+
+    # re-scale phenotyoe ot have variance of 1 and mean of zero
+    mt = mt.annotate_cols(y_noise = hl.rand_norm(0, hl.sqrt(1-h2_beta-h2_theta)))
+    mt = mt.annotate_cols(y_unscaled = mt.y_no_noise + mt.y_noise)
+    ystats = mt.aggregate_cols(hl.agg.stats(mt.y_unscaled))
+    mt = mt.annotate_cols(y = (mt.y_unscaled-ystats.mean)/ystats.stdev)
 
     # binarize phenotype
     if K is not None:
         y_stats = mt.aggregate_cols(hl.agg.stats(mt.y))
         threshold = stats.norm.ppf(1-K, loc=y_stats.mean, scale=y_stats.stdev)
         mt = mt.annotate_cols(case=mt.y > threshold)
-        
 
     # export effect sizes
     ht = mt.select_rows(*['beta','theta']).select_entries(*['pKO','knockout'])
