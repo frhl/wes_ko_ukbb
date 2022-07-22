@@ -5,9 +5,9 @@
 #$ -o logs/mac_by_phenotypes.log
 #$ -e logs/mac_by_phenotypes.errors.log
 #$ -P lindgren.prjc
-#$ -q short.qc
-#$ -pe shmem 2
-#$ -t 22
+#$ -q short.qa
+#$ -pe shmem 10
+#$ -t 20-22
 #$ -V
 
 # Note: this script requires at least 10 A cores. For chromosome
@@ -36,6 +36,7 @@ readonly input_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damagi
 readonly out_prefix_cts="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense_AC_cts"
 readonly out_prefix_bin="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense_AC_bin"
 readonly out_prefix_combined="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense_AC"
+readonly covar_path="${pheno_dir}/covars1.csv"
 
 readonly phenotypes_cts=$(cat "${pheno_dir}/filtered_phenotypes_cts_manual.tsv" | tr "\n" "," | sed 's/\(.*\),/\1 /' )
 readonly phenotypes_bin=$(cat "${pheno_dir}/filtered_phenotypes_binary_header.tsv" | tr "\n" "," | sed 's/\(.*\),/\1 /' )
@@ -51,7 +52,8 @@ calc_allele_count_by_phenotype() {
      --in_vcf ${input_path} \
      --out_prefix ${out_prefix} \
      --subset_phenotypes ${phenotypes} \
-     --phenotypes ${pheno_path}
+     --phenotypes ${pheno_path} \
+     --covariates ${covar_path}
   else
     >&2 echo "${out_prefix}.txt.gz already exists. Skipping."
   fi

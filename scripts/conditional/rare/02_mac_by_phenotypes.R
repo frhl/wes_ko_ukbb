@@ -28,6 +28,7 @@ main <- function(args){
 
   stopifnot(file.exists(args$in_vcf)) 
   stopifnot(file.exists(args$phenotypes))
+  stopifnot(file.exists(args$covariates))
   stopifnot(dir.exists(dirname(args$out_prefix)))
 
   # read in VCF
@@ -55,9 +56,17 @@ main <- function(args){
     phenotypes <- intersect(unlist(new_phenotypes), phenotypes)
   }
 
-  cores <- detectCores()
-  registerDoParallel(8)
-  write(paste("running parallel with",cores,"cores."), stdout())
+  # are there samples with missing covariates?
+  col_cov <- unlist(strsplit(readLines(args$covariates), split = ","))
+  lst <- lapply(col_cov, function(col){row_ok <- is.na(pheno_df[[col]])})
+  missing_cov <- rowSums(do.call(cbind, lst)) > 0
+  pheno_df <- pheno_df[!missing_cov, ]
+  msg <- paste("Removed", sum(missing_cov),"samples with missing covariates.")
+  write(msg, stdout())
+
+  #cores <- detectCores()
+  #registerDoParallel(8)
+  #write(paste("running parallel with",cores,"cores."), stdout())
 
   # easy to switch to non-parallel workflow with lapply
   #lst <- (foreach (i=1:length(phenotypes)) %dopar% {
@@ -81,6 +90,7 @@ main <- function(args){
 parser <- ArgumentParser()
 parser$add_argument("--in_vcf", default=NULL, required = TRUE, help = "either 'binary' or 'cts'")
 parser$add_argument("--phenotypes", default=NULL, required = TRUE, help = "String. Current phenotype")
+parser$add_argument("--covariates", default=NULL, required = TRUE, help = "Covariates seperated by comma")
 parser$add_argument("--subset_phenotypes", default=NULL, required = TRUE, help = "String. Current phenotype")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()
