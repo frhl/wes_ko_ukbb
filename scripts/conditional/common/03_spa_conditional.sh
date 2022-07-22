@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-10
+#$ -t 1-20
 #$ -V
 
 set -o errexit
@@ -15,14 +15,20 @@ set -o nounset
 
 readonly bash_script="scripts/conditional/common/_spa_conditional.sh"
 
+
+# parameters
 readonly min_mac=4
 readonly max_iter=5
 readonly P_cutoff="5e-8"
 
+# directories and paths
+readonly pheno_dir="data/phenotypes"
 readonly interval_dir="data/conditional/common/intervals/min_mac${min_mac}"
 readonly out_dir="data/conditional/common/spa_iter"
+readonly grm_dir="data/saige/grm/input"
+readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+readonly grm_sam="${grm_mtx}.sampleIDs.txt"
 
-readonly pheno_dir="data/phenotypes"
 readonly in_prefix="ukb_eur_wes_200k"
 readonly maf="0to5e-2"
 
@@ -58,31 +64,29 @@ submit_cond_spa()
   echo "interval_vcf: $( ls -l ${interval_vcf})"
 
   mkdir -p ${out_dir}
-  #if [[ "$P_cutoff" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
-    if [ -f ${interval_vcf} ]; then 
-      qsub -N "_cond_${1}" \
-        -q "short.qc@@short.hge" \
-        -t "${SGE_TASK_ID}" \
-        -pe shmem 1 \
-        "${bash_script}" \
-        "${in_gmat}" \
-        "${in_var}" \
-        "${interval_vcf}" \
-        "${out_prefix}" \
-        "${P_cutoff}" \
-        "${max_iter}" \
-        "${min_mac}"
-    else
-      >&2 echo "${interval_vcf} (interval) does not exist. Exiting.."
-    fi
-  #else
-  #  >&2 echo "${P_cutoff} is not a valid decimal number"
-  #fi
+  if [ -f "${interval_vcf}" ]; then 
+    qsub -N "_cond_${1}" \
+      -q "short.qc@@short.hge" \
+      -t "${SGE_TASK_ID}" \
+      -pe shmem 1 \
+      "${bash_script}" \
+      "${in_gmat}" \
+      "${in_var}" \
+      "${interval_vcf}" \
+      "${out_prefix}" \
+      "${P_cutoff}" \
+      "${max_iter}" \
+      "${min_mac}" \
+      "${grm_mtx}" \
+      "${grm_sam}"
+  else
+    >&2 echo "${interval_vcf} (interval) does not exist. Exiting.."
+  fi
 
 }
 
-submit_cts_analysis "pLoF_damaging_missense"
-#submit_binary_analysis "pLoF_damaging_missense"
+#submit_cts_analysis "pLoF_damaging_missense"
+submit_binary_analysis "pLoF_damaging_missense"
 
 
 

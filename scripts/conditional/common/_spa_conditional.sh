@@ -21,6 +21,8 @@ readonly out_prefix=${4?Error: Missing arg4 (out_prefix)}
 readonly P_cutoff=${5?Error: Missing arg5 (P_cutoff)}
 readonly max_iter=${6?Error: Missing arg6 (max_iter)}
 readonly min_mac=${7?Error: Missing arg7 (min_mac)}
+readonly grm_mtx=${8?Error: Missing arg8 (grm_mtx)}
+readonly grm_sam=${9?Error: Missing arg9 (grm_sam)}
 
 readonly csi="${vcf}.csi"
 readonly step2_SPAtests="utils/saige/step2_SPAtests.R"
@@ -66,6 +68,8 @@ spa_chr_loop() {
            --vcfFile="${vcf}" \
            --vcfFileIndex="${csi}" \
            --vcfField="GT" \
+           --sparseGRMFile="${grm_mtx}" \
+           --sparseGRMSampleIDFile="${grm_sam}"  \
            --chrom="chr${chr}" \
            --minMAF=0.0000001 \
            --minMAC="${min_mac}" \
