@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-20
+#$ -t 1-10
 #$ -V
 
 set -o errexit
@@ -19,7 +19,7 @@ readonly bash_script="scripts/conditional/common/_spa_conditional.sh"
 # parameters
 readonly min_mac=4
 readonly max_iter=5
-readonly P_cutoff="5e-8"
+readonly P_cutoff="5e-3"
 
 # directories and paths
 readonly pheno_dir="data/phenotypes"
@@ -78,7 +78,8 @@ submit_cond_spa()
       "${max_iter}" \
       "${min_mac}" \
       "${grm_mtx}" \
-      "${grm_sam}"
+      "${grm_sam}" \
+      "${phenotype}"
   else
     >&2 echo "${interval_vcf} (interval) does not exist. Exiting.."
   fi

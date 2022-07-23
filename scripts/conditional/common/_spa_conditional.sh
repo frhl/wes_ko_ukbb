@@ -23,11 +23,13 @@ readonly max_iter=${6?Error: Missing arg6 (max_iter)}
 readonly min_mac=${7?Error: Missing arg7 (min_mac)}
 readonly grm_mtx=${8?Error: Missing arg8 (grm_mtx)}
 readonly grm_sam=${9?Error: Missing arg9 (grm_sam)}
+readonly phenotype=${10?Error: Missing arg9 (grm_sam)}
 
 readonly csi="${vcf}.csi"
 readonly step2_SPAtests="utils/saige/step2_SPAtests.R"
 readonly shell_spa="scripts/conditional/common/_chr_spa.sh"
 readonly rscript="scripts/conditional/common/03_spa_conditional.R"
+readonly helper="scripts/conditional/common/_get_marker_and_pval.R"
 
 # A function to extract all the (unique) chromsomes
 extract_chr_from_vcf() {
@@ -78,33 +80,18 @@ spa_chr_loop() {
            --SAIGEOutputFile="${spa_prefix}${chr}" \
            --LOCO=FALSE \
            ${markers:+--condition "$markers"}
+        # only copy if file exists
+        cp "${spa_prefix}${chr}" "${spa_prefix}${chr}.txt"
       fi
-      cp "${spa_prefix}${chr}" "${spa_prefix}${chr}.txt"
    done
    set -eu
-}
-
-qsub_spa_chr_loop() {
-# deprecated for now ..
-   local markers="${1}"
-   local spa_prefix="${2}_chr"
-   qsub -N "_cond_spa_${markers}" \
-        -t 1-22 \
-        -q "short.qf" \
-        -pe shmem 1 \
-        "${shell_spa}" \
-        "${vcf}" \
-        "${in_gmat}" \
-        "${in_var}" \
-        "${phenotype}" \
-        "${prefix}" \
-        "${markers}"
 }
 
 
 
 conditional_analysis() {
   
+  # setup variables
   local i=0 
   local marker_list=""
   local current_marker=""
@@ -123,35 +110,32 @@ conditional_analysis() {
 
       local old_marker=${current_marker}
       local old_p=${current_p}
+     
+      # format file so that the right P-value is always extracted 
+      # regardless of conditional analysis being enabled or not 
+      Rscript "${helper}" --spa_file "${out_prefix_mrg}" --p_cutoff "${P_cutoff}"  --out_file "${markers_conditional}"
+      local current_p=$( tail -n1 "${markers_conditional}" | cut -f13 )
+      local current_marker=$( tail -n1 "${markers_conditional}" | cut -f12 )
 
-      if [ ${i} -eq 1 ]; then
-
-        cat ${out_prefix_mrg} | awk -v P="${P_cutoff}" '$13 < P' | head -n1 >> ${markers_conditional}
-        local current_p=$( tail -n1 ${markers_conditional} | cut -f13)
-        local current_marker=$( tail -n1 ${markers_conditional} | awk '{print $1":"$2":"$4":"$5}')
-
-      else
-
-        cat ${out_prefix_mrg} | awk -v P="${P_cutoff}" '$18 < P' | head -n1 >> ${markers_conditional} 
-        local current_p=$( tail -n1 ${markers_conditional} | cut -f18)
-        local current_marker=$( tail -n1 ${markers_conditional} | awk '{print $1":"$2":"$4":"$5}')
-
-      fi
-
-      if [[ "${current_marker}" != "${old_marker}" ]]; then
-        if [[ "${marker_list}" == "" ]]; then
-          local marker_list="${current_marker}"
+      if [ ! -z "${current_marker}" ]; then
+        if [[ "${current_marker}" != "${old_marker}" ]]; then
+          if [ -z "${marker_list}" ]; then
+            local marker_list="${current_marker}"
+          else
+            local marker_list="${marker_list},${current_marker}"
+          fi
+          >&2 echo "[i${i}]: New marker found '${current_marker} (P-value=${current_p}). Conditioning on ${marker_list} for ${phenotype}'"
         else
-          local marker_list="${marker_list},${current_marker}"
+          >&2 echo "[i${i}]: No other markers passing sig threshold (P-value<${P_cutoff}). Ended loop with markers: ${marker_list} for ${phenotype}."
+          break
         fi
-        >&2 echo "[Iteration ${i}]: New marker found '${current_marker} (P-value=${current_p}). Conditioning on ${marker_list}'"
       else
-        >&2 echo "[Iteration ${i}]: No other markers passing sig threshold (P-value<${P_cutoff}). Ended loop with markers: ${marker_list}"
-        break
+       >&2 echo "[i${i}]: No markers found at P-value<${P_cutoff}. Loop ended with markers ${marker_list} for ${phenotype}."
+       break
       fi
       # clean up
-      rm -f "${out_prefix_iter}_chr"*
-      rm -f ${out_prefix_mrg}
+      #rm -f "${out_prefix_iter}_chr"*
+      #rm -f ${out_prefix_mrg}
   done
   echo ${marker_list} > "${out_prefix}.markers"
 }

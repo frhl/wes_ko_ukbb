@@ -64,7 +64,7 @@ submit_intervals()
     if [ -f ${genes} ]; then
       set -x
       qsub -N "_filter_genotypes_${1}" \
-        -q "short.qc@@short.hge" \
+        -q "long.qc@@long.hge" \
         -t "${SGE_TASK_ID}" \
         -pe shmem 4 \
         "${bash_script}" \
