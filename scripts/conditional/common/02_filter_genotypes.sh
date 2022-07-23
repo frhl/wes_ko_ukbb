@@ -27,9 +27,10 @@ readonly padding=500000
 # minimum maf and imputation score extracted
 readonly min_maf=0.01
 readonly min_info=0.8
+readonly min_mac=4
 
-readonly in_dir="data/conditional/common/gene_positions"
-readonly out_dir="data/conditional/common/intervals"
+readonly in_dir="data/conditional/common/gene_positions/min_mac${min_mac}"
+readonly out_dir="data/conditional/common/intervals/min_mac${min_mac}"
 readonly pheno_dir="data/phenotypes"
 readonly in_prefix="ukb_eur_wes_200k"
 readonly maf="0to5e-2"
@@ -58,23 +59,25 @@ submit_intervals()
   local phenotype=${2?Error: Missing arg2 (phenotype)}
   local trait=${3?Error: Missing arg3 (trait)}
   local genes="${in_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}.tsv.gz"
-  local out_prefix="${out_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}"
-  if [ -f ${genes} ]; then
-    set -x
-    qsub -N "_filter_genotypes_${1}" \
-      -q "short.qc@@short.hge" \
-      -t "${SGE_TASK_ID}" \
-      -pe shmem 4 \
-      "${bash_script}" \
-      "${genes}" \
-      "${final_sample_list}" \
-      "${out_prefix}" \
-      "${padding}" \
-      "${min_maf}" \
-      "${min_info}"
-    set +x
-  else
-    >&2 echo "${genes} (${phenotype}) did not pass significance threshols or does not exist. Skipping.."
+  local out_prefix="${out_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}_500kb"
+  if [ ! -z "${phenotype}" ]; then
+    if [ -f ${genes} ]; then
+      set -x
+      qsub -N "_filter_genotypes_${1}" \
+        -q "short.qc@@short.hge" \
+        -t "${SGE_TASK_ID}" \
+        -pe shmem 4 \
+        "${bash_script}" \
+        "${genes}" \
+        "${final_sample_list}" \
+        "${out_prefix}" \
+        "${padding}" \
+        "${min_maf}" \
+        "${min_info}"
+      set +x
+    else
+      >&2 echo "${genes} (${phenotype}) did not pass significance threshols or does not exist. Skipping.."
+    fi
   fi
 }
 
