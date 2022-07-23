@@ -22,13 +22,14 @@ readonly bash_script="scripts/conditional/common/_filter_genotypes.sh"
 
 readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
 
-readonly padding=10e+6
+# padding upstream/downstream
+readonly padding=500000
+# minimum maf and imputation score extracted
 readonly min_maf=0.01
 readonly min_info=0.8
-readonly min_mac=4
 
-readonly in_dir="data/conditional/common/gene_positions/min_mac${min_mac}"
-readonly out_dir="data/conditional/common/intervals/min_mac${min_mac}"
+readonly in_dir="data/conditional/common/gene_positions"
+readonly out_dir="data/conditional/common/intervals"
 readonly pheno_dir="data/phenotypes"
 readonly in_prefix="ukb_eur_wes_200k"
 readonly maf="0to5e-2"
