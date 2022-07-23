@@ -43,7 +43,7 @@ main <- function(args){
   #print(head(d, n = 2))
   #print(tail(d, n = 2))
   # write file
-  fwrite(d, args$out_file, sep = "\t", header = FALSE)
+  fwrite(d, args$out_file, sep = "\t", col.names = FALSE)
 
 }
 
