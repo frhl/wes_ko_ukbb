@@ -23,14 +23,22 @@ main <- function(args){
   # only keep the follow columns in the output file
   keep_cols <- c("CHR", "POS", "MarkerID", "Allele1", "Allele2",
                  "AC_allele2", "AF_Allele2", "BETA", "SE", "Tstat",
-                 "var", "p.value", "Tstat_cond", "p.value_cond", "varT_vond",
-                 "BETA_cond", "SE_cond") 
+                 "var", "p.value", "Tstat_c", "p.value_c", "varT_c",
+                 "BETA_c", "SE_c") 
   
   # subset columns
   d <- d[,colnames(d) %in% keep_cols, with = FALSE]
-  d$MARKER <- apply( d[ ,c("CHR", "POS", "Allele1", "Allele2") ] , 1 , paste , collapse = ":" )
-  d$PVAL <- d[[col_pvalue]]
- 
+  marker <- apply( d[ ,c("CHR", "POS", "Allele1", "Allele2") ] , 1 , paste , collapse = ":" )
+  pvalue <- d[[col_pvalue]]
+  dnew <- data.table(MARKER=marker, PVAL=pvalue)
+
+  # combine tables ensureing that marker/pvalue is first and second column
+  d <- cbind(dnew, d)
+
+  min_p <- min(d$PVAL)
+  msg <- paste("Lowest P-value detected was:", min_p, "using column", col_pvalue)
+  write(msg, stderr())
+
   # perform rows based on markers that pass thresholds
   p_cutoff <- as.numeric(args$p_cutoff)
   bool <- d$PVAL < p_cutoff
@@ -43,6 +51,7 @@ main <- function(args){
   #print(head(d, n = 2))
   #print(tail(d, n = 2))
   # write file
+  write(paste("Writing", args$out_file), stderr())
   fwrite(d, args$out_file, sep = "\t", col.names = FALSE)
 
 }
@@ -53,7 +62,7 @@ parser$add_argument("--spa_file", default=NULL, help = "?")
 parser$add_argument("--out_file", default=NULL, help = "?")
 parser$add_argument("--p_cutoff", default=NULL, help = "?")
 parser$add_argument("--col_pvalue", default="p.value", help = "?")
-parser$add_argument("--col_pvalue_cond", default="p.value_cond", help = "?")
+parser$add_argument("--col_pvalue_cond", default="p.value_c", help = "?")
 args <- parser$parse_args()
 
 main(args)

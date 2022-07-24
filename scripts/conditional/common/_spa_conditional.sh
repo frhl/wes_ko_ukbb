@@ -44,6 +44,7 @@ merge_spa_by_chr(){
   local prefix=${1?Error: expected prefix (arg1)}
   local out=${2?Error: expected out file (arg2)}
   local first_iter="Y"
+  rm -f ${out}
   for chr in {1..22}; do
      local file=$(echo ${prefix} | sed -e "s/CHR/${chr}/g")
      if [ -f ${file} ]; then
@@ -63,9 +64,10 @@ merge_spa_by_chr(){
 spa_chr_loop() {
    local markers="${1}"
    local spa_prefix="${2}_chr"
-   set +eu
    for chr in ${CHROMS}; do
-      if [ ! -f "${spa_prefix}${chr}" ]; then
+      local out_spa="${spa_prefix}${chr}"
+      local spa_copy="${spa_prefix}${chr}.txt"
+      if [ ! -f "${out_spa}" ]; then
         Rscript "${step2_SPAtests}"  \
            --vcfFile="${vcf}" \
            --vcfFileIndex="${csi}" \
@@ -77,14 +79,16 @@ spa_chr_loop() {
            --minMAC="${min_mac}" \
            --GMMATmodelFile="${in_gmat}" \
            --varianceRatioFile="${in_var}" \
-           --SAIGEOutputFile="${spa_prefix}${chr}" \
+           --SAIGEOutputFile="${out_spa}" \
            --LOCO=FALSE \
            ${markers:+--condition "$markers"}
-        # only copy if file exists
-        cp "${spa_prefix}${chr}" "${spa_prefix}${chr}.txt"
+        # create backup of the chromosome, the other
+        # is used for merging and then deleted subsequently
+      else
+        >&2 echo "${out_spa} already exists. Skipping.."
       fi
+      cp "${out_spa}" "${spa_copy}"
    done
-   set -eu
 }
 
 
@@ -97,28 +101,33 @@ conditional_analysis() {
   local current_marker=""
   local current_p=""
 
+  >&2 echo "Beginning conditional analysis for ${phenotype}.."
+
   while [ $i -lt $max_iter ]; do
 
       true $(( i++ ))
       >&2 echo "[Iteration ${i}]: Current list of condtioning marker(s): ${marker_list}"
 
       local out_prefix_iter="${out_prefix}_i${i}"
-      local out_prefix_mrg="${out_prefix_iter}.mrg"
+      local out_mrg="${out_prefix_iter}.mrg"
+      local out_r="${out_prefix_iter}.txt"
 
+      # run SAIGE and merge output
       spa_chr_loop "${marker_list}" "${out_prefix_iter}"
-      merge_spa_by_chr "${out_prefix_iter}_chrCHR.txt" "${out_prefix_mrg}"
+      merge_spa_by_chr "${out_prefix_iter}_chrCHR.txt" "${out_mrg}"
 
+      # set old values for comparison
       local old_marker=${current_marker}
       local old_p=${current_p}
-     
+    
       # format file so that the right P-value is always extracted 
       # regardless of conditional analysis being enabled or not 
-      Rscript "${helper}" --spa_file "${out_prefix_mrg}" --p_cutoff "${P_cutoff}"  --out_file "${markers_conditional}"
-      local current_p=$( tail -n1 "${markers_conditional}" | cut -f13 )
-      local current_marker=$( tail -n1 "${markers_conditional}" | cut -f12 )
+      Rscript "${helper}" --spa_file "${out_mrg}" --p_cutoff "${P_cutoff}"  --out_file "${out_r}"
+      local current_p=$( tail -n1 "${out_r}" | cut -f2 )
+      local current_marker=$( tail -n1 "${out_r}" | cut -f1 )
 
       if [ ! -z "${current_marker}" ]; then
-        if [[ "${current_marker}" != "${old_marker}" ]]; then
+        if [ "${current_marker}" != "${old_marker}" ]; then
           if [ -z "${marker_list}" ]; then
             local marker_list="${current_marker}"
           else
@@ -135,23 +144,24 @@ conditional_analysis() {
       fi
       # clean up
       #rm -f "${out_prefix_iter}_chr"*
-      #rm -f ${out_prefix_mrg}
+      #rm -f ${out_mrg}
+    echo -e "${i}\t${current_marker}\t${current_p}\t${P_cutoff}" >> ${final_markers}
   done
-  echo ${marker_list} > "${out_prefix}.markers"
 }
 
 ###############
 # main script #
 ##############
 
-# setup constant files 
+# setup permenant variables
 readonly CHROMS=$(extract_chr_from_vcf ${vcf}) 
-readonly markers_conditional="${out_prefix}.spa"
-rm -f ${markers_conditional}
+readonly final_markers="${out_prefix}.markers"
+rm -f ${final_markers}
 
 # setup saige
 module purge
 set_up_RSAIGE
+set +eu
 
 # Run conditional analysis
 conditional_analysis ${vcf} ${out_prefix}

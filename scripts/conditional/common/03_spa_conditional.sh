@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-10
+#$ -t 1-80
 #$ -V
 
 set -o errexit
@@ -19,12 +19,12 @@ readonly bash_script="scripts/conditional/common/_spa_conditional.sh"
 # parameters
 readonly min_mac=4
 readonly max_iter=5
-readonly P_cutoff="5e-3"
+readonly P_cutoff="5e-6"
 
 # directories and paths
 readonly pheno_dir="data/phenotypes"
 readonly interval_dir="data/conditional/common/intervals/min_mac${min_mac}"
-readonly out_dir="data/conditional/common/spa_iter"
+readonly out_dir="data/conditional/common/spa_iter/new_run_monday"
 readonly grm_dir="data/saige/grm/input"
 readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
