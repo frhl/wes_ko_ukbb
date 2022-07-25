@@ -106,36 +106,41 @@ def main(args):
     print("h2:", str(h2))
     print("var_beta:", str(var_beta))
     print("var_theta:", str(var_theta))
+    
     # setup effects
-    mt = mt.annotate_rows(beta = make_effect(mt, h2=var_beta, pi=pi_beta))
-    mt = mt.annotate_rows(theta_nosign = hl.abs(make_effect(mt, h2=var_theta, pi=pi_theta)))
-
-    # keep the sign to ensure that effects are always in the same direction
-    mt = mt.annotate_rows(
-        beta_sign = hl.case().when(hl.sign(mt.beta) == 0, 1).default(hl.sign(mt.beta))
-    )
-
-    # we would like to operate on the same genotype scale as the additive effects,
-    # so use the original scaled matrix, but only keep hom/ch alt alleles sites
-    mt = mt.annotate_entries(
-        G_norm_alt = (hl.case().when(mt.G == 2, mt.G_norm).default(0))
-    )
-
-    # set sign
-    mt = mt.annotate_rows(
-        theta = mt.theta_nosign * mt.beta_sign
-    )
-
-    # sum up effect from domincance
-    mt = mt.annotate_cols(y_no_noise_add=hl.agg.sum(mt.beta * mt.G_norm))
-    mt = mt.annotate_cols(y_no_noise_dom=hl.agg.sum(mt.theta * mt.G_norm_alt))
-    mt = mt.annotate_cols(y_no_noise=mt.y_no_noise_add+mt.y_no_noise_dom)
-
-    # re-scale effects
     if h2 > 0 and (var_beta + var_theta) > 0:
+        mt = mt.annotate_rows(beta = make_effect(mt, h2=var_beta, pi=pi_beta))
+        mt = mt.annotate_rows(theta_nosign = hl.abs(make_effect(mt, h2=var_theta, pi=pi_theta)))
+
+        # keep the sign to ensure that effects are always in the same direction
+        mt = mt.annotate_rows(
+            beta_sign = hl.case().when(hl.sign(mt.beta) == 0, 1).default(hl.sign(mt.beta))
+        )
+
+        # we would like to operate on the same genotype scale as the additive effects,
+        # so use the original scaled matrix, but only keep hom/ch alt alleles sites
+        mt = mt.annotate_entries(
+            G_norm_alt = (hl.case().when(mt.G == 2, mt.G_norm).default(0))
+        )
+
+        # set sign
+        mt = mt.annotate_rows(
+            theta = mt.theta_nosign * mt.beta_sign
+        )
+
+        # sum up effect from domincance
+        mt = mt.annotate_cols(y_no_noise_add=hl.agg.sum(mt.beta * mt.G_norm))
+        mt = mt.annotate_cols(y_no_noise_dom=hl.agg.sum(mt.theta * mt.G_norm_alt))
+        mt = mt.annotate_cols(y_no_noise=mt.y_no_noise_add+mt.y_no_noise_dom)
+
+        # re-scale effects
         mt = mt.annotate_cols(y_no_noise_rescaled = rescale_variances_hail(mt.y_no_noise, mt, h2))
     else:
-        mt = mt.annotate_cols(y_no_noise_rescaled = 0)    
+        mt = mt.annotate_cols(y_no_noise_rescaled = 0)
+        mt = mt.annotate_rows(
+                beta = 0,
+                theta = 0
+       )
 
     # add up all effects
     mt = mt.annotate_cols(y_noise = hl.rand_norm(0, hl.sqrt(1-h2)))

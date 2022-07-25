@@ -100,16 +100,16 @@ readonly seed=42
 simulate_phenotypes 0.00 0.00 0.00 0.01 0.01
 
 # gradually greater recessive effects (polygenic model)
-simulate_phenotypes 0.30 0.01 0.01 1.00 1.00
-simulate_phenotypes 0.30 0.01 0.10 1.00 1.00
-simulate_phenotypes 0.30 0.01 0.50 1.00 1.00
-simulate_phenotypes 0.30 0.01 1.00 1.00 1.00
-simulate_phenotypes 0.30 0.01 10.0 1.00 1.00
-simulate_phenotypes 0.30 0.01 20.0 1.00 1.00
-simulate_phenotypes 0.30 0.01 40.0 1.00 1.00
-simulate_phenotypes 0.30 0.01 100.0 1.00 1.00
-simulate_phenotypes 0.30 0.01 500.0 1.00 1.00
-simulate_phenotypes 0.30 0.01 1000.0 1.00 1.00
+#simulate_phenotypes 0.30 0.01 0.01 1.00 1.00
+#simulate_phenotypes 0.30 0.01 0.10 1.00 1.00
+#simulate_phenotypes 0.30 0.01 0.50 1.00 1.00
+#simulate_phenotypes 0.30 0.01 1.00 1.00 1.00
+#simulate_phenotypes 0.30 0.01 10.0 1.00 1.00
+#simulate_phenotypes 0.30 0.01 20.0 1.00 1.00
+#simulate_phenotypes 0.30 0.01 40.0 1.00 1.00
+#simulate_phenotypes 0.30 0.01 100.0 1.00 1.00
+#simulate_phenotypes 0.30 0.01 500.0 1.00 1.00
+#simulate_phenotypes 0.30 0.01 1000.0 1.00 1.00
 
 
 

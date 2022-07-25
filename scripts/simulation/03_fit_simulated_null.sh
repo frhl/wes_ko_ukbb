@@ -88,7 +88,7 @@ fit_null() {
    set +x
  }
 
-readonly tasks="1-10"
+readonly tasks="1-20"
 
 fit_phenotypes 0.00 0.00 0.00 0.01 0.01
 

@@ -38,15 +38,16 @@ readonly nslots=1
 submit_spa()
 {
   local K=0.1
-  local h2_beta=${1}
-  local h2_theta=${2}
-  local pi_beta=${3}
-  local pi_theta=${4}
+  local h2=${1}
+  local var_beta=${2}
+  local var_theta=${3}
+  local pi_beta=${4}
+  local pi_theta=${5}
 
-  local h2s="${h2_beta}_${h2_theta}"
+  local vars="${var_beta}_${var_theta}"
   local pis="${pi_beta}_${pi_theta}"
 
-  local prefix="ukb_eur_h2_${h2s}_pi_${pis}_K${K}_chr${chr}" 
+  local prefix="ukb_eur_h2_${h2}_var_${vars}_pi_${pis}_K${K}_chr${chr}"
   local saige_prefix="${prefix}_y_${SGE_TASK_ID}"
   local phenotype="y_${SGE_TASK_ID}"
   submit_spa_with_csqs "${phenotype}" "${saige_prefix}" "cts"
@@ -92,16 +93,17 @@ submit_spa_job() {
 
 readonly annotation="pLoF_damaging_missense"
 
-# simulate absence of CH effects
-submit_spa 0.00 0.00 0.00 0.00
+submit_spa 0.00 0.00 0.00 0.01 0.01
+submit_spa 0.30 0.01 0.01 1.00 1.00
+submit_spa 0.30 0.01 0.10 1.00 1.00
+submit_spa 0.30 0.01 0.50 1.00 1.00
+submit_spa 0.30 0.01 1.00 1.00 1.00
+submit_spa 0.30 0.01 10.0 1.00 1.00
+submit_spa 0.30 0.01 20.0 1.00 1.00
+submit_spa 0.30 0.01 40.0 1.00 1.00
+submit_spa 0.30 0.01 100.0 1.00 1.00
+submit_spa 0.30 0.01 500.0 1.00 1.00
+submit_spa 0.30 0.01 1000.0 1.00 1.00
 
-# standard additive effects
-#simulate_phenotypes 0.10 0.00 0.10 0.00
-#simulate_phenotypes 0.10 0.00 0.20 0.00
-#simulate_phenotypes 0.10 0.00 1.00 0.00
-
-# only domincance effects
-#simulate_phenotypes 0.00 0.10 0.00 0.50
-#simulate_phenotypes 0.10 0.10 0.10 0.50
 
 

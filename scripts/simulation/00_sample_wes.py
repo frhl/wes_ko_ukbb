@@ -19,13 +19,17 @@ def main(args):
     exclude_related = args.exclude_related
     random_samples = args.random_samples
     random_seed = args.random_seed
-    min_maf = args.min_maf
     out_prefix = args.out_prefix
     out_type = args.out_type
     filter_to_unrelated_using_kinship_coef = args.filter_to_unrelated_using_kinship_coef
     filter_missing = args.filter_missing
     in_prefix = args.in_prefix
     in_type = args.in_type
+    in_ko_prefix = args.in_ko_prefix
+    in_ko_type = args.in_ko_type
+    
+    # Note: only samples are filtered in this script. Thus, the original knockout
+    # files (data/knockouts/alt*) can be used after subsetting accordingly
 
     hail_init.hail_bmrc_init_local('logs/hail/hail_format.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
@@ -56,11 +60,9 @@ def main(args):
         missing = hl.agg.mean(hl.is_missing(mt.GT)) <= float(filter_missing)
         mt = mt.filter_rows(missing)
 
-    if min_maf:
-        mt = mt.filter_rows(variants.get_maf_expr(mt) > float(min_maf))
-
     if out_type and out_prefix:
         io.export_table(mt, out_prefix, out_type)
+
 
 
 if __name__=='__main__':
@@ -68,6 +70,8 @@ if __name__=='__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--in_prefix', default=None, help='')
     parser.add_argument('--in_type', default=None, help='')
+    parser.add_argument('--in_ko_prefix', default=None, help='')
+    parser.add_argument('--in_ko_type', default=None, help='')
     parser.add_argument('--exclude_related', default=None, action='store_true', help='Exclude any related individuals.')
     parser.add_argument('--filter_to_unrelated_using_kinship_coef', default=None, action='store_true', help='Exclude any related individuals.')
     parser.add_argument('--filter_missing', default=None, help='Filter to variants with lt value in genotype missingness.')
@@ -76,7 +80,6 @@ if __name__=='__main__':
     parser.add_argument('--ancestry', default=None, help='Either "eur" or "all".')
     parser.add_argument('--random_samples', default=None, help='Subset to random samples')
     parser.add_argument('--random_seed', default=42, help='Seed for randomizer')
-    parser.add_argument('--min_maf', default=None, help='Subset to variants based on minimum MAF')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Either "mt", "vcf" or "plink"')
     args = parser.parse_args()
