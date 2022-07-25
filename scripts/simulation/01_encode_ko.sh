@@ -20,11 +20,11 @@ readonly spark_dir="data/tmp/spark_dir"
 readonly chr=$( get_chr ${SGE_TASK_ID} )
 
 readonly in_dir="data/simulation/data"
-readonly in_file="${in_dir}/ukb_eur_100000_samples_chr${chr}.mt"
+readonly in_file="${in_dir}/ukb_eur_10000_samples_chr${chr}.mt"
 readonly in_type="mt"
 
 readonly out_dir="data/simulation/knockouts"
-readonly out_prefix="${out_dir}/ukb_eur_100000_samples_knockout_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_eur_10000_samples_knockout_chr${chr}"
 readonly out_type="vcf"
 
 # Allele frequency thresholds to filter on

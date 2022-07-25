@@ -25,12 +25,7 @@ def main(args):
     filter_missing = args.filter_missing
     in_prefix = args.in_prefix
     in_type = args.in_type
-    in_ko_prefix = args.in_ko_prefix
-    in_ko_type = args.in_ko_type
     
-    # Note: only samples are filtered in this script. Thus, the original knockout
-    # files (data/knockouts/alt*) can be used after subsetting accordingly
-
     hail_init.hail_bmrc_init_local('logs/hail/hail_format.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
     mt = io.import_table(in_prefix, in_type)
@@ -70,8 +65,6 @@ if __name__=='__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--in_prefix', default=None, help='')
     parser.add_argument('--in_type', default=None, help='')
-    parser.add_argument('--in_ko_prefix', default=None, help='')
-    parser.add_argument('--in_ko_type', default=None, help='')
     parser.add_argument('--exclude_related', default=None, action='store_true', help='Exclude any related individuals.')
     parser.add_argument('--filter_to_unrelated_using_kinship_coef', default=None, action='store_true', help='Exclude any related individuals.')
     parser.add_argument('--filter_missing', default=None, help='Filter to variants with lt value in genotype missingness.')

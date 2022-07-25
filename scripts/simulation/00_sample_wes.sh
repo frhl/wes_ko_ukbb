@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 3
 #$ -q short.qa
-#$ -t 21
+#$ -t 22
 #$ -V
 
 source utils/qsub_utils.sh
@@ -20,16 +20,12 @@ readonly spark_dir="data/tmp/spark_dir"
 readonly chr=$( get_chr ${SGE_TASK_ID} )
 
 readonly in_dir="data/mt/annotated"
-readonly in_file="${in_dir}/ukb_eur_wes_200k_annot_chr${chr}.mt"
+readonly in_file="${in_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.mt"
 readonly in_type="mt"
-
-readonly ko_dir="data/knockouts/alt"
-readonly ko_file="${ko_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense.vcf.bgz"
-readonly ko_type="vcf"
 
 readonly out_dir="data/simulation/mt"
 readonly out_prefix="${out_dir}/ukb_eur_100k_chr${chr}"
-readonly out_type="vcf"
+readonly out_type="mt"
 
 readonly seed="1995"
 
@@ -48,7 +44,6 @@ python3 "${hail_script}" \
    --out_prefix "${out_prefix}" \
    --out_type "${out_type}" 
 
-# Sample corresponding KO file
 
 
 

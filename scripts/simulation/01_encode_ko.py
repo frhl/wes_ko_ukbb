@@ -88,6 +88,7 @@ def main(args):
         G_norm=(mt.G-mt.stats.mean)/mt.stats.stdev
     )
     
+
     # setup sites and alleles
     rows = mt.count()[0]
     locus = [ "chr%s:%s" % (chrom, str(i+1)) for i in range(rows)]
@@ -133,7 +134,9 @@ def main(args):
         prob = prob.transmute_entries(DS = new_DS)
 
     # export genes with knockouts
-    prob.filter_entries(prob.pKO > 0).entries().flatten().export(out_prefix + ".tsv.gz")
+    genes = prob.drop(prob.stats)
+    genes = genes.drop(genes.stdev)
+    genes.filter_entries(genes.DS > 0).entries().flatten().export(out_prefix + ".tsv.gz")
 
     # write out variants involved and vcf
     io.export_table(prob, out_prefix, out_type)
