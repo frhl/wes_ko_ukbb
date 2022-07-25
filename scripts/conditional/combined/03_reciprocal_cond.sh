@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N spa_cond_common_rare
+#$ -N reciprocal_cond
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/spa_cond_common_rare.log
-#$ -e logs/spa_cond_common_rare.errors.log
+#$ -o logs/reciprocal_cond_ko.log
+#$ -e logs/reciprocal_cond.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc

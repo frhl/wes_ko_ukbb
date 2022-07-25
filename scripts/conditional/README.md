@@ -17,8 +17,7 @@ b. Just run the brute force approach of conditioning out all rare variant PTVs i
 
 * `common`: Condition on nearby common variants
 * `rare`: Condition on rare variants in gene
-* `reciprocal`: Condition on common variants, prs, and knockouts 
-* `brute_force`: Condition on common variants, prs and rare variants
+* `combined`: Either `reciprocal` with conditioning on common variants, prs, and knockouts or `brute_force`: Condition on common variants, prs and rare variants
 
 
 

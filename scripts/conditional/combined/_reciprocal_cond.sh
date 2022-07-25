@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
 #
-#$ -N _spa_cond_common_rare
+#$ -N _reciprocal_conde
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_spa_cond_common_rare.log
-#$ -e logs/_spa_cond_common_rare.errors.log
+#$ -o logs/_reciprocal_cond.log
+#$ -e logs/_reciprocal_cond.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q lindgren.qe
