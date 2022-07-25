@@ -30,7 +30,7 @@ readonly out_checkpoint="${out_prefix}_checkpoint.mt"
 readonly out_type="vcf"
 
 readonly markers_dir="data/conditional/common/spa_iter"
-readonly markers=$(cat ${markers_dir}/*.markers | sed '/^[[:space:]]*$/d' | tr "\n" ",")
+readonly markers=$(cat ${markers_dir}/*.markers | cut -f2 | sort -u | tr "\n" ",")
 readonly chroms=$(cat ${markers_dir}/*.markers | sed '/^[[:space:]]*$/d' | cut -d":" -f1)
 
 mkdir -p ${out_dir}

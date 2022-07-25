@@ -22,7 +22,7 @@ source utils/bash_utils.sh
 source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/conditional/combined/01_combine_ko_rare_common.py"
+readonly hail_script="scripts/conditional/brute_force/01_combine_ko_rare_common.py"
 
 readonly chr="${SGE_TASK_ID}"
 readonly variants_dir="data/mt/annotated"
@@ -30,7 +30,7 @@ readonly variants_dir="data/mt/annotated"
 # note: assuming ko and rare variants have already been merged
 readonly ko_rare_dir="data/conditional/rare/combined"
 readonly common_dir="data/conditional/common/marker_mt"
-readonly out_dir="data/conditional/combined"
+readonly out_dir="data/conditional/brute_force"
 
 readonly ko_rare_path_wo_ext="${ko_rare_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense"
 readonly common_path_wo_ext="${common_dir}/conditional_markers_chrundefined"

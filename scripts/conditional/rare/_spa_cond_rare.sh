@@ -3,8 +3,8 @@
 #
 #$ -N _spa_cond_rare
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_spa_cond_rare3.log
-#$ -e logs/_spa_cond_rare3.errors.log
+#$ -o logs/_spa_cond_rare.log
+#$ -e logs/_spa_cond_rare.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q lindgren.qe
@@ -45,14 +45,17 @@ readonly csi=$(echo ${in_csi} | sed -e "s/CHR/${chr}/g")
 readonly out=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
 readonly markers_ac=$(echo ${in_markers_ac} | sed -e "s/CHR/${chr}/g")
 
+echo "File: .vcf: ${vcf}"
+echo "File: .csi: ${csi} "
+
 readonly threads=$(( ${NSLOTS}-1 ))
 readonly step2_SPAtests="utils/saige/step2_SPAtests_cond.R"
 readonly rscript="scripts/conditional/rare/_variants_with_ac.R"
 
 # condiitonal markers based on rare variants
 readonly cond_chr=$(echo ${cond} | sed -e "s/CHR/${chr}/g")
->&2 echo ${cond_chr}
->&2 echo ${cond_cat}
+#>&2 echo ${cond_chr}
+#>&2 echo ${cond_cat}
 
 # subset first by consequence
 readonly markers_raw=$(zcat ${cond_chr} | grep -E "${cond_cat}" | cut -f3)
@@ -62,13 +65,13 @@ echo ${markers_raw} > "${markers_file}"
 
 # subset by non-monomorphic markers
 set_up_rpy
-readonly markers_pheno_file="${out_prefix/CHR/${chr}}.${phenotype}.markers"
+readonly markers_pheno_file="${out_prefix/CHR/${chr}}.subset.markers"
 Rscript "${rscript}" \
-  --phenotype ${phenotype} \
-  --current_marker_file ${markers_file} \
-  --allele_count_file ${markers_ac} \
-  --outfile ${markers_pheno_file} \
-  --allele_count_threshold 2 #{min_mac}
+  --phenotype "${phenotype}" \
+  --current_marker_file "${markers_file}" \
+  --allele_count_file "${markers_ac}" \
+  --outfile "${markers_pheno_file}" \
+  --allele_count_threshold 3
 
 spa_test() {
   echo "var_bytes=${var_bytes} at ${var}"
@@ -105,6 +108,6 @@ else
   >&2 echo "${out} already exists. Skipping.."
 fi 
 
-rm ${markers_file}
+#rm ${markers_file}
 
 

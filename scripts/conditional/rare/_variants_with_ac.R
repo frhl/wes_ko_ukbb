@@ -8,6 +8,8 @@ library(data.table)
 
 main <- function(args){
 
+  print(args)
+
   stopifnot(file.exists(args$current_marker_file)) 
   stopifnot(file.exists(args$allele_count_file)) 
   stopifnot(as.numeric(args$allele_count_threshold) >= 0) 
@@ -25,16 +27,17 @@ main <- function(args){
 
   # read variants and allele count by phenotype
   cutoff <- as.numeric(args$allele_count_threshold) 
-  bool_ac_gt_threshold <- d[[args$phenotype]] >= cutoff
-  variants_with_ac_gt_threshold <- d$id[bool_ac_gt_threshold]
+  bool_ok <- floor(d[[args$phenotype]]) > cutoff
+  variants_ok <- d$id[bool_ok]
 
   # subset to variants with AC > 0 and keep string
-  monomorphic_variants <- !(current_variants$id %in% variants_with_ac_gt_threshold)
-  n_discarded <- sum(monomorphic_variants)
+  #monomorphic_variants <- !(current_variants$id %in% variants_with_ac_gt_threshold)
+  n_ok <- sum(bool_ok)
+  n_discarded <- sum(!bool_ok)
   n_total <- nrow(current_variants)
-  current_variants <- current_variants[!monomorphic_variants, ]
-  write(paste("Note:",args$phenotype,"had", n_discarded,"of",n_total,"variants with AC <", cutoff, "that were discarded."),stderr())
-  fwrite(current_variants, args$outfile, row.names = FALSE, col.names = FALSE)
+  #write(paste("Note:",args$phenotype,"had", n_discarded,"of",n_total,"variants with AC <", cutoff, "that were discarded."),stderr())
+  write(paste("Note:",args$phenotype,"had", n_ok,"of",n_total," variants with AC >", cutoff),stderr())
+  fwrite(data.table(x=variants_ok), args$outfile, row.names = FALSE, col.names = FALSE)
 
 }
 

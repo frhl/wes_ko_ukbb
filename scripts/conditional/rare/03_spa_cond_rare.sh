@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 3
+#$ -t 2
 #$ -tc 10
 #$ -V
 
@@ -139,9 +139,9 @@ submit_merge_job()
 
 # parameters
 readonly conditioning_markers=""
-readonly use_prs="0"
+readonly use_prs="1"
 readonly min_mac=4
-readonly tasks=22
+readonly tasks=21
 readonly queue="short.qe"
 readonly nslots=4
 
@@ -151,8 +151,8 @@ readonly nslots=4
 maf="maf0to5e-2"
 
 # cts traits
-submit_spa_cts_with_csqs "pLoF_damaging_missense"
-#submit_spa_binary_with_csqs "pLoF_damaging_missense"
+#submit_spa_cts_with_csqs "pLoF_damaging_missense"
+submit_spa_binary_with_csqs "pLoF_damaging_missense"
 
 #sleep 10
 #submit_spa_cts_with_csqs "pLoF"

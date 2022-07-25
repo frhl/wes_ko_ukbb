@@ -133,19 +133,19 @@ conditional_analysis() {
           else
             local marker_list="${marker_list},${current_marker}"
           fi
-          >&2 echo "[i${i}]: New marker found '${current_marker} (P-value=${current_p}). Conditioning on ${marker_list} for ${phenotype}'"
+          >&2 echo "[i${i}]: New marker found '${current_marker} (P-value=${current_p}). Conditioning on '${marker_list}' for ${phenotype}'"
         else
-          >&2 echo "[i${i}]: No other markers passing sig threshold (P-value<${P_cutoff}). Ended loop with markers: ${marker_list} for ${phenotype}."
+          >&2 echo "[i${i}]: No other markers passing sig threshold (P-value<${P_cutoff}). Ended loop with markers: '${marker_list}' for ${phenotype}."
           break
         fi
       else
-       >&2 echo "[i${i}]: No markers found at P-value<${P_cutoff}. Loop ended with markers ${marker_list} for ${phenotype}."
+       >&2 echo "[i${i}]: No markers found at P-value<${P_cutoff}. Loop ended with markers '${marker_list}' for ${phenotype}."
        break
       fi
       # clean up
       #rm -f "${out_prefix_iter}_chr"*
       #rm -f ${out_mrg}
-    echo -e "${i}\t${current_marker}\t${current_p}\t${P_cutoff}" >> ${final_markers}
+    echo -e "${i}\t${current_marker}\t${current_p}\t${P_cutoff}\t${phenotype}\t${marker_list}" >> ${final_markers}
   done
 }
 

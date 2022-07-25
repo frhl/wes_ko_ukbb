@@ -17,15 +17,15 @@ set -o nounset
 module purge
 source utils/bash_utils.sh
 
-readonly vcf_dir="data/conditional/combined"
+readonly vcf_dir="data/conditional/burte_force"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
 
-readonly spa_script="scripts/conditional/combined/_spa_cond_common_rare.sh"
+readonly spa_script="scripts/conditional/brute_force/_spa_cond_common_rare.sh"
 readonly merge_script="scripts/_spa_merge.sh"
 readonly in_prefix="ukb_eur_wes_200k"
 
-readonly cond_dir="data/conditional/combined"
+readonly cond_dir="data/conditional/brute_force"
 readonly cond="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_markers.txt.gz"
 readonly sorted_markers="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_sorted_markers.txt"
 readonly cond_cat="(pLoF)|(damaging_missense)" 
