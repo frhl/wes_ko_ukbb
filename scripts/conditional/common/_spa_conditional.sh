@@ -30,9 +30,11 @@ readonly step2_SPAtests="utils/saige/step2_SPAtests.R"
 readonly shell_spa="scripts/conditional/common/_chr_spa.sh"
 readonly rscript="scripts/conditional/common/03_spa_conditional.R"
 readonly helper="scripts/conditional/common/_get_marker_and_pval.R"
+readonly order_markers="scripts/conditional/common/_order_markers.R"
 
 # A function to extract all the (unique) chromsomes
 extract_chr_from_vcf() {
+  >&2 echo "Extracting chromsomes from VCF.."
   module purge
   module load BCFtools/1.12-GCC-10.3.0 
   bcftools query -f '%CHROM\n' ${1} | sort | uniq | sed -e "s/chr//g" |tr "\n" " "
@@ -131,7 +133,9 @@ conditional_analysis() {
           if [ -z "${marker_list}" ]; then
             local marker_list="${current_marker}"
           else
-            local marker_list="${marker_list},${current_marker}"
+            # markers need to be sorted by position, otherwise SAIGE will an invertible matrix error
+            local marker_list_unsorted="${marker_list},${current_marker}" 
+            local marker_list=$( Rscript "${order_markers}" --markers "${marker_list_unsorted}")
           fi
           >&2 echo "[i${i}]: New marker found '${current_marker} (P-value=${current_p}). Conditioning on '${marker_list}' for ${phenotype}'"
         else
