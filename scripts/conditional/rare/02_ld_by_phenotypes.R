@@ -6,7 +6,7 @@ library(parallel)
 library(doParallel)
 library(digest)
 
-geno_row_sums <- function(G, pheno_df, pheno){
+geno_dosage_hash <- function(G, pheno_df, pheno){
     #' @param G matrix of genotypes (numerics)
     #' @param pheno_df data.table of phenotypes
     #' @param pheno current phenotype (string)
@@ -18,10 +18,22 @@ geno_row_sums <- function(G, pheno_df, pheno){
     # get subset of G which contains defiend phenotypes
     G_with_defined_phenos <- colnames(G) %in% eid_with_defined_phenos
     G_subset <- G[,G_with_defined_phenos, with = FALSE]
-    sums <- rowSums(G_subset, na.rm = TRUE)
-    return(sums)
-    
+
+    # combine all dosages into a single variant
+    dt <- data.table(
+        dosage_string = unlist(apply(G_subset, 1, function(x) as.character(paste(x, collapse = '-'))))
+    )
+    # create hash of the string
+    dt$dosage_hash <- unlist(lapply(dt$dosage_string, function(x) digest(x, algo="md5")))
+    # clean up
+    dt$gt_string <- NULL
+    dt$dosage_string <- NULL
+    dt$dosage_hash_dup <- as.numeric(duplicated(dt))
+    return(dt$dosage_hash)
+
 }
+
+
 
 main <- function(args){
 
@@ -63,30 +75,26 @@ main <- function(args){
   msg <- paste("Removed", sum(missing_cov),"samples with missing covariates.")
   write(msg, stdout())
 
-  #cores <- detectCores()
-  #registerDoParallel(8)
-  #write(paste("running parallel with",cores,"cores."), stdout())
-
-
-  # easy to switch to non-parallel workflow with lapply
-  lst_ds_ac <- lapply(1:length(phenotypes), function(i){
-     geno_row_sums(G, pheno_df, phenotypes[i])
+  # get hash of dosages to count duplicates (find those genotypes
+  # that are in perfect LD)
+  lst_ds_hash <- lapply(1:length(phenotypes), function(i){
+     geno_dosage_hash(G, pheno_df, phenotypes[i])
   }) 
 
-  # combine files
-  dt_ds_ac <- data.table(do.call(cbind, lst_ds_ac))
+    # combine files
+  dt_ds_hash <- data.table(do.call(cbind, lst_ds_hash))
   
   # ensure that they are same lenght
-  stopifnot(nrow(dt_ds_ac) == nrow(G))
+  stopifnot(nrow(dt_ds_hash) == nrow(G))
   
   # clean up header
   colnames(dt_ds_hash) <- phenotypes
-  dt_ds_ac <- cbind(id_simple, dt_ds_ac)
+  dt_ds_hash <- cbind(id_simple, dt_ds_hash)
 
   
   outfile = paste0(args$out_prefix, ".txt.gz")
   write(paste("Done! writing to", outfile), stdout())
-  fwrite(dt_ds_ac, outfile)
+  fwrite(dt_ds_hash, outfile)
   
 }
 

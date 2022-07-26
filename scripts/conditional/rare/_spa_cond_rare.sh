@@ -15,6 +15,10 @@ set -o nounset
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
+readonly threads=$(( ${NSLOTS}-1 ))
+readonly step2_SPAtests="utils/saige/step2_SPAtests_cond.R"
+readonly rscript="scripts/conditional/rare/_variants_with_ac.R"
+
 readonly phenotype=${1?Error: Missing arg1 (phenotype)}
 readonly in_vcf=${2?Error: Missing arg2 (in_vcf)}
 readonly in_csi=${3?Error: Missing arg3 (in_csi)}
@@ -47,10 +51,6 @@ readonly markers_ac=$(echo ${in_markers_ac} | sed -e "s/CHR/${chr}/g")
 
 echo "File: .vcf: ${vcf}"
 echo "File: .csi: ${csi} "
-
-readonly threads=$(( ${NSLOTS}-1 ))
-readonly step2_SPAtests="utils/saige/step2_SPAtests_cond.R"
-readonly rscript="scripts/conditional/rare/_variants_with_ac.R"
 
 # condiitonal markers based on rare variants
 readonly cond_chr=$(echo ${cond} | sed -e "s/CHR/${chr}/g")
