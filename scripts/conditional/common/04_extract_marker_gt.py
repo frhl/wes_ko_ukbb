@@ -89,10 +89,11 @@ def main(args):
 
     # export variants to be used for conditional analysis
     io.export_table(mt, out_prefix, "mt")
-    mt = io.import_table(out_prefix, "mt")
+    mt = io.import_table(out_prefix + ".mt", "mt")
 
     # write VCF
-    io.export_table(mt, out_prefix, out_type)
+    if out_prefix not in "mt":
+        io.export_table(mt, out_prefix, out_type)
     
     # extract indiviudal GT entries
     mt = mt.select_rows(*[mt.rsid, mt.varid])
@@ -100,9 +101,9 @@ def main(args):
 
     # get ordered table of variants included
     ht = ht.flatten()
-    ht = ht.select(*[ht.locus, ht.alleles, ht.marker, ht.csqs])
+    ht = mt.select(*[ht.locus, ht.alleles, ht.marker, ht.csqs])
     ht = ht.rename({"marker" : "rsid"})
-    ht.flatten().export(out_prefix + "_markers.txt.gz")
+    ht.flatten().export(out_prefix + "_rows.txt.gz")
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()

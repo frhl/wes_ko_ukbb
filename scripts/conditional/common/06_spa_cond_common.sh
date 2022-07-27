@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1
+#$ -t 50
 #$ -tc 10
 #$ -V
 
@@ -26,7 +26,7 @@ readonly merge_script="scripts/_spa_merge.sh"
 readonly in_prefix="ukb_eur_wes_200k"
 
 readonly cond_dir="data/conditional/common/combined"
-readonly cond_file="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_markers.txt.gz"
+readonly cond_file="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_w_common_markers.txt"
 readonly cond_cat="common" 
 
 readonly grm_dir="data/saige/grm/input"
@@ -59,7 +59,7 @@ submit_spa_with_csqs()
 
     local step1_dir="data/saige/output/${trait}/step1"
     local step2_dir="data/saige/output/${trait}/step2_common_cond/min_mac${min_mac}"
-    local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${maf}_${annotation}.vcf.bgz"
+    local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${maf}_${annotation}_w_common.vcf.bgz"
     mkdir -p ${step2_dir}
 
     local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
@@ -135,11 +135,11 @@ submit_merge_job()
 }
 
 # parameters
-readonly use_prs="0"
+readonly use_prs="1"
 readonly min_mac=4
-readonly tasks=12 #1-22
+readonly tasks=6 #1-22
 readonly queue="short.qa"
-readonly nslots=2
+readonly nslots=1
 
 
 
@@ -147,8 +147,8 @@ readonly nslots=2
 maf="maf0to5e-2"
 
 # cts traits
-submit_spa_cts_with_csqs "pLoF_damaging_missense"
-#submit_spa_binary_with_csqs "pLoF_damaging_missense"
+#submit_spa_cts_with_csqs "pLoF_damaging_missense"
+submit_spa_binary_with_csqs "pLoF_damaging_missense"
 
 #sleep 10
 #submit_spa_cts_with_csqs "pLoF"

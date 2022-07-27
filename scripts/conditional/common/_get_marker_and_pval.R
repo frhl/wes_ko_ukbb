@@ -30,7 +30,8 @@ main <- function(args){
   d <- d[,colnames(d) %in% keep_cols, with = FALSE]
   marker <- apply( d[ ,c("CHR", "POS", "Allele1", "Allele2") ] , 1 , paste , collapse = ":" )
   pvalue <- d[[col_pvalue]]
-  dnew <- data.table(MARKER=marker, PVAL=pvalue)
+  rsid <- d$MarkerID
+  dnew <- data.table(MARKER=marker, PVAL=pvalue, RSID=rsid)
 
   # combine tables ensureing that marker/pvalue is first and second column
   d <- cbind(dnew, d)
@@ -47,10 +48,6 @@ main <- function(args){
   # sort by most significant at BOTTOM (tail)
   d <- d[rev(order(d$PVAL)), ]
 
-  #write("Example head and tail (n=2):", stdout())
-  #print(head(d, n = 2))
-  #print(tail(d, n = 2))
-  # write file
   write(paste("Writing", args$out_file), stderr())
   fwrite(d, args$out_file, sep = "\t", col.names = FALSE)
 

@@ -9,7 +9,7 @@
 #$ -P lindgren.prjc
 #$ -q short.qc
 #$ -pe shmem 3
-#$ -t 12-14
+#$ -t 1-18
 #$ -V
 
 source utils/vcf_utils.sh
@@ -22,22 +22,22 @@ readonly hail_script="scripts/conditional/common/05_append_vcf_common.py"
 readonly chr="${SGE_TASK_ID}"
 
 readonly ko_dir="data/knockouts/alt"
-readonly common_dir="data/conditional/common/marker_mt"
+readonly common_dir="data/conditional/common/markers_with_gt"
 readonly out_dir="data/conditional/common/combined"
 
 readonly ko_path_wo_ext="${ko_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense"
-readonly common_path_wo_ext="${common_dir}/conditional_markers_chrundefined"
+readonly common_path_wo_ext="${common_dir}/markers_sig_cond"
 
 readonly ko_path_mt="${ko_path_wo_ext}.mt"
 readonly ko_path_vcf="${ko_path_wo_ext}.vcf.bgz"
 readonly common_path_mt="${common_path_wo_ext}.mt"
 readonly common_path_vcf="${common_path_wo_ext}.vcf.bgz"
 
-readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense"
+readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense_w_common"
 readonly out_markers="${out_prefix}_markers.txt"
 readonly out_markers_sorted="${out_prefix}_markers_sorted.txt"
 
-readonly markers_common="${common_dir}/conditional_markers_chrundefined_markers.txt.gz"
+readonly markers_common="${common_dir}/common_conditional.markers"
 
 readonly ko_type="mt"
 readonly common_type="mt"
@@ -46,14 +46,13 @@ readonly out="${out_prefix}.vcf.bgz"
 
 mkdir -p ${out_dir}
 
-# create new marker file (common markers + rare markers)
-if [ ! -f "${out_markers}.gz" ]; then
-  zcat ${markers_common} | grep -v locus | grep chr${chr} > ${out_markers}
-  gzip ${out_markers}
+# create file that contains all the markers
+if [ ! -f "${out_markers}" ]; then
+  cat ${markers_common} | grep chr${chr} > ${out_markers}
 fi
 
 # count markers in each file
-readonly n_common_markers=$(zcat "${out_markers}.gz" | grep chr${chr} | wc -l )
+readonly n_common_markers=$(cat "${out_markers}" | grep chr${chr} | wc -l )
 echo "Note: ${n_common_markers} common markers found."
 
 # symlink file if no common markers exist.

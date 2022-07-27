@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 #
+# Note: we assume that all phenotypes have common markers present, i.e.
+# there is no need to subset to non-monomorphic markers in a phenotype
+# dependent manner (see scripts/conditional/rare/_spa_cond_rare.sh).
 #
 #$ -N _spa_cond_rare
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -15,6 +18,10 @@ set -o nounset
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
+readonly threads=$(( ${NSLOTS}-1 ))
+readonly step2_SPAtests="utils/saige/step2_SPAtests_cond.R"
+readonly read_markers="scripts/conditional/utils/_read_markers.R"
+
 readonly phenotype=${1?Error: Missing arg1 (phenotype)}
 readonly in_vcf=${2?Error: Missing arg2 (in_vcf)}
 readonly in_csi=${3?Error: Missing arg3 (in_csi)}
@@ -24,17 +31,12 @@ readonly grm_mtx=${6?Error: Missing arg6 (grm_mtx)}
 readonly grm_sam=${7?Error: Missing arg7 (grm_sam)}
 readonly min_mac=${8?Error: Missing arg8 (min_mac)} 
 readonly out_prefix=${9?Error: Missing arg10 (out_prefix)}
-readonly cond="${10}"
+readonly cond_markers="${10}"
 readonly cond_cat="${11}"
 readonly chr=${SGE_TASK_ID}
 
-
-# chromosome specified at in_gmat and in_var
-# when off chromosome PRS will beused
 readonly gmat=$(echo ${in_gmat} | sed -e "s/CHR/${chr}/g")
 readonly var=$(echo ${in_var} | sed -e "s/CHR/${chr}/g")
-
->&2 echo "${gmat} and ${var} with ${phenotype}"
 
 readonly var_bytes=$( file_size ${var} )
 readonly gmat_bytes=$( file_size ${gmat} )
@@ -43,29 +45,25 @@ readonly vcf=$(echo ${in_vcf} | sed -e "s/CHR/${chr}/g")
 readonly csi=$(echo ${in_csi} | sed -e "s/CHR/${chr}/g")
 readonly out=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
 
-readonly threads=$(( ${NSLOTS}-1 ))
-readonly step2_SPAtests="utils/saige/step2_SPAtests_cond.R"
-readonly rscript="scripts/conditional/rare/_variants_with_ac.R"
+readonly out_markers="${out_prefix/CHR/${chr}}.markers"
+readonly cond_markers_chr=$(echo ${cond_markers} | sed -e "s/CHR/${chr}/g") 
+  l
+check_for_markers() {
+  # Note: This function assumed
+  local infile=${1?Error: Missing arg1 (infile)}
 
-# condiitonal markers based on rare variants
-readonly cond_chr=$(echo ${cond} | sed -e "s/CHR/${chr}/g")
->&2 echo ${cond_chr}
->&2 echo ${cond_cat}
+  local markers_raw=$(cat ${infile} | awk -v m="${phenotype}" '$5 == m' | cut -f2)
+  if [ ! -z "${markers_raw}" ]; then 
+    local markers_sorted=$( Rscript ${order_markers} --markers ${markers_raw})
+    echo ${markers_sorted} > ${markers_file}
+  fi
 
-# subset first by consequence
-readonly markers_raw=$(zcat ${cond_chr} | grep -E "${cond_cat}" | cut -f3)
-readonly markers_n=$(zcat ${cond_chr} | grep -E "${cond_cat}" | wc -l)
-readonly markers_file="${out_prefix/CHR/${chr}}.markers"
-echo ${markers_raw} > "${markers_file}"
+}
 
-# we assume that all phenotypes have common markers present, i.e.
-# there is no need to subset to non-monomorphic markers in a phenotype
-# dependent manner (see scripts/conditional/rare/_spa_cond_rare.sh).
 
 spa_test() {
-  echo "var_bytes=${var_bytes} at ${var}"
-  echo "gmat_bytes=${gmat_bytes} at ${gmat}"
-  if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then 
+  
+    if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then 
     SECONDS=0
     Rscript "${step2_SPAtests}"	\
        --vcfFile=${vcf} \
@@ -80,7 +78,7 @@ spa_test() {
        --varianceRatioFile=${var} \
        --SAIGEOutputFile=${out} \
        --LOCO=FALSE \
-       --condition_file "${markers_file}" \
+       ${markers_sorted:+--condition_file "${markers_file}"} \
        && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
        || raise_error "Saddle-point approximation for chr${chr} failed"
   else

@@ -1,30 +1,30 @@
 #!/usr/bin/env bash
 #
-#$ -N spa_conditional
+#$ -N spa_common_iter
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/spa_conditional.log
-#$ -e logs/spa_conditional.errors.log
+#$ -o logs/spa_common_iter.log
+#$ -e logs/spa_common_iter.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 50
+#$ -t 1-80
 #$ -V
 
 set -o errexit
 set -o nounset
 
-readonly bash_script="scripts/conditional/common/_spa_conditional.sh"
+readonly bash_script="scripts/conditional/common/_spa_common_iter.sh"
 
 
 # parameters
-readonly min_mac=4
+readonly min_mac=10
 readonly max_iter=10
 readonly P_cutoff="5e-6"
 
 # directories and paths
 readonly pheno_dir="data/phenotypes"
 readonly interval_dir="data/conditional/common/intervals/min_mac${min_mac}"
-readonly out_dir="data/conditional/common/spa_iter/new_run_tuesday"
+readonly out_dir="data/conditional/common/spa_iter/new_run_thursday"
 readonly grm_dir="data/saige/grm/input"
 readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"

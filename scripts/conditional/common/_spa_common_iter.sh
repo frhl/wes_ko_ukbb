@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
 #
-#$ -N _spa_conditional
+#$ -N _spa_common_iter
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_spa_conditional.log
-#$ -e logs/_spa_conditional.errors.log
+#$ -o logs/_spa_common_iter.log
+#$ -e logs/_spa_common_iter.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q lindgren.qe
@@ -25,12 +25,14 @@ readonly grm_mtx=${8?Error: Missing arg8 (grm_mtx)}
 readonly grm_sam=${9?Error: Missing arg9 (grm_sam)}
 readonly phenotype=${10?Error: Missing arg9 (grm_sam)}
 
+readonly variant_category="common"
+
 readonly csi="${vcf}.csi"
 readonly step2_SPAtests="utils/saige/step2_SPAtests.R"
 readonly shell_spa="scripts/conditional/common/_chr_spa.sh"
 readonly rscript="scripts/conditional/common/03_spa_conditional.R"
 readonly helper="scripts/conditional/common/_get_marker_and_pval.R"
-readonly order_markers="scripts/conditional/common/_order_markers.R"
+readonly order_markers="scripts/conditional/utils/_order_markers.R"
 
 # A function to extract all the (unique) chromsomes
 extract_chr_from_vcf() {
@@ -127,6 +129,7 @@ conditional_analysis() {
       Rscript "${helper}" --spa_file "${out_mrg}" --p_cutoff "${P_cutoff}"  --out_file "${out_r}"
       local current_p=$( tail -n1 "${out_r}" | cut -f2 )
       local current_marker=$( tail -n1 "${out_r}" | cut -f1 )
+      local current_rsid=$( tail -n1 "${out-r}" | cut -f3)
 
       if [ ! -z "${current_marker}" ]; then
         if [ "${current_marker}" != "${old_marker}" ]; then
@@ -146,10 +149,7 @@ conditional_analysis() {
        >&2 echo "[i${i}]: No markers found at P-value<${P_cutoff}. Loop ended with markers '${marker_list}' for ${phenotype}."
        break
       fi
-      # clean up
-      #rm -f "${out_prefix_iter}_chr"*
-      #rm -f ${out_mrg}
-    echo -e "${i}\t${current_marker}\t${current_p}\t${P_cutoff}\t${phenotype}\t${marker_list}" >> ${final_markers}
+    echo -e "${i}\t${current_marker}\t${current_rsid}\t${variant_category}\t${current_p}\t${P_cutoff}\t${phenotype}\t${marker_list}" >> ${final_markers}
   done
 }
 
@@ -161,6 +161,7 @@ conditional_analysis() {
 readonly CHROMS=$(extract_chr_from_vcf ${vcf}) 
 readonly final_markers="${out_prefix}.markers"
 rm -f ${final_markers}
+echo -e "#iteration\tmarker\trsid\tcategory\tpvalue\tp_cutoff\tphenotype\tcondlist" >> ${final_markers}
 
 # setup saige
 module purge
