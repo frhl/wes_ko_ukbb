@@ -21,5 +21,6 @@ Collate:
     'get_expected_p.R'
     'get_int.R'
     'get_rint.R'
+    'order_markers.R'
     'residualize_trait.R'
     'residualize_trait_by_sex.R'
