@@ -20,7 +20,7 @@ order_markers <- function(x, rm.dup = TRUE) {
     if (rm.dup){
       dups <- duplicated(d)
       d <- d[!dups,]
-      if (sum(dups) > 0) warning("Some markers are duplicated. These have been discarded.")
+      if (sum(dups) > 0) warning("Some markers are duplicated. These have been discarded. Change with 'rm.dup'")
     }
  
     # format out vector
