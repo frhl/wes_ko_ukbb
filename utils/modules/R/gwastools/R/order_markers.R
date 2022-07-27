@@ -1,6 +1,7 @@
 #' @title Order markers by position
 #' @param x vector of markers to be ordered
 #' @return a vector of oredered markers.
+#' @export
 
 order_markers <- function(x, rm.dup = TRUE) {
     
