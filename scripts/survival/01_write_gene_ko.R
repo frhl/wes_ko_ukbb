@@ -120,7 +120,9 @@ main <- function(args){
         # annotate gene 
         d_gene <- d[d$ensembl_gene_id %in% g,]
         d_gene$hgnc_symbol <-  ensg_to_hgnc[d_gene$ensembl_gene_id]
-        
+        d_gene$pKO <- as.numeric(d_gene$pKO)
+        print(head(d_gene))
+
         # lower quantile of LOEUF
         if (!is.null(args$loeuf_lower_quantile)){
             lower_quantile <- quantile(na.omit(constraints$loeuf), probs = args$loeuf_lower_quantile)
