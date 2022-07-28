@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N aggr_knockouts_by_loeuf
+#$ -N write_gene_ko
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/aggr_knockouts_by_loeuf.log
-#$ -e logs/aggr_knockouts_by_loeuf.errors.log
+#$ -o logs/write_gene_ko.log
+#$ -e logs/write_gene_ko.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
@@ -16,7 +16,7 @@ set -o nounset
 
 source utils/bash_utils.sh
 
-readonly rscript="scripts/survival/01_aggr_knockouts_by_loeuf.R"
+readonly rscript="scripts/survival/01_write_gene_ko.R"
 
 readonly in_pattern="pLoF_damaging_missense_all.tsv.gz"
 readonly in_dir="data/knockouts/alt"
@@ -28,8 +28,6 @@ set_up_rpy
 Rscript ${rscript} \
   --in_pattern ${in_pattern} \
   --in_dir ${in_dir} \
-  --loeuf_lower_quantile 0.2 \
-  --loeuf_upper_quantile 0.8 \
   --out_dir ${out_dir}
 
 
