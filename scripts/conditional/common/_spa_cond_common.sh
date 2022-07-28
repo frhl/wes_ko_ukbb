@@ -50,12 +50,17 @@ readonly cond_markers_chr=$(echo ${cond_markers} | sed -e "s/CHR/${chr}/g")
 spa_test() {
 
   # generate a list of conditioning markers if available
-  local out_markers="${out_prefix/CHR/${chr}}.common.markers"
+  local out_markers="${out_prefix/CHR/${chr}}.markers"
   local markers=$( Rscript ${read_markers} \
     --infile ${cond_markers_chr} \
     --phenotype ${phenotype} \
     --pheno_col 5 )
-  echo ${markers} > ${out_markers}
+  if [ ! -z ${markers} ]; then
+    echo ${markers} > ${out_markers}
+  fi
+
+  #local vcf_markers="${out_prefix/CHR/${chr}}.vcf.markers"
+  #echo $(zcat ${vcf} | grep -v "$" | cut -f1-5 | awk 'BEGIN{OFS=":"} {print $1,$2,$4,$5}' ) > ${vcf_markers}
 
   if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then 
     SECONDS=0
@@ -75,7 +80,6 @@ spa_test() {
         ${markers:+--condition "${markers}"} \
        && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
        || raise_error "Saddle-point approximation for chr${chr} failed"
-       #--condition_file {out_markers} \
   else
     raise_error "${var} or ${gmat} does not contain any bytes!"
   fi
@@ -89,6 +93,5 @@ else
   >&2 echo "${out} already exists. Skipping.."
 fi 
 
-rm ${markers_file}
 
 
