@@ -137,8 +137,8 @@ submit_merge_job()
 # parameters
 readonly use_prs="1"
 readonly min_mac=4
-readonly tasks=6 #1-22
-readonly queue="short.qa"
+readonly tasks=1-22
+readonly queue="short.qc"
 readonly nslots=1
 
 

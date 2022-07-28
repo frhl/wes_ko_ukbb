@@ -50,12 +50,12 @@ readonly cond_markers_chr=$(echo ${cond_markers} | sed -e "s/CHR/${chr}/g")
 spa_test() {
 
   # generate a list of conditioning markers if available
-  local out_markers="${out_prefix/CHR/${chr}}.markers"
-  Rscript ${read_markers} \
+  local out_markers="${out_prefix/CHR/${chr}}.common.markers"
+  local markers=$( Rscript ${read_markers} \
     --infile ${cond_markers_chr} \
     --phenotype ${phenotype} \
-    --outfile ${out_markers} \
-    --pheno_col 5
+    --pheno_col 5 )
+  echo ${markers} > ${out_markers}
 
   if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then 
     SECONDS=0
@@ -72,9 +72,10 @@ spa_test() {
        --varianceRatioFile=${var} \
        --SAIGEOutputFile=${out} \
        --LOCO=FALSE \
-       --condition_file ${out_markers} \
+        ${markers:+--condition "${markers}"} \
        && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
        || raise_error "Saddle-point approximation for chr${chr} failed"
+       #--condition_file {out_markers} \
   else
     raise_error "${var} or ${gmat} does not contain any bytes!"
   fi
