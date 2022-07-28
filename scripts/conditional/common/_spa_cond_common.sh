@@ -45,25 +45,19 @@ readonly vcf=$(echo ${in_vcf} | sed -e "s/CHR/${chr}/g")
 readonly csi=$(echo ${in_csi} | sed -e "s/CHR/${chr}/g")
 readonly out=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
 
-readonly out_markers="${out_prefix/CHR/${chr}}.markers"
 readonly cond_markers_chr=$(echo ${cond_markers} | sed -e "s/CHR/${chr}/g") 
-  l
-check_for_markers() {
-  # Note: This function assumed
-  local infile=${1?Error: Missing arg1 (infile)}
-
-  local markers_raw=$(cat ${infile} | awk -v m="${phenotype}" '$5 == m' | cut -f2)
-  if [ ! -z "${markers_raw}" ]; then 
-    local markers_sorted=$( Rscript ${order_markers} --markers ${markers_raw})
-    echo ${markers_sorted} > ${markers_file}
-  fi
-
-}
-
 
 spa_test() {
-  
-    if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then 
+
+  # generate a list of conditioning markers if available
+  local out_markers="${out_prefix/CHR/${chr}}.markers"
+  Rscript ${read_markers} \
+    --infile ${cond_markers_chr} \
+    --phenotype ${phenotype} \
+    --outfile ${out_markers} \
+    --pheno_col 5
+
+  if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then 
     SECONDS=0
     Rscript "${step2_SPAtests}"	\
        --vcfFile=${vcf} \
@@ -78,7 +72,7 @@ spa_test() {
        --varianceRatioFile=${var} \
        --SAIGEOutputFile=${out} \
        --LOCO=FALSE \
-       ${markers_sorted:+--condition_file "${markers_file}"} \
+       --condition_file ${out_markers} \
        && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
        || raise_error "Saddle-point approximation for chr${chr} failed"
   else
