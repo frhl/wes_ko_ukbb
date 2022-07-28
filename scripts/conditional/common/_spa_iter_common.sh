@@ -31,7 +31,7 @@ readonly csi="${vcf}.csi"
 readonly step2_SPAtests="utils/saige/step2_SPAtests.R"
 readonly shell_spa="scripts/conditional/common/_chr_spa.sh"
 readonly rscript="scripts/conditional/common/03_spa_conditional.R"
-readonly helper="scripts/conditional/common/_get_marker_and_pval.R"
+readonly helper="scripts/conditional/common/_spa_iter_common.R"
 readonly order_markers="scripts/conditional/utils/_order_markers.R"
 
 # A function to extract all the (unique) chromsomes
@@ -127,9 +127,9 @@ conditional_analysis() {
       # format file so that the right P-value is always extracted 
       # regardless of conditional analysis being enabled or not 
       Rscript "${helper}" --spa_file "${out_mrg}" --p_cutoff "${P_cutoff}"  --out_file "${out_r}"
-      local current_p=$( tail -n1 "${out_r}" | cut -f2 )
       local current_marker=$( tail -n1 "${out_r}" | cut -f1 )
-      local current_rsid=$( tail -n1 "${out-r}" | cut -f3)
+      local current_rsid=$( tail -n1 "${out_r}" | cut -f2 )
+      local current_p=$( tail -n1 "${out_r}" | cut -f3 )
 
       if [ ! -z "${current_marker}" ]; then
         if [ "${current_marker}" != "${old_marker}" ]; then

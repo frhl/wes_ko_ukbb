@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N spa_common_iter
+#$ -N spa_iter_common
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/spa_common_iter.log
-#$ -e logs/spa_common_iter.errors.log
+#$ -o logs/spa_iter_common.log
+#$ -e logs/spa_iter_common.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
@@ -13,11 +13,11 @@
 set -o errexit
 set -o nounset
 
-readonly bash_script="scripts/conditional/common/_spa_common_iter.sh"
+readonly bash_script="scripts/conditional/common/_spa_iter_common.sh"
 
 
 # parameters
-readonly min_mac=10
+readonly min_mac=4
 readonly max_iter=10
 readonly P_cutoff="5e-6"
 

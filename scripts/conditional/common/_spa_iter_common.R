@@ -3,6 +3,10 @@
 library(argparse)
 library(data.table)
 
+z_to_log10p <- function(z) {
+      abs((pnorm(-abs(z),log.p=TRUE)+log(2))/log(10))
+}
+
 main <- function(args){
 
   # read and check integratity of file
@@ -14,8 +18,14 @@ main <- function(args){
   # always use conditional P-valu column if present
   if (args$col_pvalue_cond %in% cols) {
     col_pvalue <- args$col_pvalue_cond
+    col_tstat <- "Tstat_c"
+    col_beta <- "BETA_c"
+    col_se <- "SE_c"
   } else if (args$col_pvalue %in% cols) {
     col_pvalue <- args$col_pvalue
+    col_tstat <- "Tstat"
+    col_beta <- "BETA"
+    col_se <- "SE"
   } else {
     stop(paste(args$col_pvalue,"/",args$col_pvalue_cond, "not in",args$spa_file))
   }
@@ -29,27 +39,53 @@ main <- function(args){
   # subset columns
   d <- d[,colnames(d) %in% keep_cols, with = FALSE]
   marker <- apply( d[ ,c("CHR", "POS", "Allele1", "Allele2") ] , 1 , paste , collapse = ":" )
-  pvalue <- d[[col_pvalue]]
   rsid <- d$MarkerID
-  dnew <- data.table(MARKER=marker, PVAL=pvalue, RSID=rsid)
+  pvalue <- d[[col_pvalue]]
+  tstat <- d[[col_tstat]]
+  zstat <- d[[col_beta]] / d[[col_se]]
+  logp <- z_to_log10p(zstat) 
+  p <- 2 * pnorm(abs(zstat), lower.tail = FALSE)
 
-  # combine tables ensureing that marker/pvalue is first and second column
+  # setup new data.table with columns
+  dnew <- data.table(
+    cur_marker=marker,  
+    cur_rsid=rsid, 
+    cur_pvalue=pvalue, 
+    cur_tstat=tstat, 
+    cur_zstat=zstat,
+    cur_log10p=logp,
+    cur_zstat_p=p
+  )
+
+  # keep original
   d <- cbind(dnew, d)
-
-  min_p <- min(d$PVAL)
-  msg <- paste("Lowest P-value detected was:", min_p, "using column", col_pvalue)
-  write(msg, stderr())
 
   # perform rows based on markers that pass thresholds
   p_cutoff <- as.numeric(args$p_cutoff)
-  bool <- d$PVAL < p_cutoff
+  bool <- d$cur_pvalue < p_cutoff
   d <- d[bool, ]
-    
-  # sort by most significant at BOTTOM (tail)
-  d <- d[rev(order(d$PVAL)), ]
+  
+  # check for any INF estimates
+  bool_inf <- is.infinite(d$cur_zstat)
+  n_inf <- sum(bool_inf)
+  d <- d[!bool_inf, ]
+  msg <- paste(n_inf, "rows are have infinite beta/SEs, these have been discarded.")
+  if (n_inf > 0) write(msg, stderr())
+
+  # sort by most significant at bottom. Note that we are sorting by t-stats
+  # since floating point precision is not good enough for SAIGE to do extreme P-values
+  #d <- d[rev(order(abs(d$pvalue))), ]
+  #d <- d[order(abs(d$cur_tstat)), ]
+  d <- d[order(abs(d$cur_zstat)), ]
+  #d <- d[order(abs(d$cur_log10p)), ]
+
+  d_subset <- tail(d, 1)
+  msg <- paste("Lowest P-value/log10(p-value)/tstat detected was:", d_subset$cur_pvalue,"/", d_subset$cur_log10p ,"/", d_subset$cur_tstat)
+  write(msg, stderr())
+
 
   write(paste("Writing", args$out_file), stderr())
-  fwrite(d, args$out_file, sep = "\t", col.names = FALSE)
+  fwrite(d, args$out_file, sep = "\t", col.names = TRUE)
 
 }
 

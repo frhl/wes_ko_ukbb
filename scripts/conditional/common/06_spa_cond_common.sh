@@ -7,8 +7,8 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 50
-#$ -tc 10
+#$ -t 1-80
+#$ -tc 2
 #$ -V
 
 set -o errexit
@@ -22,7 +22,7 @@ readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
 
 readonly spa_script="scripts/conditional/common/_spa_cond_common.sh"
-readonly merge_script="scripts/conditional/common/_spa_cond_merge.sh"
+readonly merge_script="scripts/_spa_merge.sh"
 readonly in_prefix="ukb_eur_wes_200k"
 
 readonly cond_dir="data/conditional/common/combined"
@@ -83,7 +83,7 @@ submit_spa_with_csqs()
     if [ ! -f "${out_mrg}" ]; then
       local qsub_spa_name="spa_${phenotype}_${annotation}"
       local qsub_merge_name="_mrg_${phenotype}_${annotation}"
-      #submit_spa_job
+      submit_spa_job
       submit_merge_job
     else
       >&2 echo "Phenotype ${phenotype} with annotation ${annotation} already exists! Skipping.." 
@@ -100,7 +100,6 @@ submit_spa_job() {
   qsub -N "${qsub_spa_name}" \
     -t ${tasks} \
     -q "${queue}" \
-    -tc 11 \
     -pe shmem ${nslots} \
     "${spa_script}" \
     "${phenotype}" \
