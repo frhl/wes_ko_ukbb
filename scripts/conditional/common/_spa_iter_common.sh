@@ -161,7 +161,6 @@ conditional_analysis() {
 readonly CHROMS=$(extract_chr_from_vcf ${vcf}) 
 readonly final_markers="${out_prefix}.markers"
 rm -f ${final_markers}
-echo -e "#iteration\tmarker\trsid\tcategory\tpvalue\tp_cutoff\tphenotype\tcondlist" >> ${final_markers}
 
 # setup saige
 module purge

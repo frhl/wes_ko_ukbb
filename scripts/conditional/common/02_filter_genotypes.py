@@ -21,6 +21,10 @@ def main(args):
     min_maf = float(args.min_maf)
     missing = float(args.missing)
     padding = int(float(args.padding))
+    min_maf_by_case_control = args.min_maf_by_case_control
+    phenotypes = args.phenotypes
+    phenotype = args.phenotype
+    trait = args.trait 
 
     reference_genome = 'GRCh38'
     hail_init.hail_bmrc_init_local(
@@ -28,6 +32,23 @@ def main(args):
         reference_genome)
     hl._set_flags(no_whole_stage_codegen='1')
 
+    # Import phenotypes for MAF thresholding
+    if phenotype and phenotypes and min_maf_by_case_control and trait in "binary":
+        print("reading phenotypes...")
+        ht = hl.import_table(phenotypes,
+                     types={'eid': hl.tstr},
+                     missing=["",'""',"NA"],
+                     impute=True,
+                     force=True,
+                     key='eid')
+        cases = ht.aggregate(hl.agg.sum(ht[phenotype] == 1))
+        controls = ht.aggregate(hl.agg.sum(ht[phenotype] == 0))
+        min_maf = hl.max(0.01, 25/(2 * hl.min([cases, controls]))).collect()[0]
+        print("Setting new min_maf>={min_maf} for {phenotype}")
+    else:
+        raise ValueError("param 'phenotypes' is not set! ")
+
+    # import table of start/end contigs
     ht = hl.import_table(
         gene_table,
         force=True,
@@ -128,9 +149,6 @@ def main(args):
     hail_intervals = ht.intervals.collect()
     mt = hl.filter_intervals(mt, hail_intervals)
 
-    mt.describe()
-    print(mt.describe())
-
     # add variant IDs
     mt = mt.annotate_rows(
                 varid = hl.delimit(
@@ -154,6 +172,10 @@ if __name__ == '__main__':
     parser.add_argument('--min_info', default=0.8, help='What info threshold should be used?')
     parser.add_argument('--missing', default=0.1, help='What info threshold should be used?')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset (plink format)')
+    parser.add_argument('--phenotype', default=None, help='Actual phenotpe for min_maf thresholding')
+    parser.add_argument('--phenotypes', default=None, help='Path to phenotypes for min_maf thresholding')
+    parser.add_argument('--min_maf_by_case_control', default=None, action="store_true", help='Should min_maf be set by case-control ratio?')
+    parser.add_argument('--trait', default=None, help='What is the trait?')
     args = parser.parse_args()
 
     main(args)

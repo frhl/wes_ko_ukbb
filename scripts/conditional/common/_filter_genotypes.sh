@@ -21,6 +21,9 @@ readonly out_prefix=${3?Error: Missing arg3 (out prefix)}
 readonly padding=${4?Error: Missing arg4 (padding to add upstream/downstream of gens)}
 readonly min_maf=${5?Error: Missing arg5 (Filter variants by min MAF)}
 readonly min_info=${6?Error: Missing arg1 (Filter variants by min INFO)}
+readonly pheno_file=${7?Error: Missing arg7 (pheno_file)}
+readonly trait=${8?Error: Missing arg8 (trait)}
+readonly phenotype=${9?Error: Missing arg9 (phenotype)}
 
 readonly spark_dir="data/tmp/spark"
 readonly hail_script="scripts/conditional/common/02_filter_genotypes.py"
@@ -35,8 +38,12 @@ filter_genotypes()
        --gene_table ${gene_table} \
        --extract ${final_sample_list} \
        --out_prefix ${out_prefix} \
+       --phenotypes ${pheno_file} \
+       --phenotype ${phenotype} \
+       --trait ${trait} \
+       --min_maf_by_case_control \
        && print_update "Finished filtering imputed genotypes ${out_prefix}" ${SECONDS} \
-       || raise_error "Filtering impyted genotypes for for ${out_prefix} failed!"
+       || raise_error "Filtering imputed genotypes for for ${out_prefix} failed!"
   else
     >%2 echo "${out_prefix}.vcf.bgz already exists. Skipping.."
   fi
