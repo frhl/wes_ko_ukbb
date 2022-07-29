@@ -29,8 +29,9 @@ main <- function(args){
     stopifnot(dir.exists(dirname(args$out_prefix)))
 
     # read in VCF
-    cmd <- paste0("zcat ", args$in_vcf, " | grep -v '##' "  )
-    d <- fread(cmd = cmd)
+    #cmd <- paste0("zcat ", args$in_vcf, " | grep -v '##' "  )
+    #d <- fread(cmd = cmd)
+    d <- fread(args$in_vcf)
 
     # get columns with genotypes / metaid
     genotype_cols <- suppressWarnings(!is.na(as.numeric(colnames(d))))

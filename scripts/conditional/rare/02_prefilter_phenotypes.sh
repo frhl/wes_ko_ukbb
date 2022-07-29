@@ -6,7 +6,7 @@
 #$ -e logs/prefilter_phenotypes.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q test.qc
+#$ -q short.qc
 #$ -t 21
 #$ -tc 10
 #$ -V
@@ -28,6 +28,8 @@ readonly out_dir="data/conditional/rare/combined"
 readonly pheno_cts_path="${pheno_dir}/curated_covar_phenotypes_cts_200k.tsv"
 
 readonly in_vcf="${in_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense.vcf.bgz"
+readonly tmp_vcf="${in_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense.txt"
+readonly tmp_vcf_gz="${tmp_vcf}.gz"
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense_ld"
 readonly out_mrg="${out_dir}/ukb_eur_wes_200k_maf0to5e-2_pLoF_damaging_missense_ld"
 readonly covar_path="${pheno_dir}/covars1.csv"
@@ -36,6 +38,17 @@ readonly phenotypes_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
 readonly phenotypes_bin="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
 
 mkdir -p ${out_dir}
+
+# need to generate temporary uncompressed VCF
+# otherwise, fread will have to read chunks from 
+# zcat which is ineffecient (?)
+if [ ! -f "${tmp_vcf_gz}" ]; then
+  >&2 echo "checking $in_vcf"
+  zcat "${in_vcf}" | grep -v "##" > ${tmp_vcf}
+  echo -e "\n" >> ${tmp_vcf}
+  gzip ${tmp_vcf}
+  rm -f ${tmp_vcf}
+fi
 
 submit_binary(){
   local trait="binary"
@@ -60,7 +73,7 @@ submit_qc_job() {
       "${pheno_list}" \
       "${pheno_file}" \
       "${covar_path}" \
-      "${in_vcf}" \
+      "${tmp_vcf_gz}" \
       "${out_prefix}"
   
   # submit merge job
@@ -70,14 +83,15 @@ submit_qc_job() {
     -hold_jid "${qsub_main}" \
     "${merge_script}" \
     "${out_prefix}" \
+    "${tmp_vcf_gz}" \
     "${out_mrg}"
 }
 
 
 
-readonly tasks=1-80
-readonly queue="short.qc"
-readonly nslots=2
+readonly tasks=1-2
+readonly queue="short.qe"
+readonly nslots=3
 submit_binary
 
 
