@@ -62,7 +62,7 @@ Rscript "${rscript}" \
   --path_markers "${cond_markers_chr}" \
   --path_ac_by_phenotypes "${markers_ac}" \
   --outfile "${markers_pheno_file}" \
-  --min_mac 3
+  --min_mac 4
 
 spa_test() {
   echo "var_bytes=${var_bytes} at ${var}"
