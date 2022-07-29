@@ -17,7 +17,7 @@ source utils/hail_utils.sh
 
 readonly threads=$(( ${NSLOTS}-1 ))
 readonly step2_SPAtests="utils/saige/step2_SPAtests_cond.R"
-readonly rscript="scripts/conditional/rare/_variants_with_ac.R"
+readonly rscript="scripts/conditional/rare/_spa_cond_rare.R"
 
 readonly phenotype=${1?Error: Missing arg1 (phenotype)}
 readonly in_vcf=${2?Error: Missing arg2 (in_vcf)}
@@ -29,10 +29,9 @@ readonly grm_sam=${7?Error: Missing arg7 (grm_sam)}
 readonly min_mac=${8?Error: Missing arg8 (min_mac)} 
 readonly in_markers_ac=${9?Error: Missing arg9 (markers_ac)} 
 readonly out_prefix=${10?Error: Missing arg10 (out_prefix)}
-readonly cond="${11}"
-readonly cond_cat="${12}"
+readonly cond_markers="${11}"
+readonly cond_annotation="${12}"
 readonly chr=${SGE_TASK_ID}
-
 
 # chromosome specified at in_gmat and in_var
 # when off chromosome PRS will beused
@@ -52,26 +51,18 @@ readonly markers_ac=$(echo ${in_markers_ac} | sed -e "s/CHR/${chr}/g")
 echo "File: .vcf: ${vcf}"
 echo "File: .csi: ${csi} "
 
-# condiitonal markers based on rare variants
-readonly cond_chr=$(echo ${cond} | sed -e "s/CHR/${chr}/g")
-#>&2 echo ${cond_chr}
-#>&2 echo ${cond_cat}
-
-# subset first by consequence
-readonly markers_raw=$(zcat ${cond_chr} | grep -E "${cond_cat}" | cut -f3)
-readonly markers_n=$(zcat ${cond_chr} | grep -E "${cond_cat}" | wc -l)
-readonly markers_file="${out_prefix/CHR/${chr}}.markers"
-echo ${markers_raw} > "${markers_file}"
-
-# subset by non-monomorphic markers
 set_up_rpy
+
+# subset variants to be used for conditional analysis
+readonly cond_markers_chr=$(echo ${cond_markers} | sed -e "s/CHR/${chr}/g")
 readonly markers_pheno_file="${out_prefix/CHR/${chr}}.subset.markers"
 Rscript "${rscript}" \
   --phenotype "${phenotype}" \
-  --current_marker_file "${markers_file}" \
-  --allele_count_file "${markers_ac}" \
+  --annotation "${cond_annotation}" \
+  --path_markers "${cond_markers_chr}" \
+  --path_ac_by_phenotypes "${markers_ac}" \
   --outfile "${markers_pheno_file}" \
-  --allele_count_threshold 3
+  --min_mac 3
 
 spa_test() {
   echo "var_bytes=${var_bytes} at ${var}"
@@ -108,6 +99,5 @@ else
   >&2 echo "${out} already exists. Skipping.."
 fi 
 
-#rm ${markers_file}
 
 

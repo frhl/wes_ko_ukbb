@@ -32,8 +32,8 @@ readonly cond_dir="data/conditional/rare/combined"
 readonly cond="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_markers.txt.gz"
 # path to file with allele count by phenotype (need to avoid conditioning on monomorphic SNPs)
 readonly markers_ac="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_AC.txt.gz"
-# regex for conditional category to use
-readonly cond_cat="(pLoF)|(damaging_missense)" 
+# category group for markers to condition on (csv)
+readonly cond_cat="pLoF,damaging_missense" 
 
 
 submit_spa_binary_with_csqs()
@@ -153,20 +153,6 @@ maf="maf0to5e-2"
 # cts traits
 #submit_spa_cts_with_csqs "pLoF_damaging_missense"
 submit_spa_binary_with_csqs "pLoF_damaging_missense"
-
-#sleep 10
-#submit_spa_cts_with_csqs "pLoF"
-#submit_spa_binary_with_csqs "pLoF"
-
-#sleep 10
-#submit_spa_cts_with_csqs "damaging_missense"
-#submit_spa_binary_with_csqs "damaging_missense"
-
-#sleep 10
-#submit_spa_cts_with_csqs "synonymous"
-#submit_spa_binary_with_csqs "synonymous"
-
-
 
 
 
