@@ -29,7 +29,7 @@ main <- function(args){
     stopifnot(dir.exists(dirname(args$out_prefix)))
 
     # read in VCF
-    cmd <- paste0("zcat ", args$in_vcf, " | grep -v '##' | head -n 500" )
+    cmd <- paste0("zcat ", args$in_vcf, " | grep -v '##' "  )
     d <- fread(cmd = cmd)
 
     # get columns with genotypes / metaid
@@ -38,7 +38,7 @@ main <- function(args){
 
     # Need to ensure that G is all numerics
     G <- d[,genotype_cols, with = FALSE]
-    G[, names(G) := lapply(.SD, as.numeric)]
+    suppressWarnings(G[, names(G) := lapply(.SD, as.numeric)])
 
     # read in phenotypes
     phenotype <- args$phenotype
