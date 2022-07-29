@@ -17,6 +17,7 @@ readonly bash_script="scripts/conditional/common/_spa_iter_common.sh"
 
 
 # parameters
+readonly min_maf=0.01
 readonly min_mac=4
 readonly max_iter=10
 readonly P_cutoff="5e-6"
@@ -24,7 +25,7 @@ readonly P_cutoff="5e-6"
 # directories and paths
 readonly pheno_dir="data/phenotypes"
 readonly interval_dir="data/conditional/common/intervals/min_mac${min_mac}"
-readonly out_dir="data/conditional/common/spa_iter/new_run_thursday"
+readonly out_dir="data/conditional/common/spa_iter/new_run_saturday_saigev1_1_1"
 readonly grm_dir="data/saige/grm/input"
 readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
@@ -61,12 +62,11 @@ submit_cond_spa()
   local interval_vcf="${interval_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}.vcf.bgz"
   local out_prefix="${out_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}_cond"
 
-
   echo "interval_vcf: $( ls -l ${interval_vcf})"
 
   mkdir -p ${out_dir}
   if [ -f "${interval_vcf}" ]; then 
-    qsub -N "_cond_${1}" \
+    qsub -N "_cond_${phenotype}" \
       -o "${out_prefix}.log" \
       -e "${out_prefix}.errors.log" \
       -q "short.qc@@short.hge" \
@@ -82,7 +82,8 @@ submit_cond_spa()
       "${min_mac}" \
       "${grm_mtx}" \
       "${grm_sam}" \
-      "${phenotype}"
+      "${phenotype}" \
+      "${min_maf}"
   else
     >&2 echo "${interval_vcf} (interval) does not exist. Exiting.."
   fi

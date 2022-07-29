@@ -23,7 +23,8 @@ readonly max_iter=${6?Error: Missing arg6 (max_iter)}
 readonly min_mac=${7?Error: Missing arg7 (min_mac)}
 readonly grm_mtx=${8?Error: Missing arg8 (grm_mtx)}
 readonly grm_sam=${9?Error: Missing arg9 (grm_sam)}
-readonly phenotype=${10?Error: Missing arg9 (grm_sam)}
+readonly phenotype=${10?Error: Missing arg10 (grm_sam)}
+readonly min_maf=${11?Error: Missing arg11 (min_maf)}
 
 readonly variant_category="common"
 
@@ -79,7 +80,7 @@ spa_chr_loop() {
            --sparseGRMFile="${grm_mtx}" \
            --sparseGRMSampleIDFile="${grm_sam}"  \
            --chrom="chr${chr}" \
-           --minMAF=0.0000001 \
+           --minMAF="${min_maf}" \
            --minMAC="${min_mac}" \
            --GMMATmodelFile="${in_gmat}" \
            --varianceRatioFile="${in_var}" \
@@ -128,8 +129,10 @@ conditional_analysis() {
       # regardless of conditional analysis being enabled or not 
       Rscript "${helper}" --spa_file "${out_mrg}" --p_cutoff "${P_cutoff}"  --out_file "${out_r}"
       local current_marker=$( tail -n1 "${out_r}" | cut -f1 )
-      local current_rsid=$( tail -n1 "${out_r}" | cut -f2 )
-      local current_p=$( tail -n1 "${out_r}" | cut -f3 )
+      local current_p=$( tail -n1 "${out_r}" | cut -f2 )
+  
+      >&2 echo "current_p=${current_p}"
+      >&2 echo "current_marker=${current_marker}"
 
       if [ ! -z "${current_marker}" ]; then
         if [ "${current_marker}" != "${old_marker}" ]; then
@@ -149,7 +152,7 @@ conditional_analysis() {
        >&2 echo "[i${i}]: No markers found at P-value<${P_cutoff}. Loop ended with markers '${marker_list}' for ${phenotype}."
        break
       fi
-    echo -e "${i}\t${current_marker}\t${current_rsid}\t${variant_category}\t${current_p}\t${P_cutoff}\t${phenotype}\t${marker_list}" >> ${final_markers}
+    echo -e "${i}\t${current_marker}\t${variant_category}\t${current_p}\t${P_cutoff}\t${phenotype}\t${marker_list}" >> ${final_markers}
   done
 }
 

@@ -38,7 +38,7 @@ filter_genotypes()
        --gene_table ${gene_table} \
        --extract ${final_sample_list} \
        --out_prefix ${out_prefix} \
-       --phenotypes ${pheno_file} \
+       --pheno_file ${pheno_file} \
        --phenotype ${phenotype} \
        --trait ${trait} \
        --min_maf_by_case_control \

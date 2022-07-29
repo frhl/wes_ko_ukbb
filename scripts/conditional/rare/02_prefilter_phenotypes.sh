@@ -89,9 +89,9 @@ submit_qc_job() {
 
 
 
-readonly tasks=1-2
-readonly queue="short.qe"
-readonly nslots=3
+readonly tasks=1-80
+readonly queue="short.qa@@short.hga"
+readonly nslots=10
 submit_binary
 
 
