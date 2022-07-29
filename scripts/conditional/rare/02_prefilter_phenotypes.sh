@@ -17,7 +17,7 @@ set -o nounset
 module purge
 source utils/bash_utils.sh
 
-readonly rscript="scripts/conditional/rare/_qc_phenotypes.sh"
+readonly rscript="scripts/conditional/rare/_prefilter_phenotypes.sh"
 readonly rcombine="scripts/conditional/rare/_combine_ac.R"
 
 readonly chr="${SGE_TASK_ID}"
@@ -55,6 +55,7 @@ submit_qc_job() {
     "${pheno_file}" \
     "${covar_path}" \
     "${in_vcf}" \
+    "${out_prefix}"
   set +x
 }
 
