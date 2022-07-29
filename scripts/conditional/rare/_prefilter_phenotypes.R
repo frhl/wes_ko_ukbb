@@ -4,6 +4,23 @@ library(argparse)
 library(data.table)
 library(digest)
 
+gsub_to_dosage <- function(gt){
+    gt <- gsub("\\|", "\\\\", gt)
+    gt <- gsub("0/1", "1", gt)
+    gt <- gsub("1/0", "1", gt)
+    gt <- gsub("0/0", "0", gt)
+    gt <- gsub("1/1", "2", gt)
+    return(gt)
+}
+
+hash_genotypes <- function(G, algo = "xxhash32"){
+    require(digest)
+    gt_string <- unlist(apply(G, 1, function(x) as.character(paste(x, collapse = '-'))))
+    dosage_string <- gsub_to_dosage(gt_string)
+    the_hash <- unlist(lapply(dosage_string, function(x) digest(x, algo=algo)))
+    return(the_hash)
+}
+
 main <- function(args){
 
     stopifnot(file.exists(args$in_vcf))
