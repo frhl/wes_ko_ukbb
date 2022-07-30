@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 21
+#$ -t 22
 #$ -V
 
 set -o errexit
@@ -26,9 +26,8 @@ readonly covar_file="${pheno_dir}/covars2.csv"
 readonly covariates=$( cat ${covar_file} )
 
 readonly chr=$( get_chr ${SGE_TASK_ID} )
-readonly in_dir="data/simulation/data"
-#readonly in_prefix="${in_dir}/ukb_eur_100k_chr${chr}.mt"
-readonly in_prefix="${in_dir}/ukb_eur_10000_samples_chr${chr}.mt"
+readonly in_dir="data/simulation/knockouts"
+readonly in_prefix="${in_dir}/ukb_eur_100k_knockout_chr${chr}.mt"
 readonly in_type="mt"
 
 readonly out_dir="data/simulation/phenotypes"
@@ -93,23 +92,25 @@ simulate_phenotypes() {
 
 readonly queue="short.qc"
 readonly nslots="2"
-readonly tasks=1-20
+readonly tasks=1-50 #-2
 readonly seed=42
 
 # simulate absence of CH effects
 simulate_phenotypes 0.00 0.00 0.00 0.01 0.01
 
 # gradually greater recessive effects (polygenic model)
-#simulate_phenotypes 0.30 0.01 0.01 1.00 1.00
-#simulate_phenotypes 0.30 0.01 0.10 1.00 1.00
-#simulate_phenotypes 0.30 0.01 0.50 1.00 1.00
-#simulate_phenotypes 0.30 0.01 1.00 1.00 1.00
-#simulate_phenotypes 0.30 0.01 10.0 1.00 1.00
-#simulate_phenotypes 0.30 0.01 20.0 1.00 1.00
-#simulate_phenotypes 0.30 0.01 40.0 1.00 1.00
-#simulate_phenotypes 0.30 0.01 100.0 1.00 1.00
-#simulate_phenotypes 0.30 0.01 500.0 1.00 1.00
-#simulate_phenotypes 0.30 0.01 1000.0 1.00 1.00
+simulate_phenotypes 0.30 0.01 0.01 1.00 1.00
+simulate_phenotypes 0.30 0.01 0.10 1.00 1.00
+simulate_phenotypes 0.30 0.01 0.50 1.00 1.00
+simulate_phenotypes 0.30 0.01 1.00 1.00 1.00
+ssimulate_phenotypes 0.30 0.01 2.00 1.00 1.00
+simulate_phenotypes 0.30 0.01 3.00 1.00 1.00
+simulate_phenotypes 0.30 0.01 5.00 1.00 1.00
+simulate_phenotypes 0.30 0.01 10.0 1.00 1.00
+simulate_phenotypes 0.30 0.01 20.0 1.00 1.00
+simulate_phenotypes 0.30 0.01 40.0 1.00 1.00
+simulate_phenotypes 0.30 0.01 100.0 1.00 1.00
+simulate_phenotypes 0.30 0.01 500.0 1.00 1.00
 
 
 

@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 21
+#$ -t 20-22
 #$ -tc 10
 #$ -V
 
@@ -64,18 +64,20 @@ submit_qc_job() {
   local qsub_main="_pref_c${chr}_${trait}"
   local qsub_mrg="_mrg_c${chr}"
   
-  # submit mains script
-  qsub -N "${qsub_main}" \
-      -t ${tasks} \
-      -q "${queue}" \
-      -pe shmem ${nslots} \
-      "${rscript}" \
-      "${pheno_list}" \
-      "${pheno_file}" \
-      "${covar_path}" \
-      "${tmp_vcf_gz}" \
-      "${out_prefix}"
-  
+  if [ ! -f "${out_mrg}_AC.txt.gz" ]; then
+    # submit mains script
+    qsub -N "${qsub_main}" \
+        -t ${tasks} \
+        -q "${queue}" \
+        -pe shmem ${nslots} \
+        "${rscript}" \
+        "${pheno_list}" \
+        "${pheno_file}" \
+        "${covar_path}" \
+        "${tmp_vcf_gz}" \
+        "${out_prefix}"
+  fi
+
   # submit merge job
   qsub -N "${qsub_mrg}" \
     -q short.qc@@short.hge \

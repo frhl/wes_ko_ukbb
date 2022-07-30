@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 1
+#$ -t 1-20
 #$ -tc 1
 #$ -V
 
@@ -56,10 +56,11 @@ fit_binary_traits() {
 
 fit_cts_traits() {
   local trait_type="quantitative"
-  local inv_normalize="TRUE"
+  local inv_normalize="FALSE"
   local out_dir="data/saige/output/cts/step1"
   local pheno_list="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
-  local phenotype=$( sed "${index}q;d" ${pheno_list} )
+  local phenotype_in=$( sed "${index}q;d" ${pheno_list} )
+  local phenotype="${phenotype_in}_int" # hack to add inverse norm transformed
   local out="${out_dir}/${out_prefix}_${phenotype}"
   pheno_file="${pheno_dir}/filtered_covar_phenotypes_cts.tsv.gz"
 

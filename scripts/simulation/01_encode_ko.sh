@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 3
 #$ -q short.qa
-#$ -t 21
+#$ -t 20-22
 #$ -V
 
 source utils/qsub_utils.sh
@@ -19,12 +19,13 @@ readonly spark_dir="data/tmp/spark_dir"
 
 readonly chr=$( get_chr ${SGE_TASK_ID} )
 
-readonly in_dir="data/simulation/data"
-readonly in_file="${in_dir}/ukb_eur_10000_samples_chr${chr}.mt"
+readonly n_samples="100k"
+readonly in_dir="data/simulation/mt"
+readonly in_file="${in_dir}/ukb_eur_${n_samples}_chr${chr}.mt"
 readonly in_type="mt"
 
-readonly out_dir="data/simulation/knockouts"
-readonly out_prefix="${out_dir}/ukb_eur_10000_samples_knockout_chr${chr}"
+readonly out_dir="data/simulation/knockouts/new"
+readonly out_prefix="${out_dir}/ukb_eur_${n_samples}_knockout_chr${chr}"
 readonly out_type="vcf"
 
 # Allele frequency thresholds to filter on
@@ -32,7 +33,7 @@ readonly maf_min="0"
 readonly maf_max="5e-2"
 
 # Discard probabilistic encodings? I.e. unphased singletons
-readonly discard_prob_dosages="Y"
+#readonly discard_prob_dosages="Y"
 
 # What group of SNPs should be kept
 readonly in_category="pLoF,damaging_missense"
@@ -52,7 +53,7 @@ python3 "${hail_script}" \
       --maf_max ${maf_max} \
       --maf_min ${maf_min} \
       --out_prefix ${out_prefix} \
-      --out_type ${out_type}
+      --out_type ${out_type} 
 
 
 

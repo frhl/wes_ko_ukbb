@@ -141,7 +141,7 @@ submit_merge_job()
 readonly conditioning_markers=""
 readonly use_prs="1"
 readonly min_mac=4
-readonly tasks=21
+readonly tasks=1
 readonly queue="short.qe"
 readonly nslots=4
 

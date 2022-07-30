@@ -45,7 +45,7 @@ main <- function(args){
   
   # check estimates and ensure that
   # the trait is actually heritable 
-  stopifnot(pvalue < 1e-5)
+  #stopifnot(pvalue < 1e-5)
   stopifnot(!is.null(gwas)) 
 
   # load prediction file (note, that this needs to be done before loading

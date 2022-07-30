@@ -22,7 +22,9 @@ def main(args):
 
     phased = io.import_table(
             input_path=input_phased,
-            input_type=input_phased_type)
+            input_type=input_phased_type,
+            force_bgz = False
+            )
 
     unphased = io.import_table(
             input_path=input_unphased,

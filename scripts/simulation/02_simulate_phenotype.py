@@ -46,7 +46,6 @@ def main(args):
     in_type = args.in_type
     out_prefix = args.out_prefix
     seed = args.seed
-    max_maf = args.max_maf
     h2 = try_param_h2(args.h2)
     var_beta = try_param_h2(args.var_beta)
     var_theta = try_param_h2(args.var_theta)
@@ -59,49 +58,6 @@ def main(args):
     hl._set_flags(no_whole_stage_codegen='1')
     hl.set_global_seed(int(seed))
     mt = io.import_table(in_prefix, in_type)
-    
-    # filter on MAF 
-    if max_maf:
-        mt = mt.annotate_rows(MAF=variants.get_maf_expr(mt))
-        mt = mt.filter_rows(mt.MAF <= float(max_maf))
-
-    # annotate with variant consequence and collapse by gene
-    mt = mt.explode_rows(mt.consequence.vep.worst_csq_by_gene_canonical)
-    mt = mt.annotate_rows(
-        consequence_category=ko.csqs_case_builder(
-                worst_csq_expr=mt.consequence.vep.worst_csq_by_gene_canonical,
-                use_loftee=True))
-
-    # filter to variants with SD > 0 and codign variants
-    categories = ['pLoF','LC','damaging_missense']
-    mt = mt.filter_rows(hl.agg.stats(mt.GT.n_alt_alleles()).stdev>0)
-    mt = mt.filter_rows(hl.literal(set(categories)).contains(mt.consequence_category))
-
-    # collapse to gene level
-    gene_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
-    mt = ko.aggr_phase_count_by_expr(mt, gene_expr)
-
-    # annotate knockout type
-    expr_pko = ko.calc_prob_ko(mt.hom_alt_n, mt.phased, mt.unphased)
-    expr_ko = ko.annotate_knockout(mt.hom_alt_n, expr_pko)
-    mt = mt.annotate_entries(
-        pKO=expr_pko, 
-        knockout=expr_ko
-    )   
-
-    # What haplotypes are affected?
-    mt = mt.annotate_entries(
-        H1 = 1*((mt.phased.a1 > 0) | (mt.hom_alt_n > 0)),
-        H2 = 1*((mt.phased.a2 > 0) | (mt.hom_alt_n > 0)),
-    )
-
-    # combine into single dosage (G) matrix 
-    mt = mt.annotate_entries(G=hl.int32(mt.H1+mt.H2))
-    mt = mt.annotate_rows(**{'stats': hl.agg.stats(mt.G)})
-    mt = mt.filter_rows(mt.stats.stdev > 0)
-    mt = mt.annotate_entries(
-        G_norm=(mt.G-mt.stats.mean)/mt.stats.stdev
-    )
     
     print("h2:", str(h2))
     print("var_beta:", str(var_beta))
@@ -170,7 +126,6 @@ if __name__=='__main__':
     parser.add_argument('--pi_beta', default=0, help='Probability of variant being causal in coding region')
     parser.add_argument('--pi_theta', default=0, help='Probability of variant being causal in non-coding region')
     parser.add_argument('--K', default=0, help='Prevalence of phenotype: cases / (cases + controls)')
-    parser.add_argument('--max_maf', default=None, help='Maximum minor allele frequency')
     parser.add_argument('--seed', default=None, help='seed for random simulations')
     parser.add_argument('--in_prefix', default=None, help='Path prefix for input dataset')
     parser.add_argument('--in_type', default=None, help='Either "mt", "vcf" or "plink"')
