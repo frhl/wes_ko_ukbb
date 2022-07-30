@@ -176,13 +176,11 @@ if (opt$condition_file != ""){
     print(opt$condition_file)
     stopifnot(file.exists(opt$condition_file))
     markers <- read.table(opt$condition_file, header = FALSE)
-    
-    #markers <- readLines(opt$condition_file)
-    #markers <- gsub(" ", ",", markers)
-    
-    # need to append them since saige does a split based on comma
-    markers <- paste0(markers[,1], collapse = ",")
-    print(head(markers))
+    arr_markers <- markers[,1]
+    n_markers <- length(arr_markers)
+    msg <- paste0("Debug: ", n_markers, " markers were read.")
+    write(msg, stderr())
+    markers <- paste0(arr_markers, collapse = ",")
     opt$condition <- markers
 }
 
