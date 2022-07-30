@@ -30,8 +30,8 @@ readonly pheno_cts_path="${pheno_dir}/curated_covar_phenotypes_cts_200k.tsv"
 readonly in_vcf="${in_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense.vcf.bgz"
 readonly tmp_vcf="${in_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense.txt"
 readonly tmp_vcf_gz="${tmp_vcf}.gz"
-readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense_ld"
-readonly out_mrg="${out_dir}/ukb_eur_wes_200k_maf0to5e-2_pLoF_damaging_missense_ld"
+readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense_info"
+readonly out_mrg="${out_dir}/ukb_eur_wes_200k_maf0to5e-2_pLoF_damaging_missense_info"
 readonly covar_path="${pheno_dir}/covars1.csv"
 
 readonly phenotypes_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
@@ -83,7 +83,6 @@ submit_qc_job() {
     -hold_jid "${qsub_main}" \
     "${merge_script}" \
     "${out_prefix}" \
-    "${tmp_vcf_gz}" \
     "${out_mrg}"
 }
 

@@ -156,7 +156,13 @@ def main(args):
         cases = mt.aggregate_cols(hl.agg.sum(mt.pheno[phenotype] == 1))
         controls = mt.aggregate_cols(hl.agg.sum(mt.pheno[phenotype] == 0)) 
         min_maf = hl.max(0.01, 25/(2 * hl.min([cases, controls]))).collect()[0]
-        print("Setting new min_maf>={min_maf} for {phenotype}")
+        
+        # write to outfile
+        outfile = out_prefix + "_min_maf.tsv"
+        with open(outfile, "w") as outfile:
+            line = ("%s\t%d\t%d\t%f" % (phenotype, cases, controls, min_maf))  
+            outfile.write(line + "\n")
+
     else:
         raise ValueError("param 'phenotypes' is not set! ")
 

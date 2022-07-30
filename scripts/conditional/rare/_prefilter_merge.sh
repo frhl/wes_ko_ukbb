@@ -19,19 +19,10 @@ readonly rscript="scripts/conditional/rare/_prefilter_merge.R"
 readonly in_prefix=${1?Error: Missing arg1 (in_prefix)}
 readonly out_prefix=${2?Error: Missing arg2 (out_prefix)}
 
-if [ -f "${in_prefix}.txt.gz" ]; then
-  set_up_rpy
-  set -x
-  Rscript "${rscript}" \
-   --in_vcf ${in_vcf} \
-   --out_prefix ${out_prefix_pheno} \
-   --phenotype ${phenotype} \
-   --pheno_file ${pheno_file} \
-   --covariates ${covar_path}
-  set +x
-else
-  >&2 echo "${out_prefix}.txt.gz already exists. Skipping."
-fi
+set_up_rpy
+Rscript "${rscript}" \
+ --in_prefix ${in_prefix} \
+ --out_prefix ${out_prefix} 
 
 
 
