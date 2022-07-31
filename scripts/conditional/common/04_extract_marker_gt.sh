@@ -24,12 +24,12 @@ readonly hail_script="scripts/conditional/common/04_extract_marker_gt.py"
 readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
 
 readonly chr="${SGE_TASK_ID}"
-readonly out_dir="data/conditional/common/markers_with_gt"
+readonly out_dir="data/conditional/common/markers_with_gt/final"
 readonly out_prefix="${out_dir}/common_conditional"
 readonly out_checkpoint="${out_prefix}_checkpoint.mt"
 readonly out_type="vcf"
 
-readonly markers_dir="data/conditional/common/spa_iter/new_run_tuesday"
+readonly markers_dir="data/conditional/common/spa_iter/final"
 readonly markers=$(cat ${markers_dir}/*.markers | cut -f2 | sort -u | tr "\n" ",")
 readonly chroms=$(cat ${markers_dir}/*.markers | sed '/^[[:space:]]*$/d' | cut -d":" -f1)
 

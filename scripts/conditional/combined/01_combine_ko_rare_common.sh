@@ -9,7 +9,7 @@
 #$ -P lindgren.prjc
 #$ -q short.qc
 #$ -pe shmem 3
-#$ -t 1-22
+#$ -t 1
 #$ -V
 
 
@@ -22,30 +22,29 @@ source utils/bash_utils.sh
 source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/conditional/brute_force/01_combine_ko_rare_common.py"
+readonly hail_script="scripts/conditional/combined/01_combine_ko_rare_common.py"
 
 readonly chr="${SGE_TASK_ID}"
 readonly variants_dir="data/mt/annotated"
 
 # note: assuming ko and rare variants have already been merged
 readonly ko_rare_dir="data/conditional/rare/combined"
-readonly common_dir="data/conditional/common/marker_mt"
-readonly out_dir="data/conditional/brute_force"
+readonly common_dir="data/conditional/common/markers_with_gt"
+readonly out_dir="data/conditional/combined"
 
 readonly ko_rare_path_wo_ext="${ko_rare_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense"
-readonly common_path_wo_ext="${common_dir}/conditional_markers_chrundefined"
+readonly common_path_wo_ext="${common_dir}/common_conditional"
 
 readonly ko_rare_path_mt="${ko_rare_path_wo_ext}.mt"
 readonly ko_rare_path_vcf="${ko_rare_path_wo_ext}.vcf.bgz"
 readonly common_path_mt="${common_path_wo_ext}.mt"
 readonly common_path_vcf="${common_path_wo_ext}.vcf.bgz"
+readonly markers_common="${common_path_wo_ext}.markers"
+
+# one file of rare markers for each chromosome
+readonly markers_rare="${ko_rare_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense_markers.txt.gz"
 
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense"
-readonly out_markers="${out_prefix}_markers.txt"
-readonly out_markers_sorted="${out_prefix}_markers_sorted.txt"
-
-readonly markers_rare="${ko_rare_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense_markers.txt.gz"
-readonly markers_common="${common_dir}/conditional_markers_chrundefined_markers.txt.gz"
 
 readonly ko_rare_type="mt"
 readonly common_type="mt"
@@ -54,27 +53,23 @@ readonly out="${out_prefix}.vcf.bgz"
 
 mkdir -p ${out_dir}
 
-# create new marker file (common markers + rare markers)
-if [ ! -f "${out_markers}.gz" ]; then
-  zcat $markers_rare | head -n1 > ${out_markers}
-  zcat $markers_common $markers_rare | grep -v locus | grep chr${chr} >> ${out_markers}
-  gzip ${out_markers}
-fi
+# A function to extract all the (unique) chromsomes
+extract_chr_from_vcf() {
+  >&2 echo "Extracting chromsomes from VCF ${1}.."
+  module load BCFtools/1.12-GCC-10.3.0
+  local string=$(bcftools query -f '%CHROM\n' ${1} | sort | uniq)
+  echo ${string}
+}
 
-# count markers in each file
-readonly n_common_markers=$(zcat ${markers_common} | grep chr${chr} | wc -l )
-readonly n_rare_markers=$(zcat ${markers_rare} | grep chr${chr} | wc -l )
+# check if the a common chromosome is here, only returning exact match
+# note to self: need to ensure that this is converted into a bash array
+readonly chr_common=$(extract_chr_from_vcf ${common_path_vcf})
+readonly chr_common_present=$(echo ${chr_common} | grep -ow "chr${chr}" | wc -l)
 
-# if no common markers exists, just copy the previous vcf
-# note: we assume that rare markers always exists.
-if [ "${n_common_markers}" -eq "0" ]; then
-  >&2 echo "Note: No common markers. Creating symlink to rare variants vcf."
-  #ln -s "$(pwd)/${ko_rare_path_vcf}" "${out_prefix}.vcf.bgz"
-  #ln -s "$(pwd)/${ko_rare_path_vcf}.csi" "${out_prefix}.vcf.bgz.csi"
-elif [ "${n_common_markers}" -eq "0" ]; then
-  >&2 echo "Note: No rare markers. Creating symlink to common variants vcf."
-  #ln -s "$(pwd)/${common_path_vcf}" "${out_prefix}.vcf.bgz"
-  #ln -s "$(pwd)/${common_path_vcf}.csi" "${out_prefix}.vcf.bgz.csi"
+if [ "${chr_common_present}" -eq "0" ]; then
+  echo "No common markers for ${chr} in ${common_path_vcf}. Creating symlink to rare variants"
+  ln -s "$(pwd)/${ko_rare_path_vcf}" "${out_prefix}.vcf.bgz"
+  ln -s "$(pwd)/${ko_rare_path_vcf}.csi" "${out_prefix}.vcf.bgz.csi"
 else 
   if [ ! -f "${out_prefix}.vcf.bgz" ]; then
     SECONDS=0
@@ -99,13 +94,5 @@ else
   fi
 fi
 
-# SAIGE needs markers to be sorted
-if [ ! -f "${out_markers_sorted}" ]; then
-  >&2 echo "Extracting sorted markers from VCF"
-  module purge
-  module load BCFtools/1.12-GCC-10.3.0
-  bcftools query -f '%ID\t%CHROM:%POS:%REF:%ALT\n' ${out} | grep -v ENS | cut -f1 > ${out_markers_sorted}
-  gzip ${out_markers_sorted}
-fi
 
 

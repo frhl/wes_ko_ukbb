@@ -28,8 +28,8 @@ readonly spa_script="scripts/conditional/rare/_spa_cond_rare.sh"
 readonly merge_script="scripts/_spa_merge.sh"
 readonly in_prefix="ukb_eur_wes_200k"
 
-readonly cond_dir="data/conditional/rare/combined"
-readonly cond="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_markers.txt.gz"
+readonly cond_rare_dir="data/conditional/rare/combined"
+readonly cond_rare_file="${cond_rare_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_markers.txt.gz"
 # path to file with allele count by phenotype (need to avoid conditioning on monomorphic SNPs)
 readonly markers_ac="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_AC.txt.gz"
 # category group for markers to condition on (csv)
@@ -115,7 +115,7 @@ submit_spa_job() {
     "${min_mac}" \
     "${markers_ac}" \
     "${out_prefix}" \
-    "${cond}" \
+    "${cond_rare_file}" \
     "${cond_cat}"
   set +x
 }

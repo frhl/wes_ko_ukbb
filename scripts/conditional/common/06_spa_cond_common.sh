@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 #
+# Perform a conditional analysis on pre-selected common markers.
+#
 #$ -N spa_cond_common
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/spa_cond_common.log
