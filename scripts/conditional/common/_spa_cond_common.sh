@@ -20,7 +20,7 @@ source utils/hail_utils.sh
 
 readonly threads=$(( ${NSLOTS}-1 ))
 readonly step2_SPAtests="utils/saige/step2_SPAtests_cond.R"
-readonly read_markers="scripts/conditional/utils/_read_markers.R"
+readonly read_markers="scripts/conditional/common/_spa_cond_common.R"
 
 readonly phenotype=${1?Error: Missing arg1 (phenotype)}
 readonly in_vcf=${2?Error: Missing arg2 (in_vcf)}

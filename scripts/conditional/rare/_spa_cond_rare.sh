@@ -55,7 +55,7 @@ set_up_rpy
 
 # subset variants to be used for conditional analysis
 readonly cond_markers_chr=$(echo ${cond_markers} | sed -e "s/CHR/${chr}/g")
-readonly markers_pheno_file="${out_prefix/CHR/${chr}}.subset.markers"
+readonly markers_pheno_file="${out_prefix/CHR/${chr}}.rare.markers"
 Rscript "${rscript}" \
   --phenotype "${phenotype}" \
   --annotation "${cond_annotation}" \
