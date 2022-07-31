@@ -5,9 +5,9 @@
 #$ -o logs/prefilter_phenotypes.log
 #$ -e logs/prefilter_phenotypes.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 1
+#$ -pe shmem 10
 #$ -q short.qc
-#$ -t 1-22
+#$ -t 21
 #$ -tc 10
 #$ -V
 
@@ -17,8 +17,7 @@ set -o nounset
 module purge
 source utils/bash_utils.sh
 
-readonly rscript="scripts/conditional/rare/_prefilter_phenotypes.sh"
-readonly merge_script="scripts/conditional/rare/_prefilter_merge.sh"
+readonly rscript="scripts/conditional/rare/02_prefilter_phenotypes.R"
 
 readonly chr="${SGE_TASK_ID}"
 readonly pheno_dir="data/phenotypes"
@@ -30,8 +29,8 @@ readonly pheno_cts_path="${pheno_dir}/curated_covar_phenotypes_cts_200k.tsv"
 readonly in_vcf="${in_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense.vcf.bgz"
 readonly tmp_vcf="${in_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense.txt"
 readonly tmp_vcf_gz="${tmp_vcf}.gz"
-readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense_info"
-readonly out_mrg="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense_info"
+readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense_test"
+readonly out_mrg="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense_test"
 readonly covar_path="${pheno_dir}/covars1.csv"
 
 readonly phenotypes_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
@@ -63,36 +62,18 @@ submit_qc_job() {
   local trait=${3}
   local qsub_main="_pref_c${chr}_${trait}"
   local qsub_mrg="_mrg_c${chr}"
-  
-  if [ ! -f "${out_mrg}_AC.txt.gz" ]; then
-    # submit mains script
-    qsub -N "${qsub_main}" \
-        -t ${tasks} \
-        -q "${queue}" \
-        -pe shmem ${nslots} \
-        "${rscript}" \
-        "${pheno_list}" \
-        "${pheno_file}" \
-        "${covar_path}" \
-        "${tmp_vcf_gz}" \
-        "${out_prefix}"
-  fi
+  local pheno_list_csv=$(cat ${pheno_list} | tr "\n" ",")
 
-  # submit merge job
-  qsub -N "${qsub_mrg}" \
-    -q short.qc@@short.hge \
-    -pe shmem 1 \
-    -hold_jid "${qsub_main}" \
-    "${merge_script}" \
-    "${out_prefix}" \
-    "${out_mrg}"
+  set_up_rpy
+  Rscript "${rscript}" \
+    --phenotypes ${pheno_list_csv} \
+    --pheno_file ${pheno_file} \
+    --in_vcf ${tmp_vcf_gz} \
+    --covariates ${covar_path} \
+    --out_prefix ${out_prefix}
+
 }
 
-
-
-readonly tasks=1-80
-readonly queue="short.qa@@short.hga"
-readonly nslots=10
 submit_binary
 
 
