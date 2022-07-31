@@ -5,9 +5,9 @@
 #$ -o logs/prefilter_phenotypes.log
 #$ -e logs/prefilter_phenotypes.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 10
+#$ -pe shmem 20
 #$ -q short.qc
-#$ -t 21
+#$ -t 1-22
 #$ -tc 10
 #$ -V
 
@@ -29,8 +29,8 @@ readonly pheno_cts_path="${pheno_dir}/curated_covar_phenotypes_cts_200k.tsv"
 readonly in_vcf="${in_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense.vcf.bgz"
 readonly tmp_vcf="${in_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense.txt"
 readonly tmp_vcf_gz="${tmp_vcf}.gz"
-readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense_test"
-readonly out_mrg="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense_test"
+readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense"
+readonly out_mrg="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense"
 readonly covar_path="${pheno_dir}/covars1.csv"
 
 readonly phenotypes_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
@@ -72,6 +72,7 @@ submit_qc_job() {
     --covariates ${covar_path} \
     --out_prefix ${out_prefix}
 
+  rm -f ${tmp_vcf_gz}
 }
 
 submit_binary
