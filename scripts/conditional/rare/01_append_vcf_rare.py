@@ -68,7 +68,6 @@ def main(args):
     ht = ht.select('rsid', 'consequence_category')
     ht.flatten().export(out_prefix + "_markers.txt.gz")
 
-
     # annotate dosage
     mt = mt.drop("GT")
 

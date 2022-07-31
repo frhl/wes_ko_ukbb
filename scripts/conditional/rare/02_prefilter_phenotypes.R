@@ -27,95 +27,124 @@ main <- function(args){
     stopifnot(file.exists(args$pheno_file))
     stopifnot(file.exists(args$covariates))
     stopifnot(dir.exists(dirname(args$out_prefix)))
-
-    # read in VCF
-    #cmd <- paste0("zcat ", args$in_vcf, " | grep -v '##' "  )
-    #d <- fread(cmd = cmd)
-    d <- fread(args$in_vcf)
-
-    # get columns with genotypes / metaid
-    genotype_cols <- suppressWarnings(!is.na(as.numeric(colnames(d))))
-    id_cols <- suppressWarnings(is.na(as.numeric(colnames(d))))
     
-    # setup main data.table from which we will append stuff to
-    id <- d[,id_cols, with = FALSE]
-    out <- data.table(
-          chr = id$`#CHROM`, 
-          pos = id$POS, 
-          id = id$ID, 
-          ref = id$REF,
-          alt = id$ALT
-      )
-
-    # copy root markers
-    out_ac <- out
-    out_hash <- out
-
-    # Need to ensure that G is all numerics
-    G <- d[,genotype_cols, with = FALSE]
-    suppressWarnings(G[, names(G) := lapply(.SD, as.numeric)])
-
     # read pheno file
     main_pheno_df <- fread(args$pheno_file)
-    
-    # read in phenotypes
-    phenotypes <- unlist(strsplit(args$phenotypes, split = ","))
-    phenotypes <- gsub(" ", "", phenotypes)
-    phenotypes <- phenotypes[phenotypes %in% colnames(main_pheno_df)]
+ 
+    # read header one time
+    header_cmd <- cmd <- paste0("zcat ", args$in_vcf, " | grep '#CHR' ")
+    header <- fread(cmd = header_cmd, header = FALSE)
+    header <- as.character(t(header)[,1])
+
+    # create chunks for analysis
+    lines <- as.numeric(args$vcf_lines)
+    lines_per_chunk <- as.numeric(args$lines_per_chunk)
+    chunks <- ceiling(lines / lines_per_chunk)
+
+    # starting chunk
+    idx_start <- 1
+    idx_end <- lines_per_chunk
+   
+    for (chunk in 1:chunks) {
+
+      msg <- paste("reading chunk",chunk,"of",chunks)
+      write(msg, stdout()) 
       
-    for (phenotype in phenotypes) {
-       
-      write(paste("opening",phenotype,"for", args$in_vcf), stdout())
-      pheno_df <- main_pheno_df
+      # read currentn chunk avoiding header line
+      cmd <- paste0("zcat ", args$in_vcf, " | grep -v '#' | sed '", idx_start, ",", idx_end, "!d'")
+      print(paste0("command: ", cmd))
+      d <- fread(cmd = cmd, header = FALSE)
+      colnames(d) <- header
+
+      # get columns with genotypes / metaid
+      genotype_cols <- suppressWarnings(!is.na(as.numeric(colnames(d))))
+      id_cols <- suppressWarnings(is.na(as.numeric(colnames(d))))
       
-      # are there samples with missing covariates?
-      col_cov <- unlist(strsplit(readLines(args$covariates), split = ","))
-      lst <- lapply(col_cov, function(col){row_ok <- is.na(pheno_df[[col]])})
-      missing_cov <- rowSums(do.call(cbind, lst)) > 0
-      pheno_df <- pheno_df[!missing_cov, ]
-      msg <- paste("Note: Removed", sum(missing_cov),"samples with missing covariates.")
-      write(msg, stdout())
+      # setup main data.table from which we will append stuff to
+      id <- d[,id_cols, with = FALSE]
+      out <- data.table(
+            chr = id$`#CHROM`, 
+            pos = id$POS, 
+            id = id$ID, 
+            ref = id$REF,
+            alt = id$ALT
+        )
 
-      # get defined phenotypes
-      defined_phenos <- !is.na(pheno_df[[phenotype]])
-      eid_with_defined_phenos <- pheno_df$eid[defined_phenos]
-      stopifnot(length(eid_with_defined_phenos) > 0)
+      # copy root markers
+      out_ac <- out
+      out_hash <- out
 
-      # get subset of G which contains defiend phenotypes
-      G_with_defined_phenos <- colnames(G) %in% eid_with_defined_phenos
-      G_subset <- G[,G_with_defined_phenos, with = FALSE]
+      # Need to ensure that G is all numerics
+      G <- d[,genotype_cols, with = FALSE]
+      suppressWarnings(G[, names(G) := lapply(.SD, as.numeric)])
 
-      # Get allele count and hash for genotypes
-      G_subset_AC <- rowSums(G_subset, na.rm = TRUE)
-      G_subset_hash <- hash_genotypes(G_subset, "xxhash32")
+     # read in phenotypes
+      phenotypes <- unlist(strsplit(args$phenotypes, split = ","))
+      phenotypes <- gsub(" ", "", phenotypes)
+      phenotypes <- phenotypes[phenotypes %in% colnames(main_pheno_df)]
+        
+      for (phenotype in phenotypes) {
+         
+        write(paste("opening",phenotype,"for", args$in_vcf, "at chunk", chunk), stdout())
+        pheno_df <- main_pheno_df
+        
+        # are there samples with missing covariates?
+        col_cov <- unlist(strsplit(readLines(args$covariates), split = ","))
+        lst <- lapply(col_cov, function(col){row_ok <- is.na(pheno_df[[col]])})
+        missing_cov <- rowSums(do.call(cbind, lst)) > 0
+        pheno_df <- pheno_df[!missing_cov, ]
+        msg <- paste("Note: Removed", sum(missing_cov),"samples with missing covariates.")
+        write(msg, stdout())
 
-      # generate allele count outfile
-      out_ac[[phenotype]] <- G_subset_AC
-      #lst_ac[[phenotype]] <- G_subset_AC
-      #fwrite(out, outfile_ac, sep = '\t')
+        # get defined phenotypes
+        defined_phenos <- !is.na(pheno_df[[phenotype]])
+        eid_with_defined_phenos <- pheno_df$eid[defined_phenos]
+        stopifnot(length(eid_with_defined_phenos) > 0)
 
-      # generate allele count outfile
-      #outfile_hash <- paste0(args$out_prefix,"_",phenotype,"_hash.txt.gz")
-      out_hash[[phenotype]] <- G_subset_hash
-      #lst_hash[[phenotype]] <- G_subset_hash
+        # get subset of G which contains defiend phenotypes
+        G_with_defined_phenos <- colnames(G) %in% eid_with_defined_phenos
+        G_subset <- G[,G_with_defined_phenos, with = FALSE]
+
+        # Get allele count and hash for genotypes
+        G_subset_AC <- rowSums(G_subset, na.rm = TRUE)
+        G_subset_hash <- hash_genotypes(G_subset, "xxhash32")
+
+        # generate allele count outfile
+        out_ac[[phenotype]] <- G_subset_AC
+        #lst_ac[[phenotype]] <- G_subset_AC
+        #fwrite(out, outfile_ac, sep = '\t')
+
+        # generate allele count outfile
+        #outfile_hash <- paste0(args$out_prefix,"_",phenotype,"_hash.txt.gz")
+        out_hash[[phenotype]] <- G_subset_hash
+        #lst_hash[[phenotype]] <- G_subset_hash
+
+      }
+
+      # combine files
+      out_ac <- data.table(do.call(cbind, out_ac))
+      out_hash <- data.table(do.call(cbind, out_hash))
+
+      # save to file 
+      outfile_ac <- paste0(args$out_prefix,".",chunk,"of",chunks,".AC.txt.gz")
+      outfile_hash <- paste0(args$out_prefix,".",chunk,"of",chunks,".hash.txt.gz")
+      fwrite(out_ac, outfile_ac, sep = '\t')
+      fwrite(out_hash, outfile_hash, sep = '\t')
 
     }
 
-    # combine files
-    out_ac <- data.table(do.call(cbind, out_ac))
-    out_hash <- data.table(do.call(cbind, out_hash))
-
-    # save to file 
-    outfile_ac <- paste0(args$out_prefix,"_AC.txt.gz")
-    outfile_hash <- paste0(args$out_prefix,"_hash.txt.gz")
-    fwrite(out_ac, outfile_ac, sep = '\t')
-    fwrite(out_hash, outfile_hash, sep = '\t')
+    # move to next chunks
+    idx_end <- idx_end + lines_per_chunk
+    idx_start <- idx_start + lines_per_chunk
+    print(paste(idx_start,'-',idx_end))
 
 }
 
 # add arguments
 parser <- ArgumentParser()
 parser$add_argument("--in_vcf", default=NULL, required = TRUE, help = "Path to vcf")
+parser$add_argument("--vcf_lines", default=NULL, required = TRUE, help = "Path to vcf")
+parser$add_argument("--lines_per_chunk", default=1000, help = "Path to vcf")
 parser$add_argument("--pheno_file", default=NULL, required = TRUE, help = "Path to vcf")
 parser$add_argument("--phenotypes", default=NULL, required = TRUE, help = "Path to vcf")
 parser$add_argument("--covariates", default=NULL, required = TRUE, help = "Path to vcf")
