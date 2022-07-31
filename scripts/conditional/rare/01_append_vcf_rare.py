@@ -61,6 +61,9 @@ def main(args):
         mt.alleles[0],
         mt.alleles[1]],':')
     mt = mt.annotate_rows(rsid=varid)
+    #mt = mt.annotate_rows(
+    #    INFO = 
+    #)
     ht = mt.rows()
     ht = ht.select('rsid', 'consequence_category')
     ht.flatten().export(out_prefix + "_markers.txt.gz")
