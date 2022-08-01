@@ -103,7 +103,7 @@ simulate_phenotypes 0.30 0.01 0.01 1.00 1.00
 simulate_phenotypes 0.30 0.01 0.10 1.00 1.00
 simulate_phenotypes 0.30 0.01 0.50 1.00 1.00
 simulate_phenotypes 0.30 0.01 1.00 1.00 1.00
-ssimulate_phenotypes 0.30 0.01 2.00 1.00 1.00
+simulate_phenotypes 0.30 0.01 2.00 1.00 1.00
 simulate_phenotypes 0.30 0.01 3.00 1.00 1.00
 simulate_phenotypes 0.30 0.01 5.00 1.00 1.00
 simulate_phenotypes 0.30 0.01 10.0 1.00 1.00
