@@ -5,9 +5,9 @@
 #$ -o logs/ldsc.log
 #$ -e logs/ldsc.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 4
-#$ -q short.qc
-#$ -t 1-80
+#$ -pe shmem 3
+#$ -q short.qe
+#$ -t 1-100
 #$ -V
 
 set -o errexit
@@ -19,20 +19,20 @@ source utils/qsub_utils.sh
 readonly rscript="scripts/prs/05_ldsc.R"
 
 readonly gwas_dir="data/prs/sumstat"
-readonly bed_dir="data/prs/hapmap/ld/unrel_eur_10k"
+readonly bed_dir="data/prs/hapmap/ld/unrel_kin_eur_10k"
 readonly out_dir="data/prs/ldsc"
 readonly pheno_dir="data/phenotypes"
 
 readonly ld_bed="${bed_dir}/short_merged_ukb_hapmap_rand_10k_eur.bed"
-readonly ld_dir="data/prs/hapmap/ld/matrix"
+readonly ld_dir="data/prs/hapmap/ld/matrix_unrel_kin"
 
 readonly index=${SGE_TASK_ID}
 
-readonly file_cts="${pheno_dir}/filtered_phenotypes_cts.txt"
+readonly file_cts="${pheno_dir}/curated_covar_phenotypes_cts.tsv.gz"
 readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
 readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
 
-readonly file_binary="${pheno_dir}/filtered_phenotypes_binary.txt"
+readonly file_binary="${pheno_dir}/curated_covar_phenotypes_binary.tsv.gz"
 readonly pheno_list_binary="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
 readonly phenotype_binary=$( sed "${index}q;d" ${pheno_list_binary} )
 
@@ -42,7 +42,7 @@ mkdir -p ${out_dir}
 export OPENBLAS_NUM_THREADS=1 # avoid two levels of parallelization
 
 estimate_heritability(){
-  set_up_rpy
+  set_up_ldpred2
   local phenotype="${1}" 
   local trait="${2}"
   local out_prefix="${out_dir}/ldsc_${phenotype}"
@@ -56,13 +56,15 @@ estimate_heritability(){
         --trait "${trait}" \
         --phenotype "${phenotype}" \
         --path_cts_phenotypes "${file_cts}" \
-        --out_prefix "${out_prefix}"
+        --out_prefix "${out_prefix}" \
+        --disable_qc # we have already QCed Sumstats/SNPs
     set +x
   else
     echo "Note: ${out_prefix} already exists. Skipping.."
   fi
 }
 
-estimate_heritability "${phenotype_cts}" "cts"
+
+estimate_heritability "${phenotype_cts}_int" "cts"
 estimate_heritability "${phenotype_binary}" "binary"
 

@@ -26,29 +26,32 @@ readonly index=${SGE_TASK_ID}
 
 # input arguments
 readonly chr=${1?Error: Missing arg1}
-readonly input_path_prelim=${2?Error: Missing arg2}
-readonly out_prefix_prelim=${3?Error: Missing arg3}
-readonly pheno_dir=${4?Error: Missing arg4}
-readonly genes_path=${5?Error: Missing arg5} # <- new arg
-readonly true_p_path=${6?Error: Missing arg6}
-readonly min_mac=${7?Error: Missing arg7}
-readonly replicates=${8?Error: Missing arg8}
-readonly n_shuffle=${9?Error: Missing arg9}
-readonly n_cutoff_shuffle=${10?Error: Missing arg9}
-readonly n_slots_saige=${11?Error: Missing arg10}
-readonly n_slots_permute=${12?Error: Missing arg11}
-readonly tick_interval=${13?Error: Missing arg12}
-readonly tick_timeout=${14?Error: Missing arg13}
-readonly queue_saige=${15?Error: Missing arg14}
-readonly queue_permute=${16?Error: Missing arg15}
-readonly queue_merge=${17?Error: Missing arg15}
-readonly queue_master=${18?Error: Missing arg15}
-readonly annotation=${19?Error: Missing arg17}
-readonly static_assoc=${20?Error: Missing arg18}
-readonly use_prs=${21?Error: Missing arg18}
-iteration=${22?Error: Missing arg18}
-permutation_supply=${23?Error: Missing arg18}
-top_p=${24?Error: Missing arg18}
+readonly grm_mtx=${2?Error: Missing arg6 (grm_mtx)}
+readonly grm_sam=${3?Error: Missing arg7 (grm_sam)}
+readonly input_path_prelim=${4?Error: Missing arg2}
+readonly out_prefix_prelim=${5?Error: Missing arg3}
+readonly pheno_dir=${6?Error: Missing arg4}
+readonly genes_path=${7?Error: Missing arg5} 
+readonly true_p_path=${8?Error: Missing arg6 (Path to true non-permuted P-values)}
+readonly min_mac=${9?Error: Missing arg7 (Minimum number of knockouts)}
+readonly replicates=${10?Error: Missing arg8 (Shuffles per permute submission)}
+readonly n_shuffle=${11?Error: Missing arg9 (How many shuffles of of phase should be done) }
+readonly n_cutoff_shuffle=${12?Error: Missing arg10 (maximum allowed number of shuffles)}
+readonly n_slots_saige=${13?Error: Missing arg11 (compute slots flor saige script)}
+readonly n_slots_permute=${14?Error: Missing arg12 (compute slots for permute script)}
+readonly queue_saige=${15?Error: Missing arg13 (What queue should be used for SAIGE gwas)}
+readonly queue_permute=${16?Error: Missing arg14 (What queue should be used for permute script)}
+readonly queue_merge=${17?Error: Missing arg15 (What queue should be used for merge script)}
+readonly queue_master=${18?Error: Missing arg16 (What queue should be user for master script)}
+readonly annotation=${19?Error: Missing arg17 (Consequence annotation)}
+readonly static_assoc=${20?Error: Missing arg18 (Prefix for association file)}
+readonly use_prs=${21?Error: Missing arg19 (Should PRS be used)}
+readonly cond_markers=${22?Error: Missing arg20 (List of markers to condition on)}
+readonly use_cond_common=${23?Error: Missing arg20 (List of markers to condition on)}
+readonly cond_genotypes=${24?Error: Missing arg21 (Genotypes/dosages for conditioning markers)}
+iteration=${25?Error: Missing arg22 (What is the current iteration)}
+permutation_supply=${26?Error: Missing arg23 (How many permutations have been accomplished so far)}
+top_p=${27?Error: Missing arg24 (What index of the lowest P-value should be used to determien covergence (10 or 100)}
 
 # set final paths depending on gene
 readonly gene="$(zcat ${genes_path} | grep "chr${chr}" | cut -f1 | sed ${index}'q;d' )"
@@ -109,13 +112,25 @@ set_arr_phenos() {
 
 # set array of paths to saige null models
 set_arr_saige() {
+  local in_prefix="ukb_wes_200k"
   local phenotype=${1}
   local trait=$( get_trait_from_pheno ${phenotype} )
   if [[ ( $trait == "cts" ) || ( $trait == "binary") ]]; then
     local step1_dir="data/saige/output/${trait}/step1"
-    local step2_dir="data/saige/output/set/${trait}/step2"
-    local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
-    local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
+    local step2_dir="data/saige/output/${trait}/step2"
+    local in_gmat="${step1_dir}/${in_prefix}_${phenotype}.rda"
+    local in_var="${step1_dir}/${in_prefix}_${phenotype}.varianceRatio.txt"
+    if [ "${use_prs}" -eq "1" ]; then
+      local in_gmat_prs="${step1_dir}/${in_prefix}_${phenotype}_chr${chr}.rda"
+      local in_var_prs="${step1_dir}/${in_prefix}_${phenotype}_chr${chr}.varianceRatio.txt"
+      if [ -f "${in_gmat_prs/CHR/21}" ] & [ -f "${in_var_prs/CHR/21}" ]; then
+        echo "Note: PRS files were found (${phenotype}). Using PRS NULL models as SAIGE input."
+        local in_gmat=${in_gmat_prs}
+        local in_var=${in_var_prs}
+      else
+        >&2 echo "Saige NULL (PRS) ${in_gmat_prs}/${in_var_prs} does not exist. Using without PRS."
+      fi
+    fi
     read -a arr_saige <<< "${step1_dir} ${step2_dir} ${in_gmat} ${in_var}"
   else
     raise_error "${1} is not a valid trait"
@@ -139,6 +154,8 @@ get_trait_from_pheno() {
 # been completed. Will wait for the qsub script to run before proceeding.
 submit_shuffle_phase() {
 
+  
+  permutation_supply=$( get_permutation_supply )
   local permutations_demand=${1}
   local n_tasks_required=$(( (${permutations_demand} / ${replicates}) - ${permutation_supply} ))
   local sge_seed=3
@@ -149,7 +166,7 @@ submit_shuffle_phase() {
     local tasks_lower_bound=$(( ${permutation_supply} + 1 ))
     local tasks_upper_bound=$(( ${permutation_supply} + ${n_tasks_required} ))
     local tasks_permute=${tasks_lower_bound}-${tasks_upper_bound}
-    permutation_supply=$(( ${permutation_supply} + ${n_tasks_required}))
+    #permutation_supply=$(( ${permutation_supply} + ${n_tasks_required}))
 
     local out_permute_success="${out_prefix}_${tasks_permute}"
     local out_permute_upper_bound="${out_prefix}_${tasks_upper_bound}"
@@ -170,7 +187,9 @@ submit_shuffle_phase() {
           ${out_permute_success} \
           ${sge_seed} \
           ${gene} \
-          ${replicates}
+          ${replicates} \
+          ${cond_genotypes} \
+          ${use_cond_common}
 
     else
       echo >&2 "${out_permute_upper_bound} already exists. Skipping.."
@@ -219,9 +238,13 @@ submit_saige() {
         "${out_spa_success}" \
         "${in_gmat}" \
         "${in_var}" \
+        "${grm_mtx}" \
+        "${grm_sam}" \
         "${phenotype}" \
         "${gene}" \
-        "${min_mac}"
+        "${min_mac}" \
+        "${cond_markers}" \
+        "${use_cond_common}"
     else
       echo >&2 "${out_spa_upper_bound} already exists. Skipping.."
     fi
@@ -250,6 +273,8 @@ submit_merge() {
 }
 
 submit_calc_p() {
+  # check if actual PRS is used in SAIGE
+
   echo "Calculating empirical P."
   set -x
   qsub -N "${name_calc_pheno}" \
@@ -264,6 +289,7 @@ submit_calc_p() {
     "${annotation}" \
     "${static_assoc}" \
     "${use_prs}" \
+    "${prs_available}" \
     "${path_merged}.gz" \
     "${top_p}" \
     "${true_p_path}" \
@@ -282,6 +308,8 @@ resubmit_loop() {
     -hold_jid "${name_calc_pheno}" \
     "${this_script}" \
     "${chr}" \
+    "${grm_mtx}" \
+    "${grm_sam}" \
     "${input_path}" \
     "${out_prefix}" \
     "${pheno_dir}" \
@@ -293,8 +321,6 @@ resubmit_loop() {
     "${n_cutoff_shuffle}" \
     "${n_slots_saige}" \
     "${n_slots_permute}" \
-    "${tick_interval}" \
-    "${tick_timeout}" \
     "${queue_saige}" \
     "${queue_permute}" \
     "${queue_merge}" \
@@ -302,6 +328,9 @@ resubmit_loop() {
     "${annotation}" \
     "${static_assoc}" \
     "${use_prs}" \
+    "${cond_markers}" \
+    "${use_cond_common}" \
+    "${cond_genotypes}" \
     "${iteration}" \
     "${permutation_supply}" \
     "${new_top_p}" 
@@ -328,7 +357,7 @@ check_if_all_done() {
   if [ -f ${file} ]; then
     local obs_count="$(cat ${file} | grep "OK" | cut -f2 | sort | uniq | wc -l)"
     local expt_count="$(cat ${tested_phenos} | sort | uniq | wc -l)"
-    if [ ${obs_count} -ge 1 ]; then
+    if [ "${obs_count}" -ge "1" ]; then
       if [ ${expt_count} -eq ${obs_count} ]; then
         echo "1"
       else
@@ -343,16 +372,25 @@ check_if_all_done() {
 }
 
 
+# a function that counts the number of permuted VCFs created
+get_permutation_supply() {
+  local prefix_basename="$( basename "${out_prefix}_[0-9]*.vcf.gz$" )"
+  echo "$( ls $write_dir | grep -E "${prefix_basename}" | wc -l )"
+}
+
+# A function that counts the number of SAIGE associations created
 get_saige_supply() {
-  echo "$( ls $write_dir | grep -E "${out_prefix}_${phenotype}_[0-9]*.txt.gz" | wc -l )"
+  local prefix_basename="$( basename "${out_prefix}_${phenotype}_[0-9]*.txt.gz" )"
+  echo "$( ls $write_dir | grep -E "${prefix_basename}" | wc -l )"
 }
 
 SECONDS=0
 do_extra_loop=0
 iteration=$((${iteration} + 1))
-set_arr_phenos "cts"
+set_arr_phenos "both"
 arr_phenos=( "Alanine_aminotransferase_residual" "Calcium_residual" "WHR_adj_BMI" "BMI" "Apolipoprotein_B_residual")
 #arr_phenos=( "Alanine_aminotransferase_residual" )
+#arr_phenos=( "Alanine_aminotransferase_residual" "BMI" )
 
 
 echo "Starting iteration ${iteration}"
@@ -363,6 +401,7 @@ if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then
       name_saige_pheno="_spa_${gene}_${phenotype}"
       name_merge_pheno="_mrg_${gene}_${phenotype}"
       name_calc_pheno="_p_${gene}_${phenotype}"
+      echo ${phenotype} >> ${tested_phenos}
       if [ $(check_if_done) -eq "0" ]; then
         set_arr_saige ${phenotype}
         in_gmat=${arr_saige[2]}
@@ -370,8 +409,8 @@ if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then
         if [ -f ${in_gmat} ] && [ -f ${in_var} ]; then
           gmat_bytes=$( file_size ${in_gmat} )
           var_bytes=$( file_size ${in_var} )
+          prs_available=$( echo ${in_gmat} | grep chr | wc -l)
           if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then
-            echo ${phenotype} >> ${tested_phenos}
             path_merged="${out_prefix}_${phenotype}_merged.txt"
             if [ ! -f ${path_merged} ]; then
               submit_saige ${n_shuffle}
@@ -384,12 +423,12 @@ if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then
       fi
     done
   fi
-  if [ ${do_extra_loop} -eq "1" ]; then
+  if [ "${do_extra_loop}" -eq "1" ]; then
     new_top_p=100
     new_n_shuffle=$(( ${n_shuffle} * 10 ))
     resubmit_loop
   else
-    echo "Done! Finished all inputted phenotypes."
+    echo "Done! Finished all (selected) phenotypes."
   fi
 else
   touch ${file_cutoff}

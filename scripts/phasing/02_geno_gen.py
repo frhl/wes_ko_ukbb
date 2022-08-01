@@ -33,7 +33,8 @@ def main(args):
 
     hail_init.hail_bmrc_init_local('logs/hail/01_geno_gen.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
-    
+    print("Current Chrom:" + str(chrom))
+
     if dataset in "imp":
         mt = genotypes.get_ukb_imputed_v3_bgen(chroms=[chrom])
         if min_info:
@@ -54,6 +55,7 @@ def main(args):
         mt = filter_to_females(mt)
     if liftover:
         mt = variants.liftover(mt, from_build='GRCh37', to_build='GRCh38', drop_annotations=True)
+        mt = mt.filter_rows(mt.locus.contig == "chr" + str(chrom))
 
     if input_path and input_type:
 

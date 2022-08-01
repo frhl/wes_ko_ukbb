@@ -5,9 +5,9 @@
 #$ -o logs/trim_chunks.log
 #$ -e logs/trim_chunks.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 5
+#$ -pe shmem 8
 #$ -q short.qe
-#$ -t 2-19
+#$ -t 23
 #$ -V
 
 set -o errexit
@@ -21,9 +21,9 @@ readonly hail_script="scripts/phasing/05_trim_chunks.py"
 readonly spark_dir="data/tmp/spark"
 
 readonly chr=$( get_chr ${SGE_TASK_ID} )
-readonly main_dir="data/phased/wes_union_calls/chunks/final"
-readonly in_dir="${main_dir}/ukb_eur_wes_union_calls_200k_chr${chr}-16xshort.qe/"
-readonly in_prefix="shapeit4_prs100000_pro25000_mprs100000"
+readonly main_dir="data/phased/wes_union_calls/chunks"
+readonly in_dir="${main_dir}/ukb_eur_wes_union_calls_200k_chr${chr}-19xshort.qe/"
+readonly in_prefix="shapeit4_prs100000_pro50000_mprs100000"
 
 readonly pedigree_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 readonly pedigree="${pedigree_dir}/ukb11867_pedigree.fam"

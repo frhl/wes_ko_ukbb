@@ -8,9 +8,8 @@
 #$ -e logs/gene_positions.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q short.qf
-#$ -t 1-44
-#$ -tc 10
+#$ -q test.qc
+#$ -t 1-80
 
 set -o errexit
 set -o nounset
@@ -53,30 +52,44 @@ submit_intervals()
   local phenotype=${2?Error: Missing arg2 (phenotype)}
   local trait=${3?Error: Missing arg3 (trait)}
   local step2_dir="data/saige/output/${trait}/step2/min_mac${min_mac}"
-  local in_file="${step2_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}.txt.gz"
-  local out_prefix="${out_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}"
+  
+  # Only use PRS if enabled and PRS file present
+  local in_file_loco="${step2_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}_locoprs.txt.gz"
+  local in_file_std="${step2_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}.txt.gz"
+  #local out_prefix_loco="${out_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}_locoprs"
+  local out_prefix_std="${out_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}"
+  if [ "${use_prs}" -eq "1" ] & [ -f "${in_file_loco}" ]; then
+    echo "Note: Using PRS results from ${phenotype}"
+    local in_file=${in_file_loco}
+  else
+    echo "Warning: No PRS for ${phenotype}. Using standard results instead."
+    local in_file=${in_file_std}
+  fi
+  local out_prefix=${out_prefix_std}
+
   if [ -f ${in_file} ]; then
-    set -x
     Rscript "${rscript}" \
       --in_spa_file "${in_file}" \
       --coordinates "${genes}" \
       --flanking_bp 0 \
-      --fdr_cutoff "0.25" \
-      --out_prefix "${out_prefix}"
-    set +x
+      --out_prefix "${out_prefix}" \
+      --phenotype "${phenotype}"
   else
     >&2 echo "${in_file} does not exist. Skipping!"
   fi
 }
 
+# Use PRS when available
+readonly use_prs=1
+
 submit_binary_intervals "pLoF_damaging_missense"
-submit_cts_intervals "pLoF_damaging_missense"
-submit_binary_intervals "pLoF"
-submit_cts_intervals "pLoF"
-submit_binary_intervals "damaging_missense"
-submit_cts_intervals "damaging_missense"
-submit_binary_intervals "synonymous"
-submit_cts_intervals "synonymous"
+#submit_cts_intervals "pLoF_damaging_missense"
+#submit_binary_intervals "pLoF"
+#submit_cts_intervals "pLoF"
+#submit_binary_intervals "damaging_missense"
+#submit_cts_intervals "damaging_missense"
+#submit_binary_intervals "synonymous"
+#submit_cts_intervals "synonymous"
 
 
 

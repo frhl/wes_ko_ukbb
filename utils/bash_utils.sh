@@ -137,7 +137,7 @@ wait_for_path() {
 
 set_up_RSAIGE() {
   module load Anaconda3/2020.07 
-  local version="${1:-1.0.7}"
+  local version="${1:-1.1.1}"
   local envs=$( conda env list | grep $version )
   local env_dir=$(echo $envs | cut -d" " -f2 )
   local env_saige="saige-v${version}"
@@ -169,6 +169,15 @@ set_up_rpy() {
   set -eu
 }
 
+set_up_ldpred2() {
+  set +eu
+  module load Anaconda3/2020.07
+  module load java/1.8.0_latest
+  source "/apps/eb/skylake/software/Anaconda3/2020.07/etc/profile.d/conda.sh"
+  conda activate bigsnpr-v1.10
+  set -eu
+}
+
 set_up_tensorflow() {
   module load Anaconda3/2020.07
   module load java/1.8.0_latest
@@ -183,4 +192,8 @@ set_up_tensorflow() {
 #  module load samtools/1.8-gcc5.4.0 # required for LOFTEE 
 #  export PERL5LIB=$PERL5LIB:/well/lindgren/flassen/software/VEP/plugins_grch38/
 #}
+
+
+
+
 

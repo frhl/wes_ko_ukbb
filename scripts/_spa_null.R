@@ -16,6 +16,23 @@ main <- function(args){
   # load PRS and phenotypes
   prs <- fread(args$prsfile)
   colnames(prs)[1] <- 'eid'
+  
+  # calculate off-chrosome PRS contribution
+  id_col <- colnames(prs)[1]
+  chroms <- colnames(prs)[-1]
+  stopifnot(length(chroms)==22)
+  lst <- lapply(chroms, function(ch){
+      dt_remove_chr <- prs[,-ch, with = FALSE]
+      off_chrom_prs <- rowSums(dt_remove_chr[,-1])
+      return(off_chrom_prs)
+  })
+
+  # create new data.frame
+  loco_prs <- data.table(do.call(cbind, lst))
+  colnames(loco_prs) <- paste0('loco_',chroms)
+  loco_prs[[id_col]] <- prs[[id_col]]
+
+  # Load phenotypes
   d <- fread(args$phenofile)
   covars <- unlist(strsplit(args$covariates, split = ","))
   
@@ -24,9 +41,10 @@ main <- function(args){
   stopifnot(args$phenotype %in% colnames(d))
   stopifnot("eid" %in% colnames(d))
   
-  # combiune files and write
+  # combine files and write
   d <- d[,c('eid',args$phenotype, covars), with = FALSE]
-  mrg <- merge(d, prs, all.x = TRUE)
+  mrg <- merge(d, loco_prs, all.x = TRUE)
+  
   fwrite(mrg, args$outfile, sep = "\t")
 
 }

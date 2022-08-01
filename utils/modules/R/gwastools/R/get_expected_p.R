@@ -1,7 +1,7 @@
 #' @title Get expected P-value based on uniform quantiles
 #' @param observed_p float for current p-values
 #' @param na.rm Should NAs be discarded?
-#' @exporti
+#' @export
 
 get_expected_p <- function(observed_p, na.rm = FALSE){
     stopifnot(is.numeric(observed_p))

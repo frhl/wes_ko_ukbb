@@ -23,19 +23,19 @@ readonly clean_script="scripts/prs/_prs_clean.sh"
 readonly aggr_script="scripts/prs/_prs_aggr.sh"
 
 readonly ldsc_dir="data/prs/ldsc"
-readonly pred_dir="data/prs/hapmap/ukb_500k"
-readonly ld_dir="data/prs/hapmap/ld/matrix"
+readonly pred_dir="data/prs/hapmap/ukb_500k/validation"
+readonly ld_dir="data/prs/hapmap/ld/matrix_unrel_kin"
 readonly pheno_dir="data/phenotypes"
 readonly out_dir="data/prs/scores/auto"
 readonly mrg_dir="data/prs/scores"
 
 readonly index=${SGE_TASK_ID}
 
-readonly file_cts="${pheno_dir}/filtered_phenotypes_cts.tsv"
+readonly file_cts="${pheno_dir}/curated_covar_phenotypes_cts.tsv.gz"
 readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
 readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
 
-readonly file_binary="${pheno_dir}/filtered_phenotypes_binary.tsv"
+readonly file_binary="${pheno_dir}/curated_covar_phenotypes_binary.tsv.gz"
 readonly pheno_list_binary="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
 readonly phenotype_binary=$( sed "${index}q;d" ${pheno_list_binary} )
 readonly impute="mean2"
@@ -55,14 +55,14 @@ submit_ldpred2()
   local qsub_aggr="_aggr_${phenotype}"
   local qsub_clean="_clean_${phenotype}"
 
-  # fit actual pgs
-  fit_pgs
-
-  # aggregate into matrix
-  aggr_pgs
-
-  # remove disk backing files
-  clean_pgs
+  if [ ! -z ${phenotype} ]; then
+    # fit actual pgs
+    fit_pgs
+    # aggregate into matrix
+    aggr_pgs
+    # remove disk backing files
+    clean_pgs
+  fi
 
 }
 
@@ -71,7 +71,7 @@ fit_pgs()
 {
   set -x
   qsub -N "${qsub_fit}" \
-    -t 1-22 \
+    -t ${tasks} \
     -q short.qc@@short.hga \
     -pe shmem "${cores}" \
     "${bash_script}" \
@@ -106,7 +106,7 @@ clean_pgs()
 {
   set -x
   qsub -N "${qsub_clean}" \
-    -t 1-22 \
+    -t ${tasks} \
     -q test.qc \
     -pe shmem 1 \
     -hold_jid_ad "_prs_${phenotype}" \
@@ -116,7 +116,7 @@ clean_pgs()
   set +x 
 }
 
-
-submit_ldpred2 "auto" "10" "${phenotype_cts}"
-submit_ldpred2 "auto" "10" "${phenotype_binary}"
+readonly tasks=1-22
+submit_ldpred2 "auto" "6" "${phenotype_cts}_int"
+submit_ldpred2 "auto" "6" "${phenotype_binary}"
 

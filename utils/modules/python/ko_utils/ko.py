@@ -247,7 +247,7 @@ def calc_prob_ko_by_count(ko_expr, phased_expr, unphased_expr):
             (phased_expr == 0) & (unphased_expr > 1), 
             (1 - 2 * (1 / 2) ** unphased_expr))
         .default(0))
-    
+
 
 
 def annotate_knockout(hom_expr, pko_expr, phased_expr = None):
@@ -275,6 +275,14 @@ def annotate_knockout(hom_expr, pko_expr, phased_expr = None):
                .when((hom_expr == 0) & (pko_expr >= 0.5),'Possible Compound heterozygote')
                .or_missing()
                 )
+
+def discard_prob_dosages(DS):
+    """remove any compound het owed to unphased
+    singletons. Will return either 0 or 2.
+    :param ds: DOSAGE float between 0 and 2. 
+    """
+    return (hl.case().when(DS == 2, 2).default(0))
+
 
 
 def normalize_by_name(mt, name):
@@ -320,6 +328,19 @@ def make_effect_size(mt, beta, pi = None):
     
     pi_temp = 1 if pi == None else pi
     return(hl.rand_bool(pi_temp)*beta)
+
+def get_gt_from_floor_ds(DS):
+    """ Take dosage and create fake GT calls. This ensures that VCFs
+    with GT annotations can be read back in via hail. Note that DS is
+    rounded down to nearest integer (0, 1, 2).
+    :param DS: Dosage (float64)
+    """
+    return (hl.case()
+     .when(hl.int(hl.floor(DS)) == 0, hl.parse_call("0/0"))
+     .when(hl.int(hl.floor(DS)) == 1, hl.parse_call("1/0"))
+     .when(hl.int(hl.floor(DS)) == 2, hl.parse_call("1/1"))
+     .default(hl.parse_call("0/0")))
+ 
 
 
 

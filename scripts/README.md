@@ -1,5 +1,20 @@
 # Compound Heterozygous pLOF pipeline
 
+
+## Overview
+
+* `scripts`: Main scripts
+* `scripts/conditional`: Identify common and rare variants for conditional analysis
+* `scripts/permute`: Permute genetic phase to empirical P-values across phentoypes
+* `scripts/phasing`: Phasing whole exome sequencing data
+* `scripts/post_hoc`: Summary of knockouts and variants
+* `scripts/prs`: Polygenic risk scores using ldpred2
+* `scripts/saige_gene`: set-based analysis with SAIGE-GENE+
+* `scripts/simulation`: Simulation of compound heterozygous effects
+* `scripts/survival`: Generate tables for surivival analysis
+
+
+## Main scripts
 | Script                            | Description                                   | Requires output from |
 | -                                 | -                                             | - |
 | `00_phenotypes.sh` | Filter phenotype table based on specific samples and sex. Count up cases and controls for binary phenotypes. Export header of phenotypes.  | N/A |
@@ -11,6 +26,8 @@
 | `06_grm.sh` | 1. Load all autosomes from ukbiobank genotype calls and subset to variants in `/well/lindgren/UKBIOBANK/DATA/QC/ukb_snp_qc.txt` with `in_Relatedness==1`.  </br> 2. Perform sample subsets based Duncan's [QCed samples](https://github.com/astheeggeggs/SAIGE_gene_munging/tree/main/QC_scripts). </br> 3. Write plink (.bed, .bim, .fam) files. </br>  4. use SAIGE to fit sparse genetic relatedness matrix.  | N/A |
 | `07_spa_null.sh` | Use SAIGE to fit a null model for each phenotype. | `00_phenotypes.sh` </br> `05_create_grm.sh` |
 | `08_spa_test.sh` | Uuse SAIGE to fit a null model for each phenotype. Note that `min_mac` should be set. Wei recommends at least 4. </br> 2. For each trait `_spa_test.sh` will be called and resulting SPA P-values and test staistic returned.  | `00_phenotypes.sh`</br>`04_knockouts.sh`</br>`05_create_grm.sh`</br>`06_spa_null.sh` |
+
+
 
 
 

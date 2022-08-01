@@ -31,6 +31,7 @@ def main(args):
     only_valid_contigs = args.only_valid_contigs
     out_prefix = args.out_prefix
     out_type = args.out_type
+    filter_to_unrelated_using_kinship_coef = args.filter_to_unrelated_using_kinship_coef
 
     hail_init.hail_bmrc_init_local('logs/hail/hail_format.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
@@ -63,18 +64,19 @@ def main(args):
         related = samples.get_ukb_is_related_using_kinship_expr(mt)
         mt = mt.filter_cols(~related) 
 
+    if filter_to_unrelated_using_kinship_coef:
+        mt = samples.filter_ukb_to_unrelated_using_kinship(mt)
+
     if ancestry:
         mt = samples.filter_ukb_to_ancestry(mt, ancestry)
 
     if random_samples:
         mt = samples.choose_col_subset(mt, int(random_samples), seed = int(random_seed))
-        print("Finished selecting random samples") 
 
     if hapmap:
         ht = hl.read_table(hapmap)
         ht = ht.key_by('locus_grch37')
         mt = mt.filter_rows(hl.is_defined(ht[mt.locus]))
-        print("Finished filter variants by hapmap SNPs")
     
     if filter_missing:
         missing = hl.agg.mean(hl.is_missing(mt.GT)) <= float(filter_missing)
@@ -82,16 +84,13 @@ def main(args):
 
     if min_maf:
         mt = mt.filter_rows(variants.get_maf_expr(mt) > float(min_maf))
-        print("Finished subsetting by MAF")
 
     if liftover:
         mt = variants.liftover(mt, from_build='GRCh37', to_build='GRCh38', drop_annotations=True)
-        print("Finished performing liftover")
 
     if dbsnp:
         ht = variants.get_dbsnp_table(version=155, build='GRCh38')
         mt = mt.annotate_rows(rsid = ht.rows()[mt.row_key].rsid)
-        print("Finished annotating with dbsnp")
 
     if only_valid_contigs:
         chroms = [f'chr{x}' for x in range(1,23)]
@@ -114,6 +113,7 @@ if __name__=='__main__':
     parser.add_argument('--liftover', default=None, action='store_true', help='perform liftover')
     parser.add_argument('--dbsnp', default=None, action='store_true', help='Annotate rsids.')
     parser.add_argument('--exclude_related', default=None, action='store_true', help='Exclude any related individuals.')
+    parser.add_argument('--filter_to_unrelated_using_kinship_coef', default=None, action='store_true', help='Exclude any related individuals.')
     parser.add_argument('--filter_missing', default=None, help='Filter to variants with lt value in genotype missingness.')
     parser.add_argument('--extract_samples', default=None, help='Subset to sample IDs in MatrixTable')
     parser.add_argument('--exclude_samples', default=None, help='Exclude sample IDs from MatrixTable')

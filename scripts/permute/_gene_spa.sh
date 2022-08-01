@@ -17,7 +17,7 @@ source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
 readonly spark_dir="data/tmp/spark"
-readonly step2_SPAtests="utils/saige/step2_SPAtests.R"
+readonly step2_SPAtests="utils/saige/step2_SPAtests_cond.R"
 
 readonly chr=${1?Error: Missing arg1 (chr)}
 readonly in_vcf=${2?Error: Missing arg2 (in_vcf)}
@@ -25,9 +25,13 @@ readonly out_gene=${3?Error: Missing arg3 (out_gene)}
 readonly out_spa_success=${4?Error: Missing arg3 (out_gene)}
 readonly in_gmat=${5?Error: Missing arg4 (in_gmat)}
 readonly in_var=${6?Error: Missing arg5 (in_var)}
-readonly phenotype=${7?Error: Missing arg6 (phenotype)}
-readonly gene=${8?Error: Missing arg7 (gene)}
-readonly min_mac=${9?Error: Missing arg9 (min_mac)}
+readonly grm_mtx=${7?Error: Missing arg6 (grm_mtx)}
+readonly grm_sam=${8?Error: Missing arg7 (grm_sam)}
+readonly phenotype=${9?Error: Missing arg6 (phenotype)}
+readonly gene=${10?Error: Missing arg7 (gene)}
+readonly min_mac=${11?Error: Missing arg9 (min_mac)}
+readonly cond_markers=${12?Error: Missing arg10 (cond_markers)}
+readonly use_cond_common=${13?Error: Missing arg11 (1 or 0 - condition on common markers?)}
 
 readonly var_bytes=$( file_size ${in_var} )
 readonly gmat_bytes=$( file_size ${in_gmat} )
@@ -36,8 +40,13 @@ readonly id=${SGE_TASK_ID}
 readonly vcf="${in_vcf}_${id}.vcf.gz"
 readonly csi="${vcf}_${id}.csi"
 readonly out_gene_task="${out_gene}_${id}.txt"
-readonly out_file_success="${out_spa_success}_${id}.SUCCESS"
-readonly out_file_failure="${out_spa_success}_${id}.FAILURE"
+
+# read in conditional markers
+if [ "${use_cond_common}" -eq "1" ]; then
+  readonly markers=$(zcat ${cond_markers} | grep chr${chr} | cut -f3 | paste -s -d ',')
+else 
+  readonly markers=""
+fi
 
 if [ ! -f ${out_gene_task} ]; then
   echo "var_bytes=${var_bytes} at ${in_var}"
@@ -50,15 +59,16 @@ if [ ! -f ${out_gene_task} ]; then
        --vcfFile=${vcf} \
        --vcfFileIndex=${csi} \
        --vcfField="DS" \
+       --sparseGRMFile=${grm_mtx} \
+       --sparseGRMSampleIDFile=${grm_sam}  \
        --chrom="chr${chr}" \
        --minMAF=0.0000001 \
        --minMAC=${min_mac} \
        --GMMATmodelFile=${in_gmat} \
        --varianceRatioFile=${in_var} \
        --SAIGEOutputFile=${out_gene_task} \
-       --LOCO=FALSE\
-       && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
-       || raise_error "Saddle-point approximation for chr${chr} failed"
+       --LOCO=FALSE \
+       ${markers:+--condition="${markers}"} 
     set +x
     rm -f "${out_gene_task}.index"
     gzip ${out_gene_task}

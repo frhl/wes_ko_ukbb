@@ -51,24 +51,38 @@ def main(args):
 
     # subset to current csqs category
     mt = mt.filter_rows(hl.literal(set(csqs_category)).contains(mt.consequence_category)) 
-    
-    # export list of variants for later conditional analysis
-    #ht = mt.rows()
-    #varid = hl.delimit([
-    #    hl.str(ht.locus.contig),
-    #    hl.str(ht.locus.position),
-    #    ht.alleles[0],
-    #    ht.alleles[1]],':')
-    #ht = ht.annotate(
-    #    varid = varid,
-    #    csqs = csqs)
-    #ht = ht.select('rsid','info','MAF', 'MAC', 'varid', 'consequence_category')
-    #ht.flatten().export(out_prefix + "_variants.txt.gz")
+
+    # filter invariant sites
+    mt = mt.annotate_entries(DS = hl.float(mt.GT.n_alt_alleles()))
+     # export list of variants for later conditional analysis
+    varid = hl.delimit([
+        hl.str(mt.locus.contig),
+        hl.str(mt.locus.position),
+        mt.alleles[0],
+        mt.alleles[1]],':')
+    mt = mt.annotate_rows(rsid=varid)
+    #mt = mt.annotate_rows(
+    #    INFO = 
+    #)
+    ht = mt.rows()
+    ht = ht.select('rsid', 'consequence_category')
+    ht.flatten().export(out_prefix + "_markers.txt.gz")
+
+    # annotate dosage
+    mt = mt.drop("GT")
 
     # load knockouts
     ko_mt = io.import_table(ko_path, ko_type, calc_info=False)
     ko_mt = tables.order_cols(ko_mt, mt)
-    final = io.rbind_matrix_tables(ko_mt, mt)
+    final = io.rbind_matrix_tables(mt, ko_mt )
+
+    # Filter out invariant sites
+    final = final.annotate_rows(stdev = hl.agg.stats(final.DS).stdev)
+    final = final.filter_rows(final.stdev > 0)
+
+    # return MatrixTable
+    if out_type not in "mt":
+        io.export_table(final, out_prefix, "mt")
     io.export_table(final, out_prefix, out_type)
 
 if __name__=='__main__':

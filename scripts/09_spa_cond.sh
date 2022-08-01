@@ -7,8 +7,8 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 23
-#$ -tc 1
+#$ -t 1-88
+#$ -tc 22
 #$ -V
 
 set -o errexit
@@ -17,20 +17,13 @@ set -o nounset
 module purge
 source utils/bash_utils.sh
 
-readonly vcf_dir="data/knockouts/alt"
+readonly vcf_dir="data/knockouts/alt/old"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
 
 readonly spa_script="scripts/_spa_test.sh"
 readonly merge_script="scripts/_spa_merge.sh"
-readonly in_prefix="ukb_eur_wes_200k_chrCHR"
-
-readonly conditioning_markers=""
-readonly min_mac=4
-readonly tasks=1-22
-readonly queue="short.qf"
-readonly nslots=1
-
+readonly in_prefix="ukb_eur_wes_200k"
 
 submit_spa_binary_with_csqs()
 {
@@ -54,14 +47,38 @@ submit_spa_with_csqs()
   local phenotype=${2?Error: Missing arg2 (phenotype)}
   local trait=${3?Error: Missing arg3 (trait)}
   if [ ! -z ${phenotype} ]; then
+
     local step1_dir="data/saige/output/${trait}/step1"
-    local step2_dir="data/saige/output/${trait}/step2/test_cols2"
-    local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
-    local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
-    local out_prefix="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}"
-    local in_vcf="${vcf_dir}/${in_prefix}_${maf}_${annotation}.vcf.bgz"
-    submit_spa_job
-    submit_merge_job
+    local step2_dir="data/saige/output/${trait}/step2/min_mac${min_mac}"
+    local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${maf}_${annotation}.vcf.bgz"
+    mkdir -p ${step2_dir}
+
+    if [ "${use_prs}" -eq "0" ]; then
+      local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
+      local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
+      local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}"
+      local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}.txt.gz"
+    else
+      local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.rda"
+      local in_var="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.varianceRatio.txt"
+      local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}_locoprs"
+      local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}_locoprs.txt.gz"
+    fi
+
+    local conditional_dir="data/conditional/rare/combined"
+    local conditional_file="${conditional_rare_file}/ukb_eur_wes_200k_chrCHR_${maf}_${annotation}_markers.txt.gz"
+    if [ ! -z "${condition_on_rare}" ]; then
+      echo "TBD"
+    fi
+
+    if [ ! -f "${out_mrg}" ]; then
+      local qsub_spa_name="spa_${phenotype}_${annotation}"
+      local qsub_merge_name="_mrg_${phenotype}_${annotation}"
+      submit_spa_job
+      submit_merge_job
+    else
+      >&2 echo "Phenotype ${phenotype} with annotation ${annotation} already exists! Skipping.." 
+    fi
   else
     >&2 echo "No phenotype at index ${SGE_TASK_ID}. Exiting.." 
   fi 
@@ -71,9 +88,10 @@ submit_spa_with_csqs()
 submit_spa_job() {
   mkdir -p ${step2_dir}
   set -x
-  qsub -N "spa_${phenotype}_${annotation}" \
+  qsub -N "${qsub_spa_name}" \
     -t ${tasks} \
     -q "${queue}" \
+    -tc 12 \
     -pe shmem ${nslots} \
     "${spa_script}" \
     "${phenotype}" \
@@ -90,30 +108,53 @@ submit_spa_job() {
 
 submit_merge_job()
 {
-  readonly remove_by_chr="Y"
+  local remove_by_chr="Y"
   set -x
-  qsub -N "_mrg_${phenotype}" \
+  qsub -N "${qsub_merge_name}" \
     -q short.qc@@short.hge \
     -pe shmem 1 \
-    -hold_jid "spa_${phenotype}_${annotation}" \
+    -hold_jid "${qsub_spa_name}" \
     "${merge_script}" \
     "${out_prefix}" \
-    "${step2_dir}" \
-    "${out_prefix}.txt.gz" \
+    "${out_mrg}" \
     "${remove_by_chr}"
   set +x
 
 }
 
 
+
+
+# parameters
+readonly condition_on="common,pLoF,damaging_missense"
+readonly use_prs="0"
+readonly min_mac=4
+readonly tasks=1-22
+readonly queue="short.qe"
+readonly nslots=1
+
+
+
 # Binary traits
 maf="maf0to5e-2"
-#submit_spa_binary_with_csqs "pLoF"
-#submit_spa_binary_with_csqs "pLoF_damaging_missense"
-#submit_spa_binary_with_csqs "synonymous"
 
 # cts traits
-#submit_spa_cts_with_csqs "pLoF_damaging_missense"
+submit_spa_cts_with_csqs "pLoF_damaging_missense"
 submit_spa_binary_with_csqs "pLoF_damaging_missense"
+
+#sleep 10
+#submit_spa_cts_with_csqs "pLoF"
+#submit_spa_binary_with_csqs "pLoF"
+
+#sleep 10
+#submit_spa_cts_with_csqs "damaging_missense"
+#submit_spa_binary_with_csqs "damaging_missense"
+
+#sleep 10
+#submit_spa_cts_with_csqs "synonymous"
+#submit_spa_binary_with_csqs "synonymous"
+
+
+
 
 

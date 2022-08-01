@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 3
 #$ -q long.qc@@long.hga
-#$ -t 21
+#$ -t 1-21
 #$ -V
 
 source utils/qsub_utils.sh
@@ -19,7 +19,7 @@ readonly spark_dir="data/tmp/spark_dir"
 readonly hap_dir="/well/lindgren/flassen/ressources/hapmap"
 
 readonly chr=$( get_chr ${SGE_TASK_ID} )
-readonly out_dir="data/prs/hapmap/ld/unrel_eur_10k"
+readonly out_dir="data/prs/hapmap/ld/unrel_kin_eur_10k"
 readonly out_prefix="${out_dir}/short_ukb_hapmap_rand_10k_eur_chr${chr}"
 readonly hap_file="${hap_dir}/weights.l2.ldscore.liftover.ht"
 
@@ -35,18 +35,19 @@ if [ ! -f "${out_prefix}.bed" ]; then
   python3 "${hail_script}" \
      --chrom "${chr}" \
      --dataset "imp" \
-     --extract_samples "${sample_list}" \
      --exclude_related \
-     --filter_missing 0.05 \
+     --filter_missing 0.01 \
      --random_samples 10000 \
+     --filter_to_unrelated_using_kinship_coef \
+     --exclude_samples "${sample_list}" \
      --write_samples \
      --hapmap "${hap_file}" \
      --min_maf 0.01 \
      --liftover \
      --dbsnp \
      --only_valid_contigs \
-     --out_prefix "${out_prefix}"
-     #--out_type "plink" 
+     --out_prefix "${out_prefix}" \
+     --out_type "plink" 
   set +x
 else
   print_update "file ${out} already exists. Skipping!"

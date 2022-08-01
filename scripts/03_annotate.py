@@ -64,6 +64,9 @@ def main(args):
                     ':')
                 )
 
+    # always produce a matrix-table 
+    if out_type not in "mt":
+        io.export_table(mt, out_prefix, "mt")
     io.export_table(mt, out_prefix, out_type)
 
 

@@ -7,14 +7,14 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 24
 #$ -q short.qc@@short.hga
-#$ -t 20
+#$ -t 21-22
 
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
 source utils/vcf_utils.sh
 
 readonly in_dir="data/unphased/wes/prefilter"
-readonly out_dir="data/phased/wes/naive/"
+readonly out_dir="data/phased/wes/naive"
 readonly ref_dir="/well/lindgren/flassen/ressources/panels/liftover_reference_panel/data/liftover"
 readonly fam_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 

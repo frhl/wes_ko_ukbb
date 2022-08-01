@@ -9,14 +9,12 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qe
-#$ -t 1
+#$ -t 23
 #$ -V
 
 set -o errexit
 set -o nounset
-module purge
 
-# Set up
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
 source utils/vcf_utils.sh
@@ -24,39 +22,43 @@ source utils/vcf_utils.sh
 readonly hail_script="scripts/phasing/04_phase_chunks.py"
 readonly phasing_script="scripts/phasing/_phase_chunks.sh"
 readonly spark_dir="data/tmp/spark"
+
+# set +eu to avoid conda err
+set +eu
 set_up_hail
 set_up_pythonpath_legacy
+set -eu
 
 # Version of chrX-specific filter to use (options: females_only, both_sexes)
 readonly chrX_filter_version="females_only"
 # Number of variants within each interval
 readonly min_interval_unit=1000
 # Default size of phasing window in terms of variant count (should be a multiple of min_interval_unit)
-readonly phasing_region_size=150000
+readonly phasing_region_size=100000
 # Minimum overlap between adjacent phasing windows
 #readonly phasing_region_overlap=$(( ${phasing_region_size}/4 ))  
 readonly phasing_region_overlap=$(( ${phasing_region_size}/2 ))  
 # Maximum size of phasing window allowed, only used at the end of a chromosome
 # Must be larger than phasing_region_size
-readonly max_phasing_region_size=200000 
+readonly max_phasing_region_size=100000
 
 readonly chr=$( get_chr ${SGE_TASK_ID} )
 
 # Cluster params
 readonly software="shapeit4" #"shapeit4" or "eagle2"
 readonly queue="short.qe"
-readonly nslots=18
+readonly nslots=19
 
 # what vcf should be phased
 readonly vcf_dir=" data/unphased/wes_union_calls"
-readonly vcf_to_phase="${vcf_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.vcf.bgz" # <--- change this back to eur!
+readonly vcf_to_phase="${vcf_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.bgz" 
 
 # fam file for calculating switch errors
 readonly pedigree_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 readonly pedigree="${pedigree_dir}/ukb11867_pedigree.fam"
 
 # Output paths
-readonly out_dir="data/phased/wes_union_calls/chunks/final_longer"
+readonly out_dir="data/phased/wes_union_calls/chunks/eagle"
 readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
 readonly out_prefix_w_job_config="${out_prefix}-${nslots}x${queue}/${software}_prs${phasing_region_size}_pro${phasing_region_overlap}_mprs${max_phasing_region_size}"
 readonly out="${out_prefix_w_job_config}.vcf.gz"
@@ -65,6 +67,8 @@ readonly out_symlink="${out_prefix}.vcf.gz"
 readonly interval_dir="${out_dir}/intervals"
 readonly interval_path="${interval_dir}/intervals_min_${min_interval_unit}_chr${chr}.tsv"
 readonly phasing_interval_flags="--chrom ${chr} --min_interval_unit ${min_interval_unit}"
+
+mkdir -p ${out_dir}
 
 if [ -z "${interval_path}" ]; then
   raise_error "Getting intervals path failed"

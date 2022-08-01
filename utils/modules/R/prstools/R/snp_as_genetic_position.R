@@ -4,6 +4,8 @@
 #' @param mapdir What directory should genetic maps (interpolated dist) be found at?
 #' @param ncores how many cores should be used during computation
 #' @return vector of genetic positions of length n
+#' @note this is a "hacked" version of florian's function that
+#' can work on the cluster.
 #' @export
 
 

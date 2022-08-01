@@ -22,7 +22,7 @@ readonly chr=$( get_chr ${SGE_TASK_ID} )
 readonly in_file="${in_dir}/ukb_wes_200k_filtered_chr${chr}.mt"
 readonly in_type="mt"
 
-readonly out_dir="data/unphased/wes_union_calls"
+readonly out_dir="data/unphased/wes_union_calls/test"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
 readonly out_type="vcf"
 
@@ -49,7 +49,7 @@ else
   print_update "file ${out} already exists. Skipping!"
 fi
 
-  module purge
+module purge
 module load BCFtools/1.12-GCC-10.3.0
 make_tabix "${out_prefix}.vcf.bgz" "tbi"
 

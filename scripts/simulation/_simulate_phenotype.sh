@@ -17,27 +17,20 @@ source utils/qsub_utils.sh
 source utils/hail_utils.sh
 source utils/bash_utils.sh
 
-readonly hail_script="scripts/simulation/01_simulate_phenotype.py"
+readonly hail_script="scripts/simulation/02_simulate_phenotype.py"
 readonly rscript="scripts/simulation/01_simulate_phenotype.R"
 readonly spark_dir="data/tmp/spark_dir"
 
 readonly in_prefix=${1?Error: Missing arg1 (phenotype)}
 readonly in_type=${2?Error: Missing arg2 (in_vcf)}
-readonly h2_nc=${3?Error: Missing arg3 ()}
-readonly h2_co=${4?Error: Missing arg3 ()}
-readonly h2_ko=${5?Error: Missing arg3 ()}
-readonly pi_nc=${6?Error: Missing arg3 ()}
-readonly pi_co=${7?Error: Missing arg3 ()}
-readonly pi_ko=${8?Error: Missing arg3 ()}
-readonly alpha=${9?Error: Missing arg3 ()}
-readonly beta=${10?Error: Missing arg3 ()}
-readonly theta=${11?Error: Missing arg3 ()}
-readonly K=${12?Error: Missing arg3 ()}
-readonly seed=${13?Error: Missing arg3 ()}
-readonly out_prefix=${14?Error: Missing arg3 ()}
-
-readonly prune_hom_alt="0.98"
-readonly max_maf="0.05"
+readonly h2=${3?Error: Missing arg3 ()}
+readonly var_beta=${4?Error: Missing arg3 ()}
+readonly var_theta=${5?Error: Missing arg3 ()}
+readonly pi_beta=${6?Error: Missing arg3 ()}
+readonly pi_theta=${7?Error: Missing arg3 ()}
+readonly K=${8?Error: Missing arg3 ()}
+readonly seed=${9?Error: Missing arg3 ()}
+readonly out_prefix=${10?Error: Missing arg3 ()}
 
 readonly out_sge_prefix="${out_prefix}_${SGE_TASK_ID}"
 readonly sge_seed=$(( ${SGE_TASK_ID} * ${seed}))
@@ -52,18 +45,12 @@ set -x
 python3 "${hail_script}" \
    --in_prefix "${in_prefix}"\
    --in_type "${in_type}" \
-   --h2_nc ${h2_nc} \
-   --h2_co ${h2_co} \
-   --h2_ko ${h2_ko} \
-   --pi_nc ${pi_nc} \
-   --pi_co ${pi_co} \
-   --pi_ko ${pi_ko} \
-   --alpha ${alpha} \
-   --beta ${beta} \
-   --theta ${theta} \
+   --h2 ${h2} \
+   --var_beta ${var_beta} \
+   --var_theta ${var_theta} \
+   --pi_beta ${pi_beta} \
+   --pi_theta ${pi_theta} \
    --K ${K} \
-   --prune_hom_alt ${prune_hom_alt} \
-   --max_maf ${max_maf} \
    --seed ${sge_seed} \
    --out_prefix "${out_sge_prefix}" \
    && print_update "Finished simulating phenotypes for ${in_prefix}" ${SECONDS} \

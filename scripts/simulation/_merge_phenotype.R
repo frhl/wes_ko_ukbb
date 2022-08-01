@@ -22,16 +22,16 @@ main <- function(args){
   dname <- dirname(args$input_path)
   files <- list.files(dname, pattern = bname, full.names = TRUE)
   if (length(files) == 0) stop(paste("no files with pattern",bname,"in directory",dname))
-  files <- files[!grepl('_genes',files)]
+  files <- files[!grepl('_entries',files)]
   files <- files[!grepl('_phenos',files)]
 
   # merge prefixes
   lst <- lapply(files, function(f){
-     id <- str_extract(basename(f),"[0-9]+.tsv.gz")
-     id <- gsub('\\.tsv\\.gz','', id)
-     d <- fread(f)
-     colnames(d)[2:ncol(d)] <- paste0(colnames(d)[2:ncol(d)],'_', id)
-     return(d)
+      id <- stringr::str_extract(basename(f),"[0-9]+_cols.tsv.gz")
+      id <- gsub('_cols\\.tsv\\.gz','', id) 
+      d <- fread(f)
+      colnames(d)[2:ncol(d)] <- paste0(colnames(d)[2:ncol(d)],'_', id)
+      return(d)
   })
 
   # combine phentypes and each prefix file

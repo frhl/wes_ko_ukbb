@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-44
+#$ -t 1-80
 #$ -tc 22
 #$ -V
 
@@ -20,6 +20,10 @@ source utils/bash_utils.sh
 readonly vcf_dir="data/knockouts/alt"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
+readonly grm_dir="data/saige/grm/input"
+
+readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+readonly grm_sam="${grm_mtx}.sampleIDs.txt"
 
 readonly spa_script="scripts/_spa_test.sh"
 readonly merge_script="scripts/_spa_merge.sh"
@@ -54,22 +58,30 @@ submit_spa_with_csqs()
     local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${maf}_${annotation}.vcf.bgz"
     mkdir -p ${step2_dir}
 
-    if [ "${use_prs}" -eq "0" ]; then
-      local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
-      local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
-      local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}"
-      local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}.txt.gz"
-    else
-      local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.rda"
-      local in_var="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.varianceRatio.txt"
-      local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}_locoprs"
-      local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}_locoprs.txt.gz"
+    local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
+    local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
+    local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}"
+    local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}.txt.gz"
+
+    if [ "${use_prs}" -eq "1" ]; then
+      local in_gmat_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.rda"
+      local in_var_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.varianceRatio.txt"
+      if [ -f "${in_gmat_prs/CHR/21}" ] & [ -f "${in_var_prs/CHR/21}" ]; then
+        local in_gmat=${in_gmat_prs}
+        local in_var=${in_var_prs}
+        local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}_locoprs"
+        local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}_locoprs.txt.gz"
+      else
+        >&2 echo "Saige NULL (PRS) ${in_gmat_prs}/${in_var_prs} does not exist. Using without PRS."
+      fi 
     fi
 
     if [ ! -f "${out_mrg}" ]; then
       local qsub_spa_name="spa_${phenotype}_${annotation}"
       local qsub_merge_name="_mrg_${phenotype}_${annotation}"
+      >&2 echo "Submitting ${qsub_spa_name}.."
       submit_spa_job
+      >&2 echo "Submitting ${qsub_merge_name}.."
       submit_merge_job
     else
       >&2 echo "Phenotype ${phenotype} with annotation ${annotation} already exists! Skipping.." 
@@ -84,16 +96,17 @@ submit_spa_job() {
   mkdir -p ${step2_dir}
   set -x
   qsub -N "${qsub_spa_name}" \
-    -t ${tasks} \
     -q "${queue}" \
-    -tc 11 \
-    -pe shmem ${nslots} \
+    -t "${tasks}" \
+    -pe shmem "${nslots}" \
     "${spa_script}" \
     "${phenotype}" \
     "${in_vcf}" \
     "${in_vcf}.csi" \
     "${in_gmat}" \
     "${in_var}" \
+    "${grm_mtx}" \
+    "${grm_sam}" \
     "${min_mac}" \
     "${out_prefix}" \
     "${conditioning_markers}"
@@ -125,18 +138,16 @@ readonly tasks=1-22
 readonly queue="short.qe"
 readonly nslots=1
 
-
-
 # Binary traits
 maf="maf0to5e-2"
 
 # cts traits
-submit_spa_cts_with_csqs "pLoF_damaging_missense"
+#submit_spa_cts_with_csqs "pLoF_damaging_missense"
 #submit_spa_binary_with_csqs "pLoF_damaging_missense"
 
 #sleep 10
-#submit_spa_cts_with_csqs "pLoF"
-#submit_spa_binary_with_csqs "pLoF"
+submit_spa_cts_with_csqs "pLoF"
+submit_spa_binary_with_csqs "pLoF"
 
 #sleep 10
 #submit_spa_cts_with_csqs "damaging_missense"

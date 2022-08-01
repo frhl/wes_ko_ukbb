@@ -44,10 +44,19 @@ main <- function(args){
     qc <- qc_sumstat_cts(ld_data$G, info_snp, sd_y, ncores = NCORES)
   }  
   
-  
+  # what SNPs should be kept?
   well_behaved_snps <- (!qc$is_bad)
-  gwas <- info_snp[well_behaved_snps, ]
+  keep_snps <- well_behaved_snps
+  if (args$disable_qc) keep_snps <- TRUE
+  gwas <- info_snp[keep_snps, ]
   gwas$marker <- get_ldpred_marker(gwas)
+
+  # get qc data.frame
+  d_qc <- data.frame(
+    well_behaved_snps = sum(well_behaved_snps), 
+    total_snps = length(well_behaved_snps),
+    disable_qc = args$disable_qc
+  )
 
   # Get LD matrix for final SNPs
   snp <- get_ld_matrix(gwas, chrs = 1:22, ld_dir = args$ld_dir, verbose = TRUE)
@@ -75,13 +84,45 @@ main <- function(args){
                    length(snp$ld), 
                    chi2 = chi2,
                    sample_size = gwas$n_eff, 
-                   blocks = NULL)
+                   blocks = 200, # if NULL, then SE's are not estimated
+                   ncores = NCORES,
+                   )
                )  
-  
+
+  # extract coeffecients
+  print(str(ldsc))
+  int_est <- ldsc[["int"]]
+  h2_est <- ldsc[["h2"]]
+  h2_se <- ldsc[["h2_se"]]
+  int_se <- ldsc[["int_se"]]
+ 
+  # calculate P-values for linear fit
+  h2_z <- h2_est / h2_se
+  int_z <- int_est / int_se
+  h2_pval <- 2 * pnorm(abs(h2_z), lower.tail = FALSE)
+  int_pval <- 2 * pnorm(abs(int_z), lower.tail = FALSE)
+  h2_log_pval <- 2 * pnorm(abs(h2_z), lower.tail = FALSE, log.p = TRUE)
+  int_log_pval <- 2 * pnorm(abs(int_z), lower.tail = FALSE, log.p = TRUE)
+
+
+  # organize in table
+  coefficients <- data.frame(
+    estimate = c(int_est, h2_est),
+    std_error = c(int_se, h2_se),
+    zstat = c(int_z, h2_z),
+    pvalue = c(int_pval, h2_pval)
+    log_pvalue = c(int_pval, h2_pval)
+  )
+
+  # rename table
+  colnames(coefficients) <- c("estimate", "std_error", "zstat", "pvalue", "log_pvalue")
+  rownames(coefficients) <- c("intercept", "h2")
+
   # what SNPS are used
   ldsc_out <- list(  
-    h2_est = ldsc[["h2"]],
-    int_est = ldsc[['int']],
+    coefficients = coefficients,
+    qc = d_qc,
+    ldsc = ldsc,
     ld_map = snp$map,
     gwas = gwas
   ) 
@@ -101,8 +142,9 @@ parser$add_argument("--trait", default=NULL, required = TRUE, help = "either 'bi
 parser$add_argument("--gwas", default=NULL, required = TRUE, help = "Path to QCed SNPs")
 parser$add_argument("--ld_bed", default=NULL, required = TRUE, help = "Path to plink file (bed) used to design LD-matrix")
 parser$add_argument("--ld_dir", default=NULL, required = TRUE, help = "Path to directory with pre-calcualted SNP correlations and LD (.rds files)")
-parser$add_argument("--phenotype", default=NULL, required = TRUE, help = "Where should the results be written?")
-parser$add_argument("--path_cts_phenotypes", default=NULL, required = TRUE, help = "Where should the results be written?")
+parser$add_argument("--phenotype", default=NULL, required = TRUE, help = "String. Current phenotype")
+parser$add_argument("--disable_qc", default = FALSE, action='store_true', required = FALSE, help = "String. Current phenotype")
+parser$add_argument("--path_cts_phenotypes", default=NULL, required = TRUE, help = "Path to cts phenotypes")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()
 

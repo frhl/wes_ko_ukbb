@@ -3,7 +3,7 @@
 import hail as hl
 
 
-def import_table(input_path, input_type, calc_info=True, cache=False):
+def import_table(input_path, input_type, calc_info=True, cache=False, force_bgz=True):
     r'''Import mt/vcf/plink tables '''
     assert input_type in ['mt','vcf','plink']
     if input_type == 'mt':
@@ -11,7 +11,7 @@ def import_table(input_path, input_type, calc_info=True, cache=False):
     elif input_type == 'vcf':
         mt = hl.import_vcf(
             input_path,
-            force_bgz=True,
+            force_bgz=force_bgz,
             array_elements_required=False)
     elif input_type == 'plink':
         mt = hl.import_plink(

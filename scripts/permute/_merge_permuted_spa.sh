@@ -39,7 +39,7 @@ aggregate_saige() {
        done
        gzip "${out_no_gz}"
        rm -f ${out}
-       echo "Aggregated ${max_tasks} files to ${out_no_gz}."
+       echo "Note: Aggregated ${max_tasks} file(s) to ${out_no_gz}."
     else
       raise_error "Need at least one task to submit merge"
     fi

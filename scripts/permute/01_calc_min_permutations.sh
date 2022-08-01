@@ -18,13 +18,13 @@ source utils/qsub_utils.sh
 readonly rscript="scripts/permute/01_calc_min_permutations.R"
 
 # set parameters
-readonly min_mac=6
+readonly min_mac=4
 readonly p_cutoff="5e-7"
 
 # directories and out paths
 readonly spa_cts_dir="data/saige/output/cts/step2/min_mac${min_mac}"
 readonly spa_bin_dir="data/saige/output/binary/step2/min_mac${min_mac}"
-readonly out_dir="data/permute/overview/min_mac${min_mac}"
+readonly out_dir="data/permute/overview/new/min_mac${min_mac}"
 readonly out_prefix="${out_dir}/overview"
 mkdir -p ${out_dir}
 
@@ -36,8 +36,7 @@ Rscript ${rscript} \
   --tsv_path ${tsv_path} \
   --spa_cts_dir ${spa_cts_dir} \
   --spa_bin_dir ${spa_bin_dir} \
-  --out_prefix ${out_prefix} \
-  --p_cutoff ${p_cutoff}
+  --out_prefix ${out_prefix}
 
 
 
