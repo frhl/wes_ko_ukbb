@@ -101,7 +101,7 @@ def main(args):
 
     # get ordered table of variants included
     ht = ht.flatten()
-    ht = mt.select(*[ht.locus, ht.alleles, ht.marker, ht.csqs])
+    ht = ht.select(*[ht.locus, ht.alleles, ht.marker, ht.csqs])
     ht = ht.rename({"marker" : "rsid"})
     ht.flatten().export(out_prefix + "_rows.txt.gz")
 
