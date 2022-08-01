@@ -28,13 +28,12 @@ readonly grm_mtx=${6?Error: Missing arg6 (grm_mtx)}
 readonly grm_sam=${7?Error: Missing arg7 (grm_sam)}
 readonly min_mac=${8?Error: Missing arg8 (min_mac)} 
 readonly in_markers_ac=${9?Error: Missing arg9 (markers_ac)} 
-readonly out_prefix=${10?Error: Missing arg10 (out_prefix)}
-readonly cond_markers="${11}"
-readonly cond_annotation="${12}"
-readonly chr=${SGE_TASK_ID}
+readonly in_markers_hash=${10?Error: Missing arg9 (markers_hash)} 
+readonly out_prefix=${11?Error: Missing arg10 (out_prefix)}
+readonly cond_markers="${12}"
+readonly cond_annotation="${13}"
 
-# chromosome specified at in_gmat and in_var
-# when off chromosome PRS will beused
+readonly chr=${SGE_TASK_ID}
 readonly gmat=$(echo ${in_gmat} | sed -e "s/CHR/${chr}/g")
 readonly var=$(echo ${in_var} | sed -e "s/CHR/${chr}/g")
 
@@ -47,6 +46,7 @@ readonly vcf=$(echo ${in_vcf} | sed -e "s/CHR/${chr}/g")
 readonly csi=$(echo ${in_csi} | sed -e "s/CHR/${chr}/g")
 readonly out=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
 readonly markers_ac=$(echo ${in_markers_ac} | sed -e "s/CHR/${chr}/g")
+readonly markers_hash=$(echo ${in_markers_hash} | sed -e "s/CHR/${chr}/g")
 
 echo "File: .vcf: ${vcf}"
 echo "File: .csi: ${csi} "
@@ -61,6 +61,7 @@ Rscript "${rscript}" \
   --annotation "${cond_annotation}" \
   --path_markers "${cond_markers_chr}" \
   --path_ac_by_phenotypes "${markers_ac}" \
+  --path_hash_by_phenotypes "${markers_hash}" \
   --outfile "${markers_pheno_file}" \
   --min_mac 4
 

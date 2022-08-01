@@ -32,6 +32,7 @@ readonly cond_rare_dir="data/conditional/rare/combined"
 readonly cond_rare_file="${cond_rare_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_markers.txt.gz"
 # path to file with allele count by phenotype (need to avoid conditioning on monomorphic SNPs)
 readonly markers_ac="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_AC.txt.gz"
+readonly markers_hash="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_hash.txt.gz"
 # category group for markers to condition on (csv)
 readonly cond_cat="pLoF,damaging_missense" 
 
@@ -114,6 +115,7 @@ submit_spa_job() {
     "${grm_sam}" \
     "${min_mac}" \
     "${markers_ac}" \
+    "${markers_hash}" \
     "${out_prefix}" \
     "${cond_rare_file}" \
     "${cond_cat}"

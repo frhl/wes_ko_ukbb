@@ -11,6 +11,7 @@ main <- function(args){
 
   stopifnot(file.exists(args$path_markers))
   stopifnot(file.exists(args$path_ac_by_phenotypes))
+  stopifnot(file.exists(args$path_hash_by_phenotypes))
 
   min_mac <- as.numeric(args$min_mac)
   d_phenos <- fread(args$path_ac_by_phenotypes)
@@ -22,6 +23,8 @@ main <- function(args){
   stopifnot("id" %in% colnames(d_phenos))
   stopifnot(min_mac >= 0)
   cols <- c("id", phenotype)
+
+  ### filter by allele count ###
 
   # perform subset
   d_phenos <- d_phenos[,cols, with = FALSE]
@@ -49,6 +52,28 @@ main <- function(args){
   )
 
   if (length(markers) == 0) stop(paste("No variants left after combining", args$path_ac_by_phenotypes, "and", args$path_markers))
+
+  ### filter by perfect LD ###
+
+  # Prune markers in perfect LD
+  d_hash <- fread(args$path_hash_by_phenotypes)
+  stopifnot("id" %in% colnames(d_hash))
+  d_hash <- d_hash[,cols, with = FALSE]
+  d_hash <- d_hash[d_hash$id %in% markers, ]
+  in_perfect_ld <- duplicated(d_hash[[phenotype]])
+  d_hash <- d_hash[!in_perfect_ld, ]
+
+  # count how many markers were affected
+  n_perfect_ld <- sum(in_perfect_ld)
+  if (n_perfect_ld > 0) write(paste("Pruned out", n_perfect_ld,"markers in perfect LD"), stdout())
+
+  # ensure that only overlapping markers are kept
+  markers <- intersect(
+        markers,
+        d_hash$id
+  )
+
+  if (length(markers) == 0) stop(paste("No variants left after combining", args$path_hash_by_phenotypes, "and", args$path_markers, "(Perfect LD pruning)"))
   
   # ensure variants follow input formatting required by saige
   markers <- gwastools::order_markers(markers)
@@ -61,6 +86,7 @@ parser <- ArgumentParser()
 parser$add_argument("--phenotype", default=NULL, required = TRUE, help = "phenotype, single string.")
 parser$add_argument("--path_markers", default=NULL, required = TRUE, help = "list of currently used variants seperated by comma")
 parser$add_argument("--path_ac_by_phenotypes", default=NULL, required = TRUE, help = "file to allele count by phenotypes")
+parser$add_argument("--path_hash_by_phenotypes", default=NULL, required = TRUE, help = "file containing dosage hashes for removing markers in perfect LD")
 parser$add_argument("--min_mac", default=1, required = FALSE, help = "Allele count threshold, greater than or equal '>='")
 parser$add_argument("--outfile", default=NULL, required = TRUE, help = "where should the subsetted markeres be written")
 parser$add_argument("--annotation", default=NULL, required = TRUE, help = "Annotations to perform subset on")

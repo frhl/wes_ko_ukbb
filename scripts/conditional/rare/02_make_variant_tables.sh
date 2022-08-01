@@ -35,7 +35,7 @@ readonly out_mrg="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging
 
 mkdir -p ${out_dir}
 
-
+# integer division with ceiling rounding
 int_div () {
   echo $(( $(( ${1} + ${2} - 1)) / ${2} ))
 }
