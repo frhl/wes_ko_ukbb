@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 #
+# condition on common markers near knockout genes that are significant 
+# in primary analysis using an iterative approach. Note, that this script
+# calls a sub script that should be in the long queue (probably due to the fact
+# that it takes >24h to condition our signal in HLA region)
+#
 #$ -N spa_iter_common
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/spa_iter_common.log
@@ -19,7 +24,7 @@ readonly bash_script="scripts/conditional/common/_spa_iter_common.sh"
 # parameters
 readonly min_maf=0.01
 readonly min_mac=4
-readonly max_iter=20
+readonly max_iter=30
 readonly P_cutoff="5e-6"
 
 # directories and paths
@@ -69,7 +74,7 @@ submit_cond_spa()
     qsub -N "_cond_${phenotype}" \
       -o "${out_prefix}.log" \
       -e "${out_prefix}.errors.log" \
-      -q "short.qc@@short.hge" \
+      -q "long.qc@@long.hge" \
       -t "${SGE_TASK_ID}" \
       -pe shmem 1 \
       "${bash_script}" \

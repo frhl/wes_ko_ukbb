@@ -53,17 +53,17 @@ main <- function(args){
     marker_zstat_p <- dt$cur_marker[which(dt$cur_zstat_log10_pvalue == max(dt$cur_zstat_log10_pvalue))]
     marker_cur_p <- dt$cur_marker[which(dt$cur_pvalue == min(dt$cur_pvalue))]
 
-    #if (marker_zstat_p != marker_cur_p){
-    #    write("Discrepancy found:", stdout())
-    #    d_subset <- dt[dt$cur_marker %in% c(marker_zstat_p, marker_cur_p)]
-    #    print(d_subset)
-    #}
+    # lowest P
+    min_p <- min(dt$cur_pvalue)
 
     # combine with original
     d <- data.table(cbind(dt, d))
     p_cutoff <- as.numeric(args$p_cutoff)
     bool_keep <- d$cur_pvalue < p_cutoff
     d <- d[bool_keep, ]
+    finished <- nrow(d) == 0
+    if (finished) write(paste0("SUCCESS! No marker markers left to condition on (Current min P-value = ",min_p,")"), stderr())
+
 
     # ensure that most significant marker is at bottom
     #d <- d[rev(order(d$cur_zstat_pvalue)),]

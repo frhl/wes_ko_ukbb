@@ -128,12 +128,9 @@ conditional_analysis() {
       # format file so that the right P-value is always extracted 
       # regardless of conditional analysis being enabled or not 
       Rscript "${helper}" --spa_file "${out_mrg}" --p_cutoff "${P_cutoff}"  --out_file "${out_r}"
+      local n_lines=$( cat ${out_r} | wc -l )
       local current_marker=$( tail -n1 "${out_r}" | cut -f1 )
       local current_p=$( tail -n1 "${out_r}" | cut -f2 )
-  
-      >&2 echo "current_p=${current_p}"
-      >&2 echo "current_marker=${current_marker}"
-
       if [ ! -z "${current_marker}" ]; then
         if [ "${current_marker}" != "${old_marker}" ]; then
           if [ -z "${marker_list}" ]; then
