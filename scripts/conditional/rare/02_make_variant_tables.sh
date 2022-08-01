@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qa
-#$ -t 19-22
+#$ -t 1-18
 #$ -V
 
 set -o errexit
@@ -40,7 +40,7 @@ int_div () {
   echo $(( $(( ${1} + ${2} - 1)) / ${2} ))
 }
 
-# how many chunks should be employed
+# how many chunks should be employed (up to 2 qc cores needed for 1000 lines chunks).
 readonly vcf_lines=$( zcat "${in_vcf}" | grep -v "#" | cut -f1 | wc -l )
 readonly lines_per_chunk=1000
 readonly chunks=$( int_div ${vcf_lines} ${lines_per_chunk})
