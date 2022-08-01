@@ -28,17 +28,24 @@ readonly out_prefix=${8?Error: Missing arg8 (out_prefix)}
 readonly chunk=${SGE_TASK_ID}
 readonly out_prefix_chunk="${out_prefix}.${chunk}of${total_chunks}"
 
-set_up_rpy
-Rscript "${rscript}" \
-  --in_vcf "${in_vcf}" \
-  --vcf_lines "${vcf_lines}" \
-  --lines_per_chunk "${lines_per_chunk}" \
-  --chunk "${chunk}" \
-  --total_chunks "${total_chunks}" \
-  --pheno_file "${pheno_file}" \
-  --phenotypes "${pheno_list_csv}" \
-  --covariates "${covar_path}" \
-  --out_prefix "${out_prefix_chunk}"
+readonly hash_file="${out_prefix_chunk}.hash.txt.gz" 
+readonly ac_file="${out_prefix_chunk}.AC.txt.gz" 
 
+
+if [ ! -f "${hash_file}" ]; then
+  set_up_rpy
+  Rscript "${rscript}" \
+    --in_vcf "${in_vcf}" \
+    --vcf_lines "${vcf_lines}" \
+    --lines_per_chunk "${lines_per_chunk}" \
+    --chunk "${chunk}" \
+    --total_chunks "${total_chunks}" \
+    --pheno_file "${pheno_file}" \
+    --phenotypes "${pheno_list_csv}" \
+    --covariates "${covar_path}" \
+    --out_prefix "${out_prefix_chunk}"
+else
+  >&2 echo "${hash_file} already exists. Skipping.."
+fi 
 
 
