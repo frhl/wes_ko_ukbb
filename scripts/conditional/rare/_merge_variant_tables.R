@@ -34,6 +34,10 @@ main <- function(args){
     d_hash <- rbindlist(lst_hash)
     d_ac <- rbindlist(lst_ac)
 
+    # remove overlaps
+    d_hash <- d_hash[!duplicated(d_hash),]
+    d_ac <- d_ac[!duplicated(d_ac),]
+
     # write to disk
     outfile_hash <- paste0(args$out_prefix, "_hash.txt.gz")
     outfile_ac <- paste0(args$out_prefix, "_AC.txt.gz")
