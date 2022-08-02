@@ -9,7 +9,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 49
+#$ -t 1-80
 #$ -V
 
 set -o errexit
