@@ -29,9 +29,10 @@ readonly grm_sam=${7?Error: Missing arg7 (grm_sam)}
 readonly min_mac=${8?Error: Missing arg8 (min_mac)} 
 readonly in_markers_ac=${9?Error: Missing arg9 (markers_ac)} 
 readonly in_markers_hash=${10?Error: Missing arg9 (markers_hash)} 
-readonly out_prefix=${11?Error: Missing arg10 (out_prefix)}
-readonly cond_markers="${12}"
-readonly cond_annotation="${13}"
+readonly markers_by_gene=${11?Error: Missing arg9 (markers_hash)} 
+readonly out_prefix=${12?Error: Missing arg10 (out_prefix)}
+readonly cond_markers="${13}"
+readonly cond_annotation="${14}"
 
 readonly chr=${SGE_TASK_ID}
 readonly gmat=$(echo ${in_gmat} | sed -e "s/CHR/${chr}/g")
@@ -48,20 +49,19 @@ readonly out=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
 readonly markers_ac=$(echo ${in_markers_ac} | sed -e "s/CHR/${chr}/g")
 readonly markers_hash=$(echo ${in_markers_hash} | sed -e "s/CHR/${chr}/g")
 
-echo "File: .vcf: ${vcf}"
-echo "File: .csi: ${csi} "
-
 set_up_rpy
 
 # subset variants to be used for conditional analysis
 readonly cond_markers_chr=$(echo ${cond_markers} | sed -e "s/CHR/${chr}/g")
 readonly markers_pheno_file="${out_prefix/CHR/${chr}}.rare.markers"
 Rscript "${rscript}" \
+  --chromosome "chr${chr}" \
   --phenotype "${phenotype}" \
   --annotation "${cond_annotation}" \
   --path_markers "${cond_markers_chr}" \
   --path_ac_by_phenotypes "${markers_ac}" \
   --path_hash_by_phenotypes "${markers_hash}" \
+  --path_markers_by_gene "${markers_by_gene}" \
   --outfile "${markers_pheno_file}" \
   --min_mac 4
 
