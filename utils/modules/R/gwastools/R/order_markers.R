@@ -6,6 +6,7 @@
 order_markers <- function(x, rm.dup = TRUE) {
     
     # check integrity
+    stopifnot(length(x) > 0)
     regex <- "chr[0-9]+\\:[0-9]+\\:[a-zA-Z]+\\:[a-zA-Z]"
     ok <- grepl(regex, x)
     if (any(!ok)){
