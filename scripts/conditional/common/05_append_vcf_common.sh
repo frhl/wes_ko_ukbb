@@ -9,7 +9,7 @@
 #$ -P lindgren.prjc
 #$ -q short.qc
 #$ -pe shmem 3
-#$ -t 1-18
+#$ -t 1-22
 #$ -V
 
 source utils/vcf_utils.sh
@@ -26,7 +26,7 @@ readonly common_dir="data/conditional/common/markers_with_gt"
 readonly out_dir="data/conditional/common/combined"
 
 readonly ko_path_wo_ext="${ko_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense"
-readonly common_path_wo_ext="${common_dir}/markers_sig_cond"
+readonly common_path_wo_ext="${common_dir}/common_conditional"
 
 readonly ko_path_mt="${ko_path_wo_ext}.mt"
 readonly ko_path_vcf="${ko_path_wo_ext}.vcf.bgz"
@@ -34,6 +34,7 @@ readonly common_path_mt="${common_path_wo_ext}.mt"
 readonly common_path_vcf="${common_path_wo_ext}.vcf.bgz"
 
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense_w_common"
+readonly tmp_markers="${out_prefix}_markers.tmp"
 readonly out_markers="${out_prefix}_markers.txt"
 readonly out_markers_sorted="${out_prefix}_markers_sorted.txt"
 
@@ -48,7 +49,12 @@ mkdir -p ${out_dir}
 
 # create file that contains all the markers
 if [ ! -f "${out_markers}" ]; then
-  cat ${markers_common} | grep chr${chr} > ${out_markers}
+  cat ${markers_common} | grep "chr${chr}:" > ${tmp_markers}
+  if [ "$(cat ${tmp_markers} | wc -l)" -gt "0" ]; then
+    mv ${tmp_markers} ${out_markers}
+  else
+    rm ${tmp_markers}
+  fi
 fi
 
 # count markers in each file
