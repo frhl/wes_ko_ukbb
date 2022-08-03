@@ -15,6 +15,9 @@ main <- function(args){
     spa <- spa[spa$p.value < p_cutoff,]
     write("Note: using standard column $p.value to check cutoff", stderr())
 
+    vep_path_old <- ""
+    vep <- NULL
+
     # only continue if something is significant
     if (nrow(spa) > 0){
         
@@ -28,8 +31,13 @@ main <- function(args){
             # read in vep
             vep_path <- gsub("chrCHR", chrom, args$vep_path_with_CHR)
             stopifnot(file.exists(vep_path))
-            vep <- fread(vep_path)
+            if (vep_path != vep_path_old){
+                vep <<- fread(vep_path)
+            }
 
+            # save old VEP path as global
+            vep_path_old <<- vep_path
+            
             # filter to genes in that are significant
             vep_subset <- vep[vep$csqs.gene_id %in% gene,]
             vep_subset <- vep_subset[,c("varid","csqs.gene_id","consequence_category")]
