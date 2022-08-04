@@ -9,8 +9,8 @@ main <- function(args){
     files <- list.files(args$in_dir, pattern = args$regex, full.names = TRUE)
     files_index <- paste0(files, ".index")
     n <- length(files)
-    if (n < 22) stop(paste0("Expected gt 21 files but found ", n, ". Regex: ", args$in_dir))    
-    if (n > 23) stop(paste0("Expected lt 24 files but found ", n, ". Regex: ", args$in_dir))
+    if (n < 22) stop(paste0("Expected more than 21 files but found ", n, ". Merge regex: ", args$in_dir))    
+    if (n > 23) stop(paste0("Expected less than24 files but found ", n, ". Merge regex: ", args$in_dir))
     # read files
     lst <- lapply(files, fread)
     d <- rbindlist(lst, fill = TRUE)
