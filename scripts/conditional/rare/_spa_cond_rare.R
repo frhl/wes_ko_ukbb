@@ -192,33 +192,34 @@ main <- function(args){
     # ensure variants follow input formatting required by saige
     markers <- gwastools::order_markers(markers)
     fwrite(data.table(x=markers), args$outfile, row.names = FALSE, col.names = FALSE)
+
+    # get counts for verbose message
+    n_markers_start <- length(unique(d_gene_filter$id))
+    n_markers_end <-  length(unique(mrg$id))
+    n_genes <- length(unique(d_gene_filter$ensembl_gene_id))
+    n_ac_ok <- sum(d_ac_filter$keep_variant_ac)
+    n_ld_ok <- sum(!d_ld_filter$keep_variant_ld)
+    n_dup_mark <- ifelse(length(unique(mrg$id)) != length(mrg$id),"Yes","No")
+    n_ac_above_zero <- sum(d_ac_filter$ac > 0)
+    n_ac_singletons <- sum(d_ac_filter$ac == 1)
+
+    msg <- paste0(
+      "# Phenotype: ", phenotype, "\n",
+      "# Significant gene(s): ", n_genes, "\n",
+      "# Maximum hail markers in gene(s): ", n_markers_start, "\n",
+      "# Same marker in different gene(s): ", n_dup_mark, "\n",
+      "# Markers in perfect LD: ", n_ld_ok, "\n",
+      "# Markers with AC>=0: ", n_ac_above_zero, "\n",
+      "# Markers with AC==1: ", n_ac_singletons, "\n",
+      "# Markers with AC>=", min_mac,": ", n_ac_ok, "\n",
+      "# Markers (post filtering of AC>=",min_mac," and LD) count: ", n_markers_end, ""
+    )
+
+    write(msg, stderr())
+
   } else {
     write("No markers present after subsetting", stderr())
   }
-
-  # get counts
-  n_markers_start <- length(unique(d_gene_filter$id))
-  n_markers_end <-  length(unique(mrg$id))
-  n_genes <- length(unique(d_gene_filter$ensembl_gene_id))
-  n_ac_ok <- sum(d_ac_filter$keep_variant_ac)
-  n_ld_ok <- sum(!d_ld_filter$keep_variant_ld)
-  n_dup_mark <- ifelse(length(unique(mrg$id)) != length(mrg$id),"Yes","No")
-  n_ac_above_zero <- sum(d_ac_filter$ac > 0)
-  n_ac_singletons <- sum(d_ac_filter$ac == 1)
-
-  msg <- paste0(
-    "# Phenotype: ", phenotype, "\n",
-    "# Significant gene(s): ", n_genes, "\n",
-    "# Maximum hail markers in gene(s): ", n_markers_start, "\n",
-    "# Same marker in different gene(s): ", n_dup_mark, "\n",
-    "# Markers in perfect LD: ", n_ld_ok, "\n",
-    "# Markers with AC>=0: ", n_ac_above_zero, "\n",
-    "# Markers with AC==1: ", n_ac_singletons, "\n",
-    "# Markers with AC>=", min_mac,": ", n_ac_ok, "\n",
-    "# Markers (post filtering of AC>=",min_mac," and LD) count: ", n_markers_end, ""
-  )
-
-  write(msg, stderr())
 
 write(msg, stdout())
 
