@@ -24,7 +24,7 @@ readonly p_cutoff="5e-7"
 # directories and out paths
 readonly spa_cts_dir="data/saige/output/cts/step2_common_cond/min_mac${min_mac}"
 readonly spa_bin_dir="data/saige/output/binary/step2_common_cond/min_mac${min_mac}"
-readonly out_dir="data/permute/overview/min_mac${min_mac}"
+readonly out_dir="data/permute/overview/min_mac${min_mac}/phased_only"
 readonly out_prefix="${out_dir}/main"
 mkdir -p ${out_dir}
 
