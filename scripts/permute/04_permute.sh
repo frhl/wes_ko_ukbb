@@ -22,10 +22,10 @@ readonly bash_script="scripts/permute/_permute.sh"
 readonly chr="${SGE_TASK_ID}"
 
 # setup directories
-readonly in_dir="data/permute/genes/chr${chr}"
+readonly in_dir="data/permute/genes/phased_only/chr${chr}"
 readonly out_dir="data/permute/permutations/chr${chr}/GENE"
 readonly pheno_dir="data/phenotypes"
-readonly cond_dir="data/conditional/common/marker_mt"
+readonly cond_dir="data/conditional/common/markers_with_gt"
 readonly grm_dir="data/saige/grm/input"
 
 # setup input and output paths
@@ -36,10 +36,9 @@ readonly assoc_format="ukb_eur_wes_200k_maf0to5e-2_PHENO_ANNO"
 readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
 
-
 # The markers and actual genotypes/dosages for each sample respectively
-readonly cond_markers="${cond_dir}/conditional_markers_chrundefined_markers.txt.gz"
-readonly cond_genotypes="${cond_dir}/conditional_markers_chrundefined.tsv.gz"
+readonly cond_markers="${cond_dir}/common_conditional.markers"
+readonly cond_genotypes="${cond_dir}/common_conditional.tsv.gz"
 
 # parameters for master script
 readonly min_mac=4
@@ -60,13 +59,14 @@ readonly use_prs=1
 readonly use_cond_common=1
 
 # get path to true P-value and t-stats
-readonly genes_path="data/permute/overview/min_mac${min_mac}/overview_genes.tsv.gz"
-readonly true_p_path="data/permute/overview/min_mac${min_mac}/overview_true_p.tsv.gz"
+readonly overview_dir="data/permute/overview/min_mac${min_mac}/phased_only"
+readonly genes_path="${overview_dir}/main_genes.tsv.gz"
+readonly true_p_path="${overview_dir}/main_true_p.tsv.gz"
 
 # count how many genes to submit for the given chromosome
 readonly n_genes="$( zcat ${genes_path} | grep "chr${chr}" | wc -l)"
 #readonly sge_tasks="1-${n_genes}"
-readonly sge_tasks="1-20"
+readonly sge_tasks="1-2"
 
 
 set -x
