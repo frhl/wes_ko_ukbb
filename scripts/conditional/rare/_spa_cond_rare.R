@@ -175,19 +175,20 @@ main <- function(args){
   # markers to keep
   mrg$keep <- mrg$keep_variant_ac & mrg$keep_variant_ld
   
-  # create file containing the gene-specific variants
-  outfile = paste0(args$outfile,".full")
-  fwrite(mrg, outfile, sep = '\t', row.names = FALSE)
+  if (sum(mrg$keep) > 0) {
+    
+    # create file containing the gene-specific variants
+    outfile = paste0(args$outfile,".full")
+    fwrite(mrg, outfile, sep = '\t', row.names = FALSE)
 
-  # get final set of markers
-  mrg <- mrg[mrg$keep,]
-  markers <- mrg$id[!duplicated(mrg$id)]
+    # get final set of markers
+    mrg <- mrg[mrg$keep,]
+    markers <- mrg$id[!duplicated(mrg$id)]
 
-  # create file containing the gene-specific variants
-  outfile = paste0(args$outfile,".keep")
-  fwrite(mrg, outfile, sep = '\t', row.names = FALSE)
+    # create file containing the gene-specific variants
+    outfile = paste0(args$outfile,".keep")
+    fwrite(mrg, outfile, sep = '\t', row.names = FALSE)
 
-  if (length(markers) > 0) {
     # ensure variants follow input formatting required by saige
     markers <- gwastools::order_markers(markers)
     fwrite(data.table(x=markers), args$outfile, row.names = FALSE, col.names = FALSE)
