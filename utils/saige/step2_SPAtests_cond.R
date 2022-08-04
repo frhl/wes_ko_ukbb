@@ -183,7 +183,7 @@ if (opt$condition_file != ""){
         markers <- paste0(arr_markers, collapse = ",")
         opt$condition <- markers
     } else {
-        msg <- paste0("Note: --condition_file specified but file was not found. Defaulting to non-conditional analysis.")
+        msg <- paste0("Note: --condition_file specified but file (",opt$condition_file,") was not found. Defaulting to non-conditional analysis.")
         write(msg, stderr())
         opt$condition <- ""
     }
