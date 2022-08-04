@@ -54,7 +54,8 @@ def main(args):
 
     # filter invariant sites
     mt = mt.annotate_entries(DS = hl.float(mt.GT.n_alt_alleles()))
-     # export list of variants for later conditional analysis
+    
+    # export list of variants for later conditional analysis
     varid = hl.delimit([
         hl.str(mt.locus.contig),
         hl.str(mt.locus.position),

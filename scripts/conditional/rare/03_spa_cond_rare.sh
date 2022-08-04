@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 49
+#$ -t 6
 #$ -tc 10
 #$ -V
 
@@ -94,6 +94,10 @@ submit_spa_with_csqs()
     local markers_by_gene="${markers_by_gene_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}.txt.gz"
 
     if [ ! -f "${out_mrg}" ]; then
+
+      local log="${out_prefix}.log"
+      local logerror="${out_prefix}.errors.log"
+
       local qsub_spa_name="spa_${phenotype}_${annotation}"
       local qsub_merge_name="_mrg_${phenotype}_${annotation}"
       submit_spa_job
@@ -111,6 +115,8 @@ submit_spa_job() {
   mkdir -p ${step2_dir}
   set -x
   qsub -N "${qsub_spa_name}" \
+    -o "${log}" \
+    -e "${logerror}" \
     -t ${tasks} \
     -q "${queue}" \
     -pe shmem ${nslots} \
@@ -153,9 +159,9 @@ submit_merge_job()
 readonly conditioning_markers=""
 readonly use_prs="1"
 readonly min_mac=4
-readonly tasks=6
+readonly tasks=19
 readonly queue="short.qc"
-readonly nslots=2
+readonly nslots=3
 
 
 

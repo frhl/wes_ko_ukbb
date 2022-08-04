@@ -51,6 +51,9 @@ readonly markers_hash=$(echo ${in_markers_hash} | sed -e "s/CHR/${chr}/g")
 
 set_up_rpy
 
+# todo: Only start conditional analysis if markers_by_gene has been generated (which
+# is currently only generated for markers that are significant in main analysis)
+
 # subset variants to be used for conditional analysis
 readonly cond_markers_chr=$(echo ${cond_markers} | sed -e "s/CHR/${chr}/g")
 readonly markers_pheno_file="${out_prefix/CHR/${chr}}.rare.markers"
@@ -58,7 +61,7 @@ Rscript "${rscript}" \
   --chromosome "chr${chr}" \
   --phenotype "${phenotype}" \
   --annotation "${cond_annotation}" \
-  --path_markers "${cond_markers_chr}" \
+  --path_markers_in_chrom "${cond_markers_chr}" \
   --path_ac_by_phenotypes "${markers_ac}" \
   --path_hash_by_phenotypes "${markers_hash}" \
   --path_markers_by_gene "${markers_by_gene}" \
