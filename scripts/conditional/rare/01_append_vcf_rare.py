@@ -42,11 +42,14 @@ def main(args):
         ht = hl.import_table(exclude, impute=True).key_by('varid')
         mt = mt.filter_rows(~hl.literal(set(ht.varid.collect())).contains(mt.varid))
 
-    # Build variant annotation
-    mt = mt.explode_rows(mt.consequence.vep.worst_csq_by_gene_canonical)
+    # Build variant annotation. Note: that we are building by variants,`
+    # instead of gene, so that we get one variant per line. If we did this by
+    # gene, in the scenario in which there are one variant affecting two different,
+    # genes, then we would have the same variant twice (and these would be in perfect LD).
+    mt = mt.explode_rows(mt.consequence.vep.worst_csq_for_variant_canonical)
     mt = mt.annotate_rows(
         consequence_category=ko.csqs_case_builder(
-                worst_csq_expr=mt.consequence.vep.worst_csq_by_gene_canonical,
+                worst_csq_expr=mt.consequence.vep.worst_csq_for_variant_canonical,
                 use_loftee=use_loftee))
 
     # subset to current csqs category
