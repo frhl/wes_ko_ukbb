@@ -21,16 +21,22 @@ main <- function(args){
     d$chr_int <- as.numeric(gsub("chr","",d$CHR))
     d <- d[order(d$chr_int, d$POS),]
     d$chr_int <- NULL
+    if (args$cond){
+        
+
+
+    }
     # setup outfile
     outfile <- args$out
     write(paste0("writing merge to ", outfile), stderr())
-    fwrite(d, outfile, sep = "\t")
+    fwrite(d, outfile, sep = "\t", na = NA)
 
 }
 
 # add arguments
 parser <- ArgumentParser()
 parser$add_argument("--in_dir", default=NULL, help = "directory of input file")
+parser$add_argument("--cond", default=0, help = "Add columns to the data, so that cond P-values are always taken when available.")
 parser$add_argument("--regex", default=NULL, help = "basename of input file")
 parser$add_argument("--out", default=NULL, help = "?")
 args <- parser$parse_args()
