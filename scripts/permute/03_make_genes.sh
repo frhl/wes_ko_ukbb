@@ -37,7 +37,7 @@ readonly genes="data/permute/overview/min_mac${min_mac}/phased_only/main_genes.t
 mkdir -p ${out_dir}
 
 if [ -f "${genes}" ]; then
-  readonly n_tasks="$( zcat ${genes} | grep -w "chr${chr}" | wc -l)"
+  readonly n_tasks="$( zcat ${genes} | grep -w "chr${chr}" | grep "ENSG" | wc -l)"
   readonly tasks="1-${n_tasks}"
   qsub -N "_c${chr}_make_genes" \
       -q "short.qc" \

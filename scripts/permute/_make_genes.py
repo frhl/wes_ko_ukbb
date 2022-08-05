@@ -27,6 +27,7 @@ def main(args):
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--chrom', default=None, help='')
     parser.add_argument('--input_path', default=None, help='')
     parser.add_argument('--input_type', default=None, help='')
     parser.add_argument('--gene', default=None, help='')
