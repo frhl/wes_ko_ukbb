@@ -1,26 +1,29 @@
 #!/usr/bin/env Rscript
 
-
 devtools::load_all("/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/utils/modules/R/gwastools")
 library(argparse)
 library(data.table)
 
 main <- function(args){
 
-  print(args)
-
-  stopifnot(file.exists(args$file_common_markers))
-  stopifnot(file.exists(args$file_rare_markers))
+  common_exists <- (file.exists(args$file_common_markers))
+  rare_exists <- (file.exists(args$file_rare_markers))
     
-  # common markers may be empty, but there will always be rare markers
-  d1 <- fread(args$file_common_markers, header = FALSE)
-  d2 <- fread(args$file_rare_markers, header = FALSE)
+  if (common_exists & rare_exists) {
+    d1 <- fread(args$file_common_markers, header = FALSE)
+    d2 <- fread(args$file_rare_markers, header = FALSE)
+    d <- rbind(d1, d2)
+  } else if (common_exists) {
+    d <- fread(args$file_common_markers, header = FALSE)
+  } else if (rare_exists) {
+    d <- fread(args$file_rare_markers, header = FALSE)
+  } else {
+    stop(paste("Expected at least", args$file_rare_marker, "or", args$file_common_markers, "to exist!"))
+  }
 
-
-
-  # ensure variants follow input formatting required by saige
-  #markers <- gwastools::order_markers(markers)
-  #fwrite(data.table(x=markers), args$outfile, row.names = FALSE, col.names = FALSE)
+  # rename and order markers
+  markers <- gwastools::order_markers(d$V1)
+  fwrite(data.table(x=markers), args$outfile, row.names = FALSE, col.names = FALSE)
 
 }
 

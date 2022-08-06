@@ -10,7 +10,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1
+#$ -t 49
 #$ -tc 10
 #$ -V
 
@@ -28,13 +28,16 @@ readonly grm_dir="data/saige/grm/input"
 readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
 
-readonly spa_script="scripts/conditional/rare/_spa_cond_rare.sh"
+readonly spa_script="scripts/conditional/combined/_brute_force_cond.sh"
 readonly merge_script="scripts/_spa_merge.sh"
 readonly in_prefix="ukb_eur_wes_200k"
 
+readonly markers_rare_by_gene_dir="data/conditional/rare/combined/genes/min_mac4"
 readonly cond_rare_dir="data/conditional/rare/combined"
+
 readonly cond_rare_file="${cond_rare_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_markers.txt.gz"
-readonly markers_rare_ac="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_AC.txt.gz"
+readonly markers_rare_ac="${cond_rare_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_AC.txt.gz"
+readonly markers_rare_hash="${cond_rare_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_hash.txt.gz"
 
 readonly cond_common_dir="data/conditional/common/combined"
 readonly cond_common_file="${cond_common_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_w_common_markers.txt"
@@ -66,7 +69,7 @@ submit_spa_with_csqs()
   if [ ! -z ${phenotype} ]; then
 
     local step1_dir="data/saige/output/${trait}/step1"
-    local step2_dir="data/saige/output/${trait}/step2_rare_cond/min_mac${min_mac}"
+    local step2_dir="data/saige/output/${trait}/step2_brute_force/min_mac${min_mac}"
     local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${maf}_${annotation}.vcf.bgz"
     mkdir -p ${step2_dir}
 
@@ -88,11 +91,14 @@ submit_spa_with_csqs()
       fi
     fi
 
+    # setup paths to variants in genes by phenotypes
+    local markers_rare_by_gene="${markers_rare_by_gene_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}.txt.gz"
+
     if [ ! -f "${out_mrg}" ]; then
       local qsub_spa_name="spa_${phenotype}_${annotation}"
       local qsub_merge_name="_mrg_${phenotype}_${annotation}"
       submit_spa_job
-      submit_merge_job
+      #submit_merge_job
     else
       >&2 echo "Phenotype ${phenotype} with annotation ${annotation} already exists! Skipping.."
     fi
@@ -121,6 +127,9 @@ submit_spa_job() {
     "${min_mac}" \
     "${out_prefix}" \
     "${markers_rare_ac}" \
+    "${markers_rare_hash}" \
+    "${markers_rare_by_gene}" \
+    "${markers_rare_cond_min_mac}" \
     "${cond_rare_file}" \
     "${cond_common_file}" \
     "${cond_cat}"
@@ -145,12 +154,12 @@ submit_merge_job()
 }
 
 # parameters
-readonly conditioning_markers=""
+readonly markers_rare_cond_min_mac=4
 readonly use_prs="1"
 readonly min_mac=4
-readonly tasks=1
+readonly tasks=6
 readonly queue="short.qe"
-readonly nslots=4
+readonly nslots=1
 
 
 
