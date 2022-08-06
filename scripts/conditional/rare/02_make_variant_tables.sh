@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qa
-#$ -t 1-22
+#$ -t 1,17
 #$ -V
 
 set -o errexit
@@ -44,7 +44,7 @@ readonly chunks=$( int_div ${vcf_lines} ${lines_per_chunk})
 
 # hpc paramaters
 readonly queue="short.qc"
-readonly nslots=4
+readonly nslots=2
 readonly tasks="1-${chunks}"
 
 submit_binary(){

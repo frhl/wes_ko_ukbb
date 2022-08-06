@@ -30,25 +30,27 @@ readonly min_mac=${8?Error: Missing arg8 (min_mac)}
 readonly in_markers_ac=${9?Error: Missing arg9 (markers_ac)} 
 readonly in_markers_hash=${10?Error: Missing arg9 (markers_hash)} 
 readonly markers_by_gene=${11?Error: Missing arg9 (markers_hash)} 
-readonly out_prefix=${12?Error: Missing arg10 (out_prefix)}
-readonly cond_markers="${13}"
-readonly cond_annotation="${14}"
+readonly markers_cond_min_mac=${12?Error: Missing arg9 (markers_hash)} 
+readonly out_prefix=${13?Error: Missing arg10 (out_prefix)}
+readonly cond_markers="${14}"
+readonly cond_annotation="${15}"
 
 readonly chr=${SGE_TASK_ID}
+
+# Change CHR to current chromosome based on task-ID
 readonly gmat=$(echo ${in_gmat} | sed -e "s/CHR/${chr}/g")
 readonly var=$(echo ${in_var} | sed -e "s/CHR/${chr}/g")
-
->&2 echo "${gmat} and ${var} with ${phenotype}"
-
-readonly var_bytes=$( file_size ${var} )
-readonly gmat_bytes=$( file_size ${gmat} )
-
 readonly vcf=$(echo ${in_vcf} | sed -e "s/CHR/${chr}/g")
 readonly csi=$(echo ${in_csi} | sed -e "s/CHR/${chr}/g")
 readonly out=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
 readonly markers_ac=$(echo ${in_markers_ac} | sed -e "s/CHR/${chr}/g")
 readonly markers_hash=$(echo ${in_markers_hash} | sed -e "s/CHR/${chr}/g")
 
+# check that saige step 1 exists
+readonly var_bytes=$( file_size ${var} )
+readonly gmat_bytes=$( file_size ${gmat} )
+
+# setup R
 set_up_rpy
 
 # todo: Only start conditional analysis if markers_by_gene has been generated (which
@@ -66,7 +68,7 @@ Rscript "${rscript}" \
   --path_hash_by_phenotypes "${markers_hash}" \
   --path_markers_by_gene "${markers_by_gene}" \
   --outfile "${markers_pheno_file}" \
-  --min_mac 4
+  --min_mac "${markers_cond_min_mac}"
 
 spa_test() {
   echo "var_bytes=${var_bytes} at ${var}"

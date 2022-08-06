@@ -218,10 +218,8 @@ main <- function(args){
     write(msg, stderr())
 
   } else {
-    write("No markers present after subsetting", stderr())
+    write("Note: No markers present after subsetting", stderr())
   }
-
-write(msg, stdout())
 
 }
 

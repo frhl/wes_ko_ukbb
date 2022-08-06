@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 11-80
+#$ -t 49
 #$ -tc 10
 #$ -V
 
@@ -132,6 +132,7 @@ submit_spa_job() {
     "${markers_ac}" \
     "${markers_hash}" \
     "${markers_by_gene}" \
+    "${markers_cond_min_mac}" \
     "${out_prefix}" \
     "${cond_rare_file}" \
     "${cond_cat}"
@@ -156,10 +157,10 @@ submit_merge_job()
 }
 
 # parameters
-readonly conditioning_markers=""
+readonly markers_cond_min_mac=4
 readonly use_prs="1"
 readonly min_mac=4
-readonly tasks=1-22
+readonly tasks=5-6
 readonly queue="short.qc"
 readonly nslots=3
 
