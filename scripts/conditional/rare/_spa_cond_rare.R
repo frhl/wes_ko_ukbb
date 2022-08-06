@@ -134,9 +134,9 @@ main <- function(args){
 
   print(args)
 
-  stopifnot(file.exists(args$path_ac_by_phenotypes))
-  stopifnot(file.exists(args$path_hash_by_phenotypes))
-  stopifnot(file.exists(args$path_markers_by_gene))
+  if (!file.exists(args$path_ac_by_phenotypes)) stop(paste(args$path_ac_by_phenotypes, "does not exist!"))
+  if (!file.exists(args$path_hash_by_phenotypes)) stop(paste(args$path_hash_by_phenotypes, "does not exist!"))
+  if (!file.exists(args$path_markers_by_gene)) stop(paste(args$path_markers_by_gene, "does not exist!"))
 
   chromosome <- args$chromosome
   phenotype <- args$phenotype
