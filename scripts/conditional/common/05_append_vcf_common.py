@@ -25,7 +25,7 @@ def main(args):
     common = io.import_table(common_path, common_type, calc_info=False)
 
     # re-annotate dosage as alt alleles
-    common = common.transmute_entries(DS = common.GT.n_alt_alleles())
+    common = common.transmute_entries(DS = hl.float64(common.GT.n_alt_alleles()))
 
     # filter to chromosomes (Assuing common
     # variants have already been combined).
