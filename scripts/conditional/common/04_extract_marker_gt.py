@@ -75,7 +75,7 @@ def main(args):
     mt = mt.key_rows_by(locus=mt.grch38.locus, alleles=mt.grch38.alleles)     
 
     # We are interested in dosages
-    mt = mt.annotate_entries(DS=mt.dosage)
+    mt = mt.annotate_entries(DS=mt.GT.n_alt_alleles())
     mt = mt.select_entries(*[mt.DS, mt.GT])
     mt = mt.drop(mt.grch38)
 
