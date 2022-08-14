@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-5
+#$ -t 1
 #$ -tc 1
 #$ -V
 
@@ -23,13 +23,18 @@ source utils/bash_utils.sh
 readonly vcf_dir="data/mt/annotated"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
+readonly grm_dir="data/saige/grm/input"
 
 readonly spa_script="scripts/geneset/_spa_set.sh"
 readonly merge_script="scripts/_spa_merge.sh"
-readonly in_prefix="ukb_eur_wes_200k_annot"
+readonly in_prefix="ukb_eur_wes_union_calls_200k"
+readonly in_vcf="${vcf_dir}/${in_prefix}_chrCHR.vcf.bgz"
 
-readonly group_dir="data/mt/vep"
-readonly group="${group_dir}/ukb_eur_wes_200k_csqs_chrCHR.saige"
+readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+readonly grm_sam="${grm_mtx}.sampleIDs.txt"
+
+readonly group_dir="data/mt/vep/worst_csq_by_gene_canonical"
+readonly group="${group_dir}/ukb_eur_wes_union_calls_200k_chrCHR.saige"
 
 submit_spa_set_binary()
 {
@@ -75,7 +80,6 @@ submit_spa_pair()
     fi
   fi 
 
-  local in_vcf="${vcf_dir}/${in_prefix}_chrCHR.vcf.bgz"
   mkdir -p ${step2_dir}
   if [ ! -f ${out_mrg} ]; then
     local qsub_spa_name="sspa_${phenotype}_${annotation}"
@@ -101,6 +105,8 @@ submit_spa_set_job()
     "${in_vcf}.csi" \
     "${in_gmat}" \
     "${in_var}" \
+    "${grm_mtx}" \
+    "${grm_sam}" \
     "${min_mac}" \
     "${group}" \
     "${out_prefix}"
@@ -126,12 +132,13 @@ submit_merge_job()
 
 readonly maf="maf0to5e-2"
 readonly min_mac=4
-readonly tasks=1-22
+readonly tasks=21
 readonly queue="short.qf"
 readonly nslots=1
-readonly use_prs="0"
+readonly use_prs="1"
 
 # cts traits
-submit_spa_set_cts "pLoF_damaging_missense"
+submit_spa_set_binary "pLoF_damaging_missense"
+#submit_spa_set_cts "pLoF_damaging_missense"
 
 
