@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 49
+#$ -t 1-80
 #$ -tc 10
 #$ -V
 
@@ -157,12 +157,12 @@ submit_merge_job()
 }
 
 # parameters
-readonly markers_cond_min_mac=4
+readonly markers_cond_min_mac=3
 readonly use_prs="1"
 readonly min_mac=4
-readonly tasks=5-6
+readonly tasks=15
 readonly queue="short.qc"
-readonly nslots=3
+readonly nslots=5
 
 
 

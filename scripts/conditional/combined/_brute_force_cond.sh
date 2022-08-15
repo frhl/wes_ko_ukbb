@@ -71,11 +71,13 @@ Rscript "${rscript_rare}" \
 # create a subset of common (non-coding) makers to be used in analysis
 readonly out_common_markers_file="${out_prefix/CHR/${chr}}.common.markers"
 readonly cond_chr_common_file=$(echo ${cond_common_file} | sed -e "s/CHR/${chr}/g")
-Rscript ${rscript_common} \
-  --infile ${cond_chr_common_file} \
-  --phenotype ${phenotype} \
-  --outfile ${out_common_markers_file} \
-  --pheno_col 6
+if [ -f ${cond_chr_common_file} ]; then
+  Rscript ${rscript_common} \
+    --infile ${cond_chr_common_file} \
+    --phenotype ${phenotype} \
+    --outfile ${out_common_markers_file} \
+    --pheno_col 6
+fi
 
 # merge the two subsets
 readonly out_markers_file="${out_prefix/CHR/${chr}}.final.markers"
@@ -101,7 +103,7 @@ spa_test() {
        --varianceRatioFile=${var} \
        --SAIGEOutputFile=${out} \
        --LOCO=FALSE \
-       --condition_file "${out_markers_file}" \
+       --condition_file "${out_common_markers_file}" \
        && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
        || raise_error "Saddle-point approximation for chr${chr} failed"
   else
@@ -113,7 +115,7 @@ if [ ! -f ${out} ]; then
   conda deactivate
   set_up_RSAIGE
   set -eu
-  #spa_test
+  spa_test
 else
   >&2 echo "${out} already exists. Skipping.."
 fi

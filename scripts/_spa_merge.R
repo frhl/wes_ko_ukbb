@@ -29,7 +29,7 @@ main <- function(args){
     # setup outfile
     outfile <- args$out
     write(paste0("writing merge to ", outfile), stderr())
-    fwrite(d, outfile, sep = "\t", na = NA)
+    fwrite(d, outfile, sep = "\t", na = NA, quote = FALSE)
 
 }
 

@@ -98,7 +98,7 @@ submit_spa_with_csqs()
       local qsub_spa_name="spa_${phenotype}_${annotation}"
       local qsub_merge_name="_mrg_${phenotype}_${annotation}"
       submit_spa_job
-      #submit_merge_job
+      submit_merge_job
     else
       >&2 echo "Phenotype ${phenotype} with annotation ${annotation} already exists! Skipping.."
     fi
@@ -157,9 +157,9 @@ submit_merge_job()
 readonly markers_rare_cond_min_mac=4
 readonly use_prs="1"
 readonly min_mac=4
-readonly tasks=6
+readonly tasks=5-6
 readonly queue="short.qe"
-readonly nslots=1
+readonly nslots=2
 
 
 

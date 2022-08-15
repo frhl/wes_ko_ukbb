@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc
-#$ -t 21
+#$ -t 1-21
 #$ -V
 
 set -o errexit
@@ -23,11 +23,11 @@ readonly in_dir="data/mt/annotated"
 readonly out_dir="data/permute/counts"
 
 readonly chr="${SGE_TASK_ID}"
-readonly input_path="${in_dir}/ukb_eur_wes_200k_annot_chr${chr}.mt"
+readonly input_path="${in_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.mt"
 readonly input_type='mt'
 
 readonly csqs="pLoF,damaging_missense"
-readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_counts_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_phased_counts_chr${chr}"
 readonly out_type="mt"
 
 mkdir -p ${out_dir}
@@ -41,6 +41,7 @@ if [ ! -d "${out_prefix}.mt" ]; then
     --out_prefix ${out_prefix} \
     --out_type ${out_type} \
     --csqs_category ${csqs} \
+    --discard_unphased \
     --use_loftee
 else
   >&2 echo "${out_prefix}.mt already exists. Skipping.."
