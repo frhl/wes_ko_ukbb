@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc@@short.hga
-#$ -t 1-21
+#$ -t 1-22
 
 set -o errexit
 set -o nounset
@@ -18,7 +18,7 @@ source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark_dir"
 readonly hail_script="scripts/04_export_csqs.py"
-readonly rscript="scripts/04_export_csqs_test.R"
+readonly rscript="scripts/04_export_csqs.R"
 
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 
 readonly in_dir="data/mt/annotated"
