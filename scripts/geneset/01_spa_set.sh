@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-80
+#$ -t 5
 #$ -tc 1
 #$ -V
 
@@ -60,7 +60,7 @@ submit_spa_pair()
   local trait=${3?Error: Missing arg3 (trait)}
 
   local step1_dir="data/saige/output/${trait}/step1"
-  local step2_dir="data/saige/output/${trait}/step2_set_JUNE/min_mac${min_mac}"
+  local step2_dir="data/saige/output/${trait}/step2_set_AUG/min_mac${min_mac}"
   mkdir -p ${step2_dir}
 
   local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
@@ -83,7 +83,7 @@ submit_spa_pair()
   fi 
 
   # Submit scripts
-  if [ -f "${in_gmat}" ] && [ -f "${in_var}" ]; then
+  if [ -f "${in_gmat/CHR/21}" ] && [ -f "${in_var/CHR/21}" ]; then
     if [ ! -f "${out_mrg}" ]; then
       local qsub_spa_name="sspa_${phenotype}_${annotation}"
       local qsub_merge_name="_smrg_${phenotype}_${annotation}"  
@@ -139,7 +139,7 @@ submit_merge_job()
 
 readonly maf="maf0to5e-2"
 readonly min_mac=4
-readonly tasks=1-22
+readonly tasks=1
 readonly queue="short.qf"
 readonly nslots=1
 readonly use_prs="1"
