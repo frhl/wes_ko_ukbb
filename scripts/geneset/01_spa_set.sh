@@ -61,12 +61,14 @@ submit_spa_pair()
 
   local step1_dir="data/saige/output/${trait}/step1"
   local step2_dir="data/saige/output/${trait}/step2_set_JUNE/min_mac${min_mac}"
+  mkdir -p ${step2_dir}
 
   local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
   local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
   local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}"
   local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}.txt.gz"
 
+  # setup PRS
   if [ "${use_prs}" -eq "1" ]; then
     local in_gmat_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.rda"
     local in_var_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.varianceRatio.txt"
@@ -80,15 +82,20 @@ submit_spa_pair()
     fi
   fi 
 
-  mkdir -p ${step2_dir}
-  if [ ! -f ${out_mrg} ]; then
-    local qsub_spa_name="sspa_${phenotype}_${annotation}"
-    local qsub_merge_name="_smrg_${phenotype}_${annotation}"  
-    submit_spa_set_job
-    submit_merge_job
+  # Submit scripts
+  if [ -f "${in_gmat}" ] && [ -f "${in_var}" ]; then
+    if [ ! -f "${out_mrg}" ]; then
+      local qsub_spa_name="sspa_${phenotype}_${annotation}"
+      local qsub_merge_name="_smrg_${phenotype}_${annotation}"  
+      submit_spa_set_job
+      submit_merge_job
+    else
+      >&2 echo "${out_mrg} already exists. Skipping.."
+    fi
   else
-    >&2 echo "${out_mrg} already exists. Skipping.."
+    >&2 echo "${in_gmat} and/or ${in_var} does not exist!"
   fi
+
 }
 
 
