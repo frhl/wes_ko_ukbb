@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N eval_final_phased
+#$ -N eval_chunks_by_maf
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/eval_final_phased.log
-#$ -e logs/eval_final_phased.errors.log
+#$ -o logs/eval_chunks_by_maf.log
+#$ -e logs/eval_chunks_by_maf.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
@@ -12,7 +12,7 @@
 
 source utils/bash_utils.sh
 
-readonly rscript="scripts/phasing/08_eval_final_phased.R"
+readonly rscript="scripts/phasing/07_eval_chunks_by_maf.R"
 readonly ligated_dir="data/phased/wes_union_calls/ligated"
 readonly out_dir="data/phased/validation"
 

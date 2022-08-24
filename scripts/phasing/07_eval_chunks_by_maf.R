@@ -4,6 +4,7 @@ devtools::load_all('utils/modules/R/phasingtools')
 library(argparse)
 library(RColorBrewer)
 library(stringr)
+library(ggsci)
 
 fread_phased_sites <- function(file, ...){
     
@@ -44,6 +45,7 @@ aggregate_by_chrom <- function(files, variants){
 
 # same as above, but also aggregate my selected MAF bin
 aggregate_by_chrom_and_maf_bin <- function(files, maf_bin, variants){
+    cuts <- c(1, 10^-(1:6))
     lst <- lapply(files, function(file){
         d <- fread_phased_sites(file)
         d$wes_variant <- d$locus %in% variants$locus
@@ -93,33 +95,33 @@ main <- function(args){
     counts_by_chrom$wes_label <- ifelse(counts_by_chrom$wes_variant, "Whole Exome Sequencing","Genotyping Array")
 
     # *** plot switch errors by chromosome ***
-    p1 <- ggplot(counts_by_chrom,
-       aes(
-           y=factor(CHR, levels = autosomes),
-           x=100*pointest,
-           xmax = 100*upper,
-           xmin = 100*lower,
-           color = factor(wes_label)
-       )) +
-    theme_bw() +
-    geom_pointrange() + 
-    labs(color = "") +
-    xlab('% Switch Error Rate (95% CI)') + ylab('') +
-    scale_color_d3('category20c', limits=NULL) +
-    scale_x_continuous(breaks=scales::pretty_breaks(n=10)) +
-    theme(
-        legend.position = "top",
-        axis.text=element_text(size=10),
-        axis.title=element_text(size=10,face="bold"),
-        axis.title.x = element_text(margin=ggplot2::margin(t=10)),
-        axis.title.y = element_text(margin=ggplot2::margin(r=10)),
-        plot.title = element_text(hjust=0.5)
-    ) 
+    #p1 <- ggplot(counts_by_chrom,
+    #   aes(
+    #       y=factor(CHR, levels = autosomes),
+    #       x=100*pointest,
+    #       xmax = 100*upper,
+    #       xmin = 100*lower,
+    #       color = factor(wes_label)
+    #   )) +
+    #theme_bw() +
+    #geom_pointrange() + 
+    #labs(color = "") +
+    #xlab('% Switch Error Rate (95% CI)') + ylab('') +
+    #scale_color_d3('category20c', limits=NULL) +
+    #scale_x_continuous(breaks=scales::pretty_breaks(n=10)) +
+    #theme(
+    #    legend.position = "top",
+    #    axis.text=element_text(size=10),
+    #    axis.title=element_text(size=10,face="bold"),
+    #    axis.title.x = element_text(margin=ggplot2::margin(t=10)),
+    #    axis.title.y = element_text(margin=ggplot2::margin(r=10)),
+    #    plot.title = element_text(hjust=0.5)
+    #) 
 
     out_p1 <- paste0(args$out_prefix, "_ser_by_chrom")
-    out_p1_img <- paste0(out_p1, ".png")
+    #out_p1_img <- paste0(out_p1, ".png")
     out_p1_txt <- paste0(out_p1, ".txt.gz")
-    ggsave(p1, out_p1_img, width = 10, height = 8)
+    #ggsave(p1, out_p1_img, width = 10, height = 8)
     fwrite(counts_by_chrom, out_p1_txt, sep = "\t")
 
     # *** plot switch errors by chrom and MAF ****
@@ -128,35 +130,35 @@ main <- function(args){
     counts_by_chrom_by_maf <- counts_by_chrom_by_maf[counts_by_chrom_by_maf$wes_variant == TRUE,]
     counts_by_chrom_by_maf$wes_label <- ifelse(counts_by_chrom_by_maf$wes_variant, "Whole Exome Sequencing","Genotyping Array")
     
-    p2 <- ggplot(counts_by_chrom_by_maf,
-           aes(
-               y=maf_bin,
-               x=100*pointest,
-               xmax = 100*upper,
-               xmin = 100*lower,
-               color = factor(wes_label)
-           )) +
-        theme_bw() +
-        geom_pointrange() + 
-        labs(color = "") +
-        xlab('% Switch Error Rate (95% CI)') + ylab('') +
-        scale_color_d3('category20c', limits=NULL) +
-        scale_x_continuous(breaks=scales::pretty_breaks(n=10)) +
-        facet_wrap(~factor(CHR, levels = autosomes)) +
-        coord_cartesian(xlim=c(0, 2)) +
-        theme(
-            legend.position = "top",
-            axis.text=element_text(size=10),
-            axis.title=element_text(size=10,face="bold"),
-            axis.title.x = element_text(margin=ggplot2::margin(t=10)),
-            axis.title.y = element_text(margin=ggplot2::margin(r=10)),
-            plot.title = element_text(hjust=0.5)
-        ) 
+    #p2 <- ggplot(counts_by_chrom_by_maf,
+    #       aes(
+    #           y=maf_bin,
+    #           x=100*pointest,
+    #           xmax = 100*upper,
+    #           xmin = 100*lower,
+    #           color = factor(wes_label)
+    #       )) +
+    #    theme_bw() +
+    #    geom_pointrange() + 
+    #    labs(color = "") +
+    #    xlab('% Switch Error Rate (95% CI)') + ylab('') +
+    #    scale_color_d3('category20c', limits=NULL) +
+    #    scale_x_continuous(breaks=scales::pretty_breaks(n=10)) +
+    #    facet_wrap(~factor(CHR, levels = autosomes)) +
+    #    coord_cartesian(xlim=c(0, 2)) +
+    #    theme(
+    #        legend.position = "top",
+    #        axis.text=element_text(size=10),
+    #        axis.title=element_text(size=10,face="bold"),
+    #        axis.title.x = element_text(margin=ggplot2::margin(t=10)),
+    #        axis.title.y = element_text(margin=ggplot2::margin(r=10)),
+    #        plot.title = element_text(hjust=0.5)
+    #    ) 
 
     out_p2 <- paste0(args$out_prefix, "_ser_by_maf_chrom")
-    out_p2_img <- paste0(out_p2, ".png")
+    #out_p2_img <- paste0(out_p2, ".png")
     out_p2_txt <- paste0(out_p2, ".txt.gz")
-    ggsave(p2, out_p2_img, width = 10, height = 8)
+    #ggsave(p2, out_p2_img, width = 10, height = 8)
     fwrite(counts_by_chrom, out_p2_txt, sep = "\t")
 
 
@@ -168,33 +170,33 @@ main <- function(args){
     aggr_counts <- calc_binom_ci(aggr_counts)
     aggr_counts$wes_label <- ifelse(aggr_counts$wes_variant, "Whole Exome Sequencing","Genotyping Array")
 
-    p3 <- ggplot(aggr_counts,
-           aes(
-               y=maf_bin,
-               x=100*pointest,
-               xmax = 100*upper,
-               xmin = 100*lower,
-               color = factor(wes_label)
-           )) +
-        theme_bw() +
-        geom_pointrange() + 
-        labs(color = "") +
-        xlab('% Switch Error Rate (95% CI)') + ylab('') +
-        scale_color_d3('category20c', limits=NULL) +
-        scale_x_continuous(breaks=scales::pretty_breaks(n=10)) +
-        theme(
-            legend.position = "top",
-            axis.text=element_text(size=10),
-            axis.title=element_text(size=10,face="bold"),
-            axis.title.x = element_text(margin=ggplot2::margin(t=10)),
-            axis.title.y = element_text(margin=ggplot2::margin(r=10)),
-            plot.title = element_text(hjust=0.5)
-        ) 
-
+    #p3 <- ggplot(aggr_counts,
+    #       aes(
+    #           y=maf_bin,
+    #           x=100*pointest,
+    #           xmax = 100*upper,
+    #           xmin = 100*lower,
+    #           color = factor(wes_label)
+    #       )) +
+    #    theme_bw() +
+    #    geom_pointrange() + 
+    #    labs(color = "") +
+    #    xlab('% Switch Error Rate (95% CI)') + ylab('') +
+    #    scale_color_d3('category20c', limits=NULL) +
+    #    scale_x_continuous(breaks=scales::pretty_breaks(n=10)) +
+    #    theme(
+    #        legend.position = "top",
+    #        axis.text=element_text(size=10),
+    #        axis.title=element_text(size=10,face="bold"),
+    #        axis.title.x = element_text(margin=ggplot2::margin(t=10)),
+    #        axis.title.y = element_text(margin=ggplot2::margin(r=10)),
+    #        plot.title = element_text(hjust=0.5)
+    #    ) 
+    #
     out_p3 <- paste0(args$out_prefix, "_ser_by_maf")
-    out_p3_img <- paste0(out_p1, ".png")
+    #out_p3_img <- paste0(out_p1, ".png")
     out_p3_txt <- paste0(out_p1, ".txt.gz")
-    ggsave(p3, out_p3_img, width = 8, height = 6)
+    #ggsave(p3, out_p3_img, width = 8, height = 6)
     fwrite(counts_by_chrom, out_p3_txt, sep = "\t")
 
 
