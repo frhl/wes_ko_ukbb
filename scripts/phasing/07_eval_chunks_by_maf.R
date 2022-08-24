@@ -45,11 +45,10 @@ aggregate_by_chrom <- function(files, variants){
 
 # same as above, but also aggregate my selected MAF bin
 aggregate_by_chrom_and_maf_bin <- function(files, maf_bin, variants){
-    cuts <- c(1, 10^-(1:6))
     lst <- lapply(files, function(file){
         d <- fread_phased_sites(file)
         d$wes_variant <- d$locus %in% variants$locus
-        d$maf_bin <- cut(d$MAF, breaks = cuts)
+        d$maf_bin <- cut(d$MAF, breaks = maf_bin)
         counts <- aggregate(switches ~ wes_variant + maf_bin + CHR, data = d, FUN = sum)
         tested <- aggregate(switches ~ wes_variant + maf_bin + CHR, data = d, FUN = length)
         counts <- data.table(counts, tested = tested$switches)
@@ -123,11 +122,11 @@ main <- function(args){
     out_p1_txt <- paste0(out_p1, ".txt.gz")
     #ggsave(p1, out_p1_img, width = 10, height = 8)
     fwrite(counts_by_chrom, out_p1_txt, sep = "\t")
+    write(paste("writing",out_p1_txt), stderr())
 
     # *** plot switch errors by chrom and MAF ****
     lst_by_chrom_by_maf = aggregate_by_chrom_and_maf_bin(files, maf_bins, variants) 
     counts_by_chrom_by_maf <- calc_binom_ci(lst_by_chrom_by_maf)
-    counts_by_chrom_by_maf <- counts_by_chrom_by_maf[counts_by_chrom_by_maf$wes_variant == TRUE,]
     counts_by_chrom_by_maf$wes_label <- ifelse(counts_by_chrom_by_maf$wes_variant, "Whole Exome Sequencing","Genotyping Array")
     
     #p2 <- ggplot(counts_by_chrom_by_maf,
@@ -159,15 +158,19 @@ main <- function(args){
     #out_p2_img <- paste0(out_p2, ".png")
     out_p2_txt <- paste0(out_p2, ".txt.gz")
     #ggsave(p2, out_p2_img, width = 10, height = 8)
+    write(paste("writing",out_p2_txt), stderr())
     fwrite(counts_by_chrom, out_p2_txt, sep = "\t")
 
 
     # *** counts by maf bin across all chromosomes ***
-    aggr_d <- count_by_chrom_by_maf
+    aggr_d <- counts_by_chrom_by_maf
     aggr_switches <- aggregate(switches ~ wes_variant + maf_bin, data = aggr_d, FUN = sum)
     aggr_tested <- aggregate(tested ~ wes_variant + maf_bin, data = aggr_d, FUN = sum)
     aggr_counts <- data.table(aggr_switches, tested = aggr_tested$tested)
-    aggr_counts <- calc_binom_ci(aggr_counts)
+    print(5)
+    print(head(aggr_counts))
+    aggr_counts <- calc_binom_ci(list(aggr_counts))
+    print(6)
     aggr_counts$wes_label <- ifelse(aggr_counts$wes_variant, "Whole Exome Sequencing","Genotyping Array")
 
     #p3 <- ggplot(aggr_counts,
@@ -195,9 +198,10 @@ main <- function(args){
     #
     out_p3 <- paste0(args$out_prefix, "_ser_by_maf")
     #out_p3_img <- paste0(out_p1, ".png")
-    out_p3_txt <- paste0(out_p1, ".txt.gz")
+    out_p3_txt <- paste0(out_p3, ".txt.gz")
+    write(paste("writing",out_p3_txt), stderr())
     #ggsave(p3, out_p3_img, width = 8, height = 6)
-    fwrite(counts_by_chrom, out_p3_txt, sep = "\t")
+    fwrite(aggr_counts, out_p3_txt, sep = "\t")
 
 
 }
