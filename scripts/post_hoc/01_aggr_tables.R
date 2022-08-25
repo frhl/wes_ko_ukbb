@@ -35,8 +35,9 @@ paste_lst <- function(x, sep = ', ') unlist(lapply(x, paste, collapse = sep))
 
 main <- function(args){
     
-    autosomes=1:22
+    autosomes=22:1
     lst <- lapply(autosomes, function(chr){
+        print(chr)
         write(paste0("Reading chr",chr), stdout())
         vep <- fread(paste0('data/mt/vep/worst_csq_by_gene_canonical/ukb_eur_wes_union_calls_200k_chr',chr,'.tsv.gz'))
         dt <- fread(paste0('data/knockouts/alt/ukb_eur_wes_200k_chr',chr,'_maf0to5e-2_pLoF_damaging_missense_all.tsv.gz'))
@@ -58,6 +59,7 @@ main <- function(args){
 
     d <- do.call(rbind, lst)
     outfile = paste0(args$out_prefix, ".txt.gz")
+    write(paste0("writing to ", outfile), stderr())
     fwrite(d, outfile, sep = '\t')
 
 }

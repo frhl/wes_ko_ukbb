@@ -73,11 +73,11 @@ calc_binom_ci <- function(lst){
 main <- function(args){
 
     # parser
-    print(args)
     stopifnot(dir.exists(args$ligated_dir))
     stopifnot(dir.exists(dirname(args$out_prefix)))
     stopifnot(file.exists(args$sites))
-    maf_bins <- c(1, 10^-(1:6))
+    maf_bins <- c(1, 10^-(1:8))
+    print(maf_bins)
 
     # get WES sites 
     variants <- fread(args$sites) 
@@ -167,11 +167,9 @@ main <- function(args){
     aggr_switches <- aggregate(switches ~ wes_variant + maf_bin, data = aggr_d, FUN = sum)
     aggr_tested <- aggregate(tested ~ wes_variant + maf_bin, data = aggr_d, FUN = sum)
     aggr_counts <- data.table(aggr_switches, tested = aggr_tested$tested)
-    print(5)
-    print(head(aggr_counts))
     aggr_counts <- calc_binom_ci(list(aggr_counts))
-    print(6)
     aggr_counts$wes_label <- ifelse(aggr_counts$wes_variant, "Whole Exome Sequencing","Genotyping Array")
+    print(table(aggr_counts$maf_bin))
 
     #p3 <- ggplot(aggr_counts,
     #       aes(
