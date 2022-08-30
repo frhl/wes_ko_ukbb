@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-80
+#$ -t 1-75
 #$ -tc 1
 #$ -V
 
@@ -117,6 +117,6 @@ clean_pgs()
 }
 
 readonly tasks=1-22
-submit_ldpred2 "auto" "6" "${phenotype_cts}_int"
+#submit_ldpred2 "auto" "6" "${phenotype_cts}_int"
 submit_ldpred2 "auto" "6" "${phenotype_binary}"
 
