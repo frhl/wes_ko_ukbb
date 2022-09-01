@@ -1,10 +1,14 @@
 
+# Takes gene hits that are significant in primary analysis
+# and digs out all variants in the gene as annotated by VEP.
+
 library(argparse)
 library(data.table)
 
 main <- function(args){
 
-    stopifnot(file.exists(args$in_spa_file))
+
+    if (!file.exists(args$in_spa_file)) stop(paste(args$in_spa_file, "does not exists!"))
     stopifnot(grepl("CHR", args$vep_path_with_CHR))
     spa <- fread(args$in_spa_file)
     spa_n <- nrow(spa)
@@ -53,9 +57,11 @@ main <- function(args){
         
         # write file
         outfile = paste0(args$out_prefix, '.txt.gz')
-        write(paste("writing to", outfile), stderr())
+        write(paste("writing to", outfile), stdout())
         fwrite(d, outfile, sep = '\t')
         
+    } else {
+        write(paste0("No lines in SPA file after subsetting by P-value for ", args$in_spa_file), stderr())
     }
 
 }
