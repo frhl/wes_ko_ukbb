@@ -10,7 +10,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-80
+#$ -t 70
 
 set -o errexit
 set -o nounset
@@ -23,7 +23,10 @@ readonly rscript="scripts/conditional/rare/00_sig_gene_markers.R"
 # parameters
 readonly maf="0to5e-2"
 readonly min_mac=4
-readonly use_prs=1
+# Note: we generally don't want to use PRS here, since this is just a filter
+# for how many genes to interrogate downstream. We will show PRS P-values regardless, 
+# but would be nice to see how variants behave after conditionionon common/rare stuff.
+readonly use_prs=0
 
 # I/O
 readonly genes="data/genes/220310_ensgid_grch38_pos.tsv.gz"
@@ -67,13 +70,14 @@ submit_sig_genes()
       local in_file_std="${step2_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}.txt.gz"
       local out_prefix_std="${out_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}"
 
+      echo "prs on = ${use_prs}"
       # depending on whether PRS is available select path
-      if [ "${use_prs}" -eq "1" ] & [ -f "${in_file_loco}" ]; then
+      if [ "${use_prs}" -eq "1" ] && [ -f "${in_file_loco}" ]; then
         echo "Note: Using PRS results from ${phenotype}"
         local in_file=${in_file_loco}
         local out_prefix="${out_prefix_std}_locoprs"
       else
-        echo "Warning: No PRS for ${phenotype}. Using standard results instead."
+        echo "Note: No PRS for ${phenotype}."
         local in_file=${in_file_std}
         local out_prefix="${out_prefix_std}"
       fi
