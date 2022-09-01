@@ -66,7 +66,7 @@ submit_spa_with_csqs()
 
     # setup input and outputs
     local step1_dir="data/saige/output/${trait}/step1"
-    local step2_dir="data/saige/output/${trait}/step2_rare_cond/min_mac${min_mac}"
+    local step2_dir="data/saige/output/${trait}/step2_rare_cond_SEP/min_mac${min_mac}"
     local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${maf}_${annotation}.vcf.bgz"
     mkdir -p ${step2_dir}
 
@@ -90,14 +90,14 @@ submit_spa_with_csqs()
       fi
     fi
 
-    # setup paths to variants in genes by phenotype (note: currently only PRS available)
+    # setup paths to variants in genes by phenotype (We don't care about PRS here, since
+    # this step is just for selecting variants within genes).
     local markers_by_gene="${markers_by_gene_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}.txt.gz"
 
+    # if file has not been generated, run it
     if [ ! -f "${out_mrg}" ]; then
-
       local log="${out_prefix}.log"
       local logerror="${out_prefix}.errors.log"
-
       local qsub_spa_name="spa_${phenotype}_${annotation}"
       local qsub_merge_name="_mrg_${phenotype}_${annotation}"
       submit_spa_job
@@ -157,7 +157,7 @@ submit_merge_job()
 }
 
 # parameters
-readonly markers_cond_min_mac=3
+readonly markers_cond_min_mac=4  #3
 readonly use_prs="1"
 readonly min_mac=4
 readonly tasks=15
