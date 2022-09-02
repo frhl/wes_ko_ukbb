@@ -170,7 +170,7 @@ main <- function(args){
   # chr19:40778389:A:G    ENSG00000171570 damaging_missense   COPD_combined_primary_care  chr19 
   mrg <- merge(mrg, d_gene_filter, by = 'id', all.x = TRUE)
   mrg$chr <- NULL
-  mrg$phenotype <- NULL
+  #mrg$phenotype <- NULL
 
   # markers to keep
   mrg$keep <- mrg$keep_variant_ac & mrg$keep_variant_ld
