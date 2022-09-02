@@ -94,17 +94,20 @@ submit_spa_with_csqs()
     # this step is just for selecting variants within genes).
     local markers_by_gene="${markers_by_gene_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}.txt.gz"
 
-    # if file has not been generated, run it
-    if [ ! -f "${out_mrg}" ]; then
-      local log="${out_prefix}.log"
-      local logerror="${out_prefix}.errors.log"
-      local qsub_spa_name="spa_${phenotype}_${annotation}"
-      local qsub_merge_name="_mrg_${phenotype}_${annotation}"
-      submit_spa_job
-      submit_merge_job
+    if [ -f ${markers_by_gene} ]; then
+      if [ ! -f "${out_mrg}" ]; then
+        local log="${out_prefix}.log"
+        local logerror="${out_prefix}.errors.log"
+        local qsub_spa_name="spa_${phenotype}_${annotation}"
+        local qsub_merge_name="_mrg_${phenotype}_${annotation}"
+        submit_spa_job
+        submit_merge_job
+      else
+        >&2 echo "Phenotype ${phenotype} with annotation ${annotation} already exists! Skipping.." 
+      fi
     else
-      >&2 echo "Phenotype ${phenotype} with annotation ${annotation} already exists! Skipping.." 
-    fi
+      >&2 echo "Markers by gene file does not exists (${markers_by_gene})"
+    fi 
   else
     >&2 echo "No phenotype at index ${SGE_TASK_ID}. Exiting.." 
   fi 
