@@ -100,20 +100,18 @@ readonly tasks=1-5 #-2
 #simulate_phenotypes 0.00 0.00 0.00 0.01 0.01
 
 # gradually greater recessive effects (polygenic model)
-run_with_params 0.007 0.10 0.10 0.20 0.20 100
-run_with_params 0.007 10.0 0.10 0.20 0.20 100
-run_with_params 0.007 0.10 10.0 0.20 0.20 100
-run_with_params 0.007 0.10 20.0 0.20 0.20 100
 
-run_with_params 0.007 0.10 0.10 0.20 0.20 101
-run_with_params 0.007 10.0 0.10 0.20 0.20 101
-run_with_params 0.007 0.10 10.0 0.20 0.20 101
-run_with_params 0.007 0.10 20.0 0.20 0.20 101
+run_with_params 0.002 0.10 0.10 0.20 0.20 201
+run_with_params 0.002 5.00 0.10 0.20 0.20 201
+run_with_params 0.002 0.10 5.00 0.20 0.20 201
 
-run_with_params 0.007 0.10 0.10 0.20 0.20 102
-run_with_params 0.007 10.0 0.10 0.20 0.20 102
-run_with_params 0.007 0.10 10.0 0.20 0.20 102
-run_with_params 0.007 0.10 20.0 0.20 0.20 102
+run_with_params 0.003 0.10 0.10 0.20 0.20 201
+run_with_params 0.003 5.00 0.10 0.20 0.20 201
+run_with_params 0.003 0.10 5.00 0.20 0.20 201
+
+run_with_params 0.005 0.10 0.10 0.20 0.20 201
+run_with_params 0.005 5.00 0.10 0.20 0.20 201
+run_with_params 0.005 0.10 5.00 0.20 0.20 201
 
 
 

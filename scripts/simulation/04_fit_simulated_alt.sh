@@ -37,7 +37,7 @@ readonly nslots=1
 
 # wrapper for running main script
 run_with_params() {
-    simulate_phenotypes ${1} ${2} ${3} ${4} ${5} ${6}
+    submit_spa ${1} ${2} ${3} ${4} ${5} ${6}
 }
 
 # main script
@@ -104,20 +104,15 @@ submit_spa_job() {
 
 readonly annotation="pLoF_damaging_missense"
 
-run_with_params 0.007 0.10 0.10 0.20 0.20 100
-run_with_params 0.007 10.0 0.10 0.20 0.20 100
-run_with_params 0.007 0.10 10.0 0.20 0.20 100
-run_with_params 0.007 0.10 20.0 0.20 0.20 100
+run_with_params 0.002 0.10 0.10 0.20 0.20 201
+run_with_params 0.002 5.00 0.10 0.20 0.20 201
+run_with_params 0.002 0.10 5.00 0.20 0.20 201
 
-run_with_params 0.007 0.10 0.10 0.20 0.20 101
-run_with_params 0.007 10.0 0.10 0.20 0.20 101
-run_with_params 0.007 0.10 10.0 0.20 0.20 101
-run_with_params 0.007 0.10 20.0 0.20 0.20 101
+run_with_params 0.003 0.10 0.10 0.20 0.20 201
+run_with_params 0.003 5.00 0.10 0.20 0.20 201
+run_with_params 0.003 0.10 5.00 0.20 0.20 201
 
-run_with_params 0.007 0.10 0.10 0.20 0.20 102
-run_with_params 0.007 10.0 0.10 0.20 0.20 102
-run_with_params 0.007 0.10 10.0 0.20 0.20 102
-run_with_params 0.007 0.10 20.0 0.20 0.20 102
-
-
+run_with_params 0.005 0.10 0.10 0.20 0.20 201
+run_with_params 0.005 5.00 0.10 0.20 0.20 201
+run_with_params 0.005 0.10 5.00 0.20 0.20 201
 

@@ -21,7 +21,7 @@ readonly plink_dir="data/saige/grm/input"
 readonly grm_dir="data/saige/grm/input"
 readonly covar_dir="data/phenotypes"
 readonly pheno_dir="data/simulation/phenotypes"
-readonly out_dir="data/simulation/saige/step1/binary"
+readonly out_dir="data/simulation/saige/step1/cts"
 
 readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
@@ -93,19 +93,17 @@ fit_null() {
 
 readonly tasks="1-5"
 
-run_with_params 0.007 0.10 0.10 0.20 0.20 100
-run_with_params 0.007 10.0 0.10 0.20 0.20 100
-run_with_params 0.007 0.10 10.0 0.20 0.20 100
-run_with_params 0.007 0.10 20.0 0.20 0.20 100
+run_with_params 0.002 0.10 0.10 0.20 0.20 201
+run_with_params 0.002 5.00 0.10 0.20 0.20 201
+run_with_params 0.002 0.10 5.00 0.20 0.20 201
 
-run_with_params 0.007 0.10 0.10 0.20 0.20 101
-run_with_params 0.007 10.0 0.10 0.20 0.20 101
-run_with_params 0.007 0.10 10.0 0.20 0.20 101
-run_with_params 0.007 0.10 20.0 0.20 0.20 101
+run_with_params 0.003 0.10 0.10 0.20 0.20 201
+run_with_params 0.003 5.00 0.10 0.20 0.20 201
+run_with_params 0.003 0.10 5.00 0.20 0.20 201
 
-run_with_params 0.007 0.10 0.10 0.20 0.20 102
-run_with_params 0.007 10.0 0.10 0.20 0.20 102
-run_with_params 0.007 0.10 10.0 0.20 0.20 102
-run_with_params 0.007 0.10 20.0 0.20 0.20 102
+run_with_params 0.005 0.10 0.10 0.20 0.20 201
+run_with_params 0.005 5.00 0.10 0.20 0.20 201
+run_with_params 0.005 0.10 5.00 0.20 0.20 201
+
 
 

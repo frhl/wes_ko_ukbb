@@ -109,7 +109,7 @@ def main(args):
         mt = mt.annotate_cols(case=mt.y > threshold)
 
     # export effect sizes
-    ht = mt.select_rows(*['beta','theta']).select_entries(*['pKO','knockout'])
+    ht = mt.select_rows(*['rsid','beta','theta']).select_entries(*['pKO','knockout'])
     ht.entries().flatten().export(out_prefix + "_entries.tsv.gz")
 
     # export simulated phenotypes
