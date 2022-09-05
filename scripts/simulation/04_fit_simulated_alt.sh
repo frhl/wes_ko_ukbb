@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-10
+#$ -t 1-5
 #$ -tc 5
 #$ -V
 
@@ -30,11 +30,17 @@ readonly grm_sam="${grm_mtx}.sampleIDs.txt"
 
 readonly conditioning_markers=""
 readonly min_mac=2
-readonly chr=21
+readonly chr=22
 readonly tasks=${chr}
 readonly queue="short.qf"
 readonly nslots=1
 
+# wrapper for running main script
+run_with_params() {
+    simulate_phenotypes ${1} ${2} ${3} ${4} ${5} ${6}
+}
+
+# main script
 submit_spa()
 {
   local K=0.1
@@ -43,12 +49,17 @@ submit_spa()
   local var_theta=${3}
   local pi_beta=${4}
   local pi_theta=${5}
+  local seed=${6}
 
   local vars="${var_beta}_${var_theta}"
   local pis="${pi_beta}_${pi_theta}"
 
-  local prefix="ukb_eur_h2_${h2}_var_${vars}_pi_${pis}_K${K}_chr${chr}"
+
+  # change "case" to "y" for quant
+  local prefix="ukb_eur_h2_${h2}_var_${vars}_pi_${pis}_K${K}_seed${seed}_chr${chr}"
   local saige_prefix="${prefix}_y_${SGE_TASK_ID}"
+  
+  #local phenotype="y_${SGE_TASK_ID}"
   local phenotype="y_${SGE_TASK_ID}"
   submit_spa_with_csqs "${phenotype}" "${saige_prefix}" "cts"
 }
@@ -59,8 +70,8 @@ submit_spa_with_csqs()
   local phenotype=${1?Error: Missing arg2 (phenotype)}
   local saige_prefix=${2?Error: Missing arg3 (saige_prefix)}
   local trait=${3?Error: Missing arg4 (trait)}
-  local step1_dir="data/simulation/saige/step1"
-  local step2_dir="data/simulation/saige/step2"
+  local step1_dir="data/simulation/saige/step1/${trait}"
+  local step2_dir="data/simulation/saige/step2/${trait}"
   local in_gmat="${step1_dir}/${saige_prefix}.rda"
   local in_var="${step1_dir}/${saige_prefix}.varianceRatio.txt"
   local out_prefix="${step2_dir}/${saige_prefix}_${annotation}"
@@ -93,18 +104,20 @@ submit_spa_job() {
 
 readonly annotation="pLoF_damaging_missense"
 
-submit_spa 0.30 0.01 0.01 1.00 1.00
-submit_spa 0.30 0.01 0.10 1.00 1.00
-submit_spa 0.30 0.01 0.50 1.00 1.00
-submit_spa 0.30 0.01 1.00 1.00 1.00
-submit_spa 0.30 0.01 2.00 1.00 1.00
-submit_spa 0.30 0.01 3.00 1.00 1.00
-submit_spa 0.30 0.01 5.00 1.00 1.00
-submit_spa 0.30 0.01 10.0 1.00 1.00
-submit_spa 0.30 0.01 20.0 1.00 1.00
-submit_spa 0.30 0.01 40.0 1.00 1.00
-submit_spa 0.30 0.01 100.0 1.00 1.00
-submit_spa 0.30 0.01 500.0 1.00 1.00
+run_with_params 0.007 0.10 0.10 0.20 0.20 100
+run_with_params 0.007 10.0 0.10 0.20 0.20 100
+run_with_params 0.007 0.10 10.0 0.20 0.20 100
+run_with_params 0.007 0.10 20.0 0.20 0.20 100
+
+run_with_params 0.007 0.10 0.10 0.20 0.20 101
+run_with_params 0.007 10.0 0.10 0.20 0.20 101
+run_with_params 0.007 0.10 10.0 0.20 0.20 101
+run_with_params 0.007 0.10 20.0 0.20 0.20 101
+
+run_with_params 0.007 0.10 0.10 0.20 0.20 102
+run_with_params 0.007 10.0 0.10 0.20 0.20 102
+run_with_params 0.007 0.10 10.0 0.20 0.20 102
+run_with_params 0.007 0.10 20.0 0.20 0.20 102
 
 
 

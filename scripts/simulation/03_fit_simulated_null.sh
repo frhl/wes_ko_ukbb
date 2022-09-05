@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 21
+#$ -t 22
 #$ -V
 
 set -o errexit
@@ -21,7 +21,7 @@ readonly plink_dir="data/saige/grm/input"
 readonly grm_dir="data/saige/grm/input"
 readonly covar_dir="data/phenotypes"
 readonly pheno_dir="data/simulation/phenotypes"
-readonly out_dir="data/simulation/saige/step1"
+readonly out_dir="data/simulation/saige/step1/binary"
 
 readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
@@ -35,7 +35,14 @@ readonly rscript="utils/saige/step1_fitNULLGLMM.R"
 
 mkdir -p ${out_dir}
 
-fit_phenotypes() {
+
+# wrapper for running main script
+run_with_params() {
+    simulate_phenotypes ${1} ${2} ${3} ${4} ${5} ${6}
+}
+
+# main script
+simulate_phenotypes() {
 
   local K=0.1
   local h2=${1}
@@ -43,26 +50,22 @@ fit_phenotypes() {
   local var_theta=${3}
   local pi_beta=${4}
   local pi_theta=${5}
+  local seed=${6}
 
   local vars="${var_beta}_${var_theta}"
   local pis="${pi_beta}_${pi_theta}"
 
-  #local K=0.1
-  #local h2_beta=${1}
-  #local h2_theta=${2}
-  #local pi_beta=${3}
-  #local pi_theta=${4}
-
-  #local h2s="${h2_beta}_${h2_theta}"
-  #local pis="${pi_beta}_${pi_theta}"
-
-  local prefix="ukb_eur_h2_${h2}_var_${vars}_pi_${pis}_K${K}_chr${chr}"
-  #local prefix="ukb_eur_h2_${h2s}_pi_${pis}_K${K}_chr${chr}"
+  local prefix="ukb_eur_h2_${h2}_var_${vars}_pi_${pis}_K${K}_seed${seed}_chr${chr}"
+  #local prefix="ukb_eur_h2_${h2s}_pi_${pis}_K${K}_seed${seed}_chr${chr}"
   local pheno_file="${pheno_dir}/${prefix}_phenos.tsv.gz"
 
   local trait_type="quantitative"
+  #local trait_type="binary"
   local inv_normalize="TRUE"
-  local phenotype="y" # or "case" for binary
+  #local inv_normalize="FALSE"
+  #local phenotype="y" # or "case" for binary
+  local phenotype="y"
+  #local phenotype="case"
   fit_null
 }
 
@@ -88,24 +91,21 @@ fit_null() {
    set +x
  }
 
-readonly tasks="1-50"
+readonly tasks="1-5"
 
-fit_phenotypes 0.00 0.00 0.00 0.01 0.01
+run_with_params 0.007 0.10 0.10 0.20 0.20 100
+run_with_params 0.007 10.0 0.10 0.20 0.20 100
+run_with_params 0.007 0.10 10.0 0.20 0.20 100
+run_with_params 0.007 0.10 20.0 0.20 0.20 100
 
-# gradually greater recessive effects (polygenic model)
-fit_phenotypes 0.30 0.01 0.01 1.00 1.00
-fit_phenotypes 0.30 0.01 0.10 1.00 1.00
-fit_phenotypes 0.30 0.01 0.50 1.00 1.00
-fit_phenotypes 0.30 0.01 1.00 1.00 1.00
-fit_phenotypes 0.30 0.01 2.00 1.00 1.00
-fit_phenotypes 0.30 0.01 3.00 1.00 1.00
-fit_phenotypes 0.30 0.01 5.00 1.00 1.00
-fit_phenotypes 0.30 0.01 10.0 1.00 1.00
-fit_phenotypes 0.30 0.01 20.0 1.00 1.00
-fit_phenotypes 0.30 0.01 40.0 1.00 1.00
-fit_phenotypes 0.30 0.01 100.0 1.00 1.00
-fit_phenotypes 0.30 0.01 500.0 1.00 1.00
+run_with_params 0.007 0.10 0.10 0.20 0.20 101
+run_with_params 0.007 10.0 0.10 0.20 0.20 101
+run_with_params 0.007 0.10 10.0 0.20 0.20 101
+run_with_params 0.007 0.10 20.0 0.20 0.20 101
 
-
+run_with_params 0.007 0.10 0.10 0.20 0.20 102
+run_with_params 0.007 10.0 0.10 0.20 0.20 102
+run_with_params 0.007 0.10 10.0 0.20 0.20 102
+run_with_params 0.007 0.10 20.0 0.20 0.20 102
 
 
