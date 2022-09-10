@@ -6,7 +6,7 @@
 #$ -e logs/extract_marker_gt.errors.log
 #$ -P lindgren.prjc
 #$ -q short.qa
-#$ -pe shmem 4
+#$ -pe shmem 5
 #$ -V
 
 # Takes ~13h with 3a cores
@@ -23,7 +23,6 @@ readonly hail_script="scripts/conditional/common/04_extract_marker_gt.py"
 
 readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
 
-readonly chr="${SGE_TASK_ID}"
 readonly out_dir="data/conditional/common/markers_with_gt/final"
 readonly out_prefix="${out_dir}/common_conditional"
 readonly out_checkpoint="${out_prefix}_checkpoint.mt"
