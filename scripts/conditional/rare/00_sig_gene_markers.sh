@@ -10,7 +10,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 70
+#$ -t 1-80
 
 set -o errexit
 set -o nounset
@@ -70,7 +70,6 @@ submit_sig_genes()
       local in_file_std="${step2_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}.txt.gz"
       local out_prefix_std="${out_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}"
 
-      echo "prs on = ${use_prs}"
       # depending on whether PRS is available select path
       if [ "${use_prs}" -eq "1" ] && [ -f "${in_file_loco}" ]; then
         echo "Note: Using PRS results from ${phenotype}"

@@ -75,7 +75,7 @@ spa_test() {
   echo "gmat_bytes=${gmat_bytes} at ${gmat}"
   if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then 
     SECONDS=0
-    Rscript "${step2_SPAtests}"	\
+    Rscript "${step2_SPAtests}" \
        --vcfFile=${vcf} \
        --vcfFileIndex=${csi} \
        --vcfField="DS" \

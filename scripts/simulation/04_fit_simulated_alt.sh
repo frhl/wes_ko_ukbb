@@ -32,7 +32,7 @@ readonly conditioning_markers=""
 readonly min_mac=2
 readonly chr=22
 readonly tasks=${chr}
-readonly queue="short.qf"
+readonly queue="short.qe"
 readonly nslots=1
 
 # wrapper for running main script
@@ -57,11 +57,11 @@ submit_spa()
 
   # change "case" to "y" for quant
   local prefix="ukb_eur_h2_${h2}_var_${vars}_pi_${pis}_K${K}_seed${seed}_chr${chr}"
-  local saige_prefix="${prefix}_y_${SGE_TASK_ID}"
+  local saige_prefix="${prefix}_case_${SGE_TASK_ID}"
   
   #local phenotype="y_${SGE_TASK_ID}"
-  local phenotype="y_${SGE_TASK_ID}"
-  submit_spa_with_csqs "${phenotype}" "${saige_prefix}" "cts"
+  local phenotype="case_${SGE_TASK_ID}"
+  submit_spa_with_csqs "${phenotype}" "${saige_prefix}" "binary"
 }
 
 
@@ -104,15 +104,43 @@ submit_spa_job() {
 
 readonly annotation="pLoF_damaging_missense"
 
-run_with_params 0.002 0.10 0.10 0.20 0.20 201
-run_with_params 0.002 5.00 0.10 0.20 0.20 201
-run_with_params 0.002 0.10 5.00 0.20 0.20 201
+run_with_params 0.00 0.00 0.00 0.01 0.01 600
 
-run_with_params 0.003 0.10 0.10 0.20 0.20 201
-run_with_params 0.003 5.00 0.10 0.20 0.20 201
-run_with_params 0.003 0.10 5.00 0.20 0.20 201
+#run_with_params 0.001 0.10 99.0 0.20 0.20 601
+#run_with_params 0.002 0.10 99.0 0.20 0.20 602
+#run_with_params 0.005 0.10 99.0 0.20 0.20 603
+#run_with_params 0.01 0.10 99.0 0.20 0.20 604
+#run_with_params 0.02 0.10 99.0 0.20 0.20 605
+#run_with_params 0.05 0.10 99.0 0.20 0.20 606
 
-run_with_params 0.005 0.10 0.10 0.20 0.20 201
-run_with_params 0.005 5.00 0.10 0.20 0.20 201
-run_with_params 0.005 0.10 5.00 0.20 0.20 201
+#run_with_params 0.001 0.10 99.0 1.00 1.00 601
+#run_with_params 0.002 0.10 99.0 1.00 1.00 602
+#run_with_params 0.005 0.10 99.0 1.00 1.00 603
+#run_with_params 0.01 0.10 99.0 1.00 1.00 604
+#run_with_params 0.02 0.10 99.0 1.00 1.00 605
+#run_with_params 0.05 0.10 99.0 1.00 1.00 606
+
+#run_with_params 0.001 10.0 0.10 0.20 0.20 501
+#run_with_params 0.001 0.10 0.10 0.20 0.20 501
+#run_with_params 0.001 0.10 1.00 0.20 0.20 502
+#run_with_params 0.001 0.10 10.0 0.20 0.20 503
+#run_with_params 0.001 0.10 99.0 0.20 0.20 504
+
+#run_with_params 0.005 10.0 0.10 0.20 0.20 501
+#run_with_params 0.005 0.10 0.10 0.20 0.20 501
+#run_with_params 0.005 0.10 1.00 0.20 0.20 502
+#run_with_params 0.005 0.10 10.0 0.20 0.20 503
+#run_with_params 0.005 0.10 99.0 0.20 0.20 504
+
+run_with_params 0.01 10.0 0.10 0.20 0.20 501
+run_with_params 0.01 0.10 0.10 0.20 0.20 501
+run_with_params 0.01 0.10 1.00 0.20 0.20 502
+run_with_params 0.01 0.10 10.0 0.20 0.20 503
+run_with_params 0.01 0.10 99.0 0.20 0.20 504
+
+run_with_params 0.10 10.0 0.10 0.20 0.20 501
+run_with_params 0.10 0.10 0.10 0.20 0.20 501
+run_with_params 0.10 0.10 1.00 0.20 0.20 502
+run_with_params 0.10 0.10 10.0 0.20 0.20 503
+run_with_params 0.10 0.10 99.0 0.20 0.20 504
 

@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 1-20
+#$ -t 1-80
 #$ -tc 1
 #$ -V
 
@@ -141,7 +141,7 @@ readonly nslots=2
 readonly queue="short.qe"
 
 # Fit null model for binary/cts traits
-fit_cts_traits
+#fit_cts_traits
 fit_binary_traits
 
 

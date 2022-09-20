@@ -11,7 +11,6 @@ main <- function(args){
   d <- do.call(rbind, lapply(files, function(rds){
     phenotype <- gsub("ldsc_","",tools::file_path_sans_ext(basename(rds)))
     d <- readRDS(rds)
-    d$log_pvalue <- NULL
     qc <- d$qc
     ldsc <- d$coefficients
     gwas <- d$gwas
@@ -20,16 +19,17 @@ main <- function(args){
     ldsc$coef <- rownames(ldsc)
     ldsc$n <- gwas$n[1]
     ldsc$n_eff <- gwas$n_eff[1]
+    ldsc$log_pvalue <- NULL
     return(ldsc)
   }))
 
   # write outfile
   outfile1 <- paste0(args$out_prefix, ".txt.gz")
-  fwrite(d, outfilei1, sep = "\t") 
+  fwrite(d, outfile1, sep = "\t") 
 
   # save list of phenotypes that pass our sig thresholds
   pval_threshold <- 1e-5
-  phenotypes <- d$phenotype[d$coef == "h2" & d$pvalue > pval_threshold]
+  phenotypes <- d$phenotype[d$coef == "h2" & d$pvalue < pval_threshold]
   outfile2 <- paste0(args$out_prefix, "_qc_passed.txt")
   fwrite(data.frame(phenotypes), outfile2, sep = '\t')
 

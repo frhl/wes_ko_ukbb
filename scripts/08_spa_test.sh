@@ -132,7 +132,7 @@ submit_merge_job()
 
 # parameters
 readonly conditioning_markers=""
-readonly use_prs="0"
+readonly use_prs="1"
 readonly min_mac=4
 readonly tasks=1-22
 readonly queue="short.qe"
@@ -143,11 +143,11 @@ maf="maf0to5e-2"
 
 # cts traits
 #submit_spa_cts_with_csqs "pLoF_damaging_missense"
-#submit_spa_binary_with_csqs "pLoF_damaging_missense"
+submit_spa_binary_with_csqs "pLoF_damaging_missense"
 
 #sleep 10
-submit_spa_cts_with_csqs "pLoF"
-submit_spa_binary_with_csqs "pLoF"
+#submit_spa_cts_with_csqs "pLoF"
+#submit_spa_binary_with_csqs "pLoF"
 
 #sleep 10
 #submit_spa_cts_with_csqs "damaging_missense"

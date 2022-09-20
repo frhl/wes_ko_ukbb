@@ -22,8 +22,8 @@ readonly hail_script="scripts/conditional/common/05_append_vcf_common.py"
 readonly chr="${SGE_TASK_ID}"
 
 readonly ko_dir="data/knockouts/alt"
-readonly common_dir="data/conditional/common/markers_with_gt"
-readonly out_dir="data/conditional/common/combined"
+readonly common_dir="data/conditional/common/markers_with_gt/final"
+readonly out_dir="data/conditional/common/combined/final"
 
 readonly ko_path_wo_ext="${ko_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense"
 readonly common_path_wo_ext="${common_dir}/common_conditional"

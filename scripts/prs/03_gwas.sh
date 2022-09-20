@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-100
+#$ -t 30-31
 #$ -tc 5
 #$ -V
 
@@ -102,7 +102,7 @@ submit_merge_job()
 
 readonly tasks="1-22"
 submit_gwas_job "data/prs/sumstat/binary" "${phenotype_binary}" "${file_binary}"
-submit_gwas_job "data/prs/sumstat/cts" "${phenotype_cts}_int" "${file_cts}"
+#submit_gwas_job "data/prs/sumstat/cts" "${phenotype_cts}_int" "${file_cts}"
 
 
 

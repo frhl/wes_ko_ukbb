@@ -60,7 +60,8 @@ def main(args):
 
     # filter invariant sites
     mt = mt.annotate_entries(DS = hl.float(mt.GT.n_alt_alleles()))
-    
+  
+ 
     # export list of variants for later conditional analysis
     varid = hl.delimit([
         hl.str(mt.locus.contig),
@@ -69,9 +70,14 @@ def main(args):
         mt.alleles[1]],':')
     mt = mt.annotate_rows(rsid=varid)
 
+    # get MAC
+    mt = mt.annotate_rows(
+            MAC=hl.min(hl.agg.call_stats(mt.GT, mt.alleles).AC)
+            )
+
     # create list of markers in data
     ht = mt.rows()
-    ht = ht.select('rsid', 'consequence_category')
+    ht = ht.select('rsid', 'consequence_category', 'MAC')
     ht.flatten().export(out_prefix + "_markers.txt.gz")
 
     # annotate dosage
