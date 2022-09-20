@@ -17,10 +17,12 @@ readonly in_vcf=${2?Error: Missing arg2 (in_vcf)}
 readonly in_csi=${3?Error: Missing arg3 (in_csi)}
 readonly in_gmat=${4?Error: Missing arg4 (in_gmat)} 
 readonly in_var=${5?Error: Missing arg5 (in_var)} 
-readonly min_mac=${6?Error: Missing arg6 (min_mac)} 
-readonly in_group=${7?Error: Missing arg6 (path prefix for group file)}
-readonly out_prefix=${8?Error: Missing arg6 (path prefix for saige output)}
-readonly in_markers=${9} # optional conditioning markers
+readonly grm_mtx=${6?Error: Missing arg6 (grm_mtx)}
+readonly grm_sam=${7?Error: Missing arg7 (grm_sam)}
+readonly min_mac=${8?Error: Missing arg8 (min_mac)} 
+readonly in_group=${9?Error: Missing arg9 (path prefix for group file)}
+readonly out_prefix=${10?Error: Missing arg10 (path prefix for saige output)}
+readonly in_markers=${11} # optional conditioning markers
 readonly chr=${SGE_TASK_ID}
 
 # chromosome specified at in_gmat and in_var
@@ -52,6 +54,8 @@ spa_set_test() {
        --vcfFile=${vcf} \
        --vcfFileIndex=${csi} \
        --vcfField="GT" \
+       --sparseGRMFile=${grm_mtx} \
+       --sparseGRMSampleIDFile=${grm_sam}  \
        --chrom="chr${chr}" \
        --minMAF=0 \
        --minMAC=${min_mac} \
@@ -61,7 +65,7 @@ spa_set_test() {
        --LOCO=FALSE \
        --groupFile=${group} \
        --annotation_in_groupTest=pLoF,damaging_missense,synonymous,damaging_missense:pLoF,synonymous:damaging_missense:pLoF \
-       --maxMAF_in_groupTest=0.001,0.01
+       --maxMAF_in_groupTest=0.001,0.01,0.05
        ${markers:+--condition "$markers"} 
      set +x
    else

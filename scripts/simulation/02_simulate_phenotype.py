@@ -84,10 +84,10 @@ def main(args):
             theta = mt.theta_nosign * mt.beta_sign
         )
 
-        # sum up effect from domincance
+        # sum up recessive effects
         mt = mt.annotate_cols(y_no_noise_add=hl.agg.sum(mt.beta * mt.G_norm))
-        mt = mt.annotate_cols(y_no_noise_dom=hl.agg.sum(mt.theta * mt.G_norm_alt))
-        mt = mt.annotate_cols(y_no_noise=mt.y_no_noise_add+mt.y_no_noise_dom)
+        mt = mt.annotate_cols(y_no_noise_rec=hl.agg.sum(mt.theta * mt.G_norm_alt))
+        mt = mt.annotate_cols(y_no_noise=mt.y_no_noise_add+mt.y_no_noise_rec)
 
         # re-scale effects
         mt = mt.annotate_cols(y_no_noise_rescaled = rescale_variances_hail(mt.y_no_noise, mt, h2))
@@ -109,7 +109,7 @@ def main(args):
         mt = mt.annotate_cols(case=mt.y > threshold)
 
     # export effect sizes
-    ht = mt.select_rows(*['beta','theta']).select_entries(*['pKO','knockout'])
+    ht = mt.select_rows(*['rsid','beta','theta']).select_entries(*['pKO','knockout'])
     ht.entries().flatten().export(out_prefix + "_entries.tsv.gz")
 
     # export simulated phenotypes

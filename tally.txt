@@ -1,7 +1,0 @@
-### Mon Mar 14 22:46:54 GMT 2022 ###
-### Mon Mar 14 22:47:25 GMT 2022 ###
-1.7T data/mt 1.4T data/unphased 497G data/prs 362G data/phased 212G data/tmp 127G data/permute 65G data/saige 9.3G data/vep 7.3G data/conditional 1.7G data/knockouts 717M data/samples 529M data/phenotypes 302M data/simulation 173M data/genes 35K data/intervals 5.5K data/tests
-### (end) ###
-### Thu Mar 17 23:36:10 GMT 2022 ###
-1.4T data/unphased 497G data/prs 362G data/phased 249G data/tmp 128G data/mt 66G data/saige 9.3G data/vep 9.0G data/conditional 1.7G data/knockouts 717M data/samples 529M data/phenotypes 302M data/simulation 194M data/permute 173M data/genes 35K data/intervals 5.5K data/tests
-### (end) ###

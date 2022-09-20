@@ -34,7 +34,7 @@ readonly out_prefix=${10?Error: Missing arg3 ()}
 
 readonly out_sge_prefix="${out_prefix}_${SGE_TASK_ID}"
 readonly sge_seed=$(( ${SGE_TASK_ID} * ${seed}))
-
+echo "Using SGE_SEED=${sge_seed}"
 
 mkdir -p ${spark_dir}
 

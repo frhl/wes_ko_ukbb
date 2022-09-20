@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc@@short.hga
-#$ -t 22
+#$ -t 1-22
 
 set -o errexit
 set -o nounset
@@ -18,15 +18,14 @@ source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark_dir"
 readonly hail_script="scripts/04_export_csqs.py"
-readonly rscript="scripts/04_export_csqs_test.R"
+readonly rscript="scripts/04_export_csqs.R"
 
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 
 readonly in_dir="data/mt/annotated"
-readonly input_prefix="${in_dir}/ukb_eur_wes_200k_annot_chr${chr}.mt"
+readonly input_prefix="${in_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.mt"
 
-readonly out_dir="data/mt/vep"
-#readonly out_prefix="${out_dir}/ukb_eur_wes_200k_csqs_chr${chr}"
-readonly out_prefix="${out_dir}/ukb_eur_wes_200k_csqs_chrALL_test"
+readonly out_dir="data/mt/vep/worst_csq_by_gene_canonical"
+readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
 readonly out_saige="${out_prefix}.saige"
 
 

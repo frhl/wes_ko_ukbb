@@ -174,14 +174,20 @@ if (BLASctl_installed){
 
 if (opt$condition_file != ""){
     print(opt$condition_file)
-    stopifnot(file.exists(opt$condition_file))
-    markers <- read.table(opt$condition_file, header = FALSE)
-    arr_markers <- markers[,1]
-    n_markers <- length(arr_markers)
-    msg <- paste0("Debug: ", n_markers, " markers were read.")
-    write(msg, stderr())
-    markers <- paste0(arr_markers, collapse = ",")
-    opt$condition <- markers
+    if (file.exists(opt$condition_file)) {
+        markers <- read.table(opt$condition_file, header = FALSE)
+        arr_markers <- markers[,1]
+        n_markers <- length(arr_markers)
+        msg <- paste0("Note: ", n_markers, " marker(s) were read for conditional analysis.")
+        write(msg, stderr())
+        markers <- paste0(arr_markers, collapse = ",")
+        opt$condition <- markers
+    } else {
+        msg <- paste0("Note: --condition_file specified but file (",opt$condition_file,") was not found. Defaulting to non-conditional analysis.")
+        write(msg, stderr())
+        opt$condition <- ""
+    }
+
 }
 
 

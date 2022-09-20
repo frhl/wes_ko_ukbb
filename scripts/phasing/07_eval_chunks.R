@@ -96,9 +96,9 @@ main <- function(args){
     w = as.numeric(args$img_width) 
     out_p1 <- paste0(args$out_prefix, "_chunks_by_ser.png")
     out_d1 <- paste0(args$out_prefix, "_chunks_by_ser.txt.gz")
-    write(paste0("writing ",h,"x", w," png to",out_p1,), stdout())
-    ggsave(out_p1, p1, width = w, height = h)
+    write(paste0("writing ",h,"x", w," png to",out_p1), stdout())
     fwrite(counts, out_d1, sep = "\t") 
+    ggsave(out_p1, p1, width = w, height = h)
 
 }
 

@@ -9,7 +9,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 6
+#$ -t 15,18
 #$ -V
 
 set -o errexit
@@ -18,7 +18,7 @@ set -o nounset
 module purge
 source utils/bash_utils.sh
 
-readonly vcf_dir="data/conditional/common/combined"
+readonly vcf_dir="data/conditional/common/combined/final"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
 
@@ -26,7 +26,7 @@ readonly spa_script="scripts/conditional/common/_spa_cond_common.sh"
 readonly merge_script="scripts/_spa_merge.sh"
 readonly in_prefix="ukb_eur_wes_200k"
 
-readonly cond_dir="data/conditional/common/combined"
+readonly cond_dir="data/conditional/common/combined/final"
 readonly cond_file="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_w_common_markers.txt"
 readonly cond_cat="common" 
 
@@ -59,7 +59,7 @@ submit_spa_with_csqs()
   if [ ! -z ${phenotype} ]; then
 
     local step1_dir="data/saige/output/${trait}/step1"
-    local step2_dir="data/saige/output/${trait}/step2_common_cond/min_mac${min_mac}"
+    local step2_dir="data/saige/output/${trait}/step2_common_cond_SEP/min_mac${min_mac}"
     local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${maf}_${annotation}_w_common.vcf.bgz"
     mkdir -p ${step2_dir}
 
@@ -137,9 +137,9 @@ submit_merge_job()
 # parameters
 readonly use_prs="1"
 readonly min_mac=4
-readonly tasks=1,16
+readonly tasks=1-22
 readonly queue="short.qc"
-readonly nslots=1
+readonly nslots=2
 
 
 

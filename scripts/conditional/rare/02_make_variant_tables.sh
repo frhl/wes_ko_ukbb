@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qa
-#$ -t 1-22
+#$ -t 1,17
 #$ -V
 
 set -o errexit
@@ -22,17 +22,15 @@ readonly merge_script="scripts/conditional/rare/_merge_variant_tables.sh"
 readonly chr="${SGE_TASK_ID}"
 readonly pheno_dir="data/phenotypes"
 readonly in_dir="data/conditional/rare/combined"
-readonly out_tmp_dir="data/conditional/rare/combined/chunks_parallel"
-readonly out_dir="data/conditional/rare/combined"
+readonly out_dir="data/conditional/rare/combined/chunks"
 
 readonly in_vcf="${in_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense.vcf.bgz"
 readonly covar_path="${pheno_dir}/covars1.csv"
 
-readonly out_prefix="${out_tmp_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense"
+readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense"
 readonly out_mrg="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense"
 
 mkdir -p ${out_dir}
-mkdir -p ${tmp_dir}
 
 # integer division with ceiling rounding
 int_div () {

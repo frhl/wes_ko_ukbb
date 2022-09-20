@@ -20,7 +20,7 @@ source utils/hail_utils.sh
 
 readonly threads=$(( ${NSLOTS}-1 ))
 readonly step2_SPAtests="utils/saige/step2_SPAtests_cond.R"
-readonly read_markers="scripts/conditional/common/_spa_cond_common.R"
+readonly rscript="scripts/conditional/common/_spa_cond_common.R"
 
 readonly phenotype=${1?Error: Missing arg1 (phenotype)}
 readonly in_vcf=${2?Error: Missing arg2 (in_vcf)}
@@ -45,22 +45,20 @@ readonly vcf=$(echo ${in_vcf} | sed -e "s/CHR/${chr}/g")
 readonly csi=$(echo ${in_csi} | sed -e "s/CHR/${chr}/g")
 readonly out=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
 
+# get conditional markers for current phenotype
 readonly cond_markers_chr=$(echo ${cond_markers} | sed -e "s/CHR/${chr}/g") 
-
-spa_test() {
-
-  # generate a list of conditioning markers if available
-  local out_markers="${out_prefix/CHR/${chr}}.markers"
-  local markers=$( Rscript ${read_markers} \
+readonly out_markers="${out_prefix/CHR/${chr}}.common.markers"
+if [ -f "${cond_markers_chr}" ]; then
+  set_up_rpy
+  Rscript ${rscript} \
     --infile ${cond_markers_chr} \
     --phenotype ${phenotype} \
-    --pheno_col 5 )
-  if [ ! -z ${markers} ]; then
-    echo ${markers} > ${out_markers}
-  fi
+    --pheno_col 6 \
+    --outfile ${out_markers}
+fi
 
-  #local vcf_markers="${out_prefix/CHR/${chr}}.vcf.markers"
-  #echo $(zcat ${vcf} | grep -v "$" | cut -f1-5 | awk 'BEGIN{OFS=":"} {print $1,$2,$4,$5}' ) > ${vcf_markers}
+
+spa_test() {
 
   if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then 
     SECONDS=0
@@ -77,7 +75,7 @@ spa_test() {
        --varianceRatioFile=${var} \
        --SAIGEOutputFile=${out} \
        --LOCO=FALSE \
-        ${markers:+--condition "${markers}"} \
+       --condition_file=${out_markers} \
        && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
        || raise_error "Saddle-point approximation for chr${chr} failed"
   else

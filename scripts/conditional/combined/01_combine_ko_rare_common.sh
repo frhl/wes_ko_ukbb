@@ -8,8 +8,8 @@
 #$ -e logs/combine_ko_rare_common.errors.log
 #$ -P lindgren.prjc
 #$ -q short.qc
-#$ -pe shmem 3
-#$ -t 1
+#$ -pe shmem 5
+#$ -t 1-22
 #$ -V
 
 

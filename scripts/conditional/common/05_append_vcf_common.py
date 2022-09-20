@@ -24,6 +24,9 @@ def main(args):
     ko = io.import_table(ko_path, ko_type, calc_info=False)
     common = io.import_table(common_path, common_type, calc_info=False)
 
+    # re-annotate dosage as alt alleles
+    common = common.transmute_entries(DS = hl.float64(common.GT.n_alt_alleles()))
+
     # filter to chromosomes (Assuing common
     # variants have already been combined).
     contig = "chr" + chrom

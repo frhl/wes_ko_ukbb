@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 2
+#$ -t 1-80
 #$ -tc 10
 #$ -V
 
@@ -28,11 +28,15 @@ readonly spa_script="scripts/conditional/rare/_spa_cond_rare.sh"
 readonly merge_script="scripts/_spa_merge.sh"
 readonly in_prefix="ukb_eur_wes_200k"
 
+# directory to markers by genes that are significant in primary analysis
+readonly markers_by_gene_dir="data/conditional/rare/combined/genes/min_mac4"
+
+# directory to conditioning markers
 readonly cond_rare_dir="data/conditional/rare/combined"
 readonly cond_rare_file="${cond_rare_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_markers.txt.gz"
 # path to file with allele count by phenotype (need to avoid conditioning on monomorphic SNPs)
-readonly markers_ac="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_AC.txt.gz"
-readonly markers_hash="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_hash.txt.gz"
+readonly markers_ac="${cond_rare_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_AC.txt.gz"
+readonly markers_hash="${cond_rare_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_hash.txt.gz"
 # category group for markers to condition on (csv)
 readonly cond_cat="pLoF,damaging_missense" 
 
@@ -60,16 +64,19 @@ submit_spa_with_csqs()
   local trait=${3?Error: Missing arg3 (trait)}
   if [ ! -z ${phenotype} ]; then
 
+    # setup input and outputs
     local step1_dir="data/saige/output/${trait}/step1"
-    local step2_dir="data/saige/output/${trait}/step2_rare_cond/min_mac${min_mac}"
+    local step2_dir="data/saige/output/${trait}/step2_rare_cond_v1116_retest/min_mac${min_mac}"
     local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${maf}_${annotation}.vcf.bgz"
     mkdir -p ${step2_dir}
 
+    # setup paths to saige step 1
     local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
     local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
     local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}"
     local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}.txt.gz"
 
+    # setup paths to saige step 1 PRS scores
    if [ "${use_prs}" -eq "1" ]; then
       local in_gmat_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.rda"
       local in_var_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.varianceRatio.txt"
@@ -83,14 +90,24 @@ submit_spa_with_csqs()
       fi
     fi
 
-    if [ ! -f "${out_mrg}" ]; then
-      local qsub_spa_name="spa_${phenotype}_${annotation}"
-      local qsub_merge_name="_mrg_${phenotype}_${annotation}"
-      submit_spa_job
-      submit_merge_job
+    # setup paths to variants in genes by phenotype (We don't care about PRS here, since
+    # this step is just for selecting variants within genes).
+    local markers_by_gene="${markers_by_gene_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}.txt.gz"
+
+    if [ -f ${markers_by_gene} ]; then
+      if [ ! -f "${out_mrg}" ]; then
+        local log="${out_prefix}.log"
+        local logerror="${out_prefix}.errors.log"
+        local qsub_spa_name="spa_${phenotype}_${annotation}"
+        local qsub_merge_name="_mrg_${phenotype}_${annotation}"
+        submit_spa_job
+        submit_merge_job
+      else
+        >&2 echo "Phenotype ${phenotype} with annotation ${annotation} already exists! Skipping.." 
+      fi
     else
-      >&2 echo "Phenotype ${phenotype} with annotation ${annotation} already exists! Skipping.." 
-    fi
+      >&2 echo "Markers by gene file does not exists (${markers_by_gene})"
+    fi 
   else
     >&2 echo "No phenotype at index ${SGE_TASK_ID}. Exiting.." 
   fi 
@@ -101,9 +118,10 @@ submit_spa_job() {
   mkdir -p ${step2_dir}
   set -x
   qsub -N "${qsub_spa_name}" \
+    -o "${log}" \
+    -e "${logerror}" \
     -t ${tasks} \
     -q "${queue}" \
-    -tc 11 \
     -pe shmem ${nslots} \
     "${spa_script}" \
     "${phenotype}" \
@@ -116,6 +134,8 @@ submit_spa_job() {
     "${min_mac}" \
     "${markers_ac}" \
     "${markers_hash}" \
+    "${markers_by_gene}" \
+    "${markers_cond_min_mac}" \
     "${out_prefix}" \
     "${cond_rare_file}" \
     "${cond_cat}"
@@ -140,12 +160,12 @@ submit_merge_job()
 }
 
 # parameters
-readonly conditioning_markers=""
+readonly markers_cond_min_mac=4  #3
 readonly use_prs="1"
 readonly min_mac=4
-readonly tasks=1
-readonly queue="short.qe"
-readonly nslots=4
+readonly tasks=1-22
+readonly queue="short.qc"
+readonly nslots=5
 
 
 

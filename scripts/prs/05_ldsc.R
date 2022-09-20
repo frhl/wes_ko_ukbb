@@ -90,7 +90,6 @@ main <- function(args){
                )  
 
   # extract coeffecients
-  print(str(ldsc))
   int_est <- ldsc[["int"]]
   h2_est <- ldsc[["h2"]]
   h2_se <- ldsc[["h2_se"]]
@@ -101,8 +100,8 @@ main <- function(args){
   int_z <- int_est / int_se
   h2_pval <- 2 * pnorm(abs(h2_z), lower.tail = FALSE)
   int_pval <- 2 * pnorm(abs(int_z), lower.tail = FALSE)
-  h2_log_pval <- 2 * pnorm(abs(h2_z), lower.tail = FALSE, log.p = TRUE)
-  int_log_pval <- 2 * pnorm(abs(int_z), lower.tail = FALSE, log.p = TRUE)
+  h2_log_pval <- pnorm(abs(h2_z), lower.tail = FALSE, log.p = TRUE)
+  int_log_pval <- pnorm(abs(int_z), lower.tail = FALSE, log.p = TRUE)
 
 
   # organize in table
@@ -110,7 +109,7 @@ main <- function(args){
     estimate = c(int_est, h2_est),
     std_error = c(int_se, h2_se),
     zstat = c(int_z, h2_z),
-    pvalue = c(int_pval, h2_pval)
+    pvalue = c(int_pval, h2_pval),
     log_pvalue = c(int_pval, h2_pval)
   )
 
@@ -129,7 +128,6 @@ main <- function(args){
 
   #write(paste0(args$pred, ".. done! Writing to ", args$out_prefix, ".rds"), stdout())
   print(args)
-  print(str(ldsc_out))
   outfile = paste0(args$out_prefix, ".rds")
   write(paste("Done! writing to", outfile), stdout())
   saveRDS(ldsc_out, outfile)

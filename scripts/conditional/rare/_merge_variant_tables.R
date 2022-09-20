@@ -28,7 +28,9 @@ main <- function(args){
     n_hash <- length(lst_hash)
     n_ac <- length(lst_ac)
     stopifnot(n_hash == n_ac)
-    stopifnot(n_hash == expected_chunks)
+    all_chunks_found <- n_hash >= expected_chunks
+    if (!all_chunks_found) stop(paste("Found", n_hash, "chunks but expected", expected_chunks, "for", args$in_prefix))
+    
 
     # combine them all
     d_hash <- rbindlist(lst_hash)
@@ -41,6 +43,7 @@ main <- function(args){
     # write to disk
     outfile_hash <- paste0(args$out_prefix, "_hash.txt.gz")
     outfile_ac <- paste0(args$out_prefix, "_AC.txt.gz")
+    write(paste("writing", outfile_hash, "and", outfile_ac), stdout())
     fwrite(d_hash, outfile_hash, sep = "\t")
     fwrite(d_ac, outfile_ac, sep = "\t")
 

@@ -19,13 +19,20 @@ main <- function(args){
     ldsc$coef <- rownames(ldsc)
     ldsc$n <- gwas$n[1]
     ldsc$n_eff <- gwas$n_eff[1]
+    ldsc$log_pvalue <- NULL
     return(ldsc)
   }))
 
   # write outfile
-  outfile <- paste0(args$out_prefix, ".txt.gz")
-  fwrite(d, outfile, sep = "\t") 
- 
+  outfile1 <- paste0(args$out_prefix, ".txt.gz")
+  fwrite(d, outfile1, sep = "\t") 
+
+  # save list of phenotypes that pass our sig thresholds
+  pval_threshold <- 1e-5
+  phenotypes <- d$phenotype[d$coef == "h2" & d$pvalue < pval_threshold]
+  outfile2 <- paste0(args$out_prefix, "_qc_passed.txt")
+  fwrite(data.frame(phenotypes), outfile2, sep = '\t')
+
 }
 
 # add arguments

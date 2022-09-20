@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-5
+#$ -t 5
 #$ -tc 1
 #$ -V
 
@@ -23,13 +23,18 @@ source utils/bash_utils.sh
 readonly vcf_dir="data/mt/annotated"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
+readonly grm_dir="data/saige/grm/input"
 
 readonly spa_script="scripts/geneset/_spa_set.sh"
 readonly merge_script="scripts/_spa_merge.sh"
-readonly in_prefix="ukb_eur_wes_200k_annot"
+readonly in_prefix="ukb_eur_wes_union_calls_200k"
+readonly in_vcf="${vcf_dir}/${in_prefix}_chrCHR.vcf.bgz"
 
-readonly group_dir="data/mt/vep"
-readonly group="${group_dir}/ukb_eur_wes_200k_csqs_chrCHR.saige"
+readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+readonly grm_sam="${grm_mtx}.sampleIDs.txt"
+
+readonly group_dir="data/mt/vep/worst_csq_by_gene_canonical"
+readonly group="${group_dir}/ukb_eur_wes_union_calls_200k_chrCHR.saige"
 
 submit_spa_set_binary()
 {
@@ -55,13 +60,15 @@ submit_spa_pair()
   local trait=${3?Error: Missing arg3 (trait)}
 
   local step1_dir="data/saige/output/${trait}/step1"
-  local step2_dir="data/saige/output/${trait}/step2_set_JUNE/min_mac${min_mac}"
+  local step2_dir="data/saige/output/${trait}/step2_set_AUG/min_mac${min_mac}"
+  mkdir -p ${step2_dir}
 
   local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
   local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
   local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}"
   local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}.txt.gz"
 
+  # setup PRS
   if [ "${use_prs}" -eq "1" ]; then
     local in_gmat_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.rda"
     local in_var_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.varianceRatio.txt"
@@ -75,16 +82,20 @@ submit_spa_pair()
     fi
   fi 
 
-  local in_vcf="${vcf_dir}/${in_prefix}_chrCHR.vcf.bgz"
-  mkdir -p ${step2_dir}
-  if [ ! -f ${out_mrg} ]; then
-    local qsub_spa_name="sspa_${phenotype}_${annotation}"
-    local qsub_merge_name="_smrg_${phenotype}_${annotation}"  
-    submit_spa_set_job
-    submit_merge_job
+  # Submit scripts
+  if [ -f "${in_gmat/CHR/21}" ] && [ -f "${in_var/CHR/21}" ]; then
+    if [ ! -f "${out_mrg}" ]; then
+      local qsub_spa_name="sspa_${phenotype}_${annotation}"
+      local qsub_merge_name="_smrg_${phenotype}_${annotation}"  
+      submit_spa_set_job
+      submit_merge_job
+    else
+      >&2 echo "${out_mrg} already exists. Skipping.."
+    fi
   else
-    >&2 echo "${out_mrg} already exists. Skipping.."
+    >&2 echo "${in_gmat} and/or ${in_var} does not exist!"
   fi
+
 }
 
 
@@ -101,6 +112,8 @@ submit_spa_set_job()
     "${in_vcf}.csi" \
     "${in_gmat}" \
     "${in_var}" \
+    "${grm_mtx}" \
+    "${grm_sam}" \
     "${min_mac}" \
     "${group}" \
     "${out_prefix}"
@@ -126,12 +139,13 @@ submit_merge_job()
 
 readonly maf="maf0to5e-2"
 readonly min_mac=4
-readonly tasks=1-22
+readonly tasks=1
 readonly queue="short.qf"
 readonly nslots=1
-readonly use_prs="0"
+readonly use_prs="1"
 
 # cts traits
-submit_spa_set_cts "pLoF_damaging_missense"
+submit_spa_set_binary "pLoF_damaging_missense"
+#submit_spa_set_cts "pLoF_damaging_missense"
 
 

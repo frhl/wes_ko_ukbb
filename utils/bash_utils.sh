@@ -137,7 +137,7 @@ wait_for_path() {
 
 set_up_RSAIGE() {
   module load Anaconda3/2020.07 
-  local version="${1:-1.1.1}"
+  local version="${1:-1.1.6.1}"
   local envs=$( conda env list | grep $version )
   local env_dir=$(echo $envs | cut -d" " -f2 )
   local env_saige="saige-v${version}"

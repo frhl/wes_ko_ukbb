@@ -22,9 +22,9 @@ readonly bash_script="scripts/permute/_make_genes.sh"
 
 readonly chr="${SGE_TASK_ID}"
 readonly in_dir="data/permute/counts"
-readonly out_dir="data/permute/genes/chr${chr}"
+readonly out_dir="data/permute/genes/phased_only/chr${chr}"
 
-readonly input_path="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_counts_chr${chr}.mt"
+readonly input_path="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_phased_counts_chr${chr}.mt"
 readonly input_type='mt'
 
 readonly maf="maf0to5e-2"
@@ -32,23 +32,25 @@ readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_chr${chr
 readonly out_type="mt"
 
 readonly min_mac=4
-readonly overview="data/permute/overview/min_mac${min_mac}/overview_genes.tsv.gz"
-readonly n_tasks="$( zcat ${overview} | grep "chr${chr}" | wc -l)"
-readonly tasks="1-${n_tasks}"
+readonly genes="data/permute/overview/min_mac${min_mac}/phased_only/main_genes.tsv.gz"
 
 mkdir -p ${out_dir}
 
-set -x
-qsub -N "_c${chr}_make_genes" \
-    -q "short.qc" \
-    -pe shmem 1 \
-    -t ${tasks} \
-    "${bash_script}" \
-    "${chr}" \
-    "${input_path}" \
-    "${input_type}" \
-    "${out_prefix}" \
-    "${out_type}" \
-    "${overview}"
-set +x
+if [ -f "${genes}" ]; then
+  readonly n_tasks="$( zcat ${genes} | grep -w "chr${chr}" | grep "ENSG" | wc -l)"
+  readonly tasks="1-${n_tasks}"
+  qsub -N "_c${chr}_make_genes" \
+      -q "short.qc" \
+      -pe shmem 1 \
+      -t ${tasks} \
+      "${bash_script}" \
+      "${chr}" \
+      "${input_path}" \
+      "${input_type}" \
+      "${out_prefix}" \
+      "${out_type}" \
+      "${genes}"
+else
+  >&2 echo "File ${overview} does not exists! Exiting.."
+fi
 

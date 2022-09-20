@@ -29,48 +29,53 @@ readonly grm_sam=${7?Error: Missing arg7 (grm_sam)}
 readonly min_mac=${8?Error: Missing arg8 (min_mac)} 
 readonly in_markers_ac=${9?Error: Missing arg9 (markers_ac)} 
 readonly in_markers_hash=${10?Error: Missing arg9 (markers_hash)} 
-readonly out_prefix=${11?Error: Missing arg10 (out_prefix)}
-readonly cond_markers="${12}"
-readonly cond_annotation="${13}"
+readonly markers_by_gene=${11?Error: Missing arg9 (markers_hash)} 
+readonly markers_cond_min_mac=${12?Error: Missing arg9 (markers_hash)} 
+readonly out_prefix=${13?Error: Missing arg10 (out_prefix)}
+readonly cond_markers="${14}"
+readonly cond_annotation="${15}"
 
 readonly chr=${SGE_TASK_ID}
+
+# Change CHR to current chromosome based on task-ID
 readonly gmat=$(echo ${in_gmat} | sed -e "s/CHR/${chr}/g")
 readonly var=$(echo ${in_var} | sed -e "s/CHR/${chr}/g")
-
->&2 echo "${gmat} and ${var} with ${phenotype}"
-
-readonly var_bytes=$( file_size ${var} )
-readonly gmat_bytes=$( file_size ${gmat} )
-
 readonly vcf=$(echo ${in_vcf} | sed -e "s/CHR/${chr}/g")
 readonly csi=$(echo ${in_csi} | sed -e "s/CHR/${chr}/g")
 readonly out=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
 readonly markers_ac=$(echo ${in_markers_ac} | sed -e "s/CHR/${chr}/g")
 readonly markers_hash=$(echo ${in_markers_hash} | sed -e "s/CHR/${chr}/g")
 
-echo "File: .vcf: ${vcf}"
-echo "File: .csi: ${csi} "
+# check that saige step 1 exists
+readonly var_bytes=$( file_size ${var} )
+readonly gmat_bytes=$( file_size ${gmat} )
 
+# setup R
 set_up_rpy
+
+# todo: Only start conditional analysis if markers_by_gene has been generated (which
+# is currently only generated for markers that are significant in main analysis)
 
 # subset variants to be used for conditional analysis
 readonly cond_markers_chr=$(echo ${cond_markers} | sed -e "s/CHR/${chr}/g")
 readonly markers_pheno_file="${out_prefix/CHR/${chr}}.rare.markers"
 Rscript "${rscript}" \
+  --chromosome "chr${chr}" \
   --phenotype "${phenotype}" \
   --annotation "${cond_annotation}" \
-  --path_markers "${cond_markers_chr}" \
+  --path_markers_in_chrom "${cond_markers_chr}" \
   --path_ac_by_phenotypes "${markers_ac}" \
   --path_hash_by_phenotypes "${markers_hash}" \
+  --path_markers_by_gene "${markers_by_gene}" \
   --outfile "${markers_pheno_file}" \
-  --min_mac 4
+  --min_mac "${markers_cond_min_mac}"
 
 spa_test() {
   echo "var_bytes=${var_bytes} at ${var}"
   echo "gmat_bytes=${gmat_bytes} at ${gmat}"
   if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then 
     SECONDS=0
-    Rscript "${step2_SPAtests}"	\
+    Rscript "${step2_SPAtests}" \
        --vcfFile=${vcf} \
        --vcfFileIndex=${csi} \
        --vcfField="DS" \

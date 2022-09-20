@@ -35,35 +35,35 @@ paste_lst <- function(x, sep = ', ') unlist(lapply(x, paste, collapse = sep))
 
 main <- function(args){
     
-    autosomes=1:22
-    lst <- lapply(autosomes, function(chr){
-        write(paste0("Reading chr",chr), stdout())
-        vep <- fread(paste0('data/mt/csqs/ukb_eur_wes_200k_chr',chr,'.tsv.gz'))
-        dt <- fread(paste0('data/knockouts/alt/ukb_eur_wes_200k_chr',chr,'_maf0to5e-2_pLoF_damaging_missense.tsv.gz'))
-        dt$gts <- clean_hail_list(dt$gts)
-        dt$varid <- clean_hail_list(dt$varid)
-        dt$revel_score <- paste_lst(extract_by_entry(dt$varid, vep$varid, vep$csqs.revel_score))
-        dt$cadd_phred <- paste_lst(extract_by_entry(dt$varid, vep$varid, vep$csqs.cadd_phred))
-        dt$most_severe_csqs <- paste_lst(extract_by_entry(dt$varid, vep$varid, vep$csqs.most_severe_consequence))
-        dt$AF <- paste_lst(extract_by_entry(dt$varid, vep$varid, vep$info.AF))
-        dt$AC <- paste_lst(extract_by_entry(dt$varid, vep$varid, vep$info.AF))
-        dt$AN <- paste_lst(extract_by_entry(dt$varid, vep$varid, vep$info.AN))
-        dt$gene_symbol <- paste_lst(extract_by_entry(dt$varid, vep$varid, vep$csqs.gene_symbol))
-        dt$exon <- paste_lst(extract_by_entry(dt$varid, vep$varid, vep$csqs.exon))
-        dt$codon <- paste_lst(extract_by_entry(dt$varid, vep$varid, vep$csqs.codons))
-        dt$amino_acids <- paste_lst(extract_by_entry(dt$varid, vep$varid, vep$csqs.amino_acids))
-        dt$chr <- chr
-        return(dt)
-    })
+    chr = args$chrom
+    print(chr)
+    write(paste0("Reading chr",chr), stdout())
+    vep <- fread(paste0('data/mt/vep/worst_csq_by_gene_canonical/ukb_eur_wes_union_calls_200k_chr',chr,'.tsv.gz'))
+    dt <- fread(paste0('data/knockouts/alt/ukb_eur_wes_200k_chr',chr,'_maf0to5e-2_pLoF_damaging_missense_all.tsv.gz'))
+    dt$gts <- clean_hail_list(dt$gts)
+    dt$varid <- clean_hail_list(dt$varid)
+    dt$revel_score <- paste_lst(extract_by_entry(dt$varid, vep$varid, vep$csqs.revel_score))
+    dt$cadd_phred <- paste_lst(extract_by_entry(dt$varid, vep$varid, vep$csqs.cadd_phred))
+    dt$most_severe_csqs <- paste_lst(extract_by_entry(dt$varid, vep$varid, vep$csqs.most_severe_consequence))
+    dt$AF <- paste_lst(extract_by_entry(dt$varid, vep$varid, vep$info.AF))
+    dt$AC <- paste_lst(extract_by_entry(dt$varid, vep$varid, vep$info.AF))
+    dt$AN <- paste_lst(extract_by_entry(dt$varid, vep$varid, vep$info.AN))
+    dt$gene_symbol <- paste_lst(extract_by_entry(dt$varid, vep$varid, vep$csqs.gene_symbol))
+    dt$exon <- paste_lst(extract_by_entry(dt$varid, vep$varid, vep$csqs.exon))
+    dt$codon <- paste_lst(extract_by_entry(dt$varid, vep$varid, vep$csqs.codons))
+    dt$amino_acids <- paste_lst(extract_by_entry(dt$varid, vep$varid, vep$csqs.amino_acids))
+    dt$consequence_category <- paste_lst(extract_by_entry(dt$varid, vep$varid, vep$consequence_category))
+    dt$chr <- chr
 
-    d <- do.call(rbind, lst)
-    outfile = paste0(args$out_prefix, ".txt.gz")
-    fwrite(d, outfile, sep = '\t')
+    outfile = paste0(args$out_prefix, "_chr", chr,".txt.gz")
+    write(paste0("writing to ", outfile), stderr())
+    fwrite(dt, outfile, sep = '\t')
 
 }
 
 # add arguments
 parser <- ArgumentParser()
+parser$add_argument("--chrom", default=NULL, required = TRUE, help = "Chromosome")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()
 

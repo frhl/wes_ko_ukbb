@@ -21,6 +21,7 @@ def main(args):
     out_type = args.out_type 
     csqs_category = args.csqs_category 
     use_loftee = args.use_loftee 
+    discard_unphased = args.discard_unphased
 
     # run parser
     hail_init.hail_bmrc_init('logs/hail/aggr_hets.log', 'GRCh38')
@@ -48,7 +49,10 @@ def main(args):
     # What is the probability that they are all on the same phase? We don't need to distinghuish
     # between mac1 an mac+1 PTVs in this case. 
     # 1 - p(all on phase 1) - p(all on phase 2) = 1 - 2*p(all on phase 1) = 1 - 2*(1/2)^k
-    mt = mt.annotate_entries(het = mt.unphased_het + mt.phased_het)
+    if discard_unphased:
+        mt = mt.annotate_entries(het = mt.phased_het)
+    else:
+        mt = mt.annotate_entries(het = mt.unphased_het + mt.phased_het)
     
     # calculate likelihood of being a true knockouts, these probabilities
     # will be used later to draw from when permuting the phase.
@@ -63,6 +67,7 @@ if __name__=='__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--input_path', default=None, help='Path to input')
     parser.add_argument('--input_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
+    parser.add_argument('--discard_unphased', default=None, action='store_true', help='If true, removes unphased (singletons) from analysis')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Type of output dataset (options: mt, vcf, plink)')
     parser.add_argument('--use_loftee', default=False, action='store_true', help='use LOFTEE to distinghiush between high confidence PTVs')
