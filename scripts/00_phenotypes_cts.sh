@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 #
-#$ -N phenotypes_cts
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/phenotypes_cts.log
-#$ -e logs/phenotypes_cts.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qf
-#$ -V
+#
+#SBATCH -A lindgren.prj
+#SBATCH -J phenotypes_cts
+#SBATCH -D /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/phenotypes_cts.log
+#SBATCH --error=logs/phenotypes_cts.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 1
+#SBATCH --requeue
 
 source utils/bash_utils.sh
 source utils/hail_utils.sh
