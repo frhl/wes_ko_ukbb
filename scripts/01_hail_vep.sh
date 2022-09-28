@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
-
-#SBATCH -A lindgren.prj
-#SBATCH -J hail_vep
-#SBATCH -D /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#
+# @description annotate variants using Hail
+# @depends quality controlled MatrixTables with variants.
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=hail_vep
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/hail_vep.log
 #SBATCH --error=logs/hail_vep.errors.log
 #SBATCH --partition=short

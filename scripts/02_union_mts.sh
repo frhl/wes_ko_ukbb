@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 #
-#$ -N union_mts
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/union_mts.log
-#$ -e logs/union_mts.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 6
-#$ -q long.qc@@long.hga
-#$ -t 23
+# @description combine variants from genotyping array and whole exomes.
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=union_mts
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/union_mts.log
+#SBATCH --error=logs/union_mts.errors.log
+#SBATCH --partition=long
+#SBATCH --cpus-per-task 6
+#SBATCH --array=1-22
+#SBATCH --requeue
+
 
 set -o errexit
 set -o nounset
@@ -18,7 +22,7 @@ source utils/hail_utils.sh
 readonly spark_dir="data/tmp/spark_dir"
 
 # input files
-readonly chr=$( get_chr ${SGE_TASK_ID} ) 
+readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} ) 
 readonly in_dir_phased="data/phased/wes_union_calls/ligated"
 readonly in_phased="${in_dir_phased}/ukb_eur_wes_union_calls_200k_chr${chr}.vcf.bgz"
 readonly in_dir_unphased="data/unphased/wes/post-qc"

@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 #
-#$ -N export_csqs
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/export_csqs.log
-#$ -e logs/export_csqs.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qc@@short.hga
-#$ -t 1-22
+# @description Get variant csqs and MAF/MAC count by combined tables
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=export_csqs
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/export_csqs.log
+#SBATCH --error=logs/export_csqs.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 1
+#SBATCH --array=1-22
+#SBATCH --requeue
 
 set -o errexit
 set -o nounset

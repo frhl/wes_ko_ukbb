@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 #
+# @description: amalgamate variants by phase to infer knockouts by genes.
 #
-#$ -N knockouts
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/knockouts.log
-#$ -e logs/knockouts.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q test.qc
-#$ -V
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=knockouts
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/knockouts.log
+#SBATCH --error=logs/knockouts.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 1
+#SBATCH --requeue
+
 
 set -o errexit
 set -o nounset
@@ -29,12 +31,12 @@ readonly out_prefix="${out_dir}/ukb_eur_wes_200k"
 readonly out_type="vcf"
 
 # Note: ~24 slots are needed for running chr1. 
-# when using aggr_method="collect" on the e-queue.
 # Note: long queue may be required for chr1.
 readonly tasks="1-22"
 readonly queue="short.qc"
-#readonly nslots=5 # now set manually
+readonly project="lindgren.prj"
 
+# should only VCF be produced?
 readonly only_vcf=""
 
 # should singletons be removed? Set to empty for FALSE
@@ -54,19 +56,29 @@ mkdir -p ${out_dir}
 
 submit_knockout_job() 
 {
+  # I/O
   local annotation=${1}
   local nslots=${2}
   local aggr_method=${3}
-  #local input_path="${in_prefix}_chrCHR_maf${maf_lb}to${maf_ub}_${annotation}.mt"
   local out_prefix_csqs="${out_prefix}_chrCHR_maf${maf_lb}to${maf_ub}_${annotation/,/_}"
   local out_checkpoint="${out_prefix_csqs}_checkpoint.mt"
-  set -x
-  qsub -N "_ko_${annotation}" \
-    -o "logs/_knockouts.log" \
-    -e "logs/_knockouts.errors.log" \
-    -t ${tasks} \
-    -q "${queue}" \
-    -pe shmem ${nslots} \
+  # slurm specific paramters 
+  local slurm_tasks="${tasks}"
+  local slurm_jname="_ko_${annotation}"
+  local slurm_lname="_knockouts"
+  local slurm_project="${project}"
+  local slurm_queue="${queue}"
+  local slurm_nslots="${nslots}"
+  readonly jid=$( sbatch \
+    --account="${slurm_project}" \
+    --job-name="${slurm_jname}" \
+    --output="${slurm_lname}.log" \
+    --error="${slurm_lname}.errors.log" \
+    --chdir="${curwd}" \
+    --partition="${slurm_queue}" \
+    --cpus-per-task="${slurm_nslots}" \
+    --array=${slurm_tasks} \
+    --parsable \
     "${bash_script}" \
     "${in_prefix}" \
     "${in_type}" \
@@ -80,11 +92,8 @@ submit_knockout_job()
     "${only_vcf}" \
     "${aggr_method}" \
     "${out_prefix_csqs}" \
-    "${out_type}" 
-  set +x
-
+    "${out_type}" )
   # clean up after checkpints when
-  # aggr_method="collect"
   if [ -f "${out_checkpoint}" ]; then
     rm -rf ${out_checkpoint}
   fi

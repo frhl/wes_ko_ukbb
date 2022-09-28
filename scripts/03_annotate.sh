@@ -1,14 +1,17 @@
 #!/usr/bin/env bash
 #
-#$ -N annotate
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/annotate.log
-#$ -e logs/annotate.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 2
-# -q short.qc@@short.hga
-#$ -q long.qc@@long.hga
-#$ -t 1-22
+# @description Annotate main MatrixTables with VEP results
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=annotate
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/annotate.log
+#SBATCH --error=logs/annotate.errors.log
+#SBATCH --partition=long
+#SBATCH --cpus-per-task 2
+#SBATCH --array=1-22
+#SBATCH --requeue
+
 
 
 # Note: long.qc@@long.hga with 4 slots required to run full pipeline
