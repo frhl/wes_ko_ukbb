@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
 #
-#$ -N gwas
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/gwas.log
-#$ -e logs/gwas.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q test.qc
-#$ -t 30-31
-#$ -tc 5
-#$ -V
+#
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=gwas
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/gwas.log
+#SBATCH --error=logs/gwas.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 1
+#SBATCH --array=30-31
+#SBATCH --requeue
 
 
 set -o errexit
@@ -19,6 +20,7 @@ module purge
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
+readonly curwd=$(pwd)
 readonly in_dir="data/prs/hapmap/ukb_500k/fitting"
 readonly pheno_dir="data/phenotypes"
 
@@ -32,7 +34,7 @@ readonly covariates=$( cat ${covar_file} )
 readonly input_type="plink"
 readonly input_path="${in_dir}/ukb_hapmap_500k_eur_chrCHR"
 
-readonly index=${SGE_TASK_ID}
+readonly index=${SLURM_ARRAY_TASK_ID}
 
 readonly file_cts="${pheno_dir}/curated_covar_phenotypes_cts.tsv.gz" 
 readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
@@ -42,7 +44,7 @@ readonly file_binary="${pheno_dir}/curated_covar_phenotypes_binary.tsv.gz"
 readonly pheno_list_binary="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
 readonly phenotype_binary=$( sed "${index}q;d" ${pheno_list_binary} )
 
-
+# the job will fail if less than X cases
 readonly min_cases=100
 
 submit_gwas_job()
@@ -56,12 +58,22 @@ submit_gwas_job()
   if [ ! -f "${out_prefix}.txt.gz" ]; then
     if [ ! -z ${phenotype} ]; then
       if [ ! -z ${covariates} ]; then
-        set -x
-        qsub -N "_${phenotype}_sumstat" \
-          -t ${tasks} \
-          -tc 11 \
-          -q short.qc@@short.hge \
-          -pe shmem 3 \
+        local slurm_jname="_${phenotype}_sumstat"
+        local slurm_lname="_filter_genotypes"
+        local slurm_project="lindgren.prj"
+        local slurm_tasks="${tasks}"
+        local slurm_queue="short"
+        local slurm_shmem="3"
+        readonly gwas_jid=$( sbatch \
+          --account="${slurm_project}" \
+          --job-name="${slurm_jname}" \
+          --output="${slurm_lname}.log" \
+          --error="${slurm_lname}.errors.log" \
+          --chdir="${curwd}" \
+          --partition="${slurm_queue}" \
+          --cpus-per-task="${slurm_shmem}" \
+          --array=${slurm_tasks} \
+          --parsable \
           "${bash_script}" \
           "${hail_script}" \
           "${input_path}" \
@@ -70,8 +82,7 @@ submit_gwas_job()
           "${phenotype}" \
           "${covariates}" \
           "${min_cases}" \
-          "${prefix}"
-        set +x
+          "${prefix}" )
         submit_merge_job
       else
       >&2 echo "Covariate argument is emtpy! Exiting.."
@@ -86,17 +97,26 @@ submit_gwas_job()
 
 submit_merge_job()
 {
-  set -x
-  qsub -N "_mrg_${phenotype}" \
-    -q short.qc@@short.hge \
-    -pe shmem 1 \
-    -hold_jid "_${phenotype}_sumstat" \
+  local slurm_jname="_mrg_${phenotype}"
+  local slurm_lname="_gwas_merge"
+  local slurm_project="lindgren.prj"
+  local slurm_queue="short"
+  local slurm_nslots="1"
+  readonly merge_jid=$( sbatch \
+    --account="${slurm_project}" \
+    --job-name="${slurm_jname}" \
+    --output="${slurm_lname}.log" \
+    --error="${slurm_lname}.errors.log" \
+    --chdir="${curwd}" \
+    --partition="${slurm_queue}" \
+    --cpus-per-task="${slurm_nslots}" \
+    --dependency="afterok:${gwas_jid}" \
+    --open-mode="append" \
+    --parsable \
     "${merge_script}" \
     "${prefix}" \
     "${out_dir}" \
-    "${out_prefix}.txt.gz"
-  set +x
-
+    "${out_prefix}.txt.gz" )
 }
 
 

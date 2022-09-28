@@ -15,6 +15,7 @@ def main(args):
     adjust_maf_by_case_control = args.adjust_maf_by_case_control
     response = args.response
     min_cases = args.min_cases
+    min_maf_cutoff = args.min_maf_cutoff
     covariates = args.covariates
     phenotypes = args.phenotypes
     out_prefix = args.out_prefix
@@ -41,6 +42,8 @@ def main(args):
         covariates = [mt.pheno[x] for x in split_covariates]
         covariates.insert(0, 1) 
         if response in list(mt.pheno):
+            if min_maf_cutoff:
+               mt = mt.filter_rows(variants.get_maf_expr(mt) > float(min_maf_cutoff))
             if mt.pheno[response].dtype == hl.dtype('float64'):
                reg = hl.linear_regression_rows(
                         y=mt.pheno[response],
@@ -104,6 +107,7 @@ if __name__=='__main__':
     parser.add_argument('--input_path', default=None, help='Path to input.')
     parser.add_argument('--input_type', default=None, help='Input type (vcf/mt/plink).')
     parser.add_argument('--min_cases', default=1, help='Minimum number of cases allowed for binary traits.')
+    parser.add_argument('--min_maf_cutoff', default=None, help='filter by minimum minor allele frequency')
     parser.add_argument('--adjust_maf_by_case_control', default=None, action='store_true', help='Perform further subsets on MAF based on case/controls')
     #parser.add_argument('--liftover', default=None, action='store_true', help='perform liftover')
     #parser.add_argument('--extract_samples', default=None, help='Subset to sample IDs in file')

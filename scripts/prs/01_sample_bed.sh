@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 #
-#$ -N sample_bed
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/sample_bed.log
-#$ -e logs/sample_bed.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 3
-#$ -q long.qc@@long.hga
-#$ -t 1-21
-#$ -V
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=sample_bed
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/sample_bed.log
+#SBATCH --error=logs/sampled_bed.errors.log
+#SBATCH --partition=long
+#SBATCH --cpus-per-task 3
+#SBATCH --array=1-22
+#SBATCH --requeue
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
@@ -18,7 +18,7 @@ readonly hail_script="scripts/prs/00_bed_gen.py"
 readonly spark_dir="data/tmp/spark_dir"
 readonly hap_dir="/well/lindgren/flassen/ressources/hapmap"
 
-readonly chr=$( get_chr ${SGE_TASK_ID} )
+readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 readonly out_dir="data/prs/hapmap/ld/unrel_kin_eur_10k"
 readonly out_prefix="${out_dir}/short_ukb_hapmap_rand_10k_eur_chr${chr}"
 readonly hap_file="${hap_dir}/weights.l2.ldscore.liftover.ht"
