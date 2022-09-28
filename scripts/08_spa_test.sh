@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
 #
-#$ -N spa_test
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/spa_test.log
-#$ -e logs/spa_test.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q test.qc
-#$ -t 1-80
-#$ -tc 22
-#$ -V
+#
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=spa_test
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/spa_test.log
+#SBATCH --error=logs/spa_test.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 1
+#SBATCH --array=1-80
+#SBATCH --requeue
 
 set -o errexit
 set -o nounset
@@ -29,12 +30,13 @@ readonly spa_script="scripts/_spa_test.sh"
 readonly merge_script="scripts/_spa_merge.sh"
 readonly in_prefix="ukb_eur_wes_200k"
 
+readonly index=${SLURM_ARRAY_TASK_ID}
 
 submit_spa_binary_with_csqs()
 {
   local annotation="${1?Error: Missing arg1 (annotation)}"
   local pheno_list="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
-  local phenotype=$( sed "${SGE_TASK_ID}q;d" ${pheno_list} )
+  local phenotype=$( sed "${index}q;d" ${pheno_list} )
   submit_spa_with_csqs "${annotation}" "${phenotype}" "binary"
 }
 
@@ -42,7 +44,7 @@ submit_spa_cts_with_csqs()
 {
   local annotation="${1?Error: Missing arg1 (annotation)}"
   local pheno_list="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
-  local phenotype=$( sed "${SGE_TASK_ID}q;d" ${pheno_list} )
+  local phenotype=$( sed "${index}q;d" ${pheno_list} )
   submit_spa_with_csqs "${annotation}" "${phenotype}" "cts"
 }
 
@@ -77,8 +79,8 @@ submit_spa_with_csqs()
     fi
 
     if [ ! -f "${out_mrg}" ]; then
-      local qsub_spa_name="spa_${phenotype}_${annotation}"
-      local qsub_merge_name="_mrg_${phenotype}_${annotation}"
+      local slurm_spa_name="spa_${phenotype}_${annotation}"
+      local slurm_merge_name="_mrg_${phenotype}_${annotation}"
       >&2 echo "Submitting ${qsub_spa_name}.."
       submit_spa_job
       >&2 echo "Submitting ${qsub_merge_name}.."
@@ -87,18 +89,29 @@ submit_spa_with_csqs()
       >&2 echo "Phenotype ${phenotype} with annotation ${annotation} already exists! Skipping.." 
     fi
   else
-    >&2 echo "No phenotype at index ${SGE_TASK_ID}. Exiting.." 
+    >&2 echo "No phenotype at index ${index}. Exiting.." 
   fi 
 }
 
 
 submit_spa_job() {
   mkdir -p ${step2_dir}
-  set -x
-  qsub -N "${qsub_spa_name}" \
-    -q "${queue}" \
-    -t "${tasks}" \
-    -pe shmem "${nslots}" \
+  local slurm_tasks="${tasks}"
+  local slurm_jname="${slurm_spa_name}"
+  local slurm_lname="_spa_test"
+  local slurm_project="${project}"
+  local slurm_queue="${queue}"
+  local slurm_nslots="${nslots}"
+  readonly spa_jid=$( sbatch \
+    --account="${slurm_project}" \
+    --job-name="${slurm_jname}" \
+    --output="${slurm_lname}.log" \
+    --error="${slurm_lname}.errors.log" \
+    --chdir="${curwd}" \
+    --partition="${slurm_queue}" \
+    --cpus-per-task="${slurm_nslots}" \
+    --array=${slurm_tasks} \
+    --parsable \
     "${spa_script}" \
     "${phenotype}" \
     "${in_vcf}" \
@@ -109,31 +122,41 @@ submit_spa_job() {
     "${grm_sam}" \
     "${min_mac}" \
     "${out_prefix}" \
-    "${conditioning_markers}"
-  set +x
+    "${conditioning_markers}" )
+
 }
 
 
 submit_merge_job()
 {
   local remove_by_chr="Y"
-  set -x
-  qsub -N "${qsub_merge_name}" \
-    -q short.qc@@short.hge \
-    -pe shmem 1 \
-    -hold_jid "${qsub_spa_name}" \
+  local slurm_jname="${slurm_merge_name}"
+  local slurm_lname="_spa_merge"
+  local slurm_project="${project}"
+  local slurm_queue="${queue}"
+  local slurm_nslots="1"
+  readonly merge_jid=$( sbatch \
+    --account="${slurm_project}" \
+    --job-name="${slurm_jname}" \
+    --output="${slurm_lname}.log" \
+    --error="${slurm_lname}.errors.log" \
+    --chdir="${curwd}" \
+    --partition="${slurm_queue}" \
+    --cpus-per-task="${slurm_nslots}" \
+    --dependency="afterok:${spa_jid}" \
+    --open-mode="append" \
+    --parsable \
     "${merge_script}" \
     "${out_prefix}" \
     "${out_mrg}" \
-    "${remove_by_chr}"
-  set +x
-
+    "${remove_by_chr}")
 }
 
 # parameters
 readonly conditioning_markers=""
 readonly use_prs="0"
 readonly min_mac=4
+readonly project="lindgren.prj"
 readonly tasks=1-22
 readonly queue="short.qe"
 readonly nslots=1

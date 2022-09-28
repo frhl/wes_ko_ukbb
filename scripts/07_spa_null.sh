@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
 #
-#$ -N spa_null
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/spa_null.log
-#$ -e logs/spa_null.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qc
-#$ -t 1-80
-#$ -tc 1
-#$ -V
+# @description generate saige null models (with and without PRS)
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=spa_null
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/spa_null.log
+#SBATCH --error=logs/spa_null.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 1
+#SBATCH --array=1-80
+
 
 # all binary: 1 - 71
 
@@ -35,7 +36,7 @@ readonly covar_file="${covar_dir}/covars1.csv"
 readonly covariates=$( cat ${covar_file} )
 
 readonly out_prefix="ukb_wes_200k"
-readonly index=${SGE_TASK_ID}
+readonly index=${SLURM_ARRAY_TASK_ID}
 
 
 
@@ -102,18 +103,29 @@ set_up_prs() {
 
 submit_spa_null() {
   mkdir -p ${out_dir}
-  tasks=${SGE_TASK_ID}
+  tasks=${index}
   set_up_prs
   if [[ "${prs_ok}" -eq "0"  && "${use_prs}" -eq "1" ]]; then
     >&2 echo "Note: PRS could not be started for ${phenotype}. Skipping."
   else
     if [ ! -z ${phenotype} ]; then
       if [ ! -f "${out_prefix}.rda" ]; then
-        set -x
-        qsub -N "_null_${phenotype}" \
-         -t "${tasks}" \
-          -q "${queue}" \
-          -pe shmem ${nslots} \
+        local slurm_tasks="${tasks}"
+        local slurm_jname="_null_${phenotype}"
+        local slurm_lname="_spa_null"
+        local slurm_project="${project}"
+        local slurm_queue="${queue}"
+        local slurm_nslots="${nslots}"
+        readonly spa_null_jid=$( sbatch \
+          --account="${slurm_project}" \
+          --job-name="${slurm_jname}" \
+          --output="${slurm_lname}.log" \
+          --error="${slurm_lname}.errors.log" \
+          --chdir="${curwd}" \
+          --partition="${slurm_queue}" \
+          --cpus-per-task="${slurm_nslots}" \
+          --array=${slurm_tasks} \
+          --parsable \
           "${spa_null_script}" \
           "${plink_file}" \
           "${pheno_file}" \
@@ -124,13 +136,12 @@ submit_spa_null() {
           "${grm_sam}" \
           "${inv_normalize}" \
           "${use_prs}" \
-          "${out}"
-        set +x
+          "${out}" )
       else
         >&2 echo "${out_prefix} already exists. Skipping.."
       fi
     else
-      >&2 echo "No phenotype at index ${SGE_TASK_ID}. Exiting.." 
+      >&2 echo "No phenotype at index ${index}. Exiting.." 
     fi
   fi
 }
@@ -138,7 +149,8 @@ submit_spa_null() {
 # Parameters
 readonly use_prs=1
 readonly nslots=2
-readonly queue="short.qe"
+readonly queue="short"
+readonly project="lindgren.prj"
 
 # Fit null model for binary/cts traits
 #fit_cts_traits
