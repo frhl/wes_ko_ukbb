@@ -45,8 +45,8 @@ if [ -f "${genes}" ]; then
   readonly slurm_queue="short"
   readonly slurm_shmem="1"
   readonly jid=$( sbatch \
-    --account="${project}" \
-    --job-name="${jname}" \
+    --account="${slurm_project}" \
+    --job-name="${slurm_jname}" \
     --output="${slum_jname}.log" \
     --error="${slurm_jname}.errors.log" \
     --chdir="${curwd}" \
