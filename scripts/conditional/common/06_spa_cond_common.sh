@@ -133,7 +133,7 @@ submit_merge_job()
 {
   local remove_by_chr="Y"
   local slurm_jname="${slurm_merge_name}"
-  local slurm_lname="${out_prefix}_merge"
+  local slurm_lname="${out_prefix}"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
   local slurm_nslots="1"
