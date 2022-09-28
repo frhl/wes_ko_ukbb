@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
-#$ -N calc_min_permutations
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/calc_min_permutations.log
-#$ -e logs/calc_min_permutations.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 2
-#$ -q short.qc
-#$ -V
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=calc_min_permutations
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/calc_min_permutations.log
+#SBATCH --error=logs/calc_min_permutations.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 2
+#SBATCH --requeue
 
 set -o errexit
 set -o nounset
