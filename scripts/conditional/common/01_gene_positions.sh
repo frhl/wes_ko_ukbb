@@ -2,14 +2,15 @@
 #
 # Extract genetic coordinates for significant genes in primary analysis.
 #
-#$ -N gene_positions
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/gene_positions.log
-#$ -e logs/gene_positions.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q test.qc
-#$ -t 1-80
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=gene_positions
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/gene_positions.log
+#SBATCH --error=logs/gene_positions.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 1
+#SBATCH --array=1-80
+#SBATCH --requeue
 
 set -o errexit
 set -o nounset
@@ -33,7 +34,7 @@ submit_binary_intervals()
 {
   local annotation="${1?Error: Missing arg1 (annotation)}"
   local pheno_list="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
-  local phenotype=$( sed "${SGE_TASK_ID}q;d" ${pheno_list} )
+  local phenotype=$( sed "${SLURM_ARRAY_TASK_ID}q;d" ${pheno_list} )
   submit_intervals "${annotation}" "${phenotype}" "binary"
 }
 
@@ -41,7 +42,7 @@ submit_cts_intervals()
 {
   local annotation="${1?Error: Missing arg1 (annotation)}"
   local pheno_list="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
-  local phenotype=$( sed "${SGE_TASK_ID}q;d" ${pheno_list} )
+  local phenotype=$( sed "${SLURM_ARRAY_TASK_ID}q;d" ${pheno_list} )
   submit_intervals "${annotation}" "${phenotype}" "cts"
 }
 
