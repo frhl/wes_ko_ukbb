@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 #
-#$ -N _prs_clean
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_prs_clean.log
-#$ -e logs/_prs_clean.errors.log
-#$ -V
+#
+#
 
 readonly pred=${1?Error: Missing arg3 (prediction file)}
 readonly prefix=${2?Error: Missing arg8 (prefix)}

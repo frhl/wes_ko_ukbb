@@ -1,10 +1,4 @@
 #!/usr/bin/env bash
-#
-#$ -N _gwas
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_gwas.log
-#$ -e logs/_gwas.errors.log
-#$ -V
 
 set -o errexit
 set -o nounset

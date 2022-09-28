@@ -1,10 +1,4 @@
 #!/usr/bin/env bash
-#
-#$ -N _gwas_merge
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_gwas_merge.log
-#$ -e logs/_gwas_merge.errors.log
-#$ -V
 
 source utils/bash_utils.sh
 

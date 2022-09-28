@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 #
-#$ -N plot_intra_chrom_cor
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/plot_intra_chrom_cor.log
-#$ -e logs/plot_intra_chrom_cor.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qf
-#$ -V
+#
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=plot_intra_chrom_cor
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/plot_intra_chrom_cor.log
+#SBATCH --error=logs/plot_intra_chrom_cor.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 1
+#SBATCH --requeue
 
 set -o errexit
 set -o nounset

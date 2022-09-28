@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 #
-#$ -N _prs_test
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_prs.log
-#$ -e logs/_prs.errors.log
-#$ -V
+#
+#
 
 source utils/bash_utils.sh
 source utils/qsub_utils.sh

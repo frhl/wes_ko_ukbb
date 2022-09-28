@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 #
-#$ -N calc_ld
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/calc_ld.log
-#$ -e logs/calc_ld.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 5
-#$ -q short.qc@@short.hga
-#$ -V
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=calc_ld
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/calc_ld.log
+#SBATCH --error=logs/calc_ld.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 5
+#SBATCH --requeue
+
 
 source utils/bash_utils.sh
 source utils/qsub_utils.sh

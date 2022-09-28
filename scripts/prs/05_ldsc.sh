@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 #
-#$ -N ldsc
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/ldsc.log
-#$ -e logs/ldsc.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 3
-#$ -q short.qe
-#$ -t 1-75
-#$ -V
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=ldsc
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/ldsc.log
+#SBATCH --error=logs/ldsc.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 1
+#SBATCH --array=1-75
+#SBATCH --requeue
 
 set -o errexit
 set -o nounset
@@ -26,7 +27,7 @@ readonly pheno_dir="data/phenotypes"
 readonly ld_bed="${bed_dir}/short_merged_ukb_hapmap_rand_10k_eur.bed"
 readonly ld_dir="data/prs/hapmap/ld/matrix_unrel_kin"
 
-readonly index=${SGE_TASK_ID}
+readonly index=${SLURM_ARRAY_TASK_ID}
 
 readonly file_cts="${pheno_dir}/curated_covar_phenotypes_cts.tsv.gz"
 readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"

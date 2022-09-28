@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 #
-#$ -N make_plots
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/make_plots.log
-#$ -e logs/make_plots.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qf
-#$ -V
+#
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=make_plots
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/make_plots.log
+#SBATCH --error=logs/make_plots.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 1
+#SBATCH --requeue
 
 set -o errexit
 set -o nounset
