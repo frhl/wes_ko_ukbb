@@ -2,15 +2,15 @@
 #
 # extract genotypes in regions near genes that are significant in primary analysis
 #
-#$ -N filter_genotypes
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/filter_genotypes.log
-#$ -e logs/filter_genotypes.errors.log
-#$ -P lindgren.prjc
-#$ -q test.qc
-#$ -t 1-80
-#$ -V
-
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=filter_genotypes
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/filter_genotypes.log
+#SBATCH --error=logs/filter_genotypes.errors.log
+#SBATCH --partition=test
+#SBATCH --cpus-per-task 1
+#SBATCH --array=1-80
+#SBATCH --requeue
 
 set -o errexit
 set -o nounset
@@ -18,6 +18,7 @@ set -o nounset
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
 
+readonly curwd=$(pwd)
 readonly bash_script="scripts/conditional/common/_filter_genotypes.sh"
 
 readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
@@ -42,7 +43,7 @@ submit_binary_analysis()
   local annotation="${1?Error: Missing arg1 (annotation)}"
   local pheno_list="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
   local pheno_file="${pheno_dir}/filtered_covar_phenotypes_binary.tsv.gz"
-  local phenotype=$( sed "${SGE_TASK_ID}q;d" ${pheno_list} )
+  local phenotype=$( sed "${SLURM_ARRAY_TASK_ID}q;d" ${pheno_list} )
   submit_intervals "${annotation}" "${phenotype}" "binary" "${pheno_file}"
 }
 
@@ -51,7 +52,7 @@ submit_cts_analysis()
   local annotation="${1?Error: Missing arg1 (annotation)}"
   local pheno_list="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
   local pheno_file="${pheno_dir}/filtered_covar_phenotypes_cts.tsv.gz"
-  local phenotype=$( sed "${SGE_TASK_ID}q;d" ${pheno_list} )
+  local phenotype=$( sed "${SLURM_ARRAY_TASK_ID}q;d" ${pheno_list} )
   submit_intervals "${annotation}" "${phenotype}" "cts" "${pheno_file}"
 }
 
@@ -65,11 +66,23 @@ submit_intervals()
   local out_prefix="${out_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}"
   if [ ! -z "${phenotype}" ]; then
     if [ -f ${genes} ]; then
+      readonly slurm_tasks="${SLURM_ARRAY_TASK_ID}"
+      readonly slurm_jname="_filter_genotypes_${1}"
+      readonly slurm_lname="_filter_genotypes"
+      readonly slurm_project="lindgren.prj"
+      readonly slurm_queue="long"
+      readonly slurm_shmem="4"
       set -x
-      qsub -N "_filter_genotypes_${1}" \
-        -q "long.qc@@long.hge" \
-        -t "${SGE_TASK_ID}" \
-        -pe shmem 4 \
+      sbatch \
+        --account="${slurm_project}" \
+        --job-name="${slurm_jname}" \
+        --output="${slurm_lname}.log" \
+        --error="${slurm_lname}.errors.log" \
+        --chdir="${curwd}" \
+        --partition="${slurm_queue}" \
+        --cpus-per-task="${slurm_shmem}" \
+        --array=${slurm_tasks} \
+        --parsable \
         "${bash_script}" \
         "${genes}" \
         "${final_sample_list}" \
@@ -80,8 +93,8 @@ submit_intervals()
         "${pheno_file}" \
         "${trait}" \
         "${phenotype}"
-      set +x
-    else
+    set +x 
+  else
       >&2 echo "${genes} (${phenotype}) did not pass significance threshols or does not exist. Skipping.."
     fi
   fi

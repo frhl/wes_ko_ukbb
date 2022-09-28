@@ -5,19 +5,21 @@
 # calls a sub script that should be in the long queue (probably due to the fact
 # that it takes >24h to condition our signal in HLA region)
 #
-#$ -N spa_iter_common
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/spa_iter_common.log
-#$ -e logs/spa_iter_common.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q test.qc
-#$ -t 1-80
-#$ -V
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=spa_iter_common
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/spa_iter_common.log
+#SBATCH --error=logs/spa_iter_common.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 1
+#SBATCH --array=1-80
+#SBATCH --requeue
+
 
 set -o errexit
 set -o nounset
 
+readonly curwd=$(pwd)
 readonly bash_script="scripts/conditional/common/_spa_iter_common.sh"
 
 
@@ -42,7 +44,7 @@ submit_binary_analysis()
 {
   local annotation="${1?Error: Missing arg1 (annotation)}"
   local pheno_list="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
-  local phenotype=$( sed "${SGE_TASK_ID}q;d" ${pheno_list} )
+  local phenotype=$( sed "${SLURM_ARRAY_TASK_ID}q;d" ${pheno_list} )
   submit_cond_spa "${annotation}" "${phenotype}" "binary"
 }
 
@@ -50,7 +52,7 @@ submit_cts_analysis()
 {
   local annotation="${1?Error: Missing arg1 (annotation)}"
   local pheno_list="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
-  local phenotype=$( sed "${SGE_TASK_ID}q;d" ${pheno_list} )
+  local phenotype=$( sed "${SLURM_ARRAY_TASK_ID}q;d" ${pheno_list} )
   submit_cond_spa "${annotation}" "${phenotype}" "cts"
 }
 
@@ -71,12 +73,23 @@ submit_cond_spa()
 
   mkdir -p ${out_dir}
   if [ -f "${interval_vcf}" ]; then 
-    qsub -N "_cond_${phenotype}" \
-      -o "${out_prefix}.log" \
-      -e "${out_prefix}.errors.log" \
-      -q "long.qc@@long.hge" \
-      -t "${SGE_TASK_ID}" \
-      -pe shmem 1 \
+    readonly slurm_tasks="${SLURM_ARRAY_TASK_ID}"
+    readonly slurm_jname="_cond_${phenotype}"
+    readonly slurm_lname="${out_prefix}"
+    readonly slurm_project="lindgren.prj"
+    readonly slurm_queue="long"
+    readonly slurm_shmem="1"
+    set -x
+    sbatch \
+      --account="${slurm_project}" \
+      --job-name="${slurm_jname}" \
+      --output="${slurm_lname}.log" \
+      --error="${slurm_lname}.errors.log" \
+      --chdir="${curwd}" \
+      --partition="${slurm_queue}" \
+      --cpus-per-task="${slurm_shmem}" \
+      --array=${slurm_tasks} \
+      --parsable \
       "${bash_script}" \
       "${in_gmat}" \
       "${in_var}" \
@@ -89,6 +102,7 @@ submit_cond_spa()
       "${grm_sam}" \
       "${phenotype}" \
       "${min_maf}"
+    set +x
   else
     >&2 echo "${interval_vcf} (interval) does not exist. Exiting.."
   fi
