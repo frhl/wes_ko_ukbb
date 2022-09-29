@@ -2,16 +2,14 @@
 #
 # Append pseudo variants with actual variants for downstream conditional analysis.
 #
-#$ -N append_vcf_rare
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/append_vcf_rare.log
-#$ -e logs/append_vcf_rare.errors.log
-#$ -P lindgren.prjc
-#$ -q short.qc
-#$ -pe shmem 3
-#$ -t 1-22
-#$ -V
-
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=append_vcf_rare
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/append_vcf_rare.log
+#SBATCH --error=logs/append_vcf_rare.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 3
+#SBATCH --array=1-22
 
 set -o errexit
 set -o nounset
@@ -24,7 +22,7 @@ source utils/hail_utils.sh
 readonly spark_dir="data/tmp/spark"
 readonly hail_script="scripts/conditional/rare/01_append_vcf_rare.py"
 
-readonly chr="${SGE_TASK_ID}"
+readonly chr="${SLURM_ARRAY_TASK_ID}"
 readonly variants_dir="data/mt/annotated"
 readonly ko_dir="data/knockouts/alt"
 readonly out_dir="data/conditional/rare/combined"
