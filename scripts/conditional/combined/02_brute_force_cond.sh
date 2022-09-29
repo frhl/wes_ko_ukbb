@@ -163,7 +163,7 @@ submit_merge_job()
     --chdir="${curwd}" \
     --partition="${slurm_queue}" \
     --cpus-per-task="${slurm_nslots}" \
-    --dependency="after:${spa_jid}" \
+    --dependency="afterok:${spa_jid}" \
     --open-mode="append" \
     --parsable \
     "${merge_script}" \
