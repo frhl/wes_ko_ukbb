@@ -74,7 +74,11 @@ def main(args):
     gene_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
     if aggr_method in "fast":
         genes = ko.aggr_phase_count_by_expr(mt, gene_expr)
-        expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased)
+        expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased, only_homs=False)
+        expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko)
+    elif aggr_method in "only_homs":
+        genes = ko.aggr_phase_count_by_expr(mt, gene_expr)
+        expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased, only_homs=True)
         expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko)
     elif aggr_method in "collect":
         genes = ko.collect_phase_count_by_expr(mt, gene_expr)

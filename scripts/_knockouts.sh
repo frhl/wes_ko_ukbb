@@ -28,7 +28,7 @@ readonly aggr_method=${11?Error: Missing arg11 (Aggr method: fast or collect)}
 readonly out_prefix=${12?Error: Missing arg12 (path prefix for saige output)}
 readonly out_type=${13?Error: Missing arg13 (output type e.g., mt,vcf or plink)}
 
-readonly chr=${SGE_TASK_ID}
+readonly chr=${SLURM_ARRAY_TASK_ID}
 readonly input_path_chr=$(echo ${input_path} | sed -e "s/CHR/${chr}/g")
 readonly out_prefix_chr=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
 

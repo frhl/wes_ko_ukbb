@@ -9,8 +9,7 @@
 #SBATCH --error=logs/spa_cond_common.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=18
-#SBATCH --requeue
+#SBATCH --array=1-44
 
 set -o errexit
 set -o nounset

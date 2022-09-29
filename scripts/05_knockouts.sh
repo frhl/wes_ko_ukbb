@@ -19,11 +19,12 @@ source utils/qsub_utils.sh
 source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
+readonly curwd=$(pwd)
 readonly spark_dir="data/tmp/spark"
 readonly bash_script="scripts/_knockouts.sh"
 
 readonly in_dir="data/mt/annotated"
-readonly out_dir="data/knockouts/alt/dont_discard_singletons"
+readonly out_dir="data/knockouts/alt/only_homs"
 readonly in_prefix="${in_dir}/ukb_eur_wes_union_calls_200k_chrCHR.mt"
 readonly in_type="mt"
 
@@ -32,8 +33,8 @@ readonly out_type="vcf"
 
 # Note: ~24 slots are needed for running chr1. 
 # Note: long queue may be required for chr1.
-readonly tasks="1-22"
-readonly queue="short.qc"
+readonly tasks="21" # 1-22
+readonly queue="short"
 readonly project="lindgren.prj"
 
 # should only VCF be produced?
@@ -65,7 +66,7 @@ submit_knockout_job()
   # slurm specific paramters 
   local slurm_tasks="${tasks}"
   local slurm_jname="_ko_${annotation}"
-  local slurm_lname="_knockouts"
+  local slurm_lname="logs/_knockouts"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
   local slurm_nslots="${nslots}"
@@ -108,10 +109,11 @@ submit_knockout_job()
 #
 
 #submit_knockout_job "pLoF,damaging_missense" "24" "collect"
-submit_knockout_job "pLoF" "24" "collect"
+submit_knockout_job "pLoF,damaging_missense" "6" "only_homs"
+#submit_knockout_job "pLoF" "24" "collect"
 #submit_knockout_job "pLoF,damaging_missense" "6" "fast"
-submit_knockout_job "pLoF,LC" "6" "fast"
-submit_knockout_job "synonymous" "6" "fast"
+#submit_knockout_job "pLoF,LC" "6" "fast"
+#submit_knockout_job "synonymous" "6" "fast"
 
 #submit_knockout_job "0" "5e-2" "" "damaging_missense"
 #submit_knockout_job "0" "5e-2" "" "synonymous"
