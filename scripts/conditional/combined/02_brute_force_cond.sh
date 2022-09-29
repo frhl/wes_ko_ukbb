@@ -10,7 +10,9 @@
 #SBATCH --error=logs/brute_force_cond.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=49
+#SBATCH --array=1-80
+
+# array index 49 is PSOR_combined
 
 set -o errexit
 set -o nounset
