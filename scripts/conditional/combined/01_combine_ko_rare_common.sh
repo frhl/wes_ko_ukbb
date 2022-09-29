@@ -2,16 +2,14 @@
 #
 # Append pseudo variants with actual variants for downstream conditional analysis.
 #
-#$ -N combine_ko_rare_common
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/combine_ko_rare_common.log
-#$ -e logs/combine_ko_rare_common.errors.log
-#$ -P lindgren.prjc
-#$ -q short.qc
-#$ -pe shmem 5
-#$ -t 1-22
-#$ -V
-
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=combine_ko_rare_common
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/combine_ko_rare_common.log
+#SBATCH --error=logs/combine_ko_rare_cond_common.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 5
+#SBATCH --array=1-22
 
 set -o errexit
 set -o nounset
@@ -24,7 +22,7 @@ source utils/hail_utils.sh
 readonly spark_dir="data/tmp/spark"
 readonly hail_script="scripts/conditional/combined/01_combine_ko_rare_common.py"
 
-readonly chr="${SGE_TASK_ID}"
+readonly chr="${SLURM_ARRAY_TASK_ID}"
 readonly variants_dir="data/mt/annotated"
 
 # note: assuming ko and rare variants have already been merged
