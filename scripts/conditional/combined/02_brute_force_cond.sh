@@ -39,7 +39,7 @@ readonly cond_rare_file="${cond_rare_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLo
 readonly markers_rare_ac="${cond_rare_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_AC.txt.gz"
 readonly markers_rare_hash="${cond_rare_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_hash.txt.gz"
 
-readonly cond_common_dir="data/conditional/common/combined"
+readonly cond_common_dir="data/conditional/common/combined/final"
 readonly cond_common_file="${cond_common_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_w_common_markers.txt"
 
 # what categories should be included downstream?
@@ -163,7 +163,7 @@ submit_merge_job()
     --chdir="${curwd}" \
     --partition="${slurm_queue}" \
     --cpus-per-task="${slurm_nslots}" \
-    --dependency="afterok:${spa_jid}" \
+    --dependency="after:${spa_jid}" \
     --open-mode="append" \
     --parsable \
     "${merge_script}" \
@@ -178,7 +178,7 @@ submit_merge_job()
 readonly markers_rare_cond_min_mac=4
 readonly use_prs="1"
 readonly min_mac=4
-readonly tasks=6
+readonly tasks=1-22
 readonly project="lindgren.prj"
 readonly queue="short"
 readonly nslots=2
