@@ -197,32 +197,39 @@ def sum_gts_entries(mt: hl.MatrixTable):
 
    
 
-def calc_prob_ko(hom_expr, phased_expr, unphased_expr):
+def calc_prob_ko(hom_expr, phased_expr, unphased_expr, only_homs=False):
     """Calculate probability of knockout based on phased 
        and unphased alleles (requires sum_gts_entries)
     
     :param hom_expr: integer for homozygous count 
     :param phased_expr: struct with integers a1 and a2
     :param unphased_expr: struct with integers a1 and a2
+    :param only_homs: only count homozygotes as knockouts.
     """
     
     n = unphased_expr.n
     #n = unphased_expr.a1 + unphased_expr.a2 
-    return (hl.case()
-           .when(hom_expr > 0, 1) # homozygote
-           .when(
-               (phased_expr.a1 > 0) & # compound het
-               (phased_expr.a2 > 0), 1)
-           .when(
-               ((phased_expr.a1 == 1) | # likely compound het (one phased het)
-                (phased_expr.a2 == 1)) &
-                (n > 0), 1 - (1 / 2) ** n)
-           .when(
-               ((phased_expr.a1 == 0) | # likely compound het (zero phased het)
-                (phased_expr.a2 == 0)) &
-                (n > 1), 1 - 2 * (1 / 2) ** n)
-           .default(0)
-            )
+    if only_homs:
+        return (hl.case()
+               .when(hom_expr > 0, 1) # homozygote
+               .default(0)
+               )
+    else:
+        return (hl.case()
+               .when(hom_expr > 0, 1) # homozygote
+               .when(
+                   (phased_expr.a1 > 0) & # compound het
+                   (phased_expr.a2 > 0), 1)
+               .when(
+                   ((phased_expr.a1 == 1) | # likely compound het (one phased het)
+                    (phased_expr.a2 == 1)) &
+                    (n > 0), 1 - (1 / 2) ** n)
+               .when(
+                   ((phased_expr.a1 == 0) | # likely compound het (zero phased het)
+                    (phased_expr.a2 == 0)) &
+                    (n > 1), 1 - 2 * (1 / 2) ** n)
+               .default(0)
+                )
 
 
 def calc_prob_ko_by_count(ko_expr, phased_expr, unphased_expr):
