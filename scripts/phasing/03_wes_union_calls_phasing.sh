@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 #
-#$ -N wes_union_calls_phasing
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/wes_union_calls_phasing.log
-#$ -e logs/wes_union_calls_phasing.errors.log
-#$ -P lindgren.prjc
-#$ -q long.qc@@long.hga
-#$ -pe shmem 24
-#$ -t 20
+# @description phase combined set of UK Biobank whole exome and genotyping array using SHAPEIT4.2
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=wes_union_calls_phasing
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/wes_union_calls_phasing.log
+#SBATCH --error=logs/wes_union_calls_phasing.errors.log
+#SBATCH --partition=long
+#SBATCH --cpus-per-task 24
+#SBATCH --array=21
+
 
 # note, shmem 20 is not enough for chrom 21.
 
@@ -20,7 +23,7 @@ readonly out_dir="data/phased/wes_union_calls/naive"
 readonly ref_dir="/well/lindgren/flassen/ressources/panels/liftover_reference_panel/data/liftover"
 readonly fam_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 
-readonly chr="${SGE_TASK_ID}"
+readonly chr="${SLURM_ARRAY_TASK_ID}"
 readonly in_file="${in_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.vcf.bgz"
 readonly out_file="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.vcf.gz"
 readonly ser_file="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.txt"

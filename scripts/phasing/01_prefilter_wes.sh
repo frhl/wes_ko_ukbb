@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 #
-#$ -N prefilter_wes
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/prefilter_wes.log
-#$ -e logs/prefilter_wes.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 2
-#$ -q short.qc@@short.hga
-#$ -t 22
-#$ -V
+# @description filter WES quality-controlled data.
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=prefilter_wes
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/prefilter_wes.log
+#SBATCH --error=logs/prefilter_wes.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 2
+#SBATCH --array=20-22
+
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
@@ -18,7 +20,7 @@ readonly spark_dir="data/tmp/spark"
 readonly hail_script="scripts/phasing/01_prefilter_wes.py"
 readonly in_dir="data/unphased/wes/post-qc"
 
-readonly chr=$( get_chr ${SGE_TASK_ID} )
+readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 readonly in_file="${in_dir}/ukb_wes_200k_filtered_chr${chr}.mt"
 readonly in_type="mt"
 

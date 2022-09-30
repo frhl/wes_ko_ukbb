@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 #
-#$ -N wes_naive_phasing
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/wes_naive_phasing.log
-#$ -e logs/wes_naive_phasing.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 24
-#$ -q short.qc@@short.hga
-#$ -t 21-22
+# @description phase variants from UKBB whole exome sequencing using SHAPEIT4.2
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=wes_naive_phasing
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/wes_naive_phasing.log
+#SBATCH --error=logs/wes_naive_phasing.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 24
+#SBATCH --array=20-22
+
 
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
@@ -18,7 +21,7 @@ readonly out_dir="data/phased/wes/naive"
 readonly ref_dir="/well/lindgren/flassen/ressources/panels/liftover_reference_panel/data/liftover"
 readonly fam_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 
-readonly chr="${SGE_TASK_ID}"
+readonly chr="${SLURM_ARRAY_TASK_ID}"
 readonly in_file="${in_dir}/ukb_eur_wes_prefilter_200k_chr${chr}.vcf.bgz"
 readonly out_file="${out_dir}/ukb_eur_wes_prefilter_200k_naive_phasing_chr${chr}.vcf.gz"
 readonly fam_file="${fam_dir}/ukb11867_pedigree.fam"

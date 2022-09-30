@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 #
-#$ -N calls_gen
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/calls_gen.log
-#$ -e logs/calls_gen.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 2
-#$ -q short.qc
-#$ -t 1-22
-#$ -V
+# @description generate files of genotyped calls
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=calls_gen
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/calls_gen.log
+#SBATCH --error=logs/calls_gen.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 2
+#SBATCH --array=20-22
 
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
@@ -18,7 +19,7 @@ source utils/vcf_utils.sh
 readonly spark_dir="data/tmp/spark"
 readonly hail_script="scripts/phasing/02_geno_gen.py"
 
-readonly chr=$( get_chr ${SGE_TASK_ID} )
+readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 readonly out_dir="data/unphased/calls"
 readonly out_prefix="${out_dir}/ukb_prefilter_calls_200k_chr${chr}"
 readonly out_type="vcf"
@@ -41,6 +42,7 @@ if [ ! -f "$( get_hail_ext ${out_prefix} ${out_type})" ]; then
      --liftover \
      --min_mac 2 \
      --missing 0.05 \
+     --exclude_parents \
      --ancestry "eur" \
      --dataset "calls"
   set +x

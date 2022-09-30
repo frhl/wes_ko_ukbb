@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 #
-#$ -N calls_naive_phasing
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/calls_naive_phasing.log
-#$ -e logs/calls_naive_phasing.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 6
-#$ -q short.qc@@short.hga
-#$ -t 20-22
+# @description phase genotyping array calls using SHAPEIT4.2
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=calls_naive_phasing
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/calls_naive_phasing.log
+#SBATCH --error=logs/calls_naive_phasing.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 6
+#SBATCH --array=20-22
 
 
 source utils/vcf_utils.sh
@@ -21,7 +23,7 @@ readonly ref_dir="/well/lindgren/flassen/ressources/panels/liftover_reference_pa
 readonly pedigree_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 readonly pedigree="${pedigree_dir}/ukb11867_pedigree.fam"
 
-readonly chr="${SGE_TASK_ID}"
+readonly chr="${SLURM_ARRAY_TASK_ID}"
 readonly in_file="${in_dir}/ukb_prefilter_calls_200k_chr${chr}.vcf.bgz"
 readonly out_prefix="${out_dir}/ukb_prefilter_calls_200k_chr${chr}"
 readonly out="${out_prefix}.vcf.gz"
