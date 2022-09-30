@@ -1,26 +1,25 @@
 #!/usr/bin/env bash
 #
-#$ -N ligate_chunks
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/ligate_chunks.log
-#$ -e logs/ligate_chunks.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 2
-#$ -q short.qa
-#$ -t 23
-#$ -V
+# @description combine chunks in a phase-aware manner into full chromosomes.
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=ligate_chunks
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/ligate_chunks.log
+#SBATCH --error=logs/ligate_chunks.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 2
+#SBATCH --array=20-22
 
 set -o errexit
 set -o nounset
-
-#module load BCFtools/1.12-GCC-10.3.0
 
 source utils/bash_utils.sh
 source utils/vcf_utils.sh
 
 readonly rscript="scripts/phasing/_sort_chunks.R"
 
-readonly chr=$( get_chr ${SGE_TASK_ID} )
+readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 readonly in_dir="data/phased/wes_union_calls/trimmed"
 readonly in_prefix="${in_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
 readonly in_trim="${in_prefix}_trim"

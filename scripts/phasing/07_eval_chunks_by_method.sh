@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 #
-#$ -N eval_chunks_by_method
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/eval_chunks_by_method.log
-#$ -e logs/eval_chunks_by_method.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qe
-#$ -V
-
+# @description evaluate quality of chunks by methods
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=eval_chunks_by_method
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/eval_chunks_by_method.log
+#SBATCH --error=logs/eval_chunks_by_method.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 1
 
 source utils/bash_utils.sh
 

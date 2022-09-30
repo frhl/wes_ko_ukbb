@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 #
-#$ -N trim_chunks
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/trim_chunks.log
-#$ -e logs/trim_chunks.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 8
-#$ -q short.qe
-#$ -t 23
-#$ -V
+# @description Prune phased chunk boundaries so that only a few overlapping sites remain.
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=trim_chunks
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/trim_chunks.log
+#SBATCH --error=logs/trim_chunks.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 8
+#SBATCH --array=20-22
 
 set -o errexit
 set -o nounset
@@ -20,7 +21,7 @@ source utils/vcf_utils.sh
 readonly hail_script="scripts/phasing/05_trim_chunks.py"
 readonly spark_dir="data/tmp/spark"
 
-readonly chr=$( get_chr ${SGE_TASK_ID} )
+readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 readonly main_dir="data/phased/wes_union_calls/chunks"
 readonly in_dir="${main_dir}/ukb_eur_wes_union_calls_200k_chr${chr}-19xshort.qe/"
 readonly in_prefix="shapeit4_prs100000_pro50000_mprs100000"

@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 #
-#$ -N eval_chunks_by_maf
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/eval_chunks_by_maf.log
-#$ -e logs/eval_chunks_by_maf.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qc
-#$ -V
-
+# @description evaluate phasing quality stratified by MAF
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=eval_chunks_by_maf
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/eval_chunks_by_maf.log
+#SBATCH --error=logs/eval_chunks_by_maf.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 2
 
 source utils/bash_utils.sh
 
