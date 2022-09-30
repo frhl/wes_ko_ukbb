@@ -42,7 +42,7 @@ if [ ! -f "$( get_hail_ext ${out_prefix} ${out_type})" ]; then
      --liftover \
      --min_mac 2 \
      --missing 0.05 \
-     --exclude_parents \
+     --exclude_trio_parents \
      --ancestry "eur" \
      --dataset "calls"
   set +x

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #
 # @description filter WES quality-controlled data.
+# @note singletons are excluded here but re-introduced in a later script.
 #
 #SBATCH --account=lindgren.prj
 #SBATCH --job-name=prefilter_wes
@@ -39,6 +40,7 @@ if [ ! -f "${out_prefix}.vcf.bgz" ]; then
      --input_type "${in_type}" \
      --out_prefix "${out_prefix}" \
      --out_type "${out_type}" \
+     --exclude_trio_parents \
      --ancestry "eur" \
      --min_mac 2 \
      --missing 0.05

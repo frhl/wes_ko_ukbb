@@ -16,6 +16,7 @@ def main(args):
     input_path = args.input_path
     input_type = args.input_type
     extract_samples = args.extract_samples
+    exclude_trio_parents = args.exclude_trio_parents
     min_mac = args.min_mac
     missing = args.missing
     ancestry = args.ancestry
@@ -31,6 +32,8 @@ def main(args):
         mt = mt.filter_cols(hl.is_defined(ht_samples[mt.col_key])) 
     if ancestry:
         mt = samples.filter_ukb_to_ancestry(mt, ancestry)
+    if exclude_trio_parents:
+        mt = samples.exclude_parents_by_fam(mt, relation = ["TRIO"])
     if min_mac:
         mt = filter_min_mac(mt, int(min_mac))
     if missing:
@@ -47,6 +50,7 @@ if __name__=='__main__':
     parser.add_argument('--input_type', default=None, help='What input type?')
     parser.add_argument('--ancestry', default=None, help='filter to specific ancestry')
     parser.add_argument('--extract_samples', default=None, help='HailTable with samples to be extracted.')
+    parser.add_argument('--exclude_trio_parents', default=None, action='store_true', help='Exclude parents of trio relationships')
     parser.add_argument('--min_mac', default=None, help='Filter to MAC >= value')
     parser.add_argument('--missing', default=None, help='Filter to variants to have le value in genotype missingness')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')

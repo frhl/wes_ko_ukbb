@@ -43,7 +43,7 @@ if [ ! -f "${out_prefix}.vcf.bgz" ]; then
      --min_mac 2 \
      --missing 0.05 \
      --dataset "calls" \
-     --exclude_parents \
+     --exclude_trio_parents \
      --liftover
   set +x
   log_runtime ${SECONDS}
