@@ -23,6 +23,7 @@ def main(args):
     dataset = args.dataset
     convert_sample_id = args.convert_sample_id
     extract_samples = args.extract_samples
+    exclude_parents = args.exclude_parents
     min_info = args.min_info
     liftover = args.liftover
     min_mac = args.min_mac
@@ -99,6 +100,8 @@ def main(args):
         mt = io.recalc_info(mt)
     if ancestry:
         mt = samples.filter_ukb_to_ancestry(mt, ancestry)
+    if exclude_parents:
+        mt = samples.exclude_parents_by_fam(mt, relation = ["TRIO"])
     if min_mac:
         mt = filter_min_mac(mt, int(min_mac))
     if missing:
@@ -114,6 +117,7 @@ if __name__=='__main__':
     parser.add_argument('--input_type', default=None, help='What input type?')
     parser.add_argument('--min_info', default=None, help='minimum info score (only imputed data)')
     parser.add_argument('--liftover', default=None, action='store_true', help='perform liftover')
+    parser.add_argument('--exclude_parents', default=None, action='store_true', help='Exclude parents of duo/trio relationships')
     parser.add_argument('--ancestry', default=None, help='filter to specific ancestry')
     parser.add_argument('--convert_sample_id', default=None, action='store_true', help='convert to lindgren sample id')
     parser.add_argument('--dataset', default=None, help='Either "imp" or "calls".')
