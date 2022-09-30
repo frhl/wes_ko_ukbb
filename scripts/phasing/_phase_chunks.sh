@@ -1,13 +1,4 @@
 #!/usr/bin/env bash
-#
-#$ -N _phase_chunks
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_phase_chunks.log
-#$ -e logs/_phase_chunks.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qa
-#$ -V
 
 set -o errexit
 set -o nounset
@@ -33,7 +24,7 @@ readonly software=${10?Error: Missing arg10 (software)} # Path of VCF to use as 
 
 readonly hail_script="scripts/phasing/04_phase_chunks.py"
 readonly interval_flags="--chrom ${chr} --min_interval_unit ${min_interval_unit} --phasing_region_size ${phasing_region_size} --phasing_region_overlap ${phasing_region_overlap} --max_phasing_region_size ${max_phasing_region_size}"
-readonly phasing_idx=${SGE_TASK_ID} # one-based index for which phasing interval to phase
+readonly phasing_idx=${SLURM_ARRAY_TASK_ID} # one-based index for which phasing interval to phase
 
 readonly max_phasing_idx=$( python3 ${hail_script} ${interval_flags} --get_max_phasing_idx --interval_path ${interval_path})
 readonly out_prefix_w_phasing_idx="${out_prefix}.${phasing_idx}of${max_phasing_idx}"

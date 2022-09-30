@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 #
-# author: Nbaya with revisions from flassen
+# @description phase UK Biobank VCFs in optimal chunks
+# @author Nbaya and flassen
 #
-#$ -N phase_chunks
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/phase_chunks.log
-#$ -e logs/phase_chunks.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 2
-#$ -q short.qe
-#$ -t 23
-#$ -V
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=phase_chunks
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/phase_chunks.log
+#SBATCH --error=logs/phase_chunks.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 2
+#SBATCH --array=20-22
 
 set -o errexit
 set -o nounset
@@ -19,6 +19,7 @@ source utils/qsub_utils.sh
 source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
+readonly curwd=$(pwd)
 readonly hail_script="scripts/phasing/04_phase_chunks.py"
 readonly phasing_script="scripts/phasing/_phase_chunks.sh"
 readonly spark_dir="data/tmp/spark"
@@ -42,10 +43,11 @@ readonly phasing_region_overlap=$(( ${phasing_region_size}/2 ))
 # Must be larger than phasing_region_size
 readonly max_phasing_region_size=100000
 
-readonly chr=$( get_chr ${SGE_TASK_ID} )
+readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 
 # Cluster params
 readonly software="shapeit4" #"shapeit4" or "eagle2"
+readonly project="lindgren.prj"
 readonly queue="short.qe"
 readonly nslots=19
 
@@ -92,12 +94,31 @@ else
 fi
 
 submit_phasing_job() {
-  readonly max_phasing_idx=$( python3 ${hail_script} ${phasing_interval_flags} --phasing_region_size ${phasing_region_size} --phasing_region_overlap ${phasing_region_overlap} --max_phasing_region_size ${max_phasing_region_size} --get_max_phasing_idx --interval_path ${interval_path} )
+  # get number of phasing indexes to run
+  readonly max_phasing_idx=$( python3 ${hail_script} ${phasing_interval_flags} \
+    --phasing_region_size ${phasing_region_size} \
+    --phasing_region_overlap ${phasing_region_overlap} \
+    --max_phasing_region_size ${max_phasing_region_size} \
+    --get_max_phasing_idx \
+    --interval_path ${interval_path} )
+  # submit child script for phasing
+  local slurm_tasks="1-${max_phasing_idx}"
+  local slurm_jname="_c${chr}_${software}_phase_chunks"
+  local slurm_lname="_phase_chunks"
+  local slurm_project="${project}"
+  local slurm_queue="${queue}"
+  local slurm_nslots="${nslots}"
   set -x
-  qsub -N "_c${chr}_${software}_phase_chunks" \
-    -t 1-${max_phasing_idx} \
-    -q ${queue} \
-    -pe shmem ${nslots} \
+  sbatch \
+    --account="${slurm_project}" \
+    --job-name="${slurm_jname}" \
+    --output="${slurm_lname}.log" \
+    --error="${slurm_lname}.errors.log" \
+    --chdir="${curwd}" \
+    --partition="${slurm_queue}" \
+    --cpus-per-task="${slurm_nslots}" \
+    --array="${slurm_tasks}" \
+    --open-mode="append" \
     ${phasing_script} \
     ${chr} \
     ${vcf_to_phase} \
@@ -110,6 +131,7 @@ submit_phasing_job() {
     ${pedigree} \
     ${software}
   set +x
+
 }
 
 if [ ! -f ${out} ]; then
