@@ -10,7 +10,7 @@
 #SBATCH --error=logs/phase_chunks.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=20-22
+#SBATCH --array=1-22
 
 set -o errexit
 set -o nounset
@@ -48,8 +48,8 @@ readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 # Cluster params
 readonly software="shapeit4" #"shapeit4" or "eagle2"
 readonly project="lindgren.prj"
-readonly queue="short.qe"
-readonly nslots=19
+readonly queue="short"
+readonly nslots=16
 
 # what vcf should be phased
 readonly vcf_dir=" data/unphased/wes_union_calls"
@@ -60,7 +60,7 @@ readonly pedigree_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 readonly pedigree="${pedigree_dir}/ukb11867_pedigree.fam"
 
 # Output paths
-readonly out_dir="data/phased/wes_union_calls/chunks/eagle"
+readonly out_dir="data/phased/wes_union_calls/chunks/${software}"
 readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
 readonly out_prefix_w_job_config="${out_prefix}-${nslots}x${queue}/${software}_prs${phasing_region_size}_pro${phasing_region_overlap}_mprs${max_phasing_region_size}"
 readonly out="${out_prefix_w_job_config}.vcf.gz"
@@ -104,7 +104,7 @@ submit_phasing_job() {
   # submit child script for phasing
   local slurm_tasks="1-${max_phasing_idx}"
   local slurm_jname="_c${chr}_${software}_phase_chunks"
-  local slurm_lname="_phase_chunks"
+  local slurm_lname="logs/_phase_chunks"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
   local slurm_nslots="${nslots}"

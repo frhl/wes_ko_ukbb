@@ -31,6 +31,7 @@ readonly trio="${out_prefix}.trio"
 
 readonly ref="${ref_dir}/ALL.chr${chr}.phase3_shapeit2_mvncall_integrated_v5.20130502.genotypes.vcf.bgz"
 readonly gmap="/well/lindgren/flassen/software/SHAPEIT4/b38.gmap/chr${chr}.b38.gmap.gz"
+readonly threads=$(( ${SLURM_CPUS_ON_NODE} - 1))
 
 mkdir -p ${out}
 
@@ -41,7 +42,7 @@ if [ ! -f ${out} ]; then
     --input ${in_file} \
     --map ${gmap} \
     --region "chr${chr}" \
-    --thread $(( ${NSLOTS}-1 )) \
+    --thread ${threads} \
     --output ${out} \
     && print_update "Finished phasing variants for chr${chr}, out: ${out}" "${SECONDS}" \
     || raise_error "$( print_update "Phasing variants failed for chr${chr}" ${SECONDS} )"

@@ -8,7 +8,7 @@
 #SBATCH --output=logs/wes_union_calls_gen.log
 #SBATCH --error=logs/wes_union_calls_gen.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 2
+#SBATCH --cpus-per-task 3
 #SBATCH --array=1-22
 
 source utils/qsub_utils.sh
@@ -23,7 +23,7 @@ readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 readonly in_file="${in_dir}/ukb_wes_200k_filtered_chr${chr}.mt"
 readonly in_type="mt"
 
-readonly out_dir="data/unphased/wes_union_calls/without_parents"
+readonly out_dir="data/unphased/wes_union_calls"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
 readonly out_type="vcf"
 

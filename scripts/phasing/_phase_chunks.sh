@@ -21,6 +21,7 @@ readonly max_phasing_region_size=${7?Error: Missing arg7 (max_phasing_region_siz
 readonly out_prefix=${8?Error: Missing arg8 (path prefix for output intermediate VCF)} # Path to output phased VCF
 readonly pedigree=${9?Error: Missing arg9 (pedigree)} # Path of VCF to use as haplotype scaffold
 readonly software=${10?Error: Missing arg10 (software)} # Path of VCF to use as haplotype scaffold
+readonly threads=$(( ${SLURM_CPUS_ON_NODE} - 1))
 
 readonly hail_script="scripts/phasing/04_phase_chunks.py"
 readonly interval_flags="--chrom ${chr} --min_interval_unit ${min_interval_unit} --phasing_region_size ${phasing_region_size} --phasing_region_overlap ${phasing_region_overlap} --max_phasing_region_size ${max_phasing_region_size}"
@@ -46,7 +47,7 @@ phase_with_shapeit() {
     --input ${vcf_to_phase} \
     --map ${gmap} \
     --region "chr${region}" \
-    --thread $(( ${NSLOTS}-1 )) \
+    --thread ${threads} \
     --sequencing \
     --log ${log} \
     --output ${out}
@@ -71,7 +72,7 @@ phase_with_eagle2() {
     --bpEnd ${bp_end} \
     --outPrefix ${out_prefix_w_phasing_idx} \
     --geneticMapFile ${gmap} \
-    --numThreads $(( ${NSLOTS}-1 )) \
+    --numThreads ${threads} \
     --maxMissingPerIndiv=0.1 \
     --maxMissingPerSnp=0.1 \
     --Kpbwt=20000 \
