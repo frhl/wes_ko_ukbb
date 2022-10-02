@@ -1,13 +1,4 @@
 #!/usr/bin/env bash
-#
-#
-#$ -N _spa_set
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_spa_set.log
-#$ -e logs/_spa_set.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q lindgren.qe
 
 source utils/bash_utils.sh
 source utils/hail_utils.sh
@@ -23,7 +14,7 @@ readonly min_mac=${8?Error: Missing arg8 (min_mac)}
 readonly in_group=${9?Error: Missing arg9 (path prefix for group file)}
 readonly out_prefix=${10?Error: Missing arg10 (path prefix for saige output)}
 readonly in_markers=${11} # optional conditioning markers
-readonly chr=${SGE_TASK_ID}
+readonly chr=${SLURM_ARRAY_TASK_ID}
 
 # chromosome specified at in_gmat and in_var
 # when off chromosome PRS will beused
@@ -45,8 +36,8 @@ readonly threads=$(( ${NSLOTS}-1 ))
 readonly step2_SPAtests="utils/saige/step2_SPAtests.R"
 
 spa_set_test() {
-   echo "var_bytes=${var_bytes} at ${var}"
-   echo "gmat_bytes=${gmat_bytes} at ${gmat}"
+   >&2 echo "var_bytes=${var_bytes} at ${var}"
+   >&2 echo "gmat_bytes=${gmat_bytes} at ${gmat}"
    if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then 
      SECONDS=0
      set -x
