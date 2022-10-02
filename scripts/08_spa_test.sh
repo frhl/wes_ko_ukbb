@@ -9,7 +9,7 @@
 #SBATCH --error=logs/spa_test.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-80
+#SBATCH --array=1-2
 #SBATCH --requeue
 
 set -o errexit
@@ -31,6 +31,7 @@ readonly merge_script="scripts/_spa_merge.sh"
 readonly in_prefix="ukb_eur_wes_200k"
 
 readonly index=${SLURM_ARRAY_TASK_ID}
+readonly curwd=$(pwd)
 
 submit_spa_binary_with_csqs()
 {
@@ -81,9 +82,7 @@ submit_spa_with_csqs()
     if [ ! -f "${out_mrg}" ]; then
       local slurm_spa_name="spa_${phenotype}_${annotation}"
       local slurm_merge_name="_mrg_${phenotype}_${annotation}"
-      >&2 echo "Submitting ${qsub_spa_name}.."
       submit_spa_job
-      >&2 echo "Submitting ${qsub_merge_name}.."
       submit_merge_job
     else
       >&2 echo "Phenotype ${phenotype} with annotation ${annotation} already exists! Skipping.." 
@@ -123,7 +122,7 @@ submit_spa_job() {
     "${min_mac}" \
     "${out_prefix}" \
     "${conditioning_markers}" )
-
+  echo "Submitting ${phenotype} (JID=${spa_jid}).."
 }
 
 
@@ -158,7 +157,7 @@ readonly use_prs="0"
 readonly min_mac=4
 readonly project="lindgren.prj"
 readonly tasks=1-22
-readonly queue="short.qe"
+readonly queue="short"
 readonly nslots=1
 
 # Binary traits

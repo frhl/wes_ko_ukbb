@@ -17,6 +17,7 @@
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
+readonly curwd=$(pwd)
 readonly spa_null_script="scripts/_spa_null.sh"
 readonly rscript="scripts/_spa_null.R"
 readonly rscript_ldsc="scripts/_check_prs_p.R"
