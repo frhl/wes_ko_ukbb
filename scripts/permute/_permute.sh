@@ -1,14 +1,7 @@
 #!/usr/bin/env bash
 #
 #
-#$ -N _permute
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_permute.log
-#$ -e logs/_permute.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q lindgren.qe
-#$ -V
+#
 
 set -o errexit
 set -o nounset
@@ -22,7 +15,9 @@ readonly spa_script="scripts/permute/_gene_spa.sh"
 readonly merge_script="scripts/permute/_merge_permuted_spa.sh"
 readonly calc_script="scripts/permute/_calc_p.sh"
 
-readonly index=${SGE_TASK_ID}
+readonly curwd=$(pwd)
+readonly project="lindgren.prj"
+readonly index=${SLURM_ARRAY_TASK_ID}
 
 # input arguments
 readonly chr=${1?Error: Missing arg1}
@@ -154,43 +149,49 @@ get_trait_from_pheno() {
 # been completed. Will wait for the qsub script to run before proceeding.
 submit_shuffle_phase() {
 
-  
   permutation_supply=$( get_permutation_supply )
   local permutations_demand=${1}
   local n_tasks_required=$(( (${permutations_demand} / ${replicates}) - ${permutation_supply} ))
   local sge_seed=3
-
   if [ ${n_tasks_required} -ge 1 ]; then
-
     echo "Running shuffle phase ${n_tasks_required} time(s)."
     local tasks_lower_bound=$(( ${permutation_supply} + 1 ))
     local tasks_upper_bound=$(( ${permutation_supply} + ${n_tasks_required} ))
     local tasks_permute=${tasks_lower_bound}-${tasks_upper_bound}
     #permutation_supply=$(( ${permutation_supply} + ${n_tasks_required}))
-
     local out_permute_success="${out_prefix}_${tasks_permute}"
     local out_permute_upper_bound="${out_prefix}_${tasks_upper_bound}"
-
     # if the permutation already exists. Skip submission..
     if [ ! -f "${out_permute_upper_bound}.vcf.gz" ]; then
-
-      qsub -N "${name_shuffle}" \
-          -t ${tasks_permute} \
-          -o ${log} \
-          -e ${log_errors} \
-          -q ${queue_permute} \
-          -pe shmem ${n_slots_permute} \
-          ${bash_script} \
-          ${chr} \
-          ${input_path} \
-          ${out_prefix} \
-          ${out_permute_success} \
-          ${sge_seed} \
-          ${gene} \
-          ${replicates} \
-          ${cond_genotypes} \
-          ${use_cond_common}
-
+      local slurm_tasks="${tasks_permute}"
+      local slurm_jname="${name_shuffle}"
+      local slurm_lname_e="${log_errors}"
+      local slurm_lname_o="${log}"
+      local slurm_project="${project}"
+      local slurm_queue="${queue_permute}"
+      local slurm_nslots="${n_slots_permute}"
+      readonly shuffle_jid=$( sbatch \
+        --account="${slurm_project}" \
+        --job-name="${slurm_jname}" \
+        --output="${slurm_lname_o}" \
+        --error="${slurm_lname_e}" \
+        --open-mode="append" \
+        --chdir="${curwd}" \
+        --partition="${slurm_queue}" \
+        --cpus-per-task="${slurm_nslots}" \
+        --array=${slurm_tasks} \
+        --parsable \ 
+        ${bash_script} \
+        ${chr} \
+        ${input_path} \
+        ${out_prefix} \
+        ${out_permute_success} \
+        ${sge_seed} \
+        ${gene} \
+        ${replicates} \
+        ${cond_genotypes} \
+        ${use_cond_common} )
+      echo "Submitting shuffle script (JID=${shuffle_jid})"
     else
       echo >&2 "${out_permute_upper_bound} already exists. Skipping.."
     fi
@@ -206,31 +207,37 @@ submit_saige() {
   local saige_demand=${1}
   local pheno_saige_supply=$(get_saige_supply)
   local n_tasks_required=$(( (${saige_demand} / ${replicates}) - ${pheno_saige_supply} ))
-
   if [ ${n_tasks_required} -ge 1 ]; then
-
     echo "Running saige for ${phenotype} with ${n_tasks_required} job(s)."
     local tasks_lower_bound=$(( ${pheno_saige_supply} + 1 ))
     local tasks_upper_bound=$(( ${pheno_saige_supply} + ${n_tasks_required} ))
     local tasks_spa=${tasks_lower_bound}-${tasks_upper_bound}
     #saige_supply[${phenotype}]=$(( ${pheno_saige_supply} + ${n_tasks_required}))
-
     local vcf_gene_spa="${out_prefix}"
     local out_gene_spa="${out_prefix}_${phenotype}"
     local out_spa_success="${out_gene_spa}_${tasks_spa}"
     local out_spa_upper_bound="${out_gene_spa}_${tasks_upper_bound}"
-
     #local spa_name="spa_${gene}_${tasks_spa}_${phenotype}"
-
     # if the SPA has already been performed. Skip it.
     if [ ! -f "${out_spa_upper_bound}.txt" ]; then
-      qsub -N "${name_saige_pheno}" \
-        -o ${log_saige} \
-        -e ${log_saige_errors} \
-        -t ${tasks_spa} \
-        -q ${queue_saige} \
-        -pe shmem ${n_slots_saige} \
-        -hold_jid ${name_shuffle} \
+      local slurm_tasks="${tasks_spa}"
+      local slurm_jname="${name_saige_pheno}"
+      local slurm_lname_e="${log_saige_errors}"
+      local slurm_lname_o="${log_saige}"
+      local slurm_project="${project}"
+      local slurm_queue="${queue_saige}"
+      local slurm_nslots="${n_slots_saige}"
+      readonly spa_jid=$( sbatch \
+        --account="${slurm_project}" \
+        --job-name="${slurm_jname}" \
+        --output="${slurm_lname_o}" \
+        --error="${slurm_lname_e}" \
+        --chdir="${curwd}" \
+        --partition="${slurm_queue}" \
+        --cpus-per-task="${slurm_nslots}" \
+        --array=${slurm_tasks} \
+        --dependency="afterok:${shuffle_jid}"
+        --parsable \
         "${spa_script}" \
         "${chr}" \
         "${vcf_gene_spa}" \
@@ -244,7 +251,8 @@ submit_saige() {
         "${gene}" \
         "${min_mac}" \
         "${cond_markers}" \
-        "${use_cond_common}"
+        "${use_cond_common}" )
+      echo "Submitting SPA on shuffled VCFs (JID=${spa_jid})"
     else
       echo >&2 "${out_spa_upper_bound} already exists. Skipping.."
     fi
@@ -256,33 +264,49 @@ submit_saige() {
 
 
 submit_merge() {
-  set -x
-  qsub -N "${name_merge_pheno}" \
-    -o ${log} \
-    -e ${log_errors} \
-    -q ${queue_merge} \
-    -pe shmem 1 \
-    -hold_jid "${name_saige_pheno}" \
+  local slurm_jname="${name_saige_pheno}"
+  local slurm_lname_e="${log_errors}"
+  local slurm_lname_o="${log}"
+  local slurm_project="${project}"
+  local slurm_queue="${queue_merge}"
+  local slurm_nslots="1"
+  readonly merge_jid=$( sbatch \
+    --account="${slurm_project}" \
+    --job-name="${slurm_jname}" \
+    --output="${slurm_lname_o}" \
+    --error="${slurm_lname_e}" \
+    --chdir="${curwd}" \
+    --partition="${slurm_queue}" \
+    --cpus-per-task="${slurm_nslots}" \
+    --dependency="afterok:${spa_jid}"
+    --parsable \
     "${merge_script}" \
     "${n_shuffle}" \
     "${replicates}" \
     "${phenotype}" \
     "${out_prefix}" \
-    "${path_merged}"
-  set +x 
+    "${path_merged}" )
+  echo "Submitting merge (JID=${merge_jid}).."
 }
 
 submit_calc_p() {
   # check if actual PRS is used in SAIGE
-
-  echo "Calculating empirical P."
-  set -x
-  qsub -N "${name_calc_pheno}" \
-    -o ${log} \
-    -e ${log_errors} \
-    -q ${queue_merge} \
-    -pe shmem 1 \
-    -hold_jid "${name_merge_pheno}" \
+  local slurm_jname="${name_calc_pheno}"
+  local slurm_lname_e="${log_errors}"
+  local slurm_lname_o="${log}"
+  local slurm_project="${project}"
+  local slurm_queue="${queue_merge}"
+  local slurm_nslots="1"
+  readonly calc_p_jid=$( sbatch \
+    --account="${slurm_project}" \
+    --job-name="${slurm_jname}" \
+    --output="${slurm_lname_o}" \
+    --error="${slurm_lname_e}" \
+    --chdir="${curwd}" \
+    --partition="${slurm_queue}" \
+    --cpus-per-task="${slurm_nslots}" \
+    --dependency="afterok:${merge_jid}"
+    --parsable \
     "${calc_script}" \
     "${gene}" \
     "${phenotype}" \
@@ -294,18 +318,30 @@ submit_calc_p() {
     "${top_p}" \
     "${true_p_path}" \
     "${n_shuffle}" \
-    "${out_prefix}"
-  set +x
+    "${out_prefix}")
+  echo "Submitted calc_p (JID=${calc_p_jid})."
 }
 
 resubmit_loop() {
   echo "Resubmitting loop."
-  set -x
-  qsub -N "${name_main}" \
-    -q "${queue_master}" \
-    -pe shmem "1" \
-    -t ${SGE_TASK_ID} \
-    -hold_jid "${name_calc_pheno}" \
+  local slurm_tasks="${SLURM_ARRAY_TASK_ID}"
+  local slurm_jname="${name_main}"
+  local slurm_lname_e="${log_errors}"
+  local slurm_lname_o="${log}"
+  local slurm_project="${project}"
+  local slurm_queue="${queue_master}"
+  local slurm_nslots="1"
+  readonly loop_jid=$( sbatch \
+    --account="${slurm_project}" \
+    --job-name="${slurm_jname}" \
+    --output="${slurm_lname_o}" \
+    --error="${slurm_lname_e}" \
+    --chdir="${curwd}" \
+    --partition="${slurm_queue}" \
+    --cpus-per-task="${slurm_nslots}" \
+    --array=${slurm_tasks} \
+    --dependency="afterok:${calc_p_jid}"
+    --parsable \
     "${this_script}" \
     "${chr}" \
     "${grm_mtx}" \
@@ -333,8 +369,8 @@ resubmit_loop() {
     "${cond_genotypes}" \
     "${iteration}" \
     "${permutation_supply}" \
-    "${new_top_p}" 
-  set +x
+    "${new_top_p}" )
+  echo "Re-submitted main script for another iteration (JID=${loop_jid})"
 }
 
 check_if_done() {
