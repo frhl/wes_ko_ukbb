@@ -1,13 +1,4 @@
 #!/usr/bin/env bash
-#
-#
-#$ -N _gene_permute
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_gene_permute.log
-#$ -e logs/_gene_permute.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q lindgren.qe
 
 set -o errexit
 set -o nounset
@@ -30,7 +21,7 @@ readonly replicates=${7?Error: Missing arg7 (replicates)}
 readonly cond_genotypes=${8?Error: Missing arg8 (cond_genotypes)}
 readonly use_cond_common=${9?Error: Missing arg9 (use_cond_common)}
 
-readonly id=${SGE_TASK_ID}
+readonly id=${SLURM_ARRAY_TASK_ID}
 readonly sge_seed=$(( ${id} * ${seed}))
 readonly out_prefix_id="${out_prefix}_${id}"
 readonly out_file_success="${out_prefix_success}_${id}.SUCCESS"

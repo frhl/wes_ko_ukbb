@@ -101,7 +101,7 @@ format_real_variant_long_to_wide <- function(dt, position_last = 20000){
 
 main <- function(args){
 
-    #print(args)
+    # print(args)
 
     autosomes <- paste0("chr",1:22)
     stopifnot(file.exists(args$input_path))
@@ -111,8 +111,13 @@ main <- function(args){
     stopifnot(args$chrom %in% autosomes)
     stopifnot(!is.null(args$enable_cond_pipeline))
     # conditional pipeline
-    if (args$enable_cond_pipeline) stopifnot(file.exists(args$input_path_cond_genotypes))
-    
+    if (args$enable_cond_pipeline) {
+      cpath = args$input_path_cond_genotypes  
+      if (!file.exists(cpath)){
+        stop(paste("Can't find conditional markers at: ", cpath))
+      }
+    }
+
     # seed for reproducibility
     seed <- as.numeric(args$seed)
     set.seed(seed)
@@ -147,6 +152,9 @@ main <- function(args){
     # if there are conditioning markers available include them downstream.
     if (n_real_markers > 0){
 
+        # how many markers were found?
+        write(paste("Note:",n_real_markers, "real marker(s) found. These will be included as unshuffled in permuted VCF."),stdout())
+
         # ensure that samples are overlapping
         sample_overlap <- unique(intersect(cond_dt$s, d$s))
 
@@ -172,7 +180,12 @@ main <- function(args){
         combined_dosages <- rbind(dosage, cond_dosage) 
         combined_meta <- rbind(rows, cond_rows)
         final <- cbind(combined_meta, combined_dosages)
-        sds <- unlist(apply(combined_dosages, 1, sd))
+        sds <- unlist(apply(combined_dosages, 1, function(x) sd(x, na.rm = TRUE)))
+
+        # how many real markers have missing dosages
+        n_real_count <- nrow(cond_dosage)
+        n_real_miss <- sum(is.na(apply(cond_dosage, 1, sd)))
+        write(paste0("Note: ", n_real_miss, " of ", n_real_count, " real markers have one or more missing dosages."), stdout())
 
         # debugging - are SNPs monoprhic and thus
         # the resulting matrix not invertible?
@@ -189,11 +202,15 @@ main <- function(args){
         sds <- unlist(apply(dosage, 1, sd))
     }
 
+
+
     # Sometimes markers with zero AC are crated,
     # let's remove them before entering SAIGE.
+    if (any(is.na(sds))) stop("Some standard devations are NA! Something went wrong with shuffle")
     if (args$remove_invariant_markers){
         bool_invariant <- sds == 0
         n_invariant <- sum(bool_invariant)
+        print(n_invariant)
         if (n_invariant > 0){
             final <- final[!bool_invariant,]
             write(paste("[_gene_permute.R]: Removed", n_invariant, "invariant markers."), stderr())
