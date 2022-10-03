@@ -170,7 +170,7 @@ submit_shuffle_phase() {
       local slurm_project="${project}"
       local slurm_queue="${queue_permute}"
       local slurm_nslots="${n_slots_permute}"
-      readonly shuffle_jid=$( sbatch \
+      qshuffle_jid=$( sbatch \
         --account="${slurm_project}" \
         --job-name="${slurm_jname}" \
         --output="${slurm_lname_o}" \
@@ -191,7 +191,7 @@ submit_shuffle_phase() {
         ${replicates} \
         ${cond_genotypes} \
         ${use_cond_common} )
-      echo "Submitting shuffle script (JID=${shuffle_jid})"
+      echo "Submitting shuffle script (JID=${qshuffle_jid})"
     else
       echo >&2 "${out_permute_upper_bound} already exists. Skipping.."
     fi
@@ -212,14 +212,17 @@ submit_saige() {
     local tasks_lower_bound=$(( ${pheno_saige_supply} + 1 ))
     local tasks_upper_bound=$(( ${pheno_saige_supply} + ${n_tasks_required} ))
     local tasks_spa=${tasks_lower_bound}-${tasks_upper_bound}
+    
     #saige_supply[${phenotype}]=$(( ${pheno_saige_supply} + ${n_tasks_required}))
     local vcf_gene_spa="${out_prefix}"
     local out_gene_spa="${out_prefix}_${phenotype}"
     local out_spa_success="${out_gene_spa}_${tasks_spa}"
     local out_spa_upper_bound="${out_gene_spa}_${tasks_upper_bound}"
     #local spa_name="spa_${gene}_${tasks_spa}_${phenotype}"
+    
     # if the SPA has already been performed. Skip it.
     if [ ! -f "${out_spa_upper_bound}.txt" ]; then
+      
       local slurm_tasks="${tasks_spa}"
       local slurm_jname="${name_saige_pheno}"
       local slurm_lname_e="${log_saige_errors}"
@@ -227,7 +230,7 @@ submit_saige() {
       local slurm_project="${project}"
       local slurm_queue="${queue_saige}"
       local slurm_nslots="${n_slots_saige}"
-      readonly spa_jid=$( sbatch \
+      spa_jid=$( sbatch \
         --account="${slurm_project}" \
         --job-name="${slurm_jname}" \
         --output="${slurm_lname_o}" \
@@ -236,7 +239,7 @@ submit_saige() {
         --partition="${slurm_queue}" \
         --cpus-per-task="${slurm_nslots}" \
         --array=${slurm_tasks} \
-        --dependency="afterok:${shuffle_jid}"
+        --dependency="after:${qshuffle_jid}" \
         --parsable \
         "${spa_script}" \
         "${chr}" \
@@ -251,7 +254,7 @@ submit_saige() {
         "${gene}" \
         "${min_mac}" \
         "${cond_markers}" \
-        "${use_cond_common}" )
+        "${use_cond_common}")
       echo "Submitting SPA on shuffled VCFs (JID=${spa_jid})"
     else
       echo >&2 "${out_spa_upper_bound} already exists. Skipping.."
@@ -270,7 +273,7 @@ submit_merge() {
   local slurm_project="${project}"
   local slurm_queue="${queue_merge}"
   local slurm_nslots="1"
-  readonly merge_jid=$( sbatch \
+  merge_jid=$( sbatch \
     --account="${slurm_project}" \
     --job-name="${slurm_jname}" \
     --output="${slurm_lname_o}" \
@@ -297,7 +300,7 @@ submit_calc_p() {
   local slurm_project="${project}"
   local slurm_queue="${queue_merge}"
   local slurm_nslots="1"
-  readonly calc_p_jid=$( sbatch \
+  calc_p_jid=$( sbatch \
     --account="${slurm_project}" \
     --job-name="${slurm_jname}" \
     --output="${slurm_lname_o}" \
@@ -331,7 +334,7 @@ resubmit_loop() {
   local slurm_project="${project}"
   local slurm_queue="${queue_master}"
   local slurm_nslots="1"
-  readonly loop_jid=$( sbatch \
+  loop_jid=$( sbatch \
     --account="${slurm_project}" \
     --job-name="${slurm_jname}" \
     --output="${slurm_lname_o}" \
@@ -424,8 +427,9 @@ SECONDS=0
 do_extra_loop=0
 iteration=$((${iteration} + 1))
 set_arr_phenos "both"
-arr_phenos=( "Alanine_aminotransferase_residual" "Calcium_residual" "WHR_adj_BMI" "BMI" "Apolipoprotein_B_residual")
+#arr_phenos=( "Alanine_aminotransferase_residual" "Calcium_residual" "WHR_adj_BMI" "BMI" "Apolipoprotein_B_residual")
 #arr_phenos=( "Alanine_aminotransferase_residual" )
+arr_phenos=( "CC_combined" "BMI" )
 #arr_phenos=( "Alanine_aminotransferase_residual" "BMI" )
 
 
