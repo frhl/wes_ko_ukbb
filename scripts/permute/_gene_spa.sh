@@ -1,14 +1,4 @@
 #!/usr/bin/env bash
-#
-#
-#$ -N _gene_spa
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_gene_spa.log
-#$ -e logs/_gene_spa.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q lindgren.qe
-#$ -V
 
 set -o errexit
 set -o nounset
@@ -36,14 +26,18 @@ readonly use_cond_common=${13?Error: Missing arg11 (1 or 0 - condition on common
 readonly var_bytes=$( file_size ${in_var} )
 readonly gmat_bytes=$( file_size ${in_gmat} )
 
-readonly id=${SGE_TASK_ID}
+readonly id=${SLURM_ARRAY_TASK_ID}
 readonly vcf="${in_vcf}_${id}.vcf.gz"
-readonly csi="${vcf}_${id}.csi"
+readonly csi="${in_vcf}_${id}.vcf.gz.csi"
 readonly out_gene_task="${out_gene}_${id}.txt"
 
 # read in conditional markers
 if [ "${use_cond_common}" -eq "1" ]; then
-  readonly markers=$(zcat ${cond_markers} | grep chr${chr} | cut -f3 | paste -s -d ',')
+  if [ -f "${cond_markers}" ]; then
+    readonly markers=$(cat ${cond_markers} | grep chr${chr} | cut -f3 | paste -s -d ',')
+  else
+    >&2 echo "${cond_markers} file does not exist! "
+  fi
 else 
   readonly markers=""
 fi
