@@ -35,13 +35,29 @@ main <- function(args){
 
     print(head(spa_cts_full, n=2))
     print(head(spa_bin_full, n=2))
-
-    # combine and subset
+    
+        # combine and subset
     keep <- c("CHR","MarkerID","basename", "p.value", "Tstat", "p.value_c", "Tstat_c")
     spa_full <- rbindlist(list(spa_cts_full, spa_bin_full))
     spa_full <- spa_full[, colnames(spa_full) %in% keep, with = FALSE]
     spa_full <- spa_full[,..keep]
     
+    # what is the format of the input file?
+    basename_prefix = args$basename_prefix
+    basename_annotation = "(pLoF_damaging_missense)|(pLoF)|(damaging_missense)"
+    basename_locoprs = "locoprs"
+
+    # perform string operations to get pheotype
+    stopifnot(all(grepl(basename_prefix, spa_full$basename)))
+    stopifnot(all(grepl(basename_annotation, spa_full$basename)))
+    basename_minimal <- gsub(basename_prefix, "", spa_full$basename)
+    basename_minimal <- gsub(basename_annotation, "", basename_minimal)
+    basename_minimal <- gsub(basename_locoprs, "", basename_minimal)
+    spa_full$phenotype <- gsub("(^\\_*)|(\\_*$)", "", basename_minimal)
+    spa_full$annotation <- stringr::str_extract_all(spa_full$basename, basename_annotation)
+    spa_full$prs <- ifelse(grepl("locoprs", spa_full$basename), "locoprs", NA)
+    spa_full$basename <- NULL
+
     n <- nrow(spa_full) 
 
     if (args$use_cond_p) {
@@ -65,20 +81,23 @@ main <- function(args){
         spa_full <- spa_full[!bool_discard,] 
     }
 
+    # discard markers from files that are significant
+    spa_full <- spa_full[grepl("ENSG", spa_full$MarkerID),]
+
     # format to avoid scientific notation 
     out_prefix_true_p_detailed <- paste0(args$out_prefix, "_true_p_detailed.tsv.gz")
     fwrite(spa_full, out_prefix_true_p_detailed, sep = '\t', quote = FALSE, na = NA)
 
     # remove old columns
-    spa_full$p.value_c <- NULL
-    spa_full$Tstat_c <- NULL
+    #spa_full$p.value_c <- NULL
+    #spa_full$Tstat_c <- NULL
     spa_full$cond <- NULL
- 
-    # the filtered version
-    spa_full$pvalue <- format(spa_full$pvalue, scientific = FALSE)
-    spa_full$tstat <- format(spa_full$tstat, scientific = FALSE)
+
+        # the filtered version
+    #spa_full$pvalue <- format(spa_full$pvalue, scientific = FALSE)
+    #spa_full$tstat <- format(spa_full$tstat, scientific = FALSE)
     out_prefix_true_p <- paste0(args$out_prefix, "_true_p.tsv.gz")
-    fwrite(spa_full, out_prefix_true_p, sep = '\t', quote = FALSE)
+    fwrite(spa_full, out_prefix_true_p, sep = '\t', quote = FALSE, na = NA)
     write(paste("Note: wrote", out_prefix_true_p),stderr())
     
   
@@ -95,6 +114,7 @@ main <- function(args){
 parser <- ArgumentParser()
 parser$add_argument("--spa_cts_dir", default=NULL, required = TRUE, help = "Path to QCed SNPs")
 parser$add_argument("--spa_bin_dir", default=NULL, required = TRUE, help = "Path to QCed SNPs")
+parser$add_argument("--basename_prefix", default="ukb_eur_wes_200k_maf0to5e-2", required = TRUE, help = "Path to QCed SNPs")
 parser$add_argument("--tsv_path", default=NULL, required = TRUE, help = "Path to QCed SNPs")
 parser$add_argument("--p_cutoff", default=NULL, required = FALSE, help = "Path to QCed SNPs")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
