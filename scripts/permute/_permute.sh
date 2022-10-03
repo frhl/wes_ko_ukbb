@@ -239,7 +239,7 @@ submit_saige() {
         --partition="${slurm_queue}" \
         --cpus-per-task="${slurm_nslots}" \
         --array=${slurm_tasks} \
-        --dependency="after:${qshuffle_jid}" \
+        --dependency="afterok:${qshuffle_jid}" \
         --parsable \
         "${spa_script}" \
         "${chr}" \
@@ -281,7 +281,7 @@ submit_merge() {
     --chdir="${curwd}" \
     --partition="${slurm_queue}" \
     --cpus-per-task="${slurm_nslots}" \
-    --dependency="afterok:${spa_jid}"
+    --dependency="afterok:${spa_jid}" \
     --parsable \
     "${merge_script}" \
     "${n_shuffle}" \
@@ -308,7 +308,7 @@ submit_calc_p() {
     --chdir="${curwd}" \
     --partition="${slurm_queue}" \
     --cpus-per-task="${slurm_nslots}" \
-    --dependency="afterok:${merge_jid}"
+    --dependency="afterok:${merge_jid}" \
     --parsable \
     "${calc_script}" \
     "${gene}" \
@@ -343,7 +343,7 @@ resubmit_loop() {
     --partition="${slurm_queue}" \
     --cpus-per-task="${slurm_nslots}" \
     --array=${slurm_tasks} \
-    --dependency="afterok:${calc_p_jid}"
+    --dependency="afterok:${calc_p_jid}" \
     --parsable \
     "${this_script}" \
     "${chr}" \

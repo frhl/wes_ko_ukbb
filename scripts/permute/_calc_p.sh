@@ -1,10 +1,4 @@
 #!/usr/bin/env bash
-#
-#$ -N _calc_p
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_calc_p.log
-#$ -e logs/_calc_p.errors.log
-#$ -V
 
 set -o errexit
 set -o nounset
@@ -15,6 +9,7 @@ source utils/bash_utils.sh
 readonly r_calc_emp_p="scripts/permute/_calc_empirical_p.R"
 readonly r_get_spa_p="scripts/permute/_get_spa_p.R"
 readonly rlogic="scripts/permute/_logic.R"
+readonly r_get_true_p="scripts/permute/_get_true_p.R"
 
 readonly gene=${1?Error: Missing arg1 (prefix)}
 readonly phenotype=${2?Error: Missing arg1 (prefix)}
@@ -31,10 +26,31 @@ readonly out_prefix=${11?Error: Missing arg1 (prefix)}
 readonly outfile="${out_prefix}.permuted"
 readonly pfile="${out_prefix}_${phenotype}.pvalues"
 
+#echo "${gene}"
+#echo "${true_p_path}"
+#echo "${phenotype}"
+#echo "${use_prs}"
+#echo "${static_assoc}"
+#echo "${annotation}"
+
+
+lookup_true() {
+  local column=${1} # either "p" or "t"
+  local true_value=$( Rscript ${r_get_true_p} \
+    --gene ${gene} \
+    --phenotype ${phenotype} \
+    --annotation ${annotation} \
+    --use_prs ${use_prs} \
+    --true_p_path ${true_p_path} \
+    --target ${column} )
+  echo ${true_value}
+}
+
 # use a table to lookup the true P-value from the primary analysis.
 # problematic when you are using strings that are subsets of otuer strings,
 # e.g. WHR and WHRadjBMI. Seraching for the first will result in two phenotypes. 
-lookup_true() {
+lookup_true_bash() {
+  # note: columns were changed since last, and cut -fX will need to be updated accordingly!
   local column=${1}
   # read file and subset to current gene/pheno/annotation
   if [ -f ${true_p_path} ]; then
@@ -83,12 +99,12 @@ get_last_permuted_p() {
   fi
 }
 
+set_up_rpy
 if [ -f ${saige_merged} ]; then
   readonly true_p=$( lookup_true "p" )
   readonly true_t=$( lookup_true "t" )
   if [ $(zcat ${saige_merged} | wc -l) -gt 1 ]; then
     if [[ "${true_p}" != "NA" ]]; then
-      set_up_rpy
       readonly last_p=$(get_last_permuted_p)
       readonly permuted_p=$(Rscript ${r_get_spa_p} --input_path "${saige_merged}" --select_min_p ${top_p} )
       readonly done=$(Rscript ${rlogic} --a ${true_p} --o "ge" --b ${permuted_p})

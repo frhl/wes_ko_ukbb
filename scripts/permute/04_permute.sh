@@ -26,7 +26,7 @@ readonly chr="${SLRUM_ARRAY_TASK_ID}"
 readonly in_dir="data/permute/genes/phased_only/chr${chr}"
 readonly out_dir="data/permute/permutations/chr${chr}/GENE"
 readonly pheno_dir="data/phenotypes"
-readonly cond_dir="data/conditional/common/markers_with_gt"
+readonly cond_dir="data/conditional/common/markers_with_gt/final"
 readonly grm_dir="data/saige/grm/input"
 
 # setup input and output paths

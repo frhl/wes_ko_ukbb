@@ -9,7 +9,7 @@
 #SBATCH --error=logs/count_hets.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=1-22
+#SBATCH --array=1
 #SBATCH --requeue
 
 set -o errexit
