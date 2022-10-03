@@ -26,7 +26,7 @@ readonly out_prefix=${4?Error: Missing arg4 (out_prefix)}
 readonly out_type=${5?Error: Missing arg5 (out_type)}
 readonly genes=${6?Error: Missing arg6 (genes)}
 
-readonly NUM=${SGE_TASK_ID}
+readonly NUM=${SLURM_ARRAY_TASK_ID}
 readonly gene="$(zcat ${genes} | grep -w "chr${chr}" | grep "ENSG" | cut -f1 | sed ${NUM}'q;d' )"
 readonly out_prefix_gene="${out_prefix}_${gene}"
 

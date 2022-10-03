@@ -5,10 +5,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/make_genes.log
 #SBATCH --error=logs/make_genes.errors.log
-#SBATCH --partition=test
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=21
-#SBATCH --requeue
+#SBATCH --array=1-22
 
 set -o errexit
 set -o nounset
@@ -16,7 +15,7 @@ set -o nounset
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
-readonly curwd="${pwd}"
+readonly curwd="$(pwd)"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
 readonly bash_script="scripts/permute/_make_genes.sh"
@@ -41,14 +40,15 @@ if [ -f "${genes}" ]; then
   readonly n_tasks="$( zcat ${genes} | grep -w "chr${chr}" | grep "ENSG" | wc -l)"
   readonly slurm_tasks="1-${n_tasks}"
   readonly slurm_jname="_make_genes"
+  readonly slurm_lname="logs/_make_genes"
   readonly slurm_project="lindgren.prj"
   readonly slurm_queue="short"
   readonly slurm_shmem="1"
   readonly jid=$( sbatch \
     --account="${slurm_project}" \
     --job-name="${slurm_jname}" \
-    --output="${slum_jname}.log" \
-    --error="${slurm_jname}.errors.log" \
+    --output="${slurm_lname}.log" \
+    --error="${slurm_lname}.errors.log" \
     --chdir="${curwd}" \
     --partition="${slurm_queue}" \
     --cpus-per-task="${slurm_shmem}" \
