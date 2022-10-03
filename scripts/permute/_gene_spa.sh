@@ -8,6 +8,7 @@ source utils/qsub_utils.sh
 
 readonly spark_dir="data/tmp/spark"
 readonly step2_SPAtests="utils/saige/step2_SPAtests_cond.R"
+readonly rscript="scripts/conditional/common/_spa_cond_common.R"
 
 readonly chr=${1?Error: Missing arg1 (chr)}
 readonly in_vcf=${2?Error: Missing arg2 (in_vcf)}
@@ -31,16 +32,33 @@ readonly vcf="${in_vcf}_${id}.vcf.gz"
 readonly csi="${in_vcf}_${id}.vcf.gz.csi"
 readonly out_gene_task="${out_gene}_${id}.txt"
 
-# read in conditional markers
-if [ "${use_cond_common}" -eq "1" ]; then
-  if [ -f "${cond_markers}" ]; then
-    readonly markers=$(cat ${cond_markers} | grep chr${chr} | cut -f3 | paste -s -d ',')
-  else
-    >&2 echo "${cond_markers} file does not exist! "
+# get conditional markers for current phenotype
+if [ -f "${cond_markers}" ]; then
+  readonly cond_markers_chr=$(echo ${cond_markers} | sed -e "s/CHR/${chr}/g")
+  readonly out_markers="${out_gene/CHR/${chr}}.common.markers"
+  if [ -f "${cond_markers_chr}" ]; then
+    if [ ! -f "${out_markers}" ]; then
+      set_up_rpy
+      Rscript ${rscript} \
+        --infile ${cond_markers_chr} \
+        --phenotype ${phenotype} \
+        --pheno_col 6 \
+        --outfile ${out_markers}
+    fi
   fi
-else 
-  readonly markers=""
 fi
+
+# read in conditional markers
+#if [ "${use_cond_common}" -eq "1" ]; then
+#  if [ -f "${cond_markers}" ]; then
+#    readonly markers=$(cat ${cond_markers} | grep -w chr${chr} | cut -f3 | paste -s -d ',')
+#    echo "The following markers will be included: ${markers}"
+#  else
+#    >&2 echo "${cond_markers} file does not exist! "
+#  fi
+#else 
+#  readonly markers=""
+#fi
 
 if [ ! -f ${out_gene_task} ]; then
   echo "var_bytes=${var_bytes} at ${in_var}"
@@ -61,8 +79,8 @@ if [ ! -f ${out_gene_task} ]; then
        --GMMATmodelFile=${in_gmat} \
        --varianceRatioFile=${in_var} \
        --SAIGEOutputFile=${out_gene_task} \
-       --LOCO=FALSE \
-       ${markers:+--condition="${markers}"} 
+       --condition_file=${out_markers} \
+       --LOCO=FALSE
     set +x
     rm -f "${out_gene_task}.index"
     gzip ${out_gene_task}
