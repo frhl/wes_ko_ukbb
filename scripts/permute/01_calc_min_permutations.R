@@ -55,6 +55,16 @@ main <- function(args){
        spa_full$tstat[bool_c] <- spa_full$Tstat_c[bool_c]
     }    
 
+    # if P-value cutoff, then discard genes
+    if (!is.null(args$p_cutoff)){
+        p_cutoff <- as.numeric(args$p_cutoff)
+        stopifnot(p_cutoff < 1)
+        bool_discard <- spa_full$pvalue > p_cutoff
+        n_discard <- sum(bool_discard)
+        write(paste("Removing", n_discard, " genes that do not pass P-value threshold"), stdout())
+        spa_full <- spa_full[!bool_discard,] 
+    }
+
     # format to avoid scientific notation 
     out_prefix_true_p_detailed <- paste0(args$out_prefix, "_true_p_detailed.tsv.gz")
     fwrite(spa_full, out_prefix_true_p_detailed, sep = '\t', quote = FALSE, na = NA)
@@ -71,6 +81,7 @@ main <- function(args){
     fwrite(spa_full, out_prefix_true_p, sep = '\t', quote = FALSE)
     write(paste("Note: wrote", out_prefix_true_p),stderr())
     
+  
     # write out genes and chromosomes used 
     spa_genes <- spa_full[,c("MarkerID","CHR")]
     spa_genes <- spa_genes[!duplicated(spa_genes),]
@@ -85,6 +96,7 @@ parser <- ArgumentParser()
 parser$add_argument("--spa_cts_dir", default=NULL, required = TRUE, help = "Path to QCed SNPs")
 parser$add_argument("--spa_bin_dir", default=NULL, required = TRUE, help = "Path to QCed SNPs")
 parser$add_argument("--tsv_path", default=NULL, required = TRUE, help = "Path to QCed SNPs")
+parser$add_argument("--p_cutoff", default=NULL, required = FALSE, help = "Path to QCed SNPs")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 parser$add_argument("--use_cond_p", default=FALSE, action = "store_true", help = "Where should the results be written?")
 args <- parser$parse_args()

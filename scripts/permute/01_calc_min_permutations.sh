@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 #
+# @description for each gene across all phenotypes figure out how many permutations are needed
+#
 #SBATCH --account=lindgren.prj
 #SBATCH --job-name=calc_min_permutations
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -37,6 +39,7 @@ Rscript ${rscript} \
   --spa_cts_dir ${spa_cts_dir} \
   --spa_bin_dir ${spa_bin_dir} \
   --out_prefix ${out_prefix} \
+  --p_cutoff "5e-3" \
   --use_cond_p
 
 
