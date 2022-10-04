@@ -32,6 +32,9 @@ def main(args):
          ht_final_samples = hl.import_table(final_sample_list, no_header=True, key='f0',delimiter = ',')
          mt = mt.filter_cols(hl.is_defined(ht_final_samples[mt.col_key]))
 
+    # we need to sample markers with low MAC >= 10 >= 20 for SAIGE to work. See SAIGE GIT documentation.
+    # Note: on DNA-nexus, Wei recommends to LD-prune genotypes instead of using the ukb_snp_qc kinship 
+    # markers. I need to clarify with her why she does this. It probably will not change our results.
     if use_markers_by_mac:
         ht = genotypes.get_ukb_parsed_imputed_v3_mfi(chroms)
         mt_mac = mt.annotate_rows(info = ht[mt.row_key].info)
@@ -42,6 +45,7 @@ def main(args):
         print(f"(new) min_markers={min_markers}")
         markers.extend(random.sample(mac_markers, min_markers))
 
+    # grab markers from UKBB used to infer ancestry
     if use_markers_by_kinship:
         ht = hl.import_table('/well/lindgren/UKBIOBANK/DATA/QC/ukb_snp_qc.txt', impute = True, delimiter = ' ')
         ht = ht.filter(ht.in_Relatedness == 1)
