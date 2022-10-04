@@ -32,7 +32,7 @@ readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc
 readonly samples_keep="${out_dir}/samples.keep"
 
 readonly curwd=$(pwd)
-readonly tasks="1-22"
+readonly tasks="21-22"
 readonly project="lindgren.prj"
 
 readonly rare_markers_per_chrom=100
@@ -174,7 +174,7 @@ fit_grm() {
     --dependency="afterok:${dependency}" \
     --cpus-per-task="${slurm_nslots}" \
     --parsable \
-    "${grm_script}" \
+    "${fit_script}" \
     "${in_file}" \
     "${out_prefix}" )
   echo "${fit_grm_jid}"
