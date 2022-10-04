@@ -11,6 +11,7 @@ main <- function(args){
     phenotype <- args$phenotype
     annotation <- args$annotation
     use_prs <- args$use_prs
+    target <- args$target
 
     stopifnot(file.exists(true_p_path))
     d <- fread(true_p_path)
