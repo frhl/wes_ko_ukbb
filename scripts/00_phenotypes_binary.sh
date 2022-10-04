@@ -21,9 +21,9 @@ readonly covar_dir="data/phenotypes"
 readonly out_dir="data/phenotypes"
 
 readonly in_bin="${in_dir}/curated_phenotypes_binary.tsv"
-readonly tmp_bin="${out_dir}/curated_covar_phenotypes_binary.tsv.gz"
-readonly out_bin_500k="${out_dir}/curated_covar_phenotypes_binary_500k"
-readonly out_bin_200k="${out_dir}/curated_covar_phenotypes_binary_200k"
+readonly tmp_bin="${out_dir}/spiros_phenotypes_binary.tsv.gz"
+readonly out_bin_500k="${out_dir}/spiros_phenotypes_binary_500k"
+readonly out_bin_200k="${out_dir}/spiros_phenotypes_binary_200k"
 
 readonly final_sample_list="/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list"
 
@@ -37,6 +37,7 @@ set_up_rpy
 Rscript ${r_script} \
   --input_path ${in_bin} \
   --covariates ${covariates} \
+  --qc_samples ${final_sample_list} \
   --out_path ${tmp_bin}
 
 
