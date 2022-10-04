@@ -9,7 +9,7 @@
 #SBATCH --error=logs/spa_test.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-2
+#SBATCH --array=1-80
 #SBATCH --requeue
 
 set -o errexit
@@ -97,7 +97,7 @@ submit_spa_job() {
   mkdir -p ${step2_dir}
   local slurm_tasks="${tasks}"
   local slurm_jname="${slurm_spa_name}"
-  local slurm_lname="_spa_test"
+  local slurm_lname="logs/_spa_test"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
   local slurm_nslots="${nslots}"
@@ -130,7 +130,7 @@ submit_merge_job()
 {
   local remove_by_chr="Y"
   local slurm_jname="${slurm_merge_name}"
-  local slurm_lname="_spa_merge"
+  local slurm_lname="logs/_spa_merge"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
   local slurm_nslots="1"
@@ -153,7 +153,7 @@ submit_merge_job()
 
 # parameters
 readonly conditioning_markers=""
-readonly use_prs="0"
+readonly use_prs="1"
 readonly min_mac=4
 readonly project="lindgren.prj"
 readonly tasks=1-22

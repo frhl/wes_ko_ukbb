@@ -38,6 +38,7 @@ Rscript ${r_script} \
   --input_path ${in_bin} \
   --covariates ${covariates} \
   --qc_samples ${final_sample_list} \
+  --include_spiros \
   --out_path ${tmp_bin}
 
 

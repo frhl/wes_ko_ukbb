@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Create sparse genetic relatedness matrix using genotyped/imputed data.
+# @description Create sparse genetic relatedness matrix using genotyped/imputed data.
 #
 #$ -N grm
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
