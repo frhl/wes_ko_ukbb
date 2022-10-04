@@ -18,7 +18,7 @@ def main(args):
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
 
     AUTOSOMES = list(map(str, range(1, 23)))
-    mts = [io.import_table(in_prefix + str(chrom), in_type) for chrom in AUTOSOMES]
+    mts = [io.import_table(in_prefix + "_chr" + str(chrom), in_type) for chrom in AUTOSOMES]
     mt = hl.MatrixTable.union_rows(*mts)
     io.export_table(mt, out_prefix, out_type)
 
