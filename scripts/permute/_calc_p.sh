@@ -46,46 +46,6 @@ lookup_true() {
   echo ${true_value}
 }
 
-# use a table to lookup the true P-value from the primary analysis.
-# problematic when you are using strings that are subsets of otuer strings,
-# e.g. WHR and WHRadjBMI. Seraching for the first will result in two phenotypes. 
-lookup_true_bash() {
-  # note: columns were changed since last, and cut -fX will need to be updated accordingly!
-  local column=${1}
-  # read file and subset to current gene/pheno/annotation
-  if [ -f ${true_p_path} ]; then
-    if [ "${use_prs}" -eq "1" ] & [ "${prs_available}" -eq "1" ]; then
-      local cur_assoc=$( echo ${static_assoc} | sed -e "s/PHENO/${phenotype}/g" | sed -e "s/ANNO/${annotation}/g")
-      local readfile=$( zcat ${true_p_path} | grep ${gene} | grep ${cur_assoc} | grep "locoprs" )
-      local lines=$( zcat ${true_p_path} | grep ${gene} | grep ${cur_assoc} | grep "locoprs" | wc -l)
-    else
-      local cur_assoc=$( echo ${static_assoc} | sed -e "s/PHENO/${phenotype}/g" | sed -e "s/ANNO/${annotation}/g")
-      local readfile=$( zcat ${true_p_path} | grep ${gene} | grep ${cur_assoc} | grep -v "locoprs" )
-      local lines=$( zcat ${true_p_path} | grep ${gene} | grep ${cur_assoc} | grep -v "locoprs" | wc -l)
-    fi
-     # return P-value or T-stat
-    if [ "${lines}" -eq 1 ]; then
-      if [[ "${column}" == "p" ]]; then
-        local true_value=$( echo ${readfile} | cut -d" " -f4 )
-        echo ${true_value}
-      elif [[ "${column}" == "t" ]]; then
-        local true_value=$( echo ${readfile} | cut -d" " -f5 )
-        echo ${true_value}
-      else
-        raise_error "Column must be t (t-statistic) or p (P-value)."
-      fi
-    elif [ "${lines}" -le 1 ]; then
-      echo "NA"
-      >&2 echo "Lookup true P-value failed for ${gene} at ${cur_assoc} (No lines! true_p does not exist.)"
-    else
-      echo "NA"
-      >&2 echo "Lookup true P-value failed for ${gene} at ${cur_assoc} (Too many lines! Lines=${lines}.)"
-   fi
- else
-   raise_error "Overview path (${true_p_path}) does not exist!"
- fi
-}
-
 get_last_permuted_p() {
   if [ -f ${outfile} ]; then
     local last_p=$(cat ${outfile} | awk -v g="${gene}" -v p="${phenotype}" '$1==g && $2==p' | cut -f6 | tail -n1)
@@ -145,6 +105,10 @@ if [ -f ${saige_merged} ]; then
     readonly permuted_p="NA"
     readonly empirical_p="NA"
     readonly the_status="OK (min_mac)"
+  fi 
+  touch ${outfile}
+  if [ "$( cat ${outfile} | wc -l)" -eq "0" ]; then 
+    echo -e "gene\tphenotype\tprs\tn_shuffle\ttrue_p\tpermuted_p\tempirical_p\tcomment" >> ${outfile}
   fi
   echo -e "${gene}\t${phenotype}\t${prs_available}\t${n_shuffle}\t${true_p}\t${permuted_p}\t${empirical_p}\t${the_status}" >> ${outfile}
 else
