@@ -49,7 +49,7 @@ permutation_supply=${26?Error: Missing arg23 (How many permutations have been ac
 top_p=${27?Error: Missing arg24 (What index of the lowest P-value should be used to determien covergence (10 or 100)}
 
 # set final paths depending on gene
-readonly gene="$(zcat ${genes_path} | grep "chr${chr}" | cut -f1 | sed ${index}'q;d' )"
+readonly gene="$(zcat ${genes_path} | grep -w "chr${chr}" | cut -f1 | sed ${index}'q;d' )"
 readonly input_path=$(echo ${input_path_prelim} | sed -e "s/GENE/${gene}/g")
 readonly out_prefix=$(echo ${out_prefix_prelim} | sed -e "s/GENE/${gene}/g")
 readonly write_dir="$( dirname ${out_prefix})"
@@ -180,7 +180,7 @@ submit_shuffle_phase() {
         --partition="${slurm_queue}" \
         --cpus-per-task="${slurm_nslots}" \
         --array=${slurm_tasks} \
-        --parsable \ 
+        --parsable \
         ${bash_script} \
         ${chr} \
         ${input_path} \
@@ -267,7 +267,7 @@ submit_saige() {
 
 
 submit_merge() {
-  local slurm_jname="${name_saige_pheno}"
+  local slurm_jname="${name_merge_pheno}"
   local slurm_lname_e="${log_errors}"
   local slurm_lname_o="${log}"
   local slurm_project="${project}"
@@ -334,7 +334,7 @@ resubmit_loop() {
   local slurm_project="${project}"
   local slurm_queue="${queue_master}"
   local slurm_nslots="1"
-  loop_jid=$( sbatch \
+  readonly loop_jid=( sbatch \
     --account="${slurm_project}" \
     --job-name="${slurm_jname}" \
     --output="${slurm_lname_o}" \
@@ -429,7 +429,7 @@ iteration=$((${iteration} + 1))
 set_arr_phenos "both"
 #arr_phenos=( "Alanine_aminotransferase_residual" "Calcium_residual" "WHR_adj_BMI" "BMI" "Apolipoprotein_B_residual")
 #arr_phenos=( "Alanine_aminotransferase_residual" )
-arr_phenos=( "CC_combined" "BMI" )
+arr_phenos=( "CC_combined" )
 #arr_phenos=( "Alanine_aminotransferase_residual" "BMI" )
 
 
