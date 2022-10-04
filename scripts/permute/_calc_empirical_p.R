@@ -20,6 +20,18 @@ main <- function(args){
     true_t <- as.numeric(args$true_tstat)
     true_p <- as.numeric(args$true_p)
     
+    # exclude real markers (non-permuted stuff)
+    stopifnot("MarkerID" %in% colnames(d))
+    if (args$exclude_real_markers) {
+        bool_real_marker <- !grepl("ENSG", d$MarkerID)
+        n_real_marker <- sum(bool_real_marker)
+        if (n_real_marker > 0) {
+            write(paste("Excluded", n_real_marker, "real marker(s)."), stderr()) 
+            d <- d[!bool_real_marker, ]
+        }
+    }
+
+
     # Check for conditional
     if ("p.value_c" %in% colnames(d)){ 
       pvalue <- as.numeric(d$p.value_c)
@@ -46,10 +58,11 @@ main <- function(args){
 
 # add arguments
 parser <- ArgumentParser()
-parser$add_argument("--input_path", default=NULL, help = "path to the input")
-parser$add_argument("--out_prefix", default=NULL, help = "path to the input")
-parser$add_argument("--true_tstat", default=NULL, help = "path to the input")
-parser$add_argument("--true_p", default=NULL, help = "path to the input")
+parser$add_argument("--input_path", default=NULL, help = "path to saige (merge) file of markers")
+parser$add_argument("--out_prefix", default=NULL, help = "prefix for output")
+parser$add_argument("--true_tstat", default=NULL, help = "the true t-statistic from non-permuted analysis")
+parser$add_argument("--true_p", default=NULL, help = "the true p-value from non-permuted analysis")
+parser$add_argument("--exclude_real_markers", default=FALSE, action="store_true", help = "Exclude real conditioning markers (from conditioning analysis)")
 args <- parser$parse_args()
 
 main(args)

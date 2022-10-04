@@ -31,7 +31,7 @@ main <- function(args){
     bool_prs <- (!is.na(d1$prs))
     if ((use_prs == "1") & sum(bool_prs) > 0){
         d1 <- d1[bool_prs,]
-        write(paste0("Using PRS for ", phenotype), stderr())
+        write(paste0("PRS found for ", phenotype), stderr())
     } 
 
     # check that we have at least one row.

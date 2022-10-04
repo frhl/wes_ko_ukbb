@@ -64,11 +64,15 @@ readonly name_merge="_mrg_${gene}"
 readonly name_calc="_p_${gene}"
 readonly name_main="_i${iteration}_${gene}"
 
+
 # get logs
 readonly log="${write_dir}/${gene}.log"
 readonly log_saige="${write_dir}/saige.log"
 readonly log_errors="${write_dir}/${gene}.errors.log"
 readonly log_saige_errors="${write_dir}/saige.errors.log"
+
+
+
 
 # check if permute gene even exists:
 if [ ! -f "${input_path}" ]; then
@@ -231,6 +235,7 @@ submit_saige() {
       local slurm_queue="${queue_saige}"
       local slurm_nslots="${n_slots_saige}"
       spa_jid=$( sbatch \
+        ${qshuffle_jid:+--dependency="afterok:${qshuffle_jid}"} \
         --account="${slurm_project}" \
         --job-name="${slurm_jname}" \
         --output="${slurm_lname_o}" \
@@ -239,7 +244,7 @@ submit_saige() {
         --partition="${slurm_queue}" \
         --cpus-per-task="${slurm_nslots}" \
         --array=${slurm_tasks} \
-        --dependency="afterok:${qshuffle_jid}" \
+        --open-mode="append" \
         --parsable \
         "${spa_script}" \
         "${chr}" \
@@ -274,6 +279,7 @@ submit_merge() {
   local slurm_queue="${queue_merge}"
   local slurm_nslots="1"
   merge_jid=$( sbatch \
+    ${spa_jid:+--dependency="afterok:${spa_jid}"} \
     --account="${slurm_project}" \
     --job-name="${slurm_jname}" \
     --output="${slurm_lname_o}" \
@@ -281,7 +287,7 @@ submit_merge() {
     --chdir="${curwd}" \
     --partition="${slurm_queue}" \
     --cpus-per-task="${slurm_nslots}" \
-    --dependency="afterok:${spa_jid}" \
+    --open-mode="append" \
     --parsable \
     "${merge_script}" \
     "${n_shuffle}" \
@@ -301,6 +307,7 @@ submit_calc_p() {
   local slurm_queue="${queue_merge}"
   local slurm_nslots="1"
   calc_p_jid=$( sbatch \
+    ${merge_jid:+--dependency="afterok:${merge_jid}"} \
     --account="${slurm_project}" \
     --job-name="${slurm_jname}" \
     --output="${slurm_lname_o}" \
@@ -308,7 +315,7 @@ submit_calc_p() {
     --chdir="${curwd}" \
     --partition="${slurm_queue}" \
     --cpus-per-task="${slurm_nslots}" \
-    --dependency="afterok:${merge_jid}" \
+    --open-mode="append" \
     --parsable \
     "${calc_script}" \
     "${gene}" \
@@ -334,7 +341,10 @@ resubmit_loop() {
   local slurm_project="${project}"
   local slurm_queue="${queue_master}"
   local slurm_nslots="1"
-  readonly loop_jid=( sbatch \
+  #set -x
+  #loop_jid=( 
+  sbatch \
+    ${calc_p_jid:+--dependency="afterok:${calc_p_jid}"} \
     --account="${slurm_project}" \
     --job-name="${slurm_jname}" \
     --output="${slurm_lname_o}" \
@@ -343,7 +353,7 @@ resubmit_loop() {
     --partition="${slurm_queue}" \
     --cpus-per-task="${slurm_nslots}" \
     --array=${slurm_tasks} \
-    --dependency="afterok:${calc_p_jid}" \
+    --open-mode="append" \
     --parsable \
     "${this_script}" \
     "${chr}" \
@@ -372,8 +382,9 @@ resubmit_loop() {
     "${cond_genotypes}" \
     "${iteration}" \
     "${permutation_supply}" \
-    "${new_top_p}" )
-  echo "Re-submitted main script for another iteration (JID=${loop_jid})"
+    "${new_top_p}"
+  #set +x
+  echo "Re-submitted main script for another iteration!"
 }
 
 check_if_done() {

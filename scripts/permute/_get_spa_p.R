@@ -13,7 +13,7 @@ main <- function(args){
     sorted_p <- sort(p)
     top_p <- sorted_p[as.numeric(args$select_min_p)]
     top_p <- top_p * as.numeric(args$multiply_p)
-    write(format(top_p, scientific = FALSE), stdout())
+    write(top_p, stdout())
 
 
 }
