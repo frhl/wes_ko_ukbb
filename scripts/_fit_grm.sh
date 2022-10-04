@@ -17,7 +17,7 @@ readonly createSparseGRM="utils/saige/createSparseGRM.R"
 
 readonly plink_file=${1?Error: Missing arg2 (in_vcf)}
 readonly out_prefix=${3?Error: Missing arg2 (in_vcf)}
-readonly threads=$(( ${NSLOTS}-1 ))
+readonly threads="42"
 
 mkdir -p ${out_dir}
 
@@ -27,8 +27,8 @@ Rscript "${createSparseGRM}" \
     --plinkFile=${plink_file} \
     --nThreads=${threads} \
     --outputPrefix=${out_prefix} \
-    --numRandomMarkerforSparseKin=1000 \
-    --relatednessCutoff=0.125 \
+    --numRandomMarkerforSparseKin=2000 \
+    --relatednessCutoff=0.05 \
     && print_update "Finished fitting GRM" ${SECONDS} \
     || raise_error "Fitting GRM failed"
 

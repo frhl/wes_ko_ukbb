@@ -437,10 +437,10 @@ get_saige_supply() {
 SECONDS=0
 do_extra_loop=0
 iteration=$((${iteration} + 1))
-set_arr_phenos "both"
+set_arr_phenos "binary"
 #arr_phenos=( "Alanine_aminotransferase_residual" "Calcium_residual" "WHR_adj_BMI" "BMI" "Apolipoprotein_B_residual")
 #arr_phenos=( "Alanine_aminotransferase_residual" )
-arr_phenos=( "CC_combined" )
+#arr_phenos=( "CC_combined" )
 #arr_phenos=( "Alanine_aminotransferase_residual" "BMI" )
 
 

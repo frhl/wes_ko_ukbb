@@ -13,6 +13,8 @@ from ukb_utils import hail_init
 def sort_by_chunks(chunks):
     ''' sort by X in XofY with regex '''
     n = len(chunks)
+    n_chunks_expt = int(re.findall(r'\d+of\d+', chunks[0])[0].split("of")[1])
+    assert n == n_chunks_expt
     lst = { int(re.findall(r'\d+of\d+', c)[0].split("of")[0])-1 : c for c in chunks }
     chunks = [lst[i] for i in range(n)]
     return chunks

@@ -119,6 +119,7 @@ submit_phasing_job() {
     --cpus-per-task="${slurm_nslots}" \
     --array="${slurm_tasks}" \
     --open-mode="append" \
+    --constraint=skl-compat \
     ${phasing_script} \
     ${chr} \
     ${vcf_to_phase} \

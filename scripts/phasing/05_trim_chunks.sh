@@ -8,8 +8,8 @@
 #SBATCH --output=logs/trim_chunks.log
 #SBATCH --error=logs/trim_chunks.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 8
-#SBATCH --array=20-22
+#SBATCH --cpus-per-task 6
+#SBATCH --array=2
 
 set -o errexit
 set -o nounset
@@ -21,9 +21,10 @@ source utils/vcf_utils.sh
 readonly hail_script="scripts/phasing/05_trim_chunks.py"
 readonly spark_dir="data/tmp/spark"
 
+
 readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
-readonly main_dir="data/phased/wes_union_calls/chunks"
-readonly in_dir="${main_dir}/ukb_eur_wes_union_calls_200k_chr${chr}-19xshort.qe/"
+readonly main_dir="data/phased/wes_union_calls/chunks/shapeit4"
+readonly in_dir="${main_dir}/ukb_eur_wes_union_calls_200k_chr${chr}-16xshort/"
 readonly in_prefix="shapeit4_prs100000_pro50000_mprs100000"
 
 readonly pedigree_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
