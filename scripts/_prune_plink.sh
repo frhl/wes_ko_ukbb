@@ -20,16 +20,19 @@ readonly calls_bed="${geno_dir}/ukb_cal_chr${chr}_v2.bed"
 readonly calls_bim="${geno_dir}/ukb_snp_chr${chr}_v2.bim"
 readonly calls_fam="/well/lindgren/UKBIOBANK/DATA/SAMPLE_FAM/ukb11867_cal_chr1_v2_s488363.fam"
 
-module load PLINK/2.00a2.3_x86_64
 
-set -x
-plink2 \
-  --bed ${calls_bed} \
-  --bim ${calls_bim} \
-  --fam ${calls_fam} \
-  --keep ${samples_keep} \
-  --indep-pairwise 50 5 0.05 \
-  --make-bed \
-  --out ${out_prefix_chr}
-set -x
+if [ ! -f "${out_prefix_chr}.bed" ]; then
+  module load PLINK/2.00a2.3_x86_64
+  plink2 \
+    --bed ${calls_bed} \
+    --bim ${calls_bim} \
+    --fam ${calls_fam} \
+    --keep ${samples_keep} \
+    --indep-pairwise 50 5 0.05 \
+    --make-bed \
+    --out ${out_prefix_chr}
+else 
+  echo "${out_prefix_chr} already exists. Skipping.."
+fi
+
 

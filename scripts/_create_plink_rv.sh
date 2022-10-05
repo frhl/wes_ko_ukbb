@@ -23,33 +23,32 @@ readonly calls_bed="${geno_dir}/ukb_cal_chr${chr}_v2.bed"
 readonly calls_bim="${geno_dir}/ukb_snp_chr${chr}_v2.bim"
 readonly calls_fam="/well/lindgren/UKBIOBANK/DATA/SAMPLE_FAM/ukb11867_cal_chr1_v2_s488363.fam"
 
-module load PLINK/2.00a2.3_x86_64
 
-#1. calculate allele counts for each marker in the large plink file with hard called genotypes
-set -x
-plink2 \
-  --bed ${calls_bed} \
-  --bim ${calls_bim} \
-  --fam ${calls_fam} \
-  --keep ${samples_keep} \
-  --freq counts \
-  --out ${out_prefix_counts}
-set +x
+if [ ! -f "${out}.bed" ]; then
+  module load PLINK/2.00a2.3_x86_64
+  #1. calculate allele counts for each marker in the large plink file with hard called genotypes
+  plink2 \
+    --bed ${calls_bed} \
+    --bim ${calls_bim} \
+    --fam ${calls_fam} \
+    --keep ${samples_keep} \
+    --freq counts \
+    --out ${out_prefix_counts}
 
-#2 randomly extract IDs for markers falling in the two MAC categories
-cat <(tail -n +2 ${out_prefix_counts}.acount | awk '(($6-$5) < 20 && ($6-$5) >= 10) || ($5 < 20 && $5 >= 10) {print $2}' | shuf -n ${rare_markers_per_chrom}) \
-  <(tail -n +2 ${out_prefix_counts}.acount | awk ' $5 >= 20 && ($6-$5)>= 20 {print $2}' | shuf -n ${low_freq_markers_per_chrom}) > ${out_prefix_counts}.markerid.list
+  #2 randomly extract IDs for markers falling in the two MAC categories
+  cat <(tail -n +2 ${out_prefix_counts}.acount | awk '(($6-$5) < 20 && ($6-$5) >= 10) || ($5 < 20 && $5 >= 10) {print $2}' | shuf -n ${rare_markers_per_chrom}) \
+    <(tail -n +2 ${out_prefix_counts}.acount | awk ' $5 >= 20 && ($6-$5)>= 20 {print $2}' | shuf -n ${low_freq_markers_per_chrom}) > ${out_prefix_counts}.markerid.list
 
-# 3. extract markers from the large plink file
-set -x
-plink2 \
-  --bed ${calls_bed} \
-  --bim ${calls_bim} \
-  --fam ${calls_fam} \
-  --keep ${samples_keep} \
-  --extract ${out_prefix_counts}.markerid.list \
-  --make-bed \
-  --out ${out}
-set +x
-
+  # 3. extract markers from the large plink file
+  plink2 \
+    --bed ${calls_bed} \
+    --bim ${calls_bim} \
+    --fam ${calls_fam} \
+    --keep ${samples_keep} \
+    --extract ${out_prefix_counts}.markerid.list \
+    --make-bed \
+    --out ${out}
+  else
+  echo "${out} already exists. Skipping.."
+fi
 
