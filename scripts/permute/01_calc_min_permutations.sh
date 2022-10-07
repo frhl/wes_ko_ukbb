@@ -41,7 +41,6 @@ Rscript ${rscript} \
   --spa_bin_dir ${spa_bin_dir} \
   --basename_prefix ${basename_prefix} \
   --out_prefix ${out_prefix} \
-  --p_cutoff "5e-3" \
   --use_cond_p
 
 

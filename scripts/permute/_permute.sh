@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-#
-#
-#
 
 set -o errexit
 set -o nounset
@@ -54,7 +51,7 @@ readonly input_path=$(echo ${input_path_prelim} | sed -e "s/GENE/${gene}/g")
 readonly out_prefix=$(echo ${out_prefix_prelim} | sed -e "s/GENE/${gene}/g")
 readonly write_dir="$( dirname ${out_prefix})"
 readonly tested_phenos="${out_prefix}.phenos"
-readonly empirical_p="${out_prefix}.permuted"
+readonly status_phenos="${out_prefix}.permuted"
 readonly file_cutoff="${out_prefix}.cutoff"
 
 # qsub names
@@ -279,7 +276,7 @@ submit_merge() {
   local slurm_queue="${queue_merge}"
   local slurm_nslots="1"
   merge_jid=$( sbatch \
-    ${spa_jid:+--dependency="afterok:${spa_jid}"} \
+    ${spa_jid:+--dependency="afterany:${spa_jid}"} \
     --account="${slurm_project}" \
     --job-name="${slurm_jname}" \
     --output="${slurm_lname_o}" \
@@ -293,6 +290,7 @@ submit_merge() {
     "${n_shuffle}" \
     "${replicates}" \
     "${phenotype}" \
+    "${iteration}" \
     "${out_prefix}" \
     "${path_merged}" )
   echo "Submitting merge (JID=${merge_jid}).."
@@ -328,6 +326,7 @@ submit_calc_p() {
     "${top_p}" \
     "${true_p_path}" \
     "${n_shuffle}" \
+    "${iteration}" \
     "${out_prefix}")
   echo "Submitted calc_p (JID=${calc_p_jid})."
 }
@@ -390,7 +389,7 @@ resubmit_loop() {
 check_if_done() {
   local file="${out_prefix}.permuted"
   if [ -f ${file} ]; then
-    local fcount="$(cat ${file} | grep "OK" | awk -v var="${phenotype}" '$2 == var' | wc -l)"
+    local fcount="$(cat ${file} | grep -w "OK" | awk -v var="${phenotype}" '$2 == var' | wc -l)"
     if [ ${fcount} -ge "1" ]; then
       echo "1"
     else
@@ -403,12 +402,17 @@ check_if_done() {
 
 
 check_if_all_done() {
-  local file="${out_prefix}.permuted"
-  if [ -f ${file} ]; then
+  local file=${1}
+  local tested=${2}
+  if [ -f "${file}" ]; then
     local obs_count="$(cat ${file} | grep "OK" | cut -f2 | sort | uniq | wc -l)"
-    local expt_count="$(cat ${tested_phenos} | sort | uniq | wc -l)"
+    local expt_count="$(cat ${tested} | sort | uniq | wc -l)"
+    >&2 echo "####"
+    >&2 echo "$(cat $file )"
+    >&2 echo "####"
+    >&2 echo "$(cat $tested)"
     if [ "${obs_count}" -ge "1" ]; then
-      if [ ${expt_count} -eq ${obs_count} ]; then
+      if [ "${expt_count}" -eq "${obs_count}" ]; then
         echo "1"
       else
         echo "0"
@@ -440,13 +444,13 @@ iteration=$((${iteration} + 1))
 set_arr_phenos "binary"
 #arr_phenos=( "Alanine_aminotransferase_residual" "Calcium_residual" "WHR_adj_BMI" "BMI" "Apolipoprotein_B_residual")
 #arr_phenos=( "Alanine_aminotransferase_residual" )
-#arr_phenos=( "CC_combined" )
+arr_phenos=( "CC_combined" "DEM_combined" "AD_combined" "BC_combined" )
 #arr_phenos=( "Alanine_aminotransferase_residual" "BMI" )
-
 
 echo "Starting iteration ${iteration}"
 if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then
-  if [ $(check_if_all_done) -eq "0" ]; then
+  readonly is_all_done=$( check_if_all_done ${status_phenos} ${tested_phenos} )
+  if [ "${is_all_done}" -eq "0" ]; then
     submit_shuffle_phase ${n_shuffle}
     for phenotype in "${arr_phenos[@]}"; do
       name_saige_pheno="_spa_${gene}_${phenotype}"
