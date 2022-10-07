@@ -6,7 +6,8 @@ library(data.table)
 
 main <- function(args){
     
-    stopifnot(file.exists(args$input_path))
+     
+    if (!file.exists(args$input_path)) stop(paste(args$input_path, "does not exist!"))
 
     d <- fread(args$input_path)
     p <- as.numeric(d$p.value)

@@ -78,16 +78,10 @@ elif [ $( zcat ${input_path} | wc -l ) -le 1 ]; then
   raise_error "${input_path} only contains a header!"
 fi
 
-
-
 # create files and dirs
 mkdir -p ${write_dir}
 touch ${tested_phenos}
-
-#if [ ! -z ${empirical_p} ]; then
-#  echo -e "gene\tphenotype\tn_shuffle\ttrue_p\tpermuted_p\tempirical_p\tstatus" > ${empirical_p}
-#fi
-
+touch ${status_phenos}
 
 set_arr_phenos() {
   trait=${1}
@@ -405,12 +399,8 @@ check_if_all_done() {
   local file=${1}
   local tested=${2}
   if [ -f "${file}" ]; then
-    local obs_count="$(cat ${file} | grep "OK" | cut -f2 | sort | uniq | wc -l)"
+    local obs_count="$(cat ${file} | grep -w "OK" | cut -f2 | sort | uniq | wc -l)"
     local expt_count="$(cat ${tested} | sort | uniq | wc -l)"
-    >&2 echo "####"
-    >&2 echo "$(cat $file )"
-    >&2 echo "####"
-    >&2 echo "$(cat $tested)"
     if [ "${obs_count}" -ge "1" ]; then
       if [ "${expt_count}" -eq "${obs_count}" ]; then
         echo "1"
