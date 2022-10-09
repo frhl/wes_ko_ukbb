@@ -43,9 +43,9 @@ readonly cond_genotypes="${cond_dir}/common_conditional.tsv.gz"
 
 # parameters for master script
 readonly min_mac=4
-readonly n_replicates=100 #1000
+readonly n_replicates=100
 readonly n_start_shuffle=100 #1000
-readonly n_cutoff_shuffle=1100 #100000 #10000000
+readonly n_cutoff_shuffle=1100 #10000000
 readonly n_slots_saige=1
 readonly n_slots_permute=1
 readonly queue_saige="short"

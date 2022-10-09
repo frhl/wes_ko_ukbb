@@ -322,11 +322,10 @@ submit_calc_p() {
     "${n_shuffle}" \
     "${iteration}" \
     "${out_prefix}")
-  echo "Submitted calc_p (JID=${calc_p_jid})."
+  echo "${calc_p_jid}"
 }
 
 resubmit_loop() {
-  echo "Resubmitting loop."
   local slurm_tasks="${SLURM_ARRAY_TASK_ID}"
   local slurm_jname="${name_main}"
   local slurm_lname_e="${log_errors}"
@@ -334,10 +333,9 @@ resubmit_loop() {
   local slurm_project="${project}"
   local slurm_queue="${queue_master}"
   local slurm_nslots="1"
-  #set -x
   #loop_jid=( 
   sbatch \
-    ${calc_p_jid:+--dependency="afterok:${calc_p_jid}"} \
+    --dependency="afterok:${wait_on_jids}" \
     --account="${slurm_project}" \
     --job-name="${slurm_jname}" \
     --output="${slurm_lname_o}" \
@@ -376,7 +374,7 @@ resubmit_loop() {
     "${iteration}" \
     "${permutation_supply}" \
     "${new_top_p}"
-  #set +x
+
   echo "Re-submitted main script for another iteration!"
 }
 
@@ -431,21 +429,24 @@ get_saige_supply() {
 SECONDS=0
 do_extra_loop=0
 iteration=$((${iteration} + 1))
+wait_on_jids=""
 set_arr_phenos "binary"
 #arr_phenos=( "Alanine_aminotransferase_residual" "Calcium_residual" "WHR_adj_BMI" "BMI" "Apolipoprotein_B_residual")
 #arr_phenos=( "Alanine_aminotransferase_residual" )
 arr_phenos=( "CC_combined" "DEM_combined" "AD_combined" "BC_combined" )
 #arr_phenos=( "Alanine_aminotransferase_residual" "BMI" )
 
-echo "Starting iteration ${iteration}"
 if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then
   readonly is_all_done=$( check_if_all_done ${status_phenos} ${tested_phenos} )
   if [ "${is_all_done}" -eq "0" ]; then
+    echo "Starting iteration ${iteration}."
     submit_shuffle_phase ${n_shuffle}
     for phenotype in "${arr_phenos[@]}"; do
       name_saige_pheno="_spa_${gene}_${phenotype}"
       name_merge_pheno="_mrg_${gene}_${phenotype}"
       name_calc_pheno="_p_${gene}_${phenotype}"
+      name_calc_gene="_p_${gene}"
+      echo "Testing phenotype ${phenotype} at iteration ${iteration}."
       echo ${phenotype} >> ${tested_phenos}
       if [ $(check_if_done) -eq "0" ]; then
         set_arr_saige ${phenotype}
@@ -458,11 +459,14 @@ if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then
           if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then
             path_merged="${out_prefix}_${phenotype}_merged.txt"
             if [ ! -f ${path_merged} ]; then
+              echo "Running phenotype ${phenotype} with SAIGE at iteration ${iteration}"
               submit_saige ${n_shuffle}
               submit_merge 
             fi
-            submit_calc_p
+            # only re-submit loop once all of the previous jobs (per phenotype) have completed
             do_extra_loop=1
+            last_jid=$(submit_calc_p)
+            wait_on_jids=$( echo "${last_jid}:${wait_on_jids}" | sed 's/:$//g' )
           fi
        fi
       fi
