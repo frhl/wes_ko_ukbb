@@ -84,6 +84,45 @@ main <- function(args){
     # discard markers from files that are significant
     spa_full <- spa_full[grepl("ENSG", spa_full$MarkerID),]
 
+    # lookup hashes and AC
+    genes <- unique(spa_full$MarkerID) # ~ 1800 genes
+    phenos <- unique(spa_full$phenotype) # ~ 45 phenotypes
+
+    # get AC for relevant phenotypes and 
+    AUTOSOMES <- 1:22 
+    lst_ac <- lapply(AUTOSOMES, function(chr){
+        path <- gsub("CHR",chr,args$ac_path)
+        if (!file.exists(path)) stop(paste(path, "does not exist"))
+        d <- fread(path)
+        d$chr <- NULL
+        d$ref <- NULL
+        d$alt <- NULL
+        d$pos <- NULL
+        return(d)
+    })
+    
+    # Get hash 
+    lst_hash <- lapply(AUTOSOMES, function(chr){
+        path <- gsub("CHR",chr,args$hash_path)
+        if (!file.exists(path)) stop(paste(path, "does not exist"))
+        d <- fread(path)
+        d$chr <- NULL
+        d$ref <- NULL
+        d$alt <- NULL
+        d$pos <- NULL
+        return(d)
+    })
+
+    # merge allele count onto main file
+    d_ac <- do.call(rbind, lst_ac)
+    d_hash <- do.call(rbind, lst_hash)
+    melted_ac <- data.table::melt(d_ac, id.var = "id")
+    melted_hash <- data.table::melt(d_hash, id.var = "id")
+    colnames(melted_ac) <- c("MarkerID", "phenotype", "AC")
+    colnames(melted_hash) <- c("MarkerID", "phenotype", "AC")
+    spa_full <- merge(spa_full, melted_hash, all.x = TRUE)
+    spa_full <- merge(spa_full, melted_ac, all.x = TRUE)
+
     # format to avoid scientific notation 
     out_prefix_true_p_detailed <- paste0(args$out_prefix, "_true_p_detailed.tsv.gz")
     fwrite(spa_full, out_prefix_true_p_detailed, sep = '\t', quote = FALSE, na = NA)
@@ -114,6 +153,8 @@ main <- function(args){
 parser <- ArgumentParser()
 parser$add_argument("--spa_cts_dir", default=NULL, required = TRUE, help = "Path to QCed SNPs")
 parser$add_argument("--spa_bin_dir", default=NULL, required = TRUE, help = "Path to QCed SNPs")
+parser$add_argument("--ac_path", default=NULL, required = TRUE, help = "Path to QCed SNPs")
+parser$add_argument("--hash_path", default=NULL, required = TRUE, help = "Path to QCed SNPs")
 parser$add_argument("--basename_prefix", default="ukb_eur_wes_200k_maf0to5e-2", required = TRUE, help = "Path to QCed SNPs")
 parser$add_argument("--tsv_path", default=NULL, required = TRUE, help = "Path to QCed SNPs")
 parser$add_argument("--p_cutoff", default=NULL, required = FALSE, help = "Path to QCed SNPs")

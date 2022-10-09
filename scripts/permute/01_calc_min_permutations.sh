@@ -31,6 +31,11 @@ readonly out_dir="data/permute/overview/min_mac${min_mac}/phased_only"
 readonly out_prefix="${out_dir}/main"
 mkdir -p ${out_dir}
 
+# lookup true dosage hash and AC for the given phenotype
+readonly lookup_dir="data/conditional/rare/combined"
+readonly hash_path="${lookup_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_hash.txt.gz"
+readonly ac_path="${lookup_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_AC.txt.gz"
+
 # required to pin down which genes are ch knockout and which are hom alt knockouts
 readonly tsv_path="data/knockouts/alt/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense.tsv.gz"
 
@@ -40,6 +45,8 @@ Rscript ${rscript} \
   --spa_cts_dir ${spa_cts_dir} \
   --spa_bin_dir ${spa_bin_dir} \
   --basename_prefix ${basename_prefix} \
+  --ac_path ${ac_path} \
+  --hash_path ${hash_path} \
   --out_prefix ${out_prefix} \
   --use_cond_p
 
