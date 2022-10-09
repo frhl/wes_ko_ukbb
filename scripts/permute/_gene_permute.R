@@ -6,10 +6,20 @@ library(data.table)
 # simple method to shuffle knockouts
 shuffle_knockouts <- function(d){
     d$KO <- rbinom(n=nrow(d), size=1, prob = d$pTKO)
-    d$pKO <- ifelse((d$KO == 1 & d$unphased_het == 0), 1,
-         ifelse((d$KO == 1 & d$hom_alt_n > 0), 1,
-         ifelse((d$phased_het == 1 & d$unphased_het > 0), 1 - 1*(1/2)^d$unphased_het,
-         ifelse((d$phased_het == 0 & d$unphased_het > 1), 1 - 2*(1/2)^d$unphased_het, 0))))
+    d$n_hets <- d$phased_het
+    d$n_homs <- d$hom_alt_n
+    
+    # if there are any homs the probability of KO is one.
+    # if there are hets, then the probabiliy of being a KO 
+    # is 1 minus the probability of all hets falling on the
+    # same haplotype
+    d$pKO <- ifelse(d$n_homs > 0, 1,
+             ifelse(d$n_hets > 1, 1-(2*((1/2)^d$n_hets)), 0))
+    
+    #d$pKO <- ifelse((d$KO == 1 & d$unphased_het == 0), 1,
+    #     ifelse((d$KO == 1 & d$hom_alt_n > 0), 1,
+    #     ifelse((d$phased_het == 1 & d$unphased_het > 0), 1 - 1*(1/2)^d$unphased_het,
+    #     ifelse((d$phased_het == 0 & d$unphased_het > 1), 1 - 2*(1/2)^d$unphased_het, 0))))
     return(d$pKO)
 }
 
