@@ -10,7 +10,7 @@
 #SBATCH --error=logs/prefilter_wes.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=1-22
+#SBATCH --array=21
 
 
 source utils/qsub_utils.sh
@@ -34,18 +34,14 @@ if [ ! -f "${out_prefix}.vcf.bgz" ]; then
   SECONDS=0
   set_up_hail
   set_up_pythonpath_legacy
-  set -x
   python3 "${hail_script}" \
      --input_path "${in_file}" \
      --input_type "${in_type}" \
      --out_prefix "${out_prefix}" \
      --out_type "${out_type}" \
-     --exclude_trio_parents \
      --ancestry "eur" \
      --min_mac 2 \
      --missing 0.05
-  set +x
-  log_runtime ${SECONDS}
 else
   print_update "file ${out} already exists. Skipping!"
 fi
