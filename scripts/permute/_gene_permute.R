@@ -75,7 +75,7 @@ calc_info <- function(DS_matrix){
     stopifnot(nrow(DS_matrix) > 1)
     # create INFO row by comining strings column wise
     d_info <- data.table(
-        allele_count = rowSums(DS_matrix),
+        allele_count = rowSums(DS_matrix, na.rm = TRUE),
         hashes = hash_dosage(DS_matrix)    
     )
     # append identifiers as specified in header

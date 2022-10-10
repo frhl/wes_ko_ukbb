@@ -48,17 +48,7 @@ if [ -f "${cond_markers}" ]; then
   fi
 fi
 
-# read in conditional markers
-#if [ "${use_cond_common}" -eq "1" ]; then
-#  if [ -f "${cond_markers}" ]; then
-#    readonly markers=$(cat ${cond_markers} | grep -w chr${chr} | cut -f3 | paste -s -d ',')
-#    echo "The following markers will be included: ${markers}"
-#  else
-#    >&2 echo "${cond_markers} file does not exist! "
-#  fi
-#else 
-#  readonly markers=""
-#fi
+
 
 if [ ! -f ${out_gene_task} ]; then
   echo "var_bytes=${var_bytes} at ${in_var}"
