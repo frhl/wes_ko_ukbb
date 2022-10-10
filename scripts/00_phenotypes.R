@@ -119,8 +119,11 @@ main <- function(args){
         pheno_cols <- names(which(sapply(dt, is.logical))) 
         n_cutoff <- as.numeric(args$case_count_cutoff)
 
+        # load samples that are QCed
+        qc_samples <- fread(args$qc_samples)$V1
+
         # discard phenotypes with less than 50 cases in quality controlled samples (200k)
-        dt_subset_by_qced_samples <- dt[dt$eid %in% samples,]
+        dt_subset_by_qced_samples <- dt[dt$eid %in% qc_samples,]
         lst <- lapply(pheno_cols, function(ph) sum(dt_subset_by_qced_samples[[ph]], na.rm = TRUE))
         names(lst) <- pheno_cols
         dlst <- stack(lst)
