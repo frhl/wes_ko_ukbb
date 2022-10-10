@@ -116,12 +116,12 @@ main <- function(args){
         write("Removing phenotypes by case count cutoff", stderr())  
 
         # drop phenotypes based on case/control count
-        pheno_cols <- names(which(sapply(mrg, is.logical))) 
+        pheno_cols <- names(which(sapply(dt, is.logical))) 
         n_cutoff <- as.numeric(args$case_count_cutoff)
 
         # discard phenotypes with less than 50 cases in quality controlled samples (200k)
-        mrg_subset_by_qced_samples <- dt[dt$eid %in% samples,]
-        lst <- lapply(pheno_cols, function(ph) sum(mrg_subset_by_qced_samples[[ph]], na.rm = TRUE))
+        dt_subset_by_qced_samples <- dt[dt$eid %in% samples,]
+        lst <- lapply(pheno_cols, function(ph) sum(dt_subset_by_qced_samples[[ph]], na.rm = TRUE))
         names(lst) <- pheno_cols
         dlst <- stack(lst)
         colnames(dlst) <- c("cases", "phenotype")
@@ -131,7 +131,7 @@ main <- function(args){
         phenos_keep <- dlst$phenotype 
         
         # final filtering         
-        cols_keep <- (!(colnames(mrg) %in% pheno_cols)) | (colnames(mrg) %in% phenos_keep)
+        cols_keep <- (!(colnames(dt) %in% pheno_cols)) | (colnames(dt) %in% phenos_keep)
         dt <- dt[,..cols_keep]
     }
     
