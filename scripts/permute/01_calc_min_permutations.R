@@ -119,7 +119,7 @@ main <- function(args){
     melted_ac <- data.table::melt(d_ac, id.var = "id")
     melted_hash <- data.table::melt(d_hash, id.var = "id")
     colnames(melted_ac) <- c("MarkerID", "phenotype", "AC")
-    colnames(melted_hash) <- c("MarkerID", "phenotype", "AC")
+    colnames(melted_hash) <- c("MarkerID", "phenotype", "HASH")
     spa_full <- merge(spa_full, melted_hash, all.x = TRUE)
     spa_full <- merge(spa_full, melted_ac, all.x = TRUE)
 
