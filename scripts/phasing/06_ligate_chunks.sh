@@ -9,13 +9,15 @@
 #SBATCH --error=logs/ligate_chunks.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=20-22
+#SBATCH --array=22
 
 set -o errexit
 set -o nounset
 
 source utils/bash_utils.sh
 source utils/vcf_utils.sh
+
+set -x
 
 readonly rscript="scripts/phasing/_sort_chunks.R"
 
@@ -47,12 +49,13 @@ readonly trio="${out_prefix}.trio"
 mkdir -p ${out_dir}
 
 
-if [ ${n} -gt 1 ] && [ ! -f ${out} ]; then 
-  bcftools concat --ligate ${files} -O z -o ${out}
-else
-  ln -s "${PWD}/${in_prefix}"*.vcf.bgz ${out}
+if [ ! -f ${out} ]; then
+  if [ ${n} -gt 1 ]; then 
+    bcftools concat --ligate ${files} -O z -o ${out}
+  else
+    ln -s "${PWD}/${in_prefix}"*.vcf.bgz ${out}
+  fi
 fi
-
 
 if [ ! -f ${trio} ]; then
     bcftools +trio-switch-rate ${out} -- -p ${pedigree} > ${trio}

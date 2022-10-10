@@ -16,7 +16,7 @@ readonly rscript="scripts/phasing/07_eval_chunks_by_maf.R"
 readonly ligated_dir="data/phased/wes_union_calls/ligated"
 readonly out_dir="data/phased/validation"
 
-readonly out_prefix="${out_dir}/220713_ligated"
+readonly out_prefix="${out_dir}/221010_ligated"
 
 readonly wes_variants="/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list"
 

@@ -29,7 +29,7 @@ readonly out_type="vcf"
 
 mkdir -p ${spark_dir}
 mkdir -p ${out_dir}
-if [ ! -f "${out_prefix}.vcf.bgz" ]; then
+#if [ ! -f "${out_prefix}.vcf.bgz" ]; then
   SECONDS=0
   set_up_hail
   set_up_pythonpath_legacy
@@ -44,12 +44,12 @@ if [ ! -f "${out_prefix}.vcf.bgz" ]; then
      --missing 0.05 \
      --dataset "calls" \
      --exclude_trio_parents \
+     --export_parents \
      --liftover
   set +x
-  log_runtime ${SECONDS}
-else
-  print_update "file ${out} already exists. Skipping!"
-fi
+#else
+#  print_update "file ${out} already exists. Skipping!"
+#fi
 
 module purge
 module load BCFtools/1.12-GCC-10.3.0

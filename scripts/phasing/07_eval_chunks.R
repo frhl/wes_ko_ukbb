@@ -42,6 +42,8 @@ main <- function(args){
     # load files   
     files <- list.files(args$master_chunk_dir, recursive = TRUE, pattern = ".txt", full.names = TRUE)
     files <- files[grepl("shapeit", files)]
+    print("this is the header")
+    print(head(files))
     variants <- fread(args$sites)
 
     lst <- lapply(autosomes, function(chr){

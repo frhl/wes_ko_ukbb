@@ -13,9 +13,9 @@
 source utils/bash_utils.sh
 
 readonly rscript="scripts/phasing/07_eval_chunks.R"
-readonly main_dir="data/phased/wes_union_calls/chunks"
+readonly main_dir="data/phased/wes_union_calls/chunks/shapeit4"
 readonly out_dir="data/phased/validation"
-readonly out_prefix="${out_dir}/220713_ukb_eur_wes_union_calls"
+readonly out_prefix="${out_dir}/221010_ukb_eur_wes_union_calls"
 
 readonly wes_variants="/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list"
 

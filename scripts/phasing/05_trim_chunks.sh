@@ -9,7 +9,7 @@
 #SBATCH --error=logs/trim_chunks.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 6
-#SBATCH --array=2
+#SBATCH --array=2-22
 
 set -o errexit
 set -o nounset
