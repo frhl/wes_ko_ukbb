@@ -111,7 +111,7 @@ main <- function(args){
         dt <- merge(dt, brava, by = "eid", all.x = TRUE)
     }
 
-    if (args$case_count_cutoff) {    
+    if (!is.null(args$case_count_cutoff)) {    
         
         write("Removing phenotypes by case count cutoff", stderr())  
 
