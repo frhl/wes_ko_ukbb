@@ -11,15 +11,16 @@ main <- function(args){
     stopifnot(dir.exists(dirname(args$out_prefix)))
     stopifnot(is.numeric(as.numeric(args$true_tstat)))
     stopifnot(is.numeric(as.numeric(args$true_p)))
+    
+    # get true values from non-permuted data
+    true_t <- as.numeric(args$true_tstat)
+    true_p <- as.numeric(args$true_p)
+    true_AC <- as.numeric(args$true_AC)
+    true_marker <- as.character(args$true_marker)
 
     # read input
     d <- fread(args$input_path)
-    tstat <- as.numeric(d$Tstat)
-    pvalue <- as.numeric(d$p.value)
-    pvalue_orig <- pvalue
-    true_t <- as.numeric(args$true_tstat)
-    true_p <- as.numeric(args$true_p)
-    
+   
     # exclude real markers (non-permuted stuff)
     stopifnot("MarkerID" %in% colnames(d))
     if (args$exclude_real_markers) {
@@ -31,6 +32,12 @@ main <- function(args){
         }
     }
 
+    # get permuted values
+    marker <- as.character(d$MarkerID)
+    tstat <- as.numeric(d$Tstat)
+    pvalue <- as.numeric(d$p.value)
+    pvalue_orig <- pvalue
+    AC <- as.numeric(d$AC_Allele2)
 
     # Check for conditional
     if ("p.value_c" %in% colnames(d)){ 
@@ -44,7 +51,9 @@ main <- function(args){
     out_p <- c(true_p, pvalue)
     out_p_orig <- c(true_p, pvalue_orig)
     is_permuted <- c(rep(0, 1), rep(1, length(tstat)))
-    dt <- data.table(Tstat=out_t, p=out_p, p_orig=out_p_orig, is_permuted)
+    out_marker <- c(true_marker, marker)
+    out_ac <- c(true_AC, AC)
+    dt <- data.table(Tstat=out_t, p=out_p, p_orig=out_p_orig, out_marker, out_ac, is_permuted)
     outfile <- paste0(args$out_prefix, ".txt.gz")
     fwrite(dt, outfile, sep = "\t")
 
@@ -62,6 +71,8 @@ parser$add_argument("--input_path", default=NULL, help = "path to saige (merge) 
 parser$add_argument("--out_prefix", default=NULL, help = "prefix for output")
 parser$add_argument("--true_tstat", default=NULL, help = "the true t-statistic from non-permuted analysis")
 parser$add_argument("--true_p", default=NULL, help = "the true p-value from non-permuted analysis")
+parser$add_argument("--true_AC", default=NULL, help = "the true allele count from non-permuted analysis")
+parser$add_argument("--true_marker", default=NULL, help = "the true marker name")
 parser$add_argument("--exclude_real_markers", default=FALSE, action="store_true", help = "Exclude real conditioning markers (from conditioning analysis)")
 args <- parser$parse_args()
 

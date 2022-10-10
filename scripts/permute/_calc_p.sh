@@ -32,7 +32,7 @@ readonly pfile="${out_prefix}_${phenotype}.pvalues"
 
 
 lookup_true() {
-  local column=${1} # either "p" or "t"
+  local column=${1} # either "p" "t" or "AC"
   local true_value=$( Rscript ${r_get_true_p} \
     --gene ${gene} \
     --phenotype ${phenotype} \
@@ -65,6 +65,7 @@ if [ "${total_phenos}" -ne "${tested_phenos}" ]; then
     set_up_rpy
     readonly true_p=$( lookup_true "p" )
     readonly true_t=$( lookup_true "t" )
+    readonly true_AC=$( lookup_true "AC" )
     if [ "$(zcat ${saige_merged} | wc -l)" -gt "1" ]; then
       if [[ "${true_p}" != "NA" ]]; then
         readonly last_p=$(get_last_permuted_p)
@@ -73,6 +74,8 @@ if [ "${total_phenos}" -ne "${tested_phenos}" ]; then
         readonly tmp_empirical_p=$(
             Rscript ${r_calc_emp_p} \
               --input_path "${saige_merged}" \
+              --true_marker "${gene}" \
+              --true_AC "${true_AC}" \
               --true_tstat "${true_t}" \
               --true_p "${true_p}" \
               --out_prefix "${pfile}.tmp")

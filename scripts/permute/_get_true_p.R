@@ -44,6 +44,8 @@ main <- function(args){
           write(d1$pvalue, stdout())
       } else if (target == "t"){
           write(d1$tstat, stdout())
+      } else if (target == "AC"){
+          write(d1$AC, stdout())
       } else {
           stop(paste(target, "is not a valid parameter to return!"))
       } 
