@@ -24,6 +24,7 @@ readonly fam_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 readonly chr="${SLURM_ARRAY_TASK_ID}"
 readonly in_file="${in_dir}/ukb_eur_wes_prefilter_200k_chr${chr}.vcf.bgz"
 readonly out_file="${out_dir}/ukb_eur_wes_prefilter_200k_naive_phasing_chr${chr}.vcf.gz"
+readonly parents_file="${out_dir}/ukb_eur_wes_prefilter_200k_naive_phasing_chr${chr}_parents.vcf.gz"
 readonly fam_file="${fam_dir}/ukb11867_pedigree.fam"
 
 readonly ref="${ref_dir}/ALL.chr${chr}.phase3_shapeit2_mvncall_integrated_v5.20130502.genotypes.vcf.bgz"
@@ -54,6 +55,13 @@ if [ ! -f "${out_file}.tbi" ]; then
   module load BCFtools/1.12-GCC-10.3.0
   make_tabix "${out_file}" "tbi"
 fi
+
+if [ ! -f "${parents_file}.tbi" ]; then
+  module purge
+  module load BCFtools/1.12-GCC-10.3.0
+  make_tabix "${parents_file}" "tbi"
+fi
+
 
 
 

@@ -9,7 +9,7 @@
 #SBATCH --error=logs/ligate_chunks.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=22
+#SBATCH --array=20-22
 
 set -o errexit
 set -o nounset
@@ -28,7 +28,7 @@ readonly in_trim="${in_prefix}_trim"
 
 set_up_rpy
 module load BCFtools/1.12-GCC-10.3.0
-for f in ${in_prefix}*.vcf.bgz; do 
+for f in ${in_prefix}*.vcf.bgz; do
   make_tabix ${f} "tbi"
 done
 
@@ -49,7 +49,7 @@ readonly trio="${out_prefix}.trio"
 mkdir -p ${out_dir}
 
 
-if [ ! -f ${out} ]; then
+if [ ! -f "${out}" ]; then
   if [ ${n} -gt 1 ]; then 
     bcftools concat --ligate ${files} -O z -o ${out}
   else
@@ -57,9 +57,10 @@ if [ ! -f ${out} ]; then
   fi
 fi
 
-if [ ! -f ${trio} ]; then
-    bcftools +trio-switch-rate ${out} -- -p ${pedigree} > ${trio}
-    switch_errors_by_site ${out} ${pedigree}
+if [ ! -f "${out}.tbi" ]; then
+  make_tabix ${out}
 fi
+
+
 
 

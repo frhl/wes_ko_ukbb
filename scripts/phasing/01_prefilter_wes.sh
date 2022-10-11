@@ -10,7 +10,7 @@
 #SBATCH --error=logs/prefilter_wes.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=21
+#SBATCH --array=1
 
 
 source utils/qsub_utils.sh
@@ -30,6 +30,7 @@ readonly out_prefix="${out_dir}/ukb_eur_wes_prefilter_200k_chr${chr}"
 readonly out_type="vcf"
 
 mkdir -p ${out_dir}
+mkdir -p ${spark_dir}
 if [ ! -f "${out_prefix}.vcf.bgz" ]; then
   SECONDS=0
   set_up_hail

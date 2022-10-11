@@ -35,6 +35,28 @@ readonly log="${out_prefix_w_phasing_idx}.log"
 # switch error files
 readonly trio="${out%.*.*}.trio"
 
+phase_with_whatshap() {
+  
+  local grch38="/well/lindgren/flassen/ressources/genome_reference/1kg/GRCh38_full_analysis_set_plus_decoy_hla.fa"
+  local cram_dir="/well/ukbb-wes/cram/oqfe/ukbb-11867"
+  local cram_placeholder="${cram_dir}/SAMPLE_oqfe.cram"
+
+  whatshap phase \
+    --reference ${grch38} \
+    --chromosome chr${chr} \
+    --mapq 15 \
+    --default-gq 30 \
+    -o ${out_file} \
+    ${vcf_file} \
+    ${cram_files}
+
+
+
+}
+
+
+
+
 
 phase_with_shapeit() {
   SECONDS=0

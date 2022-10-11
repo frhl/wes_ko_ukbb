@@ -107,11 +107,10 @@ def main(args):
         mt = filter_missing(mt, float(missing))
     if exclude_trio_parents:
         pids = samples.get_parents_by_fam(mt, ["TRIO"])
-        mt = mt.filter_cols(~hl.literal(pids).contains(mt.s))
-        # create a file just with the parents
         if export_parents:
             mt_parents = mt.filter_cols(hl.literal(pids).contains(mt.s))
             io.export_table(mt_parents, out_prefix + "_parents", out_type)
+        mt = mt.filter_cols(~hl.literal(pids).contains(mt.s))
        
     #io.export_table(mt, out_prefix, out_type)
 
