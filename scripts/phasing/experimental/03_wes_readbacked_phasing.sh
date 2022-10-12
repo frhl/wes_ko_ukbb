@@ -52,7 +52,7 @@ cram_to_bam() {
   samtools index ${_bam}
 }
 
-readonly eid="1281289" #"1000278"
+readonly eid="5101274" #"1000278"
 readonly cram_file=${cram_placeholder/SAMPLE/${eid}}
 readonly bam_file=${bam_placeholder/SAMPLE/${eid}}
 if [ ! -f ${bam_file} ]; then
@@ -64,20 +64,20 @@ fi
 readonly threads=42
 
 # use read backed phasing
-set -x
-set_up_phaser
-python2.7 ${PHASER_PATH} \
-   --vcf ${vcf_file} \
-   --bam ${bam_file} \
-   --threads ${threads} \
-   --pass_only 0 \
-   --chr "chr${chr}" \
-   --baseq 30 \
-   --mapq 15 \
-   --paired_end 1 \
-   --sample ${eid} \
-   --o ${out_file}
-set +x
+#set -x
+#set_up_phaser
+#python2.7 ${PHASER_PATH} \
+#   --vcf ${vcf_file} \
+#   --bam ${bam_file} \
+#   --threads ${threads} \
+#   --pass_only 0 \
+#   --chr "chr${chr}" \
+#   --baseq 30 \
+#   --mapq 15 \
+#   --paired_end 1 \
+#   --sample ${eid} \
+#   --o ${out_file}
+#set +x
 
 
 
