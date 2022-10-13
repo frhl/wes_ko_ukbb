@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #
 # @description merge phased vcf with unphased parents for later switch error calculation.
+# @note - takes about ~ 24h with 1 a core
 #
 #SBATCH --account=lindgren.prj
 #SBATCH --job-name=append_parents
@@ -9,7 +10,7 @@
 #SBATCH --error=logs/append_parents.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-22
+#SBATCH --array=21
 
 set -o errexit
 set -o nounset

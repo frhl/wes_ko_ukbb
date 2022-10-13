@@ -3,20 +3,20 @@
 # @description evaluate phasing quality stratified by MAF
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=eval_chunks_by_maf
+#SBATCH --job-name=calc_ser
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/eval_chunks_by_maf.log
-#SBATCH --error=logs/eval_chunks_by_maf.errors.log
+#SBATCH --output=logs/calc_ser.log
+#SBATCH --error=logs/calc_ser.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
 
 source utils/bash_utils.sh
 
 readonly rscript="scripts/phasing/07_eval_chunks_by_maf.R"
-readonly ligated_dir="data/phased/wes_union_calls/ligated"
+readonly ligated_dir="data/phased/wes_union_calls/with_parents"
 readonly out_dir="data/phased/validation"
 
-readonly out_prefix="${out_dir}/221010_ligated"
+readonly out_prefix="${out_dir}/221013_switch_error_rates"
 
 readonly wes_variants="/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list"
 

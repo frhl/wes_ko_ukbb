@@ -22,9 +22,16 @@ def main(args):
     # set up
     hail_init.hail_bmrc_init_local('logs/hail/merge_chunks.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
-    
     parents = io.import_table(parents_path, parents_type, calc_info = False)
     phased = io.import_table(phased_path, phased_type, calc_info = False)
+    # PQ/PS in all phased data except chromsome 21
+    if "PQ" in list(phased.col):
+        parents = parents.annotate_entries(
+                   PQ = hl.missing('int32'),
+                   PS = hl.missing('int32')
+                )
+       
+    
     mt = parents.union_cols(phased)
     io.export_table(mt, out_prefix, out_type)
 
