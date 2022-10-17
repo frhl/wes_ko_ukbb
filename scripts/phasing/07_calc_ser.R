@@ -7,7 +7,7 @@ library(stringr)
 library(ggsci)
 
 fread_phased_sites <- function(file, ...){
-    
+
     # get details about chunks
     bname <- basename(file)
     chunk_current <- as.numeric(gsub("of","",stringr::str_extract(bname, "[0-9]+of")))
@@ -16,9 +16,11 @@ fread_phased_sites <- function(file, ...){
     phasing_region_size <- as.numeric(gsub("_prs","",stringr::str_extract(bname, "_prs[0-9]+")))
     phasing_overlap_size <- as.numeric(gsub("_pro","",stringr::str_extract(bname, "_pro[0-9]+")))
     max_phasing_region_size <- as.numeric(gsub("_mprs","",stringr::str_extract(bname, "_mprs[0-9]+")))
-    
+
     # append to data.table
     d <- fread(file, ...)
+    d$AN_m_AC <- as.numeric(d$AN - d$AC)
+    d$MAC <- as.numeric(apply(d[,c("AC","AN_m_AC")], 1, min))
     d$locus <- paste0(d$CHR,":",d$POS)
     d$chunk_current <- chunk_current
     d$chunk_final <- chunk_final
@@ -27,8 +29,9 @@ fread_phased_sites <- function(file, ...){
     d$phasing_overlap_size <- phasing_overlap_size
     d$max_phasing_region_size <- max_phasing_region_size
     return(d)
-    
+
 }
+
 
 # aggregate switch errors by chromosome and minor allele frequency bins
 aggregate_by_chrom <- function(files, variants){
@@ -57,6 +60,18 @@ aggregate_by_chrom_and_maf_bin <- function(files, maf_bin, variants){
     return(lst)
 }
 
+aggregate_by_chrom_and_mac_bin <- function(files, mac_bin, variants){
+    lst <- lapply(files, function(file){
+        d <- fread_phased_sites(file)
+        d$wes_variant <- d$locus %in% variants$locus
+        d$mac_bin <- cut(d$MAC, breaks = mac_bin)
+        counts <- aggregate(switches ~ wes_variant + mac_bin + CHR, data = d, FUN = sum)
+        tested <- aggregate(switches ~ wes_variant + mac_bin + CHR, data = d, FUN = length)
+        counts <- data.table(counts, tested = tested$switches)
+        return(counts)
+    })
+    return(lst)
+}
 
 # iterate over a matrix of switch errors and tested columns and append with
 # binomial confidence intervals for the switch error rate
@@ -77,6 +92,7 @@ main <- function(args){
     stopifnot(dir.exists(dirname(args$out_prefix)))
     stopifnot(file.exists(args$sites))
     maf_bins <- c(1, 10^-(1:8))
+    mac_bins = c(Inf,1000, 100, 30, 20, 10, 5,4,3,2,1,0)
     print(maf_bins)
 
     # get WES sites 
@@ -200,6 +216,25 @@ main <- function(args){
     write(paste("writing",out_p3_txt), stderr())
     #ggsave(p3, out_p3_img, width = 8, height = 6)
     fwrite(aggr_counts, out_p3_txt, sep = "\t")
+
+
+    # *** counts by mac bin and ALL chromosomes ***
+    aggr_d <- aggregate_by_chrom_and_mac_bin(files, mac_bins, variants)
+    aggr_switches <- aggregate(switches ~ wes_variant + mac_bin, data = aggr_d, FUN = sum)
+    aggr_tested <- aggregate(tested ~ wes_variant + mac_bin, data = aggr_d, FUN = sum)
+    aggr_counts <- data.table(aggr_switches, tested = aggr_tested$tested)
+    aggr_counts <- calc_binom_ci(list(aggr_counts))
+    aggr_counts$wes_label <- ifelse(aggr_counts$wes_variant, "Whole Exome Sequencing","Genotyping Array")
+    print(table(aggr_counts$mac_bin))
+
+    out_p4 <- paste0(args$out_prefix, "_ser_by_mac")
+    #out_p3_img <- paste0(out_p1, ".png")
+    out_p4_txt <- paste0(out_p3, ".txt.gz")
+    write(paste("writing",out_p4_txt), stderr())
+    #ggsave(p3, out_p3_img, width = 8, height = 6)
+    fwrite(aggr_counts, out_p4_txt, sep = "\t")
+
+
 
 
 }

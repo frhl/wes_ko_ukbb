@@ -12,11 +12,11 @@
 
 source utils/bash_utils.sh
 
-readonly rscript="scripts/phasing/07_eval_chunks_by_maf.R"
+readonly rscript="scripts/phasing/07_calc_ser.R"
 readonly ligated_dir="data/phased/wes_union_calls/with_parents"
 readonly out_dir="data/phased/validation"
 
-readonly out_prefix="${out_dir}/221013_switch_error_rates"
+readonly out_prefix="${out_dir}/221014_switch_error_rates"
 
 readonly wes_variants="/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list"
 
