@@ -22,22 +22,24 @@ readonly spark_dir="data/tmp/spark_dir"
 readonly hail_script="scripts/phasing/experimental/04_export_sample.py"
 
 readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} ) 
-readonly in_dir="data/mt/annotated"
-readonly input_prefix="${in_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.mt"
-
-readonly out_dir="data/reads/samples"
-readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
-readonly out_type="vcf"
+readonly in_dir="data/unphased/wes_union_calls"
+readonly input_prefix="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.bgz"
+readonly input_type="vcf"
 
 readonly eid="1281289"
+
+readonly out_dir="data/reads/samples"
+readonly out_prefix="${out_dir}/eid${eid}_eur_wes_union_calls_chr${chr}"
+readonly out_type="vcf"
+
 
 mkdir -p ${out_dir}
 
 set_up_hail
 set_up_pythonpath_legacy  
 python3 "${hail_script}" \
-   --in_file ${input_prefix}\
-   --in_type "mt" \
+   --in_file "${input_prefix}" \
+   --in_type "${input_type}" \
    --out_prefix ${out_prefix} \
    --out_type "${out_type}" \
    --extract_samples ${eid}
