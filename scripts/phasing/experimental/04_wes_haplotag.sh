@@ -3,12 +3,12 @@
 # @description phase variants from UKBB whole exome sequencing using SHAPEIT4.2
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=wes_whatshap
+#SBATCH --job-name=wes_haplotag
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/wes_whatshap.log
-#SBATCH --error=logs/wes_whatshap.errors.log
+#SBATCH --output=logs/wes_haplotag.log
+#SBATCH --error=logs/wes_haplotog.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 5
+#SBATCH --cpus-per-task 2
 #SBATCH --array=21
 
 
@@ -18,8 +18,8 @@ source utils/vcf_utils.sh
 
 
 #readonly in_dir="data/mt/annotated/"
-readonly in_dir="data/unphased/wes_union_calls"
-readonly out_dir="data/phased/experimental"
+readonly in_dir="data/reads/samples"
+readonly out_dir="data/reads/haplotag"
 
 mkdir -p ${out_dir}
 
@@ -34,13 +34,14 @@ readonly cram_placeholder="${cram_dir}/SAMPLE_oqfe.cram"
 
 readonly eid="1281289" #"1000278"
 readonly cram_file=${cram_placeholder/SAMPLE/${eid}}
-readonly bam_file=${bam_placeholder/SAMPLE/${eid}}
+readonly threads=30
 
 SECONDS=0
 set_up_whatshap
-whatshap phase \
+whatshap haplotag \
   --reference ${grch38} \
   --chromosome chr${chr} \
+  --output-threads ${threads} \
   --sample  ${eid} \
   -o ${out_file} \
   ${vcf_file} \

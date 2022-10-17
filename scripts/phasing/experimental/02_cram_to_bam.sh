@@ -36,7 +36,7 @@ cram_to_bam() {
   samtools index ${_bam}
 }
 
-readonly eid="2183281" #"5101274" #"1000278"
+readonly eid="2613995" #"5101274" #"1000278"
 readonly cram_file=${cram_placeholder/SAMPLE/${eid}}
 readonly bam_file=${bam_placeholder/SAMPLE/${eid}}
 cram_to_bam ${grch38} ${cram_file} ${bam_file}

@@ -2,6 +2,7 @@
 
 library(argparse)
 library(data.table)
+library(stringr)
 
 main <- function(args){
 
@@ -18,6 +19,12 @@ main <- function(args){
       d <- d[d$pKO > 0 & d$pKO < 1]
       return(d)
     }))
+
+    # clean up 
+    d$varid <- gsub('(\\[)|(\\])|(\\")', '', d$varid)
+    d$gts <- gsub('(\\[)|(\\])|(\\")', '', d$gts)
+    d$chromosome <- str_extract(d$varid,"chr[0-9]+")
+    d$knockout <- NULL
 
     # write combined SNPs 
     outfile = args$out_path
