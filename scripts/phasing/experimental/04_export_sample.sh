@@ -29,7 +29,7 @@ readonly input_type="vcf"
 readonly eid="1281289,5101274"
 
 readonly out_dir="data/reads/samples"
-readonly out_prefix="${out_dir}/eid${eid/","/"_"}_eur_wes_union_calls_chr${chr}"
+readonly out_prefix="${out_dir}/eids${eid/,/_}_eur_wes_union_calls_chr${chr}"
 readonly out_type="vcf"
 
 
