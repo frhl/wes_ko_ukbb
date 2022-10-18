@@ -25,7 +25,7 @@ readonly merge_script="scripts/phasing/_prephase_merge.sh"
 readonly spark_dir="data/tmp/spark"
 
 # how many samples should there be in each chunk 
-readonly samples_per_chunk=100
+readonly samples_per_chunk=10
 readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 
 # Cluster params
@@ -117,7 +117,7 @@ submit_prephasing_job() {
 
 submit_merge_job() {
   # merge resulting chunk files
-  #local dependency=${1}
+  local dependency=${1}
   local max_interval_idx=$( get_max_interval_idx )
   local slurm_jname="_c${chr}_prephase_merge"
   local slurm_lname="logs/_prephase_merge"
@@ -132,19 +132,20 @@ submit_merge_job() {
     --chdir="${curwd}" \
     --partition="${slurm_queue}" \
     --cpus-per-task="${slurm_nslots}" \
+    --dependency="afterok:${dependency}" \
     --constraint=skl-compat \
     ${merge_script} \
     ${out_prefix_w_job_config} \
     ${max_interval_idx} \
     ${out_merge_file}
   )
-
+  echo ${jid} 
 }
 
-    #--dependency="afterok:${dependency}" \
 
-#readonly prephasing_jid=$( submit_prephasing_job )
-submit_merge_job
+readonly prephasing_jid=$( submit_prephasing_job )
+readonly merge_jid=$( submit_merge_job ${prephasing_jid} )
+
 
 
 

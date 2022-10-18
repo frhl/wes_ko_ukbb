@@ -9,8 +9,8 @@ from ukb_utils import hail_init
 def main(args):
 
     # parser
-    in_list = args.in_list
-    in_type = args.in_type
+    input_list = args.input_list
+    input_type = args.input_type
     out_prefix = args.out_prefix
     out_type = args.out_type
 
@@ -19,20 +19,20 @@ def main(args):
 
     # read list of files to be merged
     lines = []
-    with open(in_list, "r") as infile:
+    with open(input_list, "r") as infile:
         for line in infile:
             if line.strip():
                 lines += [line.strip()]
 
-    mts = [io.import_table(infile, in_type) for infile in lines]
+    mts = [io.import_table(infile, input_type) for infile in lines]
     mt = hl.MatrixTable.union_cols(*mts)
     io.export_table(mt, out_prefix, out_type)
 
 if __name__=='__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--in_list', default=None, help='Path prefix for intput dataset')
-    parser.add_argument('--in_type', default=None, help='Either "mt", "vcf" or "plink"')
+    parser.add_argument('--input_list', default=None, help='Path prefix for intput dataset')
+    parser.add_argument('--input_type', default=None, help='Either "mt", "vcf" or "plink"')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Either "mt", "vcf" or "plink"')
     args = parser.parse_args()
