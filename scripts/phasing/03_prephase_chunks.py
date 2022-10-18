@@ -56,7 +56,7 @@ def main(args):
     
     if write_interval:
         samples = mt.s.collect()
-        write_interval_file(samples, interval_path, samples_per_chunk)
+        write_interval_file(samples, interval_path, int(samples_per_chunk))
     elif split_by_interval:
         if interval_idx:
             samples = read_interval_idx(interval_path, int(interval_idx) - 1)
