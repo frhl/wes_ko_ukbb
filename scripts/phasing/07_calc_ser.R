@@ -92,7 +92,7 @@ main <- function(args){
     stopifnot(dir.exists(dirname(args$out_prefix)))
     stopifnot(file.exists(args$sites))
     maf_bins <- c(1, 10^-(1:8))
-    mac_bins = c(Inf,1000, 100, 30, 20, 10, 5,4,3,2,1,0)
+    mac_bins <- c(Inf,1000, 100, 30, 20, 10, 5,3,1,0)
     print(maf_bins)
 
     # get WES sites 
@@ -219,7 +219,9 @@ main <- function(args){
 
 
     # *** counts by mac bin and ALL chromosomes ***
-    aggr_d <- aggregate_by_chrom_and_mac_bin(files, mac_bins, variants)
+    lst_by_chrom_by_mac <- aggregate_by_chrom_and_mac_bin(files, mac_bins, variants = variants)
+    aggr_d <- calc_binom_ci(lst_by_chrom_by_mac)
+    aggr_d$wes_label <- ifelse(aggr_d$wes_variant, "Whole Exome Sequencing","Genotyping Array")
     aggr_switches <- aggregate(switches ~ wes_variant + mac_bin, data = aggr_d, FUN = sum)
     aggr_tested <- aggregate(tested ~ wes_variant + mac_bin, data = aggr_d, FUN = sum)
     aggr_counts <- data.table(aggr_switches, tested = aggr_tested$tested)
