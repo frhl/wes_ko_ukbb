@@ -25,13 +25,13 @@ readonly merge_script="scripts/phasing/_prephase_merge.sh"
 readonly spark_dir="data/tmp/spark"
 
 # how many samples should there be in each chunk 
-readonly samples_per_chunk=1000
+readonly samples_per_chunk=100
 readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 
 # Cluster params
 readonly project="lindgren.prj"
 readonly queue="short"
-readonly nslots=4
+readonly nslots=2
 
 # what file should be split up
 readonly input_dir=" data/unphased/wes_union_calls"
@@ -55,10 +55,10 @@ readonly read_dir="/well/ukbb-wes/cram/oqfe/ukbb-11867"
 readonly read_placeholder="${read_dir}/SAMPLE_oqfe.cram"
 
 mkdir -p ${out_dir}
-
+mkdir -p $( dirname ${out_prefix_w_job_config} )
+mkdir -p $( dirname ${interval_path} )
 
 if [ ! -f ${interval_path} ]; then
-  mkdir -p $( dirname ${interval_path} )
   SECONDS=0
   set_up_hail
   set_up_pythonpath_legacy
@@ -117,10 +117,10 @@ submit_prephasing_job() {
 
 submit_merge_job() {
   # merge resulting chunk files
-  local dependency=${1}
+  #local dependency=${1}
   local max_interval_idx=$( get_max_interval_idx )
-  local slurm_jname="_c${chr}_merge_prephased_chunks"
-  local slurm_lname="logs/_merge_prephased_chunks"
+  local slurm_jname="_c${chr}_prephase_merge"
+  local slurm_lname="logs/_prephase_merge"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
   local slurm_nslots="2"
@@ -132,19 +132,19 @@ submit_merge_job() {
     --chdir="${curwd}" \
     --partition="${slurm_queue}" \
     --cpus-per-task="${slurm_nslots}" \
-    --dependency="afterok:${dependency}" \
     --constraint=skl-compat \
     ${merge_script} \
     ${out_prefix_w_job_config} \
     ${max_interval_idx} \
-    ${out_merged_file}
+    ${out_merge_file}
   )
 
 }
 
+    #--dependency="afterok:${dependency}" \
 
-readonly prephasing_jid=$( submit_prephasing_job )
-
+#readonly prephasing_jid=$( submit_prephasing_job )
+submit_merge_job
 
 
 
