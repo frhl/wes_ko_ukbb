@@ -25,13 +25,13 @@ readonly merge_script="scripts/phasing/_prephase_merge.sh"
 readonly spark_dir="data/tmp/spark"
 
 # how many samples should there be in each chunk 
-readonly samples_per_chunk=100
+readonly samples_per_chunk=1000
 readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 
 # Cluster params
 readonly project="lindgren.prj"
 readonly queue="short"
-readonly nslots=1
+readonly nslots=4
 
 # what file should be split up
 readonly input_dir=" data/unphased/wes_union_calls"
@@ -41,11 +41,10 @@ readonly input_type="mt"
 # Output paths
 readonly out_dir="data/phased/wes_union_calls/prephased/chunks"
 readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
-readonly out_prefix_w_job_config="${out_prefix}-${nslots}x${queue}/chr${chr}_spc${samples_per_chunk}"
-readonly out="${out_prefix_w_job_config}.mt"
+readonly out_prefix_w_job_config="${out_prefix}-${queue}/chr${chr}_spc${samples_per_chunk}"
 
 readonly out_merge_dir="data/phased/wes_union_calls/prephased"
-readonly out_merge_file="${out_merge_dir}/ukb_eur_wess_union_calls_prephased_200k_chr${chr}.vcf.bgz"
+readonly out_merge_file="${out_merge_dir}/ukb_eur_wes_union_calls_prephased_200k_chr${chr}.vcf.bgz"
 
 # Interval paths
 readonly interval_dir="${out_dir}/intervals"
@@ -117,9 +116,9 @@ submit_prephasing_job() {
 }
 
 submit_merge_job() {
-
+  # merge resulting chunk files
   local dependency=${1}
-  local  max_interval_idx=$( get_max_interval_idx )
+  local max_interval_idx=$( get_max_interval_idx )
   local slurm_jname="_c${chr}_merge_prephased_chunks"
   local slurm_lname="logs/_merge_prephased_chunks"
   local slurm_project="${project}"
