@@ -17,15 +17,21 @@ source utils/bash_utils.sh
 source utils/vcf_utils.sh
 
 
-#readonly in_dir="data/mt/annotated/"
-readonly in_dir="data/reads/samples"
-readonly out_dir="data/reads/haplotag"
+#readonly in_dir="data/reads/samples"
 
-mkdir -p ${out_dir}
 
 readonly chr="${SLURM_ARRAY_TASK_ID}"
-readonly vcf_file="${in_dir}/eid1281289_5101274_eur_wes_union_calls_chr${chr}.vcf.bgz"
-readonly out_file="${out_dir}/eid1281289_5101274_eur_wes_union_calls_chr${chr}_phased.vcf"
+
+readonly in_dir="data/unphased/wes_union_calls"
+readonly vcf_file="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.bgz"
+
+readonly out_dir="data/reads/phased"
+readonly out_file="${out_dir}/eid1281289_5101274_eur_wes_union_calls_chr${chr}_phased_full_vcf.vcf"
+
+#readonly vcf_file="${in_dir}/eid1281289_5101274_eur_wes_union_calls_chr${chr}.vcf.bgz"
+#readonly out_file="${out_dir}/eid1281289_5101274_eur_wes_union_calls_chr${chr}_phased.vcf"
+
+
 
 #readonly grch38="/well/lindgren/flassen/ressources/genome_reference/1kg/GRCh38_full_analysis_set_plus_decoy_hla.fa"
 readonly cram_dir="/well/ukbb-wes/cram/oqfe/ukbb-11867"
@@ -40,6 +46,8 @@ readonly refdir="/well/lindgren/flassen/ressources/genome_reference/broad"
 readonly grch38="${refdir}/Homo_sapiens_assembly38.fasta"
 export REF_PATH="${refdir}/ref/cache/%2s/%2s/%s:http://www.ebi.ac.uk/ena/cram/md5/%s"
 export REF_CACHE="${refdir}/ref/cache/%2s/%2s/%s"
+
+mkdir -p ${out_dir}
 
 SECONDS=0
 set_up_whatshap
