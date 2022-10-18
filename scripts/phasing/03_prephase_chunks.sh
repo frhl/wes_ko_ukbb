@@ -9,7 +9,7 @@
 #SBATCH --error=logs/prephase_chunks.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=22
+#SBATCH --array=21
 
 set -o errexit
 set -o nounset
@@ -25,10 +25,11 @@ readonly merge_script="scripts/phasing/_prephase_merge.sh"
 readonly spark_dir="data/tmp/spark"
 
 # how many samples should there be in each chunk 
-readonly samples_per_chunk=10
+readonly samples_per_chunk=100
 readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 
 # Cluster params
+# note: errors after 50 min with 1000 samples/chunk with 4 slots
 readonly project="lindgren.prj"
 readonly queue="short"
 readonly nslots=2
@@ -85,15 +86,14 @@ get_max_interval_idx() {
 
 
 submit_prephasing_job() {
-  # get number of phasing indexes to run
   local max_interval_idx=$( get_max_interval_idx )
-  local slurm_tasks="1-2" #-${max_phasing_idx}"
+  local slurm_tasks="1-${max_phasing_idx}"
   local slurm_jname="_c${chr}_prephase_chunks"
   local slurm_lname="logs/_prephase_chunks"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
   local slurm_nslots="${nslots}"
-  local jid=$( sbatch \
+  readonly prephasing_jid=$( sbatch \
     --account="${slurm_project}" \
     --job-name="${slurm_jname}" \
     --output="${slurm_lname}.log" \
@@ -103,6 +103,7 @@ submit_prephasing_job() {
     --cpus-per-task="${slurm_nslots}" \
     --array="${slurm_tasks}" \
     --open-mode="append" \
+    --parsable \
     --constraint=skl-compat \
     ${prephasing_script} \
     ${chr} \
@@ -112,19 +113,17 @@ submit_prephasing_job() {
     ${max_interval_idx} \
     ${read_placeholder} \
     ${out_prefix_w_job_config} )
-  echo ${jid}
+
 }
 
 submit_merge_job() {
-  # merge resulting chunk files
-  local dependency=${1}
   local max_interval_idx=$( get_max_interval_idx )
   local slurm_jname="_c${chr}_prephase_merge"
   local slurm_lname="logs/_prephase_merge"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
   local slurm_nslots="2"
-  local jid=$( sbatch \
+  readonly merge_jid=$( sbatch \
     --account="${slurm_project}" \
     --job-name="${slurm_jname}" \
     --output="${slurm_lname}.log" \
@@ -132,19 +131,19 @@ submit_merge_job() {
     --chdir="${curwd}" \
     --partition="${slurm_queue}" \
     --cpus-per-task="${slurm_nslots}" \
-    --dependency="afterok:${dependency}" \
+    --dependency="afterok:${prephasing_jid}" \
+    --parsable \
     --constraint=skl-compat \
     ${merge_script} \
     ${out_prefix_w_job_config} \
     ${max_interval_idx} \
     ${out_merge_file}
   )
-  echo ${jid} 
 }
 
 
-readonly prephasing_jid=$( submit_prephasing_job )
-readonly merge_jid=$( submit_merge_job ${prephasing_jid} )
+submit_prephasing_job
+submit_merge_job
 
 
 

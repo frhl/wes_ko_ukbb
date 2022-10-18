@@ -19,8 +19,8 @@ readonly out_type="vcf"
 
 rm -f ${mrg_list}
 # create list of chunks
-#for idx in ${1..${max_idx}}; do
-for idx in {1..2}; do
+#for idx in {1..2}; do
+for idx in {1..${max_idx}}; do
   outfile_w_prefix="${input_prefix}.${idx}of${max_idx}.phased.vcf.gz"
   if [ -f "${outfile_w_prefix}" ]; then
     echo -e "${outfile_w_prefix}" >> ${mrg_list}
