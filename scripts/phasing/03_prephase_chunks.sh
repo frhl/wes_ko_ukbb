@@ -21,10 +21,11 @@ source utils/vcf_utils.sh
 readonly curwd=$(pwd)
 readonly hail_script="scripts/phasing/03_prephase_chunks.py"
 readonly prephasing_script="scripts/phasing/_prephase_chunks.sh"
+readonly merge_script="scripts/phasing/_prephase_merge.sh"
 readonly spark_dir="data/tmp/spark"
 
 # how many samples should there be in each chunk 
-readonly samples_per_chunk=1000
+readonly samples_per_chunk=100
 readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 
 # Cluster params
@@ -42,6 +43,9 @@ readonly out_dir="data/phased/wes_union_calls/prephased/chunks"
 readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
 readonly out_prefix_w_job_config="${out_prefix}-${nslots}x${queue}/chr${chr}_spc${samples_per_chunk}"
 readonly out="${out_prefix_w_job_config}.mt"
+
+readonly out_merge_dir="data/phased/wes_union_calls/prephased"
+readonly out_merge_file="${out_merge_dir}/ukb_eur_wess_union_calls_prephased_200k_chr${chr}.vcf.bgz"
 
 # Interval paths
 readonly interval_dir="${out_dir}/intervals"
@@ -83,9 +87,8 @@ get_max_interval_idx() {
 
 submit_prephasing_job() {
   # get number of phasing indexes to run
-  readonly max_interval_idx=$( get_max_interval_idx )
-  echo "max_interval=${max_interval_idx}"
-  local slurm_tasks="1" #-${max_phasing_idx}"
+  local max_interval_idx=$( get_max_interval_idx )
+  local slurm_tasks="1-2" #-${max_phasing_idx}"
   local slurm_jname="_c${chr}_prephase_chunks"
   local slurm_lname="logs/_prephase_chunks"
   local slurm_project="${project}"
@@ -115,7 +118,28 @@ submit_prephasing_job() {
 
 submit_merge_job() {
 
-    echo "Test"
+  local dependency=${1}
+  local  max_interval_idx=$( get_max_interval_idx )
+  local slurm_jname="_c${chr}_merge_prephased_chunks"
+  local slurm_lname="logs/_merge_prephased_chunks"
+  local slurm_project="${project}"
+  local slurm_queue="${queue}"
+  local slurm_nslots="2"
+  local jid=$( sbatch \
+    --account="${slurm_project}" \
+    --job-name="${slurm_jname}" \
+    --output="${slurm_lname}.log" \
+    --error="${slurm_lname}.errors.log" \
+    --chdir="${curwd}" \
+    --partition="${slurm_queue}" \
+    --cpus-per-task="${slurm_nslots}" \
+    --dependency="afterok:${dependency}" \
+    --constraint=skl-compat \
+    ${merge_script} \
+    ${out_prefix_w_job_config} \
+    ${max_interval_idx} \
+    ${out_merged_file}
+  )
 
 }
 

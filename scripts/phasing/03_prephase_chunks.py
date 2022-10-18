@@ -19,8 +19,9 @@ def write_interval_file(samples, path, n):
     :param path: file to write to
     :param n: how big should each chunk be
     """
+    assert n > 0
     with open(path, "w") as outfile:
-        for chunk in chunks(samples, 1000):
+        for chunk in chunks(samples, n):
             outline = ",".join(chunk) + "\n"
             outfile.write(outline)
 

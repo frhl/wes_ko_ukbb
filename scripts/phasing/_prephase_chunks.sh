@@ -5,6 +5,7 @@ set -o nounset
 
 source utils/bash_utils.sh
 source utils/hail_utils.sh
+source utils/vcf_utils.sh
 
 readonly spark_dir="data/tmp/spark"
 
@@ -17,6 +18,7 @@ readonly read_placeholder=${6?Error: Missing arg5 (intervals_path)}
 readonly out_prefix=${7?Error: Missing arg6 ()} 
 
 readonly hail_script="scripts/phasing/03_prephase_chunks.py"
+readonly rscript="scripts/phasing/_prephase_chunks.R"
 
 readonly interval_idx=${SLURM_ARRAY_TASK_ID} # one-based index for which phasing interval to phase
 readonly out_prefix_w_interval_idx="${out_prefix}.${interval_idx}of${max_interval_idx}"
@@ -55,7 +57,7 @@ split_to_chunks() {
       && print_update "Finished splitting for ${out_prefix_w_interval_idx}" ${SECONDS} \
       || raise_error "Error when splitting chunks for ${out_prefix_w_interval_idx}"
   else
-    >&2 ehco "${out_file} (split) already exists. Skipping!"
+    >&2 echo "${out_file} (split) already exists. Skipping!"
   fi
 }
 
@@ -106,12 +108,16 @@ if [ ! -f ${out_phased} ]; then
     ${out_splitted}
 
   # make tabix of VCF
-  make_tabix "${out_splitted_vcf}" "tbi"
+  if [ ! -f "${out_splitted_vcf}.tbi" ]; then
+    module purge
+    module load BCFtools/1.12-GCC-10.3.0
+    make_tabix "${out_splitted_vcf}" "tbi"
+  fi
   
   # get variable with paths to relevant read files
   readonly reads=$( get_read_files ${interval_idx} ${read_placeholder} )
   
-  # perform phasing
+  # perform read-backed phasing using whatshap
   prephase_with_whatshap \
     ${out_splitted_vcf} \
     ${out_phased} \
