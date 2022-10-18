@@ -19,12 +19,10 @@ def write_interval_file(samples, path, n):
     :param path: file to write to
     :param n: how big should each chunk be
     """
-    idx = 0
     with open(path, "w") as outfile:
         for chunk in chunks(samples, 1000):
             outline = ",".join(chunk) + "\n"
             outfile.write(outline)
-            idx += 1
 
 
 def read_interval_idx(interval_path, idx):
@@ -33,7 +31,7 @@ def read_interval_idx(interval_path, idx):
     :param idx: interval index
     """
     assert idx >= 0
-    with open(interval_path, "w") as infile:
+    with open(interval_path, "r") as infile:
         for i, line in enumerate(infile):
             if i == idx:
                 return(line)
@@ -60,7 +58,7 @@ def main(args):
         write_interval_file(samples, interval_path, samples_per_chunk)
     elif split_by_interval:
         if interval_idx:
-            samples = read_interval_idx(interval_path, int(interval_idx))
+            samples = read_interval_idx(interval_path, int(interval_idx) - 1)
             samples = samples.strip().split(",")
             mt = mt.filter_cols(hl.literal(samples).contains(mt.s))
             io.export_table(mt, output_path, output_type)
@@ -81,7 +79,7 @@ if __name__=='__main__':
     parser.add_argument('--output_type', default=".vcf.gz", help='What extension does the file(s) end with?')
     parser.add_argument('--samples_per_chunk', default=None, help='What extension does the file(s) end with?')
     parser.add_argument('--interval_path', default=None, help='How big should the new overlap be?')
-    parser.add_argument('--interval_idx', default=None, help='current interval number')
+    parser.add_argument('--interval_idx', default=None, help='current interval number in 1-based index')
     parser.add_argument('--write_interval', default=None, action='store_true', help='should interval file be written')
     parser.add_argument('--split_by_interval', default=None, action='store_true', help='should mt be split by interval_idx')
 

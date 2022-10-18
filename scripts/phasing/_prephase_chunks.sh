@@ -3,9 +3,8 @@
 set -o errexit
 set -o nounset
 
-source utils/qsub_utils.sh
+source utils/bash_utils.sh
 source utils/hail_utils.sh
-source utils/vcf_utils.sh
 
 readonly spark_dir="data/tmp/spark"
 
@@ -23,6 +22,7 @@ readonly interval_idx=${SLURM_ARRAY_TASK_ID} # one-based index for which phasing
 readonly out_prefix_w_interval_idx="${out_prefix}.${interval_idx}of${max_interval_idx}"
 
 readonly out_splitted="${out_prefix_w_interval_idx}"
+readonly out_splitted_vcf="${out_prefix_w_interval_idx}.vcf.bgz"
 readonly out_phased="${out_prefix_w_interval_idx}.phased.vcf.gz"
 readonly log="${out_prefix_w_interval_idx}.log"
 
@@ -33,6 +33,8 @@ export REF_PATH="${refdir}/ref/cache/%2s/%2s/%s:http://www.ebi.ac.uk/ena/cram/md
 export REF_CACHE="${refdir}/ref/cache/%2s/%2s/%s"
 
 split_to_chunks() {
+  # use hail to split to pre-defined chunks of samples
+  SECONDS=0
   local current_interval=${1}
   local file_to_split=${2}
   local type_to_split=${3}
@@ -58,24 +60,28 @@ split_to_chunks() {
 }
 
 get_read_files() {
-
+  # use R to get paths to relevant read files
+  module purge
+  set_up_rpy
   local current_interval=${1}
-  local read_placeholder=${2}
-  
-
+  local read_sample_path=${2}
+  local reads=$( Rscript ${rscript} \
+    --interval_idx ${current_interval} \
+    --interval_path ${interval_path} \
+    --read_placeholder ${read_sample_path} )
+  echo ${reads}
 }
 
-
-
-
- 
 prephase_with_whatshap() {
+  # perform prephasing using whatshap
+  SECONDS=0
   local vcf_to_phase=${1}
   local vcf_result=${2}
   local cram_files=${3}
   module purge
   module load htslib/1.8-gcc5.4.0
   set_up_whatshap
+  set -x
   whatshap phase \
     --reference="${grch38}" \
     --output="${vcf_result}" \
@@ -84,35 +90,38 @@ prephase_with_whatshap() {
     ${cram_files} \
     && print_update "Finished prephasing ${out_prefix_w_interval_idx}" ${SECONDS} \
     || raise_error "Error prephasing ${out_prefix_w_interval_idx}"
+  set +x
 }
 
 
 
-
-
-
-if [ ! -f ${out} ]; then
+if [ ! -f ${out_phased} ]; then
   
   # split main MatrixTable into 
   # chunks of equally sized VCFs by sample
   split_to_chunks \
-    ${phasing_idx} \
+    ${interval_idx} \
     ${input_path} \
     ${input_type} \
-    ${out_split}
+    ${out_splitted}
 
-  # obtain all read files required to run
-  # the current chunk in whatshap
-  get_read_files \
-    ${phasing_idx} \
-    ${read_placeholder}
-
+  # make tabix of VCF
+  make_tabix "${out_splitted_vcf}" "tbi"
+  
+  # get variable with paths to relevant read files
+  readonly reads=$( get_read_files ${interval_idx} ${read_placeholder} )
+  
+  # perform phasing
+  prephase_with_whatshap \
+    ${out_splitted_vcf} \
+    ${out_phased} \
+    ${reads}
+    
 
 else
-  print_update "Warning: ${out} already exists! Skipping." | tee /dev/stderr
+  print_update "Warning: ${out_phased} already exists! Skipping." | tee /dev/stderr
 fi
 
-make_tabix ${out}
 
 
 

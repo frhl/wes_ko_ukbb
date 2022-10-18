@@ -20,7 +20,7 @@ source utils/vcf_utils.sh
 
 readonly curwd=$(pwd)
 readonly hail_script="scripts/phasing/03_prephase_chunks.py"
-readonly phasing_script="scripts/phasing/_prephase_chunks.sh"
+readonly prephasing_script="scripts/phasing/_prephase_chunks.sh"
 readonly spark_dir="data/tmp/spark"
 
 # how many samples should there be in each chunk 
@@ -30,7 +30,7 @@ readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 # Cluster params
 readonly project="lindgren.prj"
 readonly queue="short"
-readonly nslots=16
+readonly nslots=1
 
 # what file should be split up
 readonly input_dir=" data/unphased/wes_union_calls"
@@ -40,13 +40,12 @@ readonly input_type="mt"
 # Output paths
 readonly out_dir="data/phased/wes_union_calls/prephased/chunks"
 readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
-readonly out_prefix_w_job_config="${out_prefix}-${nslots}x${queue}/spc${samples_per_chunk}"
+readonly out_prefix_w_job_config="${out_prefix}-${nslots}x${queue}/chr${chr}_spc${samples_per_chunk}"
 readonly out="${out_prefix_w_job_config}.mt"
-readonly out_symlink="${out_prefix}.mt"
 
 # Interval paths
 readonly interval_dir="${out_dir}/intervals"
-readonly interval_path="${interval_dir}/intervals_chr${chr}.tsv"
+readonly interval_path="${interval_dir}/intervals_spc${samples_per_chunk}_chr${chr}.tsv"
 
 # Read locations
 readonly read_dir="/well/ukbb-wes/cram/oqfe/ukbb-11867"
@@ -87,13 +86,12 @@ submit_prephasing_job() {
   readonly max_interval_idx=$( get_max_interval_idx )
   echo "max_interval=${max_interval_idx}"
   local slurm_tasks="1" #-${max_phasing_idx}"
-  local slurm_jname="_c${chr}_${software}_phase_chunks"
-  local slurm_lname="logs/_phase_chunks"
+  local slurm_jname="_c${chr}_prephase_chunks"
+  local slurm_lname="logs/_prephase_chunks"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
   local slurm_nslots="${nslots}"
-  set -x
-  sbatch \
+  local jid=$( sbatch \
     --account="${slurm_project}" \
     --job-name="${slurm_jname}" \
     --output="${slurm_lname}.log" \
@@ -111,12 +109,18 @@ submit_prephasing_job() {
     ${interval_path} \
     ${max_interval_idx} \
     ${read_placeholder} \
-    ${out_prefix_w_job_config}
-  set +x
+    ${out_prefix_w_job_config} )
+  echo ${jid}
+}
+
+submit_merge_job() {
+
+    echo "Test"
 
 }
 
-submit_prephasing_job
+
+readonly prephasing_jid=$( submit_prephasing_job )
 
 
 
