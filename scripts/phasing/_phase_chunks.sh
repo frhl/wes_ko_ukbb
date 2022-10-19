@@ -32,32 +32,6 @@ readonly out_prefix_w_phasing_idx="${out_prefix}.${phasing_idx}of${max_phasing_i
 readonly out="${out_prefix_w_phasing_idx}.vcf.gz"
 readonly log="${out_prefix_w_phasing_idx}.log"
 
-# switch error files
-readonly trio="${out%.*.*}.trio"
-
-phase_with_whatshap() {
-  
-  local grch38="/well/lindgren/flassen/ressources/genome_reference/1kg/GRCh38_full_analysis_set_plus_decoy_hla.fa"
-  local cram_dir="/well/ukbb-wes/cram/oqfe/ukbb-11867"
-  local cram_placeholder="${cram_dir}/SAMPLE_oqfe.cram"
-
-  whatshap phase \
-    --reference ${grch38} \
-    --chromosome chr${chr} \
-    --mapq 15 \
-    --default-gq 30 \
-    -o ${out_file} \
-    ${vcf_file} \
-    ${cram_files}
-
-
-
-}
-
-
-
-
-
 phase_with_shapeit() {
   SECONDS=0
   local gmap="/well/lindgren/flassen/software/SHAPEIT4/b38.gmap/chr${chr}.b38.gmap.gz"
@@ -112,11 +86,9 @@ if [ ! -f ${out} ]; then
     phase_with_shapeit  
   elif [ ${software} = "eagle2" ]; then
     phase_with_eagle2
+  else
+    echo "Software ${software} is not valid"
   fi
-  module purge
-  module load BCFtools/1.12-GCC-10.3.0
-  bcftools +trio-switch-rate ${out} -- -p ${pedigree} > ${trio}
-  switch_errors_by_site ${out} ${pedigree}
 else
   print_update "Warning: ${out} already exists! Skipping." | tee /dev/stderr
 fi
