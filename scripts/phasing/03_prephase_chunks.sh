@@ -87,7 +87,7 @@ get_max_interval_idx() {
 
 submit_prephasing_job() {
   local max_interval_idx=$( get_max_interval_idx )
-  local slurm_tasks="1-${max_phasing_idx}"
+  local slurm_tasks="1-${max_interval_idx}"
   local slurm_jname="_c${chr}_prephase_chunks"
   local slurm_lname="logs/_prephase_chunks"
   local slurm_project="${project}"

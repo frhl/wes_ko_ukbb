@@ -34,16 +34,18 @@ readonly log="${out_prefix_w_phasing_idx}.log"
 
 phase_with_shapeit() {
   SECONDS=0
+  local min_mac=2 # default value. Unable to phase singletons.
   local gmap="/well/lindgren/flassen/software/SHAPEIT4/b38.gmap/chr${chr}.b38.gmap.gz"
   mkdir -p $( dirname ${out} )
   readonly region=$( python3 ${hail_script} ${interval_flags} --get_interval --phasing_idx ${phasing_idx} --interval_path ${interval_path} )
-  print_update "Starting SHAPEIT4 phasing for ${region}, out: ${out}"
+  print_update "Starting SHAPEIT4 phasing for ${region} (min_mac > 1) out: ${out}"
   set -x
   shapeit4.2 \
     --input ${vcf_to_phase} \
     --map ${gmap} \
     --region "chr${region}" \
     --thread ${threads} \
+    --pbwt-mac ${min_mac} \
     --sequencing \
     --log ${log} \
     --output ${out}
