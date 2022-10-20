@@ -9,7 +9,7 @@
 #SBATCH --error=logs/prephase_chunks.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=21
+#SBATCH --array=18
 
 set -o errexit
 set -o nounset
@@ -32,10 +32,10 @@ readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 # note: errors after 50 min with 1000 samples/chunk with 4 slots
 readonly project="lindgren.prj"
 readonly queue="short"
-readonly nslots=2
+readonly nslots=1
 
 # what file should be split up
-readonly input_dir=" data/unphased/wes_union_calls"
+readonly input_dir=" data/unphased/wes_union_calls/tmp"
 readonly input_path="${input_dir}/ukb_wes_union_calls_200k_chr${chr}.mt" 
 readonly input_type="mt"
 
@@ -87,7 +87,7 @@ get_max_interval_idx() {
 
 submit_prephasing_job() {
   local max_interval_idx=$( get_max_interval_idx )
-  local slurm_tasks="1-${max_interval_idx}"
+  local slurm_tasks="1-2" #${max_interval_idx}"
   local slurm_jname="_c${chr}_prephase_chunks"
   local slurm_lname="logs/_prephase_chunks"
   local slurm_project="${project}"

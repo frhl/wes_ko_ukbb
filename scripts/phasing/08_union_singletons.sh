@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# @description combine variants from genotyping array and whole exomes.
+# @description merge phased data with unphased singleton and exclude genotype array calls.
 #
 #SBATCH --account=lindgren.prj
 #SBATCH --job-name=filter_to_exomes
@@ -49,10 +49,10 @@ if [ ! -f "${out}/_SUCCESS" ]; then
        --input_phased_type "vcf" \
        --input_unphased_type "mt" \
        --out_prefix ${out_prefix} \
+       --exclude_calls \
        --out_type "mt" \
-       && print_update "Finished merging phased and unphased data for chr${chr}" ${SECONDS} \
-       || raise_error "Merging phased and unphased data for chr${chr} failed"
-    log_runtime ${SECONDS}
+       && print_update "Finished merging phased and singleton data for chr${chr}" ${SECONDS} \
+       || raise_error "Merging phased and singleton data for chr${chr} failed"
   else
     >&2 echo "${in_phased} (input) does not exists. Exiting.."
   fi
