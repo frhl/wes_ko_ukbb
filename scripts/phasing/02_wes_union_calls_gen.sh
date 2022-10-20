@@ -33,7 +33,6 @@ if [ ! -f "${out_prefix}.vcf.bgz" ]; then
   SECONDS=0
   set_up_hail
   set_up_pythonpath_legacy
-  set -x
   python3 "${hail_script}" \
      --chrom "${chr}" \
      --input_path "${in_file}" \
@@ -44,8 +43,8 @@ if [ ! -f "${out_prefix}.vcf.bgz" ]; then
      --dataset "calls" \
      --exclude_trio_parents \
      --export_parents \
+     --checkpoint \
      --liftover
-  set +x
 else
   print_update "file ${out} already exists. Skipping!"
 fi
