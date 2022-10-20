@@ -12,10 +12,14 @@ import scipy.stats as stats
 
 
 def rescale_variances_hail(X, mt, target_variance):
+    """ Rescale variance X in of field in mt by some target variance
+    """
     stats = mt.aggregate_cols(hl.agg.stats(X))
     return(rescale_variances(X, stats.stdev ** 2, target_variance))
     
 def rescale_variances(X, X_variance, Y_variance):
+    """ Variance rescaling equation
+    """
     X_sd = X_variance ** (1/2)
     Y_sd = Y_variance ** (1/2)
     K = Y_sd / X_sd
@@ -65,31 +69,32 @@ def main(args):
     
     # setup effects
     if h2 > 0 and (var_beta + var_theta) > 0:
+        
+        # setup standard additive effects
         mt = mt.annotate_rows(beta = make_effect(mt, h2=var_beta, pi=pi_beta))
-        mt = mt.annotate_rows(theta_nosign = hl.abs(make_effect(mt, h2=var_theta, pi=pi_theta)))
 
-        # keep the sign to ensure that effects are always in the same direction
+        # keep track of sign for additive effects
         mt = mt.annotate_rows(
             beta_sign = hl.case().when(hl.sign(mt.beta) == 0, 1).default(hl.sign(mt.beta))
         )
 
-        # we would like to operate on the same genotype scale as the additive effects,
-        # so use the original scaled matrix, but only keep hom/ch alt alleles sites
-        mt = mt.annotate_entries(
-            G_norm_alt = (hl.case().when(mt.G == 2, mt.G_norm).default(0))
+        # setup recessive effects
+        mt = mt.annotate_rows(
+                theta_nosign = hl.abs(make_effect(mt, h2=var_theta, pi=pi_theta))
         )
-
-        # set sign
+        
+        # keep theta sign consistent with beta sign
         mt = mt.annotate_rows(
             theta = mt.theta_nosign * mt.beta_sign
         )
 
-        # sum up recessive effects
-        mt = mt.annotate_cols(y_no_noise_add=hl.agg.sum(mt.beta * mt.G_norm))
-        mt = mt.annotate_cols(y_no_noise_rec=hl.agg.sum(mt.theta * mt.G_norm_alt))
+        # both G_add_norm and G_rec_norm are on the same scale, however G_rec_norm
+        # has been normalized AFTER excluding DS < 2, i.e. only recessive effects will be allowed.
+        mt = mt.annotate_cols(y_no_noise_add=hl.agg.sum(mt.beta * mt.G_add_norm)) # beta
+        mt = mt.annotate_cols(y_no_noise_rec=hl.agg.sum(mt.theta * mt.G_rec_norm)) # theta
         mt = mt.annotate_cols(y_no_noise=mt.y_no_noise_add+mt.y_no_noise_rec)
 
-        # re-scale effects
+        # re-scale effects genetic effects accordingly 
         mt = mt.annotate_cols(y_no_noise_rescaled = rescale_variances_hail(mt.y_no_noise, mt, h2))
     else:
         mt = mt.annotate_cols(y_no_noise_rescaled = 0)

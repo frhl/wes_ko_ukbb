@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 3
 #$ -q short.qa
-#$ -t 20-22
+#$ -t 1,22
 #$ -V
 
 source utils/qsub_utils.sh
@@ -24,8 +24,8 @@ readonly in_dir="data/simulation/mt"
 readonly in_file="${in_dir}/ukb_eur_${n_samples}_chr${chr}.mt"
 readonly in_type="mt"
 
-readonly out_dir="data/simulation/knockouts/new"
-readonly out_prefix="${out_dir}/ukb_eur_${n_samples}_knockout_chr${chr}"
+readonly out_dir="data/simulation/knockouts"
+readonly out_prefix="${out_dir}/ukb_eur_${n_samples}_knockout_recessive_chr${chr}"
 readonly out_type="vcf"
 
 # Allele frequency thresholds to filter on

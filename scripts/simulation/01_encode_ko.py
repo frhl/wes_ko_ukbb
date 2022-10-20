@@ -85,10 +85,19 @@ def main(args):
     mt = mt.annotate_rows(**{'stats': hl.agg.stats(mt.G)})
     mt = mt.filter_rows(mt.stats.stdev > 0)
     mt = mt.annotate_entries(
-        G_norm=(mt.G-mt.stats.mean)/mt.stats.stdev
+        G_add_norm=(mt.G-mt.stats.mean)/mt.stats.stdev
     )
     
-
+    # G_norm but only with alternate alleles
+    mt = mt.annotate_entries(
+            G_rec = (hl.case().when(mt.G == 2, mt.G).default(0))
+    )
+    
+    # get normalized allele count based on standard allele space
+    mt = mt.annotate_entries(
+            G_rec_norm = (mt.G_rec - mt.stats.mean)/mt.stats.stdev
+    )
+    
     # setup sites and alleles
     rows = mt.count()[0]
     locus = [ "chr%s:%s" % (chrom, str(i+1)) for i in range(rows)]
@@ -104,7 +113,7 @@ def main(args):
     # annotate knockout matrix
     prob = mt.annotate_entries(DS=mt.pKO * 2)
     prob = prob.annotate_entries(GT=ko.get_gt_from_floor_ds(prob.DS))
-    prob = prob.select_entries(*[prob.DS, prob.GT, prob.pKO, prob.knockout, prob.G, prob.G_norm])
+    prob = prob.select_entries(*[prob.DS, prob.GT, prob.pKO, prob.knockout, prob.G, prob.G_add_norm, prob.G_rec, prob.G_rec_norm])
     #prob = prob.select_entries(prob.DS)
     prob = prob.add_row_index()
     prob = prob.annotate_rows(
