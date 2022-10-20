@@ -6,8 +6,7 @@
 #SBATCH --output=logs/phenotypes_binary.log
 #SBATCH --error=logs/phenotypes_binary.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 1
-#SBATCH --requeue
+#SBATCH --cpus-per-task 5
 
 source utils/bash_utils.sh
 source utils/hail_utils.sh
@@ -31,17 +30,18 @@ readonly path_covars="${covar_dir}/covars1.csv"
 readonly covariates="$(cat ${path_covars})"
 
 mkdir -p ${out_dir}
+mkdir -p ${spark_dir}
 
 # Pre-processing of phenotypes
-set_up_rpy
-Rscript ${r_script} \
-  --input_path ${in_bin} \
-  --covariates ${covariates} \
-  --qc_samples ${final_sample_list} \
-  --case_count_cutoff "50" \
-  --include_spiros \
-  --include_brava \
-  --out_path ${tmp_bin}
+#set_up_rpy
+#Rscript ${r_script} \
+#  --input_path ${in_bin} \
+#  --covariates ${covariates} \
+#  --qc_samples ${final_sample_list} \
+#  --case_count_cutoff "50" \
+#  --include_spiros \
+#  --include_brava \
+#  --out_path ${tmp_bin}
 
 
 # set up python
@@ -52,11 +52,11 @@ set_up_pythonpath_legacy
 set -eu
 
 # get 500k IMP samples
-python3 "${hail_script}" \
-     --input_path "${tmp_bin}" \
-     --export_header \
-     --count_case_control \
-     --out_prefix "${out_bin_500k}"
+#python3 "${hail_script}" \
+#     --input_path "${tmp_bin}" \
+#     --export_header \
+#     --count_case_control \
+#     --out_prefix "${out_bin_500k}"
 
 
 # Get 200k WES samples

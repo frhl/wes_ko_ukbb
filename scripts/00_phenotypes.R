@@ -67,6 +67,7 @@ get_brava_phenos <- function(){
     
 }
 
+
 # clean header
 to_unix_friendly_colnames <- function(names){
     cols <- gsub("\\'", "", names)
@@ -76,13 +77,16 @@ to_unix_friendly_colnames <- function(names){
     cols <- gsub("\\&", "_and_", cols)
     cols <- gsub("\\,","_",cols)
     cols <- gsub("(^\\ *)|(\\ *$)","", cols)
+    cols <- gsub("\\/", "_", cols)
+    # preserve unicode charcaters
+    cols <- stringi::stri_trans_general(cols, "latin-ascii")
+    # clean up spaces
     cols <- gsub("\\ +", " ", cols)
     cols <- gsub("\\ ", "_", cols)
     cols <- gsub("\\_+", "_", cols)
     cols <- tolower(cols)
     return(cols)
 }
-
 
 
 main <- function(args){
@@ -101,6 +105,7 @@ main <- function(args){
         spiro[,-1] <- spiro[,-1] > 0
         colnames(spiro)[-1] <- paste0("spiro_", to_unix_friendly_colnames(colnames(spiro)))[-1]
         dt <- merge(dt, spiro, by = "eid", all.x = TRUE)
+        print(head(dt))
     }
 
     # include BRAVA pgenotypes
@@ -109,6 +114,7 @@ main <- function(args){
         brava[,-1] <- brava[,-1] > 0
         colnames(brava)[-1] <- paste0("brava_", to_unix_friendly_colnames(colnames(brava)))[-1]
         dt <- merge(dt, brava, by = "eid", all.x = TRUE)
+        print(head(dt))
     }
 
     if (!is.null(args$case_count_cutoff)) {    
@@ -171,8 +177,11 @@ main <- function(args){
 
 
     # Finally write file
-    write(paste0("Done! Writing to",args$out_path), stdout())
-    fwrite(dt, args$out_path, sep = "\t")
+    nrow_dt <- nrow(dt)
+    ncol_dt <- ncol(dt)
+    size_msg <- paste(nrow_dt, "samples x ",ncol_dt,"phenotypes")
+    write(paste0("Done! Writing ", size_msg, " to ",args$out_path), stdout())
+    fwrite(dt, args$out_path, sep = "\t", qyote = FALSE)
 }
 
 # add arguments
