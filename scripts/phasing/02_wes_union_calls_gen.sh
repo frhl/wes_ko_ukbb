@@ -11,10 +11,10 @@
 #SBATCH --cpus-per-task 3
 #SBATCH --array=21
 #
-#$ -N simulate_phenotype
+#$ -N wes_union_calls
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/simulate_phenotype.log
-#$ -e logs/simulate_phenotype.errors.log
+#$ -o logs/wes_union_calls.log
+#$ -e logs/wes_union_calls.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 3
 #$ -q long.qc
