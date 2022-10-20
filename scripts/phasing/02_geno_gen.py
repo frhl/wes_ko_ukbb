@@ -30,6 +30,7 @@ def main(args):
     min_mac = args.min_mac
     missing = args.missing
     ancestry = args.ancestry
+    checkpoint = args.checkpoint
     out_prefix = args.out_prefix
     out_type = args.out_type
 
@@ -97,6 +98,9 @@ def main(args):
         final = mt.count()
         print(f"Final aggregated count: {final}")
 
+    if checkpoint:
+        checkpoint_prefix = out_prefix = "_checkpoint"
+        mt = mt.checkpoint(checkpoint_prefix, overwrite = True)
     if missing or min_mac or chrom in "X":
         mt = io.recalc_info(mt)
     if ancestry:
@@ -129,6 +133,7 @@ if __name__=='__main__':
     parser.add_argument('--ancestry', default=None, help='filter to specific ancestry')
     parser.add_argument('--convert_sample_id', default=None, action='store_true', help='convert to lindgren sample id')
     parser.add_argument('--export_parents', default=None, action='store_true', help='Export parents genotypes seperately')
+    parser.add_argument('--checkpoint', default=None, action='store_true', help='Checkpoint after combining rows')
     parser.add_argument('--dataset', default=None, help='Either "imp" or "calls".')
     parser.add_argument('--extract_samples', default=None, help='HailTable with samples to be extracted.')
     parser.add_argument('--min_mac', default=None, help='Filter to MAC >= value')
