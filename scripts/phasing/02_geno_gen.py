@@ -99,7 +99,7 @@ def main(args):
         print(f"Final aggregated count: {final}")
 
     if checkpoint:
-        checkpoint_prefix = out_prefix = "_checkpoint"
+        checkpoint_prefix = out_prefix + "_checkpoint"
         mt = mt.checkpoint(checkpoint_prefix, overwrite = True)
     if missing or min_mac or chrom in "X":
         mt = io.recalc_info(mt)
