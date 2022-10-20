@@ -169,6 +169,38 @@ set_up_rpy() {
   set -eu
 }
 
+set_up_phaser() {
+  set +eu
+  module load Anaconda3/2020.07
+  module load java/1.8.0_latest
+  source "/apps/eb/skylake/software/Anaconda3/2020.07/etc/profile.d/conda.sh"
+  conda activate phaser
+  set -eu
+  readonly PHASER_PATH="/well/lindgren/flassen/software/phaser/phaser/phaser/phaser.py"
+}
+
+set_up_whatshap() {
+  set +eu
+  module load Anaconda3/2020.07
+  module load java/1.8.0_latest
+  source "/apps/eb/skylake/software/Anaconda3/2020.07/etc/profile.d/conda.sh"
+  conda activate whatshap
+  set -eu
+}
+
+set_up_smartphase() {
+  set +eu
+  module load Anaconda3/2020.07
+  module load java/10.0.1
+  source "/apps/eb/skylake/software/Anaconda3/2020.07/etc/profile.d/conda.sh"
+  conda activate smartphase
+  readonly SMARTPHASE_PATH="/well/lindgren/flassen/software/smart-phase/smartPhase.jar"
+  set -eu
+}
+
+
+
+
 set_up_ldpred2() {
   set +eu
   module load Anaconda3/2020.07
@@ -193,6 +225,28 @@ set_up_tensorflow() {
 #  export PERL5LIB=$PERL5LIB:/well/lindgren/flassen/software/VEP/plugins_grch38/
 #}
 
+
+get_current_cluster() {
+  if [ ! -z "${SGE_ACCOUNT}" ]; then
+    echo "sge"
+  elif [ ! -z "${SLURM_JOB_ID}" ]; then
+    echo "slurm"
+  else
+    raise_error "Could not find SGE/SLURM variables!"
+  fi
+}
+
+get_array_task_id() {
+  local cluster=$( get_current_cluster )
+  if [ "${cluster}" == "sge" ]; then
+    echo "${SGE_TASK_ID}" 
+  elif [ "${cluster}" == "slurm" ]; then
+    echo "${SLURM_ARRAY_TASK_ID}"
+  else
+    raise_error "${cluster} is not a valid cluster!"
+  fi
+
+}
 
 
 
