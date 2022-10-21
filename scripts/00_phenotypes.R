@@ -181,7 +181,7 @@ main <- function(args){
     ncol_dt <- ncol(dt)
     size_msg <- paste(nrow_dt, "samples x ",ncol_dt,"phenotypes")
     write(paste0("Done! Writing ", size_msg, " to ",args$out_path), stdout())
-    fwrite(dt, args$out_path, sep = "\t", qyote = FALSE)
+    fwrite(dt, args$out_path, sep = "\t", quote = FALSE)
 }
 
 # add arguments

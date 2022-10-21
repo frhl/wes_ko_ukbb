@@ -32,7 +32,7 @@ main <- function(args){
     main_pheno_df <- fread(args$pheno_file)
  
     # read header one time
-    header_cmd <- cmd <- paste0("zcat ", args$in_vcf, " | grep '#CHR' ")
+    header_cmd <- paste0("zcat ", args$in_vcf, " | grep '#CHR' ")
     header <- fread(cmd = header_cmd, header = FALSE)
     header <- as.character(t(header)[,1])
 

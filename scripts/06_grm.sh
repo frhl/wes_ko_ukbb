@@ -32,7 +32,7 @@ readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc
 readonly samples_keep="${out_dir}/samples.keep"
 
 readonly curwd=$(pwd)
-readonly tasks="21-22"
+readonly tasks="21"
 readonly project="lindgren.prj"
 
 readonly rare_markers_per_chrom=100
@@ -136,7 +136,7 @@ merge_plink() {
   local slurm_lname="logs/_merge_plink"
   local slurm_project="${project}"
   local slurm_queue="short"
-  local slurm_nslots="4"
+  local slurm_nslots="6"
   readonly merge_plink_jid=$( sbatch \
     --account="${slurm_project}" \
     --job-name="${slurm_jname}" \
@@ -162,7 +162,7 @@ fit_grm() {
   local slurm_jname="_fit_grm"
   local slurm_lname="logs/_fit_grm"
   local slurm_project="${project}"
-  local slurm_queue="short"
+  local slurm_queue="long"
   local slurm_nslots="10"
   readonly fit_grm_jid=$( sbatch \
     --account="${slurm_project}" \
@@ -203,17 +203,17 @@ fit_grm ${prefix_combined} ${prefix_fitted} ${merged_grm_jid}
 
 ## randomly sample rare markers
 readonly prefix_rv="${prefix}_rv"
-readonly prefix_rv_liftover="${prefix}_grch38"
-readonly prefix_rv_merged="${prefix}_grch38_merged"
+readonly prefix_rv_liftover="${prefix}_grch38_rv"
+readonly prefix_rv_merged="${prefix}_grch38_rv_merged"
 
 # step B1: create rare variant plink files
-rv_jid=$(create_plink_vr ${prefix_rv} )
+#rv_jid=$(create_plink_vr ${prefix_rv} )
 
 # step B2: liftover rare variant plink files
-liftover_rv_jid=$( liftover_plink ${prefix_rv} ${prefix_rv_liftover} ${rv_jid} )
+#liftover_rv_jid=$( liftover_plink ${prefix_rv} ${prefix_rv_liftover} ${rv_jid} )
 
 # step B3: combine rare variant plink files
-merge_plink ${prefix_rv_liftover} ${prefix_rv_merged} ${liftover_rv_jid}
+#merge_plink ${prefix_rv_liftover} ${prefix_rv_merged} ${liftover_rv_jid}
 
 
 

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 #
+# @description: Sample 10K indiviudals used to generate a LD-Matrix on HapMap3 SNPS. 
+#
 #SBATCH --account=lindgren.prj
 #SBATCH --job-name=sample_bed
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -31,11 +33,9 @@ mkdir -p ${out_dir}
 if [ ! -f "${out_prefix}.bed" ]; then
   set_up_hail
   set_up_pythonpath_legacy
-  set -x
   python3 "${hail_script}" \
      --chrom "${chr}" \
      --dataset "imp" \
-     --exclude_related \
      --filter_missing 0.01 \
      --random_samples 10000 \
      --filter_to_unrelated_using_kinship_coef \
@@ -48,7 +48,6 @@ if [ ! -f "${out_prefix}.bed" ]; then
      --only_valid_contigs \
      --out_prefix "${out_prefix}" \
      --out_type "plink" 
-  set +x
 else
   print_update "file ${out} already exists. Skipping!"
 fi

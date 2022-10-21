@@ -23,16 +23,15 @@ readonly rscript="scripts/_spa_null.R"
 readonly rscript_ldsc="scripts/_check_prs_p.R"
 
 readonly plink_dir="data/saige/grm/input"
-readonly grm_dir="data/saige/grm/input"
+readonly grm_dir="data/saige/grm/input/dnanexus"
 readonly covar_dir="data/phenotypes"
 readonly pheno_dir="data/phenotypes"
 readonly prs_dir="data/prs/scores"
 readonly ldsc_dir="data/prs/ldsc"
 
-readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+readonly grm_mtx="${grm_dir}/ukb_eur_200k_grm_fitted_relatednessCutoff_0.05_2000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
-#readonly plink_file="${plink_dir}/211102_long_ukb_wes_200k_sparse_autosomes"
-readonly plink_file="${plink_dir}/chunks/ukb_wes_200k_sparse_autosomes_mrg"
+readonly plink_file="${grm_dir}/ukb_eur_200k_grm_grch38_rv_merged"
 readonly covar_file="${covar_dir}/covars1.csv"
 readonly covariates=$( cat ${covar_file} )
 

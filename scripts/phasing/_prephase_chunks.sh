@@ -26,6 +26,7 @@ readonly out_prefix_w_interval_idx="${out_prefix}.${interval_idx}of${max_interva
 readonly out_splitted="${out_prefix_w_interval_idx}"
 readonly out_splitted_vcf="${out_prefix_w_interval_idx}.vcf.bgz"
 readonly out_phased="${out_prefix_w_interval_idx}.phased.vcf.gz"
+readonly out_reads="${out_prefix_w_interval_idx}.reads.txt"
 readonly log="${out_prefix_w_interval_idx}.log"
 
 # setup reference (Required for whatshap) 
@@ -87,6 +88,7 @@ prephase_with_whatshap() {
   whatshap phase \
     --reference="${grch38}" \
     --output="${vcf_result}" \
+    --output-read-list="${out_reads}" \
     --indels \
     ${vcf_to_phase} \
     ${cram_files} \

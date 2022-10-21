@@ -40,7 +40,6 @@ readonly spark_dir="data/tmp/spark"
 readonly samples_per_chunk=50
 
 readonly task_id=$( get_array_task_id )
-echo "the task id is ${task_id} "
 readonly chr=$( get_chr ${task_id} )
 
 # Cluster params
@@ -57,7 +56,7 @@ readonly input_type="mt"
 # Output paths
 readonly out_dir="data/phased/wes_union_calls/prephased/chunks"
 readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
-readonly out_prefix_w_job_config="${out_prefix}-${queue}/chr${chr}_spc${samples_per_chunk}"
+readonly out_prefix_w_job_config="${out_prefix}_spc${samples_per_chunk}_${queue}/chr${chr}_chunk"
 
 readonly out_merge_dir="data/phased/wes_union_calls/prephased"
 readonly out_merge_file="${out_merge_dir}/ukb_eur_wes_union_calls_prephased_200k_chr${chr}.vcf.bgz"

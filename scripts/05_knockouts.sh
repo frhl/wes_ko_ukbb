@@ -109,7 +109,7 @@ submit_knockout_job()
 #
 
 #submit_knockout_job "pLoF,damaging_missense" "24" "collect"
-submit_knockout_job "pLoF,damaging_missense" "6" "only_homs"
+#submit_knockout_job "pLoF,damaging_missense" "6" "only_homs"
 #submit_knockout_job "pLoF" "24" "collect"
 #submit_knockout_job "pLoF,damaging_missense" "6" "fast"
 #submit_knockout_job "pLoF,LC" "6" "fast"

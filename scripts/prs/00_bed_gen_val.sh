@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 #
+# @description Filter to samples with whole exome sequencing data available. These are the main
+# samples that also have knockout status.
+#
 #SBATCH --account=lindgren.prj
 #SBATCH --job-name=bed_gen_val
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -38,8 +41,6 @@ if [ ! -f "${out_prefix}.bed" ]; then
      --ancestry "eur" \
      --hapmap ${hap_file} \
      --filter_missing 0.01 \
-     --exclude_related \
-     --filter_to_unrelated_using_kinship_coef \
      --extract_samples "${sample_list}" \
      --min_maf 0.01 \
      --liftover \

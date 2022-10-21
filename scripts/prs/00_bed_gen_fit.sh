@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 #
+# @description Generate plink files for indiviudals with whole exome sequencing data unavailable.
+# These samples are used for training polygenic risks cores. 
+#
 #SBATCH --account=lindgren.prj
 #SBATCH --job-name=bed_gen_fit
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -38,10 +41,9 @@ if [ ! -f "${out_prefix}.bed" ]; then
      --ancestry "eur" \
      --hapmap ${hap_file} \
      --filter_missing 0.01 \
-     --exclude_related \
      --exclude_samples "${sample_list}" \
      --filter_to_unrelated_using_kinship_coef \
-     --min_maf 0.05 \
+     --min_maf 0.01 \
      --liftover \
      --dbsnp \
      --out_prefix "${out_prefix}" \

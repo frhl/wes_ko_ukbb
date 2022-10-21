@@ -8,11 +8,9 @@
 #SBATCH --output=logs/annotate.log
 #SBATCH --error=logs/annotate.errors.log
 #SBATCH --partition=long
-#SBATCH --cpus-per-task 2
-#SBATCH --array=1-22
+#SBATCH --cpus-per-task 5
+#SBATCH --array=21
 #SBATCH --requeue
-
-
 
 # Note: long.qc@@long.hga with 4 slots required to run full pipeline
 # -q long.qc@@long.hga
@@ -28,11 +26,11 @@ source utils/hail_utils.sh
 readonly spark_dir="data/tmp/spark_dir"
 readonly hail_script="scripts/03_annotate.py"
 
-readonly chr=$( get_chr ${SGE_TASK_ID} ) 
+readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} ) 
 readonly in_dir="data/mt/union"
 readonly input_prefix="${in_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.mt"
 
-readonly out_dir="data/mt/annotated"
+readonly out_dir="data/mt/annotated/test"
 readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
 readonly out_type="vcf"
 readonly out="${out_prefix}.vcf.bgz"
@@ -48,7 +46,9 @@ readonly final_variant_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_q
 
 mkdir -p ${out_dir}
 
-if [ ! -f "${out}" ]; then
+
+
+if [ ! -f ${out} ]; then
   SECONDS=0
   set_up_hail
   set_up_pythonpath_legacy  
@@ -79,14 +79,7 @@ if [ -f "${out}" ]; then
   make_tabix "${out_prefix}.vcf.bgz" "csi"
 fi
 
-if [ ! -f ${out_trio} ]; then
-    module purge
-    module load BCFtools/1.12-GCC-10.3.0
-    bcftools +trio-switch-rate ${out} -- -p ${pedigree} > ${out_trio}
-    switch_errors_by_site ${out} ${pedigree}
-fi
-
-
+make_tabix "${out_prefix}.vcf.bgz" "tbi"
 
 
 

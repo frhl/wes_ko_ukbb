@@ -14,15 +14,17 @@ readonly out_type=${4?Error: Missing arg2 (in_vcf)}
 
 mkdir -p ${out_dir}
 
-set_up_hail
-set_up_pythonpath_legacy
-set -x
-python3 "${hail_script}" \
-   --in_prefix "${in_prefix}" \
-   --in_type "${in_type}" \
-   --out_prefix "${out_prefix}" \
-   --out_type "${out_type}"
-set +x
 
+if [ ! -f "${out_prefix}.bed" ]; then
+  set_up_hail
+  set_up_pythonpath_legacy
+  python3 "${hail_script}" \
+     --in_prefix "${in_prefix}" \
+     --in_type "${in_type}" \
+     --out_prefix "${out_prefix}" \
+     --out_type "${out_type}"
+else
+  echo "${out_prefix}.bed already exists. Skipping.."
+fi
 
 
