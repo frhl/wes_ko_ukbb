@@ -24,7 +24,7 @@ source utils/qsub_utils.sh
 source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark_dir"
-readonly hail_script="scripts/03_annotate.py"
+readonly hail_script="scripts/02_annotate.py"
 
 readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} ) 
 readonly in_dir="data/mt/union"
