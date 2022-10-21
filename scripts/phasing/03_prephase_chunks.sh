@@ -10,11 +10,23 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 #SBATCH --array=18
+#
+#$ -N prephase_chunks
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#$ -o logs/prephase_chunks.log
+#$ -e logs/prephase_chunks.errors.log
+#$ -P lindgren.prjc
+#$ -pe shmem 1
+#$ -q short.qc
+#$ -t 20
+#$ -V
 
 set -o errexit
 set -o nounset
 
+
 source utils/qsub_utils.sh
+source utils/bash_utils.sh
 source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
@@ -25,8 +37,11 @@ readonly merge_script="scripts/phasing/_prephase_merge.sh"
 readonly spark_dir="data/tmp/spark"
 
 # how many samples should there be in each chunk 
-readonly samples_per_chunk=100
-readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
+readonly samples_per_chunk=50
+
+readonly task_id=$( get_array_task_id )
+echo "the task id is ${task_id} "
+readonly chr=$( get_chr ${task_id} )
 
 # Cluster params
 # note: errors after 50 min with 1000 samples/chunk with 4 slots
@@ -72,7 +87,7 @@ if [ ! -f ${interval_path} ]; then
     && print_update "Finished writing intervals for chr${chr}" ${SECONDS} \
     || raise_error "Writing intervals for chr${chr} failed" 
 else
-  print_update "${interval_path} already exists!"
+  echo "${interval_path} already exists!"
 fi
 
 get_max_interval_idx() {
@@ -86,13 +101,27 @@ get_max_interval_idx() {
 
 
 submit_prephasing_job() {
-  local max_interval_idx=$( get_max_interval_idx )
-  local slurm_tasks="1-2" #${max_interval_idx}"
-  local slurm_jname="_c${chr}_prephase_chunks"
-  local slurm_lname="logs/_prephase_chunks"
-  local slurm_project="${project}"
-  local slurm_queue="${queue}"
-  local slurm_nslots="${nslots}"
+  
+  readonly cluster=${1} # sge or slurm
+  readonly max_interval_idx=$( get_max_interval_idx )
+  readonly slurm_tasks="1-2" #${max_interval_idx}"
+  readonly slurm_jname="_c${chr}_prephase_chunks"
+  readonly slurm_lname="logs/_prephase_chunks"
+  readonly slurm_project="${project}"
+  readonly slurm_queue="${queue}"
+  readonly slurm_nslots="${nslots}"
+  if [ "${cluster}" == "slurm" ]; then
+    submit_prephasing_job_slurm
+  elif [ "${cluster}" == "sge" ]; then
+    submit_prephasing_job_sge
+  else
+    echo "${cluster} is not valid!"
+  fi
+
+}
+
+submit_prephasing_job_slurm() {
+  echo "Submitting jobs with SLURM"
   readonly prephasing_jid=$( sbatch \
     --account="${slurm_project}" \
     --job-name="${slurm_jname}" \
@@ -113,8 +142,31 @@ submit_prephasing_job() {
     ${max_interval_idx} \
     ${read_placeholder} \
     ${out_prefix_w_job_config} )
-
 }
+
+submit_prephasing_job_sge() {
+  echo "Submitting jobs with SGE"
+  set -x
+  qsub -N "${slurm_jname}" \
+    -o "${slurm_lname}.log" \
+    -e "${slurm_lname}.errors.log" \
+    -t ${slurm_tasks} \
+    -q "short.qc" \
+    -pe shmem ${slurm_nslots} \
+    -wd $(pwd) \
+    ${prephasing_script} \
+    ${chr} \
+    ${input_path} \
+    ${input_type} \
+    ${interval_path} \
+    ${max_interval_idx} \
+    ${read_placeholder} \
+    ${out_prefix_w_job_config}
+  set +x
+}
+
+
+
 
 submit_merge_job() {
   local max_interval_idx=$( get_max_interval_idx )
@@ -142,8 +194,9 @@ submit_merge_job() {
 }
 
 
-submit_prephasing_job
-submit_merge_job
+submit_prephasing_job "sge"
+
+#submit_merge_job
 
 
 

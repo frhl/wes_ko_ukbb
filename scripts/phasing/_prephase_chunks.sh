@@ -20,7 +20,7 @@ readonly out_prefix=${7?Error: Missing arg6 ()}
 readonly hail_script="scripts/phasing/03_prephase_chunks.py"
 readonly rscript="scripts/phasing/_prephase_chunks.R"
 
-readonly interval_idx=${SLURM_ARRAY_TASK_ID} # one-based index for which phasing interval to phase
+readonly interval_idx=$( get_array_task_id ) # one-based index for which phasing interval to phase
 readonly out_prefix_w_interval_idx="${out_prefix}.${interval_idx}of${max_interval_idx}"
 
 readonly out_splitted="${out_prefix_w_interval_idx}"
