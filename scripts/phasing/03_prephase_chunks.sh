@@ -18,7 +18,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 20
+#$ -t 21
 #$ -V
 
 set -o errexit
@@ -37,7 +37,7 @@ readonly merge_script="scripts/phasing/_prephase_merge.sh"
 readonly spark_dir="data/tmp/spark"
 
 # how many samples should there be in each chunk 
-readonly samples_per_chunk=50
+readonly samples_per_chunk=20
 
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
