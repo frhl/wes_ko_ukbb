@@ -1,39 +1,45 @@
 #!/usr/bin/env bash
+#$ -V
 
 set -o errexit
 set -o nounset
 
+source utils/qsub_utils.sh
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
 readonly spark_dir="data/tmp/spark"
+readonly cluster=$( get_current_cluster)
+readonly project="lindgren.prj"
+readonly queue="short"
+readonly nslots="1"
 
 readonly chr=${1?Error: Missing arg1 (chr)} # Chromosome, e.g. "1" for chrom 1
 readonly input_path=${2?Error: Missing arg2 (input_path)} 
 readonly input_type=${3?Error: Missing arg3 (input_type)} 
 readonly interval_path=${4?Error: Missing arg4 (intervals_path)} 
 readonly max_interval_idx=${5?Error: Missing arg5 (intervals_path)} 
-readonly read_placeholder=${6?Error: Missing arg5 (intervals_path)} 
-readonly out_prefix=${7?Error: Missing arg6 ()} 
+readonly samples_per_chunk=${6?Error: Missing arg5 (intervals_path)} 
+readonly read_placeholder=${7?Error: Missing arg5 (intervals_path)} 
+readonly out_prefix=${8?Error: Missing arg6 ()} 
 
+readonly prephase_sample_script="scripts/phasing/_prephase_sample.sh"
 readonly hail_script="scripts/phasing/03_prephase_chunks.py"
-readonly rscript="scripts/phasing/_prephase_chunks.R"
+readonly merge_script="scripts/phasing/_prephase_merge.sh"
 
-readonly interval_idx=$( get_array_task_id ) # one-based index for which phasing interval to phase
-readonly out_prefix_w_interval_idx="${out_prefix}.${interval_idx}of${max_interval_idx}"
+readonly chunk_idx=$( get_array_task_id ) # one-based index for which phasing interval to phase
+readonly out_prefix_w_interval_idx="${out_prefix}_${chunk_idx}of${max_interval_idx}"
+readonly splitted="${out_prefix_w_interval_idx}"
+readonly splitted_input="${splitted}.vcf.bgz"
+readonly splitted_type="vcf"
+# parameters for merge
+readonly merge_list="${out_prefix_w_interval_idx}.mergelist"
+readonly merge_type="vcf"
+readonly out_merge_file="${out_prefix_w_interval_idx}_prephased.vcf.gz"
+readonly out_merge_type="vcf"
 
-readonly out_splitted="${out_prefix_w_interval_idx}"
-readonly out_splitted_vcf="${out_prefix_w_interval_idx}.vcf.bgz"
-readonly out_phased="${out_prefix_w_interval_idx}.phased.vcf.gz"
-readonly out_reads="${out_prefix_w_interval_idx}.reads.txt"
-readonly log="${out_prefix_w_interval_idx}.log"
-
-# setup reference (Required for whatshap) 
-readonly refdir="/well/lindgren/flassen/ressources/genome_reference/broad"
-readonly grch38="${refdir}/Homo_sapiens_assembly38.fasta"
-export REF_PATH="${refdir}/ref/cache/%2s/%2s/%s:http://www.ebi.ac.uk/ena/cram/md5/%s"
-export REF_CACHE="${refdir}/ref/cache/%2s/%2s/%s"
+mkdir -p ${out_prefix_w_interval_idx}
 
 split_to_chunks() {
   # use hail to split to pre-defined chunks of samples
@@ -62,73 +68,114 @@ split_to_chunks() {
   fi
 }
 
-get_read_files() {
-  # use R to get paths to relevant read files
-  module purge
-  set_up_rpy
-  local current_interval=${1}
-  local read_sample_path=${2}
-  local reads=$( Rscript ${rscript} \
-    --interval_idx ${current_interval} \
-    --interval_path ${interval_path} \
-    --read_placeholder ${read_sample_path} )
-  echo ${reads}
+submit_prephasing_sample_job() {
+
+  local slurm_tasks="1-${samples_per_chunk}"
+  local slurm_jname="_c${chr}_i${chunk_idx}"
+  local slurm_lname="logs/_prephase_sample"
+  local slurm_project="${project}"
+  local slurm_queue="${queue}"
+  local slurm_nslots="${nslots}"
+  if [ "${cluster}" == "slurm" ]; then
+    submit_prephasing_job_slurm
+  elif [ "${cluster}" == "sge" ]; then
+    submit_prephasing_job_sge
+  else
+    echo "${cluster} is not valid!"
+  fi
+
 }
 
-prephase_with_whatshap() {
-  # perform prephasing using whatshap
-  SECONDS=0
-  local vcf_to_phase=${1}
-  local vcf_result=${2}
-  local cram_files=${3}
-  module purge
-  module load htslib/1.8-gcc5.4.0
-  set_up_whatshap
+submit_prephasing_job_slurm() {
+  echo "Submitting jobs with SLURM"
+  readonly prephasing_jid=$( sbatch \
+    --account="${slurm_project}" \
+    --job-name="${slurm_jname}" \
+    --output="${slurm_lname}.log" \
+    --error="${slurm_lname}.errors.log" \
+    --chdir="$(pwd)" \
+    --partition="${slurm_queue}" \
+    --cpus-per-task="${slurm_nslots}" \
+    --array="${slurm_tasks}" \
+    --open-mode="append" \
+    --parsable \
+    --constraint=skl-compat \
+    ${prephase_sample_script} \
+    ${splitted_input} \
+    ${interval_path} \
+    ${chunk_idx} \
+    ${read_placeholder} \
+    ${merge_list} \
+    ${out_prefix_w_interval_idx} )
+}
+
+submit_prephasing_job_sge() {
+  echo "Submitting jobs with SGE"
   set -x
-  whatshap phase \
-    --reference="${grch38}" \
-    --output="${vcf_result}" \
-    --output-read-list="${out_reads}" \
-    --indels \
-    ${vcf_to_phase} \
-    ${cram_files} \
-    && print_update "Finished prephasing ${out_prefix_w_interval_idx}" ${SECONDS} \
-    || raise_error "Error prephasing ${out_prefix_w_interval_idx}"
-  set +x
+  qsub -N "${slurm_jname}" \
+    -o "${slurm_lname}.log" \
+    -e "${slurm_lname}.errors.log" \
+    -t ${slurm_tasks} \
+    -q "short.qc" \
+    -pe shmem ${slurm_nslots} \
+    -wd $(pwd) \
+    ${prephase_sample_script} \
+    ${splitted_input} \
+    ${interval_path} \
+    ${chunk_idx} \
+    ${read_placeholder} \
+    ${merge_list} \
+    ${out_prefix_w_interval_idx}
 }
 
+submit_merge_job() {
+  local slurm_jname="_c${chr}_prephase_sample_merge"
+  local slurm_lname="logs/_prephase_sample_merge"
+  local slurm_project="${project}"
+  local slurm_queue="${queue}"
+  local slurm_nslots="1"
+  readonly merge_jid=$( sbatch \
+    --account="${slurm_project}" \
+    --job-name="${slurm_jname}" \
+    --output="${slurm_lname}.log" \
+    --error="${slurm_lname}.errors.log" \
+    --chdir="$(pwd)" \
+    --partition="${slurm_queue}" \
+    --cpus-per-task="${slurm_nslots}" \
+    --parsable \
+    --constraint=skl-compat \
+    ${merge_script} \
+    ${merge_list} \
+    ${merge_type} \
+    ${out_merge_file} \
+    ${out_merge_type} 
+  )
+}
 
+#--dependency="afterok:${prephasing_jid}" \
 
-if [ ! -f ${out_phased} ]; then
-  
-  # split main MatrixTable into 
-  # chunks of equally sized VCFs by sample
+# split main MatrixTable into 
+# chunks of equally sized VCFs by sample
+if [ ! -f "${splitted_input}" ]; then
   split_to_chunks \
-    ${interval_idx} \
+    ${chunk_idx} \
     ${input_path} \
     ${input_type} \
-    ${out_splitted}
-
-  # make tabix of VCF
-  if [ ! -f "${out_splitted_vcf}.tbi" ]; then
-    module purge
-    module load BCFtools/1.12-GCC-10.3.0
-    make_tabix "${out_splitted_vcf}" "tbi"
-  fi
-  
-  # get variable with paths to relevant read files
-  readonly reads=$( get_read_files ${interval_idx} ${read_placeholder} )
-  
-  # perform read-backed phasing using whatshap
-  prephase_with_whatshap \
-    ${out_splitted_vcf} \
-    ${out_phased} \
-    ${reads}
-    
-
-else
-  print_update "Warning: ${out_phased} already exists! Skipping." | tee /dev/stderr
+    ${splitted}
 fi
+
+# make tabix of VCF
+if [ ! -f "${splitted_input}.tbi" ]; then
+  module purge
+  module load BCFtools/1.12-GCC-10.3.0
+  make_tabix "${splitted_input}" "tbi"
+fi
+
+#submit_prephasing_sample_job ${cluster}
+submit_merge_job
+
+
+
 
 
 

@@ -9,7 +9,7 @@
 #SBATCH --error=logs/prephase_chunks.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=18
+#SBATCH --array=21
 #
 #$ -N prephase_chunks
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -31,13 +31,14 @@ source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
 readonly curwd=$(pwd)
+readonly cluster=$( get_current_cluster)
 readonly hail_script="scripts/phasing/03_prephase_chunks.py"
 readonly prephasing_script="scripts/phasing/_prephase_chunks.sh"
 readonly merge_script="scripts/phasing/_prephase_merge.sh"
 readonly spark_dir="data/tmp/spark"
 
 # how many samples should there be in each chunk 
-readonly samples_per_chunk=20
+readonly samples_per_chunk=100
 
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
@@ -46,7 +47,7 @@ readonly chr=$( get_chr ${task_id} )
 # note: errors after 50 min with 1000 samples/chunk with 4 slots
 readonly project="lindgren.prj"
 readonly queue="short"
-readonly nslots=1
+readonly nslots=2
 
 # what file should be split up
 readonly input_dir=" data/unphased/wes_union_calls/tmp"
@@ -101,9 +102,8 @@ get_max_interval_idx() {
 
 submit_prephasing_job() {
   
-  readonly cluster=${1} # sge or slurm
   readonly max_interval_idx=$( get_max_interval_idx )
-  readonly slurm_tasks="1-2" #${max_interval_idx}"
+  readonly slurm_tasks=1-2 #"1-${max_interval_idx}"
   readonly slurm_jname="_c${chr}_prephase_chunks"
   readonly slurm_lname="logs/_prephase_chunks"
   readonly slurm_project="${project}"
@@ -139,18 +139,18 @@ submit_prephasing_job_slurm() {
     ${input_type} \
     ${interval_path} \
     ${max_interval_idx} \
+    ${samples_per_chunk} \
     ${read_placeholder} \
     ${out_prefix_w_job_config} )
 }
 
 submit_prephasing_job_sge() {
   echo "Submitting jobs with SGE"
-  set -x
   qsub -N "${slurm_jname}" \
     -o "${slurm_lname}.log" \
     -e "${slurm_lname}.errors.log" \
     -t ${slurm_tasks} \
-    -q "short.qc" \
+    -q "short.qc@@short.hge" \
     -pe shmem ${slurm_nslots} \
     -wd $(pwd) \
     ${prephasing_script} \
@@ -159,9 +159,9 @@ submit_prephasing_job_sge() {
     ${input_type} \
     ${interval_path} \
     ${max_interval_idx} \
+    ${samples_per_chunk} \
     ${read_placeholder} \
     ${out_prefix_w_job_config}
-  set +x
 }
 
 
@@ -193,9 +193,9 @@ submit_merge_job() {
 }
 
 
-submit_prephasing_job "sge"
-
+submit_prephasing_job "${cluster}"
 #submit_merge_job
+
 
 
 
