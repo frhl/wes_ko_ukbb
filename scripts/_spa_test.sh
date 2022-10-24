@@ -3,6 +3,7 @@
 set -o errexit
 set -o nounset
 
+source utils/qsub_utils.sh
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
@@ -16,7 +17,7 @@ readonly grm_sam=${7?Error: Missing arg7 (grm_sam)}
 readonly min_mac=${8?Error: Missing arg6 (min_mac)} 
 readonly out_prefix=${9?Error: Missing arg7 (path prefix for saige output)}
 readonly in_markers="${10}" # optional conditioning markers
-readonly chr=${SLURM_ARRAY_TASK_ID}
+readonly chr=$( get_array_task_id )
 
 
 # chromosome specified at in_gmat and in_var
