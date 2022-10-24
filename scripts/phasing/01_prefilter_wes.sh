@@ -9,8 +9,8 @@
 #SBATCH --output=logs/prefilter_wes.log
 #SBATCH --error=logs/prefilter_wes.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 2
-#SBATCH --array=20-22
+#SBATCH --cpus-per-task 4
+#SBATCH --array=1-19
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
@@ -24,9 +24,12 @@ readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 readonly in_file="${in_dir}/ukb_wes_200k_filtered_chr${chr}.mt"
 readonly in_type="mt"
 
-readonly out_dir="data/unphased/wes/prefilter"
+readonly out_dir="data/unphased/wes/prefilter/new"
 readonly out_prefix="${out_dir}/ukb_eur_wes_prefilter_200k_chr${chr}"
-readonly out_type="vcf"
+readonly out_type="mt"
+
+readonly entry_fields_to_drop="GQ,DP,AD,PL"
+
 
 mkdir -p ${out_dir}
 mkdir -p ${spark_dir}
@@ -39,8 +42,9 @@ if [ ! -f "${out_prefix}.vcf.bgz" ]; then
      --input_type "${in_type}" \
      --out_prefix "${out_prefix}" \
      --out_type "${out_type}" \
+     --drop_entry_fields "${entry_fields_to_drop}" \
      --ancestry "eur" \
-     --min_mac 2 \
+     --min_mac 1 \
      --missing 0.05
 else
   print_update "file ${out} already exists. Skipping!"

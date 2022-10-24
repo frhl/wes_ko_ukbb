@@ -20,7 +20,7 @@ readonly spark_dir="data/tmp/spark"
 readonly hail_script="scripts/phasing/02_geno_gen.py"
 
 readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
-readonly out_dir="data/unphased/calls"
+readonly out_dir="data/unphased/calls/new_liftover"
 readonly out_prefix="${out_dir}/ukb_prefilter_calls_200k_chr${chr}"
 readonly out_type="vcf"
 
@@ -33,7 +33,6 @@ if [ ! -f "$( get_hail_ext ${out_prefix} ${out_type})" ]; then
   SECONDS=0
   set_up_hail
   set_up_pythonpath_legacy
-  set -x
   python3 "${hail_script}" \
      --chrom "${chr}" \
      --out_prefix "${out_prefix}" \
@@ -42,11 +41,8 @@ if [ ! -f "$( get_hail_ext ${out_prefix} ${out_type})" ]; then
      --liftover \
      --min_mac 2 \
      --missing 0.05 \
-     --exclude_trio_parents \
      --ancestry "eur" \
      --dataset "calls"
-  set +x
-  log_runtime ${SECONDS}
 else
   echo "file ${out} already exists. Skipping!"
 fi

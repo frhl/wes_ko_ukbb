@@ -22,7 +22,8 @@ readonly interval_path=${4?Error: Missing arg4 (intervals_path)}
 readonly max_interval_idx=${5?Error: Missing arg5 (intervals_path)} 
 readonly samples_per_chunk=${6?Error: Missing arg5 (intervals_path)} 
 readonly read_placeholder=${7?Error: Missing arg5 (intervals_path)} 
-readonly out_prefix=${8?Error: Missing arg6 ()} 
+readonly main_merge_file=${8?Error: Missing arg6 ()} 
+readonly out_prefix=${9?Error: Missing arg6 ()} 
 
 readonly prephase_sample_script="scripts/phasing/_prephase_sample.sh"
 readonly hail_script="scripts/phasing/03_prephase_chunks.py"
@@ -36,9 +37,15 @@ readonly splitted_type="vcf"
 # parameters for merge
 readonly merge_list="${out_prefix_w_interval_idx}.mergelist"
 readonly merge_type="vcf"
-readonly out_merge_file="${out_prefix_w_interval_idx}_prephased.vcf.gz"
+readonly out_merge_file="${out_prefix_w_interval_idx}_prephased"
 readonly out_merge_type="vcf"
 
+# append files to be merged
+echo "main mergefile: ${main_merge_file}"
+echo "${out_merge_file}.vcf.gz" >> ${main_merge_file}
+
+
+#rm -f ${merge_list}
 mkdir -p ${out_prefix_w_interval_idx}
 
 split_to_chunks() {
@@ -63,6 +70,7 @@ split_to_chunks() {
       --split_by_interval \
       && print_update "Finished splitting for ${out_prefix_w_interval_idx}" ${SECONDS} \
       || raise_error "Error when splitting chunks for ${out_prefix_w_interval_idx}"
+    set +x
   else
     >&2 echo "${out_file} (split) already exists. Skipping!"
   fi
@@ -111,7 +119,6 @@ submit_prephasing_job_slurm() {
 
 submit_prephasing_job_sge() {
   echo "Submitting jobs with SGE"
-  set -x
   qsub -N "${slurm_jname}" \
     -o "${slurm_lname}.log" \
     -e "${slurm_lname}.errors.log" \
@@ -128,9 +135,9 @@ submit_prephasing_job_sge() {
     ${out_prefix_w_interval_idx}
 }
 
-submit_merge_job() {
-  local slurm_jname="_c${chr}_prephase_sample_merge"
-  local slurm_lname="logs/_prephase_sample_merge"
+submit_merge_job_slurm() {
+  local slurm_jname="_c${chr}_prephase_merge"
+  local slurm_lname="logs/_prephase_merge"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
   local slurm_nslots="1"
@@ -142,6 +149,7 @@ submit_merge_job() {
     --chdir="$(pwd)" \
     --partition="${slurm_queue}" \
     --cpus-per-task="${slurm_nslots}" \
+    --dependency="afterok:${prephasing_jid}" \
     --parsable \
     --constraint=skl-compat \
     ${merge_script} \
@@ -152,7 +160,28 @@ submit_merge_job() {
   )
 }
 
-#--dependency="afterok:${prephasing_jid}" \
+submit_merge_job_sge() {
+  local slurm_jname="_c${chr}_prephase_merge"
+  local slurm_lname="logs/_prephase_merge"
+  local wait_for="_c${chr}_i${chunk_idx}"
+  local slurm_project="${project}"
+  local slurm_queue="${queue}"
+  local slurm_nslots="1"
+  qsub -N "${slurm_jname}" \
+    -o "${slurm_lname}.log" \
+    -e "${slurm_lname}.errors.log" \
+    -q "short.qc" \
+    -hold_jid "${wait_for}" \
+    -pe shmem ${slurm_nslots} \
+    -wd $(pwd) \
+    ${merge_script} \
+    ${merge_list} \
+    ${merge_type} \
+    ${out_merge_file} \
+    ${out_merge_type} 
+}
+
+
 
 # split main MatrixTable into 
 # chunks of equally sized VCFs by sample
@@ -171,12 +200,7 @@ if [ ! -f "${splitted_input}.tbi" ]; then
   make_tabix "${splitted_input}" "tbi"
 fi
 
-#submit_prephasing_sample_job ${cluster}
-submit_merge_job
-
-
-
-
-
+submit_prephasing_sample_job ${cluster}
+submit_merge_job_sge
 
 

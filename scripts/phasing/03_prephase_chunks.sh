@@ -50,7 +50,7 @@ readonly queue="short"
 readonly nslots=2
 
 # what file should be split up
-readonly input_dir=" data/unphased/wes_union_calls/tmp"
+readonly input_dir=" data/unphased/wes_union_calls/new"
 readonly input_path="${input_dir}/ukb_wes_union_calls_200k_chr${chr}.mt" 
 readonly input_type="mt"
 
@@ -58,6 +58,7 @@ readonly input_type="mt"
 readonly out_dir="data/phased/wes_union_calls/prephased/chunks"
 readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
 readonly out_prefix_w_job_config="${out_prefix}_spc${samples_per_chunk}_${queue}/chr${chr}_chunk"
+readonly out_merge_w_job_config="${out_prefix}_spc${samples_per_chunk}_${queue}.mergelist"
 
 readonly out_merge_dir="data/phased/wes_union_calls/prephased"
 readonly out_merge_file="${out_merge_dir}/ukb_eur_wes_union_calls_prephased_200k_chr${chr}.vcf.bgz"
@@ -103,7 +104,7 @@ get_max_interval_idx() {
 submit_prephasing_job() {
   
   readonly max_interval_idx=$( get_max_interval_idx )
-  readonly slurm_tasks=1-2 #"1-${max_interval_idx}"
+  readonly slurm_tasks="1-100" #${max_interval_idx}"
   readonly slurm_jname="_c${chr}_prephase_chunks"
   readonly slurm_lname="logs/_prephase_chunks"
   readonly slurm_project="${project}"
@@ -141,6 +142,7 @@ submit_prephasing_job_slurm() {
     ${max_interval_idx} \
     ${samples_per_chunk} \
     ${read_placeholder} \
+    ${out_merge_w_job_config} \
     ${out_prefix_w_job_config} )
 }
 
@@ -161,6 +163,7 @@ submit_prephasing_job_sge() {
     ${max_interval_idx} \
     ${samples_per_chunk} \
     ${read_placeholder} \
+    ${out_merge_w_job_config} \
     ${out_prefix_w_job_config}
 }
 
@@ -194,7 +197,6 @@ submit_merge_job() {
 
 
 submit_prephasing_job "${cluster}"
-#submit_merge_job
 
 
 

@@ -17,6 +17,7 @@ def main(args):
     input_type = args.input_type
     extract_samples = args.extract_samples
     exclude_trio_parents = args.exclude_trio_parents
+    drop_entry_fields = args.drop_entry_fields
     min_mac = args.min_mac
     missing = args.missing
     ancestry = args.ancestry
@@ -25,7 +26,7 @@ def main(args):
 
     hail_init.hail_bmrc_init_local('logs/hail/01_prefilter_wes.py', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
-    mt = qc.get_table(input_path, input_type) # assuming build GRCh38
+    mt = qc.get_table(input_path, input_type, calc_info = False) # assuming build GRCh38
 
     if extract_samples:
         ht_samples = hl.import_table(extract_samples, no_header=True, key='f0', delimiter=',')
@@ -40,7 +41,12 @@ def main(args):
         mt = filter_missing(mt, float(missing))
     if missing or min_mac:
         mt = io.recalc_info(mt)
- 
+    if drop_entry_fields:
+        fields = drop_entry_fields
+        fields = fields.strip().split(",")
+        mt = mt.drop(*fields)
+        mt = mt.drop(mt.info)
+    
     io.export_table(mt, out_prefix, out_type)
 
 if __name__=='__main__':
@@ -53,6 +59,7 @@ if __name__=='__main__':
     parser.add_argument('--exclude_trio_parents', default=None, action='store_true', help='Exclude parents of trio relationships')
     parser.add_argument('--min_mac', default=None, help='Filter to MAC >= value')
     parser.add_argument('--missing', default=None, help='Filter to variants to have le value in genotype missingness')
+    parser.add_argument('--drop_entry_fields', default=None, help='Filter to variants to have le value in genotype missingness')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Type out vcf/plink/mt')
     args = parser.parse_args()
