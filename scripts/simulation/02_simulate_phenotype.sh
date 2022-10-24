@@ -95,26 +95,26 @@ simulate_phenotypes() {
 
 readonly queue="short.qc"
 readonly nslots="2"
-readonly tasks=1-10 #-2
+readonly tasks=1-5 #-2
 
 #simulate_phenotypes 0.00 0.00 0.00 0.01 0.01
 
-run_with_params 0.00 0.00 0.00 0.01 0.01 600
-run_with_params 0.01 95.00 0.01 0.25 0.25 601
-run_with_params 0.05 95.00 0.01 0.25 0.25 602
+#run_with_params 0.00 0.00 0.00 0.01 0.01 600
+#run_with_params 0.01 95.00 0.01 0.25 0.25 601
+#run_with_params 0.05 95.00 0.01 0.25 0.25 602
 
 
 
 # gradually greater recessive effects (polygenic model)
 
 # this works and results in nice phenotypes
-run_with_params 0.00 0.00 0.00 0.01 0.01 600
-run_with_params 0.001 0.10 99.0 0.20 0.20 601
-run_with_params 0.002 0.10 99.0 0.20 0.20 602
-run_with_params 0.005 0.10 99.0 0.20 0.20 603
-run_with_params 0.01 0.10 99.0 0.20 0.20 604
-run_with_params 0.02 0.10 99.0 0.20 0.20 605
-run_with_params 0.05 0.10 99.0 0.20 0.20 606
+#run_with_params 0.00 0.00 0.00 0.01 0.01 600
+#run_with_params 0.001 0.10 99.0 0.20 0.20 601
+#run_with_params 0.002 0.10 99.0 0.20 0.20 602
+#run_with_params 0.005 0.10 99.0 0.20 0.20 603
+#run_with_params 0.01 0.10 99.0 0.20 0.20 604
+#run_with_params 0.02 0.10 99.0 0.20 0.20 605
+#run_with_params 0.05 0.10 99.0 0.20 0.20 606
 
 #run_with_params 0.001 0.10 99.0 1.00 1.00 601
 #run_with_params 0.002 0.10 99.0 1.00 1.00 602

@@ -18,15 +18,15 @@ source utils/bash_utils.sh
 
 readonly chr="${SGE_TASK_ID}"
 readonly plink_dir="data/saige/grm/input"
-readonly grm_dir="data/saige/grm/input"
+readonly grm_dir="data/saige/grm/input/dnanexus"
 readonly covar_dir="data/phenotypes"
 readonly pheno_dir="data/simulation/phenotypes"
 readonly out_dir="data/simulation/saige/step1/binary"
 
-readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+readonly grm_mtx="${grm_dir}/ukb_eur_200k_grm_fitted_relatednessCutoff_0.05_2000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
 
-readonly plink_file="${plink_dir}/chunks/ukb_wes_200k_sparse_autosomes_mrg"
+readonly plink_file="${grm_dir}/ukb_eur_200k_grm_grch38_rv_merged"
 readonly covar_file="${covar_dir}/covars2.csv"
 readonly covariates=$( cat ${covar_file} )
 
@@ -74,7 +74,7 @@ fit_null() {
    set -x
    qsub -N "_sim_fit_null${SGE_TASK_ID}" \
      -q "short.qe" \
-     -pe shmem 1 \
+     -pe shmem 2 \
      -t ${tasks} \
      ${bash_script} \
      ${rscript} \
@@ -91,23 +91,25 @@ fit_null() {
    set +x
  }
 
-readonly tasks="1-10"
+readonly tasks="1-5"
 
-run_with_params 0.00 0.00 0.00 0.01 0.01 600
 
-run_with_params 0.001 0.10 99.0 0.20 0.20 601
-run_with_params 0.002 0.10 99.0 0.20 0.20 602
-run_with_params 0.005 0.10 99.0 0.20 0.20 603
-run_with_params 0.01 0.10 99.0 0.20 0.20 604
-run_with_params 0.02 0.10 99.0 0.20 0.20 605
-run_with_params 0.05 0.10 99.0 0.20 0.20 606
+# this works and results in nice phenotypes
+#run_with_params 0.00 0.00 0.00 0.01 0.01 600
+#run_with_params 0.001 0.10 99.0 0.20 0.20 601
+#run_with_params 0.002 0.10 99.0 0.20 0.20 602
+#run_with_params 0.005 0.10 99.0 0.20 0.20 603
+#run_with_params 0.01 0.10 99.0 0.20 0.20 604
+#run_with_params 0.02 0.10 99.0 0.20 0.20 605
+#run_with_params 0.05 0.10 99.0 0.20 0.20 606
 
-run_with_params 0.001 0.10 99.0 1.00 1.00 601
-run_with_params 0.002 0.10 99.0 1.00 1.00 602
-run_with_params 0.005 0.10 99.0 1.00 1.00 603
-run_with_params 0.01 0.10 99.0 1.00 1.00 604
-run_with_params 0.02 0.10 99.0 1.00 1.00 605
-run_with_params 0.05 0.10 99.0 1.00 1.00 606
+#run_with_params 0.001 0.10 99.0 1.00 1.00 601
+#run_with_params 0.002 0.10 99.0 1.00 1.00 602
+#run_with_params 0.005 0.10 99.0 1.00 1.00 603
+#run_with_params 0.01 0.10 99.0 1.00 1.00 604
+#run_with_params 0.02 0.10 99.0 1.00 1.00 605
+#run_with_params 0.05 0.10 99.0 1.00 1.00 606
+
 
 run_with_params 0.001 10.0 0.10 0.20 0.20 501
 run_with_params 0.001 0.10 0.10 0.20 0.20 501
@@ -115,22 +117,21 @@ run_with_params 0.001 0.10 1.00 0.20 0.20 502
 run_with_params 0.001 0.10 10.0 0.20 0.20 503
 run_with_params 0.001 0.10 99.0 0.20 0.20 504
 
-run_with_params 0.005 10.0 0.10 0.20 0.20 501
-run_with_params 0.005 0.10 0.10 0.20 0.20 501
-run_with_params 0.005 0.10 1.00 0.20 0.20 502
-run_with_params 0.005 0.10 10.0 0.20 0.20 503
-run_with_params 0.005 0.10 99.0 0.20 0.20 504
+#run_with_params 0.005 10.0 0.10 0.20 0.20 501
+#run_with_params 0.005 0.10 0.10 0.20 0.20 501
+#run_with_params 0.005 0.10 1.00 0.20 0.20 502
+#run_with_params 0.005 0.10 10.0 0.20 0.20 503
+#run_with_params 0.005 0.10 99.0 0.20 0.20 504
 
-run_with_params 0.01 10.0 0.10 0.20 0.20 501
-run_with_params 0.01 0.10 0.10 0.20 0.20 501
-run_with_params 0.01 0.10 1.00 0.20 0.20 502
-run_with_params 0.01 0.10 10.0 0.20 0.20 503
-run_with_params 0.01 0.10 99.0 0.20 0.20 504
+#run_with_params 0.01 10.0 0.10 0.20 0.20 501
+#run_with_params 0.01 0.10 0.10 0.20 0.20 501
+#run_with_params 0.01 0.10 1.00 0.20 0.20 502
+#run_with_params 0.01 0.10 10.0 0.20 0.20 503
+#run_with_params 0.01 0.10 99.0 0.20 0.20 504
 
-run_with_params 0.10 10.0 0.10 0.20 0.20 501
-run_with_params 0.10 0.10 0.10 0.20 0.20 501
-run_with_params 0.10 0.10 1.00 0.20 0.20 502
-run_with_params 0.10 0.10 10.0 0.20 0.20 503
-run_with_params 0.10 0.10 99.0 0.20 0.20 504
-
+#run_with_params 0.10 10.0 0.10 0.20 0.20 501
+#run_with_params 0.10 0.10 0.10 0.20 0.20 501
+#run_with_params 0.10 0.10 1.00 0.20 0.20 502
+#run_with_params 0.10 0.10 10.0 0.20 0.20 503
+#run_with_params 0.10 0.10 99.0 0.20 0.20 504
 
