@@ -57,15 +57,14 @@ def main(args):
     if chrom in "X":
         mt = filter_to_females(mt)
     if liftover:
-        mt = variants.liftover(mt, from_build='GRCh37', to_build='GRCh38', drop_annotations=True)
+        print("Performing liftover")
+        mt = variants.liftover(mt, from_build='GRCh37', to_build='GRCh38', drop_annotations=True, fix_ref=True)
         mt = mt.filter_rows(mt.locus.contig == "chr" + str(chrom))
 
     if input_path and input_type:
 
         mt2 = qc.get_table(input_path, input_type) # assuming build GRCh38
-        mt2_count = mt2.count()
-        mt_count = mt.count()
-        print(f"mt2 count: {mt2_count} .. mt1 count: {mt_count}")
+        
         # only keep keys and GT for each MatrixTable
         mt = mt.drop(*set(list(mt.col)) - set(list(mt.col_key)))
         mt = mt.drop(*set(list(mt.row)) - set(list(mt.row_key)))
@@ -79,24 +78,20 @@ def main(args):
         mt_sids = mt.s.collect()
         mt2_sids = mt2.s.collect()
         overlap = list(set(mt_sids) & set(mt2_sids))
+        
         mt = mt.filter_cols(hl.literal(set(overlap)).contains(mt.s))
         mt2 = mt2.filter_cols(hl.literal(set(overlap)).contains(mt2.s))
 
         # Remove any variants from mt that are already in mt2
         mt = mt.filter_rows(~hl.is_defined(mt2.index_rows(mt.locus, mt.alleles)))
-        
+       
         # annotate origin
         mt = mt.annotate_rows(wes = 0)
         mt2 = mt2.annotate_rows(wes = 1)
-        mt2_count = mt2.count()
-        mt_count = mt.count()
-        print(f"again .. mt2 count: {mt2_count} .. mt1 count: {mt_count}")
-        
+
         # combine the two datasets
         mt = tables.order_cols(mt, mt2)
         mt = mt.union_rows(mt2)
-        final = mt.count()
-        print(f"Final aggregated count: {final}")
 
     if checkpoint:
         checkpoint_prefix = out_prefix + "_checkpoint"
