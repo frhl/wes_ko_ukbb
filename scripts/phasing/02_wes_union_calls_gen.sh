@@ -8,17 +8,18 @@
 #SBATCH --output=logs/wes_union_calls_gen.log
 #SBATCH --error=logs/wes_union_calls_gen.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 3
-#SBATCH --array=21
+#SBATCH --cpus-per-task 5
+#SBATCH --array=20-22
+
 #
 #$ -N wes_union_calls
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/wes_union_calls.log
 #$ -e logs/wes_union_calls.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 3
-#$ -q long.qc
-#$ -t 1-22
+#$ -pe shmem 5
+#$ -q short.qe
+#$ -t 20-22
 #$ -V
 
 
@@ -28,14 +29,14 @@ source utils/vcf_utils.sh
 
 readonly spark_dir="data/tmp/spark"
 readonly hail_script="scripts/phasing/02_geno_gen.py"
-readonly in_dir="data/unphased/wes/post-qc"
+readonly in_dir="data/unphased/wes/prefilter"
 
-readonly chr=$( get_chr ${SGE_TASK_ID} )
-#readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
-readonly in_file="${in_dir}/ukb_wes_200k_filtered_chr${chr}.mt"
-readonly in_type="mt"
+readonly array_idx=$( get_array_task_id )
+readonly chr=$( get_chr ${array_idx} )
+readonly in_file="${in_dir}/ukb_eur_wes_prefilter_200k_chr${chr}.vcf.bgz"
+readonly in_type="vcf"
 
-readonly out_dir="data/unphased/wes_union_calls/tmp"
+readonly out_dir="data/unphased/wes_union_calls/new"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
 readonly out_type="vcf"
 
@@ -53,6 +54,7 @@ if [ ! -f "${out_prefix}.vcf.bgz" ]; then
      --out_type "${out_type}" \
      --missing 0.05 \
      --dataset "calls" \
+     --min_mac 1 \
      --exclude_trio_parents \
      --export_parents \
      --checkpoint \
