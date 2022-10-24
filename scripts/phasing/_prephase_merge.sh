@@ -37,6 +37,11 @@ python3 ${hail_script} \
   --out_prefix ${output_file} \
   --out_type ${output_type}
 
+# remove checkpoints
+echo "${out_prefix}_checkpointA.mt"
+echo "${out_prefix}_checkpointB.mt"
+
+
 if [ "${out_type}" == "vcf" ]; then
   module purge
   module load BCFtools/1.12-GCC-10.3.0

@@ -23,9 +23,27 @@ def main(args):
         for line in infile:
             if line.strip():
                 lines += [line.strip()]
-
-    mts = [io.import_table(infile, input_type) for infile in lines]
-    mt = hl.MatrixTable.union_cols(*mts)
+    
+    mt = None
+    count = 0 
+    save = 0
+    for infile in lines:
+        count += 1
+        mt_cur = io.import_table(infile, input_type)
+        if mt is None:
+            mt = mt_cur
+        else:
+            mt = mt.union_cols(mt_cur)
+        if count % 20 == 0:
+            if save == 1:
+                mt = mt.checkpoint(out_prefix + "_checkpointA.mt", overwrite = True)
+                save = 0
+            elif save == 0:
+                mt = mt.checkpoint(out_prefix + "_checkpointB.mt", overwrite = True)
+                save = 1
+    
+    #mts = [io.import_table(infile, input_type) for infile in lines]
+    #mt = hl.MatrixTable.union_cols(*mts)
     io.export_table(mt, out_prefix, out_type)
 
 if __name__=='__main__':
