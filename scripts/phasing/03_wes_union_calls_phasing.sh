@@ -7,10 +7,19 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/wes_union_calls_phasing.log
 #SBATCH --error=logs/wes_union_calls_phasing.errors.log
-#SBATCH --partition=long
-#SBATCH --cpus-per-task 24
+#SBATCH --partition=short
+#SBATCH --cpus-per-task=3
 #SBATCH --array=21
-
+#
+#$ -N wes_union_calls_phasing
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#$ -o logs/wes_union_calls_phasing.log
+#$ -e logs/wes_union_calls_phasing.errors.log
+#$ -P lindgren.prjc
+#$ -pe shmem 5
+#$ -q short.qc
+#$ -t 21
+#$ -V
 
 # note, shmem 20 is not enough for chrom 21.
 
@@ -18,20 +27,19 @@ source utils/qsub_utils.sh
 source utils/vcf_utils.sh
 source utils/bash_utils.sh
 
-readonly in_dir="data/unphased/wes_union_calls"
-readonly out_dir="data/phased/wes_union_calls/naive"
+readonly in_dir="data/phased/wes_union_calls/prephased"
+readonly out_dir="data/phased/wes_union_calls/prephased_test_5slots"
 readonly ref_dir="/well/lindgren/flassen/ressources/panels/liftover_reference_panel/data/liftover"
 readonly fam_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 
-readonly chr="${SLURM_ARRAY_TASK_ID}"
-readonly in_file="${in_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.vcf.bgz"
-readonly out_file="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.vcf.gz"
-readonly ser_file="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.txt"
-readonly fam_file="${fam_dir}/ukb11867_pedigree.fam"
+readonly chr="$( get_array_task_id )"
+readonly in_file="${in_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.vcf.gz"
+readonly out_file="${out_dir}/ukb_eur_wes_union_calls_200k_phased_chr${chr}.vcf.gz"
 
 readonly ref="${ref_dir}/ALL.chr${chr}.phase3_shapeit2_mvncall_integrated_v5.20130502.genotypes.vcf.bgz"
 readonly gmap="/well/lindgren/flassen/software/SHAPEIT4/b38.gmap/chr${chr}.b38.gmap.gz"
 
+mkdir -p ${out_dir}
 
 if [ ! -f ${out_file} ]; then
   module load SHAPEIT4/4.2.2-foss-2021a
@@ -40,22 +48,20 @@ if [ ! -f ${out_file} ]; then
     --input ${in_file} \
     --map ${gmap} \
     --region "chr${chr}" \
-    --thread $(( ${NSLOTS}-1 )) \
+    --thread 2 \
+    --pbwt-mac 1 \
     --output ${out_file} \
+    --use-PS 0.0001 \
     --sequencing \
     && print_update "Finished phasing variants for chr${chr}, out: ${out_file}" "${SECONDS}" \
     || raise_error "$( print_update "Phasing variants failed for chr${chr}" ${SECONDS} )"
   module purge
-  log_runtime ${SECONDS}
 fi
 
-module load BCFtools/1.12-GCC-10.3.0
 if [ ! -f "${out_file}.tbi" ]; then
+     module load BCFtools/1.12-GCC-10.3.0
      make_tabix "${out_file}" "tbi"
 fi
 
-module load BCFtools/1.12-GCC-10.3.0
-export BCFTOOLS_PLUGINS="/apps/eb/2020b/skylake/software/BCFtools/1.12-GCC-10.3.0/libexec/bcftools"
-bcftools +trio-switch-rate "${out_file}" -- -p "${fam_file}" > "${ser_file}"
 
 

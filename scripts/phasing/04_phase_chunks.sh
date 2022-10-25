@@ -10,7 +10,7 @@
 #SBATCH --error=logs/phase_chunks.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=1-22
+#SBATCH --array=21
 
 set -o errexit
 set -o nounset
@@ -52,15 +52,11 @@ readonly queue="short"
 readonly nslots=16
 
 # what vcf should be phased
-readonly vcf_dir=" data/unphased/wes_union_calls"
-readonly vcf_to_phase="${vcf_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.bgz" 
-
-# fam file for calculating switch errors
-readonly pedigree_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
-readonly pedigree="${pedigree_dir}/ukb11867_pedigree.fam"
+readonly vcf_dir=" data/phased/wes_union_calls/prephased"
+readonly vcf_to_phase="${vcf_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.vcf.gz"
 
 # Output paths
-readonly out_dir="data/phased/wes_union_calls/chunks/${software}"
+readonly out_dir="data/phased/wes_union_calls/with_phased_sets/chunks/${software}"
 readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
 readonly out_prefix_w_job_config="${out_prefix}-${nslots}x${queue}/${software}_prs${phasing_region_size}_pro${phasing_region_overlap}_mprs${max_phasing_region_size}"
 readonly out="${out_prefix_w_job_config}.vcf.gz"
@@ -129,7 +125,6 @@ submit_phasing_job() {
     ${phasing_region_overlap} \
     ${max_phasing_region_size} \
     ${out_prefix_w_job_config} \
-    ${pedigree} \
     ${software}
   set +x
 

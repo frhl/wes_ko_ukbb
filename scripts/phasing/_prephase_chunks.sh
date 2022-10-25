@@ -172,6 +172,7 @@ submit_merge_job_sge() {
     -e "${slurm_lname}.errors.log" \
     -q "short.qc" \
     -pe shmem ${slurm_nslots} \
+    -hold_jid "${wait_for}" \
     -wd $(pwd) \
     ${merge_script} \
     ${merge_list} \
@@ -180,7 +181,6 @@ submit_merge_job_sge() {
     ${out_merge_type} 
 }
 
-#-hold_jid "${wait_for}" \
 
 
 # split main MatrixTable into 
@@ -200,7 +200,7 @@ if [ ! -f "${splitted_input}.tbi" ]; then
   make_tabix "${splitted_input}" "tbi"
 fi
 
-#submit_prephasing_sample_job ${cluster}
+submit_prephasing_sample_job ${cluster}
 submit_merge_job_sge
 
 

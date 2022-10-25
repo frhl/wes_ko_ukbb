@@ -9,7 +9,7 @@
 #SBATCH --error=logs/prephase_chunks.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=21
+#SBATCH --array=22
 #
 #$ -N prephase_chunks
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -18,7 +18,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 21
+#$ -t 22
 #$ -V
 
 set -o errexit

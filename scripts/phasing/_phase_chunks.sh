@@ -19,13 +19,12 @@ readonly phasing_region_size=${5?Error: Missing arg5 (phasing_region_size)} # Mi
 readonly phasing_region_overlap=${6?Error: Missing arg6 (phasing_region_overlap)} # Minimum overlap between adjacent phasing windows
 readonly max_phasing_region_size=${7?Error: Missing arg7 (max_phasing_region_size)} # Maximum size of phasing window allowed, only used at the end of a chromosome. Must be larger than phasing_region_size
 readonly out_prefix=${8?Error: Missing arg8 (path prefix for output intermediate VCF)} # Path to output phased VCF
-readonly pedigree=${9?Error: Missing arg9 (pedigree)} # Path of VCF to use as haplotype scaffold
-readonly software=${10?Error: Missing arg10 (software)} # Path of VCF to use as haplotype scaffold
+readonly software=${9?Error: Missing arg10 (software)} # Path of VCF to use as haplotype scaffold
 readonly threads=$(( ${SLURM_CPUS_ON_NODE} - 1))
 
 readonly hail_script="scripts/phasing/04_phase_chunks.py"
 readonly interval_flags="--chrom ${chr} --min_interval_unit ${min_interval_unit} --phasing_region_size ${phasing_region_size} --phasing_region_overlap ${phasing_region_overlap} --max_phasing_region_size ${max_phasing_region_size}"
-readonly phasing_idx=${SLURM_ARRAY_TASK_ID} # one-based index for which phasing interval to phase
+readonly phasing_idx=$( get_array_task_id ) # one-based index for which phasing interval to phase
 
 readonly max_phasing_idx=$( python3 ${hail_script} ${interval_flags} --get_max_phasing_idx --interval_path ${interval_path})
 readonly out_prefix_w_phasing_idx="${out_prefix}.${phasing_idx}of${max_phasing_idx}"
@@ -48,7 +47,7 @@ phase_with_shapeit() {
     --thread ${threads} \
     --pbwt-mac ${min_mac} \
     --sequencing \
-    --use-ps ${ps_error_rate}\
+    --use-PS ${ps_error_rate}\
     --log ${log} \
     --output ${out}
   set +x
