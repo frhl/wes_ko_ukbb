@@ -140,7 +140,7 @@ submit_merge_job_slurm() {
   local slurm_lname="logs/_prephase_merge"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
-  local slurm_nslots="1"
+  local slurm_nslots="2"
   readonly merge_jid=$( sbatch \
     --account="${slurm_project}" \
     --job-name="${slurm_jname}" \
@@ -166,12 +166,11 @@ submit_merge_job_sge() {
   local wait_for="_c${chr}_i${chunk_idx}"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
-  local slurm_nslots="1"
+  local slurm_nslots="2"
   qsub -N "${slurm_jname}" \
     -o "${slurm_lname}.log" \
     -e "${slurm_lname}.errors.log" \
     -q "short.qc" \
-    -hold_jid "${wait_for}" \
     -pe shmem ${slurm_nslots} \
     -wd $(pwd) \
     ${merge_script} \
@@ -181,6 +180,7 @@ submit_merge_job_sge() {
     ${out_merge_type} 
 }
 
+#-hold_jid "${wait_for}" \
 
 
 # split main MatrixTable into 
@@ -200,7 +200,7 @@ if [ ! -f "${splitted_input}.tbi" ]; then
   make_tabix "${splitted_input}" "tbi"
 fi
 
-submit_prephasing_sample_job ${cluster}
+#submit_prephasing_sample_job ${cluster}
 submit_merge_job_sge
 
 

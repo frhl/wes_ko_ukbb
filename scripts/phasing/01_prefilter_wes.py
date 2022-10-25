@@ -17,6 +17,7 @@ def main(args):
     input_type = args.input_type
     extract_samples = args.extract_samples
     exclude_trio_parents = args.exclude_trio_parents
+    export_parents = args.export_parents
     drop_entry_fields = args.drop_entry_fields
     min_mac = args.min_mac
     missing = args.missing
@@ -46,8 +47,17 @@ def main(args):
         fields = fields.strip().split(",")
         mt = mt.drop(*fields)
         mt = mt.drop(mt.info)
-    
-    io.export_table(mt, out_prefix, out_type)
+    if exclude_trio_parents:
+        pids = samples.get_parents_by_fam(mt, ["TRIO"])
+        if export_parents:
+            mt_parents = mt.filter_cols(hl.literal(pids).contains(mt.s))
+            io.export_table(mt_parents, out_prefix + "_parents", out_type)
+        mt = mt.filter_cols(~hl.literal(pids).contains(mt.s))
+
+    # always export matrix table
+    if out_type != "mt":
+        io.export_table(mt, out_prefix, "mt")
+    io.export_table(mt, out_prefix, out_type) 
 
 if __name__=='__main__':
 
@@ -57,6 +67,7 @@ if __name__=='__main__':
     parser.add_argument('--ancestry', default=None, help='filter to specific ancestry')
     parser.add_argument('--extract_samples', default=None, help='HailTable with samples to be extracted.')
     parser.add_argument('--exclude_trio_parents', default=None, action='store_true', help='Exclude parents of trio relationships')
+    parser.add_argument('--export_parents', default=None, action='store_true', help='Exclude parents of trio relationships')
     parser.add_argument('--min_mac', default=None, help='Filter to MAC >= value')
     parser.add_argument('--missing', default=None, help='Filter to variants to have le value in genotype missingness')
     parser.add_argument('--drop_entry_fields', default=None, help='Filter to variants to have le value in genotype missingness')

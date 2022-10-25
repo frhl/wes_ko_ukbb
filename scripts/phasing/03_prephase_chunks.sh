@@ -104,7 +104,7 @@ get_max_interval_idx() {
 submit_prephasing_job() {
   
   readonly max_interval_idx=$( get_max_interval_idx )
-  readonly slurm_tasks="1-100" #${max_interval_idx}"
+  readonly slurm_tasks="1-${max_interval_idx}"
   readonly slurm_jname="_c${chr}_prephase_chunks"
   readonly slurm_lname="logs/_prephase_chunks"
   readonly slurm_project="${project}"

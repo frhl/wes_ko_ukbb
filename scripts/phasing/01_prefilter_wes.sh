@@ -10,7 +10,7 @@
 #SBATCH --error=logs/prefilter_wes.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 4
-#SBATCH --array=1-19
+#SBATCH --array=22
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
@@ -45,7 +45,10 @@ if [ ! -f "${out_prefix}.vcf.bgz" ]; then
      --drop_entry_fields "${entry_fields_to_drop}" \
      --ancestry "eur" \
      --min_mac 1 \
-     --missing 0.05
+     --missing 0.05 \
+     --exclude_trio_parents \
+     --export_parents \
+     --checkpoint
 else
   print_update "file ${out} already exists. Skipping!"
 fi

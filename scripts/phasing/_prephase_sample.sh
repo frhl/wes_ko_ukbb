@@ -35,6 +35,7 @@ readonly path_phased_vcf="${prefix_phased}.vcf"
 readonly path_phased_gz="${prefix_phased}.vcf.gz"
 readonly path_phased_bgz="${prefix_phased}.vcf.bgz"
 readonly out_reads="${out_prefix}/s${sample_idx}_eid${eid}.reads"
+readonly tmp_reads="${out_prefix}/s${sample_idx}_eid${eid}.reads.tmp"
 
 # function for extracting a single sample from VCF
 extract_sample() {
@@ -67,14 +68,15 @@ if [ ! -f "${path_phased_gz}" ]; then
     ${read_path} \
     && print_update "Finished prephasing ${path_unphased}" ${SECONDS} \
     || raise_error "Error prephasing ${path_unphased}"
-
-    module load BCFtools/1.12-GCC-10.3.0
-    #bgzip -d "${path_phased_gz}"
-    bgzip ${path_phased_vcf}
-    make_tabix "${path_phased_gz}" "tbi"
-
+  # bgzip sample
+  module load BCFtools/1.12-GCC-10.3.0
+  bgzip ${path_phased_vcf}
+  make_tabix "${path_phased_gz}" "tbi"
+  # append sample ID to read table so that we can follow who is wo
 
 fi
+
+#cat ${out_reads} | awk -v eid="${eid}" 'NR==1{$9="eid";print;next} {$9=eid}1' | column -t > ${tmp_reads}
 
 echo "${path_phased_gz}" >> ${mergelist}
 
