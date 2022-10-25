@@ -1,5 +1,7 @@
 # Whole Exome Sequencing haplotype estimation
 
+OLD FILE - NEEDS TO BE UPDATED
+
 ## Overview
 | Script                            | Description                                   | Requires output from |
 | -                                 | -                                             | - |
