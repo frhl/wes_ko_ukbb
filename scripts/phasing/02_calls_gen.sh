@@ -17,7 +17,7 @@ source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/phasing/02_geno_gen.py"
+readonly hail_script="scripts/phasing/02_wes_union_calls_gen.py"
 
 readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 readonly out_dir="data/unphased/calls/new_liftover"
