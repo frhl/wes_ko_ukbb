@@ -35,6 +35,7 @@ readonly log="${out_prefix_w_phasing_idx}.log"
 phase_with_shapeit() {
   SECONDS=0
   local min_mac=2 # default value. Unable to phase singletons.
+  local ps_error_rate=0.0001 # default value
   local gmap="/well/lindgren/flassen/software/SHAPEIT4/b38.gmap/chr${chr}.b38.gmap.gz"
   mkdir -p $( dirname ${out} )
   readonly region=$( python3 ${hail_script} ${interval_flags} --get_interval --phasing_idx ${phasing_idx} --interval_path ${interval_path} )
@@ -47,6 +48,7 @@ phase_with_shapeit() {
     --thread ${threads} \
     --pbwt-mac ${min_mac} \
     --sequencing \
+    --use-ps ${ps_error_rate}\
     --log ${log} \
     --output ${out}
   set +x

@@ -16,7 +16,7 @@
 #$ -o logs/prephase_chunks_merge.log
 #$ -e logs/prephase_chunks_merge.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 5
+#$ -pe shmem 4
 #$ -q short.qc
 #$ -t 21
 #$ -V
@@ -32,6 +32,7 @@ source utils/vcf_utils.sh
 module load BCFtools/1.12-GCC-10.3.0
 
 # how many samples should there be in each chunk 
+readonly n_split=500
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
@@ -43,56 +44,61 @@ readonly samples_per_chunk=100
 readonly out_dir="data/phased/wes_union_calls/prephased/chunks"
 readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
 readonly input_list="${out_prefix}_spc${samples_per_chunk}_${queue}.mergelist"
+readonly input_super_list="${out_prefix}_spp${n_split}_${queue}.mergelist"
+# save temporary uniq files here
 readonly tmp="${input_list}.tmp"
-
+readonly tmp_super="${input_super_list}.tmp"
+# keep track of final vcf
 readonly out_vcf="${out_prefix}.vcf"
 readonly out_vcf_gz="${out_vcf}.gz"
 
-# remove duplicates (from debugging the functions)
-cat ${input_list} | sort | uniq | head -n 1000  > ${tmp}
+# remove duplicates and create temporary
+cat ${input_list} | sort | uniq  > ${tmp}
+readonly n=$( cat ${tmp} | wc -l)
+readonly n_rounded=$( echo $n | sed 's|.*|(&+500)/1000*1000|' | bc )
 
-# combine VCFs fast and make tabix
-if [ -f "${tmp}" ]; then
-  if [ ! -f "${out_vcf}" ]; then
-    bcftools merge -l ${tmp} -o "${out_vcf}"
-  fi
-else
-  raise_error "Merge list '${tmp}' does not exist!"
+if [ ! -f "${out_vcf_gz}" ]; then
+  # loop over chunks of n_split
+  for idx_start in $(seq 1 ${n_split} ${n_rounded}); do 
+    
+    # create temporary mergelist
+    idx_end=$( echo "${idx_start}+${n_split}-1" | bc )
+    tmp_idx="${tmp}_partition${idx_start}to${idx_end}"
+    sed -n "${idx_start},${idx_end} p" ${tmp} > ${tmp_idx}
+    
+    # create paths to partition files
+    out_idx_vcf="${out_prefix}_partition${idx_start}_${idx_end}.vcf"
+    out_idx_vcf_gz="${out_idx_vcf}.gz"
+    echo "Combining partition ${idx_start} to ${idx_end} in ${out_vcf}.."
+    echo "${out_idx_vcf_gz}" >> ${input_super_list}
+    
+    # combine the files
+    if [ ! -f "${out_idx_vcf_gz}" ]; then
+      bcftools merge -l ${tmp_idx} -Oz -o "${out_idx_vcf}"
+    fi
+    
+    # zip the files
+    #if [ ! -f "${out_idx_vcf_gz}" ]; then
+    #  bgzip "${out_idx_vcf}"
+    #fi
+
+    # index files
+    if [ ! -f "${out_idx_vcf_gz}.tbi" ]; then
+      make_tabix "${out_idx_vcf_gz}" "tbi"
+    fi
+
+    # remove merge indexes
+    rm ${tmp_idx}
+  done 
+  
+  # create final VCF file
+  echo "Done! Merging into final file.."
+  cat ${input_super_list} | sort | uniq  > ${tmp_super}
+  bcftools merge -l ${tmp_super} -Oz -o "${out_vcf_gz}"
+  make_tabix "${out_vcf_gz}" "tbi"
+  
+  rm ${tmp_super} ${tmp}
+  echo "removing ${ouf_idx_vcf}"
 fi
-
-# bgzip
-if [ -f "${out_vcf}" ]; then
-  if [ ! -f "${out_vcf_gz}" ]; then
-    bgzip "${out_vcf}"
-  fi
-else
-  raise_error "File '${out_vcf}' (.vcf) does not exist!"
-fi
-
-# index VCF
-if [ -f "${out_vcf_gz}" ]; then
-  if [ ! -f "${out_vcf_gz}.tbi" ]; then
-    make_tabix "${out_vcf_gz}" "tbi"
-  fi
-else
-  raise_error "File '${out_vcf_gz}' (.vcf.gz) does not exist!"
-fi
-
-#mv ${tmp} ${merge_list}
-
-# remove duplicates (from debugging the functions)
-#cat ${merge_list} | sort | uniq  > ${tmp}
-# combine VCF
-#module load BCFtools/1.12-GCC-10.3.0
-#bcftools merge -l ${tmp} -o "${output_prefix}.vcf"
-#bgzip "${output_prefix}.vcf"
-# clean up temporary files
-
-#if [ "${out_type}" == "vcf" ]; then
-#  module purge
-#  module load BCFtools/1.12-GCC-10.3.0
-#  make_tabix "${out_file}.vcf.gz" "tbi"
-#fi
-
 
 

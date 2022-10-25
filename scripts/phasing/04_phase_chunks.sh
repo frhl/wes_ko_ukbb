@@ -38,10 +38,10 @@ readonly min_interval_unit=1000
 readonly phasing_region_size=100000
 # Minimum overlap between adjacent phasing windows
 #readonly phasing_region_overlap=$(( ${phasing_region_size}/4 ))  
-readonly phasing_region_overlap=$(( ${phasing_region_size}/2 ))  
+readonly phasing_region_overlap=$(( ${phasing_region_size}/4 ))  
 # Maximum size of phasing window allowed, only used at the end of a chromosome
 # Must be larger than phasing_region_size
-readonly max_phasing_region_size=100000
+readonly max_phasing_region_size=150000
 
 readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 
