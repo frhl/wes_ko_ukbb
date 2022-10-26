@@ -35,7 +35,7 @@ readonly in_file="${in_dir}/ukb_wes_200k_filtered_chr${chr}.mt"
 readonly in_type="mt"
 
 readonly out_dir="data/unphased/wes/prefilter/new2"
-readonly out_prefix="${out_dir}/ukb_eur_wes_prefilter_200k_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_wes_prefilter_200k_chr${chr}"
 readonly out_type="mt"
 
 readonly entry_fields_to_drop="GQ,DP,AD,PL"

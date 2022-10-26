@@ -6,8 +6,8 @@ import argparse
 from ko_utils import io
 from ukb_utils import hail_init
 from ukb_utils import tables
-from ukb_utils import variants
 from ukb_utils import samples
+from ukb_utils import variants
 from ko_utils.samples import filter_to_females
 from ko_utils.variants import filter_min_mac, filter_missing
 
@@ -22,6 +22,7 @@ def main(args):
     extract_samples = args.extract_samples
     exclude_trio_parents = args.exclude_trio_parents
     export_parents = args.export_parents
+    export_variants = args.export_variants
     min_mac = args.min_mac
     missing = args.missing
     ancestry = args.ancestry
@@ -34,8 +35,8 @@ def main(args):
     print("Current Chrom:" + str(chrom))
 
     # load calls and whole exomes    
-    mt1 = io.get_table(input_calls_path, input_calls_type, calc_info = False)
-    mt2 = io.get_table(input_wes_path, input_wes_type, calc_info = False) # assuming build GRCh38
+    mt1 = io.import_table(input_calls_path, input_calls_type, calc_info = False)
+    mt2 = io.import_table(input_wes_path, input_wes_type, calc_info = False) # assuming build GRCh38
     
     # only keep keys and GT for each MatrixTable
     mt1 = mt1.drop(*set(list(mt1.col)) - set(list(mt1.col_key)))
@@ -62,9 +63,18 @@ def main(args):
     mt1 = mt1.annotate_rows(wes=0)
     mt2 = mt2.annotate_rows(wes=1)
 
+    # annotate variants
+    mt1 = mt1.annotate_rows(varid=variants.get_variant_expr(mt1.locus, mt1.alleles))
+    mt2 = mt2.annotate_rows(varid=variants.get_variant_expr(mt2.locus, mt2.alleles))
+
     # combine the two datasets
     mt1 = tables.order_cols(mt1, mt2)
     mt = mt1.union_rows(mt2)
+
+    if export_variants:
+        mt1.varid.export(out_prefix + "_calls.txt.gz")
+        mt2.varid.export(out_prefix + "_wes.txt.gz")
+        mt.varid.export(out_prefix + ".txt.gz")
 
     if checkpoint:
         checkpoint_prefix = out_prefix + "_checkpoint"
@@ -106,6 +116,7 @@ if __name__=='__main__':
     parser.add_argument('--ancestry', default=None, help='filter to specific ancestry')
     parser.add_argument('--convert_sample_id', default=None, action='store_true', help='convert to lindgren sample id')
     parser.add_argument('--export_parents', default=None, action='store_true', help='Export parents genotypes seperately')
+    parser.add_argument('--export_variants', default=None, action='store_true', help='Export parents genotypes seperately')
     parser.add_argument('--checkpoint', default=None, action='store_true', help='Checkpoint after combining rows')
     parser.add_argument('--extract_samples', default=None, help='HailTable with samples to be extracted.')
     parser.add_argument('--min_mac', default=None, help='Filter to MAC >= value')
