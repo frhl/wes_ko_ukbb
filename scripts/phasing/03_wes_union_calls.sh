@@ -55,13 +55,9 @@ if [ ! -f "${out_prefix}.vcf.bgz" ]; then
      --input_type "${in_wes_type}" \
      --out_prefix "${out_prefix}" \
      --out_type "${out_type}" \
-     --missing 0.05 \
-     --dataset "calls" \
-     --min_mac 1 \
      --exclude_trio_parents \
      --export_parents \
-     --checkpoint \
-     --liftover
+     --checkpoint
 else
   print_update "file ${out} already exists. Skipping!"
 fi

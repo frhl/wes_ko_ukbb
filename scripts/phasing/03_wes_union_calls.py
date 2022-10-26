@@ -3,11 +3,9 @@
 import hail as hl
 import argparse
 
-from ko_utils import qc
 from ko_utils import io
 from ukb_utils import hail_init
 from ukb_utils import tables
-from ukb_utils import genotypes
 from ukb_utils import variants
 from ukb_utils import samples
 from ko_utils.samples import filter_to_females
@@ -17,9 +15,10 @@ def main(args):
 
     # parser
     chrom = args.chrom
-    input_path = args.input_path
-    input_type = args.input_type
-    chrom = args.chrom
+    input_calls_path = args.input_calls_path
+    input_calls_type = args.input_calls_type
+    input_wes_path = args.input_wes_path
+    input_wes_type = args.input_wes_type
     extract_samples = args.extract_samples
     exclude_trio_parents = args.exclude_trio_parents
     export_parents = args.export_parents
@@ -34,37 +33,38 @@ def main(args):
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
     print("Current Chrom:" + str(chrom))
 
-    if input_path and input_type:
+    # load calls and whole exomes    
+    mt1 = io.get_table(input_calls_path, input_calls_type, calc_info = False)
+    mt2 = io.get_table(input_wes_path, input_wes_type, calc_info = False) # assuming build GRCh38
+    
+    # only keep keys and GT for each MatrixTable
+    mt1 = mt1.drop(*set(list(mt1.col)) - set(list(mt1.col_key)))
+    mt1 = mt1.drop(*set(list(mt1.row)) - set(list(mt1.row_key)))
+    mt1 = mt1.select_entries(mt1.GT)
 
-        mt2 = qc.get_table(input_path, input_type) # assuming build GRCh38
-        
-        # only keep keys and GT for each MatrixTable
-        mt = mt.drop(*set(list(mt.col)) - set(list(mt.col_key)))
-        mt = mt.drop(*set(list(mt.row)) - set(list(mt.row_key)))
-        mt = mt.select_entries(mt.GT)
+    mt2 = mt2.drop(*set(list(mt2.col)) - set(list(mt2.col_key)))
+    mt2 = mt2.drop(*set(list(mt2.row)) - set(list(mt2.row_key)))
+    mt2 = mt2.select_entries(mt2.GT)  
 
-        mt2 = mt2.drop(*set(list(mt2.col)) - set(list(mt2.col_key)))
-        mt2 = mt2.drop(*set(list(mt2.row)) - set(list(mt2.row_key)))
-        mt2 = mt2.select_entries(mt2.GT)  
+    # subset to intersecting samples
+    mt1_sids = mt1.s.collect()
+    mt2_sids = mt2.s.collect()
+    overlap = list(set(mt1_sids) & set(mt2_sids))
+    
+    # ensure intersection between samples
+    mt1 = mt1.filter_cols(hl.literal(set(overlap)).contains(mt1.s))
+    mt2 = mt2.filter_cols(hl.literal(set(overlap)).contains(mt2.s))
 
-        # subset to intersecting samples
-        mt_sids = mt.s.collect()
-        mt2_sids = mt2.s.collect()
-        overlap = list(set(mt_sids) & set(mt2_sids))
-        
-        mt = mt.filter_cols(hl.literal(set(overlap)).contains(mt.s))
-        mt2 = mt2.filter_cols(hl.literal(set(overlap)).contains(mt2.s))
+    # Remove any variants from mt that are already in mt2
+    mt1 = mt1.filter_rows(~hl.is_defined(mt2.index_rows(mt1.locus, mt1.alleles)))
+   
+    # annotate origin
+    mt1 = mt1.annotate_rows(wes=0)
+    mt2 = mt2.annotate_rows(wes=1)
 
-        # Remove any variants from mt that are already in mt2
-        mt = mt.filter_rows(~hl.is_defined(mt2.index_rows(mt.locus, mt.alleles)))
-       
-        # annotate origin
-        mt = mt.annotate_rows(wes = 0)
-        mt2 = mt2.annotate_rows(wes = 1)
-
-        # combine the two datasets
-        mt = tables.order_cols(mt, mt2)
-        mt = mt.union_rows(mt2)
+    # combine the two datasets
+    mt1 = tables.order_cols(mt1, mt2)
+    mt = mt1.union_rows(mt2)
 
     if checkpoint:
         checkpoint_prefix = out_prefix + "_checkpoint"
