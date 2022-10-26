@@ -8,8 +8,8 @@
 #SBATCH --output=logs/gwas.log
 #SBATCH --error=logs/gwas.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 1
-#SBATCH --array=30-31
+#SBATCH --cpus-per-task 2
+#SBATCH --array=90
 #SBATCH --requeue
 
 
@@ -40,8 +40,8 @@ readonly file_cts="${pheno_dir}/curated_covar_phenotypes_cts.tsv.gz"
 readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
 readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
 
-readonly file_binary="${pheno_dir}/curated_covar_phenotypes_binary.tsv.gz"
-readonly pheno_list_binary="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
+readonly file_binary="${pheno_dir}/spiros_brava_phenotypes_binary_200k.tsv"
+readonly pheno_list_binary="${pheno_dir}/spiros_brava_phenotypes_binary_200k_header.tsv"
 readonly phenotype_binary=$( sed "${index}q;d" ${pheno_list_binary} )
 
 # the job will fail if less than X cases
@@ -58,8 +58,8 @@ submit_gwas_job()
   if [ ! -f "${out_prefix}.txt.gz" ]; then
     if [ ! -z ${phenotype} ]; then
       if [ ! -z ${covariates} ]; then
-        local slurm_jname="_${phenotype}_sumstat"
-        local slurm_lname="_filter_genotypes"
+        local slurm_jname="_${phenotype}_gwas"
+        local slurm_lname="logs/_gwas"
         local slurm_project="lindgren.prj"
         local slurm_tasks="${tasks}"
         local slurm_queue="short"
@@ -69,7 +69,7 @@ submit_gwas_job()
           --job-name="${slurm_jname}" \
           --output="${slurm_lname}.log" \
           --error="${slurm_lname}.errors.log" \
-          --chdir="${curwd}" \
+          --chdir="$(pwd)" \
           --partition="${slurm_queue}" \
           --cpus-per-task="${slurm_shmem}" \
           --array=${slurm_tasks} \

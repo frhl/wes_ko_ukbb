@@ -11,7 +11,7 @@ source utils/qsub_utils.sh
 source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
-readonly hail_script="scripts/05_knockouts.py"
+readonly hail_script="scripts/04_encode_knockouts.py"
 readonly spark_dir="data/tmp/spark"
 
 readonly input_path=${1?Error: Missing arg1 (input_path)}
@@ -53,6 +53,7 @@ evaluate_knockouts() {
       ${in_sex:+--sex "$in_sex"} \
       --out_prefix ${out_prefix_chr} \
       --out_type ${out_type} \
+      --checkpoint \
       && print_update "Finished evaluation knockouts for chr${chr}" ${SECONDS} \
       || raise_error "Evaluating knockouts for chr${chr} failed"
   rm -rf "${out_prefix_chr}_checkpoint.mt"

@@ -3,6 +3,7 @@
 set -o errexit
 set -o nounset
 
+source utils/qsub_utils.sh
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
@@ -15,13 +16,13 @@ readonly covariates=${6?Error: Missing arg6 (covariates)}
 readonly min_cases=${7?Error: Missing arg6 (covariates)}
 readonly prefix=${8?Error: Missing arg8 (out_prefix)}
 
-readonly chr=${SGE_TASK_ID}
+readonly chr=$( get_array_task_id )
 readonly input_path_chr=$(echo ${input_path} | sed -e "s/CHR/${chr}/g")
 readonly out_prefix_chr=$(echo ${prefix} | sed -e "s/CHR/${chr}/g")
 
 readonly spark_dir="data/tmp/spark"
 
-set_up_hail
+set_up_hail 0.2.97
 set_up_pythonpath_legacy
 module load OpenBLAS/0.3.8-GCC-9.2.0 # required for linear regression
 export LD_PRELOAD=/apps/eb/skylake/software/OpenBLAS/0.3.8-GCC-9.2.0/lib/libopenblas.so # required for linear regression

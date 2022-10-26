@@ -21,7 +21,7 @@ source utils/vcf_utils.sh
 
 readonly curwd=$(pwd)
 readonly spark_dir="data/tmp/spark"
-readonly bash_script="scripts/_knockouts.sh"
+readonly bash_script="scripts/_encode_knockouts.sh"
 
 readonly in_dir="data/mt/annotated"
 readonly out_dir="data/knockouts/alt/only_homs"

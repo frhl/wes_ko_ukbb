@@ -26,11 +26,14 @@ def rescale_variances(X, X_variance, Y_variance):
     Y = K*X
     return(Y)
 
-def make_effect(mt, h2, pi = None):
+def make_effect(mt, h2, pi = None, causal_bool = None):
     """ Make effect sizes for either infintesimal or spike and slab model. """
     M = mt.count()[0]
     pi_temp = 1 if pi == None else pi
-    return(hl.rand_bool(pi_temp)*hl.rand_norm(0, hl.sqrt(h2/(M*pi_temp))))
+    if causal_bool is not None:
+        return(causal_bool*hl.rand_norm(0, hl.sqrt(h2/(M*pi_temp))))
+    else:
+        return(hl.rand_bool(pi_temp)*hl.rand_norm(0, hl.sqrt(h2/(M*pi_temp))))
 
 
 
@@ -69,9 +72,12 @@ def main(args):
     
     # setup effects
     if h2 > 0 and (var_beta + var_theta) > 0:
-        
+
+        causal_pi = 0.2
+        causal_bool = hl.rand_bool(causal_pi)
+
         # setup standard additive effects
-        mt = mt.annotate_rows(beta = make_effect(mt, h2=var_beta, pi=pi_beta))
+        mt = mt.annotate_rows(beta = make_effect(mt, h2=var_beta, pi=causal_pi, causal_bool=causal_bool))
 
         # keep track of sign for additive effects
         mt = mt.annotate_rows(
@@ -80,7 +86,7 @@ def main(args):
 
         # setup recessive effects
         mt = mt.annotate_rows(
-                theta_nosign = hl.abs(make_effect(mt, h2=var_theta, pi=pi_theta))
+                theta_nosign = hl.abs(make_effect(mt, h2=var_theta, pi=causal_pi, causal_bool=causal_bool))
         )
         
         # keep theta sign consistent with beta sign
