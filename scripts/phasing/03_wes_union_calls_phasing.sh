@@ -8,8 +8,9 @@
 #SBATCH --output=logs/wes_union_calls_phasing.log
 #SBATCH --error=logs/wes_union_calls_phasing.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task=3
+#SBATCH --cpus-per-task=22
 #SBATCH --array=21
+#SBATCH --dependency="afternotok:6390859"
 #
 #$ -N wes_union_calls_phasing
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -48,7 +49,7 @@ if [ ! -f ${out_file} ]; then
     --input ${in_file} \
     --map ${gmap} \
     --region "chr${chr}" \
-    --thread 2 \
+    --thread 21 \
     --pbwt-mac 1 \
     --output ${out_file} \
     --use-PS 0.0001 \

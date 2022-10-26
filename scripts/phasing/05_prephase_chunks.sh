@@ -9,7 +9,7 @@
 #SBATCH --error=logs/prephase_chunks.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=22
+#SBATCH --array=20
 #
 #$ -N prephase_chunks
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -18,7 +18,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 22
+#$ -t 20
 #$ -V
 
 set -o errexit
@@ -32,7 +32,7 @@ source utils/vcf_utils.sh
 
 readonly curwd=$(pwd)
 readonly cluster=$( get_current_cluster)
-readonly hail_script="scripts/phasing/03_prephase_chunks.py"
+readonly hail_script="scripts/phasing/05_prephase_chunks.py"
 readonly prephasing_script="scripts/phasing/_prephase_chunks.sh"
 readonly merge_script="scripts/phasing/_prephase_merge.sh"
 readonly spark_dir="data/tmp/spark"
@@ -55,19 +55,19 @@ readonly input_path="${input_dir}/ukb_wes_union_calls_200k_chr${chr}.mt"
 readonly input_type="mt"
 
 # Output paths
-readonly out_dir="data/phased/wes_union_calls/prephased/chunks"
+readonly out_dir="data/prephased/wes_union_calls/chunks"
 readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
 readonly out_prefix_w_job_config="${out_prefix}_spc${samples_per_chunk}_${queue}/chr${chr}_chunk"
 readonly out_merge_w_job_config="${out_prefix}_spc${samples_per_chunk}_${queue}.mergelist"
 
-readonly out_merge_dir="data/phased/wes_union_calls/prephased"
+readonly out_merge_dir="data/prephased/wes_union_calls"
 readonly out_merge_file="${out_merge_dir}/ukb_eur_wes_union_calls_prephased_200k_chr${chr}.vcf.bgz"
 
 # Interval paths
 readonly interval_dir="${out_dir}/intervals"
 readonly interval_path="${interval_dir}/intervals_spc${samples_per_chunk}_chr${chr}.tsv"
 
-# Read locations
+# Read locations (.cram)
 readonly read_dir="/well/ukbb-wes/cram/oqfe/ukbb-11867"
 readonly read_placeholder="${read_dir}/SAMPLE_oqfe.cram"
 
@@ -104,7 +104,7 @@ get_max_interval_idx() {
 submit_prephasing_job() {
   
   readonly max_interval_idx=$( get_max_interval_idx )
-  readonly slurm_tasks="1-${max_interval_idx}"
+  readonly slurm_tasks="3-${max_interval_idx}"
   readonly slurm_jname="_c${chr}_prephase_chunks"
   readonly slurm_lname="logs/_prephase_chunks"
   readonly slurm_project="${project}"

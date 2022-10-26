@@ -9,7 +9,7 @@
 #SBATCH --output=logs/append_parents.log
 #SBATCH --error=logs/append_parents.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 1
+#SBATCH --cpus-per-task 2
 #SBATCH --array=21
 
 set -o errexit
@@ -18,7 +18,7 @@ set -o nounset
 source utils/vcf_utils.sh
 source utils/hail_utils.sh
 
-readonly hail_script="scripts/phasing/07_append_parents.py"
+readonly hail_script="scripts/phasing/10_append_parents.py"
 readonly spark_dir="data/tmp/spark"
 readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 
@@ -26,13 +26,18 @@ readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 readonly pedigree_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 readonly pedigree="${pedigree_dir}/ukb11867_pedigree.fam"
 # parental genotypes that were not phased
-readonly parents_dir="data/unphased/wes_union_calls"
+readonly parents_dir="data/unphased/wes_union_calls/new"
 readonly parents_path="${parents_dir}/ukb_wes_union_calls_200k_chr${chr}_parents.vcf.bgz"
+# prephased directory (for PS field)
+readonly prephased_dir="data/phased/wes_union_calls/prephased"
+readonly prephased_path="${prephased_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.vcf.gz"
 # standard genotypes that were phased
-readonly phased_dir="data/phased/wes_union_calls/ligated"
-readonly phased_path="${phased_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.vcf.bgz"
+readonly phased_dir="data/phased/wes_union_calls/with_phased_sets/chunks/shapeit4/ukb_eur_wes_union_calls_200k_chr21-16xshort"
+#readonly phased_dir="data/phased/wes_union_calls/ligated"
+readonly phased_path="${phased_dir}/shapeit4_prs100000_pro25000_mprs150000.1of1.vcf.gz"
+#readonly phased_path="${phased_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.vcf.bgz"
 # out paths and types
-readonly out_dir="data/phased/wes_union_calls/with_parents"
+readonly out_dir="data/phased/wes_union_calls/with_parents_test_unphased"
 readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
 readonly out_vcf="${out_prefix}.vcf.bgz"
 readonly out_trio="${out_prefix}.trio"

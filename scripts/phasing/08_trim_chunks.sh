@@ -18,7 +18,7 @@ source utils/qsub_utils.sh
 source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
-readonly hail_script="scripts/phasing/05_trim_chunks.py"
+readonly hail_script="scripts/phasing/08_trim_chunks.py"
 readonly spark_dir="data/tmp/spark"
 
 

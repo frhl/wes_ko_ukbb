@@ -23,8 +23,8 @@ readonly grch38="${refdir}/Homo_sapiens_assembly38.fasta"
 export REF_PATH="${refdir}/ref/cache/%2s/%2s/%s:http://www.ebi.ac.uk/ena/cram/md5/%s"
 export REF_CACHE="${refdir}/ref/cache/%2s/%2s/%s"
 
-set_up_rpy
 # get current sample and read path
+set_up_rpy
 readonly eid=$( Rscript ${rscript} --chunk_idx ${chunk_idx} --sample_idx ${sample_idx} --interval_path ${interval_path} )
 readonly read_path=${read_placeholder/SAMPLE/${eid}}
 readonly path_unphased="${out_prefix}/s${sample_idx}_eid${eid}.vcf"
@@ -72,72 +72,8 @@ if [ ! -f "${path_phased_gz}" ]; then
   module load BCFtools/1.12-GCC-10.3.0
   bgzip ${path_phased_vcf}
   make_tabix "${path_phased_gz}" "tbi"
-  # append sample ID to read table so that we can follow who is wo
-
 fi
 
-#cat ${out_reads} | awk -v eid="${eid}" 'NR==1{$9="eid";print;next} {$9=eid}1' | column -t > ${tmp_reads}
-
+# Keep track of files that have been phased
 echo "${path_phased_gz}" >> ${mergelist}
-
-#rm -f "${path_phased_gz}"
-#rm -f "${path_phased_gz}.tbi"
-
-#if [ ! -f "${path_phased_bgz}" ]; then
-#set +eu
-#module purge
-#set_up_hail
-#set_up_pythonpath_legacy
-#python3 ${hail_script} \
-#  --input_path "${prefix_phased}.mt" \
-#  --input_type "mt" \
-#  --out_prefix ${prefix_phased} \
-#  --out_type "vcf"
-#set -eu
-#fi
-
-
-
-
-
-
-
-#module load BCFtools/1.12-GCC-10.3.0
-#bgzip -d ${path_phased_gz}
-
-#rm -f "${path_phased_gz}.tbi"
-#rm -f "${path_phased_gz}"
-#rm -f "${path_phased_bgz}"
-
-
-#bgzip ${path_phased}
-#make_tabix "${path_phased_gz}" "tbi"
-
-
-
-
-
-
-# uncompress
-#zcat ${path_phased_gz} > ${path_phased}
-#bgzip -d ${path_phased_gz}
-
-#gunzip -c ${path_phased} | bgzip > ${path_phased_bgz}
-
-
-#make_tabix "${path_phased_bgz}" "tbi"
-
-#bgzip ${path_phased}
-
-# make tabix
-#if [ ! -f "${path_phased_gz}.tbi" ]; then
-#  make_tabix "${path_phased_gz}" "tbi"
-#fi
-
-# tidy up
-#rm "${path_unphased_gz}" "${path_unphased_gz}.tbi"
-
-
-
-
 

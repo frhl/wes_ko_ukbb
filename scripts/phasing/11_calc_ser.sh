@@ -12,7 +12,7 @@
 
 source utils/bash_utils.sh
 
-readonly rscript="scripts/phasing/07_calc_ser.R"
+readonly rscript="scripts/phasing/11_calc_ser.R"
 readonly ligated_dir="data/phased/wes_union_calls/with_parents"
 readonly out_dir="data/phased/validation"
 

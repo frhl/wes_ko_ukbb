@@ -38,23 +38,22 @@ rm_bad_vcf() {
 # check if VCF is valid
 rm_bad_vcf ${out_vcf_gz}
 
+# bgzip
+#if [ -f "${out_vcf}" ]; then
+#  if [ ! -f "${out_vcf_gz}" ]; then
+#    bgzip "${out_vcf}"
+#  fi
+#else
+#  raise_error "File '${out_vcf}' (.vcf) does not exist!"
+#fi
 
 # combine VCFs fast and make tabix
 if [ -f "${tmp}" ]; then
-  if [ ! -f "${out_vcf}" ]; then
-    bcftools merge -l ${tmp} -o "${out_vcf}"
+  if [ ! -f "${out_vcf_gz}" ]; then
+    bcftools merge -l ${tmp} -Oz -o "${out_vcf_gz}"
   fi
 else
   raise_error "Merge list '${tmp}' does not exist!"
-fi
-
-# bgzip
-if [ -f "${out_vcf}" ]; then
-  if [ ! -f "${out_vcf_gz}" ]; then
-    bgzip "${out_vcf}"
-  fi
-else
-  raise_error "File '${out_vcf}' (.vcf) does not exist!"
 fi
 
 # index VCF

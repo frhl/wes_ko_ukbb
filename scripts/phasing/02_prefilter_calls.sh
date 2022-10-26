@@ -3,13 +3,13 @@
 # @description generate files of genotyped calls
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=calls_gen
+#SBATCH --job-name=prefilter_calls
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/calls_gen.log
-#SBATCH --error=logs/calls_gen.errors.log
+#SBATCH --output=logs/prefilter_calls.log
+#SBATCH --error=logs/prefilter_calls.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=20-22
+#SBATCH --array=21
 
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
@@ -17,10 +17,10 @@ source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/phasing/02_wes_union_calls_gen.py"
+readonly hail_script="scripts/phasing/02_prefilter_calls.py"
 
 readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
-readonly out_dir="data/unphased/calls/new_liftover"
+readonly out_dir="data/unphased/calls/prefilter"
 readonly out_prefix="${out_dir}/ukb_prefilter_calls_200k_chr${chr}"
 readonly out_type="vcf"
 
@@ -38,6 +38,7 @@ if [ ! -f "$( get_hail_ext ${out_prefix} ${out_type})" ]; then
      --out_prefix "${out_prefix}" \
      --out_type "${out_type}" \
      --extract_samples "${sample_list}" \
+     --filter_incorrect_reference \
      --liftover \
      --min_mac 2 \
      --missing 0.05 \
