@@ -16,6 +16,7 @@ def main(args):
     in_path = args.in_path
     in_type = args.in_type
     extract_samples = args.extract_samples
+    remove_withdrawn = args.remove_withdrawn
     min_info = args.min_info
     ancestry = args.ancestry
     out_prefix = args.out_prefix
@@ -40,17 +41,24 @@ def main(args):
    
     # get whole exome samples
     wes = io.import_table(in_path, in_type, calc_info=False)
+    if remove_withdrawn:
+        wes = samples.remove_withdrawn(wes)
+    
     if ancestry:
         wes = samples.filter_ukb_to_ancestry(wes, ancestry)
     wes_samples = wes.cols().s.collect()
 
     # assume samples should be extracted
-    input_ht = hl.import_table(extract_samples, no_header=True, key='f0', delimiter=',')
-    input_samples = input_ht.f0.collect()
+    if extract_samples:
+        input_ht = hl.import_table(extract_samples, no_header=True, key='f0', delimiter=',')
+        input_samples = input_ht.f0.collect()
 
     # get overlap
-    overlap = set(calls_samples) & set(wes_samples) & set(input_samples)
+    overlap = set(calls_samples) & set(wes_samples)
+    n = len(overlap)
+    print(f"Note. Found {n} samples in calls and whole exomes.")
     wes = wes.filter_cols(hl.literal(overlap).contains(wes.s))
+    ht = wes.cols()
     ht.s.export(out_prefix + ".txt")
     
 
@@ -64,6 +72,7 @@ if __name__=='__main__':
     parser.add_argument('--min_info', default=None, help='filter to specific ancestry')
     parser.add_argument('--dataset', default=None, help='Either "imp" or "calls".')
     parser.add_argument('--extract_samples', default=None, help='HailTable with samples to be extracted.')
+    parser.add_argument('--remove_withdrawn', default=None, action = 'store_true', help='HailTable with samples to be extracted.')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     args = parser.parse_args()
 

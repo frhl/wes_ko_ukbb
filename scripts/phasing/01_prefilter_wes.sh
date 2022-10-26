@@ -9,7 +9,7 @@
 #SBATCH --error=logs/prefilter_wes.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=22
+#SBATCH --array=20-22
 #
 #$ -N prefilter_wes
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -18,7 +18,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc
-#$ -t 22
+#$ -t 20-22
 #$ -V
 
 source utils/qsub_utils.sh
@@ -40,9 +40,8 @@ readonly out_type="mt"
 
 readonly entry_fields_to_drop="GQ,DP,AD,PL"
 
-readonly samples_dir="data/unphased/overlap"
-readonly samples_list="${samples_dir}/ukb_eur_calls_wes_samples.txt"
-
+# samples overlapping exomes and genotypes
+readonly samples_list="data/unphased/overlap/ukb_calls_wes_samples.txt"
 
 mkdir -p ${out_dir}
 mkdir -p ${spark_dir}
@@ -55,9 +54,8 @@ python3 "${hail_script}" \
    --input_type "${in_type}" \
    --out_prefix "${out_prefix}" \
    --out_type "${out_type}" \
-   --extract_samples "${samples_list}" \
    --drop_entry_fields "${entry_fields_to_drop}" \
-   --ancestry "eur" \
+   --extract_samples ${samples_list} \
    --min_mac 1 \
    --missing 0.05
 

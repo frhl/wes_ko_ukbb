@@ -54,7 +54,7 @@ def main(args):
         mismatch_expr = variants.get_reference_mismatch_expr(mt.locus, mt.alleles, "GRCh38")
         mismatch_n = mt.aggregate_rows(hl.agg.sum(mismatch_expr))
         if mismatch_n > 0:
-            print(f"Found {mismatch_n} variants with incorrect reference sequence")
+            print(f"Found {mismatch_n} variants with reference allele not in fasta!")
             mt = mt.filter_rows(~mismatch_expr)
     if ancestry:
         mt = samples.filter_ukb_to_ancestry(mt, ancestry)

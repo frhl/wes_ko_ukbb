@@ -9,7 +9,7 @@
 #SBATCH --error=logs/prefilter_calls.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=22
+#SBATCH --array=20-22
 
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
@@ -24,8 +24,8 @@ readonly out_dir="data/unphased/calls/prefilter"
 readonly out_prefix="${out_dir}/ukb_prefilter_calls_200k_chr${chr}"
 readonly out_type="vcf"
 
-readonly samples_dir="data/unphased/overlap"
-readonly samples_list="${samples_dir}/ukb_eur_calls_wes_samples.txt"
+# samples overlapping exomes and genotypes
+readonly samples_list="data/unphased/overlap/ukb_calls_wes_samples.txt"
 
 mkdir -p ${spark_dir}
 mkdir -p ${out_dir}

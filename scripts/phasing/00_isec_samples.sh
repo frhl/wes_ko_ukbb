@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# @description generate files of genotyped calls
+# @description find samples overlapping wes and calls
 #
 #SBATCH --account=lindgren.prj
 #SBATCH --job-name=isec_samples
@@ -20,13 +20,11 @@ readonly chr="21"
 
 # output samples
 readonly out_dir="data/unphased/overlap"
-readonly out_prefix="${out_dir}/ukb_eur_calls_wes_samples"
+readonly out_prefix="${out_dir}/ukb_calls_wes_samples"
 # get samples in whole exome seq data
 readonly in_wes_dir="data/unphased/wes/post-qc"
 readonly in_wes_file="${in_wes_dir}/ukb_wes_200k_filtered_chr${chr}.mt"
 readonly in_wes_type="mt"
-# get european samples
-readonly samples_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
 
 mkdir -p ${spark_dir}
 mkdir -p ${out_dir}
@@ -38,8 +36,7 @@ python3 "${hail_script}" \
    --in_path "${in_wes_file}" \
    --in_type "${in_wes_type}" \
    --out_prefix "${out_prefix}" \
-   --extract_samples "${samples_list}" \
-   --ancestry "eur" \
+   --remove_withdrawn \
    --dataset "calls"
 
 
