@@ -39,7 +39,7 @@ validate_samples_in_vcf() {
   local _vcf="${1}"
   local _expt="${2}"
   local _found=$( bcftools -l ${_vcf} | wc -l)
-  if [ "${_expt}" -ne "${_found}" ]; then
+  if [ "${_expt}" != "${_found}" ]; then
     touch "${_vcf}.ERROR"
     raise_error "Error: ${_vcf} did not have the expected number of samples!"
   fi
