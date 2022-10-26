@@ -30,7 +30,7 @@ def main(args):
     mt = qc.get_table(input_path, input_type, calc_info = False) # assuming build GRCh38
 
     if extract_samples:
-        ht_samples = hl.import_table(extract_samples, no_header=True, key='f0', delimiter=',')
+        ht_samples = hl.import_table(extract_samples, no_header=False, key='s', delimiter=',')
         mt = mt.filter_cols(hl.is_defined(ht_samples[mt.col_key])) 
     if ancestry:
         mt = samples.filter_ukb_to_ancestry(mt, ancestry)

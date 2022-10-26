@@ -36,34 +36,21 @@ def main(args):
         raise TypeError(f"{dataset} is not 'imp' or 'calls'")
 
     # get calls
-    calls = samples.convert_sample_ids(mt, 12788, 11867)
-    calls_samples = calls.col_key.collect()
+    calls_samples = mt.cols().s.collect()
    
-    print(calls.describe())
-
     # get whole exome samples
     wes = io.import_table(in_path, in_type, calc_info=False)
     if ancestry:
         wes = samples.filter_ukb_to_ancestry(wes, ancestry)
-    wes_samples = wes.col_key.collect()
+    wes_samples = wes.cols().s.collect()
 
-    print(wes.describe())
-    
     # assume samples should be extracted
     input_ht = hl.import_table(extract_samples, no_header=True, key='f0', delimiter=',')
     input_samples = input_ht.f0.collect()
-    
-    
-    print(calls_samples[0:5])
-    print(wes_samples[0:5])
-    print(input_samples[0:5])
-
 
     # get overlap
     overlap = set(calls_samples) & set(wes_samples) & set(input_samples)
     wes = wes.filter_cols(hl.literal(overlap).contains(wes.s))
-    ht = wes.s
-    ht.write(out_prefix + ".ht")
     ht.s.export(out_prefix + ".txt")
     
 
@@ -75,7 +62,6 @@ if __name__=='__main__':
     parser.add_argument('--in_type', default=None, help='chromosome')
     parser.add_argument('--ancestry', default=None, help='filter to specific ancestry')
     parser.add_argument('--min_info', default=None, help='filter to specific ancestry')
-    parser.add_argument('--convert_sample_id', default=None, action='store_true', help='convert to lindgren sample id')
     parser.add_argument('--dataset', default=None, help='Either "imp" or "calls".')
     parser.add_argument('--extract_samples', default=None, help='HailTable with samples to be extracted.')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')

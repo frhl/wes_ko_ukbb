@@ -51,11 +51,15 @@ def main(args):
         mt = variants.liftover(mt, from_build='GRCh37', to_build='GRCh38', drop_annotations=True, fix_ref=True)
         mt = mt.filter_rows(mt.locus.contig == "chr" + str(chrom))
     if filter_incorrect_reference:
-        mt = variants.filter_reference_mismatch(mt=mt, build="GRCh38")
+        mismatch_expr = variants.get_reference_mismatch_expr(mt.locus, mt.alleles, "GRCh38")
+        mismatch_n = mt.aggregate_rows(hl.agg.sum(mismatch_expr))
+        if mismatch_n > 0:
+            print(f"Found {mismatch_n} variants with incorrect reference sequence")
+            mt = mt.filter_rows(~mismatch_expr)
     if ancestry:
         mt = samples.filter_ukb_to_ancestry(mt, ancestry)
     if min_mac:
-        mt = filter_min_mac(mt, int(min_mac))
+        mt = mt.filter_rows(variants.get_mac_expr(mt) >= int(min_mac))
     if missing:
         mt = filter_missing(mt, float(missing))
     mt = io.recalc_info(mt)

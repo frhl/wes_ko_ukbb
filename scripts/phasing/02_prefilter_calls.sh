@@ -9,7 +9,7 @@
 #SBATCH --error=logs/prefilter_calls.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=21
+#SBATCH --array=22
 
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
@@ -24,29 +24,25 @@ readonly out_dir="data/unphased/calls/prefilter"
 readonly out_prefix="${out_dir}/ukb_prefilter_calls_200k_chr${chr}"
 readonly out_type="vcf"
 
-readonly sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
+readonly samples_dir="data/unphased/overlap"
+readonly samples_list="${samples_dir}/ukb_eur_calls_wes_samples.txt"
 
 mkdir -p ${spark_dir}
 mkdir -p ${out_dir}
 
-if [ ! -f "$( get_hail_ext ${out_prefix} ${out_type})" ]; then
-  SECONDS=0
-  set_up_hail
-  set_up_pythonpath_legacy
-  python3 "${hail_script}" \
-     --chrom "${chr}" \
-     --out_prefix "${out_prefix}" \
-     --out_type "${out_type}" \
-     --extract_samples "${sample_list}" \
-     --filter_incorrect_reference \
-     --liftover \
-     --min_mac 2 \
-     --missing 0.05 \
-     --ancestry "eur" \
-     --dataset "calls"
-else
-  echo "file ${out} already exists. Skipping!"
-fi
+set_up_hail
+set_up_pythonpath_legacy
+python3 "${hail_script}" \
+   --chrom "${chr}" \
+   --out_prefix "${out_prefix}" \
+   --out_type "${out_type}" \
+   --extract_samples "${samples_list}" \
+   --filter_incorrect_reference \
+   --liftover \
+   --min_mac 2 \
+   --missing 0.05 \
+   --ancestry "eur" \
+   --dataset "calls"
 
 
 if [[ ${out_type} == "vcf" ]]; then

@@ -19,7 +19,7 @@ readonly hail_script="scripts/phasing/00_isec_samples.py"
 readonly chr="21"
 
 # output samples
-readonly out_dir="data/unphased/"
+readonly out_dir="data/unphased/overlap"
 readonly out_prefix="${out_dir}/ukb_eur_calls_wes_samples"
 # get samples in whole exome seq data
 readonly in_wes_dir="data/unphased/wes/post-qc"

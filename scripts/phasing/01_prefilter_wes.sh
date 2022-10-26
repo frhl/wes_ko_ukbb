@@ -8,17 +8,17 @@
 #SBATCH --output=logs/prefilter_wes.log
 #SBATCH --error=logs/prefilter_wes.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 4
-#SBATCH --array=1-22
+#SBATCH --cpus-per-task 2
+#SBATCH --array=22
 #
 #$ -N prefilter_wes
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/prefilter_wes.log
 #$ -e logs/prefilter_wes.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 4
+#$ -pe shmem 2
 #$ -q short.qc
-#$ -t 1-19
+#$ -t 22
 #$ -V
 
 source utils/qsub_utils.sh
@@ -34,11 +34,15 @@ readonly chr=$( get_chr ${array_idx} )
 readonly in_file="${in_dir}/ukb_wes_200k_filtered_chr${chr}.mt"
 readonly in_type="mt"
 
-readonly out_dir="data/unphased/wes/prefilter/new"
+readonly out_dir="data/unphased/wes/prefilter/new2"
 readonly out_prefix="${out_dir}/ukb_eur_wes_prefilter_200k_chr${chr}"
 readonly out_type="mt"
 
 readonly entry_fields_to_drop="GQ,DP,AD,PL"
+
+readonly samples_dir="data/unphased/overlap"
+readonly samples_list="${samples_dir}/ukb_eur_calls_wes_samples.txt"
+
 
 mkdir -p ${out_dir}
 mkdir -p ${spark_dir}
@@ -51,6 +55,7 @@ python3 "${hail_script}" \
    --input_type "${in_type}" \
    --out_prefix "${out_prefix}" \
    --out_type "${out_type}" \
+   --extract_samples "${samples_list}" \
    --drop_entry_fields "${entry_fields_to_drop}" \
    --ancestry "eur" \
    --min_mac 1 \
