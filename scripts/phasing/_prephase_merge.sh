@@ -23,6 +23,7 @@ rm -f "${out_vcf_gz}.tbi"
 
 # remove duplicates (from debugging the functions)
 cat ${input_list} | sort | uniq  > ${tmp}
+readonly n_samples=$( cat ${tmp} | wc )
 
 rm_bad_vcf() {
   local _vcf=${1}
@@ -34,18 +35,21 @@ rm_bad_vcf() {
  fi
 }
 
+validate_samples_in_vcf() {
+  local _vcf="${1}"
+  local _expt="${2}"
+  local _found=$( bcftools -l ${_vcf} | wc -l)
+  if [ "${_expt}" -ne "${_found}" ]; then
+    touch "${_vcf}.ERROR"
+    raise_error "Error: ${_vcf} did not have the expected number of samples!"
+  fi
+}
+
+
 
 # check if VCF is valid
 rm_bad_vcf ${out_vcf_gz}
 
-# bgzip
-#if [ -f "${out_vcf}" ]; then
-#  if [ ! -f "${out_vcf_gz}" ]; then
-#    bgzip "${out_vcf}"
-#  fi
-#else
-#  raise_error "File '${out_vcf}' (.vcf) does not exist!"
-#fi
 
 # combine VCFs fast and make tabix
 if [ -f "${tmp}" ]; then
@@ -55,6 +59,10 @@ if [ -f "${tmp}" ]; then
 else
   raise_error "Merge list '${tmp}' does not exist!"
 fi
+
+# ensure that all samples have been merged
+validate_samples_in_vcf ${out_vcf_gz} ${n_samples}
+
 
 # index VCF
 if [ -f "${out_vcf_gz}" ]; then
