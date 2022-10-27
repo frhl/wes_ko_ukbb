@@ -49,6 +49,27 @@ extract_sample() {
     fi
 }
 
+# ensure that all variants have been extracted
+validate_variant_count() {
+  module load BCFtools/1.12-GCC-10.3.0
+  local _vcf1=${1}
+  local _vcf2=${2}
+  local _n1=$( bcftools query -f '%POS\n' ${_vcf1} | wc -l)
+  local _n2=$( bcftools query -f '%POS\n' ${_vcf2} | wc -l)
+  if [ "${_n1}" == "0" ]; then
+    raise_error "Error: VCF  ${_vcf1} has zero variants!"
+    touch "${_vcf1}.ERROR"
+    exit 1
+  fi
+  if [ "${_n1}" != "${_n2}" ]; then
+    raise_error "Error: VCFs (${_vcf1} and ${_vcf2}) had ${_n1} and  ${_n2} variants respectively!!"
+    touch "${_vcf}.ERROR"
+    exit 1
+  fi
+
+}
+
+
 # extract single sample from VCF
 module purge
 extract_sample ${input_path} ${eid} ${path_unphased}
@@ -74,6 +95,11 @@ if [ ! -f "${path_phased_gz}" ]; then
   make_tabix "${path_phased_gz}" "tbi"
 fi
 
+# check that both VCFs have the same counts
+validate_variant_count ${path_unphased_gz} ${path_phased_gz}
+
 # Keep track of files that have been phased
 echo "${path_phased_gz}" >> ${mergelist}
+
+
 
