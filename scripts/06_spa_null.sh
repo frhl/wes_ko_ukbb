@@ -9,7 +9,7 @@
 #SBATCH --error=logs/spa_null.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-100
+#SBATCH --array=1-5
 
 
 # all binary: 1 - 71
@@ -76,26 +76,31 @@ set_up_prs() {
   # fit_cts_traits/fit_binary_traits
   set_up_rpy
   prs_ok=0
-  if [[ -f "${prs}"  && "${use_prs}" -eq "1" ]]; then
-    echo "Note: Checking LDSC h2 estimates at ${ldsc}."
-    if [ -f "${ldsc}" ]; then
-      local h2_pass_qc=$(Rscript ${rscript_ldsc} --ldsc ${ldsc})
-      echo "Note: PRS for ${phenotype} pass QC: ${h2_pass_qc}"
-      if [ "${h2_pass_qc}" -eq "1" ]; then
-        if [ ! -f "${out_pheno_prs}" ]; then
-          Rscript ${rscript} \
-            --phenotype ${phenotype} \
-            --covariates ${covariates} \
-            --phenofile ${pheno_file} \
-            --prsfile ${prs} \
-            --outfile ${out_pheno_prs}
+
+  if [[ "${use_prs}" -eq "1" ]]; then
+    if [[ -f "${prs}" ]]; then
+      echo "Note: Checking LDSC h2 estimates at ${ldsc}."
+      if [ -f "${ldsc}" ]; then
+        local h2_pass_qc=$(Rscript ${rscript_ldsc} --ldsc ${ldsc})
+        echo "Note: PRS for ${phenotype} pass QC: ${h2_pass_qc}"
+        if [ "${h2_pass_qc}" -eq "1" ]; then
+          if [ ! -f "${out_pheno_prs}" ]; then
+            Rscript ${rscript} \
+              --phenotype ${phenotype} \
+              --covariates ${covariates} \
+              --phenofile ${pheno_file} \
+              --prsfile ${prs} \
+              --outfile ${out_pheno_prs}
+          fi
+          # if the pheno file has already been created
+          # ensure that chromosomal tasks are set up
+          prs_ok=1
+          pheno_file=${out_pheno_prs}
+          tasks=1-22
         fi
-        # if the pheno file has already been created
-        # ensure that chromosomal tasks are set up
-        prs_ok=1
-        pheno_file=${out_pheno_prs}
-        tasks=1-22
       fi
+    else
+      echo "Error! Could not find PRS-file '${prs}'!"
     fi
   fi
 }
@@ -106,7 +111,7 @@ submit_spa_null() {
   tasks=${index}
   set_up_prs
   if [[ "${prs_ok}" -eq "0"  && "${use_prs}" -eq "1" ]]; then
-    >&2 echo "Note: PRS could not be started for ${phenotype}. Skipping."
+    >&2 echo "Error: PRS could not be started for '${phenotype}'"
   else
     if [ ! -z ${phenotype} ]; then
       if [ ! -f "${out_prefix}.rda" ]; then
@@ -147,14 +152,14 @@ submit_spa_null() {
 }
 
 # Parameters
-readonly use_prs=0
+readonly use_prs=1
 readonly nslots=2
 readonly queue="short"
 readonly project="lindgren.prj"
 
 # Fit null model for binary/cts traits
-#fit_cts_traits
-fit_binary_traits
+fit_cts_traits
+#fit_binary_traits
 
 
 
