@@ -8,8 +8,8 @@
 #SBATCH --output=logs/prefilter_calls.log
 #SBATCH --error=logs/prefilter_calls.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 2
-#SBATCH --array=1-19
+#SBATCH --cpus-per-task 3
+#SBATCH --array=1-22
 
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
@@ -41,7 +41,6 @@ python3 "${hail_script}" \
    --liftover \
    --min_mac 2 \
    --missing 0.05 \
-   --ancestry "eur" \
    --dataset "calls"
 
 

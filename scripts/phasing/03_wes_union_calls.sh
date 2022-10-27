@@ -8,8 +8,9 @@
 #SBATCH --output=logs/wes_union_calls.log
 #SBATCH --error=logs/wes_union_calls.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 3
-#SBATCH --array=20-22
+#SBATCH --cpus-per-task 4
+#SBATCH --array=2-22
+#SBATCH --dependency="aftercorr:7183082"
 #
 #$ -N wes_union_calls
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -18,8 +19,10 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 3
 #$ -q short.qe
-#$ -t 1
+#$ -t 21
 #$ -V
+
+# take ~15H for chr21 with 3 e cores
 
 set -o errexit
 set -o nounset

@@ -21,6 +21,7 @@ def main(args):
     input_wes_type = args.input_wes_type
     extract_samples = args.extract_samples
     exclude_trio_parents = args.exclude_trio_parents
+    subset_to_overlapping_samples = args.subset_to_overlapping_samples
     export_parents = args.export_parents
     export_variants = args.export_variants
     min_mac = args.min_mac
@@ -48,13 +49,14 @@ def main(args):
     mt2 = mt2.select_entries(mt2.GT)  
 
     # subset to intersecting samples
-    mt1_sids = mt1.s.collect()
-    mt2_sids = mt2.s.collect()
-    overlap = list(set(mt1_sids) & set(mt2_sids))
-    
-    # ensure intersection between samples
-    mt1 = mt1.filter_cols(hl.literal(set(overlap)).contains(mt1.s))
-    mt2 = mt2.filter_cols(hl.literal(set(overlap)).contains(mt2.s))
+    if subset_to_overlapping_samples:
+        mt1_sids = mt1.s.collect()
+        mt2_sids = mt2.s.collect()
+        overlap = list(set(mt1_sids) & set(mt2_sids))
+        
+        # ensure intersection between samples
+        mt1 = mt1.filter_cols(hl.literal(set(overlap)).contains(mt1.s))
+        mt2 = mt2.filter_cols(hl.literal(set(overlap)).contains(mt2.s))
 
     # Remove any variants from mt that are already in mt2
     mt1 = mt1.filter_rows(~hl.is_defined(mt2.index_rows(mt1.locus, mt1.alleles)))
@@ -113,6 +115,7 @@ if __name__=='__main__':
     parser.add_argument('--input_wes_type', default=None, help='What input type?')
     parser.add_argument('--input_calls_type', default=None, help='What input type?')
     parser.add_argument('--exclude_trio_parents', default=None, action='store_true', help='Exclude parents of duo/trio relationships')
+    parser.add_argument('--subset_to_overlapping_samples', default=None, action='store_true', help='Subsets to overlapping samples (required if no pre-filtering has been performed)')
     parser.add_argument('--ancestry', default=None, help='filter to specific ancestry')
     parser.add_argument('--convert_sample_id', default=None, action='store_true', help='convert to lindgren sample id')
     parser.add_argument('--export_parents', default=None, action='store_true', help='Export parents genotypes seperately')

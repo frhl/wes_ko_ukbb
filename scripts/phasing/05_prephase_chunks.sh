@@ -9,7 +9,7 @@
 #SBATCH --error=logs/prephase_chunks.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=20
+#SBATCH --array=21
 #
 #$ -N prephase_chunks
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -50,12 +50,12 @@ readonly queue="short"
 readonly nslots=2
 
 # what file should be split up
-readonly input_dir=" data/unphased/wes_union_calls/old_old/new"
+readonly input_dir=" data/unphased/wes_union_calls"
 readonly input_path="${input_dir}/ukb_wes_union_calls_200k_chr${chr}.mt" 
 readonly input_type="mt"
 
 # Output paths
-readonly out_dir="data/prephased/wes_union_calls/chunks/test"
+readonly out_dir="data/prephased/wes_union_calls/chunks"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
 readonly out_prefix_w_job_config="${out_prefix}_spc${samples_per_chunk}_${queue}/chr${chr}_chunk"
 readonly out_merge_w_job_config="${out_prefix}_spc${samples_per_chunk}_${queue}.mergelist"
