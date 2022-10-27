@@ -8,9 +8,8 @@
 #SBATCH --output=logs/wes_union_calls_phasing.log
 #SBATCH --error=logs/wes_union_calls_phasing.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task=22
+#SBATCH --cpus-per-task=16
 #SBATCH --array=21
-#SBATCH --dependency="afternotok:6390859"
 #
 #$ -N wes_union_calls_phasing
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -28,14 +27,14 @@ source utils/qsub_utils.sh
 source utils/vcf_utils.sh
 source utils/bash_utils.sh
 
-readonly in_dir="data/phased/wes_union_calls/prephased"
-readonly out_dir="data/phased/wes_union_calls/prephased_test_5slots"
+readonly in_dir="data/unphased/wes_union_calls"
+readonly out_dir="data/phased/wes_union_calls/test_no_prephasing_180k"
 readonly ref_dir="/well/lindgren/flassen/ressources/panels/liftover_reference_panel/data/liftover"
 readonly fam_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 
 readonly chr="$( get_array_task_id )"
-readonly in_file="${in_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.vcf.gz"
-readonly out_file="${out_dir}/ukb_eur_wes_union_calls_200k_phased_chr${chr}.vcf.gz"
+readonly in_file="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.gz"
+readonly out_file="${out_dir}/ukb_wes_union_calls_200k_phased_chr${chr}.vcf.gz"
 
 readonly ref="${ref_dir}/ALL.chr${chr}.phase3_shapeit2_mvncall_integrated_v5.20130502.genotypes.vcf.bgz"
 readonly gmap="/well/lindgren/flassen/software/SHAPEIT4/b38.gmap/chr${chr}.b38.gmap.gz"
@@ -50,7 +49,7 @@ if [ ! -f ${out_file} ]; then
     --map ${gmap} \
     --region "chr${chr}" \
     --thread 21 \
-    --pbwt-mac 1 \
+    --pbwt-mac 2 \
     --output ${out_file} \
     --use-PS 0.0001 \
     --sequencing \

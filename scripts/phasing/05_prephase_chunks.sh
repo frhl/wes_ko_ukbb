@@ -50,17 +50,17 @@ readonly queue="short"
 readonly nslots=2
 
 # what file should be split up
-readonly input_dir=" data/unphased/wes_union_calls"
+readonly input_dir=" data/unphased/wes_union_calls/eur"
 readonly input_path="${input_dir}/ukb_wes_union_calls_200k_chr${chr}.mt" 
 readonly input_type="mt"
 
 # Output paths
-readonly out_dir="data/prephased/wes_union_calls/chunks"
+readonly out_dir="data/prephased/eur/wes_union_calls/chunks"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
 readonly out_prefix_w_job_config="${out_prefix}_spc${samples_per_chunk}_${queue}/chr${chr}_chunk"
 readonly out_merge_w_job_config="${out_prefix}_spc${samples_per_chunk}_${queue}.mergelist"
 
-readonly out_merge_dir="data/prephased/wes_union_calls"
+readonly out_merge_dir="data/prephased/eur/wes_union_calls"
 readonly out_merge_file="${out_merge_dir}/ukb_wes_union_calls_prephased_200k_chr${chr}.vcf.bgz"
 
 # Interval paths
@@ -104,7 +104,7 @@ get_max_interval_idx() {
 submit_prephasing_job() {
   
   readonly max_interval_idx=$( get_max_interval_idx )
-  readonly slurm_tasks="1" #${max_interval_idx}"
+  readonly slurm_tasks="1-${max_interval_idx}"
   readonly slurm_jname="_c${chr}_prephase_chunks"
   readonly slurm_lname="logs/_prephase_chunks"
   readonly slurm_project="${project}"
