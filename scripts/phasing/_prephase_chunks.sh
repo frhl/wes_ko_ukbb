@@ -182,25 +182,31 @@ submit_merge_job_sge() {
 }
 
 
+# check if phasing and merging has already been completed
+if [ ! -f "${out_merge_file}.vcf.gz" ]; then
+  
+  # split main MatrixTable into 
+  # chunks of equally sized VCFs by sample
+  if [ ! -f "${splitted_input}" ]; then
+    split_to_chunks \
+      ${chunk_idx} \
+      ${input_path} \
+      ${input_type} \
+      ${splitted}
+  fi
 
-# split main MatrixTable into 
-# chunks of equally sized VCFs by sample
-if [ ! -f "${splitted_input}" ]; then
-  split_to_chunks \
-    ${chunk_idx} \
-    ${input_path} \
-    ${input_type} \
-    ${splitted}
+  # make tabix of VCF
+  if [ ! -f "${splitted_input}.tbi" ]; then
+    module purge
+    module load BCFtools/1.12-GCC-10.3.0
+    make_tabix "${splitted_input}" "tbi"
+  fi
+
+  # submit workers for each sample
+  submit_prephasing_sample_job ${cluster}
+  submit_merge_job_sge
+
+else
+  >&2 echo "${out_merge_file}.vcf.gz already exists. Skipping."
 fi
-
-# make tabix of VCF
-if [ ! -f "${splitted_input}.tbi" ]; then
-  module purge
-  module load BCFtools/1.12-GCC-10.3.0
-  make_tabix "${splitted_input}" "tbi"
-fi
-
-submit_prephasing_sample_job ${cluster}
-submit_merge_job_sge
-
 
