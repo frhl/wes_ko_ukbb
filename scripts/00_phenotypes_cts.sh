@@ -22,9 +22,9 @@ readonly covar_dir="data/phenotypes"
 readonly out_dir="data/phenotypes/test"
 
 readonly in_bin="${in_dir}/curated_phenotypes_cts.tsv"
-readonly tmp_bin="${out_dir}/curated_covar_phenotypes_cts.tsv.gz"
-readonly out_bin_500k="${out_dir}/curated_covar_phenotypes_cts_500k"
-readonly out_bin_200k="${out_dir}/curated_covar_phenotypes_cts_200k"
+readonly tmp_bin="${out_dir}/cts_phenotypes.tsv.gz"
+readonly out_bin_500k="${out_dir}/cts_phenotypes_500k"
+readonly out_bin_200k="${out_dir}/cts_phenotypes_200k"
 
 readonly final_sample_list="/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list"
 
@@ -46,7 +46,6 @@ Rscript ${r_script} \
   --transform ${phenotypes_cts} \
   --out_path ${tmp_bin}
 
-
 # set up python
 set +eu
 module purge
@@ -60,13 +59,14 @@ python3 "${hail_script}" \
      --extract_samples "${final_sample_list}" \
      --export_header \
      --out_prefix "${out_bin_200k}"
+gzip "${out_bin_200k}.tsv"
 
 # get 500k IMP samples
 python3 "${hail_script}" \
      --input_path "${tmp_bin}" \
      --export_header \
      --out_prefix "${out_bin_500k}"
-
+gzip "${out_bin_500k}.tsv"
 
 
 

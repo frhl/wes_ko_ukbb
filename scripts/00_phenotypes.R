@@ -193,7 +193,7 @@ parser$add_argument("--transform", default=NULL, help = "What phenotypes should 
 parser$add_argument("--row_na_action", default="keep", help = "set to 'remove' to delete rows with missing covariates")
 parser$add_argument("--covariates", default=NULL, help = "comma seperated string of covariates")
 parser$add_argument("--qc_samples", default=NULL, help = "link to duncan's quality control samples (only used to subset by phenotype case count!)")
-parser$add_argument("--case_count_cutoff", default=50, help = "Discard binary phenotypes with less than n cases.")
+parser$add_argument("--case_count_cutoff", default=NULL, help = "Discard binary phenotypes with less than n cases.")
 parser$add_argument("--include_spiros", default=FALSE, action='store_true', help = "Include spiros phenotypes.")
 parser$add_argument("--include_brava", default=FALSE, action='store_true', help = "Include Brava phenotypes")
 args <- parser$parse_args()

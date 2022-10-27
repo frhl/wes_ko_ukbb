@@ -33,16 +33,17 @@ mkdir -p ${out_dir}
 mkdir -p ${spark_dir}
 
 # Pre-processing of phenotypes
-set_up_rpy
-Rscript ${r_script} \
-  --input_path ${in_bin} \
-  --covariates ${covariates} \
-  --qc_samples ${final_sample_list} \
-  --case_count_cutoff "50" \
-  --include_spiros \
-  --include_brava \
-  --out_path ${tmp_bin}
-
+if [ ! -f ${tmp_bin} ]; then
+  set_up_rpy
+  Rscript ${r_script} \
+    --input_path ${in_bin} \
+    --covariates ${covariates} \
+    --qc_samples ${final_sample_list} \
+    --case_count_cutoff "50" \
+    --include_spiros \
+    --include_brava \
+    --out_path ${tmp_bin}
+fi
 
 # set up python
 set +eu
@@ -51,21 +52,33 @@ set_up_hail
 set_up_pythonpath_legacy
 set -eu
 
-# get 500k IMP samples
-#python3 "${hail_script}" \
-#     --input_path "${tmp_bin}" \
-#     --export_header \
-#     --count_case_control \
-#     --out_prefix "${out_bin_500k}"
+# get 500k WES samples
+if [ ! -f ${out_bin_500k} ]; then
+python3 "${hail_script}" \
+     --input_path "${tmp_bin}" \
+     --export_header \
+     --count_case_control \
+     --out_prefix "${out_bin_500k}"
+fi
 
+
+if [ ! -f "${out_bin_500k}.tsv.gz" ]; then
+  gzip "${out_bin_500k}.tsv"
+fi
 
 # Get 200k WES samples
+if [ ! -f ${out_bin_200k} ]; then
 python3 "${hail_script}" \
      --input_path "${tmp_bin}" \
      --extract_samples "${final_sample_list}" \
      --export_header \
      --count_case_control \
      --out_prefix "${out_bin_200k}"
+fi
+
+if [ ! -f "${out_bin_500k}.tsv.gz" ]; then
+  gzip "${out_bin_200k}.tsv"
+fi
 
 
 
