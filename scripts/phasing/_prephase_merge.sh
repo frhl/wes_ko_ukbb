@@ -18,8 +18,13 @@ readonly out_vcf="${out_prefix}.vcf"
 readonly out_vcf_gz="${out_vcf}.gz"
 readonly tmp="${out_prefix}.tmp"
 
-rm -f "${out_vcf_gz}"
-rm -f "${out_vcf_gz}.tbi"
+# the following directories and files will be deleted upon successfull exectution
+readonly prefix_to_del="${out_prefix/_prephased/}"
+readonly dir_to_del="${prefix_to_del}"
+readonly vcf_to_del="${dir_to_del}.vcf.bgz"
+readonly tbi_to_del="${vcf_to_del}.tbi"
+readonly mrg_to_del="${prefix_to_del}.mergelist"
+echo "The following directory will be removed: ${dir_to_del}, ${vcf_to_del}, ${mrg_to_del}"
 
 # remove duplicates (from debugging the functions)
 cat ${input_list} | sort | uniq  > ${tmp}
@@ -38,10 +43,12 @@ rm_bad_vcf() {
 validate_samples_in_vcf() {
   local _vcf="${1}"
   local _expt="${2}"
-  local _found=$( bcftools -l ${_vcf} | wc -l)
+  local _found=$( bcftools query -l "${_vcf}" | wc -l)
+  echo "VCF=${_vcf} and expt=${_expt} and found=${_found}"
   if [ "${_expt}" != "${_found}" ]; then
+    raise_error "Error: ${_vcf} had ${_found} of ${_expt} expected samples!"
     touch "${_vcf}.ERROR"
-    raise_error "Error: ${_vcf} did not have the expected number of samples!"
+    exit 1
   fi
 }
 
@@ -49,7 +56,6 @@ validate_samples_in_vcf() {
 
 # check if VCF is valid
 rm_bad_vcf ${out_vcf_gz}
-
 
 # combine VCFs fast and make tabix
 if [ -f "${tmp}" ]; then
@@ -77,26 +83,16 @@ fi
 readonly file0=$( cat ${tmp} | head -n1 ) 
 readonly targetdir=$( dirname ${file0} )
 cat ${targetdir}/*.reads > "${out_prefix}.reads"
+gzip "${out_prefix}.reads"
 
 # clean up temporary files
+echo "Success (${out_prefix})! Deleting temporary files."
 rm ${tmp}
-
-
-
-
-
-# remove containing folder and clean up
-#readonly prefix_unphased="${out_prefix/_prephased/}"
-#readonly unphased_vcf="${prefix_unphased}.vcf.bgz"
-#readonly unphased_index="${prefix_unphased}.vcf.bgz.tbi"
-#readonly unphased_tmp="${prefix_unphased}.tmp"
-
-# remove directory content and then directory
-#rm ${prefix_unphased}/s*
-#rmdir ${preifx_unphased}
-#rm -f ${unphased_vcf} ${unphased_index} ${unphased_tmp}
-
-
+rm ${dir_to_del}/s*
+rmdir ${dir_to_del}
+rm ${vcf_to_del}
+rm ${tbi_to_del}
+rm ${mrg_to_del}
 
 
 

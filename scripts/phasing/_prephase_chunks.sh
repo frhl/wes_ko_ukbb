@@ -26,7 +26,7 @@ readonly main_merge_file=${8?Error: Missing arg6 ()}
 readonly out_prefix=${9?Error: Missing arg6 ()} 
 
 readonly prephase_sample_script="scripts/phasing/_prephase_sample.sh"
-readonly hail_script="scripts/phasing/03_prephase_chunks.py"
+readonly hail_script="scripts/phasing/05_prephase_chunks.py"
 readonly merge_script="scripts/phasing/_prephase_merge.sh"
 
 readonly chunk_idx=$( get_array_task_id ) # one-based index for which phasing interval to phase

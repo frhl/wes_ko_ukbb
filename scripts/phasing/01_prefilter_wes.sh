@@ -8,17 +8,17 @@
 #SBATCH --output=logs/prefilter_wes.log
 #SBATCH --error=logs/prefilter_wes.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 2
-#SBATCH --array=1-19
+#SBATCH --cpus-per-task 3
+#SBATCH --array=1
 #
 #$ -N prefilter_wes
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/prefilter_wes.log
 #$ -e logs/prefilter_wes.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 2
+#$ -pe shmem 3
 #$ -q short.qc
-#$ -t 1-19
+#$ -t 1
 #$ -V
 
 source utils/qsub_utils.sh
@@ -34,7 +34,7 @@ readonly chr=$( get_chr ${array_idx} )
 readonly in_file="${in_dir}/ukb_wes_200k_filtered_chr${chr}.mt"
 readonly in_type="mt"
 
-readonly out_dir="data/unphased/wes/prefilter/new2"
+readonly out_dir="data/unphased/wes/prefilter"
 readonly out_prefix="${out_dir}/ukb_wes_prefilter_200k_chr${chr}"
 readonly out_type="mt"
 

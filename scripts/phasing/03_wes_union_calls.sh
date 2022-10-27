@@ -10,16 +10,15 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 3
 #SBATCH --array=20-22
-#SBATCH --dependency="aftercorr:6687103:6687099"
 #
 #$ -N wes_union_calls
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/wes_union_calls.log
 #$ -e logs/wes_union_calls.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 1
+#$ -pe shmem 3
 #$ -q short.qe
-#$ -t 21
+#$ -t 1
 #$ -V
 
 set -o errexit
@@ -35,13 +34,11 @@ readonly hail_script="scripts/phasing/03_wes_union_calls.py"
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
-readonly in_wes_dir="data/unphased/wes/prefilter/new2" # note: exported to prefilter/new2 !
-#readonly in_wes_dir="data/unphased/wes/old/prefilter/new" # note: exported to prefilter/new2 !
-readonly in_wes_file="${in_wes_dir}/ukb_eur_wes_prefilter_200k_chr${chr}.mt"
+readonly in_wes_dir="data/unphased/wes/prefilter" # note: exported to prefilter/new2 !
+readonly in_wes_file="${in_wes_dir}/ukb_wes_prefilter_200k_chr${chr}.mt"
 readonly in_wes_type="mt"
 
-readonly in_calls_dir="data/unphased/calls"
-#readonly in_calls_dir="data/unphased/calls/old/new_liftover"
+readonly in_calls_dir="data/unphased/calls/prefilter"
 readonly in_calls_file="${in_calls_dir}/ukb_prefilter_calls_200k_chr${chr}.mt"
 readonly in_calls_type="mt"
 
