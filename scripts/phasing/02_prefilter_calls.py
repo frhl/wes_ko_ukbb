@@ -22,6 +22,7 @@ def main(args):
     min_info = args.min_info
     liftover = args.liftover
     min_mac = args.min_mac
+    min_maf = args.min_maf
     missing = args.missing
     ancestry = args.ancestry
     out_prefix = args.out_prefix
@@ -60,6 +61,8 @@ def main(args):
         mt = samples.filter_ukb_to_ancestry(mt, ancestry)
     if min_mac:
         mt = mt.filter_rows(variants.get_mac_expr(mt) >= int(min_mac))
+    if min_maf:
+        mt = mt.filter_rows(variants.get_maf_expr(mt) >= float(min_maf))
     if missing:
         mt = filter_missing(mt, float(missing))
     mt = io.recalc_info(mt)
@@ -81,6 +84,7 @@ if __name__=='__main__':
     parser.add_argument('--dataset', default=None, help='Either "imp" or "calls".')
     parser.add_argument('--extract_samples', default=None, help='HailTable with samples to be extracted.')
     parser.add_argument('--min_mac', default=None, help='Filter to MAC >= value')
+    parser.add_argument('--min_maf', default=None, help='Filter to MAF >= value')
     parser.add_argument('--missing', default=None, help='Filter to variants to have le value in genotype missingness')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Type out vcf/plink/mt')

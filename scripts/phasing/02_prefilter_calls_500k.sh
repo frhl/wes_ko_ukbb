@@ -9,7 +9,7 @@
 #SBATCH --error=logs/prefilter_calls.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 3
-#SBATCH --array=1-22
+#SBATCH --array=20-22
 
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
@@ -21,11 +21,11 @@ readonly hail_script="scripts/phasing/02_prefilter_calls.py"
 
 readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 readonly out_dir="data/unphased/calls/prefilter/by_maf"
-readonly out_prefix="${out_dir}/ukb_prefilter_calls_200k_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_eur_prefilter_calls_500k_chr${chr}"
 readonly out_type="vcf"
 
 # samples overlapping exomes and genotypes
-readonly samples_list="data/unphased/overlap/ukb_calls_wes_samples.txt"
+#readonly samples_list="data/unphased/overlap/ukb_calls_wes_samples.txt"
 
 mkdir -p ${spark_dir}
 mkdir -p ${out_dir}
@@ -36,9 +36,9 @@ python3 "${hail_script}" \
    --chrom "${chr}" \
    --out_prefix "${out_prefix}" \
    --out_type "${out_type}" \
-   --extract_samples "${samples_list}" \
    --filter_incorrect_reference \
    --liftover \
+   --ancestry "eur" \
    --min_maf 0.001 \
    --missing 0.05 \
    --dataset "calls"
