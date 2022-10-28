@@ -38,8 +38,6 @@ readonly covariates=$( cat ${covar_file} )
 readonly out_prefix="ukb_wes_200k"
 readonly index=${SLURM_ARRAY_TASK_ID}
 
-
-
 fit_binary_traits() {
   local trait_type="binary"
   local inv_normalize="FALSE"
@@ -61,13 +59,13 @@ fit_cts_traits() {
   local out_dir="data/saige/output/cts/step1"
   local pheno_list="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
   local phenotype_in=$( sed "${index}q;d" ${pheno_list} )
-  local phenotype="${phenotype_in}_int" # hack to add inverse norm transformed
+  local phenotype="${phenotype_in}"
   local out="${out_dir}/${out_prefix}_${phenotype}"
   pheno_file="${pheno_dir}/filtered_covar_phenotypes_cts.tsv.gz"
 
-  local out_pheno_prs="${out_dir}/${phenotype}_int_prs.txt.gz"
-  local prs="${prs_dir}/${phenotype}_int_pgs_chrom.txt.gz"
-  local ldsc="${ldsc_dir}/ldsc_${phenotype}_int.rds"
+  local out_pheno_prs="${out_dir}/${phenotype}_prs.txt.gz"
+  local prs="${prs_dir}/${phenotype}_pgs_chrom.txt.gz"
+  local ldsc="${ldsc_dir}/ldsc_${phenotype}.rds"
   submit_spa_null
 }
 
@@ -100,7 +98,7 @@ set_up_prs() {
         fi
       fi
     else
-      echo "Error! Could not find PRS-file '${prs}'!"
+      >&2 echo "Error! Could not find PRS-file '${prs}'!"
     fi
   fi
 }
