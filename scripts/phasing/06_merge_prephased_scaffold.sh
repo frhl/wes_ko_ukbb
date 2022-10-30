@@ -50,16 +50,19 @@ readonly input_super_list="${in_prefix}_spp${n_split}_${queue}.mergelist"
 # save temporary uniq files here
 readonly tmp="${input_list}.tmp"
 readonly tmp_super="${input_super_list}.tmp"
-# keep track of final vcf
+# keep track of merged VCF
 readonly out_vcf="${out_prefix}.vcf"
 readonly out_vcf_gz="${out_vcf}.gz"
+# keep track of scaffold (final VCF)
+readonly final_vcf="${out_prefix}_scaffold"
+readonly out_type="vcf"
 
 # remove duplicates and create temporary
 cat ${input_list} | sort | uniq  > ${tmp}
 readonly n=$( cat ${tmp} | wc -l)
 readonly n_rounded=$( echo $n | sed 's|.*|(&+500)/1000*1000|' | bc )
 
-#if [ ! -f "${out_vcf_gz}" ]; then
+if [ ! -f "${out_vcf_gz}" ]; then
   # loop over chunks of n_split
   for idx_start in $(seq 1 ${n_split} ${n_rounded}); do 
     # create temporary mergelist
@@ -101,6 +104,10 @@ readonly n_rounded=$( echo $n | sed 's|.*|(&+500)/1000*1000|' | bc )
     rm "${out_idx_vcf_gz}.tbi"
   done
 
-#fi
+fi
+
+# extract scaffold
+
+
 
 

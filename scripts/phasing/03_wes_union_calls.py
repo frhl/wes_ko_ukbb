@@ -66,26 +66,24 @@ def main(args):
     mt2 = mt2.annotate_rows(wes=1)
 
     # annotate variants
-    mt1 = mt1.annotate_rows(varid=variants.get_variant_expr(mt1.locus, mt1.alleles))
-    mt2 = mt2.annotate_rows(varid=variants.get_variant_expr(mt2.locus, mt2.alleles))
+    #mt1 = mt1.annotate_rows(varid=variants.get_variant_expr(mt1.locus, mt1.alleles))
+    #mt2 = mt2.annotate_rows(varid=variants.get_variant_expr(mt2.locus, mt2.alleles))
 
     # combine the two datasets
     mt1 = tables.order_cols(mt1, mt2)
     mt = mt1.union_rows(mt2)
 
-    if export_variants:
-        mt1.varid.export(out_prefix + "_calls.txt.gz")
-        mt2.varid.export(out_prefix + "_wes.txt.gz")
-        mt.varid.export(out_prefix + ".txt.gz")
+    #if export_variants:
+    #    mt1.varid.export(out_prefix + "_calls.txt.gz")
+    #    mt2.varid.export(out_prefix + "_wes.txt.gz")
+    #    mt.varid.export(out_prefix + ".txt.gz")
 
     if checkpoint:
-        checkpoint_prefix = out_prefix + "_checkpoint"
+        checkpoint_prefix = out_prefix + "_checkpoint.mt"
         mt = mt.checkpoint(checkpoint_prefix, overwrite = True)
     if extract_samples:
         ht_samples = hl.import_table(extract_samples, no_header=True, key='f0', delimiter=',')
         mt = mt.filter_cols(hl.is_defined(ht_samples[mt.col_key])) 
-    if chrom in "X":
-        mt = filter_to_females(mt)
     if ancestry:
         mt = samples.filter_ukb_to_ancestry(mt, ancestry)
     if min_mac:

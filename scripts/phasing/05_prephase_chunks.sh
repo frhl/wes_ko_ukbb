@@ -47,20 +47,20 @@ readonly chr=$( get_chr ${task_id} )
 # note: errors after 50 min with 1000 samples/chunk with 4 slots
 readonly project="lindgren.prj"
 readonly queue="short"
-readonly nslots=2
+readonly nslots=1
 
 # what file should be split up
-readonly input_dir=" data/unphased/wes_union_calls/eur"
+readonly input_dir=" data/unphased/wes_union_calls"
 readonly input_path="${input_dir}/ukb_wes_union_calls_200k_chr${chr}.mt" 
 readonly input_type="mt"
 
 # Output paths
-readonly out_dir="data/prephased/eur/wes_union_calls/chunks"
+readonly out_dir="data/prephased/wes_union_calls/chunks"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
 readonly out_prefix_w_job_config="${out_prefix}_spc${samples_per_chunk}_${queue}/chr${chr}_chunk"
 readonly out_merge_w_job_config="${out_prefix}_spc${samples_per_chunk}_${queue}.mergelist"
 
-readonly out_merge_dir="data/prephased/eur/wes_union_calls"
+readonly out_merge_dir="data/prephased/wes_union_calls"
 readonly out_merge_file="${out_merge_dir}/ukb_wes_union_calls_prephased_200k_chr${chr}.vcf.bgz"
 
 # Interval paths
@@ -74,6 +74,7 @@ readonly read_placeholder="${read_dir}/SAMPLE_oqfe.cram"
 mkdir -p ${out_dir}
 mkdir -p $( dirname ${out_prefix_w_job_config} )
 mkdir -p $( dirname ${interval_path} )
+mkdir -p ${out_merge_dir}
 
 if [ ! -f ${interval_path} ]; then
   SECONDS=0
@@ -197,7 +198,6 @@ submit_merge_job() {
 
 
 submit_prephasing_job "${cluster}"
-
 
 
 

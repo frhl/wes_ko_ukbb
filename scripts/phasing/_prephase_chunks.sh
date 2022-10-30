@@ -204,7 +204,7 @@ if [ ! -f "${out_merge_file}.vcf.gz" ]; then
 
   # submit workers for each sample
   submit_prephasing_sample_job ${cluster}
-  submit_merge_job_sge
+  submit_merge_job_slurm
 
 else
   >&2 echo "${out_merge_file}.vcf.gz already exists. Skipping."
