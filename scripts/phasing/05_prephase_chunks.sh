@@ -177,7 +177,7 @@ submit_merge_job() {
   local slurm_lname="logs/_prephase_merge"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
-  local slurm_nslots="2"
+  local slurm_nslots="1"
   readonly merge_jid=$( sbatch \
     --account="${slurm_project}" \
     --job-name="${slurm_jname}" \

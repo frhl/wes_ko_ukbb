@@ -27,7 +27,7 @@ readonly out_prefix=${9?Error: Missing arg6 ()}
 
 readonly prephase_sample_script="scripts/phasing/_prephase_sample.sh"
 readonly hail_script="scripts/phasing/05_prephase_chunks.py"
-readonly merge_script="scripts/phasing/_prephase_merge.sh"
+readonly rscript="scripts/phasing/_prephase_sample.R"
 
 readonly chunk_idx=$( get_array_task_id ) # one-based index for which phasing interval to phase
 readonly out_prefix_w_interval_idx="${out_prefix}_${chunk_idx}of${max_interval_idx}"
@@ -49,7 +49,6 @@ echo "${out_merge_file}.vcf.gz" >> ${main_merge_file}
 mkdir -p ${out_prefix_w_interval_idx}
 
 split_to_chunks() {
-  # use hail to split to pre-defined chunks of samples
   SECONDS=0
   local current_interval=${1}
   local file_to_split=${2}
@@ -76,110 +75,57 @@ split_to_chunks() {
   fi
 }
 
-submit_prephasing_sample_job() {
 
-  local slurm_tasks="1-${samples_per_chunk}"
-  local slurm_jname="_c${chr}_i${chunk_idx}"
-  local slurm_lname="logs/_prephase_sample"
-  local slurm_project="${project}"
-  local slurm_queue="${queue}"
-  local slurm_nslots="${nslots}"
-  if [ "${cluster}" == "slurm" ]; then
-    submit_prephasing_job_slurm
-  elif [ "${cluster}" == "sge" ]; then
-    submit_prephasing_job_sge
-  else
-    echo "${cluster} is not valid!"
-  fi
+extract_sample() {
+    local in_vcf=${1}
+    local sample=${2}
+    local out_vcf=${3}
+    if [ ! -f "${out_vcf}.gz" ]; then
+      module load BCFtools/1.12-GCC-10.3.0
+      bcftools view -s ${sample} -o ${out_vcf} ${in_vcf} && bgzip ${out_vcf}
+      make_tabix "${out_vcf}.gz" "tbi"
+    fi
+}
+
+prephase_sample() {
+
+  local eid=${1}
+  local to_phase_vcf=${2}
+  local read_path=${read_placeholder/SAMPLE/${eid}}
+  local path_unphased="${out_prefix}/s${sample_idx}_eid${eid}.vcf"
+  local path_unphased_gz="${path_unphased}.gz"
+  local prefix_phased="${out_prefix}/s${sample_idx}_eid${eid}_phased"
+  local path_phased_vcf="${prefix_phased}.vcf"
+  local path_phased_gz="${prefix_phased}.vcf.gz"
+  local out_reads="${out_prefix}/s${sample_idx}_eid${eid}.reads"
+  local tmp_reads="${out_prefix}/s${sample_idx}_eid${eid}.reads.tmp"
+
+  # get single sample
+  extract_sample \
+    ${to_phase_vcf} \
+    ${eid} \
+    ${path_unphased}
+
+  # prephase single sample
+  SECONDS=0
+  whatshap phase \
+    --reference="${grch38}" \
+    --output="${path_phased_vcf}" \
+    --output-read-list="${out_reads}" \
+    --ignore-read-groups \
+    --indels \
+    ${path_unphased_gz} \
+    ${read_path} \
+    && print_update "Finished prephasing ${path_unphased}" ${SECONDS} \
+    || raise_error "Error prephasing ${path_unphased}"
+  
+  # bgzip sample
+  module load BCFtools/1.12-GCC-10.3.0
+  bgzip ${path_phased_vcf}
+  make_tabix "${path_phased_gz}" "tbi"
 
 }
 
-submit_prephasing_job_slurm() {
-  echo "Submitting jobs with SLURM"
-  readonly prephasing_jid=$( sbatch \
-    --account="${slurm_project}" \
-    --job-name="${slurm_jname}" \
-    --output="${slurm_lname}.log" \
-    --error="${slurm_lname}.errors.log" \
-    --chdir="$(pwd)" \
-    --partition="${slurm_queue}" \
-    --cpus-per-task="${slurm_nslots}" \
-    --array="${slurm_tasks}" \
-    --open-mode="append" \
-    --parsable \
-    --constraint=skl-compat \
-    ${prephase_sample_script} \
-    ${splitted_input} \
-    ${interval_path} \
-    ${chunk_idx} \
-    ${read_placeholder} \
-    ${merge_list} \
-    ${out_prefix_w_interval_idx} )
-}
-
-submit_prephasing_job_sge() {
-  echo "Submitting jobs with SGE"
-  qsub -N "${slurm_jname}" \
-    -o "${slurm_lname}.log" \
-    -e "${slurm_lname}.errors.log" \
-    -t ${slurm_tasks} \
-    -q "short.qc" \
-    -pe shmem ${slurm_nslots} \
-    -wd $(pwd) \
-    ${prephase_sample_script} \
-    ${splitted_input} \
-    ${interval_path} \
-    ${chunk_idx} \
-    ${read_placeholder} \
-    ${merge_list} \
-    ${out_prefix_w_interval_idx}
-}
-
-submit_merge_job_slurm() {
-  local slurm_jname="_c${chr}_prephase_merge"
-  local slurm_lname="logs/_prephase_merge"
-  local slurm_project="${project}"
-  local slurm_queue="${queue}"
-  local slurm_nslots="1"
-  readonly merge_jid=$( sbatch \
-    --account="${slurm_project}" \
-    --job-name="${slurm_jname}" \
-    --output="${slurm_lname}.log" \
-    --error="${slurm_lname}.errors.log" \
-    --chdir="$(pwd)" \
-    --partition="${slurm_queue}" \
-    --cpus-per-task="${slurm_nslots}" \
-    --dependency="afterok:${prephasing_jid}" \
-    --parsable \
-    --constraint=skl-compat \
-    ${merge_script} \
-    ${merge_list} \
-    ${merge_type} \
-    ${out_merge_file} \
-    ${out_merge_type} 
-  )
-}
-
-submit_merge_job_sge() {
-  local slurm_jname="_c${chr}_prephase_merge"
-  local slurm_lname="logs/_prephase_merge"
-  local wait_for="_c${chr}_i${chunk_idx}"
-  local slurm_project="${project}"
-  local slurm_queue="${queue}"
-  local slurm_nslots="1"
-  qsub -N "${slurm_jname}" \
-    -o "${slurm_lname}.log" \
-    -e "${slurm_lname}.errors.log" \
-    -q "short.qc" \
-    -pe shmem ${slurm_nslots} \
-    -hold_jid "${wait_for}" \
-    -wd $(pwd) \
-    ${merge_script} \
-    ${merge_list} \
-    ${merge_type} \
-    ${out_merge_file} \
-    ${out_merge_type} 
-}
 
 
 # check if phasing and merging has already been completed
@@ -201,10 +147,19 @@ if [ ! -f "${out_merge_file}.vcf.gz" ]; then
     module load BCFtools/1.12-GCC-10.3.0
     make_tabix "${splitted_input}" "tbi"
   fi
+ 
+  # need modules for VCF handling and
+  # the module which has whatshap installed
+  module purge
+  module load HTSlib/1.12-GCC-10.3.0
+  module load BCFtools/1.12-GCC-10.3.0
+  set_up_whatshap
+ 
+  for sample_idx in $( seq 1 ${samples_per_chunk}); do 
+    eid=$( Rscript ${rscript} --chunk_idx ${chunk_idx} --sample_idx ${sample_idx} --interval_path ${interval_path} )
+    prephase_sample ${eid} ${splitted_input} 
+  done
 
-  # submit workers for each sample
-  submit_prephasing_sample_job ${cluster}
-  submit_merge_job_sge
 
 else
   >&2 echo "${out_merge_file}.vcf.gz already exists. Skipping."
