@@ -9,7 +9,7 @@
 #SBATCH --error=logs/wes_union_calls.errors.log
 #SBATCH --partition=long
 #SBATCH --cpus-per-task 3
-#SBATCH --array=1-19
+#SBATCH --array=2
 #
 #$ -N wes_union_calls
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -18,7 +18,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 3
 #$ -q short.qe
-#$ -t 1-22
+#$ -t 2
 #$ -V
 
 # take ~15H for chr21 with 3 e cores
@@ -45,7 +45,7 @@ readonly in_calls_dir="data/unphased/calls/prefilter/with_parents/by_maf"
 readonly in_calls_file="${in_calls_dir}/ukb_prefilter_calls_200k_chr${chr}.mt"
 readonly in_calls_type="mt"
 
-readonly out_dir="data/unphased/wes_union_calls/short"
+readonly out_dir="data/unphased/wes_union_calls/short_test"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
 readonly checkpoint_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}_checkpoint"
 readonly out_type="vcf"

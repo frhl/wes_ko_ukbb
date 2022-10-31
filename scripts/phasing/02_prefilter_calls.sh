@@ -9,7 +9,7 @@
 #SBATCH --error=logs/prefilter_calls.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 3
-#SBATCH --array=20-22
+#SBATCH --array=1-22
 #
 #
 #$ -N prefilter_calls
@@ -19,7 +19,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc
-#$ -t 1-22
+#$ -t 1-15
 #$ -V
 
 
@@ -46,7 +46,7 @@ mkdir -p ${spark_dir}
 mkdir -p ${out_dir}
 
 if [ ! -f "${out_prefix}.vcf.bgz" ]; then
-  set_up_hail
+  set_up_hail 0.2.97
   set_up_pythonpath_legacy
   python3 "${hail_script}" \
      --chrom "${chr}" \

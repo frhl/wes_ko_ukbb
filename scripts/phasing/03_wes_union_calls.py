@@ -65,13 +65,12 @@ def main(args):
     mt1 = mt1.annotate_rows(wes=0)
     mt2 = mt2.annotate_rows(wes=1)
     
-    # checkpoint tables
+    # combine the two datasets
+    mt1 = tables.order_cols(mt1, mt2)
     if checkpoint_prefix:
         mt1 = mt1.checkpoint(checkpoint_prefix + "1.mt", overwrite = True)
         mt2 = mt2.checkpoint(checkpoint_prefix + "2.mt", overwrite = True)
 
-    # combine the two datasets
-    mt1 = tables.order_cols(mt1, mt2)
     mt = mt1.union_rows(mt2)
 
     # export indivudal variants
