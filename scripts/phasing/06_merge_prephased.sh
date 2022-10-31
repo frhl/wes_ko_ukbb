@@ -13,8 +13,8 @@
 #
 #$ -N prephase_chunks_merge
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/prephase_chunks_merge.log
-#$ -e logs/prephase_chunks_merge.errors.log
+#$ -o logs/merge_prephased.log
+#$ -e logs/merge_prephased.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 4
 #$ -q short.qc
@@ -23,7 +23,6 @@
 
 set -o errexit
 set -o nounset
-
 
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
@@ -40,11 +39,11 @@ readonly chr=$( get_chr ${task_id} )
 readonly queue="short"
 readonly samples_per_chunk=100
 # save results in final directory
-readonly out_dir="data/phased/wes_union_calls/prephased"
-readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
+readonly out_dir="data/prephased/wes_union_calls"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
 # directories and out paths
-readonly in_dir="data/phased/wes_union_calls/prephased/chunks"
-readonly in_prefix="${in_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
+readonly in_dir="data/prephased/wes_union_calls/chunks"
+readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chr${chr}"
 readonly input_list="${in_prefix}_spc${samples_per_chunk}_${queue}.mergelist"
 readonly input_super_list="${in_prefix}_spp${n_split}_${queue}.mergelist"
 # save temporary uniq files here
