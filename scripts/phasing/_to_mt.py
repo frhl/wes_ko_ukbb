@@ -19,7 +19,7 @@ def main(args):
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
 
     mt=io.import_table(input_path, input_type)
-    mt=mt.filter_rows(variants.get_mac_expr(mt) > 0)
+    #mt=mt.filter_rows(variants.get_mac_expr(mt) > 0)
     io.export_table(mt, out_prefix, out_type)
 
 if __name__=='__main__':

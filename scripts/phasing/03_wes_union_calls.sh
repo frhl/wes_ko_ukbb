@@ -7,9 +7,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/wes_union_calls.log
 #SBATCH --error=logs/wes_union_calls.errors.log
-#SBATCH --partition=long
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 3
-#SBATCH --array=1-19
+#SBATCH --array=18
 #
 #$ -N wes_union_calls
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -41,7 +41,7 @@ readonly in_wes_dir="data/unphased/wes/prefilter" # note: exported to prefilter/
 readonly in_wes_file="${in_wes_dir}/ukb_wes_prefilter_200k_chr${chr}.mt"
 readonly in_wes_type="mt"
 
-readonly in_calls_dir="data/unphased/calls/prefilter"
+readonly in_calls_dir="data/unphased/calls/prefilter/with_parents/by_maf"
 readonly in_calls_file="${in_calls_dir}/ukb_prefilter_calls_200k_chr${chr}.mt"
 readonly in_calls_type="mt"
 

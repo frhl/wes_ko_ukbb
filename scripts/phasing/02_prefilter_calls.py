@@ -19,6 +19,8 @@ def main(args):
     convert_sample_id = args.convert_sample_id
     extract_samples = args.extract_samples
     filter_incorrect_reference = args.filter_incorrect_reference
+    exclude_trio_parents = args.exclude_trio_parents
+    export_parents = args.export_parents
     min_info = args.min_info
     liftover = args.liftover
     min_mac = args.min_mac
@@ -65,6 +67,12 @@ def main(args):
         mt = mt.filter_rows(variants.get_maf_expr(mt) >= float(min_maf))
     if missing:
         mt = filter_missing(mt, float(missing))
+    if exclude_trio_parents:
+        pids = samples.get_parents_by_fam(mt, ["TRIO"])
+        if export_parents:
+            mt_parents = mt.filter_cols(hl.literal(pids).contains(mt.s))
+            io.export_table(mt_parents, out_prefix + "_parents", out_type)
+        mt = mt.filter_cols(~hl.literal(pids).contains(mt.s))
     mt = io.recalc_info(mt)
 
     # always export matrix table 
@@ -81,6 +89,8 @@ if __name__=='__main__':
     parser.add_argument('--ancestry', default=None, help='filter to specific ancestry')
     parser.add_argument('--convert_sample_id', default=None, action='store_true', help='convert to lindgren sample id')
     parser.add_argument('--filter_incorrect_reference', default=None, action='store_true', help='Remove any sites with incorrect reference.')
+    parser.add_argument('--exclude_trio_parents', default=None, action='store_true', help='Exclude parents of duo/trio relationships')
+    parser.add_argument('--export_parents', default=None, action='store_true', help='Export parents genotypes seperately')
     parser.add_argument('--dataset', default=None, help='Either "imp" or "calls".')
     parser.add_argument('--extract_samples', default=None, help='HailTable with samples to be extracted.')
     parser.add_argument('--min_mac', default=None, help='Filter to MAC >= value')

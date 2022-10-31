@@ -64,13 +64,18 @@ def main(args):
     # annotate origin
     mt1 = mt1.annotate_rows(wes=0)
     mt2 = mt2.annotate_rows(wes=1)
-
-    # annotate variants
+       # annotate variants
     #mt1 = mt1.annotate_rows(varid=variants.get_variant_expr(mt1.locus, mt1.alleles))
     #mt2 = mt2.annotate_rows(varid=variants.get_variant_expr(mt2.locus, mt2.alleles))
+    
+    mt1_checkpoint_prefix = out_prefix + "_checkpoint_mt1.mt"
+    mt2_checkpoint_prefix = out_prefix + "_checkpoint_mt2.mt"
+    mt1 = mt1.checkpoint(mt1_checkpoint_prefix, overwrite = True)
+    mt2 = mt1.checkpoint(mt2_checkpoint_prefix, overwrite = True)
 
     # combine the two datasets
     mt1 = tables.order_cols(mt1, mt2)
+   
     mt = mt1.union_rows(mt2)
 
     #if export_variants:
