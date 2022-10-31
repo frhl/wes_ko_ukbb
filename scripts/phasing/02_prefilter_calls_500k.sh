@@ -8,8 +8,8 @@
 #SBATCH --output=logs/prefilter_calls.log
 #SBATCH --error=logs/prefilter_calls.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 3
-#SBATCH --array=20-22
+#SBATCH --cpus-per-task 2
+#SBATCH --array=1-19
 
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
@@ -21,7 +21,7 @@ readonly hail_script="scripts/phasing/02_prefilter_calls.py"
 
 readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 readonly out_dir="data/unphased/calls/prefilter/by_maf"
-readonly out_prefix="${out_dir}/ukb_eur_prefilter_calls_500k_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_prefilter_calls_500k_chr${chr}"
 readonly out_prefix_parents="${out_prefix}_parents"
 readonly out_type="vcf"
 readonly out_vcf_gz="${out_prefix}.vcf.bgz"

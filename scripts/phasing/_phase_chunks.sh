@@ -31,14 +31,15 @@ readonly out_prefix_w_phasing_idx="${out_prefix}.${phasing_idx}of${max_phasing_i
 readonly out="${out_prefix_w_phasing_idx}.vcf.gz"
 readonly log="${out_prefix_w_phasing_idx}.log"
 
-phase_with_shapeit() {
+mkdir -p $( dirname ${out} )
+
+phase_with_shapeit4() {
   SECONDS=0
-  local min_mac=2 # default value. Unable to phase singletons.
-  local ps_error_rate=0.0001 # default value
-  local gmap="/well/lindgren/flassen/software/SHAPEIT4/b38.gmap/chr${chr}.b38.gmap.gz"
-  mkdir -p $( dirname ${out} )
+  readonly min_mac=2 # default value. Unable to phase singletons.
+  readonly ps_error_rate=0.0001 # default value
+  readonly gmap="/well/lindgren/flassen/software/SHAPEIT4/b38.gmap/chr${chr}.b38.gmap.gz"
   readonly region=$( python3 ${hail_script} ${interval_flags} --get_interval --phasing_idx ${phasing_idx} --interval_path ${interval_path} )
-  print_update "Starting SHAPEIT4 phasing for ${region} (min_mac > 1) out: ${out}"
+  print_update "Starting SHAPEIT4 phasing for ${region} (min_mac >= ${min_mac}) out: ${out}"
   set -x
   shapeit4.2 \
     --input ${vcf_to_phase} \
@@ -55,11 +56,33 @@ phase_with_shapeit() {
   print_update "Finished phasing variants for ${region} (chr${chr} ${phasing_idx}/${max_phasing_idx}, out: ${out}" "${duration}"
 }
 
+phase_with_shapeit5_common() {
+  SECONDS=0
+  readonly min_mac=2 # default value. Unable to phase singletons.
+  readonly gmap="/well/lindgren/flassen/software/SHAPEIT4/b38.gmap/chr${chr}.b38.gmap.gz"
+  readonly region=$( python3 ${hail_script} ${interval_flags} --get_interval --phasing_idx ${phasing_idx} --interval_path ${interval_path} )
+  print_update "Starting SHAPEIT5 phasing for ${region} (min_mac >= ${min_mac}) out: ${out}"
+  set -x
+  ${SHAPEIT_phase_common} \
+    --input ${vcf_to_phase} \
+    --map ${gmap} \
+    --region "chr${region}" \
+    --thread ${threads} \
+    --pbwt-mac ${min_mac} \
+    --output ${out} \
+    --log ${log} \
+    && print_update "Finished phasing variants for chr${chr}, out: ${out}" "${SECONDS}" \
+    || raise_error "$( print_update "Phasing variants failed for chr${chr}" ${SECONDS} )" 
+  set +x
+  duration=${SECONDS}
+  print_update "Finished phasing variants for ${region} (chr${chr} ${phasing_idx}/${max_phasing_idx}, out: ${out}" "${duration}"
+}
+
+
 phase_with_eagle2() {
   SECONDS=0
-  local eagle="/well/lindgren/flassen/software/eagle/Eagle_v2.4.1/./eagle"
-  local gmap="/well/lindgren/flassen/software/eagle/Eagle_v2.4.1/tables/genetic_map_hg38_withX.txt.gz"
-  mkdir -p $( dirname ${out} )
+  readonly eagle="/well/lindgren/flassen/software/eagle/Eagle_v2.4.1/./eagle"
+  readonly gmap="/well/lindgren/flassen/software/eagle/Eagle_v2.4.1/tables/genetic_map_hg38_withX.txt.gz"
   readonly region=$( python3 ${hail_script} ${interval_flags} --get_interval --phasing_idx ${phasing_idx} --interval_path ${interval_path} )
   readonly bp_start="$( echo "${region%-*}" | sed 's/^.*://' )"
   readonly bp_end="${region##*-}"
@@ -86,7 +109,10 @@ phase_with_eagle2() {
 if [ ! -f ${out} ]; then
   if [ ${software} = "shapeit4" ]; then
     module load SHAPEIT4/4.2.2-foss-2021a
-    phase_with_shapeit  
+    phase_with_shapeit4
+  if [ ${software} = "shapeit5-common" ]; then
+    set_up_shapeit5
+    phase_with_shapeit5_common
   elif [ ${software} = "eagle2" ]; then
     phase_with_eagle2
   else

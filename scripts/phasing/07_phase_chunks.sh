@@ -56,7 +56,9 @@ readonly vcf_dir=" data/phased/wes_union_calls/prephased"
 readonly vcf_to_phase="${vcf_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.vcf.gz"
 
 # Output paths
-readonly out_dir="data/phased/wes_union_calls/with_phased_sets/chunks/${software}"
+#readonly out_dir="data/phased/wes_union_calls/with_ps/chunks/${software}"
+readonly out_dir="data/phased/wes_union_calls/without_ps/chunks/${software}"
+
 readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
 readonly out_prefix_w_job_config="${out_prefix}-${nslots}x${queue}/${software}_prs${phasing_region_size}_pro${phasing_region_overlap}_mprs${max_phasing_region_size}"
 readonly out="${out_prefix_w_job_config}.vcf.gz"

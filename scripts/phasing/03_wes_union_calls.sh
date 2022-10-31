@@ -7,9 +7,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/wes_union_calls.log
 #SBATCH --error=logs/wes_union_calls.errors.log
-#SBATCH --partition=short
+#SBATCH --partition=long
 #SBATCH --cpus-per-task 3
-#SBATCH --array=18
+#SBATCH --array=1-19
 #
 #$ -N wes_union_calls
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -45,8 +45,9 @@ readonly in_calls_dir="data/unphased/calls/prefilter/with_parents/by_maf"
 readonly in_calls_file="${in_calls_dir}/ukb_prefilter_calls_200k_chr${chr}.mt"
 readonly in_calls_type="mt"
 
-readonly out_dir="data/unphased/wes_union_calls/long"
+readonly out_dir="data/unphased/wes_union_calls/short"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
+readonly checkpoint_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}_checkpoint"
 readonly out_type="vcf"
 
 mkdir -p ${spark_dir}
@@ -62,12 +63,18 @@ if [ ! -f "${out_prefix}.vcf.bgz" ]; then
      --input_wes_type "${in_wes_type}" \
      --input_calls_path "${in_calls_file}" \
      --input_calls_type "${in_calls_type}" \
+     --checkpoint_prefix "${checkpoint_prefix}" \
      --out_prefix "${out_prefix}" \
      --out_type "${out_type}" \
      --exclude_trio_parents \
-     --export_parents \
-     --export_variants \
-     --checkpoint
+     --export_parents
+
+  # remove checkpoint
+  rm -rf "${checkpoint_prefix}1.mt"
+  rm -rf "${checkpoint_prefix}2.mt"
+  rm -rf "${checkpoint_prefix}3.mt"
+
+
 else
   print_update "file ${out} already exists. Skipping!"
 fi

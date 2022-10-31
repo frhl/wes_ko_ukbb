@@ -27,7 +27,7 @@ def main(args):
     min_mac = args.min_mac
     missing = args.missing
     ancestry = args.ancestry
-    checkpoint = args.checkpoint
+    checkpoint_prefix = args.checkpoint_prefix
     out_prefix = args.out_prefix
     out_type = args.out_type
 
@@ -64,28 +64,31 @@ def main(args):
     # annotate origin
     mt1 = mt1.annotate_rows(wes=0)
     mt2 = mt2.annotate_rows(wes=1)
-       # annotate variants
-    #mt1 = mt1.annotate_rows(varid=variants.get_variant_expr(mt1.locus, mt1.alleles))
-    #mt2 = mt2.annotate_rows(varid=variants.get_variant_expr(mt2.locus, mt2.alleles))
     
-    mt1_checkpoint_prefix = out_prefix + "_checkpoint_mt1.mt"
-    mt2_checkpoint_prefix = out_prefix + "_checkpoint_mt2.mt"
-    mt1 = mt1.checkpoint(mt1_checkpoint_prefix, overwrite = True)
-    mt2 = mt1.checkpoint(mt2_checkpoint_prefix, overwrite = True)
+    # checkpoint tables
+    if checkpoint_prefix:
+        mt1 = mt1.checkpoint(checkpoint_prefix + "1.mt", overwrite = True)
+        mt2 = mt2.checkpoint(checkpoint_prefix + "2.mt", overwrite = True)
 
     # combine the two datasets
     mt1 = tables.order_cols(mt1, mt2)
-   
     mt = mt1.union_rows(mt2)
 
-    #if export_variants:
-    #    mt1.varid.export(out_prefix + "_calls.txt.gz")
-    #    mt2.varid.export(out_prefix + "_wes.txt.gz")
-    #    mt.varid.export(out_prefix + ".txt.gz")
+    # export indivudal variants
+    if export_variants:
+        mt1 = mt1.annotate_rows(varid=variants.get_variant_expr(mt1.locus, mt1.alleles))
+        mt2 = mt2.annotate_rows(varid=variants.get_variant_expr(mt2.locus, mt2.alleles))
+        mt1.varid.export(out_prefix + "_calls.txt.gz")
+        mt2.varid.export(out_prefix + "_wes.txt.gz")
+        mt.varid.export(out_prefix + ".txt.gz")
 
-    if checkpoint:
-        checkpoint_prefix = out_prefix + "_checkpoint.mt"
-        mt = mt.checkpoint(checkpoint_prefix, overwrite = True)
+    # add info struct
+    mt = mt.annotate_rows(info = hl.struct())
+    mt = mt.annotate_rows(info = mt.info.annotate(is_wes=mt.wes))
+    mt = mt.drop(mt.wes)
+
+    if checkpoint_prefix:
+        mt = mt.checkpoint(checkpoint_prefix + "3.mt", overwrite = True)
     if extract_samples:
         ht_samples = hl.import_table(extract_samples, no_header=True, key='f0', delimiter=',')
         mt = mt.filter_cols(hl.is_defined(ht_samples[mt.col_key])) 
@@ -104,9 +107,10 @@ def main(args):
             io.export_table(mt_parents, out_prefix + "_parents", out_type)
         mt = mt.filter_cols(~hl.literal(pids).contains(mt.s))
     
-    # always export matrix table 
+    # always export matrix table (in this scenario we use a checkpoint so 
+    # that it can be easily expored as a VCF
     if out_type != "mt":
-        io.export_table(mt, out_prefix, "mt")
+        mt = mt.checkpoint(out_prefix + ".mt")
     io.export_table(mt, out_prefix, out_type)
 
 if __name__=='__main__':
@@ -123,8 +127,8 @@ if __name__=='__main__':
     parser.add_argument('--convert_sample_id', default=None, action='store_true', help='convert to lindgren sample id')
     parser.add_argument('--export_parents', default=None, action='store_true', help='Export parents genotypes seperately')
     parser.add_argument('--export_variants', default=None, action='store_true', help='Export parents genotypes seperately')
-    parser.add_argument('--checkpoint', default=None, action='store_true', help='Checkpoint after combining rows')
     parser.add_argument('--extract_samples', default=None, help='HailTable with samples to be extracted.')
+    parser.add_argument('--checkpoint_prefix', default=None, help='prefix for checkpoints')
     parser.add_argument('--min_mac', default=None, help='Filter to MAC >= value')
     parser.add_argument('--missing', default=None, help='Filter to variants to have le value in genotype missingness')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')

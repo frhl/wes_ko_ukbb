@@ -8,17 +8,17 @@
 #SBATCH --output=logs/phase_common.log
 #SBATCH --error=logs/phase_common.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 24
-#SBATCH --array=1-22
+#SBATCH --cpus-per-task 20
+#SBATCH --array=22
 #
 #$ -N phase_common
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/phase_common.log
 #$ -e logs/phase_common.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 2
-#$ -q short.qe
-#$ -t 21
+#$ -pe shmem 1
+#$ -q test.qc
+#$ -t 22
 #$ -V
 
 
@@ -32,7 +32,7 @@ readonly ref_dir="/well/lindgren/flassen/ressources/panels/liftover_reference_pa
 
 readonly chr="${SLURM_ARRAY_TASK_ID}"
 readonly in_file="${in_dir}/ukb_prefilter_calls_500k_chr${chr}.vcf.bgz"
-readonly out_prefix="${out_dir}/ukb_prefilter_calls_500k_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_phased_calls_500k_chr${chr}"
 readonly out="${out_prefix}.vcf.gz"
 
 readonly ref="${ref_dir}/ALL.chr${chr}.phase3_shapeit2_mvncall_integrated_v5.20130502.genotypes.vcf.bgz"

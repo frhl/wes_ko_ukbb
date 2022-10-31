@@ -55,24 +55,24 @@ readonly samples_list="data/unphased/overlap/ukb_calls_wes_samples.txt"
 mkdir -p ${out_dir}
 mkdir -p ${spark_dir}
 
-#SECONDS=0
+SECONDS=0
 set_up_hail
-set_up_pythonpath_legacy
-#python3 "${hail_script}" \
-#   --input_path "${in_file}" \
-#   --input_type "${in_type}" \
-#   --out_prefix "${out_prefix}" \
-#   --out_type "${out_type}" \
-#   --drop_entry_fields "${entry_fields_to_drop}" \
-#   --extract_samples ${samples_list} \
-#   --min_mac 1 \
-#   --missing 0.05
-
-python3 "${hail_vcf_script}" \
+set_up_pythonpath_legacy#python3 "${hail_script}" \
+python3 "${hail_script}" \
    --input_path "${in_file}" \
    --input_type "${in_type}" \
    --out_prefix "${out_prefix}" \
-   --out_type "${out_type}"
+   --out_type "${out_type}" \
+   --drop_entry_fields "${entry_fields_to_drop}" \
+   --extract_samples ${samples_list} \
+   --min_mac 1 \
+   --missing 0.05
+
+#python3 "${hail_vcf_script}" \
+#   --input_path "${in_file}" \
+#   --input_type "${in_type}" \
+#   --out_prefix "${out_prefix}" \
+#   --out_type "${out_type}"
 
 
 

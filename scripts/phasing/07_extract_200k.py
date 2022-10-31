@@ -3,12 +3,8 @@
 import hail as hl
 import argparse
 
-from ko_utils import qc
 from ko_utils import io
 from ukb_utils import hail_init
-from ukb_utils import samples
-
-from ko_utils.variants import filter_min_mac, filter_missing
 
 def main(args):
 
@@ -16,48 +12,15 @@ def main(args):
     input_path = args.input_path
     input_type = args.input_type
     extract_samples = args.extract_samples
-    exclude_trio_parents = args.exclude_trio_parents
-    export_parents = args.export_parents
-    drop_entry_fields = args.drop_entry_fields
-    min_mac = args.min_mac
-    missing = args.missing
-    ancestry = args.ancestry
     out_prefix = args.out_prefix
     out_type = args.out_type
 
-    hail_init.hail_bmrc_init_local('logs/hail/01_prefilter_wes.py', 'GRCh38')
+    hail_init.hail_bmrc_init_local('logs/hail/07_extract_200k.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
-    mt = qc.get_table(input_path, input_type, calc_info = False) # assuming build GRCh38
-
+    mt = io.import_table(input_path, input_type, calc_info = False) # assuming build GRCh38
     if extract_samples:
         ht_samples = hl.import_table(extract_samples, no_header=False, key='s', delimiter=',')
-        mt = mt.filter_cols(hl.is_defined(ht_samples[mt.col_key])) 
-    if ancestry:
-        mt = samples.filter_ukb_to_ancestry(mt, ancestry)
-    if exclude_trio_parents:
-        mt = samples.exclude_parents_by_fam(mt, relation = ["TRIO"])
-    if min_mac:
-        mt = filter_min_mac(mt, int(min_mac))
-    if missing:
-        mt = filter_missing(mt, float(missing))
-    if missing or min_mac:
-        mt = io.recalc_info(mt)
-    if drop_entry_fields:
-        fields = drop_entry_fields
-        fields = fields.strip().split(",")
-        mt = mt.drop(*fields)
-        mt = mt.drop(mt.info)
-    if exclude_trio_parents:
-        pids = samples.get_parents_by_fam(mt, ["TRIO"])
-        if export_parents:
-            mt_parents = mt.filter_cols(hl.literal(pids).contains(mt.s))
-            io.export_table(mt_parents, out_prefix + "_parents", out_type)
-        mt = mt.filter_cols(~hl.literal(pids).contains(mt.s))
-
-
-    # always export matrix table
-    if out_type != "mt":
-        io.export_table(mt, out_prefix, "mt")
+        mt = mt.filter_cols(hl.is_defined(ht_samples[mt.col_key]))
     io.export_table(mt, out_prefix, out_type) 
 
 if __name__=='__main__':
@@ -65,13 +28,7 @@ if __name__=='__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--input_path', default=None, help='What is the input path to the file?')
     parser.add_argument('--input_type', default=None, help='What input type?')
-    parser.add_argument('--ancestry', default=None, help='filter to specific ancestry')
     parser.add_argument('--extract_samples', default=None, help='HailTable with samples to be extracted.')
-    parser.add_argument('--exclude_trio_parents', default=None, action='store_true', help='Exclude parents of trio relationships')
-    parser.add_argument('--export_parents', default=None, action='store_true', help='Exclude parents of trio relationships')
-    parser.add_argument('--min_mac', default=None, help='Filter to MAC >= value')
-    parser.add_argument('--missing', default=None, help='Filter to variants to have le value in genotype missingness')
-    parser.add_argument('--drop_entry_fields', default=None, help='Filter to variants to have le value in genotype missingness')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Type out vcf/plink/mt')
     args = parser.parse_args()

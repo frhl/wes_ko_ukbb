@@ -10,6 +10,18 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 3
 #SBATCH --array=20-22
+#
+#
+#$ -N prefilter_calls
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#$ -o logs/prefilter_calls.log
+#$ -e logs/prefilter_calls.errors.log
+#$ -P lindgren.prjc
+#$ -pe shmem 2
+#$ -q short.qc
+#$ -t 1-22
+#$ -V
+
 
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
@@ -19,7 +31,9 @@ source utils/vcf_utils.sh
 readonly spark_dir="data/tmp/spark"
 readonly hail_script="scripts/phasing/02_prefilter_calls.py"
 
-readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
+readonly task_id=$( get_array_task_id )
+readonly chr=$( get_chr ${task_id} )
+
 readonly out_dir="data/unphased/calls/prefilter/by_maf"
 readonly out_prefix="${out_dir}/ukb_prefilter_calls_200k_chr${chr}"
 readonly out_prefix_parents="${out_prefix}_parents"
