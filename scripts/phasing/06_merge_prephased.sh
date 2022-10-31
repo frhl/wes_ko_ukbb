@@ -75,9 +75,10 @@ if [ ! -f "${out_vcf_gz}" ]; then
     echo "${out_idx_vcf_gz}" >> ${input_super_list}
     # combine the files
     if [ ! -f "${out_idx_vcf_gz}" ]; then
-      bcftools merge -l ${tmp_idx} -Oz -o "${out_idx_vcf}"
+      bcftools merge -l ${tmp_idx} -Oz -o "${out_idx_vcf_gz}"
     fi
     # index files
+    echo "Indexing partition ${out_idx_vcf}.."
     if [ ! -f "${out_idx_vcf_gz}.tbi" ]; then
       make_tabix "${out_idx_vcf_gz}" "tbi"
     fi
@@ -86,10 +87,10 @@ if [ ! -f "${out_vcf_gz}" ]; then
   done 
   
   # create final VCF file
-  echo "Done! Merging into final file.."
+  echo "Partitions done! Merging into final file '${out_vcf_gz}'.."
   cat ${input_super_list} | sort | uniq  > ${tmp_super}
-  #bcftools merge -l ${tmp_super} -Oz -o "${out_vcf_gz}"
-  #make_tabix "${out_vcf_gz}" "tbi"
+  bcftools merge -l ${tmp_super} -Oz -o "${out_vcf_gz}"
+  make_tabix "${out_vcf_gz}" "tbi"
   rm ${tmp_super}
   rm ${tmp}
 
@@ -104,8 +105,6 @@ if [ ! -f "${out_vcf_gz}" ]; then
   done
 
 fi
-
-# extract scaffold
 
 
 
