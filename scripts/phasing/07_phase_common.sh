@@ -8,8 +8,9 @@
 #SBATCH --output=logs/phase_common.log
 #SBATCH --error=logs/phase_common.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 20
-#SBATCH --array=22
+#SBATCH --cpus-per-task 16
+#SBATCH --array=1-22
+#SBATCH --dependency="afterok:7939576"
 #
 #$ -N phase_common
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

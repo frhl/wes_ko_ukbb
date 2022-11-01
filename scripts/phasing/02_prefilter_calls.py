@@ -68,6 +68,7 @@ def main(args):
     if missing:
         mt = filter_missing(mt, float(missing))
     if exclude_trio_parents:
+        mt = mt.checkpoint(out_prefix + ".mt")
         pids = samples.get_parents_by_fam(mt, ["TRIO"])
         if export_parents:
             mt_parents = mt.filter_cols(hl.literal(pids).contains(mt.s))
@@ -76,9 +77,10 @@ def main(args):
     mt = io.recalc_info(mt)
 
     # always export matrix table 
-    if out_type != "mt":
-        io.export_table(mt, out_prefix, "mt")
-    io.export_table(mt, out_prefix, out_type)
+    if exclude_trio_parents:
+        io.export_table(mt, out_prefix + "_no_parents", out_type)
+    else:
+        io.export_table(mt, out_prefix, out_type)
 
 if __name__=='__main__':
 

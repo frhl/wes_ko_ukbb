@@ -3,10 +3,10 @@
 # @description phase combined set of UK Biobank whole exome and genotyping array using SHAPEIT4.2
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=wes_union_calls_phasing
+#SBATCH --job-name=wes_union_calls_phasing_shapeit4
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/wes_union_calls_phasing.log
-#SBATCH --error=logs/wes_union_calls_phasing.errors.log
+#SBATCH --output=logs/wes_union_calls_phasing_shapeit4.log
+#SBATCH --error=logs/wes_union_calls_phasing_shapeit4.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task=16
 #SBATCH --array=21
@@ -28,16 +28,16 @@ source utils/vcf_utils.sh
 source utils/bash_utils.sh
 
 
-#readonly in_dir="data/unphased/wes_union_calls"
-readonly in_dir="data/prephased/wes_union_calls"
+readonly in_dir="data/unphased/wes_union_calls"
+#readonly in_dir="data/prephased/wes_union_calls"
 readonly out_dir="data/phased/wes_union_calls/benchmark/200k"
 readonly ref_dir="/well/lindgren/flassen/ressources/panels/liftover_reference_panel/data/liftover"
 readonly fam_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 
 readonly chr="$( get_array_task_id )"
-readonly in_file="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.gz"
-#readonly out_file="${out_dir}/ukb_wes_union_calls_200k_phased_shapeit4_chr${chr}.vcf.gz"
-readonly out_file="${out_dir}/ukb_wes_union_calls_200k_phased_whatshap_shapeit4_chr${chr}.vcf.gz"
+readonly in_file="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.bgz"
+readonly out_file="${out_dir}/ukb_wes_union_calls_200k_phased_shapeit4_chr${chr}.vcf.gz"
+#readonly out_file="${out_dir}/ukb_wes_union_calls_200k_phased_whatshap_shapeit4_chr${chr}.vcf.gz"
 
 readonly ref="${ref_dir}/ALL.chr${chr}.phase3_shapeit2_mvncall_integrated_v5.20130502.genotypes.vcf.bgz"
 readonly gmap="/well/lindgren/flassen/software/SHAPEIT4/b38.gmap/chr${chr}.b38.gmap.gz"

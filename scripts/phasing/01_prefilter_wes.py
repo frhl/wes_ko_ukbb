@@ -55,8 +55,11 @@ def main(args):
             io.export_table(mt_parents, out_prefix + "_parents", out_type)
         mt = mt.filter_cols(~hl.literal(pids).contains(mt.s))
 
-    # always export matrix table
-    io.export_table(mt, out_prefix + "_no_parents", out_type) 
+    if exclude_trio_parents:
+        io.export_table(mt, out_prefix + "_no_parents", out_type) 
+    else:
+        io.export_table(mt, out_prefix, out_type) 
+
 
 if __name__=='__main__':
 

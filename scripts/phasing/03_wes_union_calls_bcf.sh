@@ -3,10 +3,10 @@
 # @description combine whole exome sequences with variants from genotyping array
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=wes_union_calls
+#SBATCH --job-name=wes_union_calls_bcf
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/wes_union_calls.log
-#SBATCH --error=logs/wes_union_calls.errors.log
+#SBATCH --output=logs/wes_union_calls_bcf.log
+#SBATCH --error=logs/wes_union_calls_bcf.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
 #SBATCH --array=21
@@ -65,14 +65,18 @@ if [ ! -f "${tmp_file}" ]; then
      --input_calls_type "${in_calls_type}" \
      --out_calls_prefix "${tmp_prefix}" \
      --out_calls_type "${tmp_type}"
+  make_tabix "${tmp_file}" "tbi"
+else
+  >&2 echo "${tmp_file} exists. Skipping."
 fi
 
 if [ ! -f "${out_file}" ]; then
   module purge
   module load BCFtools/1.12-GCC-10.3.0
-  make_tabix "${tmp_file}" "tbi"
-  bcftools merge ${in_wes_file} ${tmp_file} -oZ -o ${out_file}
+  bcftools concat ${in_wes_file} ${tmp_file} -oZ -o ${out_file}
   make_tabix "${out_file}" "tbi"
+else
+  >&2 echo "${out_file} exists. Skipping."
 fi
 
 

@@ -66,6 +66,8 @@ python3 "${hail_script}" \
    --out_type "${out_type}" \
    --drop_entry_fields "${entry_fields_to_drop}" \
    --extract_samples ${samples_list} \
+   --exclude_trio_parents \
+   --export_parents \
    --min_mac 1 \
    --missing 0.05
 
@@ -75,6 +77,7 @@ python3 "${hail_script}" \
 #   --out_prefix "${out_prefix}" \
 #   --out_type "${out_type}"
 
+module load BCFtools/1.12-GCC-10.3.0
 make_tabix "${out_prefix}.vcf.bgz" "tbi"
 
 

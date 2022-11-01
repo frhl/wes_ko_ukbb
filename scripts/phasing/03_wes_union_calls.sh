@@ -66,6 +66,7 @@ if [ ! -f "${out_prefix}.vcf.bgz" ]; then
      --checkpoint_prefix "${checkpoint_prefix}" \
      --out_prefix "${out_prefix}" \
      --out_type "${out_type}" \
+     --subset_to_overlapping_samples \
      --exclude_trio_parents \
      --export_parents
 

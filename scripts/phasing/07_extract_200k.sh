@@ -10,7 +10,7 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
 #SBATCH --array=21-22
-
+#
 #
 #$ -N extract_200k
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -33,10 +33,8 @@ readonly hail_script="scripts/phasing/07_extract_200k.py"
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
-readonly samples=""
-
 readonly in_dir="data/phased/calls/shapeit5/by_maf"
-readonly in_file="${in_dir}/ukb_prefilter_calls_500k_chr${chr}.mt"
+readonly in_file="${in_dir}/ukb_phased_calls_500k_chr${chr}.vcf.gz"
 readonly in_type="vcf"
 
 readonly out_dir="data/phased/calls/shapeit5/by_maf"
