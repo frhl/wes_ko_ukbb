@@ -18,7 +18,6 @@ def main(args):
     extract_samples = args.extract_samples
     remove_withdrawn = args.remove_withdrawn
     min_info = args.min_info
-    ancestry = args.ancestry
     out_prefix = args.out_prefix
 
     hail_init.hail_bmrc_init_local('logs/hail/overlapping_samples.log', 'GRCh38')
@@ -43,9 +42,6 @@ def main(args):
     wes = io.import_table(in_path, in_type, calc_info=False)
     if remove_withdrawn:
         wes = samples.remove_withdrawn(wes)
-    
-    if ancestry:
-        wes = samples.filter_ukb_to_ancestry(wes, ancestry)
     wes_samples = wes.cols().s.collect()
     
     # assume samples should be extracted
@@ -68,6 +64,18 @@ def main(args):
     ht = wes.cols()
     ht.s.export(out_prefix + ".txt")
     
+    # print out europeans
+    wes = samples.filter_ukb_to_ancestry(wes, "eur")
+    parents = samples.get_parents_by_fam(wes, ["TRIO"])
+    mt_parents = wes.filter_cols(hl.literal(parents).contains(wes.s))
+    mt_parents.cols().s.export(out_prefix + "_eur_parents.txt")
+
+    ht = wes.cols()
+    ht.s.export(out_prefix + "eur.txt")
+    
+
+
+    
 
 if __name__=='__main__':
 
@@ -75,7 +83,6 @@ if __name__=='__main__':
     parser.add_argument('--chrom', default=None, help='chromosome')
     parser.add_argument('--in_path', default=None, help='chromosome')
     parser.add_argument('--in_type', default=None, help='chromosome')
-    parser.add_argument('--ancestry', default=None, help='filter to specific ancestry')
     parser.add_argument('--min_info', default=None, help='filter to specific ancestry')
     parser.add_argument('--dataset', default=None, help='Either "imp" or "calls".')
     parser.add_argument('--extract_samples', default=None, help='HailTable with samples to be extracted.')
