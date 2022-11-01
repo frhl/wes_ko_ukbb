@@ -48,17 +48,15 @@ def main(args):
         mt = mt.drop(*fields)
         mt = mt.drop(mt.info)
     if exclude_trio_parents:
+        mt = mt.checkpoint(out_prefix + ".mt")
         pids = samples.get_parents_by_fam(mt, ["TRIO"])
         if export_parents:
             mt_parents = mt.filter_cols(hl.literal(pids).contains(mt.s))
             io.export_table(mt_parents, out_prefix + "_parents", out_type)
         mt = mt.filter_cols(~hl.literal(pids).contains(mt.s))
 
-
     # always export matrix table
-    if out_type != "mt":
-        io.export_table(mt, out_prefix, "mt")
-    io.export_table(mt, out_prefix, out_type) 
+    io.export_table(mt, out_prefix + "_no_parents", out_type) 
 
 if __name__=='__main__':
 
