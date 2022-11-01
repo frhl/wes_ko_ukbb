@@ -17,9 +17,9 @@
 #$ -o logs/prefilter_calls.log
 #$ -e logs/prefilter_calls.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 2
-#$ -q short.qc
-#$ -t 1-15
+#$ -pe shmem 3
+#$ -q short.qe
+#$ -t 21-22
 #$ -V
 
 
@@ -34,13 +34,15 @@ readonly hail_script="scripts/phasing/02_prefilter_calls.py"
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
-readonly out_dir="data/unphased/calls/prefilter/by_maf"
+readonly out_dir="data/unphased/calls/prefilter/new_by_maf"
 readonly out_prefix="${out_dir}/ukb_prefilter_calls_200k_chr${chr}"
 readonly out_prefix_parents="${out_prefix}_parents"
 readonly out_type="vcf"
 
 # samples overlapping exomes and genotypes
-readonly samples_list="data/unphased/overlap/ukb_calls_wes_samples.txt"
+readonly samples_dir="data/unphased/overlap"
+readonly samples_list="${samples_dir}/ukb_calls_wes_samples.txt"
+readonly trio_parents="${samples_dir}/ukb_calls_wes_samples_parents.txt"
 
 mkdir -p ${spark_dir}
 mkdir -p ${out_dir}
@@ -53,9 +55,9 @@ if [ ! -f "${out_prefix}.vcf.bgz" ]; then
      --out_prefix "${out_prefix}" \
      --out_type "${out_type}" \
      --extract_samples "${samples_list}" \
+     --exclude_trio_parents "${trio_parents}" \
      --filter_incorrect_reference \
      --liftover \
-     --exclude_trio_parents \
      --export_parents \
      --min_maf 0.001 \
      --missing 0.05 \

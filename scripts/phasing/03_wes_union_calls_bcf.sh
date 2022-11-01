@@ -40,7 +40,7 @@ readonly in_wes_file="${in_wes_dir}/ukb_wes_prefilter_200k_chr${chr}.vcf.bgz"
 readonly in_wes_type="vcf"
 
 readonly in_calls_dir="data/unphased/calls/prefilter/by_maf"
-readonly in_calls_file="${in_calls_dir}/ukb_prefilter_calls_200k_chr${chr}.vcf.bgz"
+readonly in_calls_file="${in_calls_dir}/ukb_prefilter_calls_200k_chr${chr}_no_parents.vcf.bgz"
 readonly in_calls_type="vcf"
 
 readonly out_dir="data/unphased/wes_union_calls/bcftools"

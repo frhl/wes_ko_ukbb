@@ -8,8 +8,18 @@
 #SBATCH --output=logs/prefilter_calls.log
 #SBATCH --error=logs/prefilter_calls.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 2
-#SBATCH --array=1-19
+#SBATCH --cpus-per-task 3
+#SBATCH --array=1-22
+#
+#$ -N prefilter_calls
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#$ -o logs/prefilter_calls.log
+#$ -e logs/prefilter_calls.errors.log
+#$ -P lindgren.prjc
+#$ -pe shmem 3
+#$ -q short.qe
+#$ -t 21-22
+#$ -V
 
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
@@ -19,12 +29,19 @@ source utils/vcf_utils.sh
 readonly spark_dir="data/tmp/spark"
 readonly hail_script="scripts/phasing/02_prefilter_calls.py"
 
-readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
-readonly out_dir="data/unphased/calls/prefilter/by_maf"
+readonly task_id=$( get_array_task_id )
+readonly chr=$( get_chr ${task_id} )
+
+readonly out_dir="data/unphased/calls/prefilter/test_by_maf"
 readonly out_prefix="${out_dir}/ukb_prefilter_calls_500k_chr${chr}"
 readonly out_prefix_parents="${out_prefix}_parents"
 readonly out_type="vcf"
 readonly out_vcf_gz="${out_prefix}.vcf.bgz"
+
+# samples overlapping exomes and genotypes
+readonly samples_dir="data/unphased/overlap"
+readonly samples_list="${samples_dir}/ukb_calls_wes_samples.txt"
+readonly trio_parents="${samples_dir}/ukb_calls_wes_samples_parents.txt"
 
 mkdir -p ${spark_dir}
 mkdir -p ${out_dir}
@@ -36,11 +53,11 @@ if [ ! -f "${out_vcf_gz}" ]; then
      --chrom "${chr}" \
      --out_prefix "${out_prefix}" \
      --out_type "${out_type}" \
+     --exclude_trio_parents "${trio_parents}" \
      --filter_incorrect_reference \
      --liftover \
-     --exclude_trio_parents \
-     --export_parents \
      --min_maf 0.001 \
+     --export_parents \
      --missing 0.05 \
      --dataset "calls"
 fi

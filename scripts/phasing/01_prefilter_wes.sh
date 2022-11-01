@@ -9,23 +9,26 @@
 #SBATCH --error=logs/prefilter_wes.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=1-22
+#SBATCH --array=21
 #
 #$ -N prefilter_wes
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/prefilter_wes.log
-#$ -e logs/prefilter_wes.errors.log
+#$ -o data/help/logs/prefilter_wes.log
+#$ -e data/help/logs/prefilter_wes.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc
-#$ -t 1-22
+#$ -t 21
 #$ -V
 
+module purge
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
-readonly spark_dir="data/tmp/spark"
+set -x
+
+readonly spark_dir="data/help/tmp/spark"
 readonly hail_script="scripts/phasing/01_prefilter_wes.py"
 readonly hail_vcf_script="scripts/phasing/_to_mt.py"
 
@@ -36,17 +39,9 @@ readonly in_dir="data/unphased/wes/post-qc"
 readonly in_file="${in_dir}/ukb_wes_200k_filtered_chr${chr}.mt"
 readonly in_type="mt"
 
-readonly out_dir="data/unphased/wes/prefilter/new"
+readonly out_dir="data/help/unphased/wes/prefilter"
 readonly out_prefix="${out_dir}/ukb_wes_prefilter_200k_chr${chr}"
 readonly out_type="vcf"
-
-#readonly in_dir="data/unphased/wes/prefilter"
-#readonly in_file="${in_dir}/ukb_wes_prefilter_200k_chr${chr}.mt"
-#readonly in_type="mt"
-
-#readonly out_dir="data/unphased/wes/prefilter"
-#readonly out_prefix="${out_dir}/ukb_wes_prefilter_200k_chr${chr}"
-#readonly out_type="vcf"
 
 readonly entry_fields_to_drop="GQ,DP,AD,PL"
 

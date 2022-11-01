@@ -36,9 +36,9 @@ def main(args):
     else:
         raise TypeError(f"{dataset} is not 'imp' or 'calls'")
 
-    # get calls
+    # get 500k calls
     calls_samples = mt.cols().s.collect()
-   
+    
     # get whole exome samples
     wes = io.import_table(in_path, in_type, calc_info=False)
     if remove_withdrawn:
@@ -47,7 +47,7 @@ def main(args):
     if ancestry:
         wes = samples.filter_ukb_to_ancestry(wes, ancestry)
     wes_samples = wes.cols().s.collect()
-
+    
     # assume samples should be extracted
     if extract_samples:
         input_ht = hl.import_table(extract_samples, no_header=True, key='f0', delimiter=',')
@@ -58,6 +58,13 @@ def main(args):
     n = len(overlap)
     print(f"Note. Found {n} samples in calls and whole exomes.")
     wes = wes.filter_cols(hl.literal(overlap).contains(wes.s))
+    
+    # export parents that are in WES and CALLs. These are the ones
+    # that we should like to evaluate downstream and thus need to exlcude.
+    parents = samples.get_parents_by_fam(wes, ["TRIO"])
+    mt_parents = wes.filter_cols(hl.literal(parents).contains(wes.s))
+    mt_parents.cols().s.export(out_prefix + "_parents.txt")
+
     ht = wes.cols()
     ht.s.export(out_prefix + ".txt")
     

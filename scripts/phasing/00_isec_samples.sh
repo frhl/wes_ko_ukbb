@@ -9,6 +9,16 @@
 #SBATCH --error=logs/isec_samples.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
+#
+#$ -N isec_samples
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#$ -o logs/isec_samples.log
+#$ -e logs/isec_samples.errors.log
+#$ -P lindgren.prjc
+#$ -pe shmem 1
+#$ -q short.qe
+#$ -V
+
 
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
