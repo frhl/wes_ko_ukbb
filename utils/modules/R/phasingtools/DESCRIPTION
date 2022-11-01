@@ -21,3 +21,7 @@ RoxygenNote: 7.1.2
 Collate:
     'aggr_ser_by_site.R'
     'summarize_bcftools_trio_stats.R'
+    'id_single_switch_error.R'
+    'id_phase_error.R'
+    'is_snv.R'
+
