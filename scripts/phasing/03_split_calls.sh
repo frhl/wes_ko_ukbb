@@ -54,7 +54,6 @@ if [ ! -f "${out_prefix}.vcf.bgz" ]; then
      --chrom "${chr}" \
      --out_prefix "${out_prefix}" \
      --out_type "${out_type}" \
-     --extract_samples "${samples_list}" \
      --exclude_trio_parents "${trio_parents}" \
      --filter_incorrect_reference \
      --liftover \

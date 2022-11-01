@@ -24,7 +24,7 @@ def main(args):
     out_prefix = args.out_prefix
     out_type = args.out_type
 
-    hail_init.hail_bmrc_init_local('logs/hail/01_prefilter_wes.py', 'GRCh38')
+    hail_init.hail_bmrc_init_local('logs/hail/prefilter.py', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
     mt = qc.get_table(input_path, input_type, calc_info = False) # assuming build GRCh38
 

@@ -9,7 +9,7 @@
 #SBATCH --error=logs/prefilter_calls.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 3
-#SBATCH --array=1-22
+#SBATCH --array=21
 #
 #
 #$ -N prefilter_calls
@@ -29,54 +29,60 @@ source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/phasing/02_prefilter_calls.py"
+readonly hail_script="scripts/phasing/prefilter.py"
 
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
-readonly out_dir="data/unphased/calls/prefilter/new_by_maf"
-readonly out_prefix="${out_dir}/ukb_prefilter_calls_200k_chr${chr}"
-readonly out_prefix_parents="${out_prefix}_parents"
-readonly out_type="vcf"
+readonly in_dir="data/unphased/calls/liftover"
+readonly in_file="${in_dir}/ukb_liftover_calls_500k_chr${chr}.mt"
+readonly in_type="mt"
 
-# samples overlapping exomes and genotypes
-readonly samples_dir="data/unphased/overlap"
-readonly samples_list="${samples_dir}/ukb_calls_wes_samples.txt"
-readonly trio_parents="${samples_dir}/ukb_calls_wes_samples_parents.txt"
+readonly out_dir_500k="data/unphased/calls/prefilter/500k"
+readonly out_prefix_500k="${out_dir_500k}/ukb_prefilter_calls_500k_chr${chr}"
+readonly out_type_500k="mt"
+
+# Note: 200k samples that overlap samples in WES
+readonly samples_200k="data/unphased/overlap/ukb_calls_wes_samples.txt"
+readonly out_dir_200k="data/unphased/calls/prefilter/200k"
+readonly out_prefix_200k="${out_dir_200k}/ukb_prefilter_calls_200k_chr${chr}"
+readonly out_type_200k="mt"
+
+readonly min_maf="0.001"
+readonly missing="0.05"
+readonly ancestry=""
 
 mkdir -p ${spark_dir}
-mkdir -p ${out_dir}
+mkdir -p ${out_dir_200k}
+mkdir -p ${out_dir_500k}
 
-if [ ! -f "${out_prefix}.vcf.bgz" ]; then
-  set_up_hail 0.2.97
-  set_up_pythonpath_legacy
-  python3 "${hail_script}" \
-     --chrom "${chr}" \
-     --out_prefix "${out_prefix}" \
-     --out_type "${out_type}" \
-     --extract_samples "${samples_list}" \
-     --exclude_trio_parents "${trio_parents}" \
-     --filter_incorrect_reference \
-     --liftover \
-     --export_parents \
-     --min_maf 0.001 \
-     --missing 0.05 \
-     --dataset "calls"
+set_up_hail
+set_up_pythonpath_legacy
+
+if [ ! -f "${out_prefix_500k}.mt/_SUCCESS" ]; then
+  echo "Running 500K calls.."
+  python3 ${hail_script} \
+     --chrom ${chr} \
+     --input_path ${in_file} \
+     --input_type ${in_type} \
+     --out_prefix ${out_prefix_500k} \
+     --out_type ${out_type_200k} \
+     --min_maf ${min_maf} \
+     --missing ${missing}
 fi
 
-if [ ${out_type} == "vcf" ] & [ ! -f "${out_prefix}.vcf.bgz.tbi" ]; then
-  module purge
-  module load BCFtools/1.12-GCC-10.3.0
-  make_tabix "${out_prefix}.vcf.bgz" "tbi"
+if [ ! -f "${out_prefix_200k}.mt/_SUCCESS" ]; then
+  echo "Running 200K calls.."
+  python3 ${hail_script} \
+     --chrom ${chr} \
+     --input_path ${in_file} \
+     --input_type ${in_type} \
+     --out_prefix ${out_prefix_200k} \
+     --out_type ${out_type_200k} \
+     --extract_samples ${samples_list} \
+     --min_maf ${min_maf} \
+     --missing ${missing}
 fi
-
-if [ -f "${out_prefix_parents}.vcf.bgz" ]; then
-  module purge
-  module load BCFtools/1.12-GCC-10.3.0
-  make_tabix "${out_prefix_parents}.vcf.bgz" "tbi"
-fi
-
-
 
 
 
