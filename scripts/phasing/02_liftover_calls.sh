@@ -9,7 +9,7 @@
 #SBATCH --error=logs/liftover_calls.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=22
+#SBATCH --array=1-21
 #
 #$ -N liftover_calls
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -34,6 +34,8 @@ readonly out_dir="data/unphased/calls/liftover"
 readonly out_prefix="${out_dir}/ukb_liftover_calls_500k_chr${chr}"
 readonly out_type="mt"
 
+readonly fields_to_drop="fam_id,pat_id,mat_id,is_female,is_case,cm_position"
+
 mkdir -p ${spark_dir}
 mkdir -p ${out_dir}
 
@@ -43,7 +45,8 @@ python3 "${hail_script}" \
    --chrom "${chr}" \
    --out_prefix "${out_prefix}" \
    --out_type "${out_type}" \
+   --drop_fields ${fields_to_drop} \
    --filter_incorrect_reference \
-   --liftover \
-   --dataset "calls"
+   --dataset "calls" \
+   --liftover
 

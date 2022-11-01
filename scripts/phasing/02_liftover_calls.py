@@ -23,6 +23,7 @@ def main(args):
     liftover = args.liftover
     out_prefix = args.out_prefix
     out_type = args.out_type
+    drop_fields = args.drop_fields
 
     hail_init.hail_bmrc_init_local('logs/hail/01_geno_gen.log', 'GRCh38')
 
@@ -36,7 +37,10 @@ def main(args):
         mt = genotypes.get_ukb_genotypes_bed(chroms=[chrom])
     else:
         raise TypeError(f"{dataset} is not 'imp' or 'calls'")
-
+    
+    if drop_fields:
+        fields = drop_fields.strip().split(",")
+        mt = mt.drop(*fields)
     if convert_sample_id:
         mt = samples.convert_sample_ids(mt, 12788, 11867)
     if chrom in "X":
@@ -50,7 +54,6 @@ def main(args):
         if mismatch_n > 0:
             print(f"Found {mismatch_n} variants with reference allele not in fasta!")
             mt = mt.filter_rows(~mismatch_expr)
-    
     io.export_table(mt, out_prefix, out_type)
 
 if __name__=='__main__':
@@ -65,6 +68,7 @@ if __name__=='__main__':
     parser.add_argument('--extract_samples', default=None, help='HailTable with samples to be extracted.')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Type out vcf/plink/mt')
+    parser.add_argument('--drop_fields', default=None, help='Type out vcf/plink/mt')
     args = parser.parse_args()
 
     main(args)
