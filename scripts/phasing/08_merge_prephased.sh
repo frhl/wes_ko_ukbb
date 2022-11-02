@@ -9,16 +9,16 @@
 #SBATCH --error=logs/prephase_chunks_merge.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 5
-#SBATCH --array=21
+#SBATCH --array=20
 #
 #$ -N prephase_chunks_merge
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/merge_prephased.log
 #$ -e logs/merge_prephased.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 4
+#$ -pe shmem 5
 #$ -q short.qc
-#$ -t 21
+#$ -t 20
 #$ -V
 
 set -o errexit

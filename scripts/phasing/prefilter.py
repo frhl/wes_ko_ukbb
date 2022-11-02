@@ -7,6 +7,7 @@ from ko_utils import qc
 from ko_utils import io
 from ukb_utils import hail_init
 from ukb_utils import samples
+from ukb_utils import variants
 
 from ko_utils.variants import filter_min_mac, filter_missing
 
@@ -16,9 +17,9 @@ def main(args):
     input_path = args.input_path
     input_type = args.input_type
     extract_samples = args.extract_samples
-    exclude_trio_parents = args.exclude_trio_parents
     drop_fields = args.drop_fields
     min_mac = args.min_mac
+    min_maf = args.min_maf
     missing = args.missing
     ancestry = args.ancestry
     out_prefix = args.out_prefix
@@ -33,8 +34,8 @@ def main(args):
         mt = mt.filter_cols(hl.is_defined(ht_samples[mt.col_key])) 
     if ancestry:
         mt = samples.filter_ukb_to_ancestry(mt, ancestry)
-    if exclude_trio_parents:
-        mt = samples.exclude_parents_by_fam(mt, relation = ["TRIO"])
+    if min_maf:
+        mt = mt.filter_rows(variants.get_maf_expr(mt) >= float(min_maf))
     if min_mac:
         mt = filter_min_mac(mt, int(min_mac))
     if missing:
@@ -59,6 +60,7 @@ if __name__=='__main__':
     parser.add_argument('--ancestry', default=None, help='filter to specific ancestry')
     parser.add_argument('--extract_samples', default=None, help='HailTable with samples to be extracted.')
     parser.add_argument('--min_mac', default=None, help='Filter to MAC >= value')
+    parser.add_argument('--min_maf', default=None, help='Filter to MAC >= value')
     parser.add_argument('--missing', default=None, help='Filter to variants to have le value in genotype missingness')
     parser.add_argument('--drop_fields', default=None, help='Filter to variants to have le value in genotype missingness')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')

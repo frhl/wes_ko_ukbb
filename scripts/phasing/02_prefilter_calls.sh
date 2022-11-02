@@ -9,8 +9,8 @@
 #SBATCH --error=logs/prefilter_calls.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 3
-#SBATCH --array=21
-#
+#SBATCH --array=1-22
+#SBATCH --dependency="afterok:8082402"
 #
 #$ -N prefilter_calls
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -48,6 +48,9 @@ readonly out_dir_200k="data/unphased/calls/prefilter/200k"
 readonly out_prefix_200k="${out_dir_200k}/ukb_prefilter_calls_200k_chr${chr}"
 readonly out_type_200k="mt"
 
+# samples that are overlapping WES and CALLS
+readonly samples_list="data/unphased/overlap/ukb_calls_wes_samples.txt"
+
 readonly min_maf="0.001"
 readonly missing="0.05"
 readonly ancestry=""
@@ -62,7 +65,6 @@ set_up_pythonpath_legacy
 if [ ! -f "${out_prefix_500k}.mt/_SUCCESS" ]; then
   echo "Running 500K calls.."
   python3 ${hail_script} \
-     --chrom ${chr} \
      --input_path ${in_file} \
      --input_type ${in_type} \
      --out_prefix ${out_prefix_500k} \
@@ -74,7 +76,6 @@ fi
 if [ ! -f "${out_prefix_200k}.mt/_SUCCESS" ]; then
   echo "Running 200K calls.."
   python3 ${hail_script} \
-     --chrom ${chr} \
      --input_path ${in_file} \
      --input_type ${in_type} \
      --out_prefix ${out_prefix_200k} \

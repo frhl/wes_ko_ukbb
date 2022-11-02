@@ -27,15 +27,15 @@ source utils/vcf_utils.sh
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
 
-readonly in_dir="data/unphased/calls/prefilter/by_maf"
-readonly out_dir="data/phased/calls/shapeit5/by_maf"
+readonly in_dir="data/unphased/calls/prefilter/500k"
+readonly out_dir="data/phased/calls/shapeit5/500k"
 readonly ref_dir="/well/lindgren/flassen/ressources/panels/liftover_reference_panel/data/liftover"
 
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
-readonly in_file="${in_dir}/ukb_prefilter_calls_200k_chr${chr}_no_parents.vcf.bgz"
-readonly out_prefix="${out_dir}/ukb_phased_calls_200k_chr${chr}"
+readonly in_file="${in_dir}/ukb_split_calls_500k_chr${chr}_no_parents.vcf.bgz"
+readonly out_prefix="${out_dir}/ukb_phased_calls_500k_chr${chr}"
 readonly out="${out_prefix}.vcf.gz"
 
 readonly ref="${ref_dir}/ALL.chr${chr}.phase3_shapeit2_mvncall_integrated_v5.20130502.genotypes.vcf.bgz"
