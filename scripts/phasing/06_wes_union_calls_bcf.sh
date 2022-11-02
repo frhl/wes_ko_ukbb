@@ -30,25 +30,25 @@ source utils/vcf_utils.sh
 
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/phasing/03_wes_union_calls_bcf.py"
+readonly hail_script="scripts/phasing/06_wes_union_calls_bcf.py"
 
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
-readonly in_wes_dir="data/unphased/wes/prefilter"
-readonly in_wes_file="${in_wes_dir}/ukb_wes_prefilter_200k_chr${chr}.vcf.bgz"
+readonly in_wes_dir="data/unphased/wes/prefilter/new"
+readonly in_wes_file="${in_wes_dir}/ukb_wes_prefilter_200k_chr${chr}_no_parents.vcf.bgz"
 readonly in_wes_type="vcf"
 
-readonly in_calls_dir="data/unphased/calls/prefilter/by_maf"
-readonly in_calls_file="${in_calls_dir}/ukb_prefilter_calls_200k_chr${chr}_no_parents.vcf.bgz"
+readonly in_calls_dir="data/unphased/calls/prefilter/200k"
+readonly in_calls_file="${in_calls_dir}/ukb_split_calls_200k_chr${chr}_no_parents.vcf.bgz"
 readonly in_calls_type="vcf"
 
 readonly out_dir="data/unphased/wes_union_calls/bcftools"
-readonly tmp_prefix="${out_dir}/ukb_wes_union_calls_200k_calls_subset_chr${chr}"
+readonly tmp_prefix="${out_dir}/ukb_wes_union_calls_200k_calls_ordered_chr${chr}"
 readonly tmp_file="${tmp_prefix}.vcf.bgz"
 readonly tmp_type="vcf"
 
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}_no_parents"
 readonly out_file="${out_prefix}.vcf.gz"
 
 mkdir -p ${out_dir}
@@ -73,7 +73,7 @@ fi
 if [ ! -f "${out_file}" ]; then
   module purge
   module load BCFtools/1.12-GCC-10.3.0
-  bcftools concat ${in_wes_file} ${tmp_file} -oZ -o ${out_file}
+  bcftools concat ${in_wes_file} ${in_calls_file} -oZ -o ${out_file}
   make_tabix "${out_file}" "tbi"
 else
   >&2 echo "${out_file} exists. Skipping."

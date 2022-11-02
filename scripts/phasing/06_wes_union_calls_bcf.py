@@ -5,6 +5,7 @@ import argparse
 
 from ko_utils import io
 from ukb_utils import hail_init
+from ukb_utils import tables
 
 def main(args):
 
@@ -24,6 +25,9 @@ def main(args):
     mt1 = io.import_table(input_calls_path, input_calls_type, calc_info = False)
     mt2 = io.import_table(input_wes_path, input_wes_type, calc_info = False) # assuming build GRCh38
     
+    # in order to combine with bcftools, we need to order by samples
+    mt1 = tables.order_cols(mt1, mt2)
+
     # only keep keys and GT for each MatrixTable
     mt1 = mt1.drop(*set(list(mt1.col)) - set(list(mt1.col_key)))
     mt1 = mt1.drop(*set(list(mt1.row)) - set(list(mt1.row_key)))
@@ -35,7 +39,6 @@ def main(args):
 
     # Remove any variants from mt that are already in mt2
     mt1 = mt1.filter_rows(~hl.is_defined(mt2.index_rows(mt1.locus, mt1.alleles)))
-   
     io.export_table(mt1, out_calls_prefix, out_calls_type)
 
 if __name__=='__main__':
