@@ -1,16 +1,23 @@
 #!/usr/bin/env bash
 #
-#
-#
 #SBATCH --account=lindgren.prj
 #SBATCH --job-name=gwas
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/gwas.log
 #SBATCH --error=logs/gwas.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 2
-#SBATCH --array=90
-#SBATCH --requeue
+#SBATCH --cpus-per-task 1
+#SBATCH --array=30
+#
+#$ -N gwas
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#$ -o logs/gwas.log
+#$ -e logs/gwas.errors.log
+#$ -P lindgren.prjc
+#$ -pe shmem 1
+#$ -q test.qc
+#$ -t 30
+#$ -V
 
 
 set -o errexit
@@ -19,6 +26,7 @@ set -o nounset
 module purge
 source utils/bash_utils.sh
 source utils/hail_utils.sh
+source utils/qsub_utils.sh
 
 readonly curwd=$(pwd)
 readonly in_dir="data/prs/hapmap/ukb_500k/fitting"
@@ -34,7 +42,9 @@ readonly covariates=$( cat ${covar_file} )
 readonly input_type="plink"
 readonly input_path="${in_dir}/ukb_hapmap_500k_eur_chrCHR"
 
-readonly index=${SLURM_ARRAY_TASK_ID}
+# use either slurm or SGE
+readonly cluster=$( get_current_cluster )
+readonly index=$( get_array_task_id )
 
 readonly file_cts="${pheno_dir}/curated_covar_phenotypes_cts.tsv.gz" 
 readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
@@ -64,26 +74,49 @@ submit_gwas_job()
         local slurm_tasks="${tasks}"
         local slurm_queue="short"
         local slurm_shmem="3"
-        readonly gwas_jid=$( sbatch \
-          --account="${slurm_project}" \
-          --job-name="${slurm_jname}" \
-          --output="${slurm_lname}.log" \
-          --error="${slurm_lname}.errors.log" \
-          --chdir="$(pwd)" \
-          --partition="${slurm_queue}" \
-          --cpus-per-task="${slurm_shmem}" \
-          --array=${slurm_tasks} \
-          --parsable \
-          "${bash_script}" \
-          "${hail_script}" \
-          "${input_path}" \
-          "${input_type}" \
-          "${pheno_file}" \
-          "${phenotype}" \
-          "${covariates}" \
-          "${min_cases}" \
-          "${prefix}" )
-        submit_merge_job
+        if [ ${cluster} == "slurm" ]; then
+          readonly gwas_jid=$( sbatch \
+            --account="${slurm_project}" \
+            --job-name="${slurm_jname}" \
+            --output="${slurm_lname}.log" \
+            --error="${slurm_lname}.errors.log" \
+            --chdir="$(pwd)" \
+            --partition="${slurm_queue}" \
+            --cpus-per-task="${slurm_shmem}" \
+            --array=${slurm_tasks} \
+            --parsable \
+            "${bash_script}" \
+            "${hail_script}" \
+            "${input_path}" \
+            "${input_type}" \
+            "${pheno_file}" \
+            "${phenotype}" \
+            "${covariates}" \
+            "${min_cases}" \
+            "${prefix}" )
+          submit_merge_job
+        elif [ "${cluster}" == "sge" ]; then
+          qsub -N "_${phenotype}_gwas" \
+            -P lindgren.prjc \
+            -t ${slurm_tasks} \
+            -q short.qc@@short.hge \
+            -o "${slurm_lname}.log" \
+            -e "${slurm_lname}.errors.log" \
+            -pe shmem ${slurm_shmem} \
+            -wd $(pwd) \
+            "${bash_script}" \
+            "${hail_script}" \
+            "${input_path}" \
+            "${input_type}" \
+            "${pheno_file}" \
+            "${phenotype}" \
+            "${covariates}" \
+            "${min_cases}" \
+            "${prefix}" 
+          submit_merge_job
+        else
+          >&2 echo "${cluster} is not a valid cluster! Exiting.."
+        fi
       else
       >&2 echo "Covariate argument is emtpy! Exiting.."
       fi
@@ -95,34 +128,51 @@ submit_gwas_job()
   fi
 }
 
-submit_merge_job()
+submit_merge_job_slurm()
 {
   local slurm_jname="_mrg_${phenotype}"
   local slurm_lname="_gwas_merge"
   local slurm_project="lindgren.prj"
   local slurm_queue="short"
   local slurm_nslots="1"
-  readonly merge_jid=$( sbatch \
-    --account="${slurm_project}" \
-    --job-name="${slurm_jname}" \
-    --output="${slurm_lname}.log" \
-    --error="${slurm_lname}.errors.log" \
-    --chdir="${curwd}" \
-    --partition="${slurm_queue}" \
-    --cpus-per-task="${slurm_nslots}" \
-    --dependency="afterok:${gwas_jid}" \
-    --open-mode="append" \
-    --parsable \
-    "${merge_script}" \
-    "${prefix}" \
-    "${out_dir}" \
-    "${out_prefix}.txt.gz" )
+  if [ "${cluster}" == "slurm" ]; then
+    readonly merge_jid=$( sbatch \
+      --account="${slurm_project}" \
+      --job-name="${slurm_jname}" \
+      --output="${slurm_lname}.log" \
+      --error="${slurm_lname}.errors.log" \
+      --chdir="${curwd}" \
+      --partition="${slurm_queue}" \
+      --cpus-per-task="${slurm_nslots}" \
+      --dependency="afterok:${gwas_jid}" \
+      --open-mode="append" \
+      --parsable \
+      "${merge_script}" \
+      "${prefix}" \
+      "${out_dir}" \
+      "${out_prefix}.txt.gz" )
+  elif [ "${cluster}" == "sge" ]; then
+    qsub -N "_mrg_${phenotype}" \
+      -q short.qc@@short.hge \
+      -pe shmem 1 \
+      -P lindgren.prjc \
+      -o "${slurm_lname}.log" \
+      -e "${slurm_lname}.errors.log" \
+      -wd $(pwd) \
+      -hold_jid "_${phenotype}_gwas" \
+      "${merge_script}" \
+      "${prefix}" \
+      "${out_dir}" \
+      "${out_prefix}.txt.gz" 
+  else
+    >&2 echo "${cluster} is not a valid cluster. Exiting!"
+  fi
 }
 
 
-readonly tasks="1-22"
-submit_gwas_job "data/prs/sumstat/binary" "${phenotype_binary}" "${file_binary}"
-#submit_gwas_job "data/prs/sumstat/cts" "${phenotype_cts}_int" "${file_cts}"
+readonly tasks="21"
+#submit_gwas_job "data/prs/sumstat/binary" "${phenotype_binary}" "${file_binary}"
+submit_gwas_job "data/prs/sumstat/test/cts" "${phenotype_cts}_int" "${file_cts}"
 
 
 
