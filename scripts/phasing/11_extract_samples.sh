@@ -3,23 +3,23 @@
 # @description: extract 200K samples 
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=extract_200k
+#SBATCH --job-name=extract_samples
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/extract_200k.log
-#SBATCH --error=logs/extract_200k.errors.log
+#SBATCH --output=logs/extract_samples.log
+#SBATCH --error=logs/extract_samples.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=21-22
+#SBATCH --array=21
 #
 #
-#$ -N extract_200k
+#$ -N extract_samples
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/extract_200k.log
-#$ -e logs/extract_200k.errors.log
+#$ -o logs/extract_samples.log
+#$ -e logs/extract_samples.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qe
-#$ -t 21-22
+#$ -t 21
 #$ -V
 
 
@@ -28,17 +28,22 @@ source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/phasing/07_extract_200k.py"
+readonly hail_script="scripts/phasing/11_extract_samples.py"
 
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
-readonly in_dir="data/phased/calls/shapeit5/by_maf"
-readonly in_file="${in_dir}/ukb_phased_calls_500k_chr${chr}.vcf.gz"
+## REMOVE TEST PATHS BELOW
+
+#readonly in_dir="data/phased/calls/shapeit5/by_maf"
+readonly in_dir="data/unphased/calls/prefilter/500k"
+#readonly in_file="${in_dir}/ukb_phased_calls_500k_chr${chr}.vcf.gz"
+readonly in_file="${in_dir}/ukb_split_calls_500k_chr${chr}_no_parents.vcf.bgz"
 readonly in_type="vcf"
 
-readonly out_dir="data/phased/calls/shapeit5/by_maf"
-readonly out_prefix="${out_dir}/ukb_phased_calls_200k_from_500k_chr${chr}"
+readonly out_dir="data/phased/calls/shapeit5/test"
+#readonly out_prefix="${out_dir}/ukb_phased_calls_200k_from_500k_chr${chr}"
+readonly out_prefix="${out_dir}/test_ukb_phased_calls_200k_from_500k_chr${chr}"
 readonly out_type="vcf"
 
 readonly samples="data/unphased/overlap/ukb_calls_wes_samples.txt"
