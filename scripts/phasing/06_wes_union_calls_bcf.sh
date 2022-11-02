@@ -48,7 +48,7 @@ readonly tmp_prefix="${out_dir}/ukb_wes_union_calls_200k_calls_ordered_chr${chr}
 readonly tmp_file="${tmp_prefix}.vcf.bgz"
 readonly tmp_type="vcf"
 
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}_no_parents"
+readonly out_prefix="${out_dir}/test_ukb_wes_union_calls_200k_chr${chr}_no_parents"
 readonly out_file="${out_prefix}.vcf.gz"
 
 mkdir -p ${out_dir}
@@ -73,7 +73,7 @@ fi
 if [ ! -f "${out_file}" ]; then
   module purge
   module load BCFtools/1.12-GCC-10.3.0
-  bcftools concat ${in_wes_file} ${in_tmp_file} -oZ -o ${out_file}
+  bcftools concat ${in_wes_file} ${tmp_file} -oZ -o ${out_file}
   make_tabix "${out_file}" "tbi"
 else
   >&2 echo "${out_file} exists. Skipping."
