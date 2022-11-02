@@ -73,7 +73,7 @@ fi
 if [ ! -f "${out_file}" ]; then
   module purge
   module load BCFtools/1.12-GCC-10.3.0
-  bcftools concat ${in_wes_file} ${in_calls_file} -oZ -o ${out_file}
+  bcftools concat ${in_wes_file} ${in_tmp_file} -oZ -o ${out_file}
   make_tabix "${out_file}" "tbi"
 else
   >&2 echo "${out_file} exists. Skipping."
