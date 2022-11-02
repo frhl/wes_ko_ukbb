@@ -71,7 +71,7 @@ def main(args):
     mt_parents.cols().s.export(out_prefix + "_eur_parents.txt")
 
     ht = wes.cols()
-    ht.s.export(out_prefix + "eur.txt")
+    ht.s.export(out_prefix + "_eur.txt")
     
 
 
