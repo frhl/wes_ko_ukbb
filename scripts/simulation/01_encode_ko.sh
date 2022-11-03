@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 #
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=encode_ko
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/encode_ko.log
+#SBATCH --error=logs/encode_ko.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 3
+#SBATCH --array=22
+#
 #$ -N encode_ko
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/encode_ko.log
@@ -7,7 +16,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 3
 #$ -q short.qa
-#$ -t 1,22
+#$ -t 22
 #$ -V
 
 source utils/qsub_utils.sh
@@ -17,7 +26,8 @@ source utils/vcf_utils.sh
 readonly hail_script="scripts/simulation/01_encode_ko.py"
 readonly spark_dir="data/tmp/spark_dir"
 
-readonly chr=$( get_chr ${SGE_TASK_ID} )
+readonly array_idx=$( get_array_task_id )
+readonly chr=$( get_chr ${array_idx} )
 
 readonly n_samples="100k"
 readonly in_dir="data/simulation/mt"
@@ -25,7 +35,7 @@ readonly in_file="${in_dir}/ukb_eur_${n_samples}_chr${chr}.mt"
 readonly in_type="mt"
 
 readonly out_dir="data/simulation/knockouts"
-readonly out_prefix="${out_dir}/ukb_eur_${n_samples}_knockout_recessive_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_eur_${n_samples}_encoded_norm_knockouts_chr${chr}"
 readonly out_type="vcf"
 
 # Allele frequency thresholds to filter on

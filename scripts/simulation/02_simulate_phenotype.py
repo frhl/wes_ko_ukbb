@@ -26,15 +26,16 @@ def rescale_variances(X, X_variance, Y_variance):
     Y = K*X
     return(Y)
 
-def make_effect(mt, h2, pi = None, causal_bool = None):
+def make_effect(mt, h2, pi = None):
     """ Make effect sizes for either infintesimal or spike and slab model. """
     M = mt.count()[0]
     pi_temp = 1 if pi == None else pi
-    if causal_bool is not None:
-        return(causal_bool*hl.rand_norm(0, hl.sqrt(h2/(M*pi_temp))))
-    else:
-        return(hl.rand_bool(pi_temp)*hl.rand_norm(0, hl.sqrt(h2/(M*pi_temp))))
+    return(hl.rand_bool(pi_temp)*hl.rand_norm(0, hl.sqrt(h2/(M*pi_temp))))
 
+def make_effect_from_boolean(mt, h2, causal_bool, pi):
+    """ Make effect sizes for either infintesimal or spike and slab model. """
+    M = mt.count()[0]
+    return(causal_bool*hl.rand_norm(0, hl.sqrt(h2/(M*pi))))
 
 
 def try_param_h2(x):
@@ -58,6 +59,7 @@ def main(args):
     var_theta = try_param_h2(args.var_theta)
     pi_beta = try_param_pi(args.pi_beta)
     pi_theta = try_param_pi(args.pi_theta)
+    pi = try_param_pi(args.pi)
     K = float(args.K)
 
     # import table
@@ -73,11 +75,11 @@ def main(args):
     # setup effects
     if h2 > 0 and (var_beta + var_theta) > 0:
 
-        causal_pi = 0.2
-        causal_bool = hl.rand_bool(causal_pi)
+        # get causal genes
+        causal_bool = hl.rand_bool(pi)
 
         # setup standard additive effects
-        mt = mt.annotate_rows(beta = make_effect(mt, h2=var_beta, pi=causal_pi, causal_bool=causal_bool))
+        mt = mt.annotate_rows(beta = make_effect_from_boolean(mt, var_beta, causal_bool, pi))
 
         # keep track of sign for additive effects
         mt = mt.annotate_rows(
@@ -86,7 +88,7 @@ def main(args):
 
         # setup recessive effects
         mt = mt.annotate_rows(
-                theta_nosign = hl.abs(make_effect(mt, h2=var_theta, pi=causal_pi, causal_bool=causal_bool))
+                theta_nosign = hl.abs(make_effect_from_boolean(mt, var_theta, causal_bool, pi))
         )
         
         # keep theta sign consistent with beta sign
@@ -134,6 +136,7 @@ if __name__=='__main__':
     parser.add_argument('--h2', default=0, help='Heritability for coding region')
     parser.add_argument('--var_beta', default=0, help='Heritability for coding region')
     parser.add_argument('--var_theta', default=0, help='Heritability for knockouts')
+    parser.add_argument('--pi', default=0, help='Heritability for knockouts')
     parser.add_argument('--pi_beta', default=0, help='Probability of variant being causal in coding region')
     parser.add_argument('--pi_theta', default=0, help='Probability of variant being causal in non-coding region')
     parser.add_argument('--K', default=0, help='Prevalence of phenotype: cases / (cases + controls)')

@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 #
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=sample_wes
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/sample_wes.log
+#SBATCH --error=logs/sample_wes.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 3
+#SBATCH --array=20
+#
 #$ -N sample_wes
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/sample_wes.log
@@ -7,7 +16,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 3
 #$ -q short.qa
-#$ -t 1
+#$ -t 20
 #$ -V
 
 source utils/qsub_utils.sh
@@ -17,7 +26,8 @@ source utils/vcf_utils.sh
 readonly hail_script="scripts/simulation/00_sample_wes.py"
 readonly spark_dir="data/tmp/spark_dir"
 
-readonly chr=$( get_chr ${SGE_TASK_ID} )
+readonly array_idx=$( get_array_task_id )
+readonly chr=$( get_chr ${array_idx} )
 
 readonly in_dir="data/mt/annotated"
 readonly in_file="${in_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.mt"

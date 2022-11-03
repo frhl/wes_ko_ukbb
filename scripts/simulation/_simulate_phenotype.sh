@@ -26,11 +26,12 @@ readonly in_type=${2?Error: Missing arg2 (in_vcf)}
 readonly h2=${3?Error: Missing arg3 ()}
 readonly var_beta=${4?Error: Missing arg3 ()}
 readonly var_theta=${5?Error: Missing arg3 ()}
-readonly pi_beta=${6?Error: Missing arg3 ()}
-readonly pi_theta=${7?Error: Missing arg3 ()}
-readonly K=${8?Error: Missing arg3 ()}
-readonly seed=${9?Error: Missing arg3 ()}
-readonly out_prefix=${10?Error: Missing arg3 ()}
+readonly pi=${6?Error: Missing arg3 ()}
+#readonly pi_beta=${6?Error: Missing arg3 ()}
+#readonly pi_theta=${7?Error: Missing arg3 ()}
+readonly K=${7?Error: Missing arg3 ()}
+readonly seed=${8?Error: Missing arg3 ()}
+readonly out_prefix=${9?Error: Missing arg3 ()}
 
 readonly out_sge_prefix="${out_prefix}_${SGE_TASK_ID}"
 readonly sge_seed=$(( ${SGE_TASK_ID} * ${seed}))
@@ -48,8 +49,7 @@ python3 "${hail_script}" \
    --h2 ${h2} \
    --var_beta ${var_beta} \
    --var_theta ${var_theta} \
-   --pi_beta ${pi_beta} \
-   --pi_theta ${pi_theta} \
+   --pi ${pi} \
    --K ${K} \
    --seed ${sge_seed} \
    --out_prefix "${out_sge_prefix}" \

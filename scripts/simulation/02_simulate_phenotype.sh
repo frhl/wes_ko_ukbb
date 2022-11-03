@@ -35,7 +35,7 @@ readonly out_dir="data/simulation/phenotypes"
 mkdir -p ${out_dir}
 
 run_with_params() {
-  simulate_phenotypes ${1} ${2} ${3} ${4} ${5} ${6}
+  simulate_phenotypes ${1} ${2} ${3} ${4} ${5}
 }
 
 simulate_phenotypes() {
@@ -44,18 +44,16 @@ simulate_phenotypes() {
   local h2=${1}
   local var_beta=${2}
   local var_theta=${3}
-  local pi_beta=${4}
-  local pi_theta=${5}
-  local seed=${6}
+  local pi=${4}
+  local seed=${5}
 
   local vars="${var_beta}_${var_theta}"
-  local pis="${pi_beta}_${pi_theta}"
 
-  local out_prefix="${out_dir}/ukb_eur_h2_${h2}_var_${vars}_pi_${pis}_K${K}_seed${seed}_chr${chr}"
+  local out_prefix="${out_dir}/ukb_eur_h2_${h2}_var_${vars}_pi_${pi}_K${K}_seed${seed}_chr${chr}"
   local out_phenotypes="${out_prefix}_phenos.tsv.gz"
   
-  local sim_name="sim_c${SGE_TASK_ID}_h2_${h2}_var_${vars}_pi_${pis}"
-  local mrg_name="mrg_c${SGE_TASK_ID}_h2_${h2}_var_${vars}_pi_${pis}"
+  local sim_name="sim_c${SGE_TASK_ID}_h2_${h2}_var_${vars}_pi_${pi}"
+  local mrg_name="mrg_c${SGE_TASK_ID}_h2_${h2}_var_${vars}_pi_${pi}"
 
   set -x
   if [ 1 -eq 1 ]; then
@@ -69,8 +67,7 @@ simulate_phenotypes() {
        ${h2} \
        ${var_beta} \
        ${var_theta} \
-       ${pi_beta} \
-       ${pi_theta} \
+       ${pi} \
        ${K} \
        ${seed} \
        ${out_prefix}
@@ -124,11 +121,11 @@ readonly tasks=1-5 #-2
 #run_with_params 0.05 0.10 99.0 1.00 1.00 606
 
 
-run_with_params 0.001 10.0 0.10 0.20 0.20 601
-run_with_params 0.001 0.10 0.10 0.20 0.20 601
-run_with_params 0.001 0.10 1.00 0.20 0.20 602
-run_with_params 0.001 0.10 10.0 0.20 0.20 603
-run_with_params 0.001 0.10 99.0 0.20 0.20 604
+run_with_params 0.001 10.0 0.10 0.25 601
+run_with_params 0.001 0.10 0.10 0.25 601
+run_with_params 0.001 0.10 1.00 0.25 602
+run_with_params 0.001 0.10 10.0 0.25 603
+run_with_params 0.001 0.10 99.0 0.25 604
 
 #run_with_params 0.005 10.0 0.10 0.20 0.20 501
 #run_with_params 0.005 0.10 0.10 0.20 0.20 501
