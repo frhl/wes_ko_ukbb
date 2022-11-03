@@ -5,6 +5,7 @@ import argparse
 
 from ko_utils import io
 from ukb_utils import hail_init
+from ukb_utils import variants
 
 def main(args):
 
@@ -21,7 +22,15 @@ def main(args):
     if extract_samples:
         ht_samples = hl.import_table(extract_samples, no_header=False, key='s', delimiter=',')
         mt = mt.filter_cols(hl.is_defined(ht_samples[mt.col_key]))
-    mt = io.recalc_info(mt)
+    
+    # we can't use 'recalc_info" here, since SHAPEIT requires the AC/AN to be inputted
+    # as int32 wheras the direct output of hl.agg_call_stats for AC is an array for the
+    # the reference and alternate allele count. In this case, we will assume that the AC
+    # is actually the minor allele count.
+    mt = mt.drop(mt.info)
+    mt = mt.annotate_rows(info=hl.struct())
+    mt = mt.annotate_rows(info=mt.info.annotate(AC=variants.get_mac_expr(mt)))
+    mt = mt.annotate_rows(info=mt.info.annotate(AN=hl.agg.call_stats(mt.GT, mt.alleles).AN))
     io.export_table(mt, out_prefix, out_type) 
 
 if __name__=='__main__':
