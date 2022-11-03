@@ -43,17 +43,23 @@ readonly in_calls_dir="data/unphased/calls/prefilter/200k"
 readonly in_calls_file="${in_calls_dir}/ukb_split_calls_200k_chr${chr}_no_parents.vcf.bgz"
 readonly in_calls_type="vcf"
 
+readonly prefix="ukb_wes_union_calls_chr${chr}"
 readonly out_dir="data/unphased/wes_union_calls/bcftools"
-readonly tmp_prefix="${out_dir}/ukb_wes_union_calls_200k_calls_ordered_chr${chr}"
-readonly tmp_file="${tmp_prefix}.vcf.bgz"
-readonly tmp_type="vcf"
+readonly tmp_sorted_samples_prefix="${out_dir}/${prefix}_sorted_by_sample"
+readonly tmp_sorted_samples_file="${tmp_sorted_samples_prefix}.vcf.bgz"
+readonly tmp_sorted_samples_type="vcf"
 
-readonly out_prefix="${out_dir}/test_ukb_wes_union_calls_200k_chr${chr}_no_parents"
-readonly out_file="${out_prefix}.vcf.gz"
+readonly tmp_unsorted_variants_prefix="${out_dir}/${prefix}_unsorted_by_varaints"
+readonly tmp_unsorted_variants_file="${tmp_unsorted_variants_prefix}.vcf.gz"
+
+
+readonly out_file="${out_dir}/${prefix}.vcf.gz"
+
 
 mkdir -p ${out_dir}
 
-if [ ! -f "${tmp_file}" ]; then
+# 1. Sort samples in calls file by samples in wes file
+if [ ! -f "${tmp_sorted_samples_file}" ]; then
   SECONDS=0
   set_up_hail
   set_up_pythonpath_legacy
@@ -63,22 +69,35 @@ if [ ! -f "${tmp_file}" ]; then
      --input_wes_type "${in_wes_type}" \
      --input_calls_path "${in_calls_file}" \
      --input_calls_type "${in_calls_type}" \
-     --out_calls_prefix "${tmp_prefix}" \
-     --out_calls_type "${tmp_type}"
-  make_tabix "${tmp_file}" "tbi"
+     --out_calls_prefix "${tmp_sorted_samples_prefix}" \
+     --out_calls_type "${tmp_sorted_samples_type}"
+  make_tabix "${tmp_sorted_samples_file}" "tbi"
 else
-  >&2 echo "${tmp_file} exists. Skipping."
+  >&2 echo "${tmp_sorted_samples_file} exists. Skipping."
 fi
 
+
+module load BCFtools/1.12-GCC-10.3.0
+
+# 2. combine the two vcf files by variamts
+if [ ! -f "${tmp_unsorted_variants_file}" ]; then
+  >&2 echo "Concatenating.."
+  bcftools concat ${tmp_sorted_samples_file} ${in_wes_file} -oZ -o ${tmp_unsorted_variants_file}
+fi
+
+# 3. sort the file to avoid error:
+# [E::hts_idx_push] Unsorted positions on sequence #1: 46664399 followed by 10414352
+# index: failed to create index for "did_this_work.vcf.gz"
 if [ ! -f "${out_file}" ]; then
-  module purge
-  module load BCFtools/1.12-GCC-10.3.0
-  bcftools concat ${in_wes_file} ${tmp_file} -oZ -o ${out_file}
-  make_tabix "${out_file}" "tbi"
-else
-  >&2 echo "${out_file} exists. Skipping."
+  >&2 echo "Sorting file.."
+  bcftools sort ${tmp_unsorted_variants_file} -oZ -o ${out_file}
 fi
 
 
+# 4. index file
+if [ ! -f "${out_file}.tbi" ]; then
+  >&2 echo "Makign tabix.."
+  make_tabix "${out_file}" "tbi"
+fi
 
 

@@ -25,8 +25,10 @@ def main(args):
     pids = hl.import_table(parents_path, no_header=False, key='s', 
             delimiter=',', types={'s': hl.tstr}).s.collect()   
     mt_parents = mt.filter_cols(hl.literal(pids).contains(mt.s))
+    mt_parents = io.recalc_info(mt_parents)
     io.export_table(mt_parents, out_prefix + "_parents", out_type)
     mt = mt.filter_cols(~hl.literal(pids).contains(mt.s))
+    mt = io.recalc_info(mt)
     io.export_table(mt, out_prefix + "_no_parents", out_type) 
 
 

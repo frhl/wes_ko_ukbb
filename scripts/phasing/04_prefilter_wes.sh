@@ -9,7 +9,7 @@
 #SBATCH --error=logs/prefilter_wes.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-20
+#SBATCH --array=20-22
 #
 #$ -N prefilter_wes
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -37,8 +37,8 @@ readonly in_dir="data/unphased/wes/post-qc"
 readonly in_file="${in_dir}/ukb_wes_200k_filtered_chr${chr}.mt"
 readonly in_type="mt"
 
-readonly out_dir="data/unphased/wes/prefilter/new"
-readonly out_prefix="${out_dir}/ukb_wes_prefilter_200k_chr${chr}"
+readonly out_dir="data/unphased/wes/prefilter/200k"
+readonly out_prefix="${out_dir}/ukb_prefilter_wes_200k_chr${chr}"
 readonly out_prefix_no_parents="${out_prefix}_no_parents"
 readonly out_prefix_parents="${out_prefix}_parents"
 readonly out_type="mt"
@@ -59,7 +59,7 @@ if [ ! -f "${out_prefix_no_parents}.vcf.bgz" ]; then
      --input_type "${in_type}" \
      --out_prefix "${out_prefix}" \
      --out_type "${out_type}" \
-     --drop_entry_fields "${entry_fields_to_drop}" \
+     --drop_fields "${entry_fields_to_drop}" \
      --extract_samples ${samples_list} \
      --min_mac 1 \
      --missing 0.05
@@ -67,17 +67,6 @@ else
   >&2 echo "${out_prefix_no_parents} exists. Skipping."
 fi
 
-if [ ! -f "${out_prefix_no_parents}.vcf.bgz.tbi" ]; then
-  module purge
-  module load BCFtools/1.12-GCC-10.3.0
-  make_tabix "${out_prefix_no_parents}.vcf.bgz" "tbi"
-fi
-
-if [ -f "${out_prefix_parents}.vcf.bgz" ]; then
-  module purge
-  module load BCFtools/1.12-GCC-10.3.0
-  make_tabix "${out_prefix_parents}.vcf.bgz" "tbi"
-fi
 
 
 

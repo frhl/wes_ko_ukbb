@@ -21,7 +21,8 @@
 #$ -t 22
 #$ -V
 
-# 16 cores seems to be sufficient ~8-12H
+# For 500K, chr21 takes ~23 Hours.
+# Will need to use the long queue for the rest
 
 source utils/vcf_utils.sh
 source utils/qsub_utils.sh

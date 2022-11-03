@@ -31,7 +31,7 @@ readonly ref_dir="/well/lindgren/flassen/ressources/panels/liftover_reference_pa
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
-readonly common_dir="data/phased/calls/shapeit5/by_maf"
+readonly common_dir="data/phased/calls/shapeit5/200k_from_500k"
 readonly common_vcf="${common_dir}/ukb_phased_calls_200k_from_500k_chr${chr}.vcf.bgz"
 
 readonly rare_dir="data/unphased/wes/prefilter/new"
