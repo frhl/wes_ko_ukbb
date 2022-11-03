@@ -25,12 +25,12 @@ def main(args):
     
     # we can't use 'recalc_info" here, since SHAPEIT requires the AC/AN to be inputted
     # as int32 wheras the direct output of hl.agg_call_stats for AC is an array for the
-    # the reference and alternate allele count. In this case, we will assume that the AC
-    # is actually the minor allele count.
-    mt = mt.drop(mt.info)
-    mt = mt.annotate_rows(info=hl.struct())
-    mt = mt.annotate_rows(info=mt.info.annotate(AC=variants.get_mac_expr(mt)))
-    mt = mt.annotate_rows(info=mt.info.annotate(AN=hl.agg.call_stats(mt.GT, mt.alleles).AN))
+    # the reference and alternate allele count. We extract the alternate allele count
+    # since MAF is calculated internally in 
+    mt = io.recalc_info(mt)
+    mt = mt.transmute_rows(info=mt.info.annotate(AC = 1))
+
+
     io.export_table(mt, out_prefix, out_type) 
 
 if __name__=='__main__':

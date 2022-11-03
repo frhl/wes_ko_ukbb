@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 #
 # @description combine whole exome sequences with variants from genotyping array
+# @note this method is much faster than doing the combination in Hail. It takes
+# around 1h for chromosome 21, wheras hail would take 20-30h.
 #
 #SBATCH --account=lindgren.prj
 #SBATCH --job-name=wes_union_calls_bcf
@@ -9,7 +11,7 @@
 #SBATCH --error=logs/wes_union_calls_bcf.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=21-22
+#SBATCH --array=20,22
 #
 #$ -N wes_union_calls_bcf
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -47,11 +49,11 @@ readonly in_calls_type="vcf"
 readonly prefix="ukb_wes_union_calls_chr${chr}"
 readonly out_dir="data/unphased/wes_union_calls/bcftools"
 # path for sorting calls by samples
-readonly tmp_sorted_samples_prefix="${out_dir}/${prefix}_sorted_by_sample"
+readonly tmp_sorted_samples_prefix="${out_dir}/${prefix}_sorted_by_sample_tmp"
 readonly tmp_sorted_samples_file="${tmp_sorted_samples_prefix}.vcf.bgz"
 readonly tmp_sorted_samples_type="vcf"
 # path for files that remain to be sorted.
-readonly tmp_unsorted_variants_prefix="${out_dir}/${prefix}_unsorted_by_varaints"
+readonly tmp_unsorted_variants_prefix="${out_dir}/${prefix}_unsorted_by_variants_tmp"
 readonly tmp_unsorted_variants_file="${tmp_unsorted_variants_prefix}.vcf.gz"
 # final path
 readonly out_file="${out_dir}/${prefix}.vcf.gz"
@@ -117,7 +119,9 @@ fi
 
 # index the final file
 if [ ! -f "${out_file}.tbi" ]; then
-  >&2 echo "Makign tabix.."
+  >&2 echo "Making tabix.."
+  module purge
+  module load BCFtools/1.12-GCC-10.3.0
   make_tabix "${out_file}" "tbi"
 fi
 

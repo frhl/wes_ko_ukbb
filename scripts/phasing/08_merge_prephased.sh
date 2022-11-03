@@ -3,15 +3,15 @@
 # @description split into chunks of samples that are then pre-phased using whatshap
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=prephase_chunks_merge
+#SBATCH --job-name=merge_prephased
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/prephase_chunks_merge.log
-#SBATCH --error=logs/prephase_chunks_merge.errors.log
+#SBATCH --output=logs/merge_prephased.log
+#SBATCH --error=logs/merge_prephased.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 5
 #SBATCH --array=20
 #
-#$ -N prephase_chunks_merge
+#$ -N merge_prephased
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/merge_prephased.log
 #$ -e logs/merge_prephased.errors.log
@@ -28,10 +28,10 @@ source utils/qsub_utils.sh
 source utils/bash_utils.sh
 source utils/vcf_utils.sh
 
-module load BCFtools/1.12-GCC-10.3.0
 
 # how many samples should there be in each chunk 
 readonly n_split=500
+
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
@@ -61,7 +61,10 @@ cat ${input_list} | sort | uniq  > ${tmp}
 readonly n=$( cat ${tmp} | wc -l)
 readonly n_rounded=$( echo $n | sed 's|.*|(&+500)/1000*1000|' | bc )
 
+set -x
+
 if [ ! -f "${out_vcf_gz}" ]; then
+  module load BCFtools/1.12-GCC-10.3.0
   # loop over chunks of n_split
   for idx_start in $(seq 1 ${n_split} ${n_rounded}); do 
     # create temporary mergelist
@@ -75,7 +78,7 @@ if [ ! -f "${out_vcf_gz}" ]; then
     echo "${out_idx_vcf_gz}" >> ${input_super_list}
     # combine the files
     if [ ! -f "${out_idx_vcf_gz}" ]; then
-      bcftools merge -l ${tmp_idx} -Oz -o "${out_idx_vcf_gz}"
+      bcftools merge -l "${tmp_idx}" -Oz -o "${out_idx_vcf_gz}"
     fi
     # index files
     echo "Indexing partition ${out_idx_vcf}.."

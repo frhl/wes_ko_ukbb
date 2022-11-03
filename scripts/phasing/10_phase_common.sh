@@ -7,9 +7,10 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/phase_common.log
 #SBATCH --error=logs/phase_common.errors.log
-#SBATCH --partition=short
-#SBATCH --cpus-per-task 16
-#SBATCH --array=1-19
+#SBATCH --partition=long
+#SBATCH --cpus-per-task 18
+#SBATCH --array=1-22
+#SBATCH --dependency="afternotok:8330570"
 #
 #$ -N phase_common
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
