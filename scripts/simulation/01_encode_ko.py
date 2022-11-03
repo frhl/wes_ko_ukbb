@@ -82,10 +82,10 @@ def main(args):
 
     # combine into single dosage (G) matrix 
     mt = mt.annotate_entries(G=hl.int32(mt.H1+mt.H2))
-    mt = mt.annotate_rows(**{'stats': hl.agg.stats(mt.G)})
-    mt = mt.filter_rows(mt.stats.stdev > 0)
+    mt = mt.annotate_rows(**{'stats_add': hl.agg.stats(mt.G)})
+    mt = mt.filter_rows(mt.stats_add.stdev > 0)
     mt = mt.annotate_entries(
-        G_add_norm=(mt.G-mt.stats.mean)/mt.stats.stdev
+        G_add_norm=(mt.G-mt.stats_add.mean)/mt.stats_add.stdev
     )
     
     # G_norm but only with alternate alleles
@@ -93,9 +93,15 @@ def main(args):
             G_rec = (hl.case().when(mt.G == 2, mt.G).default(0))
     )
     
-    # get normalized allele count based on standard allele space
+    # normalize by additive psuedo variant count
     mt = mt.annotate_entries(
-            G_rec_norm = (mt.G_rec - mt.stats.mean)/mt.stats.stdev
+            G_rec_norm_by_add = (mt.G_rec - mt.stats_add.mean)/mt.stats_add.stdev
+    )
+ 
+    # normalize by recessive pseudo variant count
+    mt = mt.annotate_rows(**{'stats_rec': hl.agg.stats(mt.G_rec)})
+    mt = mt.annotate_entries(
+            G_rec_norm_by_rec = (mt.G_rec - mt.stats_rec.mean)/mt.stats_rec.stdev
     )
     
     # setup sites and alleles
