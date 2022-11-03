@@ -35,15 +35,12 @@ readonly chr=$( get_chr ${array_idx} )
 
 ## REMOVE TEST PATHS BELOW
 
-#readonly in_dir="data/phased/calls/shapeit5/by_maf"
-readonly in_dir="data/unphased/calls/prefilter/500k"
-#readonly in_file="${in_dir}/ukb_phased_calls_500k_chr${chr}.vcf.gz"
-readonly in_file="${in_dir}/ukb_split_calls_500k_chr${chr}_no_parents.vcf.bgz"
+readonly in_dir="data/phased/calls/shapeit5/500k"
+readonly in_file="${in_dir}/ukb_phased_calls_500k_chr${chr}.vcf.gz"
 readonly in_type="vcf"
 
-readonly out_dir="data/phased/calls/shapeit5/test"
-#readonly out_prefix="${out_dir}/ukb_phased_calls_200k_from_500k_chr${chr}"
-readonly out_prefix="${out_dir}/test_ukb_phased_calls_200k_from_500k_chr${chr}"
+readonly out_dir="data/phased/calls/shapeit5/200k_from_500k"
+readonly out_prefix="${out_dir}/ukb_phased_calls_200k_from_500k_chr${chr}"
 readonly out_type="vcf"
 
 readonly samples="data/unphased/overlap/ukb_calls_wes_samples.txt"

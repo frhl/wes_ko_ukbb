@@ -21,6 +21,7 @@ def main(args):
     if extract_samples:
         ht_samples = hl.import_table(extract_samples, no_header=False, key='s', delimiter=',')
         mt = mt.filter_cols(hl.is_defined(ht_samples[mt.col_key]))
+    mt = io.recalc_info(mt)
     io.export_table(mt, out_prefix, out_type) 
 
 if __name__=='__main__':
