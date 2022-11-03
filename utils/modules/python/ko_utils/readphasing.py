@@ -44,6 +44,8 @@ def get_alleles_supported_by_read(chrom, position, cram, reference):
             allele = alelles_at_read_position(read, position)
             allele_by_reads[read.query_name] = allele 
         except ValueError:
+            err = "%s %s %s could not be recovered from read!" % (chrom, position, cram)
+            sys.stderr.write(err)
             allele_by_reads[read.query_name] = None
     handle.close()
     return(allele_by_reads)
@@ -211,7 +213,7 @@ def query_target_variants(df, exclude_phased = False):
     assert "gts" in df
     assert "s" in df
     lst = list()
-    for index, row in df_query.iterrows():
+    for index, row in df.iterrows():
         eid = row['s']
         variants = row['varid'].split(",")
         phases = row['gts'].split(",")

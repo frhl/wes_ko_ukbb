@@ -60,6 +60,19 @@ def set_to_phased_call(gt: hl.call):
     .or_missing()))
 
 
+def unphase(gt: hl.call):
+    """ unphase a genotype call 
+    
+    :param gt: GT (call)
+    """
+    assert str(gt.dtype) == 'call'
+    return((hl.case()
+    .when(gt == hl.parse_call("1|0"), hl.parse_call("0/1"))
+    .when(gt == hl.parse_call("0|1"), hl.parse_call("0/1"))
+    .when(gt == hl.parse_call("1|1"), hl.parse_call("1/1"))
+    .when(gt == hl.parse_call("0|0"), hl.parse_call("0/0"))
+    .or_missing()))
+
 
 def is_phased(gt: hl.call):
     """is a call phased

@@ -24,7 +24,7 @@ def import_table(input_path, input_type, calc_info=True, cache=False, force_bgz=
 
 
 def export_table(mt, out_prefix, out_type, checkpoint=False,
-                 format_fields_to_drop=[]):
+                 format_fields_to_drop=[], auto_metadata=True):
     r'''Merge file with VEP info '''
     assert out_type in {'mt', 'vcf', 'plink'}
     mt = mt.drop(*[f for f in format_fields_to_drop if f in mt.entry])
@@ -37,8 +37,11 @@ def export_table(mt, out_prefix, out_type, checkpoint=False,
         out_vcf_path = out_prefix + '.vcf.bgz'
         print(f'\nExporting to VCF: {out_vcf_path}\n')
         if not hl.hadoop_is_file(out_vcf_path):
-            metadata = get_vcf_metadata(
-                format_fields_to_drop=format_fields_to_drop)
+            if auto_metadata:
+                metadata = get_vcf_metadata(
+                    format_fields_to_drop=format_fields_to_drop)
+            else:
+                metadata = None
             hl.export_vcf(dataset=mt,
                           output=out_vcf_path,
                           parallel=None,
@@ -111,7 +114,8 @@ def recalc_info(mt, maf=None, info_field='info', gt_field='GT'):
     else:
         mt = mt.annotate_rows(
             **{info_field: hl.agg.call_stats(mt[gt_field], mt.alleles)})
-    mt = mt.annotate_rows(
+    # subset
+    mt = mt.transmute_rows(
         **{info_field: mt[info_field].annotate(
             **{field: mt[info_field][field][1] for field in ['AF', 'AC']}
         )}
@@ -122,7 +126,6 @@ def recalc_info(mt, maf=None, info_field='info', gt_field='GT'):
                 mt[info_field].AF < (
                     1 - maf)))
     return mt
-
 
 
 def get_vcf_metadata(info_fields_to_drop=[],
