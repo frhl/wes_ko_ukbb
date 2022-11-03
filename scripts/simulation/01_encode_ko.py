@@ -119,7 +119,7 @@ def main(args):
     # annotate knockout matrix
     prob = mt.annotate_entries(DS=mt.pKO * 2)
     prob = prob.annotate_entries(GT=ko.get_gt_from_floor_ds(prob.DS))
-    prob = prob.select_entries(*[prob.DS, prob.GT, prob.pKO, prob.knockout, prob.G, prob.G_add_norm, prob.G_rec, prob.G_rec_norm])
+    prob = prob.select_entries(*[prob.DS, prob.GT, prob.pKO, prob.knockout, prob.G, prob.G_add_norm, prob.G_rec, prob.G_rec_norm_by_add, prob.G_rec_norm_by_rec])
     #prob = prob.select_entries(prob.DS)
     prob = prob.add_row_index()
     prob = prob.annotate_rows(
