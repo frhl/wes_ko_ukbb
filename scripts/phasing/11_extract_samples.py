@@ -22,15 +22,18 @@ def main(args):
     if extract_samples:
         ht_samples = hl.import_table(extract_samples, no_header=False, key='s', delimiter=',')
         mt = mt.filter_cols(hl.is_defined(ht_samples[mt.col_key]))
-    
+
     # we can't use 'recalc_info" here, since SHAPEIT requires the AC/AN to be inputted
     # as int32 wheras the direct output of hl.agg_call_stats for AC is an array for the
     # the reference and alternate allele count. We extract the alternate allele count
     # since MAF is calculated internally in 
     mt = io.recalc_info(mt)
-    mt = mt.transmute_rows(info=mt.info.annotate(AC = 1))
-
-
+    
+    # remove invariant sites
+    invariant = (mt.info.AC == 0) | (mt.info.AC == mt.info.AN)
+    mt = mt.filter_rows(~invariant)
+    
+    # expor table
     io.export_table(mt, out_prefix, out_type) 
 
 if __name__=='__main__':

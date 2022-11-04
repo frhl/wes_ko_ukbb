@@ -33,8 +33,6 @@ readonly hail_script="scripts/phasing/11_extract_samples.py"
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
-## REMOVE TEST PATHS BELOW
-
 readonly in_dir="data/phased/calls/shapeit5/500k"
 readonly in_file="${in_dir}/ukb_phased_calls_500k_chr${chr}.vcf.gz"
 readonly in_type="vcf"
@@ -43,7 +41,11 @@ readonly out_dir="data/phased/calls/shapeit5/200k_from_500k"
 readonly out_prefix="${out_dir}/ukb_phased_calls_200k_from_500k_chr${chr}"
 readonly out_type="vcf"
 
+# Need to filter to samples overlapping WES and CALLS
 readonly samples="data/unphased/overlap/ukb_calls_wes_samples.txt"
+# Need to filter to common variants that are present in the 200K samples
+readonly variants=
+
 
 mkdir -p ${spark_dir}
 mkdir -p ${out_dir}

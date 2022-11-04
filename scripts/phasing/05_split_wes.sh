@@ -9,7 +9,9 @@
 #SBATCH --error=logs/split_wes.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=21
+#SBATCH --array=20-22
+
+# --dependency="afterok:8444324"
 #
 #$ -N split_wes
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -39,6 +41,8 @@ readonly in_type="mt"
 
 readonly out_dir="data/unphased/wes/prefilter/200k"
 readonly out_prefix="${out_dir}/ukb_split_wes_200k_chr${chr}"
+readonly out_prefix_no_parents="${out_prefix}_no_parents"
+readonly out_prefix_parents="${out_prefix}_parents"
 readonly out_type="vcf"
 
 readonly entry_fields_to_drop="GQ,DP,AD,PL"

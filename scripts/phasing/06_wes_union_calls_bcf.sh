@@ -11,7 +11,7 @@
 #SBATCH --error=logs/wes_union_calls_bcf.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=20,22
+#SBATCH --array=21
 #
 #$ -N wes_union_calls_bcf
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -26,10 +26,10 @@
 set -o errexit
 set -o nounset
 
+source utils/bash_utils.sh
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
 source utils/vcf_utils.sh
-
 
 readonly spark_dir="data/tmp/spark"
 readonly hail_script="scripts/phasing/06_wes_union_calls_bcf.py"
@@ -47,7 +47,7 @@ readonly in_calls_type="vcf"
 
 # base paths on the following
 readonly prefix="ukb_wes_union_calls_chr${chr}"
-readonly out_dir="data/unphased/wes_union_calls/bcftools"
+readonly out_dir="data/unphased/wes_union_calls/bcftools/test"
 # path for sorting calls by samples
 readonly tmp_sorted_samples_prefix="${out_dir}/${prefix}_sorted_by_sample_tmp"
 readonly tmp_sorted_samples_file="${tmp_sorted_samples_prefix}.vcf.bgz"
@@ -57,7 +57,9 @@ readonly tmp_unsorted_variants_prefix="${out_dir}/${prefix}_unsorted_by_variants
 readonly tmp_unsorted_variants_file="${tmp_unsorted_variants_prefix}.vcf.gz"
 # final path
 readonly out_file="${out_dir}/${prefix}.vcf.gz"
-
+# tmp dirs for soring
+readonly tmp_dir="data/tmp/bcf/bcfconcat"
+readonly bcftools_v116="/well/lindgren/flassen/software/samtools/v1.16.1/bcftools-v1.16/bcftools-installed-v1.16/bin/bcftools"
 
 mkdir -p ${out_dir}
 
@@ -99,7 +101,11 @@ if [ ! -f "${out_file}" ]; then
   # index: failed to create index for "did_this_work.vcf.gz"
   if [ ! -f "${out_file}" ]; then
     >&2 echo "Sorting file.."
-    bcftools sort ${tmp_unsorted_variants_file} -oZ -o ${out_file}
+    # SHAPEIT4 has the right dependencies in the PATHs
+    # we use this untill BCFtools v1.16 has been installed
+    module purge
+    module load SHAPEIT4/4.2.2-foss-2021a
+    ${bcftools_v116} sort ${tmp_unsorted_variants_file} --temp-dir ${tmp_dir} -oZ -o ${out_file}
   else
     >&2 echo "${tmp_unsorted_variants_file} already exists. Skipping"
   fi
