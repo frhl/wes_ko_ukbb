@@ -9,7 +9,7 @@
 #SBATCH --error=logs/extract_samples.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=21
+#SBATCH --array=20,22
 #
 #
 #$ -N extract_samples

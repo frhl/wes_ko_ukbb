@@ -18,8 +18,8 @@ def main(args):
     hail_init.hail_bmrc_init_local('logs/hail/prephase_merge.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
 
-    mt=io.import_table(input_path, input_type)
-    #mt=mt.filter_rows(variants.get_mac_expr(mt) > 0)
+    mt=io.import_table(input_path, input_type, calc_info = False)
+    mt=io.recalc_info(mt)
     io.export_table(mt, out_prefix, out_type)
 
 if __name__=='__main__':

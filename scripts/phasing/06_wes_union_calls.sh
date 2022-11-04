@@ -1,89 +1,107 @@
 #!/usr/bin/env bash
 #
 # @description combine whole exome sequences with variants from genotyping array
+# @note this method is much faster than doing the combination in Hail. It takes
+# around 1h for chromosome 21, wheras hail would take 20-30h.
 #
 #SBATCH --account=lindgren.prj
 #SBATCH --job-name=wes_union_calls
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/wes_union_calls.log
 #SBATCH --error=logs/wes_union_calls.errors.log
-#SBATCH --partition=long
-#SBATCH --cpus-per-task 3
-#SBATCH --array=2
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 2
+#SBATCH --array=22
 #
-#$ -N wes_union_calls
+#$ -N wes_union_calls_bcf
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/wes_union_calls.log
 #$ -e logs/wes_union_calls.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 3
+#$ -pe shmem 2
 #$ -q short.qe
-#$ -t 2
+#$ -t 21
 #$ -V
-
-# take ~15H for chr21 with 3 e cores
-# > 30 H for most chromsoomes
 
 set -o errexit
 set -o nounset
 
+source utils/bash_utils.sh
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/phasing/03_wes_union_calls.py"
+readonly hail_script="scripts/phasing/06_wes_union_calls.py"
 
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
-readonly in_wes_dir="data/unphased/wes/prefilter" # note: exported to prefilter/new2 !
-readonly in_wes_file="${in_wes_dir}/ukb_wes_prefilter_200k_chr${chr}.mt"
-readonly in_wes_type="mt"
+readonly in_wes_dir="data/unphased/wes/prefilter/200k"
+readonly in_wes_file="${in_wes_dir}/ukb_split_wes_200k_chr${chr}_no_parents.vcf.bgz"
+readonly in_wes_type="vcf"
 
-readonly in_calls_dir="data/unphased/calls/prefilter/with_parents/by_maf"
-readonly in_calls_file="${in_calls_dir}/ukb_prefilter_calls_200k_chr${chr}.mt"
-readonly in_calls_type="mt"
+readonly in_calls_dir="data/unphased/calls/prefilter/200k"
+readonly in_calls_file="${in_calls_dir}/ukb_split_calls_200k_chr${chr}_no_parents.vcf.bgz"
+readonly in_calls_type="vcf"
 
-readonly out_dir="data/unphased/wes_union_calls/short_test"
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
-readonly checkpoint_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}_checkpoint"
-readonly out_type="vcf"
+readonly prefix="ukb_wes_union_calls_chr${chr}"
+readonly out_dir="data/unphased/wes_union_calls/bcftools/test2"
 
-mkdir -p ${spark_dir}
+readonly tmp_prefix="${out_dir}/${prefix}_tmp"
+readonly tmp_file="${tmp_prefix}.vcf.bgz"
+readonly tmp_type="vcf"
+
+readonly sort_file="${out_dir}/${prefix}_sorted.vcf.gz"
+readonly out_file="${out_dir}/${prefix}.vcf.gz"
+
+# where to store temporary files during sort
+readonly tmp_write_dir="data/tmp/bcf/bcfd"
+# this function is used internally in vcf_concat_sort
+readonly bcftools_local="/well/lindgren/flassen/software/samtools/v1.16.1/bcftools-v1.16/bcftools-installed-v1.16/bin/bcftools"
+
 mkdir -p ${out_dir}
 
-if [ ! -f "${out_prefix}.vcf.bgz" ]; then
-  SECONDS=0
-  set_up_hail 0.2.97
-  set_up_pythonpath_legacy
-  python3 "${hail_script}" \
-     --chrom "${chr}" \
-     --input_wes_path "${in_wes_file}" \
-     --input_wes_type "${in_wes_type}" \
-     --input_calls_path "${in_calls_file}" \
-     --input_calls_type "${in_calls_type}" \
-     --checkpoint_prefix "${checkpoint_prefix}" \
-     --out_prefix "${out_prefix}" \
-     --out_type "${out_type}" \
-     --subset_to_overlapping_samples \
-     --exclude_trio_parents \
-     --export_parents
-
-  # remove checkpoint
-  rm -rf "${checkpoint_prefix}1.mt"
-  rm -rf "${checkpoint_prefix}2.mt"
-  rm -rf "${checkpoint_prefix}3.mt"
-
-
-else
-  print_update "file ${out} already exists. Skipping!"
-fi
-
-if [ -f "${out_prefix}.vcf.bgz" ]; then
+if [ ! -f "${out_file}" ]; then
+  
+  # 1. Sort samples of CALLS file by WES file.
+  if [ ! -f "${tmp_file}" ]; then
+    SECONDS=0
+    set_up_hail
+    set_up_pythonpath_legacy
+    python3 "${hail_script}" \
+       --chrom "${chr}" \
+       --input_wes_path "${in_wes_file}" \
+       --input_wes_type "${in_wes_type}" \
+       --input_calls_path "${in_calls_file}" \
+       --input_calls_type "${in_calls_type}" \
+       --out_calls_prefix "${tmp_prefix}" \
+       --out_calls_type "${tmp_type}"
+  else
+    >&2 echo "${tmp_file} exists. Skipping."
+  fi
+  
   module purge
   module load BCFtools/1.12-GCC-10.3.0
-  make_tabix "${out_prefix}.vcf.bgz" "tbi"
+  
+  # 2. Tabix the temporary file
+  make_tabix "${tmp_file}" "tbi"
+  
+  # 3. combine the two tables by concatenating and sorting variants 
+  vcf_concat_sort ${tmp_file} ${in_wes_file} ${sort_file} ${tmp_write_dir}
+  make_tabix ${sort_file}
+
+  # 4. calculate AC/AN 
+  bcftools +fill-tags ${sort_file} -Oz -o ${out_file} -- -t AN,AC
+  make_tabix ${out_file}
+
+else
+  >&2 echo "Final file (${out_file}) already exists! Skipping.."
 fi
+
+
+
+
+
 
 

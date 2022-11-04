@@ -8,7 +8,7 @@
 #SBATCH --output=logs/phase_rare.log
 #SBATCH --error=logs/phase_rare.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 16
+#SBATCH --cpus-per-task 6
 #SBATCH --array=21
 #
 #$ -N phase_rare
@@ -34,8 +34,9 @@ readonly chr=$( get_chr ${task_id} )
 readonly common_dir="data/phased/calls/shapeit5/200k_from_500k"
 readonly common_vcf="${common_dir}/ukb_phased_calls_200k_from_500k_chr${chr}.vcf.bgz"
 
-readonly rare_dir="data/unphased/wes_union_calls/bcftools"
-readonly rare_vcf="${rare_dir}/ukb_wes_union_calls_chr${chr}.vcf.gz"
+readonly rare_dir="data/unphased/wes_union_calls/bcftools/newtest"
+readonly rare_vcf="${rare_dir}/tagged.vcf.bgz"
+#readonly rare_vcf="${rare_dir}/ukb_wes_union_calls_chr${chr}.vcf.gz"
 
 readonly out_dir="data/phased/wes_scaffold_calls"
 readonly out_prefix="${out_dir}/ukb_shapeit5_full_200k_from_500k_chr${chr}"
@@ -46,7 +47,7 @@ readonly gmap="/well/lindgren/flassen/software/SHAPEIT4/b38.gmap/chr${chr}.b38.g
 readonly threads=$( get_threads )
 
 readonly population="190000"
-readonly region="${chr}:1-52413617"
+readonly region="chr${chr}:10413617-10415798"
 
 # Note: These two files should have the 
 # exact same samples.

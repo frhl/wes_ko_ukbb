@@ -81,12 +81,12 @@ if __name__=='__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--chrom', default=None, help='chromosome')
-    parser.add_argument('--in_path', default=None, help='chromosome')
-    parser.add_argument('--in_type', default=None, help='chromosome')
-    parser.add_argument('--min_info', default=None, help='filter to specific ancestry')
+    parser.add_argument('--in_path', default=None, help='input path')
+    parser.add_argument('--in_type', default=None, help='input type (vcf/mt/plink)')
+    parser.add_argument('--min_info', default=None, help='imputation info when dataset is "imp"')
     parser.add_argument('--dataset', default=None, help='Either "imp" or "calls".')
     parser.add_argument('--extract_samples', default=None, help='HailTable with samples to be extracted.')
-    parser.add_argument('--remove_withdrawn', default=None, action = 'store_true', help='HailTable with samples to be extracted.')
+    parser.add_argument('--remove_withdrawn', default=None, action = 'store_true', help='Should UKBB withdrawn samples be discarded')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     args = parser.parse_args()
 
