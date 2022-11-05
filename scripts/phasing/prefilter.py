@@ -39,7 +39,10 @@ def main(args):
     if min_mac:
         mt = filter_min_mac(mt, int(min_mac))
     if missing:
+        before = mt.count()
         mt = filter_missing(mt, float(missing))
+        after = mt.count()
+        print(f"Missing filter before: {before} after: {after}")
     if missing or min_mac:
         mt = io.recalc_info(mt)
     if drop_fields:

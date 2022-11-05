@@ -9,7 +9,7 @@
 #SBATCH --error=logs/prefilter_wes.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-19
+#SBATCH --array=21
 #
 #$ -N prefilter_wes
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -37,7 +37,7 @@ readonly in_dir="data/unphased/wes/post-qc"
 readonly in_file="${in_dir}/ukb_wes_200k_filtered_chr${chr}.mt"
 readonly in_type="mt"
 
-readonly out_dir="data/unphased/wes/prefilter/200k"
+readonly out_dir="data/unphased/wes/prefilter/200k/test"
 readonly out_prefix="${out_dir}/ukb_prefilter_wes_200k_chr${chr}"
 readonly out_prefix_no_parents="${out_prefix}_no_parents"
 readonly out_prefix_parents="${out_prefix}_parents"
@@ -61,8 +61,8 @@ if [ ! -f "${out_prefix_no_parents}.vcf.bgz" ]; then
      --out_type "${out_type}" \
      --drop_fields "${entry_fields_to_drop}" \
      --extract_samples ${samples_list} \
-     --min_mac 1 \
-     --missing 0.05
+     --missing 0.05 \
+     --min_mac 1
 else
   >&2 echo "${out_prefix_no_parents} exists. Skipping."
 fi

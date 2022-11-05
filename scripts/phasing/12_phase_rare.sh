@@ -8,7 +8,7 @@
 #SBATCH --output=logs/phase_rare.log
 #SBATCH --error=logs/phase_rare.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 6
+#SBATCH --cpus-per-task 1
 #SBATCH --array=21
 #
 #$ -N phase_rare
@@ -34,20 +34,53 @@ readonly chr=$( get_chr ${task_id} )
 readonly common_dir="data/phased/calls/shapeit5/200k_from_500k"
 readonly common_vcf="${common_dir}/ukb_phased_calls_200k_from_500k_chr${chr}.vcf.bgz"
 
+#readonly rare_dir="data/unphased/wes/prefilter/200k"
 readonly rare_dir="data/unphased/wes_union_calls/bcftools/newtest"
-readonly rare_vcf="${rare_dir}/tagged.vcf.bgz"
-#readonly rare_vcf="${rare_dir}/ukb_wes_union_calls_chr${chr}.vcf.gz"
+#readonly rare_vcf="${rare_dir}/ukb_split_wes_200k_chr${chr}_no_parents.vcf.bgz"
+#readonly rare_vcf="${rare_dir}/tagged.vcf.bgz"
+readonly rare_vcf="${rare_dir}/ukb_wes_union_calls_chr${chr}.vcf.gz"
 
-readonly out_dir="data/phased/wes_scaffold_calls"
+readonly out_dir="data/phased/wes_scaffold_calls/test15"
 readonly out_prefix="${out_dir}/ukb_shapeit5_full_200k_from_500k_chr${chr}"
 readonly out="${out_prefix}.vcf.gz"
+readonly log="${out_prefix}.log"
 
 readonly ref="${ref_dir}/ALL.chr${chr}.phase3_shapeit2_mvncall_integrated_v5.20130502.genotypes.vcf.bgz"
 readonly gmap="/well/lindgren/flassen/software/SHAPEIT4/b38.gmap/chr${chr}.b38.gmap.gz"
 readonly threads=$( get_threads )
 
 readonly population="190000"
-readonly region="chr${chr}:10413617-10415798"
+#readonly region="chr${chr}:10413617-10515798"
+#readonly region="chr${chr}:1-14515798"
+#readonly region="chr${chr}:14515798-17515798"
+#readonly region="chr${chr}:17515798-19515798"
+#readonly region="chr${chr}:17515798-20000000"
+#readonly region="chr${chr}:1-20000000"
+#readonly region="chr${chr}:25000000-30000000"
+#readonly region="chr${chr}:30000000-40000000"
+
+#readonly region="chr${chr}:32000000-32500000"
+#readonly region="chr${chr}:32000000-32250000"
+
+# this does not work
+#readonly region="chr${chr}:32250000-32500000"
+
+# this does not work eitehr
+#readonly region="chr${chr}:32400000-32450000"
+
+
+#readonly region="chr${chr}:32400000-32450000"
+
+# still dies
+#readonly region="chr${chr}:32412920-32437972"
+
+#readonly region="chr${chr}:32412988-32437972"
+
+# stil dies here 6 lines
+readonly region="chr${chr}:32413059-32437972"
+#readonly region="chr${chr}:32413059-32414061"
+
+#readonly region="chr${chr}:32427401-32437972"
 
 # Note: These two files should have the 
 # exact same samples.
@@ -59,7 +92,6 @@ mkdir -p ${out_dir}
 if [ ! -f ${out} ]; then
   SECONDS=0
   set_up_shapeit5
-  set -x
   ${SHAPEIT_phase_rare} \
     --input-plain ${rare_vcf} \
     --input-region ${region} \
@@ -67,6 +99,7 @@ if [ ! -f ${out} ]; then
     --scaffold-region ${region} \
     --thread ${threads} \
     --output ${out} \
+    --log ${log} \
     && print_update "Finished phasing variants for chr${chr}, out: ${out}" "${SECONDS}" \
     || raise_error "$( print_update "Phasing variants failed for chr${chr}" ${SECONDS} )"
     module purge

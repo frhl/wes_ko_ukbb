@@ -9,8 +9,7 @@
 #SBATCH --error=logs/prefilter_calls.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 3
-#SBATCH --array=1-22
-#SBATCH --dependency="afterok:8082402"
+#SBATCH --array=21
 #
 #$ -N prefilter_calls
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -38,7 +37,7 @@ readonly in_dir="data/unphased/calls/liftover"
 readonly in_file="${in_dir}/ukb_liftover_calls_500k_chr${chr}.mt"
 readonly in_type="mt"
 
-readonly out_dir_500k="data/unphased/calls/prefilter/500k"
+readonly out_dir_500k="data/unphased/calls/prefilter/500k/test"
 readonly out_prefix_500k="${out_dir_500k}/ukb_prefilter_calls_500k_chr${chr}"
 readonly out_type_500k="mt"
 

@@ -11,7 +11,7 @@
 #SBATCH --error=logs/wes_union_calls.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=22
+#SBATCH --array=1-19
 #
 #$ -N wes_union_calls_bcf
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -46,7 +46,7 @@ readonly in_calls_file="${in_calls_dir}/ukb_split_calls_200k_chr${chr}_no_parent
 readonly in_calls_type="vcf"
 
 readonly prefix="ukb_wes_union_calls_chr${chr}"
-readonly out_dir="data/unphased/wes_union_calls/bcftools/test2"
+readonly out_dir="data/unphased/wes_union_calls/200k"
 
 readonly tmp_prefix="${out_dir}/${prefix}_tmp"
 readonly tmp_file="${tmp_prefix}.vcf.bgz"
