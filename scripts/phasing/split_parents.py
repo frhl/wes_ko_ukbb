@@ -29,13 +29,19 @@ def main(args):
         mt = mt.transmute_entries(GT = ko.unphase(mt.GT))
     pids = hl.import_table(parents_path, no_header=False, key='s', 
             delimiter=',', types={'s': hl.tstr}).s.collect()   
+    
+    # filter to subset of samples that are parents
     mt_parents = mt.filter_cols(hl.literal(pids).contains(mt.s))
-    mt_parents = io.recalc_info(mt_parents)
     mt_parents = mt_parents.filter_rows(~variants.get_invariant_expr(mt_parents)) 
+    mt_parents = io.recalc_info(mt_parents)
+    io.export_table(mt_parents, out_prefix + "_parents", "mt", auto_metadata=no_metadata)
     io.export_table(mt_parents, out_prefix + "_parents", out_type, auto_metadata=no_metadata)
+    
+    # filter to samples without parents
     mt = mt.filter_cols(~hl.literal(pids).contains(mt.s))
-    mt = io.recalc_info(mt)
     mt = mt.filter_rows(~variants.get_invariant_expr(mt))
+    mt = io.recalc_info(mt)
+    io.export_table(mt, out_prefix + "_no_parents", "mt", auto_metadata=no_metadata) 
     io.export_table(mt, out_prefix + "_no_parents", out_type, auto_metadata=no_metadata) 
 
 

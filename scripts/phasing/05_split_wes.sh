@@ -9,7 +9,7 @@
 #SBATCH --error=logs/split_wes.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=20-22
+#SBATCH --array=1-22
 
 # --dependency="afterok:8444324"
 #

@@ -8,8 +8,8 @@
 #SBATCH --output=logs/extract_samples.log
 #SBATCH --error=logs/extract_samples.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 2
-#SBATCH --array=20,22
+#SBATCH --cpus-per-task 3
+#SBATCH --array=20-22
 #
 #
 #$ -N extract_samples
@@ -22,13 +22,15 @@
 #$ -t 21
 #$ -V
 
+set -o errexit
+set -o nounset
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/phasing/11_extract_samples.py"
+readonly hail_script="scripts/phasing/extract_200k_from_500k.py"
 
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
@@ -36,6 +38,10 @@ readonly chr=$( get_chr ${array_idx} )
 readonly in_dir="data/phased/calls/shapeit5/500k"
 readonly in_file="${in_dir}/ukb_phased_calls_500k_chr${chr}.vcf.gz"
 readonly in_type="vcf"
+
+readonly ref_dir="data/unphased/wes/prefilter/200k"
+readonly ref_file="${ref_dir}/ukb_split_wes_200k_chr${chr}_no_parents.vcf.bgz"
+readonly ref_type="vcf"
 
 readonly out_dir="data/phased/calls/shapeit5/200k_from_500k"
 readonly out_prefix="${out_dir}/ukb_phased_calls_200k_from_500k_chr${chr}"
@@ -54,8 +60,10 @@ if [ ! -f "${out_prefix}.vcf.bgz" ]; then
   set_up_hail
   set_up_pythonpath_legacy
   python3 "${hail_script}" \
-     --input_path "${in_file}" \
-     --input_type "${in_type}" \
+     --calls_path "${in_file}" \
+     --calls_type "${in_type}" \
+     --wes_path "${ref_file}" \
+     --wes_type "${ref_type}" \
      --extract_samples "${samples}" \
      --out_prefix "${out_prefix}" \
      --out_type "${out_type}"
