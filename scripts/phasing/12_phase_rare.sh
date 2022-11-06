@@ -36,12 +36,12 @@ readonly chr=$( get_chr ${task_id} )
 readonly common_dir="data/phased/calls/shapeit5/200k_from_500k"
 readonly common_vcf="${common_dir}/ukb_phased_calls_200k_from_500k_chr${chr}.vcf.bgz"
 
-readonly rare_dir="data/unphased/wes_union_calls/200k"
+readonly rare_dir="data/unphased/wes_union_calls/200k/test_with_phased_calls"
 #readonly rare_dir="data/unphased/wes_union_calls/bcftools/newtest"
 #readonly rare_vcf="${rare_dir}/ukb_split_wes_200k_chr${chr}_no_parents.vcf.bgz"
 readonly rare_vcf="${rare_dir}/ukb_wes_union_calls_chr${chr}.vcf.gz"
 
-readonly out_dir="data/phased/wes_scaffold_calls/test16"
+readonly out_dir="data/phased/wes_scaffold_calls/test18"
 readonly out_prefix="${out_dir}/ukb_shapeit5_full_200k_from_500k_chr${chr}"
 readonly out="${out_prefix}.vcf.gz"
 readonly log="${out_prefix}.log"
@@ -57,7 +57,8 @@ vcf_check_sample_order ${rare_vcf} ${common_vcf}
 echo "CALLS: ${common_vcf}"
 echo WES: ${rare_vcf}""
 
-readonly region="chr${chr}:32413059-32437972"
+#readonly region="chr${chr}:32413059-32437972"
+readonly region="chr${chr}:12413059-42437972"
 
 mkdir -p ${out_dir}
 

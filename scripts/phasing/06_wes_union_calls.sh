@@ -97,6 +97,15 @@ if [ ! -f "${out_file}" ]; then
   # 4. calculate AC/AN 
   bcftools +fill-tags ${sort_file} -Oz -o ${out_file} -- -t AN,AC
   make_tabix ${out_file}
+  echo "Success. Writing to ${out_file}.."
+
+  # 5. clean up temporary files
+  if [ -f "${out_file}" ]; then
+    rm "${sort_file}" 
+    rm "${sort_file}.tbi"
+    rm "${tmp_file}"
+    rm "${tmp_file}.tbi"
+  fi
 
 else
   >&2 echo "Final file (${out_file}) already exists! Skipping.."
