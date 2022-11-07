@@ -9,7 +9,7 @@
 #SBATCH --error=logs/ligate_chunks.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=20-22
+#SBATCH --array=21
 
 set -o errexit
 set -o nounset
@@ -17,13 +17,11 @@ set -o nounset
 source utils/bash_utils.sh
 source utils/vcf_utils.sh
 
-set -x
-
 readonly rscript="scripts/phasing/_sort_chunks.R"
 
 readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
-readonly in_dir="data/phased/wes_union_calls/trimmed"
-readonly in_prefix="${in_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
+readonly in_dir="data/phased/wes_scaffold_calls/200k_from_500k/trimmed"
+readonly in_prefix="${in_dir}/ukb_wes_scaffold_calls_200k_from_500k_chr${chr}_trim.1of1"
 readonly in_trim="${in_prefix}_trim"
 
 set_up_rpy
@@ -38,19 +36,16 @@ readonly n=$(echo ${files} | tr " " "\n" | wc -l)
 echo $files
 echo "\nNote: Chunks found ${n}"
 
-readonly pedigree_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
-readonly pedigree="${pedigree_dir}/ukb11867_pedigree.fam"
-
-readonly out_dir="data/phased/wes_union_calls/ligated"
-readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
+readonly out_dir="data/phased/wes_scaffold_calls/200k_from_500k/ligated"
+readonly out_prefix="${out_dir}/ukb_wes_scaffold_calls_200k_fromm_500k_chr${chr}"
 readonly out="${out_prefix}.vcf.bgz"
-readonly trio="${out_prefix}.trio"
 
 mkdir -p ${out_dir}
 
 
 if [ ! -f "${out}" ]; then
   if [ ${n} -gt 1 ]; then 
+    echo "Ligating ${n} files for chromosome ${chr}.."
     bcftools concat --ligate ${files} -O z -o ${out}
   else
     ln -s "${PWD}/${in_prefix}"*.vcf.bgz ${out}

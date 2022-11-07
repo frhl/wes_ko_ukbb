@@ -4,10 +4,10 @@
 # @author Nbaya and flassen
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=phase_chunks
+#SBATCH --job-name=phase_prephased_chunks
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/phase_chunks.log
-#SBATCH --error=logs/phase_chunks.errors.log
+#SBATCH --output=logs/phase_prephased_chunks.log
+#SBATCH --error=logs/phase_prephased_chunks.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
 #SBATCH --array=20
@@ -152,7 +152,6 @@ if [ ! -f ${out} ]; then
   SECONDS=0
   module load BCFtools/1.12-GCC-10.3.0
   vcf_check ${vcf_to_phase}
-  vcf_check ${vcf_to_scaffold}
   submit_phasing_job
   duration=${SECONDS}
   print_update "Finished submitting scattered phasing jobs for chr${chr}" "${duration}"
