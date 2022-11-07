@@ -12,7 +12,7 @@
 #SBATCH --partition=short
 #SBATCH --constraint="skl-compat"
 #SBATCH --cpus-per-task 3
-#SBATCH --array=10
+#SBATCH --array=14-19
 #
 #$ -N wes_union_calls_bcf
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

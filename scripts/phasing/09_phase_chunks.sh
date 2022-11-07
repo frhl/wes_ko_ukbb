@@ -10,7 +10,7 @@
 #SBATCH --error=logs/phase_chunks.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=21
+#SBATCH --array=20-22
 
 set -o errexit
 set -o nounset
@@ -20,7 +20,7 @@ source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
 readonly curwd=$(pwd)
-readonly hail_script="scripts/phasing/04_phase_chunks.py"
+readonly hail_script="scripts/phasing/09_phase_chunks.py"
 readonly phasing_script="scripts/phasing/_phase_chunks.sh"
 readonly spark_dir="data/tmp/spark"
 
@@ -46,20 +46,24 @@ readonly max_phasing_region_size=150000
 readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 
 # Cluster params
-readonly software="shapeit4" #"shapeit4" or "eagle2"
+readonly software="shapeit5" #"shapeit4" or "eagle2"
 readonly project="lindgren.prj"
 readonly queue="short"
 readonly nslots=16
 
 # what vcf should be phased
-readonly vcf_dir=" data/phased/wes_union_calls/prephased"
-readonly vcf_to_phase="${vcf_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.vcf.gz"
+readonly vcf_dir=" data/unphased/wes_union_calls/200k_from_500k"
+readonly vcf_to_phase="${vcf_dir}/ukb_wes_union_calls_chr${chr}.vcf.gz"
+
+# SHAPEI5 requires a scaffold
+readonly scaffold_dir="data/phased/calls/shapeit5/200k_from_500k"
+readonly vcf_to_scaffold="${scaffold_dir}/ukb_phased_calls_200k_from_500k_chr${chr}.vcf.bgz"
 
 # Output paths
 #readonly out_dir="data/phased/wes_union_calls/with_ps/chunks/${software}"
-readonly out_dir="data/phased/wes_union_calls/without_ps/chunks/${software}"
+readonly out_dir="data/phased/wes_scaffold_calls/200k_from_500k/chunks/${software}"
 
-readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_shapeit5_200k_from_500k_chr${chr}"
 readonly out_prefix_w_job_config="${out_prefix}-${nslots}x${queue}/${software}_prs${phasing_region_size}_pro${phasing_region_overlap}_mprs${max_phasing_region_size}"
 readonly out="${out_prefix_w_job_config}.vcf.gz"
 readonly out_symlink="${out_prefix}.vcf.gz"
@@ -121,6 +125,7 @@ submit_phasing_job() {
     ${phasing_script} \
     ${chr} \
     ${vcf_to_phase} \
+    ${vcf_to_scaffold} \
     ${min_interval_unit} \
     ${interval_path} \
     ${phasing_region_size} \
@@ -136,6 +141,7 @@ if [ ! -f ${out} ]; then
   SECONDS=0
   module load BCFtools/1.12-GCC-10.3.0
   vcf_check ${vcf_to_phase}
+  vcf_check ${vcf_to_scaffold}
   submit_phasing_job
   duration=${SECONDS}
   print_update "Finished submitting scattered phasing jobs for chr${chr}" "${duration}"

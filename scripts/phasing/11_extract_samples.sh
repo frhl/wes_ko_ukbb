@@ -9,7 +9,8 @@
 #SBATCH --error=logs/extract_samples.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 3
-#SBATCH --array=20-22
+#SBATCH --array=12-13
+#SBATCH --dependency="afterok:8599380"
 #
 #
 #$ -N extract_samples
@@ -72,6 +73,7 @@ fi
 module purge
 module load BCFtools/1.12-GCC-10.3.0
 make_tabix "${out_prefix}.vcf.bgz" "tbi"
+
 
 
 
