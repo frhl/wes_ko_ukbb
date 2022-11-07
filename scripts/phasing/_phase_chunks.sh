@@ -72,7 +72,7 @@ phase_with_shapeit4() {
     --log ${log} \
     --output ${out} \
     --sequencing \
-    ${ps_error:+"--use-ps ${ps_error}"} \
+    ${ps_error:+"--use-PS ${ps_error}"} \
     && print_update "Finished phasing variants for chr${chr} using SHAPEIT4, out: ${out}" "${SECONDS}" \
     || raise_error "$( print_update "Phasing variants failed for chr${chr}" ${SECONDS} )" 
 }

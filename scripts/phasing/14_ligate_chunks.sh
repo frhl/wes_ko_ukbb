@@ -37,7 +37,7 @@ echo $files
 echo "\nNote: Chunks found ${n}"
 
 readonly out_dir="data/phased/wes_scaffold_calls/200k_from_500k/ligated"
-readonly out_prefix="${out_dir}/ukb_wes_scaffold_calls_200k_fromm_500k_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_wes_scaffold_calls_200k_from_500k_chr${chr}"
 readonly out="${out_prefix}.vcf.bgz"
 
 mkdir -p ${out_dir}

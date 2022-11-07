@@ -12,7 +12,7 @@
 #SBATCH --partition=short
 #SBATCH --constraint="skl-compat"
 #SBATCH --cpus-per-task 3
-#SBATCH --array=9
+#SBATCH --array=4
 #
 #$ -N wes_union_calls_bcf
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -67,7 +67,6 @@ if [ ! -f "${out_file}" ]; then
   
   # 1. Sort samples of CALLS file by WES file.
   if [ ! -f "${tmp_file}" ]; then
-    SECONDS=0
     set_up_hail
     set_up_pythonpath_legacy
     python3 "${hail_script}" \
@@ -82,7 +81,8 @@ if [ ! -f "${out_file}" ]; then
   else
     >&2 echo "${tmp_file} exists. Skipping."
   fi
-  
+  SECONDS=0
+
   module purge
   module load BCFtools/1.12-GCC-10.3.0
   
@@ -90,12 +90,17 @@ if [ ! -f "${out_file}" ]; then
   make_tabix "${tmp_file}" "tbi"
   
   # 3. combine the two tables by concatenating and sorting variants 
-  vcf_concat_sort ${tmp_file} ${in_wes_file} ${sort_file} ${tmp_write_dir}
+  vcf_concat_sort ${tmp_file} ${in_wes_file} ${sort_file} ${tmp_write_dir} \
+  && print_update "Finished combining VCFs for chr${chr} using bcftools." "${SECONDS}" \
+  || raise_error "$( print_update "Combining VCFs for chr${chr} using bcftools failed." ${SECONDS} )"
   make_tabix ${sort_file}
 
   # 4. calculate AC/AN 
-  bcftools +fill-tags ${sort_file} -Oz -o ${out_file} -- -t AN,AC
+  bcftools +fill-tags ${sort_file} -Oz -o ${out_file} -- -t AN,AC \
+  && print_update "Finished fill tags for chr${chr} using bcftools." "${SECONDS}" \
+  || raise_error "$( print_update "Fill tag for chr${chr} using bcftools failed." ${SECONDS} )"
   make_tabix ${out_file}
+  
   echo "Success. Writing to ${out_file}.."
 
   # 5. clean up temporary files

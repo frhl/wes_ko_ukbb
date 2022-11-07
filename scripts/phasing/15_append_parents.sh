@@ -45,7 +45,7 @@ readonly parents_path="${parents_dir}/ukb_split_wes_200k_chr${chr}_parents.vcf.b
 #readonly prephased_path="${prephased_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.vcf.gz"
 # standard genotypes that were phased
 readonly phased_dir="data/phased/wes_scaffold_calls/200k_from_500k/ligated"
-readonly phased_path="${phased_dir}/ukb_wes_scaffold_calls_200k_fromm_500k_chr${chr}.vcf.bgz"
+readonly phased_path="${phased_dir}/ukb_wes_scaffold_calls_200k_from_500k_chr${chr}.vcf.bgz"
 # out paths and types
 readonly out_dir="data/phased/wes_scaffold_calls/200k_from_500k/merge_parents"
 readonly out_prefix="${out_dir}/ukb_wes_scaffold_calls_200k_from_500k_shapeit5_chr${chr}"
