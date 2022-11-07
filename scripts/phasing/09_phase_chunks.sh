@@ -30,6 +30,9 @@ set_up_hail
 set_up_pythonpath_legacy
 set -eu
 
+readonly array_idx=$( get_array_task_id )
+readonly chr=$( get_chr ${array_idx} )
+
 # Version of chrX-specific filter to use (options: females_only, both_sexes)
 readonly chrX_filter_version="females_only"
 # Number of variants within each interval
@@ -37,15 +40,20 @@ readonly min_interval_unit=1000
 # Default size of phasing window in terms of variant count (should be a multiple of min_interval_unit)
 readonly phasing_region_size=100000
 # Minimum overlap between adjacent phasing windows
-#readonly phasing_region_overlap=$(( ${phasing_region_size}/4 ))  
 readonly phasing_region_overlap=$(( ${phasing_region_size}/4 ))  
 # Maximum size of phasing window allowed, only used at the end of a chromosome
 # Must be larger than phasing_region_size
 readonly max_phasing_region_size=150000
-
-readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
-
-# Cluster params
+# minimum allele count allowed. Note that when using SHAPEIT4, singletons
+# are randomly assigned an haplotype.
+readonly pbwt_min_mac=2 # for shapeit5
+readonly min_mac=2 # for shapeit4
+# when prephased data is available, what is the phased set error?
+# only available for shapeit4
+readonly phased_set_error="0.0001" # 0.0001
+# population effective size - only shapeit5.
+readonly pop_effective_size=150000
+# clsurm/sge parameters
 readonly software="shapeit5" #"shapeit4" or "eagle2"
 readonly project="lindgren.prj"
 readonly queue="short"
@@ -132,7 +140,11 @@ submit_phasing_job() {
     ${phasing_region_overlap} \
     ${max_phasing_region_size} \
     ${out_prefix_w_job_config} \
-    ${software}
+    ${software} \
+    ${pbwt_min_mac} \
+    ${min_mac} \
+    ${phased_set_error} \
+    ${pop_effective_size}
   set +x
 
 }

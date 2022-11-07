@@ -14,14 +14,18 @@ set_up_pythonpath_legacy
 
 readonly chr=${1?Error: Missing arg1 (chr)} # Chromosome, e.g. "1" for chrom 1
 readonly vcf_to_phase=${2?Error: Missing arg2 (vcf_to_phase)} # Path of VCF to phase
-readonly vcf_to_scaffold=${3?Error: Missing arg2 (vcf_to_phase)} # Path of VCF to phase
-readonly min_interval_unit=${4?Error: Missing arg3 (min_interval_unit)} 
-readonly interval_path=${5?Error: Missing arg4 (min_interval_unit)} 
-readonly phasing_region_size=${6?Error: Missing arg5 (phasing_region_size)} # Minimum guaranteed size of phasing window in terms of variant count
-readonly phasing_region_overlap=${7?Error: Missing arg6 (phasing_region_overlap)} # Minimum overlap between adjacent phasing windows
-readonly max_phasing_region_size=${8?Error: Missing arg7 (max_phasing_region_size)} # Maximum size of phasing window allowed, only used at the end of a chromosome. Must be larger than phasing_region_size
-readonly out_prefix=${9?Error: Missing arg8 (path prefix for output intermediate VCF)} # Path to output phased VCF
+readonly vcf_to_scaffold=${3?Error: Missing arg3 (vcf_to_scaffold)} # Path of VCF to phase
+readonly min_interval_unit=${4?Error: Missing arg4 (min_interval_unit)} 
+readonly interval_path=${5?Error: Missing arg5 (interval_path)} 
+readonly phasing_region_size=${6?Error: Missing arg6 (phasing_region_size)} # Minimum guaranteed size of phasing window in terms of variant count
+readonly phasing_region_overlap=${7?Error: Missing arg7 (phasing_region_overlap)} # Minimum overlap between adjacent phasing windows
+readonly max_phasing_region_size=${8?Error: Missing arg8 (max_phasing_region_size)} # Maximum size of phasing window allowed, only used at the end of a chromosome. Must be larger than phasing_region_size
+readonly out_prefix=${9?Error: Missing arg9 (out_prefix)} # Path to output phased VCF
 readonly software=${10?Error: Missing arg10 (software)} # Path of VCF to use as haplotype scaffold
+readonly pbwt_min_mac=${11?Error: Missing arg11 (pbwt_min_mac)} #
+readonly min_mac=${12?Error: Missing arg13 (min_mac)} #
+readonly ps_error=${13?Error: Missing arg14 (ps_error)} #
+readonly pop_effective_size=${14?Error: Missing arg14 (pop_effective_size)} #
 readonly threads=$(( ${SLURM_CPUS_ON_NODE} - 1))
 
 readonly hail_script="scripts/phasing/09_phase_chunks.py"
@@ -35,50 +39,42 @@ readonly log="${out_prefix_w_phasing_idx}.log"
 
 mkdir -p $( dirname ${out} )
 
-phase_with_shapeit4() {
+phase_with_shapeit5_rare() {
   SECONDS=0
-  readonly min_mac=2 # default value. Unable to phase singletons.
-  readonly ps_error_rate=0.0001 # default value
   readonly gmap="/well/lindgren/flassen/software/SHAPEIT4/b38.gmap/chr${chr}.b38.gmap.gz"
   readonly region=$( python3 ${hail_script} ${interval_flags} --get_interval --phasing_idx ${phasing_idx} --interval_path ${interval_path} )
-  print_update "Starting SHAPEIT5 phasing for ${region} (min_mac >= ${min_mac}) out: ${out}"
-  set -x
-  set_up_shapeit5
+  print_update "Starting SHAPEIT5 (rare) phasing for ${region} (pbwt_min_mac >= ${pbwt_min_mac}) out: ${out}"
   ${SHAPEIT_phase_rare} \
+    --input-region "chr${region}" \
     --input-plain ${vcf_to_phase} \
     --scaffold ${vcf_to_scaffold} \
-    --input-region "chr${region}" \
     --scaffold-region "chr${region}" \
-    --pbwt-mac ${min_mac} \
+    --pbwt-mac ${pbwt_min_mac} \
     --map ${gmap} \
     --thread ${threads} \
     --log ${log} \
-    --output ${out}
-  set +x
-  duration=${SECONDS}
-  print_update "Finished phasing variants for ${region} (chr${chr} ${phasing_idx}/${max_phasing_idx}, out: ${out}" "${duration}"
+    --output ${out} \
+    && print_update "Finished phasing variants for chr${chr} using SHAPEIT5, out: ${out}" "${SECONDS}" \
+    || raise_error "$( print_update "Phasing variants failed for chr${chr}" ${SECONDS} )" 
 }
 
-phase_with_shapeit5() {
+phase_with_shapeit4() {
   SECONDS=0
-  readonly min_mac=2 # default value. Unable to phase singletons.
   readonly gmap="/well/lindgren/flassen/software/SHAPEIT4/b38.gmap/chr${chr}.b38.gmap.gz"
   readonly region=$( python3 ${hail_script} ${interval_flags} --get_interval --phasing_idx ${phasing_idx} --interval_path ${interval_path} )
-  print_update "Starting SHAPEIT5 phasing for ${region} (min_mac >= ${min_mac}) out: ${out}"
-  set -x
-  ${SHAPEIT_phase_common} \
+  print_update "Starting SHAPEIT4 phasing for ${region} (min_mac >= ${min_mac}) out: ${out}"
+  shapeit4.2 \
     --input ${vcf_to_phase} \
     --map ${gmap} \
     --region "chr${region}" \
     --thread ${threads} \
-    --pbwt-mac ${min_mac} \
-    --output ${out} \
+    --min-mac ${min_mac} \
     --log ${log} \
-    && print_update "Finished phasing variants for chr${chr}, out: ${out}" "${SECONDS}" \
+    --output ${out} \
+    --sequencing \
+    ${ps_error:+"--use-ps ${ps_error}"} \
+    && print_update "Finished phasing variants for chr${chr} using SHAPEIT4, out: ${out}" "${SECONDS}" \
     || raise_error "$( print_update "Phasing variants failed for chr${chr}" ${SECONDS} )" 
-  set +x
-  duration=${SECONDS}
-  print_update "Finished phasing variants for ${region} (chr${chr} ${phasing_idx}/${max_phasing_idx}, out: ${out}" "${duration}"
 }
 
 
@@ -103,7 +99,7 @@ phase_with_eagle2() {
     --Kpbwt=20000 \
     --pbwtOnly
   set +x
-  duration=${SECONDS}
+  local duration=${SECONDS}
   print_update "Finished phasing for ${region} (chr${chr} ${phasing_idx}/${max_phasing_idx}, out: ${out}" "${duration}"
 }
 
@@ -115,7 +111,7 @@ if [ ! -f ${out} ]; then
     phase_with_shapeit4
   elif [ ${software} = "shapeit5" ]; then
     set_up_shapeit5
-    phase_with_shapeit5
+    phase_with_shapeit5_rare
   elif [ ${software} = "eagle2" ]; then
     phase_with_eagle2
   else
