@@ -10,8 +10,9 @@
 #SBATCH --output=logs/wes_union_calls.log
 #SBATCH --error=logs/wes_union_calls.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 2
-#SBATCH --array=21
+#SBATCH --constraint="skl-compat"
+#SBATCH --cpus-per-task 3
+#SBATCH --array=10
 #
 #$ -N wes_union_calls_bcf
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -41,14 +42,12 @@ readonly in_wes_dir="data/unphased/wes/prefilter/200k"
 readonly in_wes_file="${in_wes_dir}/ukb_split_wes_200k_chr${chr}_no_parents.vcf.bgz"
 readonly in_wes_type="vcf"
 
-#readonly in_calls_dir="data/unphased/calls/prefilter/200k"
 readonly in_calls_dir="data/phased/calls/shapeit5/200k_from_500k"
-#readonly in_calls_file="${in_calls_dir}/ukb_split_calls_200k_chr${chr}_no_parents.vcf.bgz"
 readonly in_calls_file="${in_calls_dir}/ukb_phased_calls_200k_from_500k_chr${chr}.vcf.bgz"
 readonly in_calls_type="vcf"
 
 readonly prefix="ukb_wes_union_calls_chr${chr}"
-readonly out_dir="data/unphased/wes_union_calls/200k/test_with_phased_calls"
+readonly out_dir="data/unphased/wes_union_calls/200k_from_500k"
 
 readonly tmp_prefix="${out_dir}/${prefix}_tmp"
 readonly tmp_file="${tmp_prefix}.vcf.bgz"
