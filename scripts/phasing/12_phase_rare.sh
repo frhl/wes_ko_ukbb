@@ -9,7 +9,7 @@
 #SBATCH --error=logs/phase_rare.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=20
+#SBATCH --array=1-19
 #
 #$ -N phase_rare
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

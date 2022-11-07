@@ -38,18 +38,17 @@ readonly chr=$( get_chr ${array_idx} )
 readonly pedigree_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 readonly pedigree="${pedigree_dir}/ukb11867_pedigree.fam"
 # parental genotypes that were not phased
-readonly parents_dir="data/unphased/wes_union_calls"
-readonly parents_path="${parents_dir}/ukb_wes_union_calls_200k_chr${chr}_parents.vcf.bgz"
+readonly parents_dir="data/unphased/wes/prefilter/200k"
+readonly parents_path="${parents_dir}/ukb_split_wes_200k_chr${chr}_parents.vcf.bgz"
 # prephased directory (for PS field)
-readonly prephased_dir="data/phased/wes_union_calls/prephased"
-readonly prephased_path="${prephased_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.vcf.gz"
+#readonly prephased_dir="data/phased/wes_union_calls/prephased"
+#readonly prephased_path="${prephased_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.vcf.gz"
 # standard genotypes that were phased
-readonly phased_dir="data/phased/wes_union_calls/benchmark/200k/without_parents"
-#readonly phased_path="${phased_dir}/ukb_wes_union_calls_200k_phased_shapeit4_chr${chr}.vcf.gz"
-readonly phased_path="${phased_dir}/ukb_wes_union_calls_200k_phased_whatshap_shapeit4_chr${chr}.vcf.gz"
+readonly phased_dir="data/phased/wes_scaffold_calls/200k_from_500k/ligated"
+readonly phased_path="${phased_dir}/ukb_wes_scaffold_calls_200k_fromm_500k_chr${chr}.vcf.bgz"
 # out paths and types
-readonly out_dir="data/phased/wes_union_calls/benchmark/200k"
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_phased_whatshap_shapeit4_chr${chr}"
+readonly out_dir="data/phased/wes_scaffold_calls/200k_from_500k/merge_parents"
+readonly out_prefix="${out_dir}/ukb_wes_scaffold_calls_200k_from_500k_shapeit5_chr${chr}"
 readonly out_vcf="${out_prefix}.vcf.gz"
 readonly out_trio="${out_prefix}.trio"
 readonly out_type="vcf"

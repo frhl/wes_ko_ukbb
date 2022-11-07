@@ -62,13 +62,13 @@ phase_with_shapeit4() {
   SECONDS=0
   readonly gmap="/well/lindgren/flassen/software/SHAPEIT4/b38.gmap/chr${chr}.b38.gmap.gz"
   readonly region=$( python3 ${hail_script} ${interval_flags} --get_interval --phasing_idx ${phasing_idx} --interval_path ${interval_path} )
-  print_update "Starting SHAPEIT4 phasing for ${region} (min_mac >= ${min_mac}) out: ${out}"
+  print_update "Starting SHAPEIT4 phasing for ${region} (min_mac >= ${pbwt_min_mac}) out: ${out}"
   shapeit4.2 \
     --input ${vcf_to_phase} \
     --map ${gmap} \
     --region "chr${region}" \
     --thread ${threads} \
-    --min-mac ${min_mac} \
+    --pbwt-mac ${pbwt_min_mac} \
     --log ${log} \
     --output ${out} \
     --sequencing \

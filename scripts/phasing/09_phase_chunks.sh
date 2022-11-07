@@ -10,7 +10,7 @@
 #SBATCH --error=logs/phase_chunks.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=20-22
+#SBATCH --array=1-19
 
 set -o errexit
 set -o nounset
