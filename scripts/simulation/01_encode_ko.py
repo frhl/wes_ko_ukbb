@@ -151,7 +151,7 @@ def main(args):
 
     # export genes with knockouts
     genes = prob.drop(prob.stats_add)
-    genes = prob.drop(genes.stats_rec)
+    genes = genes.drop(genes.stats_rec)
     genes = genes.drop(genes.stdev)
     genes.filter_entries(genes.DS > 0).entries().flatten().export(out_prefix + ".tsv.gz")
 
