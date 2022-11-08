@@ -10,7 +10,7 @@
 #SBATCH --error=logs/phase_chunks.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=1-19
+#SBATCH --array=11
 
 set -o errexit
 set -o nounset
@@ -81,6 +81,8 @@ readonly interval_path="${interval_dir}/intervals_min_${min_interval_unit}_chr${
 readonly phasing_interval_flags="--chrom ${chr} --min_interval_unit ${min_interval_unit}"
 
 mkdir -p ${out_dir}
+
+
 
 if [ -z "${interval_path}" ]; then
   raise_error "Getting intervals path failed"
@@ -154,6 +156,8 @@ if [ ! -f ${out} ]; then
   module load BCFtools/1.12-GCC-10.3.0
   vcf_check ${vcf_to_phase}
   vcf_check ${vcf_to_scaffold}
+  make_tabix ${vcf_to_phase}
+  make_tabix ${vcf_to_scaffold}
   submit_phasing_job
   duration=${SECONDS}
   print_update "Finished submitting scattered phasing jobs for chr${chr}" "${duration}"

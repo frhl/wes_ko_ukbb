@@ -10,7 +10,8 @@
 #SBATCH --error=logs/extract_pp_field.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=21
+#SBATCH --array=20,22
+#SBATCH --dependency="afterok:8613568"
 #
 #$ -N extract_pp_field
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

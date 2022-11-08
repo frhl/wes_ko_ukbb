@@ -10,7 +10,8 @@
 #SBATCH --error=logs/append_parents.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=21
+#SBATCH --array=20,22
+#SBATCH --dependency="afterok:8619875"
 #
 #$ -N append_parents
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

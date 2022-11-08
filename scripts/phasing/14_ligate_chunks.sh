@@ -9,7 +9,7 @@
 #SBATCH --error=logs/ligate_chunks.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=21
+#SBATCH --array=20,
 
 set -o errexit
 set -o nounset
@@ -21,7 +21,7 @@ readonly rscript="scripts/phasing/_sort_chunks.R"
 
 readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 readonly in_dir="data/phased/wes_scaffold_calls/200k_from_500k/trimmed"
-readonly in_prefix="${in_dir}/ukb_wes_scaffold_calls_200k_from_500k_chr${chr}_trim.1of1"
+readonly in_prefix="${in_dir}/ukb_wes_scaffold_calls_200k_from_500k_chr${chr}"
 readonly in_trim="${in_prefix}_trim"
 
 set_up_rpy

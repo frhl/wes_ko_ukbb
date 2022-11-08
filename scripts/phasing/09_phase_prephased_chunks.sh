@@ -47,7 +47,7 @@ readonly max_phasing_region_size=150000
 # minimum allele count allowed. Note that when using SHAPEIT4, singletons
 # are randomly assigned an haplotype.
 readonly pbwt_min_mac=2 # for shapeit5
-readonly min_mac=1 # for shapeit4
+readonly min_mac=2 # for shapeit4
 # when prephased data is available, what is the phased set error?
 # only available for shapeit4
 readonly phased_set_error="0.0001" # 0.0001
