@@ -9,7 +9,7 @@
 #SBATCH --error=logs/prephase_chunks.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=22
+#SBATCH --array=1
 #
 #$ -N prephase_chunks
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -18,7 +18,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 22
+#$ -t 18-19
 #$ -V
 
 set -o errexit
@@ -50,9 +50,9 @@ readonly queue="short"
 readonly nslots=1
 
 # what file should be split up
-readonly input_dir=" data/unphased/wes_union_calls"
-readonly input_path="${input_dir}/ukb_wes_union_calls_200k_chr${chr}.mt" 
-readonly input_type="mt"
+readonly input_dir=" data/unphased/wes_union_calls/200k"
+readonly input_path="${input_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.gz" 
+readonly input_type="vcf"
 
 # Output paths
 readonly out_dir="data/prephased/wes_union_calls/chunks"

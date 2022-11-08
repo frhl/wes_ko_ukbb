@@ -39,8 +39,8 @@ readonly chr=$( get_chr ${array_idx} )
 readonly pedigree_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 readonly pedigree="${pedigree_dir}/ukb11867_pedigree.fam"
 # parental genotypes that were not phased
-readonly parents_dir="data/unphased/wes/prefilter/200k"
-readonly parents_path="${parents_dir}/ukb_split_wes_200k_chr${chr}_parents.vcf.bgz"
+readonly parents_wes_dir="data/unphased/wes/prefilter/200k"
+readonly parents_wes_path="${parents_wes_dir}/ukb_split_wes_200k_chr${chr}_parents.vcf.bgz"
 # prephased directory (for PS field)
 #readonly prephased_dir="data/phased/wes_union_calls/prephased"
 #readonly prephased_path="${prephased_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.vcf.gz"

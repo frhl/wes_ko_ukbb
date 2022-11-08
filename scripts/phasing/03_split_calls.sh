@@ -9,7 +9,7 @@
 #SBATCH --error=logs/split_calls.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=1-22
+#SBATCH --array=21
 #
 #$ -N split_calls
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -33,7 +33,7 @@ readonly hail_script="scripts/phasing/split_parents.py"
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
-readonly tranche="500k"
+readonly tranche="200k"
 
 readonly in_dir="data/unphased/calls/prefilter/${tranche}"
 readonly in_file="${in_dir}/ukb_prefilter_calls_${tranche}_chr${chr}.mt"

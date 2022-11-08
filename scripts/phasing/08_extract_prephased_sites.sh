@@ -4,18 +4,18 @@
 # @note - takes about ~ 24h with 1 a core
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=extract_pp_field
+#SBATCH --job-name=extract_prephase_sites
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/extract_pp_field.log
-#SBATCH --error=logs/extract_pp_field.errors.log
+#SBATCH --output=logs/extract_prephase_sites.log
+#SBATCH --error=logs/extract_prephase_sites.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 5
 #SBATCH --array=21
 #
-#$ -N extract_pp_field
+#$ -N extract_prephase_sites
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/extract_pp_field.log
-#$ -e logs/extract_pp_field.errors.log
+#$ -o logs/extract_prephase_sites.log
+#$ -e logs/extract_prephase_sites.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc
@@ -29,18 +29,18 @@ source utils/vcf_utils.sh
 source utils/hail_utils.sh
 source utils/qsub_utils.sh
 
-readonly hail_script="scripts/phasing/15_extract_pp_field.py"
+readonly hail_script="scripts/phasing/08_extract_prephased_sites.py"
 readonly spark_dir="data/tmp/spark"
 
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
-readonly phased_dir="data/phased/wes_scaffold_calls/200k_from_500k/ligated"
-readonly phased_path="${phased_dir}/ukb_wes_scaffold_calls_200k_fromm_500k_chr${chr}.vcf.bgz"
-readonly phased_type="vcf"
+readonly prephased_dir="data/prephased/wes_union_calls"
+readonly prephased_path="${prephased_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.gz"
+readonly prephased_type="vcf"
 
-readonly out_dir="data/phased/wes_scaffold_calls/200k_from_500k/ligated"
-readonly out_prefix="${out_dir}/ukb_wes_scaffold_calls_200k_from_500k_shapeit5_chr${chr}.pp"
+readonly out_dir="data/prephased/wes_union_calls"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
 
 mkdir -p ${out_dir}
 
@@ -52,8 +52,7 @@ module purge
 set_up_hail
 set_up_pythonpath_legacy
 python3 ${hail_script} \
-  --phased_path ${phased_path} \
-  --phased_type ${phased_type} \
-  --out_prefix ${out_prefix} \
-  --max_mac "50"
+  --prephased_path ${prephased_path} \
+  --prephased_type ${prephased_type} \
+  --out_prefix ${out_prefix}
 

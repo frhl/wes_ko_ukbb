@@ -18,6 +18,7 @@ def main(args):
     input_wes_type = args.input_wes_type
     out_calls_prefix = args.out_calls_prefix
     out_calls_type = args.out_calls_type
+    extract_samples_calls = args.extract_samples_calls
     unphase = args.unphase
 
     hail_init.hail_bmrc_init_local('logs/hail/wes_union_calls_bcf.log', 'GRCh38')
@@ -26,6 +27,13 @@ def main(args):
     # load calls and whole exomes    
     mt1 = io.import_table(input_calls_path, input_calls_type, calc_info = False)
     mt2 = io.import_table(input_wes_path, input_wes_type, calc_info = False) # assuming build GRCh38
+    
+    # ensure that overlapping columns are retained
+    if extract_samples_calls:
+        ht_samples_calls = hl.import_table(extract_samples_calls, no_header=False, key='s', delimiter=',')
+        mt1 = mt1.filter_cols(hl.is_defined(ht_samples_calls[mt1.col_key]))
+
+    #mt1 = mt1.filter_cols(~hl.is_defined(mt2.index_cols(mt1.s)))
     
     # in order to combine with bcftools, we need to order by samples
     mt1 = tables.order_cols(mt1, mt2)
@@ -61,6 +69,7 @@ if __name__=='__main__':
     parser.add_argument('--out_calls_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_calls_type', default=None, help='Type out vcf/plink/mt')
     parser.add_argument('--unphase', default=None, action='store_true', help='Unphase genotypes')
+    parser.add_argument('--extract_samples_calls', default=None, help='extract samples from CALLs')
     args = parser.parse_args()
 
     main(args)

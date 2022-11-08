@@ -42,13 +42,10 @@ readonly out_prefix_500k="${out_dir_500k}/ukb_prefilter_calls_500k_chr${chr}"
 readonly out_type_500k="mt"
 
 # Note: 200k samples that overlap samples in WES
-readonly samples_200k="data/unphased/overlap/ukb_calls_wes_samples.txt"
+readonly samples_list="data/unphased/overlap/ukb_calls_wes_samples.txt"
 readonly out_dir_200k="data/unphased/calls/prefilter/200k"
 readonly out_prefix_200k="${out_dir_200k}/ukb_prefilter_calls_200k_chr${chr}"
 readonly out_type_200k="mt"
-
-# samples that are overlapping WES and CALLS
-readonly samples_list="data/unphased/overlap/ukb_calls_wes_samples.txt"
 
 readonly min_maf="0.001"
 readonly missing="0.05"
@@ -67,7 +64,7 @@ if [ ! -f "${out_prefix_500k}.mt/_SUCCESS" ]; then
      --input_path ${in_file} \
      --input_type ${in_type} \
      --out_prefix ${out_prefix_500k} \
-     --out_type ${out_type_200k} \
+     --out_type ${out_type_500k} \
      --min_maf ${min_maf} \
      --missing ${missing}
 fi

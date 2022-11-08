@@ -10,7 +10,7 @@
 #SBATCH --error=logs/phase_chunks.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=11
+#SBATCH --array=21
 
 set -o errexit
 set -o nounset
@@ -33,6 +33,8 @@ set -eu
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
+## parmaters for chunks
+
 # Version of chrX-specific filter to use (options: females_only, both_sexes)
 readonly chrX_filter_version="females_only"
 # Number of variants within each interval
@@ -44,20 +46,20 @@ readonly phasing_region_overlap=$(( ${phasing_region_size}/4 ))
 # Maximum size of phasing window allowed, only used at the end of a chromosome
 # Must be larger than phasing_region_size
 readonly max_phasing_region_size=150000
-# minimum allele count allowed. Note that when using SHAPEIT4, singletons
-# are randomly assigned an haplotype.
-readonly pbwt_min_mac=2 # for shapeit5
-readonly min_mac=2 # for shapeit4
-# when prephased data is available, what is the phased set error?
-# only available for shapeit4
-readonly phased_set_error="0.0001" # 0.0001
-# population effective size - only shapeit5.
-readonly pop_effective_size=150000
+
 # clsurm/sge parameters
-readonly software="shapeit5" #"shapeit4" or "eagle2"
+readonly software="shapeit4" #"shapeit4" or "eagle2"
 readonly project="lindgren.prj"
 readonly queue="short"
-readonly nslots=16
+readonly nslots=18
+
+## paramters for phasing with shapeit
+readonly phased_set_error="0.0001" # 0.0001
+readonly pbwt_min_mac=2 # for shapeit5r
+readonly pbwt_depth=5
+readonly pbwt_modulo=0.0004 # 0.0004 ( 0.2 / 50 ) is default value when using --sequencing arugment
+readonly pbwt_mdr=0.1
+readonly pop_effective_size=15000
 
 # what vcf should be phased
 readonly vcf_dir=" data/unphased/wes_union_calls/200k_from_500k"
@@ -69,7 +71,7 @@ readonly vcf_to_scaffold="${scaffold_dir}/ukb_phased_calls_200k_from_500k_chr${c
 
 # Output paths
 #readonly out_dir="data/phased/wes_union_calls/with_ps/chunks/${software}"
-readonly out_dir="data/phased/wes_scaffold_calls/200k_from_500k/chunks/${software}"
+readonly out_dir="data/phased/wes_scaffold_calls/200k_from_500k/pbwt_depth4_sequencing_15000eff/chunks/${software}"
 
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_shapeit5_200k_from_500k_chr${chr}"
 readonly out_prefix_w_job_config="${out_prefix}-${nslots}x${queue}/${software}_prs${phasing_region_size}_pro${phasing_region_overlap}_mprs${max_phasing_region_size}"
@@ -144,7 +146,9 @@ submit_phasing_job() {
     ${out_prefix_w_job_config} \
     ${software} \
     ${pbwt_min_mac} \
-    ${min_mac} \
+    ${pbwt_depth} \
+    ${pbwt_modulo} \
+    ${pbwt_mdr} \
     ${phased_set_error} \
     ${pop_effective_size}
   set +x

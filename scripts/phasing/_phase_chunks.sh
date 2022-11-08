@@ -9,9 +9,6 @@ source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
 readonly spark_dir="data/tmp/spark"
-set_up_hail
-set_up_pythonpath_legacy
-
 readonly chr=${1?Error: Missing arg1 (chr)} # Chromosome, e.g. "1" for chrom 1
 readonly vcf_to_phase=${2?Error: Missing arg2 (vcf_to_phase)} # Path of VCF to phase
 readonly vcf_to_scaffold=${3?Error: Missing arg3 (vcf_to_scaffold)} # Path of VCF to phase
@@ -23,9 +20,11 @@ readonly max_phasing_region_size=${8?Error: Missing arg8 (max_phasing_region_siz
 readonly out_prefix=${9?Error: Missing arg9 (out_prefix)} # Path to output phased VCF
 readonly software=${10?Error: Missing arg10 (software)} # Path of VCF to use as haplotype scaffold
 readonly pbwt_min_mac=${11?Error: Missing arg11 (pbwt_min_mac)} #
-readonly min_mac=${12?Error: Missing arg13 (min_mac)} #
-readonly ps_error=${13?Error: Missing arg14 (ps_error)} #
-readonly pop_effective_size=${14?Error: Missing arg14 (pop_effective_size)} #
+readonly pbwt_depth=${12?Error: Missing arg12 (pbwt_depth)} #
+readonly pbwt_modulo=${13?Error: Missing arg13 (pbwt_modulo)} #
+readonly pbwt_mdr=${14?Error: Missing arg14 (pbwt_ndr)} #
+readonly ps_error=${15?Error: Missing arg15 (ps_error)} #
+readonly effective_size=${16?Error: Missing arg16 (pop_effective_size)} #
 readonly threads=$(( ${SLURM_CPUS_ON_NODE} - 1))
 
 readonly hail_script="scripts/phasing/09_phase_chunks.py"
@@ -39,7 +38,7 @@ readonly log="${out_prefix_w_phasing_idx}.log"
 
 mkdir -p $( dirname ${out} )
 
-phase_with_shapeit5_rare() {
+phase_with_shapeit5() {
   SECONDS=0
   readonly gmap="/well/lindgren/flassen/software/SHAPEIT4/b38.gmap/chr${chr}.b38.gmap.gz"
   readonly region=$( python3 ${hail_script} ${interval_flags} --get_interval --phasing_idx ${phasing_idx} --interval_path ${interval_path} )
@@ -49,7 +48,12 @@ phase_with_shapeit5_rare() {
     --input-plain ${vcf_to_phase} \
     --scaffold ${vcf_to_scaffold} \
     --scaffold-region "chr${region}" \
+    --effective-size ${effective_size} \
     --pbwt-mac ${pbwt_min_mac} \
+    --pbwt-depth-rare ${pbwt_depth} \
+    --pbwt-depth-common ${pbwt_depth} \
+    --pbwt-modulo ${pbwt_modulo} \
+    --pbwt-mdr ${pbwt_mdr} \
     --map ${gmap} \
     --thread ${threads} \
     --log ${log} \
@@ -69,15 +73,13 @@ phase_with_shapeit4() {
     --region "chr${region}" \
     --thread ${threads} \
     --pbwt-mac ${pbwt_min_mac} \
+    --pbwt-depth ${pbwt_depth} \
     --log ${log} \
     --output ${out} \
     --sequencing \
-    --use-PS 0.0001
-    
-    #${ps_error:+"--use-PS ${ps_error}"}
-    
-    #&& print_update "Finished phasing variants for chr${chr} using SHAPEIT4, out: ${out}" "${SECONDS}" \
-    #|| raise_error "$( print_update "Phasing variants failed for chr${chr}" ${SECONDS} )" 
+    --use-PS ${ps_error} \
+    && print_update "Finished phasing variants for chr${chr} using SHAPEIT4, out: ${out}" "${SECONDS}" \
+    || raise_error "$( print_update "Phasing variants failed for chr${chr}" ${SECONDS} )" 
 }
 
 
@@ -108,13 +110,15 @@ phase_with_eagle2() {
 
 
 
+set_up_hail
+set_up_pythonpath_legacy
 if [ ! -f ${out} ]; then
   if [ ${software} = "shapeit4" ]; then
     module load SHAPEIT4/4.2.2-foss-2021a
     phase_with_shapeit4
   elif [ ${software} = "shapeit5" ]; then
     set_up_shapeit5
-    phase_with_shapeit5_rare
+    phase_with_shapeit5
   elif [ ${software} = "eagle2" ]; then
     phase_with_eagle2
   else
