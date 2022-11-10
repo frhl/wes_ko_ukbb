@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 #
-# @description merge phased vcf with unphased parents for later switch error calculation.
-# @note - takes about ~ 24h with 1 a core
 #
 #SBATCH --account=lindgren.prj
 #SBATCH --job-name=phasing_conf
@@ -9,7 +7,7 @@
 #SBATCH --output=logs/phasing_conf.log
 #SBATCH --error=logs/phasing_conf.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 5
+#SBATCH --cpus-per-task 4
 #SBATCH --array=21
 #
 #$ -N phasing_conf
@@ -35,12 +33,17 @@ readonly spark_dir="data/tmp/spark"
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
-readonly phased_dir="data/phased/wes_scaffold_calls/200k_from_500k/ligated"
-readonly phased_path="${phased_dir}/ukb_wes_scaffold_calls_200k_fromm_500k_chr${chr}.vcf.bgz"
+readonly ref_dir="data/prephased/wes_union_calls"
+readonly ref_path="${ref_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.gz"
+readonly ref_type="vcf"
+
+readonly phased_dir="data/phased/wes_union_calls/200k/shapeit5/phase_rare/ukb_wes_union_calls_shapeit5_200k_chr${chr}-20xshort"
+readonly phased_path="${phased_dir}/shapeit5_prs100000_pro25000_mprs150000.1of1.vcf.gz"
 readonly phased_type="vcf"
 
-readonly out_dir="data/phased/wes_scaffold_calls/200k_from_500k/ligated"
-readonly out_prefix="${out_dir}/ukb_wes_scaffold_calls_200k_from_500k_shapeit5_chr${chr}.pp"
+readonly out_dir="data/phased/wes_union_calls/200k/calibration"
+readonly out_prefix="${out_dir}/ukb_shapeit5_whatshap_chr${chr}"
+readonly out_type="mt"
 
 mkdir -p ${out_dir}
 
@@ -54,6 +57,8 @@ set_up_pythonpath_legacy
 python3 ${hail_script} \
   --phased_path ${phased_path} \
   --phased_type ${phased_type} \
+  --ref_path ${ref_path} \
+  --ref_type ${ref_type} \
   --out_prefix ${out_prefix} \
-  --max_mac "50"
+  --out_type ${out_type}
 

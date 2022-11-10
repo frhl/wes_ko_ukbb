@@ -10,21 +10,30 @@ def main(args):
     
     phased_path = args.phased_path
     phased_type = args.phased_type
+    ref_path = args.ref_path
+    ref_type = args.ref_type    
     out_prefix = args.out_prefix
-    max_mac = args.max_mac
+    out_type = args.out_type
 
     # set up
     hail_init.hail_bmrc_init_local('logs/hail/merge_chunks.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
-    phased = io.import_table(phased_path, phased_type, calc_info = False)
-    phased = io.recalc_info(phased)
-    phased = phased.annotate_rows(min_mac = hl.min(phased.info.AC, phased.info.AN - phased.info.AC))
-    phased = phased.filter_rows(phased.min_mac <= int(max_mac))
-    phased = phased.select_entries(phased.PP)
-    phased = phased.select_rows(phased.min_mac)
-    ht = phased.make_table()
-    ht = ht.flatten()
-    ht.export(out_prefix + ".txt.gz")
+    mt1 = io.import_table(phased_path, phased_type, calc_info = False)
+    mt2 = io.import_table(ref_path, ref_type, calc_info = False)
+    mt2 = io.recalc_info(mt2)
+    
+    mt1 = mt1.annotate_entries(
+        GT_rb = mt2[mt1.row_key, mt1.col_key].GT,
+        PS_rb = mt2[mt1.row_key, mt1.col_key].PS
+    )    
+
+    mt1.transmute_rows(
+        info = mt1.info.annotate(
+            AC_rb = mt2.rows()[mt1.row_key].info.AC,
+            AN_rb = mt2.rows()[mt1.row_key].info.AN
+        )
+    )
+    io.export_table(mt1, out_prefix, out_type)
 
 
 if __name__=='__main__':
@@ -32,8 +41,10 @@ if __name__=='__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--phased_path', default=None, help='What is the input directory of the files?')
     parser.add_argument('--phased_type', default="vcf", help='What is the input directory of the files?')
+    parser.add_argument('--ref_path', default=None, help='What is the input directory of the files?')
+    parser.add_argument('--ref_type', default="vcf", help='What is the input directory of the files?')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
-    parser.add_argument('--max_mac', default=50, help='Path prefix for output dataset')
+    parser.add_argument('--out_type', default=None, help='Path prefix for output dataset')
     args = parser.parse_args()
 
     main(args)

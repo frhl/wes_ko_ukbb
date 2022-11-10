@@ -9,7 +9,7 @@
 #SBATCH --error=logs/phase_common.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 18
-#SBATCH --array=20-22
+#SBATCH --array=1-22
 #
 #$ -N phase_common
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -39,7 +39,7 @@ readonly chr=$( get_chr ${task_id} )
 readonly in_dir="data/unphased/wes_union_calls/prefilter_no_maf_cutoff/${tranche}"
 readonly in_file="${in_dir}/ukb_wes_union_calls_chr${chr}.vcf.gz"
 
-readonly out_dir="data/phased/wes_union_calls/${tranche}/shapeit5/phase_common/test"
+readonly out_dir="data/phased/wes_union_calls/${tranche}/shapeit5/phase_common/newrun"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_${tranche}_chr${chr}_phase_common"
 readonly out="${out_prefix}.vcf.gz"
 readonly log="${out_prefix}.log"
