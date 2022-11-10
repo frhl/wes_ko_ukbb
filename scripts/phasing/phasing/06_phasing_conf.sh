@@ -4,18 +4,18 @@
 # @note - takes about ~ 24h with 1 a core
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=extract_pp_field
+#SBATCH --job-name=phasing_conf
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/extract_pp_field.log
-#SBATCH --error=logs/extract_pp_field.errors.log
+#SBATCH --output=logs/phasing_conf.log
+#SBATCH --error=logs/phasing_conf.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 5
 #SBATCH --array=21
 #
-#$ -N extract_pp_field
+#$ -N phasing_conf
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/extract_pp_field.log
-#$ -e logs/extract_pp_field.errors.log
+#$ -o logs/phasing_conf.log
+#$ -e logs/phasing_conf.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc
@@ -29,7 +29,7 @@ source utils/vcf_utils.sh
 source utils/hail_utils.sh
 source utils/qsub_utils.sh
 
-readonly hail_script="scripts/phasing/15_extract_pp_field.py"
+readonly hail_script="scripts/phasing/phasing/06_phasing_conf.py"
 readonly spark_dir="data/tmp/spark"
 
 readonly array_idx=$( get_array_task_id )

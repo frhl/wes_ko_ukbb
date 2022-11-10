@@ -27,7 +27,7 @@ readonly ps_error=${15?Error: Missing arg15 (ps_error)} #
 readonly effective_size=${16?Error: Missing arg16 (pop_effective_size)} #
 readonly threads=$(( ${SLURM_CPUS_ON_NODE} - 1))
 
-readonly hail_script="scripts/phasing/09_phase_chunks.py"
+readonly hail_script="scripts/phasing/phasing/02_phase_chunks.py"
 readonly interval_flags="--chrom ${chr} --min_interval_unit ${min_interval_unit} --phasing_region_size ${phasing_region_size} --phasing_region_overlap ${phasing_region_overlap} --max_phasing_region_size ${max_phasing_region_size}"
 readonly phasing_idx=$( get_array_task_id ) # one-based index for which phasing interval to phase
 

@@ -29,7 +29,7 @@ source utils/qsub_utils.sh
 source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
-readonly hail_script="scripts/phasing/13_trim_chunks.py"
+readonly hail_script="scripts/phasing/phasing/03_trim_chunks.py"
 readonly spark_dir="data/tmp/spark"
 
 readonly array_idx=$( get_array_task_id )

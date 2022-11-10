@@ -28,7 +28,7 @@ source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/phasing/prefilter.py"
+readonly hail_script="scripts/phasing/prefilter/prefilter.py"
 
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )

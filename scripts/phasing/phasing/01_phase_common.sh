@@ -9,7 +9,7 @@
 #SBATCH --error=logs/phase_common.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 18
-#SBATCH --array=21
+#SBATCH --array=20-22
 #
 #$ -N phase_common
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -17,7 +17,7 @@
 #$ -e logs/phase_common.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 18
-#$ -q long.qc
+#$ -q short.qc
 #$ -t 1-20
 #$ -V
 

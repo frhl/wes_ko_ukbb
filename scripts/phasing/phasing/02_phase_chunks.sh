@@ -21,8 +21,8 @@ source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
 readonly curwd=$(pwd)
-readonly hail_script="scripts/phasing/09_phase_chunks.py"
-readonly phasing_script="scripts/phasing/_phase_chunks.sh"
+readonly hail_script="scripts/phasing/phasing/02_phase_chunks.py"
+readonly phasing_script="scripts/phasing/phasing/_phase_chunks.sh"
 readonly spark_dir="data/tmp/spark"
 
 # set +eu to avoid conda err

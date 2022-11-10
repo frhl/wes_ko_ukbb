@@ -17,7 +17,7 @@ set -o nounset
 source utils/bash_utils.sh
 source utils/vcf_utils.sh
 
-readonly rscript="scripts/phasing/_sort_chunks.R"
+readonly rscript="scripts/phasing/phasing/_sort_chunks.R"
 
 readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 readonly in_dir="data/phased/wes_scaffold_calls/200k_from_500k/trimmed"

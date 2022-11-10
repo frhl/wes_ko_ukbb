@@ -27,7 +27,7 @@ source utils/bash_utils.sh
 source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/phasing/00_isec_samples.py"
+readonly hail_script="scripts/phasing/prefilter/00_isec_samples.py"
 readonly chr="21"
 
 # output samples

@@ -25,7 +25,7 @@ source utils/qsub_utils.sh
 source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/phasing/02_liftover_calls.py"
+readonly hail_script="scripts/phasing/prefilter/02_liftover_calls.py"
 
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )

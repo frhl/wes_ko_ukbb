@@ -4,18 +4,18 @@
 # @note - takes about ~ 24h with 1 a core
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=append_parents
+#SBATCH --job-name=parents
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/append_parents.log
-#SBATCH --error=logs/append_parents.errors.log
+#SBATCH --output=logs/parents.log
+#SBATCH --error=logs/parents.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
 #SBATCH --array=20-22
 #
-#$ -N append_parents
+#$ -N parents
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/append_parents.log
-#$ -e logs/append_parents.errors.log
+#$ -o logs/parents.log
+#$ -e logs/parents.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc
@@ -29,7 +29,7 @@ source utils/vcf_utils.sh
 source utils/hail_utils.sh
 source utils/qsub_utils.sh
 
-readonly hail_script="scripts/phasing/10_append_parents.py"
+#readonly hail_script="scripts/phasing/05_parents.py"
 readonly spark_dir="data/tmp/spark"
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
