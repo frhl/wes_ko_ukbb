@@ -29,7 +29,7 @@ source utils/vcf_utils.sh
 source utils/hail_utils.sh
 source utils/qsub_utils.sh
 
-readonly hail_script="scripts/phasing/08_extract_prephased_sites.py"
+readonly hail_script="scripts/phasing/03_extract_sites.py"
 readonly spark_dir="data/tmp/spark"
 
 readonly array_idx=$( get_array_task_id )

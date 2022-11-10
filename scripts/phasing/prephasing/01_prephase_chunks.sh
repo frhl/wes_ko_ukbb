@@ -32,9 +32,9 @@ source utils/vcf_utils.sh
 
 readonly curwd=$(pwd)
 readonly cluster=$( get_current_cluster)
-readonly hail_script="scripts/phasing/07_prephase_chunks.py"
-readonly prephasing_script="scripts/phasing/_prephase_chunks.sh"
-readonly merge_script="scripts/phasing/_prephase_merge.sh"
+readonly hail_script="scripts/phasing/prephasing/01_prephase_chunks.py"
+readonly prephasing_script="scripts/phasing/phasing/_prephase_chunks.sh"
+readonly merge_script="scripts/phasing/phasing/_prephase_merge.sh"
 readonly spark_dir="data/tmp/spark"
 
 # how many samples should there be in each chunk 

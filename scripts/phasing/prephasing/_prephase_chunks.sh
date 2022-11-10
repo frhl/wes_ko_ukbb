@@ -25,9 +25,9 @@ readonly read_placeholder=${7?Error: Missing arg5 (intervals_path)}
 readonly main_merge_file=${8?Error: Missing arg6 ()} 
 readonly out_prefix=${9?Error: Missing arg6 ()} 
 
-readonly prephase_sample_script="scripts/phasing/_prephase_sample.sh"
-readonly hail_script="scripts/phasing/07_prephase_chunks.py"
-readonly merge_script="scripts/phasing/_prephase_merge.sh"
+readonly prephase_sample_script="scripts/phasing/prephasing/_prephase_sample.sh"
+readonly hail_script="scripts/phasing/prephasing/07_prephase_chunks.py"
+readonly merge_script="scripts/phasing/prephasing/_prephase_merge.sh"
 
 readonly chunk_idx=$( get_array_task_id ) # one-based index for which phasing interval to phase
 readonly out_prefix_w_interval_idx="${out_prefix}_${chunk_idx}of${max_interval_idx}"
