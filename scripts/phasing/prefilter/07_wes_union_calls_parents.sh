@@ -42,12 +42,13 @@ readonly in_wes_dir="data/unphased/wes/prefilter/200k"
 readonly in_wes_file="${in_wes_dir}/ukb_split_wes_200k_chr${chr}_parents.vcf.bgz"
 readonly in_wes_type="vcf"
 
-readonly in_calls_dir="data/unphased/calls/prefilter/500k"
-readonly in_calls_file="${in_calls_dir}/ukb_split_calls_500k_chr${chr}_parents.vcf.bgz"
+readonly in_calls_dir="data/unphased/calls/prefilter_no_maf_cutoff/200k"
+readonly in_calls_file="${in_calls_dir}/ukb_split_calls_200k_chr${chr}_parents.vcf.bgz"
 readonly in_calls_type="vcf"
 
 readonly prefix="ukb_wes_union_calls_chr${chr}_parents"
-readonly out_dir="data/unphased/wes_union_calls/200k_from_500k"
+#readonly out_dir="data/unphased/wes_union_calls/200k_from_500k"
+readonly out_dir="data/unphased/wes_union_calls/prefilter_no_maf_cutoff/200k"
 
 readonly tmp_prefix="${out_dir}/${prefix}_tmp"
 readonly tmp_file="${tmp_prefix}.vcf.bgz"

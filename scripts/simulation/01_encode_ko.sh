@@ -7,7 +7,7 @@
 #SBATCH --error=logs/encode_ko.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 3
-#SBATCH --array=22
+#SBATCH --array=20
 #
 #$ -N encode_ko
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

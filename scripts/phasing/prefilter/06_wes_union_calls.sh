@@ -12,7 +12,7 @@
 #SBATCH --partition=short
 #SBATCH --constraint="skl-compat"
 #SBATCH --cpus-per-task 1
-#SBATCH --array=3
+#SBATCH --array=1-22
 #
 #$ -N wes_union_calls_bcf
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -113,6 +113,10 @@ if [ ! -f "${out_file}" ]; then
   fi
 
 else
+  rm -f "${tmp_file}"
+  rm -f "${tmp_file}.tbi"
+  module load BCFtools/1.12-GCC-10.3.0
+  make_tabix ${out_file}
   >&2 echo "Final file (${out_file}) already exists! Skipping.."
 fi
 

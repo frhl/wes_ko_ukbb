@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+#
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=write_ps
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/write_ps.log
+#SBATCH --error=logs/write_ps.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 4
+#SBATCH --array=21
+#
+#$ -N write_ps
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#$ -o logs/write_ps.log
+#$ -e logs/write_ps.errors.log
+#$ -P lindgren.prjc
+#$ -pe shmem 2
+#$ -q short.qc
+#$ -t 21
+#$ -V
+
+set -o errexit
+set -o nounset
+
+source utils/vcf_utils.sh
+source utils/hail_utils.sh
+source utils/qsub_utils.sh
+
+readonly hail_script="scripts/phasing/phasing/06_write_ps.py"
+readonly spark_dir="data/tmp/spark"
+
+readonly array_idx=$( get_array_task_id )
+readonly chr=$( get_chr ${array_idx} )
+
+readonly in_dir="data/phased/wes_union_calls/200k/calibration"
+readonly in_prefix="${in_dir}/ukb_shapeit5_whatshap_chr${chr}"
+readonly in_type="mt"
+
+readonly out_dir="data/phased/wes_union_calls/200k/calibration"
+readonly out_prefix="${out_dir}/ukb_shapeit5_whatshap_variants_chr${chr}"
+
+mkdir -p ${out_dir}
+
+module purge
+set_up_hail
+set_up_pythonpath_legacy
+python3 ${hail_script} \
+  --phased_path ${phased_path} \
+  --phased_type ${phased_type} \
+  --ref_path ${ref_path} \
+  --ref_type ${ref_type} \
+  --out_prefix ${out_prefix} \
+  --out_type ${out_type}
+

@@ -2,18 +2,18 @@
 #
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=phasing_conf
+#SBATCH --job-name=annotate_ps
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/phasing_conf.log
-#SBATCH --error=logs/phasing_conf.errors.log
+#SBATCH --output=logs/annotate_ps.log
+#SBATCH --error=logs/annotate_ps.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 4
 #SBATCH --array=21
 #
-#$ -N phasing_conf
+#$ -N annotate_ps
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/phasing_conf.log
-#$ -e logs/phasing_conf.errors.log
+#$ -o logs/annotate_ps.log
+#$ -e logs/annotate_ps.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc
@@ -27,7 +27,7 @@ source utils/vcf_utils.sh
 source utils/hail_utils.sh
 source utils/qsub_utils.sh
 
-readonly hail_script="scripts/phasing/phasing/06_phasing_conf.py"
+readonly hail_script="scripts/phasing/phasing/06_annotate_ps.py"
 readonly spark_dir="data/tmp/spark"
 
 readonly array_idx=$( get_array_task_id )

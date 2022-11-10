@@ -9,7 +9,7 @@
 #SBATCH --error=logs/merge_prephased.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 5
-#SBATCH --array=20
+#SBATCH --array=22
 #
 #$ -N merge_prephased
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -18,7 +18,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 5
 #$ -q short.qc
-#$ -t 20
+#$ -t 22
 #$ -V
 
 set -o errexit

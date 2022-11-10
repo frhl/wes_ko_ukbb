@@ -20,7 +20,7 @@ def main(args):
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
     mt1 = io.import_table(phased_path, phased_type, calc_info = False)
     mt2 = io.import_table(ref_path, ref_type, calc_info = False)
-    mt2 = io.recalc_info(mt2)
+    mt2 = mt2.filter_entries(hl.is_defined(mt2.PS))
     
     mt1 = mt1.annotate_entries(
         GT_rb = mt2[mt1.row_key, mt1.col_key].GT,

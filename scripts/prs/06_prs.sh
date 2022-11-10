@@ -7,7 +7,7 @@
 #SBATCH --error=logs/prs.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=18
+#SBATCH --array=17-18
 #SBATCH --requeue
 
 set -o errexit
@@ -149,5 +149,5 @@ readonly project="lindgren.prj"
 readonly tasks=1-22
 
 submit_ldpred2 "auto" "6" "${phenotype_cts}_int"
-submit_ldpred2 "auto" "6" "${phenotype_binary}"
+submit_ldpred2 "auto" "6" "${phenotype_cts}"
 
