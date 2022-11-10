@@ -52,6 +52,7 @@ def main(args):
         mt = mt.drop(mt.info)
     if out_type not in "mt":
         mt = mt.checkpoint(out_prefix + ".mt", overwrite = True)
+    mt = io.recalc_info(mt)
     io.export_table(mt, out_prefix, out_type)
 
 

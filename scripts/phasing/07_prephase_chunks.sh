@@ -18,7 +18,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 18-19
+#$ -t 22
 #$ -V
 
 set -o errexit
@@ -51,7 +51,7 @@ readonly nslots=1
 
 # what file should be split up
 readonly input_dir=" data/unphased/wes_union_calls/200k"
-readonly input_path="${input_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.gz" 
+readonly input_path="${input_dir}/ukb_wes_union_calls_chr${chr}.vcf.gz" 
 readonly input_type="vcf"
 
 # Output paths

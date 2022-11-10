@@ -10,7 +10,7 @@
 #SBATCH --error=logs/extract_prephase_sites.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 5
-#SBATCH --array=21
+#SBATCH --array=20,22
 #
 #$ -N extract_prephase_sites
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

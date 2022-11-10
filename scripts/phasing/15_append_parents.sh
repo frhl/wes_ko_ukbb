@@ -10,8 +10,7 @@
 #SBATCH --error=logs/append_parents.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=20,22
-#SBATCH --dependency="afterok:8619875"
+#SBATCH --array=20-22
 #
 #$ -N append_parents
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -39,16 +38,15 @@ readonly chr=$( get_chr ${array_idx} )
 readonly pedigree_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 readonly pedigree="${pedigree_dir}/ukb11867_pedigree.fam"
 # parental genotypes that were not phased
-readonly parents_wes_dir="data/unphased/wes/prefilter/200k"
-readonly parents_wes_path="${parents_wes_dir}/ukb_split_wes_200k_chr${chr}_parents.vcf.bgz"
-# prephased directory (for PS field)
-#readonly prephased_dir="data/phased/wes_union_calls/prephased"
-#readonly prephased_path="${prephased_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.vcf.gz"
+readonly parents_dir="data/unphased/wes_union_calls/200k_from_500k"
+readonly parents_path="${parents_dir}/ukb_wes_union_calls_chr${chr}_parents.vcf.gz"
 # standard genotypes that were phased
+#readonly phased_dir="data/phased/wes_scaffold_calls/200k_from_500k/pbwt_depth4_sequencing_15000eff/chunks/shapeit4/ukb_wes_union_calls_shapeit5_200k_from_500k_chr${chr}-18xshort"
+#readonly phased_path="${phased_dir}/shapeit4_prs100000_pro25000_mprs150000.1of1.vcf.gz"
 readonly phased_dir="data/phased/wes_scaffold_calls/200k_from_500k/ligated"
 readonly phased_path="${phased_dir}/ukb_wes_scaffold_calls_200k_from_500k_chr${chr}.vcf.bgz"
 # out paths and types
-readonly out_dir="data/phased/wes_scaffold_calls/200k_from_500k/merge_parents"
+readonly out_dir="data/phased/wes_scaffold_calls/200k_from_500k/test"
 readonly out_prefix="${out_dir}/ukb_wes_scaffold_calls_200k_from_500k_shapeit5_chr${chr}"
 readonly out_vcf="${out_prefix}.vcf.gz"
 readonly out_trio="${out_prefix}.trio"
@@ -58,6 +56,7 @@ mkdir -p ${out_dir}
 
 module load BCFtools/1.12-GCC-10.3.0
 make_tabix "${parents_path}" "tbi"
+make_tabix "${phased_path}" "tbi"
 bcftools merge ${phased_path} ${parents_path} -Oz -o ${out_vcf}
 
 # combine parents and children in same vcf

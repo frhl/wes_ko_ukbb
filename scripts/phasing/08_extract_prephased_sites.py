@@ -5,6 +5,7 @@ import argparse
 
 from ko_utils import io
 from ukb_utils import hail_init
+from ukb_utils import variants
 
 def main(args):
     
@@ -19,13 +20,16 @@ def main(args):
     mt = io.recalc_info(mt)
     mt = mt.filter_entries(hl.is_defined(mt.PS))
     mt = mt.select_entries(*[mt.PS, mt.GT])
-    # export mafs
-    ht = mt.info.flatten()
-    ht.export(out_prefix + ".maf.txt.gz")
-    # export infos
+    
+    mt = mt.transmute_rows(rsid = variants.get_variant_expr(mt.locus, mt.alleles))
+    mt = mt.annotate_rows(AC = mt.info.AC)
+    mt = mt.annotate_rows(AN = mt.info.AN)
+    mt = mt.select_rows(*[mt.rsid, mt.AC, mt.AN])
+    
+    # get entries
     ht = mt.entries()
+    ht = ht.drop(*[ht.locus, ht.alleles])
     ht.export(out_prefix + ".PS.txt.gz")
-
 
 if __name__=='__main__':
 

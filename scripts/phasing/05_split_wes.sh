@@ -23,6 +23,9 @@
 #$ -t 21
 #$ -V
 
+set -o errexit
+set -o nounset
+
 module purge
 source utils/qsub_utils.sh
 source utils/hail_utils.sh

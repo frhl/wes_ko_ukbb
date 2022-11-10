@@ -11,8 +11,8 @@
 #SBATCH --error=logs/wes_union_calls.errors.log
 #SBATCH --partition=short
 #SBATCH --constraint="skl-compat"
-#SBATCH --cpus-per-task 3
-#SBATCH --array=4
+#SBATCH --cpus-per-task 1
+#SBATCH --array=3
 #
 #$ -N wes_union_calls_bcf
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -42,12 +42,12 @@ readonly in_wes_dir="data/unphased/wes/prefilter/200k"
 readonly in_wes_file="${in_wes_dir}/ukb_split_wes_200k_chr${chr}_no_parents.vcf.bgz"
 readonly in_wes_type="vcf"
 
-readonly in_calls_dir="data/phased/calls/shapeit5/200k_from_500k"
-readonly in_calls_file="${in_calls_dir}/ukb_phased_calls_200k_from_500k_chr${chr}.vcf.bgz"
+readonly in_calls_dir="data/unphased/calls/prefilter_no_maf_cutoff/200k"
+readonly in_calls_file="${in_calls_dir}/ukb_split_calls_200k_chr${chr}_no_parents.vcf.bgz"
 readonly in_calls_type="vcf"
 
 readonly prefix="ukb_wes_union_calls_chr${chr}"
-readonly out_dir="data/unphased/wes_union_calls/200k_from_500k"
+readonly out_dir="data/unphased/wes_union_calls/prefilter_no_maf_cutoff/200k"
 
 readonly tmp_prefix="${out_dir}/${prefix}_tmp"
 readonly tmp_file="${tmp_prefix}.vcf.bgz"
@@ -57,7 +57,7 @@ readonly sort_file="${out_dir}/${prefix}_sorted.vcf.gz"
 readonly out_file="${out_dir}/${prefix}.vcf.gz"
 
 # where to store temporary files during sort
-readonly tmp_write_dir="data/tmp/bcf/bcfd"
+readonly tmp_write_dir="data/tmp/bcf/bcfdx"
 # this function is used internally in vcf_concat_sort
 readonly bcftools_local="/well/lindgren/flassen/software/samtools/v1.16.1/bcftools-v1.16/bcftools-installed-v1.16/bin/bcftools"
 
@@ -76,8 +76,7 @@ if [ ! -f "${out_file}" ]; then
        --input_calls_path "${in_calls_file}" \
        --input_calls_type "${in_calls_type}" \
        --out_calls_prefix "${tmp_prefix}" \
-       --out_calls_type "${tmp_type}" \
-       --unphase
+       --out_calls_type "${tmp_type}"
   else
     >&2 echo "${tmp_file} exists. Skipping."
   fi
@@ -88,25 +87,27 @@ if [ ! -f "${out_file}" ]; then
   
   # 2. Tabix the temporary file
   make_tabix "${tmp_file}" "tbi"
-  
+
+  module purge
+  module load  HTSlib/1.14-GCC-11.2.0  
   # 3. combine the two tables by concatenating and sorting variants 
-  vcf_concat_sort ${tmp_file} ${in_wes_file} ${sort_file} ${tmp_write_dir} \
+  vcf_concat_sort ${tmp_file} ${in_wes_file} ${out_file} ${tmp_write_dir} \
   && print_update "Finished combining VCFs for chr${chr} using bcftools." "${SECONDS}" \
   || raise_error "$( print_update "Combining VCFs for chr${chr} using bcftools failed." ${SECONDS} )"
-  make_tabix ${sort_file}
+  make_tabix ${out_file}
 
   # 4. calculate AC/AN 
-  bcftools +fill-tags ${sort_file} -Oz -o ${out_file} -- -t AN,AC \
-  && print_update "Finished fill tags for chr${chr} using bcftools." "${SECONDS}" \
-  || raise_error "$( print_update "Fill tag for chr${chr} using bcftools failed." ${SECONDS} )"
-  make_tabix ${out_file}
+  #bcftools +fill-tags ${sort_file} -Oz -o ${out_file} -- -t AN,AC \
+  #&& print_update "Finished fill tags for chr${chr} using bcftools." "${SECONDS}" \
+  #|| raise_error "$( print_update "Fill tag for chr${chr} using bcftools failed." ${SECONDS} )"
+  #make_tabix ${out_file}
   
   echo "Success. Writing to ${out_file}.."
 
   # 5. clean up temporary files
   if [ -f "${out_file}" ]; then
-    rm "${sort_file}" 
-    rm "${sort_file}.tbi"
+    #rm "${sort_file}" 
+    #rm "${sort_file}.tbi"
     rm "${tmp_file}"
     rm "${tmp_file}.tbi"
   fi
