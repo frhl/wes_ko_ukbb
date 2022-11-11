@@ -9,7 +9,7 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 4
 #SBATCH --array=21
-#SBATCH --dependency="afterok:8723488"
+#SBATCH --dependency="afterok:8725224"
 #
 #$ -N write_ps
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

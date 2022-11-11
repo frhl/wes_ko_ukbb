@@ -15,7 +15,7 @@
 #$ -o logs/annotate_ps.log
 #$ -e logs/annotate_ps.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 2
+#$ -pe shmem 3
 #$ -q short.qc
 #$ -t 21
 #$ -V
@@ -44,8 +44,10 @@ readonly phased_type="vcf"
 readonly out_dir="data/phased/wes_union_calls/200k/calibration"
 readonly out_prefix="${out_dir}/ukb_shapeit5_whatshap_chr${chr}"
 readonly out_type="mt"
+readonly out="${out_prefix}.mt"
 
 mkdir -p ${out_dir}
+
 
 
 # combine parents and children in same vcf

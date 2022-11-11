@@ -1,7 +1,0 @@
-/var/spool/slurmd/job8443924/slurm_script: line 13: utils/qsub_utils.sh: No such file or directory
-/var/spool/slurmd/job8443924/slurm_script: line 14: utils/hail_utils.sh: No such file or directory
-/var/spool/slurmd/job8443924/slurm_script: line 15: utils/vcf_utils.sh: No such file or directory
-/var/spool/slurmd/job8443924/slurm_script: line 20: get_chr: command not found
-/var/spool/slurmd/job8443924/slurm_script: line 45: set_up_hail: command not found
-/var/spool/slurmd/job8443924/slurm_script: line 46: set_up_pythonpath_legacy: command not found
-python3: can't open file 'scripts/simulation/01_encode_ko.py': [Errno 2] No such file or directory

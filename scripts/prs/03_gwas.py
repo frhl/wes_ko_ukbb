@@ -51,7 +51,7 @@ def main(args):
                         covariates=covariates
                         )
             elif mt.pheno[response].dtype == hl.dtype('bool'):
-                print(mt.pheno.count())
+                #print(mtcount())
                 cases = mt.aggregate_cols(hl.agg.sum(mt.pheno[response] == 1))
                 controls = mt.aggregate_cols(hl.agg.sum(mt.pheno[response] == 0))
                 if cases < int(min_cases):

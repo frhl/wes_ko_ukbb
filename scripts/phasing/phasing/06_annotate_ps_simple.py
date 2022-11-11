@@ -18,18 +18,13 @@ def main(args):
     # set up
     hail_init.hail_bmrc_init_local('logs/hail/merge_chunks.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
-    mt1 = hl.import_vcf(
-        phased_path,
-        force_bgz=True,
-        skip_invalid_loci=True,
-        array_elements_required=False,
-        find_replace=(':-nan', ':NaN'))
+    mt1 = io.import_table(phased_path, phased_type, calc_info = False)
     mt2 = hl.import_vcf(
         ref_path,
         force_bgz=True,
         skip_invalid_loci=True,
         array_elements_required=False,
-        find_replace=('nan', 'NaN'))
+        find_replace=('-nan', ':NaN:'))
     mt2 = mt2.filter_entries(hl.is_defined(mt2.PS))
     mt1 = mt1.annotate_entries(
         GT_rb = mt2[mt1.row_key, mt1.col_key].GT,

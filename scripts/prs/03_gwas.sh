@@ -16,7 +16,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 30-31
+#$ -t 103-200
 #$ -V
 
 
@@ -171,9 +171,9 @@ submit_merge_job_slurm()
 
 
 readonly tasks="1-22"
-#submit_gwas_job "data/prs/sumstat/binary" "${phenotype_binary}" "${file_binary}"
-submit_gwas_job "data/prs/sumstat/test/cts" "${phenotype_cts}_int" "${file_cts}"
-submit_gwas_job "data/prs/sumstat/test/cts" "${phenotype_cts}" "${file_cts}"
+submit_gwas_job "data/prs/sumstat/binary" "${phenotype_binary}" "${file_binary}"
+#submit_gwas_job "data/prs/sumstat/test/cts" "${phenotype_cts}_int" "${file_cts}"
+#submit_gwas_job "data/prs/sumstat/test/cts" "${phenotype_cts}" "${file_cts}"
 
 
 
