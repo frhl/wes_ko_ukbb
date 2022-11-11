@@ -128,6 +128,8 @@ else
   print_update "Warning: ${out} already exists! Skipping." | tee /dev/stderr
 fi
 
+module purge
+module load BCFtools/1.12-GCC-10.3.0
 make_tabix ${out}
 
 
