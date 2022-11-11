@@ -9,6 +9,7 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 4
 #SBATCH --array=21
+#SBATCH --dependency="afterok:8723488"
 #
 #$ -N write_ps
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -27,14 +28,14 @@ source utils/vcf_utils.sh
 source utils/hail_utils.sh
 source utils/qsub_utils.sh
 
-readonly hail_script="scripts/phasing/phasing/06_write_ps.py"
+readonly hail_script="scripts/phasing/phasing/07_write_ps.py"
 readonly spark_dir="data/tmp/spark"
 
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
 readonly in_dir="data/phased/wes_union_calls/200k/calibration"
-readonly in_prefix="${in_dir}/ukb_shapeit5_whatshap_chr${chr}"
+readonly in_path="${in_dir}/ukb_shapeit5_whatshap_chr${chr}.mt"
 readonly in_type="mt"
 
 readonly out_dir="data/phased/wes_union_calls/200k/calibration"
@@ -46,10 +47,7 @@ module purge
 set_up_hail
 set_up_pythonpath_legacy
 python3 ${hail_script} \
-  --phased_path ${phased_path} \
-  --phased_type ${phased_type} \
-  --ref_path ${ref_path} \
-  --ref_type ${ref_type} \
-  --out_prefix ${out_prefix} \
-  --out_type ${out_type}
+  --phased_path ${in_path} \
+  --phased_type ${in_type} \
+  --out_prefix ${out_prefix}
 

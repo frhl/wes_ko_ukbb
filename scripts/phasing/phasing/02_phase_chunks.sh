@@ -10,8 +10,7 @@
 #SBATCH --error=logs/phase_chunks.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=21
-#SBATCH --dependency="afterok:8700121"
+#SBATCH --array=20-22
 
 set -o errexit
 set -o nounset
@@ -69,13 +68,13 @@ readonly vcf_dir="data/unphased/wes_union_calls/prefilter_no_maf_cutoff/${tranch
 readonly vcf_to_phase="${vcf_dir}/ukb_wes_union_calls_chr${chr}.vcf.gz"
 
 # SHAPEI5 requires a scaffold
-readonly scaffold_dir="data/phased/wes_union_calls/${tranche}/shapeit5/phase_common"
-readonly vcf_to_scaffold="${scaffold_dir}/ukb_wes_union_calls_${tranche}_chr${chr}_phase_common_quick.vcf.bgz"
+readonly scaffold_dir="data/phased/wes_union_calls/${tranche}/shapeit5/phase_common/newrun"
+readonly vcf_to_scaffold="${scaffold_dir}/ukb_wes_union_calls_${tranche}_chr${chr}_phase_common.vcf.bgz"
 
 # Output paths
 #readonly out_dir="data/phased/wes_union_calls/with_ps/chunks/${software}"
 #readonly out_dir="data/phased/wes_scaffold_calls/200k_from_500k/test_pbwt5/chunks/${software}"
-readonly out_dir="data/phased/wes_union_calls/${tranche}/shapeit5/phase_rare"
+readonly out_dir="data/phased/wes_union_calls/${tranche}/shapeit5/phase_rare/newrun"
 
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_${software}_${tranche}_chr${chr}"
 readonly out_prefix_w_job_config="${out_prefix}-${nslots}x${queue}/${software}_prs${phasing_region_size}_pro${phasing_region_overlap}_mprs${max_phasing_region_size}"

@@ -9,7 +9,7 @@
 #SBATCH --error=logs/phase_common.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 18
-#SBATCH --array=3,19
+#SBATCH --array=21
 #
 #$ -N phase_common
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -40,7 +40,7 @@ readonly in_dir="data/unphased/wes_union_calls/prefilter_no_maf_cutoff/${tranche
 readonly in_file="${in_dir}/ukb_wes_union_calls_chr${chr}.vcf.gz"
 
 readonly out_dir="data/phased/wes_union_calls/${tranche}/shapeit5/phase_common/newrun"
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_${tranche}_chr${chr}_phase_common"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_${tranche}_chr${chr}_phase_common_sequencing"
 readonly out="${out_prefix}.vcf.gz"
 readonly log="${out_prefix}.log"
 
@@ -49,7 +49,7 @@ readonly ref="${ref_dir}/ALL.chr${chr}.phase3_shapeit2_mvncall_integrated_v5.201
 readonly gmap="/well/lindgren/flassen/software/SHAPEIT4/b38.gmap/chr${chr}.b38.gmap.gz"
 readonly threads=$( get_threads )
 
-readonly pbwt_modulo=0.1 # deault is 0.1, in shapeit4 with sequencing it is 0.0002
+readonly pbwt_modulo=0.0002 # deault is 0.1, in shapeit4 with sequencing it is 0.0002
 readonly pbwt_depth=4 # deault is 4
 readonly pbwt_mac=5 # deafult is 5
 readonly pbwt_mdr=0.1 # default is 0.1

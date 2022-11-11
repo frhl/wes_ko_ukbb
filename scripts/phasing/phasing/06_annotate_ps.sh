@@ -7,7 +7,7 @@
 #SBATCH --output=logs/annotate_ps.log
 #SBATCH --error=logs/annotate_ps.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 4
+#SBATCH --cpus-per-task 3
 #SBATCH --array=21
 #
 #$ -N annotate_ps
