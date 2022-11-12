@@ -52,8 +52,8 @@ def main(args):
                         )
             elif mt.pheno[response].dtype == hl.dtype('bool'):
                 #print(mtcount())
-                cases = mt.aggregate_cols(hl.agg.sum(mt.pheno[response] == 1))
-                controls = mt.aggregate_cols(hl.agg.sum(mt.pheno[response] == 0))
+                cases = mt.aggregate_cols(hl.agg.sum(mt.pheno[response] == True))
+                controls = mt.aggregate_cols(hl.agg.sum(mt.pheno[response] == False))
                 if cases < int(min_cases):
                      raise ValueError(str(cases) + " cases found! Expected +" + str(min_cases))
                 if adjust_maf_by_case_control:
@@ -74,7 +74,7 @@ def main(args):
                         )
                 # get effective sample size
                 n_total = mt.aggregate_cols(hl.agg.sum(hl.is_defined(mt.pheno[response])))
-                n_cases = mt.aggregate_cols(hl.agg.sum(mt.pheno[response] == 1))
+                n_cases = mt.aggregate_cols(hl.agg.sum(mt.pheno[response] == True))
                 reg = reg.annotate(n=n_total, n_cases=n_cases, maf_cutoff = min_maf)
             else:
                 raise TypeError("Response variable is not a float64 or boolean!")
