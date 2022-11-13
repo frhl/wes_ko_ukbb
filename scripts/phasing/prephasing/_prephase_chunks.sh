@@ -26,7 +26,7 @@ readonly main_merge_file=${8?Error: Missing arg6 ()}
 readonly out_prefix=${9?Error: Missing arg6 ()} 
 
 readonly prephase_sample_script="scripts/phasing/prephasing/_prephase_sample.sh"
-readonly hail_script="scripts/phasing/prephasing/07_prephase_chunks.py"
+readonly hail_script="scripts/phasing/prephasing/01_prephase_chunks.py"
 readonly merge_script="scripts/phasing/prephasing/_prephase_merge.sh"
 
 readonly chunk_idx=$( get_array_task_id ) # one-based index for which phasing interval to phase
@@ -202,9 +202,15 @@ if [ ! -f "${out_merge_file}.vcf.gz" ]; then
     make_tabix "${splitted_input}" "tbi"
   fi
 
-  # submit workers for each sample
-  submit_prephasing_sample_job ${cluster}
-  submit_merge_job_sge
+  # only submit jobs if the right files exists
+  if [ -f "${splitted_input}.tbi" ]; then
+    # submit workers for each sample
+    submit_prephasing_sample_job ${cluster}
+    submit_merge_job_sge
+  else
+    >&2 echo "Error: Prephasing job was not submitted because VCF/VCF.tbi files do not exists."
+  fi
+
 
 else
   >&2 echo "${out_merge_file}.vcf.gz already exists. Skipping."

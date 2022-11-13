@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -o errexit
+set -o nounset
 
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
@@ -7,7 +9,7 @@ source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
 readonly spark_dir="data/tmp/spark"
-readonly rscript="scripts/phasing/_prephase_sample.R"
+readonly rscript="scripts/phasing/prephasing/_prephase_sample.R"
 readonly hail_script="scripts/phasing/_to_mt.py"
 
 readonly input_path=${1?Error: Missing arg1 (input_path)} 
@@ -42,6 +44,7 @@ extract_sample() {
     local in_vcf=${1}
     local sample=${2}
     local out_vcf=${3}
+    >&2 echo "Extracting sample ${sample} from ${in_vcf}."
     if [ ! -f "${out_vcf}.gz" ]; then
       module load BCFtools/1.12-GCC-10.3.0
       bcftools view -s ${sample} -o ${out_vcf} ${in_vcf} && bgzip ${out_vcf}

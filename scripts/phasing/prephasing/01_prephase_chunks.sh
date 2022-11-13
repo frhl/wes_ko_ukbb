@@ -18,7 +18,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 22
+#$ -t 21
 #$ -V
 
 set -o errexit
@@ -47,10 +47,10 @@ readonly chr=$( get_chr ${task_id} )
 # note: errors after 50 min with 1000 samples/chunk with 4 slots
 readonly project="lindgren.prj"
 readonly queue="short"
-readonly nslots=1
+readonly nslots=2
 
 # what file should be split up
-readonly input_dir=" data/unphased/wes_union_calls/200k"
+readonly input_dir="data/unphased/wes_union_calls/prefilter_no_maf_cutoff/200k"
 readonly input_path="${input_dir}/ukb_wes_union_calls_chr${chr}.vcf.gz" 
 readonly input_type="vcf"
 
@@ -105,7 +105,7 @@ get_max_interval_idx() {
 submit_prephasing_job() {
   
   readonly max_interval_idx=$( get_max_interval_idx )
-  readonly slurm_tasks="120-130" #"1-${max_interval_idx}"
+  readonly slurm_tasks="1-${max_interval_idx}"
   readonly slurm_jname="_c${chr}_prephase_chunks"
   readonly slurm_lname="logs/_prephase_chunks"
   readonly slurm_project="${project}"
