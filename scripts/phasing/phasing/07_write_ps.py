@@ -21,15 +21,14 @@ def main(args):
     mt = mt.filter_entries(hl.is_defined(mt.PS_rb))
     mt = mt.select_entries(*[mt.PP, mt.GT, mt.PS_rb, mt.GT_rb])
     
+    print(mt.describe())
+
     mt = mt.transmute_rows(rsid = variants.get_variant_expr(mt.locus, mt.alleles))
     mt = mt.annotate_rows(AC = mt.info.AC)
-    mt = mt.annotate_rows(AC_rb = mt.info.AC_rb)
-    mt = mt.annotate_rows(AN = mt.info.AN)
-    mt = mt.annotate_rows(AN_rb = mt.info.AN_rb)
-    mt = mt.select_rows(*[mt.rsid, mt.AC, mt.AC_rb, mt.AN, mt.AN_rb])
+    mt = mt.annotate_rows(AF = mt.info.AF)
+    mt = mt.select_rows(*[mt.rsid, mt.AC, mt.AF])
     
     ht = mt.entries()
-    ht = ht.drop(*[ht.locus, ht.alleles])
     ht.export(out_prefix + ".PS.txt.gz")
 
     

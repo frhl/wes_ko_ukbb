@@ -25,12 +25,15 @@ readonly pbwt_modulo=${13?Error: Missing arg13 (pbwt_modulo)} #
 readonly pbwt_mdr=${14?Error: Missing arg14 (pbwt_ndr)} #
 readonly ps_error=${15?Error: Missing arg15 (ps_error)} #
 readonly effective_size=${16?Error: Missing arg16 (pop_effective_size)} #
-readonly threads=$(( ${SLURM_CPUS_ON_NODE} - 1))
+readonly threads=$( get_threads )
+
 
 readonly hail_script="scripts/phasing/phasing/02_phase_chunks.py"
 readonly interval_flags="--chrom ${chr} --min_interval_unit ${min_interval_unit} --phasing_region_size ${phasing_region_size} --phasing_region_overlap ${phasing_region_overlap} --max_phasing_region_size ${max_phasing_region_size}"
 readonly phasing_idx=$( get_array_task_id ) # one-based index for which phasing interval to phase
 
+set_up_hail
+set_up_pythonpath_legacy
 readonly max_phasing_idx=$( python3 ${hail_script} ${interval_flags} --get_max_phasing_idx --interval_path ${interval_path})
 readonly out_prefix_w_phasing_idx="${out_prefix}.${phasing_idx}of${max_phasing_idx}"
 readonly out="${out_prefix_w_phasing_idx}.vcf.gz"
@@ -110,8 +113,7 @@ phase_with_eagle2() {
 
 
 
-set_up_hail
-set_up_pythonpath_legacy
+echo "Checking if ${out} exists.."
 if [ ! -f ${out} ]; then
   if [ ${software} = "shapeit4" ]; then
     module load SHAPEIT4/4.2.2-foss-2021a
@@ -128,9 +130,9 @@ else
   print_update "Warning: ${out} already exists! Skipping." | tee /dev/stderr
 fi
 
-module purge
-module load BCFtools/1.12-GCC-10.3.0
-make_tabix ${out}
+#module purge
+#module load BCFtools/1.12-GCC-10.3.0
+#make_tabix ${out}
 
 
 

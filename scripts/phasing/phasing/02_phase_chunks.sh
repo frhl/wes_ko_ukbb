@@ -11,6 +11,17 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
 #SBATCH --array=21
+#
+#
+#$ -N phase_chunks
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#$ -o logs/phase_chunks.log
+#$ -e logs/phase_chunks.errors.log
+#$ -P lindgren.prjc
+#$ -pe shmem 2
+#$ -q short.qc
+#$ -t 21
+#$ -V
 
 set -o errexit
 set -o nounset
@@ -30,6 +41,7 @@ set_up_hail
 set_up_pythonpath_legacy
 set -eu
 
+readonly cluster=$( get_current_cluster )
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
@@ -126,35 +138,64 @@ submit_phasing_job() {
   local slurm_queue="${queue}"
   local slurm_nslots="${nslots}"
   set -x
-  sbatch \
-    --account="${slurm_project}" \
-    --job-name="${slurm_jname}" \
-    --output="${slurm_lname}.log" \
-    --error="${slurm_lname}.errors.log" \
-    --chdir="${curwd}" \
-    --partition="${slurm_queue}" \
-    --cpus-per-task="${slurm_nslots}" \
-    --array="${slurm_tasks}" \
-    --open-mode="append" \
-    --constraint=skl-compat \
-    ${phasing_script} \
-    ${chr} \
-    ${vcf_to_phase} \
-    ${vcf_to_scaffold} \
-    ${min_interval_unit} \
-    ${interval_path} \
-    ${phasing_region_size} \
-    ${phasing_region_overlap} \
-    ${max_phasing_region_size} \
-    ${out_prefix_w_job_config} \
-    ${software} \
-    ${pbwt_min_mac} \
-    ${pbwt_depth} \
-    ${pbwt_modulo} \
-    ${pbwt_mdr} \
-    ${phased_set_error} \
-    ${pop_effective_size}
-  set +x
+  if [ "${cluster}" == "slurm" ]; then
+    sbatch \
+      --account="${slurm_project}" \
+      --job-name="${slurm_jname}" \
+      --output="${slurm_lname}.log" \
+      --error="${slurm_lname}.errors.log" \
+      --chdir="${curwd}" \
+      --partition="${slurm_queue}" \
+      --cpus-per-task="${slurm_nslots}" \
+      --array="${slurm_tasks}" \
+      --open-mode="append" \
+      --constraint=skl-compat \
+      ${phasing_script} \
+      ${chr} \
+      ${vcf_to_phase} \
+      ${vcf_to_scaffold} \
+      ${min_interval_unit} \
+      ${interval_path} \
+      ${phasing_region_size} \
+      ${phasing_region_overlap} \
+      ${max_phasing_region_size} \
+      ${out_prefix_w_job_config} \
+      ${software} \
+      ${pbwt_min_mac} \
+      ${pbwt_depth} \
+      ${pbwt_modulo} \
+      ${pbwt_mdr} \
+      ${phased_set_error} \
+      ${pop_effective_size}
+    set +x
+  elif [ "${cluster}" == "sge" ]; then
+    qsub -N "${slurm_jname}" \
+      -o "${slurm_lname}.log" \
+      -e "${slurm_lname}.errors.log" \
+      -t ${slurm_tasks} \
+      -q "short.qc" \
+      -pe shmem ${slurm_nslots} \
+      -wd $(pwd) \
+      ${phasing_script} \
+      ${chr} \
+      ${vcf_to_phase} \
+      ${vcf_to_scaffold} \
+      ${min_interval_unit} \
+      ${interval_path} \
+      ${phasing_region_size} \
+      ${phasing_region_overlap} \
+      ${max_phasing_region_size} \
+      ${out_prefix_w_job_config} \
+      ${software} \
+      ${pbwt_min_mac} \
+      ${pbwt_depth} \
+      ${pbwt_modulo} \
+      ${pbwt_mdr} \
+      ${phased_set_error} \
+      ${pop_effective_size}
+  else
+    >&2 echo "${cluster} is not valid!"
+  fi
 
 }
 

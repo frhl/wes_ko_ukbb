@@ -42,8 +42,9 @@ def main(args):
         raise ValueError("Files were found. But no file with input prefix were found. Exiting!")
     
     # import each table as a matrix-table:
+    print(files)
     files = sort_by_chunks(files)
-    mts = [hl.import_vcf(f, force_bgz = True) for f in files]
+    mts = [hl.import_vcf(f, force_bgz = True, find_replace=(':-nan', ':NaN')) for f in files]
     n = len(mts)
 
     with open(out_prefix + "_trims.txt", "w") as outfile:
@@ -101,14 +102,18 @@ def main(args):
             for mt in final:
                 j += 1
                 out = out_prefix + "_trim." + str(j) + 'of' + str(n) 
-                print(f"Writing {out}.vcf.gz ..")
-                io.export_table(mt, out, "vcf")
+                outfile = out + ".vcf.bgz"
+                if not os.path.isfile(outfile):
+                    print(f"Writing {out}.vcf.bgz ..")
+                    io.export_table(mt, out, "vcf")
 
         else:
             mt = mts[0]
             out = out_prefix + "_trim.1of1" 
-            print(f"Writing {out}.vcf.gz ..")
-            io.export_table(mt, out, out_type)
+            outfile = out + ".vcf.bgz"
+            if not os.path.isfile(outfile):
+                print(f"Writing {out}.vcf.bgz ..")
+                io.export_table(mt, out, out_type)
 
 if __name__=='__main__':
 

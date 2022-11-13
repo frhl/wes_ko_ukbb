@@ -16,9 +16,9 @@
 #$ -o logs/phase_common.log
 #$ -e logs/phase_common.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 18
+#$ -pe shmem 20
 #$ -q short.qc
-#$ -t 1-20
+#$ -t 21
 #$ -V
 
 # For 500K, chr21 takes ~23 Hours.

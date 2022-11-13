@@ -9,7 +9,7 @@
 #SBATCH --error=logs/trim_chunks.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 6
-#SBATCH --array=20
+#SBATCH --array=5-22
 #
 #
 #$ -N trim_chunks
@@ -17,9 +17,9 @@
 #$ -o logs/trim_chunks.log
 #$ -e logs/trim_chunks.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 5
-#$ -q short.qe
-#$ -t 21
+#$ -pe shmem 6
+#$ -q long.qc
+#$ -t 1
 #$ -V
 
 set -o errexit
@@ -35,12 +35,13 @@ readonly spark_dir="data/tmp/spark"
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
-readonly main_dir="data/phased/wes_union_calls/200k/whatshap/chunks/shapeit4"
-readonly in_dir="${main_dir}/ukb_wes_union_calls_whatshap_200k_chr${chr}-16xshort"
-readonly in_prefix_regex="shapeit4_prs100000_pro25000_mprs150000" # need this for regex
+readonly main_dir="data/phased/wes_union_calls/200k/shapeit5/phase_rare/newrun"
+#readonly main_dir="data/phased/wes_union_calls/200k/whatshap/chunks/shapeit4"
+readonly in_dir="${main_dir}/ukb_wes_union_calls_shapeit5_200k_chr${chr}-20xshort"
+readonly in_prefix_regex="shapeit5_prs100000_pro25000_mprs150000" # need this for regex
 
-readonly out_dir="data/phased/wes_union_calls/200k/whatshap/chunks/shapeit4"
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_whatshap_shapeit4_200k_chr${chr}"
+readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/trimmed/chr1-long"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_shapeit5_200k_chr${chr}_trim"
 readonly out="${out_prefix}.vcf.bgz"
 
 #readonly main_dir="data/phased/wes_scaffold_calls/200k_from_500k/chunks/shapeit5"

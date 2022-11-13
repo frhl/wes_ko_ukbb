@@ -9,7 +9,17 @@
 #SBATCH --error=logs/ligate_chunks.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=20,
+#SBATCH --array=2-22
+#
+#$ -N ligate_chunks
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#$ -o logs/ligate_chunks.log
+#$ -e logs/ligate_chunks.errors.log
+#$ -P lindgren.prjc
+#$ -pe shmem 2
+#$ -q short.qc
+#$ -t 3
+#$ -V
 
 set -o errexit
 set -o nounset
@@ -19,10 +29,12 @@ source utils/vcf_utils.sh
 
 readonly rscript="scripts/phasing/phasing/_sort_chunks.R"
 
-readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
-readonly in_dir="data/phased/wes_scaffold_calls/200k_from_500k/trimmed"
-readonly in_prefix="${in_dir}/ukb_wes_scaffold_calls_200k_from_500k_chr${chr}"
-readonly in_trim="${in_prefix}_trim"
+readonly task_id=$( get_array_task_id )
+readonly chr=$( get_chr ${task_id} )
+
+readonly in_dir="data/phased/wes_union_calls/200k/shapeit5/trimmed"
+readonly in_prefix="${in_dir}/ukb_wes_union_calls_shapeit5_200k_chr${chr}"
+readonly in_trim="${in_prefix}_trim_trim"
 
 set_up_rpy
 module load BCFtools/1.12-GCC-10.3.0
@@ -36,8 +48,8 @@ readonly n=$(echo ${files} | tr " " "\n" | wc -l)
 echo $files
 echo "\nNote: Chunks found ${n}"
 
-readonly out_dir="data/phased/wes_scaffold_calls/200k_from_500k/ligated"
-readonly out_prefix="${out_dir}/ukb_wes_scaffold_calls_200k_from_500k_chr${chr}"
+readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/ligated"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
 readonly out="${out_prefix}.vcf.bgz"
 
 mkdir -p ${out_dir}
