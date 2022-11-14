@@ -22,12 +22,15 @@ readonly out_prefix_chr=$(echo ${prefix} | sed -e "s/CHR/${chr}/g")
 
 readonly spark_dir="data/tmp/spark"
 
+echo "nslots: ${NSLOTS}"
+
 set_up_hail 0.2.97
-set_up_pythonpath_legacy
-module load OpenBLAS/0.3.8-GCC-9.2.0 # required for linear regression
-export LD_PRELOAD=/apps/eb/skylake/software/OpenBLAS/0.3.8-GCC-9.2.0/lib/libopenblas.so # required for linear regression
+module load OpenBLAS/0.3.1-GCC-7.3.0-2.30
+export LD_PRELOAD=/apps/eb/skylake/software/OpenBLAS/0.3.1-GCC-7.3.0-2.30/lib/libopenblas.so
+
 if [ ! -f "${out_prefix_chr}.txt.gz" ]; then
   set -x
+  set_up_pythonpath_legacy
   python3 "${hail_script}" \
      --chrom "${chr}" \
      --input_path "${input_path_chr}" \

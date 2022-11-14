@@ -20,7 +20,7 @@ def main(args):
     phenotypes = args.phenotypes
     out_prefix = args.out_prefix
 
-    hail_init.hail_bmrc_init_local('logs/hail/hail_format.log', 'GRCh38')
+    hail_init.hail_bmrc_init_test('logs/hail/hail_format.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
     
     mt = qc.get_table(input_path, input_type)
@@ -51,9 +51,13 @@ def main(args):
                         covariates=covariates
                         )
             elif mt.pheno[response].dtype == hl.dtype('bool'):
-                #print(mtcount())
+                if response not in list(mt.pheno):
+                    raise ValueError("Response: " + str(response) + " is not in pheno file!")
+                defined = mt.aggregate_cols(hl.agg.sum(hl.is_defined(mt.pheno[response])))
                 cases = mt.aggregate_cols(hl.agg.sum(mt.pheno[response] == True))
                 controls = mt.aggregate_cols(hl.agg.sum(mt.pheno[response] == False))
+                if defined < 5:
+                    raise ValueError(str(defined) + " cases/controls defined for phenotype " + str(response)+". Exiting..")
                 if cases < int(min_cases):
                      raise ValueError(str(cases) + " cases found! Expected +" + str(min_cases))
                 if adjust_maf_by_case_control:
