@@ -2,19 +2,19 @@
 #
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=write_ps
+#SBATCH --job-name=export_ps_pp
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/write_ps.log
-#SBATCH --error=logs/write_ps.errors.log
+#SBATCH --output=logs/export_ps_pp.log
+#SBATCH --error=logs/export_ps_pp.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 4
 #SBATCH --array=21
 #SBATCH --dependency="afterok:8725224"
 #
-#$ -N write_ps
+#$ -N export_ps_pp
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/write_ps.log
-#$ -e logs/write_ps.errors.log
+#$ -o logs/export_ps_pp.log
+#$ -e logs/export_ps_pp.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc
@@ -28,7 +28,7 @@ source utils/vcf_utils.sh
 source utils/hail_utils.sh
 source utils/qsub_utils.sh
 
-readonly hail_script="scripts/phasing/phasing/07_write_ps.py"
+readonly hail_script="scripts/phasing/phasing/06_export_ps_pp.py"
 readonly spark_dir="data/tmp/spark"
 
 readonly array_idx=$( get_array_task_id )

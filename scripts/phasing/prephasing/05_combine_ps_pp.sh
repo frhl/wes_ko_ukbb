@@ -2,18 +2,18 @@
 #
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=annotate_ps
+#SBATCH --job-name=combine_ps_pp
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/annotate_ps.log
-#SBATCH --error=logs/annotate_ps.errors.log
+#SBATCH --output=logs/combine_ps_pp.log
+#SBATCH --error=logs/combine_ps_pp.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 3
 #SBATCH --array=21
 #
-#$ -N annotate_ps
+#$ -N combine_ps_pp
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/annotate_ps.log
-#$ -e logs/annotate_ps.errors.log
+#$ -o logs/combine_ps_pp.log
+#$ -e logs/combine_ps_pp.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 3
 #$ -q short.qc
@@ -27,7 +27,7 @@ source utils/vcf_utils.sh
 source utils/hail_utils.sh
 source utils/qsub_utils.sh
 
-readonly hail_script="scripts/phasing/phasing/06_annotate_ps.py"
+readonly hail_script="scripts/phasing/phasing/05_combine_ps_pp.py"
 readonly spark_dir="data/tmp/spark"
 
 readonly array_idx=$( get_array_task_id )
