@@ -7,7 +7,7 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/annotate.log
 #SBATCH --error=logs/annotate.errors.log
-#SBATCH --partition=long
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 5
 #SBATCH --array=21
 #SBATCH --requeue
@@ -27,46 +27,38 @@ readonly spark_dir="data/tmp/spark_dir"
 readonly hail_script="scripts/02_annotate.py"
 
 readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} ) 
-readonly in_dir="data/mt/union"
-readonly input_prefix="${in_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.mt"
+readonly in_dir="data/phased/wes_union_calls/200k/shapeit5/parents"
+readonly input_prefix="${in_dir}/ukb_wes_union_calls_200k_shapeit5_parents_chr${chr}.vcf.gz"
+readonly input_type="vcf"
 
-readonly out_dir="data/mt/annotated/test"
-readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
-readonly out_type="vcf"
-readonly out="${out_prefix}.vcf.bgz"
-readonly out_trio="${out_prefix}.trio"
+readonly out_dir="data/mt/annotated"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}_annotated"
+readonly out_type="mt"
+readonly out="${out_prefix}.mt"
 
 readonly annotation_table="data/vep/hail/ukb_wes_200k_chr${chr}_vep.ht"
-
-readonly pedigree_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
-readonly pedigree="${pedigree_dir}/ukb11867_pedigree.fam"
 
 readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
 readonly final_variant_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list'
 
 mkdir -p ${out_dir}
 
-
-
 if [ ! -f ${out} ]; then
   SECONDS=0
   set_up_hail
   set_up_pythonpath_legacy  
-  set -x
   python3 "${hail_script}" \
      --in_file ${input_prefix}\
-     --in_type "mt" \
+     --in_type ${input_type} \
      --input_annotation_path ${annotation_table}\
      --final_sample_list ${final_sample_list} \
      --final_variant_list ${final_variant_list}\
      --out_prefix ${out_prefix} \
      --out_type "${out_type}" \
      --dbsnp_path "155" \
-     --annotate_rsid \
      --annotate_snp_id \
      && print_update "Finished annotating MatrixTables chr${chr}" ${SECONDS} \
      || raise_error "Annotating MatrixTables for chr${chr} failed"
-  set +x 
 fi
 
 
