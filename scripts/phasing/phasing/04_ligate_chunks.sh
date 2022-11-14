@@ -16,9 +16,9 @@
 #$ -o logs/ligate_chunks.log
 #$ -e logs/ligate_chunks.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 2
+#$ -pe shmem 3
 #$ -q short.qc
-#$ -t 3
+#$ -t 1,16
 #$ -V
 
 set -o errexit

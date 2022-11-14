@@ -9,7 +9,7 @@
 #SBATCH --error=logs/trim_chunks.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 6
-#SBATCH --array=5-22
+#SBATCH --array=21
 #
 #
 #$ -N trim_chunks
@@ -40,7 +40,7 @@ readonly main_dir="data/phased/wes_union_calls/200k/shapeit5/phase_rare/newrun"
 readonly in_dir="${main_dir}/ukb_wes_union_calls_shapeit5_200k_chr${chr}-20xshort"
 readonly in_prefix_regex="shapeit5_prs100000_pro25000_mprs150000" # need this for regex
 
-readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/trimmed/chr1-long"
+readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/trimmed"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_shapeit5_200k_chr${chr}_trim"
 readonly out="${out_prefix}.vcf.bgz"
 

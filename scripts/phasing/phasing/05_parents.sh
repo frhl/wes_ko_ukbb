@@ -10,16 +10,16 @@
 #SBATCH --error=logs/parents.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=21
+#SBATCH --array=20-22
 #
 #$ -N parents
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/parents.log
 #$ -e logs/parents.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 2
+#$ -pe shmem 3
 #$ -q short.qc
-#$ -t 21
+#$ -t 1
 #$ -V
 
 set -o errexit
@@ -41,16 +41,14 @@ readonly pedigree="${pedigree_dir}/ukb11867_pedigree.fam"
 readonly parents_dir="data/unphased/wes_union_calls/prefilter_no_maf_cutoff/200k"
 readonly parents_path="${parents_dir}/ukb_wes_union_calls_chr${chr}_parents.vcf.gz"
 # standard genotypes that were phased
-#readonly phased_dir="data/phased/wes_scaffold_calls/200k_from_500k/pbwt_depth4_sequencing_15000eff/chunks/shapeit4/ukb_wes_union_calls_shapeit5_200k_from_500k_chr${chr}-18xshort"
-#readonly phased_path="${phased_dir}/shapeit4_prs100000_pro25000_mprs150000.1of1.vcf.gz"
-readonly phased_dir="data/phased/wes_union_calls/200k/shapeit5/phase_rare/newrun/ukb_wes_union_calls_shapeit5_200k_chr21_sequencing-20xshort"
-readonly phased_path="${phased_dir}/shapeit5_prs100000_pro25000_mprs150000.1of1.vcf.gz"
+readonly phased_dir="data/phased/wes_union_calls/200k/shapeit5/ligated"
+readonly phased_path="${phased_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.bgz"
 
 #readonly phased_dir="data/phased/wes_scaffold_calls/200k_from_500k/ligated"
 #readonly phased_path="${phased_dir}/ukb_wes_scaffold_calls_200k_from_500k_chr${chr}.vcf.bgz"
 # out paths and types
 readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/parents"
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_shapeit5_parents_chr${chr}_sequencing"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_shapeit5_parents_chr${chr}"
 readonly out_vcf="${out_prefix}.vcf.gz"
 readonly out_trio="${out_prefix}.trio"
 readonly out_type="vcf"

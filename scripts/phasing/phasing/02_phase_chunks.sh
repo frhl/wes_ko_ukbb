@@ -69,7 +69,7 @@ readonly nslots=20
 readonly phased_set_error="0.0001" # 0.0001
 readonly pbwt_min_mac=2 # for shapeit5r
 readonly pbwt_depth=5
-readonly pbwt_modulo=0.0002 # default is 0.1 but 0.0004 ( 0.2 / 50 ) is default value when using --sequencing arugment
+readonly pbwt_modulo=0.1 # default is 0.1 but 0.0004 ( 0.2 / 50 ) is default value when using --sequencing arugment
 readonly pbwt_mdr=0.1
 readonly pop_effective_size=15000
 
@@ -80,13 +80,15 @@ readonly vcf_dir="data/unphased/wes_union_calls/prefilter_no_maf_cutoff/${tranch
 readonly vcf_to_phase="${vcf_dir}/ukb_wes_union_calls_chr${chr}.vcf.gz"
 
 # SHAPEI5 requires a scaffold
-readonly scaffold_dir="data/phased/wes_union_calls/${tranche}/shapeit5/phase_common/newrun"
-readonly vcf_to_scaffold="${scaffold_dir}/ukb_wes_union_calls_${tranche}_chr${chr}_phase_common_sequencing.vcf.gz"
+#readonly scaffold_dir="data/phased/wes_union_calls/${tranche}/shapeit5/phase_common/newrun"
+#readonly vcf_to_scaffold="${scaffold_dir}/ukb_wes_union_calls_${tranche}_chr${chr}_phase_common_sequencing.vcf.gz"
+
+readonly scaffold_dir="data/phased/calls/shapeit5/200k_from_500k"
+readonly vcf_to_scaffold="${scaffold_dir}/ukb_phased_calls_200k_from_500k_chr${chr}.vcf.bgz"
 
 # Output paths
-#readonly out_dir="data/phased/wes_union_calls/with_ps/chunks/${software}"
-#readonly out_dir="data/phased/wes_scaffold_calls/200k_from_500k/test_pbwt5/chunks/${software}"
-readonly out_dir="data/phased/wes_union_calls/${tranche}/shapeit5/phase_rare/newrun"
+readonly out_dir="data/phased/wes_union_calls/200k_from_500k/shapeit5/phase_rare"
+#readonly out_dir="data/phased/wes_union_calls/${tranche}/shapeit5/phase_rare"
 
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_${software}_${tranche}_chr${chr}_sequencing"
 readonly out_prefix_w_job_config="${out_prefix}-${nslots}x${queue}/${software}_prs${phasing_region_size}_pro${phasing_region_overlap}_mprs${max_phasing_region_size}"
