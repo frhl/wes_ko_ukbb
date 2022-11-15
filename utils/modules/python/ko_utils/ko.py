@@ -28,7 +28,7 @@ def csqs_case_builder(worst_csq_expr: hl.StringExpression, use_loftee: bool = Tr
     case = hl.case(missing_false=True)
     if use_loftee:
         assert loftee_lc_annotation in ("LC", "damaging_missense")
-        print(f"Note: LOFTEE Low Confidence PTVs annotated as {loftee_lc_annotation}")
+        print(f"Note: LOFTEE Low Confidence PTVs will be annotated as {loftee_lc_annotation}.")
         case = (case
                 .when(worst_csq_expr.lof == 'HC', 'pLoF')
                 .when(worst_csq_expr.lof == 'LC', loftee_lc_annotation)
