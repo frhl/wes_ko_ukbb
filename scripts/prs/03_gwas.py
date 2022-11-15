@@ -53,10 +53,11 @@ def main(args):
             elif mt.pheno[response].dtype == hl.dtype('bool'):
                 if response not in list(mt.pheno):
                     raise ValueError("Response: " + str(response) + " is not in pheno file!")
-                defined = mt.aggregate_cols(hl.agg.sum(hl.is_defined(mt.pheno[response])))
+                n_total = mt.aggregate_cols(hl.agg.sum(hl.is_defined(mt.pheno[response])))
                 cases = mt.aggregate_cols(hl.agg.sum(mt.pheno[response] == True))
-                controls = mt.aggregate_cols(hl.agg.sum(mt.pheno[response] == False))
-                if defined < 5:
+                controls = n_total - cases
+                #controls = mt.aggregate_cols(hl.agg.sum(mt.pheno[response] == False))
+                if n_total < 1:
                     raise ValueError(str(defined) + " cases/controls defined for phenotype " + str(response)+". Exiting..")
                 if cases < int(min_cases):
                      raise ValueError(str(cases) + " cases found! Expected +" + str(min_cases))
@@ -77,8 +78,8 @@ def main(args):
                         covariates=covariates
                         )
                 # get effective sample size
-                n_total = mt.aggregate_cols(hl.agg.sum(hl.is_defined(mt.pheno[response])))
-                n_cases = mt.aggregate_cols(hl.agg.sum(mt.pheno[response] == True))
+                #n_total = mt.aggregate_cols(hl.agg.sum(hl.is_defined(mt.pheno[response])))
+                #n_cases = mt.aggregate_cols(hl.agg.sum(mt.pheno[response] == True))
                 reg = reg.annotate(n=n_total, n_cases=n_cases, maf_cutoff = min_maf)
             else:
                 raise TypeError("Response variable is not a float64 or boolean!")
@@ -88,7 +89,6 @@ def main(args):
         raise TypeError("Some or all covariates are not in phenotype file!")
 
     # get AFs
-    #mt = qc.recalc_info(mt) # already being done in qc.get_table
     reg = reg.annotate(
         AN=mt.rows()[reg.key].info.AN,
         AC=mt.rows()[reg.key].info.AC,
