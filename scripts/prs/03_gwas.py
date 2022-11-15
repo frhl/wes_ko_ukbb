@@ -3,7 +3,7 @@
 import hail as hl
 import argparse
 
-from ko_utils import qc
+from ko_utils import io
 from ukb_utils import hail_init
 from ukb_utils import variants
 
@@ -20,10 +20,8 @@ def main(args):
     phenotypes = args.phenotypes
     out_prefix = args.out_prefix
 
-    hail_init.hail_bmrc_init_test('logs/hail/hail_format.log', 'GRCh38')
-    hl._set_flags(no_whole_stage_codegen='1') # from zulip
-    
-    mt = qc.get_table(input_path, input_type)
+    hail_init.hail_bmrc_init_local('logs/hail/hail_format.log', 'GRCh38')
+    mt = io.import_table(input_path, input_type)
    
     if phenotypes:
         ht = hl.import_table(phenotypes,
@@ -54,22 +52,22 @@ def main(args):
                 if response not in list(mt.pheno):
                     raise ValueError("Response: " + str(response) + " is not in pheno file!")
                 n_total = mt.aggregate_cols(hl.agg.sum(hl.is_defined(mt.pheno[response])))
-                cases = mt.aggregate_cols(hl.agg.sum(mt.pheno[response] == True))
-                controls = n_total - cases
+                n_cases = mt.aggregate_cols(hl.agg.sum(mt.pheno[response] == True))
+                n_controls = n_total - n_cases
                 #controls = mt.aggregate_cols(hl.agg.sum(mt.pheno[response] == False))
                 if n_total < 1:
                     raise ValueError(str(defined) + " cases/controls defined for phenotype " + str(response)+". Exiting..")
-                if cases < int(min_cases):
-                     raise ValueError(str(cases) + " cases found! Expected +" + str(min_cases))
+                if n_cases < int(min_cases):
+                     raise ValueError(str(n_cases) + " cases found! Expected +" + str(min_cases))
                 if adjust_maf_by_case_control:
-                     min_maf = hl.max(0.01, 25/(2 * hl.min([cases, controls]))).collect()[0]
+                     min_maf = hl.max(0.01, 25/(2 * hl.min([n_cases, n_controls]))).collect()[0]
                      mt = mt.filter_rows(variants.get_maf_expr(mt) > min_maf)
                      # need to re-initalise covariates, otherwise
                      # hail will throw an error about using multiple mts
                      covariates = [mt.pheno[x] for x in split_covariates]
                      covariates.insert(0, 1) 
                      with open("data/prs/sumstat/binary/maf_thresholds.txt","a") as outfile:
-                         outfile.write(f"{input_path}\t{response}\t{cases}\t{controls}\t{min_maf}\n")
+                         outfile.write(f"{input_path}\t{response}\t{n_cases}\t{n_controls}\t{min_maf}\n")
                 
                 reg = hl.logistic_regression_rows(
                         test='wald',

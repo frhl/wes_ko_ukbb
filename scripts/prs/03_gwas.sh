@@ -5,9 +5,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/gwas.log
 #SBATCH --error=logs/gwas.errors.log
-#SBATCH --partition=short
+#SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
-#SBATCH --array=141-144
+#SBATCH --array=145
 #
 #$ -N gwas
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -18,7 +18,6 @@
 #$ -q test.qc
 #$ -t 111-140
 #$ -V
-
 
 set -o errexit
 set -o nounset
@@ -46,9 +45,9 @@ readonly input_path="${in_dir}/ukb_hapmap_500k_eur_chrCHR"
 readonly cluster=$( get_current_cluster )
 readonly index=$( get_array_task_id )
 
-readonly file_cts="${pheno_dir}/curated_covar_phenotypes_cts.tsv.gz" 
-readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
-readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
+#readonly file_cts="${pheno_dir}/curated_covar_phenotypes_cts.tsv.gz" 
+#readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
+#readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
 
 readonly file_binary="${pheno_dir}/spiros_brava_phenotypes_binary_500k.tsv.gz"
 readonly pheno_list_binary="${pheno_dir}/spiros_brava_phenotypes_binary_500k_header.tsv"
@@ -68,12 +67,12 @@ submit_gwas_job()
   if [ ! -f "${out_prefix}.txt.gz" ]; then
     if [ ! -z ${phenotype} ]; then
       if [ ! -z ${covariates} ]; then
-        local slurm_jname="_${phenotype}_gwas"
-        local slurm_lname="logs/_gwas"
+        local slurm_jname="_${phenotype}_gwas_epyc"
+        local slurm_lname="logs/_gwas_epyc"
         local slurm_project="lindgren.prj"
         local slurm_tasks="${tasks}"
-        local slurm_queue="short"
-        local slurm_shmem="3"
+        local slurm_queue="epyc"
+        local slurm_shmem="2"
         if [ ${cluster} == "slurm" ]; then
           readonly gwas_jid=$( sbatch \
             --account="${slurm_project}" \
@@ -128,7 +127,7 @@ submit_gwas_job()
   fi
 }
 
-submit_merge_job_slurm()
+submit_merge_job()
 {
   local slurm_jname="_mrg_${phenotype}"
   local slurm_lname="_gwas_merge"
@@ -170,8 +169,8 @@ submit_merge_job_slurm()
 }
 
 
-readonly tasks="1-22"
-submit_gwas_job "data/prs/sumstat/binary/test" "${phenotype_binary}" "${file_binary}"
+readonly tasks="22"
+submit_gwas_job "data/prs/sumstat/binary/test_new_queue" "${phenotype_binary}" "${file_binary}"
 #submit_gwas_job "data/prs/sumstat/test/cts" "${phenotype_cts}_int" "${file_cts}"
 #submit_gwas_job "data/prs/sumstat/test/cts" "${phenotype_cts}" "${file_cts}"
 

@@ -22,15 +22,11 @@ readonly out_prefix_chr=$(echo ${prefix} | sed -e "s/CHR/${chr}/g")
 
 readonly spark_dir="data/tmp/spark"
 
-echo "nslots: ${NSLOTS}"
-
-set_up_hail 0.2.97
-module load OpenBLAS/0.3.1-GCC-7.3.0-2.30
-export LD_PRELOAD=/apps/eb/skylake/software/OpenBLAS/0.3.1-GCC-7.3.0-2.30/lib/libopenblas.so
+set_up_hail_debug
+set_up_pythonpath_legacy
+export LD_PRELOAD="/well/lindgren/users/mmq446/conda/skylake/envs/hail-v0.2.105/lib/libopenblas.so"
 
 if [ ! -f "${out_prefix_chr}.txt.gz" ]; then
-  set -x
-  set_up_pythonpath_legacy
   python3 "${hail_script}" \
      --chrom "${chr}" \
      --input_path "${input_path_chr}" \
@@ -41,7 +37,6 @@ if [ ! -f "${out_prefix_chr}.txt.gz" ]; then
      --covariates "${covariates}" \
      --out_prefix "${out_prefix_chr}" \
      --adjust_maf_by_case_control 
-  set +x
 else
   echo "Note: ${out_prefix_chr} already exists!"
 fi
