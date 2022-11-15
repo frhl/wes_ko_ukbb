@@ -5,9 +5,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/gwas.log
 #SBATCH --error=logs/gwas.errors.log
-#SBATCH --partition=epyc
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=145
+#SBATCH --array=146
 #
 #$ -N gwas
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -16,7 +16,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 111-140
+#$ -t 146
 #$ -V
 
 set -o errexit
@@ -71,7 +71,7 @@ submit_gwas_job()
         local slurm_lname="logs/_gwas_epyc"
         local slurm_project="lindgren.prj"
         local slurm_tasks="${tasks}"
-        local slurm_queue="epyc"
+        local slurm_queue="short"
         local slurm_shmem="2"
         if [ ${cluster} == "slurm" ]; then
           readonly gwas_jid=$( sbatch \
@@ -169,7 +169,7 @@ submit_merge_job()
 }
 
 
-readonly tasks="22"
+readonly tasks="1-22"
 submit_gwas_job "data/prs/sumstat/binary/test_new_queue" "${phenotype_binary}" "${file_binary}"
 #submit_gwas_job "data/prs/sumstat/test/cts" "${phenotype_cts}_int" "${file_cts}"
 #submit_gwas_job "data/prs/sumstat/test/cts" "${phenotype_cts}" "${file_cts}"
