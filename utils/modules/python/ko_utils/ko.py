@@ -18,17 +18,20 @@ OTHER_CSQS = ["mature_miRNA_variant", "5_prime_UTR_variant",
               "regulatory_region_variant", "feature_truncation", "intergenic_variant"]
 
 
-def csqs_case_builder(worst_csq_expr: hl.StringExpression, use_loftee: bool = True):
+def csqs_case_builder(worst_csq_expr: hl.StringExpression, use_loftee: bool = True, loftee_lc_annotation="damaging_missense"):
     r'''Annotate consequence categories for downstream analysis
     
     :param worst_csq_by_gene_canonical_expr: A struct that should contain "most_severe_consequence"
     :param use_loftee: if True will annotate PTVs as either high confidence (ptv) or low confidence (ptv_LC)
+    :param loftee_lc_annotation: low confidence
     '''
     case = hl.case(missing_false=True)
     if use_loftee:
+        assert loftee_lc_annotation in ("LC", "damaging_missense")
+        print(f"Note: LOFTEE Low Confidence PTVs annotated as {loftee_lc_annotation}")
         case = (case
                 .when(worst_csq_expr.lof == 'HC', 'pLoF')
-                .when(worst_csq_expr.lof == 'LC', 'LC')
+                .when(worst_csq_expr.lof == 'LC', loftee_lc_annotation)
                 )
     else:
         case = case.when(
@@ -71,6 +74,10 @@ def unphase(gt: hl.call):
     .when(gt == hl.parse_call("0|1"), hl.parse_call("0/1"))
     .when(gt == hl.parse_call("1|1"), hl.parse_call("1/1"))
     .when(gt == hl.parse_call("0|0"), hl.parse_call("0/0"))
+    .when(gt == hl.parse_call("1/0"), hl.parse_call("0/1"))
+    .when(gt == hl.parse_call("0/1"), hl.parse_call("0/1"))
+    .when(gt == hl.parse_call("1/1"), hl.parse_call("1/1"))
+    .when(gt == hl.parse_call("0/0"), hl.parse_call("0/0"))
     .or_missing()))
 
 
