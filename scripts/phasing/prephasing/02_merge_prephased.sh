@@ -16,7 +16,7 @@
 #$ -o logs/merge_prephased.log
 #$ -e logs/merge_prephased.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 5
+#$ -pe shmem 8
 #$ -q short.qc
 #$ -t 21
 #$ -V

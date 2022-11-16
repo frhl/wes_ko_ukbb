@@ -24,7 +24,7 @@ def main(args):
     hail_init.hail_bmrc_init_local('logs/hail/annotate_mt.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1')
 
-    mt = io.import_table(in_file, in_type)
+    mt = io.import_table(in_file, in_type, find_replace=(':-?nan', ':NaN'))
     mt = samples.remove_withdrawn(mt)
 
     if final_sample_list:

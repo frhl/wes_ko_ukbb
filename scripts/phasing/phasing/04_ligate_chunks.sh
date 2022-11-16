@@ -18,7 +18,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 3
 #$ -q short.qc
-#$ -t 1,16
+#$ -t 21
 #$ -V
 
 set -o errexit
@@ -32,6 +32,7 @@ readonly rscript="scripts/phasing/phasing/_sort_chunks.R"
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
+readonly PWD=$(pwd)
 readonly in_dir="data/phased/wes_union_calls/200k/shapeit5/trimmed"
 readonly in_prefix="${in_dir}/ukb_wes_union_calls_shapeit5_200k_chr${chr}"
 readonly in_trim="${in_prefix}_trim_trim"

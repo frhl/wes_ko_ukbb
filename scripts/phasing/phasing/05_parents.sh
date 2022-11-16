@@ -8,18 +8,18 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/parents.log
 #SBATCH --error=logs/parents.errors.log
-#SBATCH --partition=short
+#SBATCH --partition=long
 #SBATCH --cpus-per-task 2
-#SBATCH --array=20-22
+#SBATCH --array=1,2
 #
 #$ -N parents
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/parents.log
 #$ -e logs/parents.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 3
-#$ -q short.qc
-#$ -t 1
+#$ -pe shmem 4
+#$ -q long.qc
+#$ -t 11
 #$ -V
 
 set -o errexit
@@ -47,7 +47,7 @@ readonly phased_path="${phased_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.bgz"
 #readonly phased_dir="data/phased/wes_scaffold_calls/200k_from_500k/ligated"
 #readonly phased_path="${phased_dir}/ukb_wes_scaffold_calls_200k_from_500k_chr${chr}.vcf.bgz"
 # out paths and types
-readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/parents"
+readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/parents/long-queue"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_shapeit5_parents_chr${chr}"
 readonly out_vcf="${out_prefix}.vcf.gz"
 readonly out_trio="${out_prefix}.trio"

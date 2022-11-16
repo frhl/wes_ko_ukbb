@@ -17,9 +17,9 @@
 #$ -o logs/trim_chunks.log
 #$ -e logs/trim_chunks.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 6
-#$ -q long.qc
-#$ -t 1
+#$ -pe shmem 3
+#$ -q short.qc
+#$ -t 21
 #$ -V
 
 set -o errexit

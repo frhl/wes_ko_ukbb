@@ -1,6 +1,7 @@
 # Whole Exome Sequencing haplotype estimation
 
-OLD FILE - NEEDS TO BE UPDATED
+NOTE: THIS README IS OLD AND REPRESENT AN OLDER VERSION OF SHAPEIT USED
+
 
 ## Overview
 | Script                            | Description                                   | Requires output from |

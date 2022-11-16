@@ -29,10 +29,8 @@ main <- function(args){
           return(paste0(c(row1, row2), collapse = '\n'))
       }
     }) 
-
     out <- null_omit(out)
     writeLines(paste(out, collapse = '\n'), args$output_path)
-
 }
 
 # add arguments

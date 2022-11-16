@@ -7,7 +7,7 @@
 #SBATCH --output=logs/export_pp.log
 #SBATCH --error=logs/export_pp.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 4
+#SBATCH --cpus-per-task 1
 #SBATCH --array=21
 #
 #$ -N export_pp
@@ -17,7 +17,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc
-#$ -t 20,22
+#$ -t 1-22
 #$ -V
 
 set -o errexit
@@ -33,12 +33,12 @@ readonly spark_dir="data/tmp/spark"
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
-readonly in_dir="data/phased/wes_union_calls/200k/shapeit5/parents"
+readonly in_dir="data/phased/wes_union_calls/200k/shapeit5/ligated"
 readonly in_path="${in_dir}/ukb_wes_union_calls_200k_shapeit5_parents_chr${chr}.vcf.gz"
 readonly in_type="vcf"
 
-readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/parents"
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_shapeit5_parents_chr${chr}_test"
+readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/stats"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_shapeit5_chr${chr}"
 
 mkdir -p ${out_dir}
 

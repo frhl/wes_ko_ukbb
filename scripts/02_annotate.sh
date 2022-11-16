@@ -7,10 +7,23 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/annotate.log
 #SBATCH --error=logs/annotate.errors.log
-#SBATCH --partition=short
-#SBATCH --cpus-per-task 5
-#SBATCH --array=21
+#SBATCH --partition=epyc
+#SBATCH --cpus-per-task 2
+#SBATCH --array=1-22
 #SBATCH --requeue
+#
+#
+#$ -N annotate
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#$ -o logs/annotate.log
+#$ -e logs/annotate.errors.log
+#$ -P lindgren.prjc
+#$ -pe shmem 2
+#$ -q short.qc
+#$ -t 1-22
+#$ -V
+
+# -q long.qc@@long.hga
 
 # Note: long.qc@@long.hga with 4 slots required to run full pipeline
 # -q long.qc@@long.hga
@@ -26,13 +39,15 @@ source utils/hail_utils.sh
 readonly spark_dir="data/tmp/spark_dir"
 readonly hail_script="scripts/02_annotate.py"
 
-readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} ) 
-readonly in_dir="data/phased/wes_union_calls/200k/shapeit5/parents"
-readonly input_prefix="${in_dir}/ukb_wes_union_calls_200k_shapeit5_parents_chr${chr}.vcf.gz"
+readonly task_id=$( get_array_task_id )
+readonly chr=$( get_chr ${task_id} )
+
+readonly in_dir="data/phased/wes_union_calls/200k/shapeit5/ligated"
+readonly input_prefix="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.bgz"
 readonly input_type="vcf"
 
-readonly out_dir="data/mt/annotated"
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}_annotated"
+readonly out_dir="data/mt/annotated/replace_nan"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
 readonly out_type="mt"
 readonly out="${out_prefix}.mt"
 
@@ -65,13 +80,13 @@ fi
 
 
 
-if [ -f "${out}" ]; then
-  module purge
-  module load BCFtools/1.12-GCC-10.3.0
-  make_tabix "${out_prefix}.vcf.bgz" "csi"
-fi
+#if [ -f "${out}" ]; then
+#  module purge
+#  module load BCFtools/1.12-GCC-10.3.0
+#  make_tabix "${out_prefix}.vcf.bgz" "csi"
+#fi
 
-make_tabix "${out_prefix}.vcf.bgz" "tbi"
+#make_tabix "${out_prefix}.vcf.bgz" "tbi"
 
 
 
