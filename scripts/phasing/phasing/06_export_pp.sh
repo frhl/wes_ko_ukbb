@@ -23,6 +23,8 @@
 set -o errexit
 set -o nounset
 
+# Note: PP-field is only defiend for MAF < 0.01%
+
 source utils/vcf_utils.sh
 source utils/hail_utils.sh
 source utils/qsub_utils.sh
@@ -34,11 +36,11 @@ readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
 readonly in_dir="data/phased/wes_union_calls/200k/shapeit5/ligated"
-readonly in_path="${in_dir}/ukb_wes_union_calls_200k_shapeit5_chr${chr}.vcf.bgz"
+readonly in_path="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.bgz"
 readonly in_type="vcf"
 
 readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/phasing_conf"
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_shapeit5_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
 
 mkdir -p ${out_dir}
 
