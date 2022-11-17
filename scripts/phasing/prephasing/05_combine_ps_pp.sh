@@ -15,9 +15,9 @@
 #$ -o logs/combine_ps_pp.log
 #$ -e logs/combine_ps_pp.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 3
+#$ -pe shmem 2
 #$ -q short.qc
-#$ -t 20,22
+#$ -t 20-22
 #$ -V
 
 set -o errexit
@@ -27,21 +27,21 @@ source utils/vcf_utils.sh
 source utils/hail_utils.sh
 source utils/qsub_utils.sh
 
-readonly hail_script="scripts/phasing/phasing/05_combine_ps_pp.py"
+readonly hail_script="scripts/phasing/prephasing/05_combine_ps_pp.py"
 readonly spark_dir="data/tmp/spark"
 
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
-readonly ref_dir="data/prephased/wes_union_calls"
+readonly ref_dir="data/prephased/wes_union_calls/no_reference"
 readonly ref_path="${ref_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.gz"
 readonly ref_type="vcf"
 
-readonly phased_dir="data/phased/wes_union_calls/200k/shapeit5/phase_rare/ukb_wes_union_calls_shapeit5_200k_chr${chr}-20xshort"
-readonly phased_path="${phased_dir}/shapeit5_prs100000_pro25000_mprs150000.1of1.vcf.gz"
+readonly phased_dir="data/phased/wes_union_calls/200k/shapeit5/ligated"
+readonly phased_path="${phased_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.bgz"
 readonly phased_type="vcf"
 
-readonly out_dir="data/phased/wes_union_calls/200k/calibration"
+readonly out_dir="data/prephased/wes_union_calls/phase_conf"
 readonly out_prefix="${out_dir}/ukb_shapeit5_whatshap_chr${chr}"
 readonly out_type="mt"
 readonly out="${out_prefix}.mt"
