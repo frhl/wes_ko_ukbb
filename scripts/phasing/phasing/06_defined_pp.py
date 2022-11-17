@@ -15,18 +15,20 @@ def main(args):
 
     # set up
     hail_init.hail_bmrc_init_local('logs/hail/write_ps.log', 'GRCh38')
-    hl._set_flags(no_whole_stage_codegen='1') # from zulipi
-    # note, we don't recalculate INFO after including parents
-    mt = io.import_table(phased_path, phased_type, calc_info = False)
-    # note that PPs are only af MAF < 0.1%
-    mt = mt.select_entries(*[mt.PP, mt.GT])
-    mt = mt.filter_entries(hl.is_defined(mt.PP))
+    hl._set_flags(no_whole_stage_codegen='1') # from zulip
+    mt = io.import_table(phased_path, phased_type, calc_info = True)
+    mt = mt.annotate_rows(
+            pp_defined = mt.aggregate_entries(hl.agg.sum((hl.is_defined(mt.PP)) & (mt.GT.is_het()))),
+            gt_defined = mt.aggregate_entries(hl.agg.sum((hl.is_defined(mt.GT)) & (mt.GT.is_het()))),
+            gt_not_pp_defined = mt.aggregate_entries(hl.agg.sum((hl.is_defined(mt.GT)) & (~hl.is_defined(mt.PP)) & (mt.GT.is_het())))
+            )
+   
+    # select rows and 
     mt = mt.transmute_rows(rsid = variants.get_variant_expr(mt.locus, mt.alleles))
     mt = mt.annotate_rows(AC = mt.info.AC)
     mt = mt.annotate_rows(AF = mt.info.AF)
-    mt = mt.select_rows(*[mt.rsid, mt.AC, mt.AF])
-    ht = mt.entries()
-    ht.export(out_prefix + ".phasingConf.txt.gz")
+    ht = mt.rows()
+    ht.export(out_prefix + ".defined.txt.gz")
     
 
 if __name__=='__main__':

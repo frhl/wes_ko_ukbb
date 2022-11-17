@@ -13,20 +13,20 @@
 source utils/bash_utils.sh
 
 readonly rscript="scripts/phasing/11_calc_ser.R"
-readonly ligated_dir="data/phased/wes_scaffold_calls/switch/200k_from_500k/merge_parents"
+readonly ligated_dir="data/phased/wes_union_calls/200k/shapeit5/parents"
 readonly out_dir="data/phased/validation"
 
-readonly out_prefix="${out_dir}/switch_error_rates"
+readonly out_prefix="${out_dir}/221116_switch_error_rates"
 
 readonly wes_variants="/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list"
 
 mkdir -p ${out_dir}
 
-#set_up_rpy
-#Rscript ${rscript} \
-#    --ligated_dir "${ligated_dir}" \
-#    --sites "${wes_variants}" \
-#    --out_prefix "${out_prefix}" 
+set_up_rpy
+Rscript ${rscript} \
+  --ligated_dir "${ligated_dir}" \
+  --sites "${wes_variants}" \
+  --out_prefix "${out_prefix}" 
 
 
 
