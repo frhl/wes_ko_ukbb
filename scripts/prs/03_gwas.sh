@@ -5,9 +5,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/gwas.log
 #SBATCH --error=logs/gwas.errors.log
-#SBATCH --partition=epyc
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=80-99
+#SBATCH --array=180-220
 #
 #$ -N gwas
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -71,7 +71,7 @@ submit_gwas_job()
         local slurm_lname="logs/_gwas_epyc"
         local slurm_project="lindgren.prj"
         local slurm_tasks="${tasks}"
-        local slurm_queue="epyc"
+        local slurm_queue="short"
         local slurm_shmem="2"
         if [ ${cluster} == "slurm" ]; then
           readonly gwas_jid=$( sbatch \
