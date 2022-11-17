@@ -24,8 +24,8 @@ readonly spark_dir="data/tmp/spark"
 readonly bash_script="scripts/_encode_knockouts.sh"
 
 readonly in_dir="data/mt/annotated"
-readonly out_dir="data/knockouts/alt/only_homs"
-readonly in_prefix="${in_dir}/ukb_eur_wes_union_calls_200k_chrCHR.mt"
+readonly out_dir="data/knockouts/alt/test"
+readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chrCHR.mt"
 readonly in_type="mt"
 
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k"
@@ -102,7 +102,7 @@ submit_knockout_job()
 
 #submit_knockout_job "synonymous" "5" "fast"
 #submit_knockout_job "other_missense" "5" "fast"
-#submit_knockout_job "pLoF" "5" "fast"
+submit_knockout_job "pLoF" "2" "fast"
 #submit_knockout_job "pLoF,LC" "5" "fast"
 #submit_knockout_job "pLoF,LC,damaging_missense" "5" "fast"
 #submit_knockout_job "damaging_missense" "5" "fast"

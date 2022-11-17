@@ -47,23 +47,7 @@ def main(args):
     # import phased/unphased data
     hail_init.hail_bmrc_init('logs/hail/knockout.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1')
-    mt = io.import_table(input_path, input_type)
-
-    # filtering
-    if sex not in 'both':
-        mt = samples.filter_to_sex(mt, sex)
-    if maf_max and maf_min:
-        mt = variants.filter_maf(mt, max_maf=float(maf_max), min_maf=float(maf_min))
-    if exclude:
-        ht = hl.import_table(exclude, impute=True).key_by('varid')
-        mt = mt.filter_rows(~hl.literal(set(ht.varid.collect())).contains(mt.varid))
-
-    # Build variant annotation
-    mt = mt.explode_rows(mt.consequence.vep.worst_csq_by_gene_canonical)
-    mt = mt.annotate_rows(
-        consequence_category=ko.csqs_case_builder(
-                worst_csq_expr=mt.consequence.vep.worst_csq_by_gene_canonical,
-                use_loftee=use_loftee))
+    mt = io.import_table(input_path, input_type, calc_info = False)
 
     # subset to current csqs category
     mt = mt.filter_rows(hl.literal(set(csqs_category)).contains(mt.consequence_category))
