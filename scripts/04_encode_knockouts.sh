@@ -23,9 +23,9 @@ readonly curwd=$(pwd)
 readonly spark_dir="data/tmp/spark"
 readonly bash_script="scripts/_encode_knockouts.sh"
 
-readonly in_dir="data/mt/annotated"
+readonly in_dir="data/mt/annotated/prefilter"
 readonly out_dir="data/knockouts/alt/test"
-readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chrCHR.mt"
+readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp95.maf0_005.mt"
 readonly in_type="mt"
 
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k"
@@ -41,17 +41,7 @@ readonly project="lindgren.prj"
 readonly only_vcf=""
 
 # should singletons be removed? Set to empty for FALSE
-#readonly discard_prob_dosages="Y"
 readonly discard_prob_dosages=""
-#readonly aggr_method="collect" # either fasts or collect
-
-# variant and sample parameters
-readonly exclude="data/genes/220310_common_plofs_to_exclude.txt"
-readonly af_min=""
-readonly af_max=""
-readonly maf_lb="0"
-readonly maf_ub="5e-2"
-readonly sex="both"
 
 mkdir -p ${out_dir}
 
@@ -61,8 +51,9 @@ submit_knockout_job()
   local annotation=${1}
   local nslots=${2}
   local aggr_method=${3}
-  local out_prefix_csqs="${out_prefix}_chrCHR_maf${maf_lb}to${maf_ub}_${annotation/,/_}"
+  local out_prefix_csqs="${out_prefix}_${annotation/,/_}"
   local out_checkpoint="${out_prefix_csqs}_checkpoint.mt"
+  
   # slurm specific paramters 
   local slurm_tasks="${tasks}"
   local slurm_jname="_ko_${annotation}"
@@ -83,12 +74,6 @@ submit_knockout_job()
     "${bash_script}" \
     "${in_prefix}" \
     "${in_type}" \
-    "${af_min}" \
-    "${af_max}" \
-    "${maf_lb}" \
-    "${maf_ub}" \
-    "${exclude}" \
-    "${sex}" \
     "${annotation}" \
     "${only_vcf}" \
     "${aggr_method}" \
@@ -115,10 +100,5 @@ submit_knockout_job "pLoF" "2" "fast"
 #submit_knockout_job "pLoF,LC" "6" "fast"
 #submit_knockout_job "synonymous" "6" "fast"
 
-#submit_knockout_job "0" "5e-2" "" "damaging_missense"
-#submit_knockout_job "0" "5e-2" "" "synonymous"
-#submit_knockout_job "0" "5e-2" "" "pLoF,LC,damaging_missense"
 
-#submit_knockout_job 0 0.05 "" "pLoF"
-#submit_knockout_job 0 0.05 "" "synonymous"
-#§submit_knockout_job 0 0.05 "" "ptv,LC"
+

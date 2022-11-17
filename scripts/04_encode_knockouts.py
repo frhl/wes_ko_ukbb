@@ -35,11 +35,6 @@ def main(args):
     checkpoint = args.checkpoint
     aggr_method = args.aggr_method
 
-    sex = args.sex
-    maf_max = args.maf_max
-    maf_min = args.maf_min
-    exclude = args.exclude
-    use_loftee = args.use_loftee
     export_all_gts = args.export_all_gts
     csqs_category = args.csqs_category
     discard_prob_dosages = args.discard_prob_dosages
@@ -148,11 +143,6 @@ if __name__=='__main__':
     parser.add_argument('--checkpoint', default=False, action='store_true', help='Checkpoint gene-aggregation matrix to avoid Spark Memory overflow errors') 
     parser.add_argument('--aggr_method', default="collect", help='How should the CH matrix be generated?')
     # filtering options
-    parser.add_argument('--sex', default='both', help='Filter to sex (males or females)')
-    parser.add_argument('--maf_min', default=None, help='Select all variants with a maf greater than the indicated values')
-    parser.add_argument('--maf_max', default=None, help='Select all variants with a maf less than the indicated value')
-    parser.add_argument('--exclude', default=None, help='exclude variants by rsid and/or variant id')
-    parser.add_argument('--use_loftee', default=False, action='store_true', help='use LOFTEE to distinghiush between high confidence PTVs')
     parser.add_argument('--export_all_gts', default=False, action='store_true', help='Exports a table of all csqs')
     parser.add_argument('--discard_prob_dosages', default=False, action='store_true', help='Discard any dosages < 2 by setting them to zero.')
     parser.add_argument('--csqs_category', default=None, action=SplitArgs, help='What categories should be subsetted to?')
