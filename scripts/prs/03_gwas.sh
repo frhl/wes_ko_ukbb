@@ -7,7 +7,7 @@
 #SBATCH --error=logs/gwas.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=180-220
+#SBATCH --array=150-179
 #
 #$ -N gwas
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -16,7 +16,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 80-100
+#$ -t 220-230
 #$ -V
 
 set -o errexit

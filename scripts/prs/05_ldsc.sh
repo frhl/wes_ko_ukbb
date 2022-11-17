@@ -8,7 +8,7 @@
 #SBATCH --error=logs/ldsc.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=150
+#SBATCH --array=1-200
 #SBATCH --requeue
 #
 #
@@ -19,7 +19,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 100-200
+#$ -t 1-220
 #$ -V
 
 set -o errexit

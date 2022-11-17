@@ -9,7 +9,6 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 4
 #SBATCH --array=21
-#SBATCH --dependency="afterok:8725224"
 #
 #$ -N export_ps_pp
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -34,11 +33,11 @@ readonly spark_dir="data/tmp/spark"
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
-readonly in_dir="data/phased/wes_union_calls/200k/calibration"
+readonly in_dir="data/prephased/wes_union_calls/phase_conf"
 readonly in_path="${in_dir}/ukb_shapeit5_whatshap_chr${chr}.mt"
 readonly in_type="mt"
 
-readonly out_dir="data/phased/wes_union_calls/200k/calibration"
+readonly out_dir="data/prephased/wes_union_calls/phase_conf"
 readonly out_prefix="${out_dir}/ukb_shapeit5_whatshap_variants_chr${chr}"
 
 mkdir -p ${out_dir}

@@ -9,7 +9,7 @@
 #SBATCH --error=logs/spa_null.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=300-460
+#SBATCH --array=1-300
 
 
 # all binary: 1 - 71
@@ -156,7 +156,7 @@ readonly queue="short"
 readonly project="lindgren.prj"
 
 # Fit null model for binary/cts traits
-fit_cts_traits
+#fit_cts_traits
 fit_binary_traits
 
 
