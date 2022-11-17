@@ -6,8 +6,8 @@
 #$ -e logs/export_csqs_by_variant.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q short.qc@@short.hga
-#$ -t 1-21
+#$ -q short.qc
+#$ -t 1-19
 
 set -o errexit
 set -o nounset
@@ -17,12 +17,15 @@ source utils/qsub_utils.sh
 source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark_dir"
-readonly hail_script="scripts/04_export_csqs.py"
-readonly rscript="scripts/04_export_csqs.R"
+readonly hail_script="scripts/03_export_csqs.py"
+readonly rscript="scripts/03_export_csqs.R"
 
-readonly chr=$( get_chr ${SGE_TASK_ID} ) 
+readonly cluster=$( get_current_cluster )
+readonly array_idx=$( get_array_task_id )
+readonly chr=$( get_chr ${array_idx} )
+
 readonly in_dir="data/mt/annotated"
-readonly input_prefix="${in_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.mt"
+readonly input_prefix="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.mt"
 
 readonly out_dir="data/mt/vep/worst_csq_for_variant_canonical"
 readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"

@@ -21,8 +21,6 @@ def main(args):
     mt = mt.filter_entries(hl.is_defined(mt.PS_rb))
     mt = mt.select_entries(*[mt.PP, mt.GT, mt.PS_rb, mt.GT_rb])
     
-    print(mt.describe())
-
     mt = mt.transmute_rows(rsid = variants.get_variant_expr(mt.locus, mt.alleles))
     mt = mt.annotate_rows(AC = mt.info.AC)
     mt = mt.annotate_rows(AF = mt.info.AF)
