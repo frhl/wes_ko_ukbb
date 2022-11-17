@@ -39,7 +39,7 @@ readonly in_dir="data/phased/wes_union_calls/200k/shapeit5/ligated"
 readonly in_path="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.bgz"
 readonly in_type="vcf"
 
-readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/phasing_conf"
+readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/phase_conf"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
 
 mkdir -p ${out_dir}

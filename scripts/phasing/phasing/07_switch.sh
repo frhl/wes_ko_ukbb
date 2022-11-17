@@ -3,20 +3,30 @@
 # @description evaluate phasing quality stratified by MAF
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=calc_ser
+#SBATCH --job-name=switch
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/calc_ser.log
-#SBATCH --error=logs/calc_ser.errors.log
+#SBATCH --output=logs/switch.log
+#SBATCH --error=logs/switch.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
 
+#
+#$ -N switch
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#$ -o logs/switch.log
+#$ -e logs/switch.errors.log
+#$ -P lindgren.prjc
+#$ -pe shmem 1
+#$ -q short.qc
+#$ -V
+
 source utils/bash_utils.sh
 
-readonly rscript="scripts/phasing/11_calc_ser.R"
+readonly rscript="scripts/phasing/phasing/07_switch.R"
 readonly ligated_dir="data/phased/wes_union_calls/200k/shapeit5/parents"
-readonly out_dir="data/phased/validation"
+readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/switch"
 
-readonly out_prefix="${out_dir}/221116_switch_error_rates"
+readonly out_prefix="${out_dir}/221117_switch_error_rates"
 
 readonly wes_variants="/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list"
 

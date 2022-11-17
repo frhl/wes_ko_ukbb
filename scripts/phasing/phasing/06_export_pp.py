@@ -20,11 +20,12 @@ def main(args):
     mt = io.import_table(phased_path, phased_type, calc_info = False, find_replace=(':-?nan', ':NaN'))
     # note that PPs are only af MAF < 0.1%
     mt = mt.select_entries(*[mt.PP, mt.GT])
+    # we are only intersted in heterozygous sites with PP field defined
     mt = mt.filter_entries(hl.is_defined(mt.PP))
+    mt = mt.filter_entries(mt.GT.is_het())
     mt = mt.transmute_rows(rsid = variants.get_variant_expr(mt.locus, mt.alleles))
     mt = mt.annotate_rows(AC = mt.info.AC)
-    mt = mt.annotate_rows(AF = mt.info.AF)
-    mt = mt.select_rows(*[mt.rsid, mt.AC, mt.AF])
+    mt = mt.select_rows(*[mt.rsid, mt.AC])
     ht = mt.entries()
     ht.export(out_prefix + ".phasingConf.txt.gz")
     
