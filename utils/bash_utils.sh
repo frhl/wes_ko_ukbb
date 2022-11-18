@@ -220,7 +220,7 @@ set_up_ldpred2() {
   module load Anaconda3/2020.07
   module load java/1.8.0_latest
   source "/apps/eb/skylake/software/Anaconda3/2020.07/etc/profile.d/conda.sh"
-  conda activate bigsnpr-v1.10
+  conda activate bigsnpr-v1.11.6
   set -eu
 }
 
