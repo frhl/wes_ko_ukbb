@@ -7,8 +7,8 @@
 #SBATCH --output=logs/export_ps_pp.log
 #SBATCH --error=logs/export_ps_pp.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 4
-#SBATCH --array=21
+#SBATCH --cpus-per-task 1
+#SBATCH --array=20-22
 #
 #$ -N export_ps_pp
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -17,7 +17,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc
-#$ -t 21
+#$ -t 20-22
 #$ -V
 
 set -o errexit
@@ -27,7 +27,7 @@ source utils/vcf_utils.sh
 source utils/hail_utils.sh
 source utils/qsub_utils.sh
 
-readonly hail_script="scripts/phasing/phasing/06_export_ps_pp.py"
+readonly hail_script="scripts/phasing/prephasing/06_export_ps_pp.py"
 readonly spark_dir="data/tmp/spark"
 
 readonly array_idx=$( get_array_task_id )
@@ -38,7 +38,7 @@ readonly in_path="${in_dir}/ukb_shapeit5_whatshap_chr${chr}.mt"
 readonly in_type="mt"
 
 readonly out_dir="data/prephased/wes_union_calls/phase_conf"
-readonly out_prefix="${out_dir}/ukb_shapeit5_whatshap_variants_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_shapeit5_whatshap_chr${chr}"
 
 mkdir -p ${out_dir}
 

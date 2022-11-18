@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-#
-#
-#
+
+set -o errexit
+set -o nounset
 
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
@@ -14,7 +14,10 @@ readonly method=${5?Error: Missing arg2 (method)}
 readonly impute=${6?Error: Missing arg2 (impute)}
 readonly prefix=${7?Error: Missing arg8 (prefix)}
 
-readonly chr="${SGE_TASK_ID}"
+readonly cluster=$( get_current_cluster )
+readonly index=$( get_array_task_id )
+readonly chr=$( get_chr ${index} )
+
 readonly pred_chr=$(echo ${pred} | sed -e "s/CHR/${chr}/g")
 readonly out_prefix_chr=$(echo ${prefix} | sed -e "s/CHR/${chr}/g")
 readonly tmp_bfile="${out_prefix_chr}.bfile"
@@ -22,9 +25,8 @@ readonly tmp_bfile="${out_prefix_chr}.bfile"
 export OPENBLAS_NUM_THREADS=1 # avoid two levels of parallelization
 
 if [ ! -f "${out_prefix_chr}.txt.gz" ]; then
+  #set_up_ldpred2
   set_up_rpy
-  duration=SECONDS
-  set -x
   Rscript "${r_script}" \
       --chrom "chr${chr}" \
       --pred "${pred_chr}" \
@@ -34,8 +36,6 @@ if [ ! -f "${out_prefix_chr}.txt.gz" ]; then
       --method "${method}" \
       --tmp_bfile "${tmp_bfile}" \
       --out_prefix "${out_prefix_chr}"
-  set +x
-  log_runtime $duration
 else
   echo "Note: ${out_prefix_chr} already exists. Skipping.."
 fi

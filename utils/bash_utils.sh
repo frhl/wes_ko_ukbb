@@ -87,6 +87,20 @@ set_up_conda() {
   unset __conda_setup
 }
 
+set_up_shapeit5 () {
+  module purge
+  module load HTSlib/1.14-GCC-11.2.0
+  local _version="${1:-0}"
+  local _dir="/well/lindgren/flassen/software/SHAPEIT5/v${_version}/shapeit5"
+  local phase_rare="${_dir}/phase_rare/bin/SHAPEIT5_phase_rare"
+  local phase_common="${_dir}/phase_common/bin/SHAPEIT5_phase_common"
+  local switch="${_dir}/switch/bin/SHAPEIT5_switch"
+  SHAPEIT_phase_rare="${phase_rare}"
+  SHAPEIT_phase_common="${phase_common}"
+  SHAPEIT_switch="${switch}"
+  >&2 echo "Loading SHAPEIT5 v${_version}."
+}
+
 #get_hail_memory() {
 #  if [[ -z ${QUEUE} || -z ${NSLOTS} ]]; then
 #    raise_error "QUEUE and NSLOTS must both be defined"
@@ -224,30 +238,5 @@ set_up_tensorflow() {
 #  module load samtools/1.8-gcc5.4.0 # required for LOFTEE 
 #  export PERL5LIB=$PERL5LIB:/well/lindgren/flassen/software/VEP/plugins_grch38/
 #}
-
-
-get_current_cluster() {
-  if [ ! -z "${SGE_ACCOUNT}" ]; then
-    echo "sge"
-  elif [ ! -z "${SLURM_JOB_ID}" ]; then
-    echo "slurm"
-  else
-    raise_error "Could not find SGE/SLURM variables!"
-  fi
-}
-
-get_array_task_id() {
-  local cluster=$( get_current_cluster )
-  if [ "${cluster}" == "sge" ]; then
-    echo "${SGE_TASK_ID}" 
-  elif [ "${cluster}" == "slurm" ]; then
-    echo "${SLURM_ARRAY_TASK_ID}"
-  else
-    raise_error "${cluster} is not a valid cluster!"
-  fi
-
-}
-
-
 
 

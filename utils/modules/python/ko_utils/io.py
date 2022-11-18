@@ -3,7 +3,8 @@
 import hail as hl
 
 
-def import_table(input_path, input_type, calc_info=True, cache=False, force_bgz=True):
+def import_table(input_path, input_type, calc_info=True, cache=False, 
+        force_bgz=True, find_replace=None):
     r'''Import mt/vcf/plink tables '''
     assert input_type in ['mt','vcf','plink']
     if input_type == 'mt':
@@ -11,8 +12,9 @@ def import_table(input_path, input_type, calc_info=True, cache=False, force_bgz=
     elif input_type == 'vcf':
         mt = hl.import_vcf(
             input_path,
-            force_bgz=force_bgz,
-            array_elements_required=False)
+            force_bgz=True,
+            array_elements_required=False,
+            find_replace=find_replace) 
     elif input_type == 'plink':
         mt = hl.import_plink(
             *[f'{input_path}.{x}' for x in ['bed', 'bim', 'fam']])

@@ -8,9 +8,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/parents.log
 #SBATCH --error=logs/parents.errors.log
-#SBATCH --partition=long
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=1,2
+#SBATCH --array=20
 #
 #$ -N parents
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -55,10 +55,14 @@ readonly out_type="vcf"
 
 mkdir -p ${out_dir}
 
-module load BCFtools/1.12-GCC-10.3.0
-make_tabix "${parents_path}" "tbi"
-make_tabix "${phased_path}" "tbi"
-bcftools merge ${phased_path} ${parents_path} -Oz -o ${out_vcf}
+
+if [ ! -f "${out_vcf}" ]; then
+  echo "Merging parents.."
+  module load BCFtools/1.12-GCC-10.3.0
+  make_tabix "${parents_path}" "tbi"
+  make_tabix "${phased_path}" "tbi"
+  bcftools merge ${phased_path} ${parents_path} -Oz -o ${out_vcf}
+fi
 
 # combine parents and children in same vcf
 # note: we can't combine data using bcftools beacuse some variants

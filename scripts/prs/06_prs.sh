@@ -7,8 +7,7 @@
 #SBATCH --error=logs/prs.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=17-18
-#SBATCH --requeue
+#SBATCH --array=151
 
 set -o errexit
 set -o nounset
@@ -25,18 +24,21 @@ readonly ldsc_dir="data/prs/ldsc"
 readonly pred_dir="data/prs/hapmap/ukb_500k/validation"
 readonly ld_dir="data/prs/hapmap/ld/matrix_unrel_kin"
 readonly pheno_dir="data/phenotypes"
-readonly out_dir="data/prs/scores/auto"
+readonly out_dir="data/prs/scores/auto/test"
 readonly mrg_dir="data/prs/scores"
 
-readonly index=${SLURM_ARRAY_TASK_ID}
+readonly cluster=$( get_current_cluster )
+readonly index=$( get_array_task_id )
 
 readonly file_cts="${pheno_dir}/curated_covar_phenotypes_cts.tsv.gz"
 readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
 readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
 
-readonly file_binary="${pheno_dir}/curated_covar_phenotypes_binary.tsv.gz"
-readonly pheno_list_binary="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
+readonly file_binary="${pheno_dir}/spiros_brava_phenotypes_binary_500k.tsv.gz"
+readonly pheno_list_binary="${pheno_dir}/spiros_brava_phenotypes_binary_500k_header.tsv"
 readonly phenotype_binary=$( sed "${index}q;d" ${pheno_list_binary} )
+
+# ldpred2 parameters
 readonly impute="mean2"
 
 mkdir -p ${out_dir}
@@ -68,7 +70,7 @@ submit_ldpred2()
 
 fit_pgs()
 {
-  local slurm_jname="_pgs"
+  local slurm_jname="_prs"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
   local slurm_tasks="${tasks}"
@@ -76,9 +78,9 @@ fit_pgs()
   readonly fit_pgs_jid=$( sbatch \
     --account="${slurm_project}" \
     --job-name="${slurm_jname}" \
-    --output="${slurm_jname}.log" \
-    --error="${slurm_jname}.errors.log" \
-    --chdir="${curwd}" \
+    --output="logs/${slurm_jname}.log" \
+    --error="logs/${slurm_jname}.errors.log" \
+    --chdir="$(pwd)" \
     --partition="${slurm_queue}" \
     --cpus-per-task="${slurm_nslots}" \
     --array=${slurm_tasks} \
@@ -104,9 +106,9 @@ aggr_pgs()
   readonly aggr_pgs_jid=$( sbatch \
     --account="${slurm_project}" \
     --job-name="${slurm_jname}" \
-    --output="${slurm_jname}.log" \
-    --error="${slurm_jname}.errors.log" \
-    --chdir="${curwd}" \
+    --output="logs/${slurm_jname}.log" \
+    --error="logs/${slurm_jname}.errors.log" \
+    --chdir="$(pwd)" \
     --partition="${slurm_queue}" \
     --cpus-per-task="${slurm_nslots}" \
     --array=${slurm_tasks} \
@@ -129,9 +131,9 @@ clean_pgs()
   readonly clean_pgs_jid=$( sbatch \
     --account="${slurm_project}" \
     --job-name="${slurm_jname}" \
-    --output="${slurm_jname}.log" \
-    --error="${slurm_jname}.errors.log" \
-    --chdir="${curwd}" \
+    --output="logs/${slurm_jname}.log" \
+    --error="logs/${slurm_jname}.errors.log" \
+    --chdir="$(pwd)" \
     --partition="${slurm_queue}" \
     --cpus-per-task="${slurm_nslots}" \
     --array=${slurm_tasks} \
@@ -146,8 +148,9 @@ clean_pgs()
 # parameters
 readonly queue="short"
 readonly project="lindgren.prj"
-readonly tasks=1-22
+readonly tasks=20-21 #1-22
 
-submit_ldpred2 "auto" "6" "${phenotype_cts}_int"
-submit_ldpred2 "auto" "6" "${phenotype_cts}"
+submit_ldpred2 "auto" "2" "${phenotype_binary}"
+#submit_ldpred2 "auto" "6" "${phenotype_cts}_int"
+#submit_ldpred2 "auto" "6" "${phenotype_cts}"
 
