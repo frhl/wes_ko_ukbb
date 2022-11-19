@@ -49,6 +49,9 @@ readonly out_type="vcf"
 readonly parents_dir="data/unphased/overlap"
 readonly parents_path="${parents_dir}/ukb_calls_wes_samples_parents.txt"
 
+# fasta reference
+readonly fasta="/well/lindgren/flassen/ressources/genome_reference/broad/Homo_sapiens_assembly38.fasta"
+
 mkdir -p ${spark_dir}
 mkdir -p ${out_dir}
 
@@ -73,6 +76,7 @@ if [ -f "${out_prefix_parents}.vcf.bgz" ]; then
   module purge
   module load BCFtools/1.12-GCC-10.3.0
   make_tabix "${out_prefix_parents}.vcf.bgz" "tbi"
+  bcftools +fixref "${out_prefix_no_parents}.vcf.bgz" -- -f ${fasta} > "${out_prefix_no_parents}.fasta.txt"
 fi
 
 

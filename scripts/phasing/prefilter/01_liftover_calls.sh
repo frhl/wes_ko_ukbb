@@ -39,14 +39,20 @@ readonly fields_to_drop="fam_id,pat_id,mat_id,is_female,is_case,cm_position"
 mkdir -p ${spark_dir}
 mkdir -p ${out_dir}
 
-set_up_hail
-set_up_pythonpath_legacy
-python3 "${hail_script}" \
-   --chrom "${chr}" \
-   --out_prefix "${out_prefix}" \
-   --out_type "${out_type}" \
-   --drop_fields ${fields_to_drop} \
-   --filter_incorrect_reference \
-   --dataset "calls" \
-   --liftover
+if [ ! -f "${out_prefix}.mt/_SUCCESS" ]; then
+  set_up_hail
+  set_up_pythonpath_legacy
+  python3 "${hail_script}" \
+     --chrom "${chr}" \
+     --out_prefix "${out_prefix}" \
+     --out_type "${out_type}" \
+     --drop_fields ${fields_to_drop} \
+     --filter_incorrect_reference \
+     --dataset "calls" \
+     --liftover
+fi
+
+
+
+
 
