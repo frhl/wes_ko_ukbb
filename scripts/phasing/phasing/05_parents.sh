@@ -17,9 +17,9 @@
 #$ -o logs/parents.log
 #$ -e logs/parents.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 4
-#$ -q long.qc
-#$ -t 11
+#$ -pe shmem 3
+#$ -q short.qc
+#$ -t 20
 #$ -V
 
 set -o errexit
@@ -51,6 +51,7 @@ readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/parents"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_shapeit5_parents_chr${chr}"
 readonly out_vcf="${out_prefix}.vcf.gz"
 readonly out_trio="${out_prefix}.trio"
+readonly out_trio_by_site="${out_prefix}.txt"
 readonly out_type="vcf"
 
 mkdir -p ${out_dir}
@@ -78,13 +79,21 @@ fi
 #    --out_type ${out_type}
 #fi
 
+module purge
+module load BCFtools/1.12-GCC-10.3.0
+
 # calculate switch errors using trio samples
 if [ ! -f "${out_trio}" ]; then
-  module purge
-  module load BCFtools/1.12-GCC-10.3.0
   make_tabix ${out_vcf} "tbi"
   bcftools +trio-switch-rate ${out_vcf} -- -p ${pedigree} > ${out_trio}
+fi
+
+# c
+if [ ! -f "${out_trio_by_site}" ]; then
   switch_errors_by_site ${out_vcf} ${pedigree}
 fi
+
+
+
 
 
