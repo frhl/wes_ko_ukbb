@@ -47,7 +47,7 @@ readonly phased_path="${phased_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.bgz"
 #readonly phased_dir="data/phased/wes_scaffold_calls/200k_from_500k/ligated"
 #readonly phased_path="${phased_dir}/ukb_wes_scaffold_calls_200k_from_500k_chr${chr}.vcf.bgz"
 # out paths and types
-readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/parents/long-queue"
+readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/parents"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_shapeit5_parents_chr${chr}"
 readonly out_vcf="${out_prefix}.vcf.gz"
 readonly out_trio="${out_prefix}.trio"

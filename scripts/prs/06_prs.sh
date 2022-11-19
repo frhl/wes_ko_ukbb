@@ -7,7 +7,7 @@
 #SBATCH --error=logs/prs.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=151
+#SBATCH --array=152-170
 
 set -o errexit
 set -o nounset
@@ -148,7 +148,7 @@ clean_pgs()
 # parameters
 readonly queue="short"
 readonly project="lindgren.prj"
-readonly tasks=20-21 #1-22
+readonly tasks=1-22 #1-22
 
 submit_ldpred2 "auto" "2" "${phenotype_binary}"
 #submit_ldpred2 "auto" "6" "${phenotype_cts}_int"
