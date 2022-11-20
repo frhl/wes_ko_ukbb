@@ -91,23 +91,23 @@ if [ ! -f "${out_file}" ]; then
   module purge
   module load  HTSlib/1.14-GCC-11.2.0  
   # 3. combine the two tables by concatenating and sorting variants 
-  vcf_concat_sort ${tmp_file} ${in_wes_file} ${out_file} ${tmp_write_dir} \
+  vcf_concat_sort ${tmp_file} ${in_wes_file} ${sort_file} ${tmp_write_dir} \
   && print_update "Finished combining VCFs for chr${chr} using bcftools." "${SECONDS}" \
   || raise_error "$( print_update "Combining VCFs for chr${chr} using bcftools failed." ${SECONDS} )"
-  make_tabix ${out_file}
+  make_tabix ${sort_file}
 
-  # 4. calculate AC/AN 
-  #bcftools +fill-tags ${sort_file} -Oz -o ${out_file} -- -t AN,AC \
-  #&& print_update "Finished fill tags for chr${chr} using bcftools." "${SECONDS}" \
-  #|| raise_error "$( print_update "Fill tag for chr${chr} using bcftools failed." ${SECONDS} )"
-  #make_tabix ${out_file}
+  # 4. calculate AC/AN (Note this was commented out before)
+  bcftools +fill-tags ${sort_file} -Oz -o ${out_file} -- -t AN,AC \
+  && print_update "Finished fill tags for chr${chr} using bcftools." "${SECONDS}" \
+  || raise_error "$( print_update "Fill tag for chr${chr} using bcftools failed." ${SECONDS} )"
+  make_tabix ${out_file}
   
   echo "Success. Writing to ${out_file}.."
 
   # 5. clean up temporary files
   if [ -f "${out_file}" ]; then
-    #rm "${sort_file}" 
-    #rm "${sort_file}.tbi"
+    rm "${sort_file}" 
+    rm "${sort_file}.tbi"
     rm "${tmp_file}"
     rm "${tmp_file}.tbi"
   fi

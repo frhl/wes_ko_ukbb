@@ -8,7 +8,7 @@
 #SBATCH --output=logs/knockouts.log
 #SBATCH --error=logs/knockouts.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 1
+#SBATCH --cpus-per-task 22
 #SBATCH --requeue
 
 

@@ -117,7 +117,7 @@ def main(args):
             io.export_table(mt_parents, out_prefix + "_parents", out_type)
         mt = mt.filter_cols(~hl.literal(pids).contains(mt.s))
        
-    #io.export_table(mt, out_prefix, out_type)
+    io.export_table(mt, out_prefix, out_type)
 
 if __name__=='__main__':
 

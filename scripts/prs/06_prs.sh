@@ -7,7 +7,7 @@
 #SBATCH --error=logs/prs.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=152-170
+#SBATCH --array=170
 
 set -o errexit
 set -o nounset
@@ -137,7 +137,7 @@ clean_pgs()
     --partition="${slurm_queue}" \
     --cpus-per-task="${slurm_nslots}" \
     --array=${slurm_tasks} \
-    --dependency="aftercorr:${fit_pgs_jid}" \
+    --dependency="after:${fit_pgs_jid}" \
     --parsable \
     -hold_jid_ad "_prs_${phenotype}" \
     "${clean_script}" \

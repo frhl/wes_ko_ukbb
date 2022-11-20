@@ -7,7 +7,7 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/wes_union_calls_gen.log
 #SBATCH --error=logs/wes_union_calls_gen.errors.log
-#SBATCH --partition=short
+#SBATCH --partition=long
 #SBATCH --cpus-per-task 3
 #SBATCH --array=20
 
@@ -23,7 +23,7 @@ readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 readonly in_file="${in_dir}/ukb_wes_200k_filtered_chr${chr}.mt"
 readonly in_type="mt"
 
-readonly out_dir="data/unphased/wes_union_calls/legacy"
+readonly out_dir="data/unphased/wes_union_calls/legacy_long"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
 readonly out_type="mt"
 
