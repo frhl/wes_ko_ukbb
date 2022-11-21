@@ -7,7 +7,18 @@
 #SBATCH --error=logs/prs.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=170
+#SBATCH --array=171
+#
+#
+#$ -N prs
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#$ -o logs/prs.log
+#$ -e logs/prs.errors.log
+#$ -P lindgren.prjc
+#$ -pe shmem 1
+#$ -q test.qc
+#$ -t 171
+#$ -V
 
 set -o errexit
 set -o nounset
@@ -70,85 +81,138 @@ submit_ldpred2()
 
 fit_pgs()
 {
-  local slurm_jname="_prs"
+  readonly prs_jname="_prs"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
+  local sge_queue="short.qc"
   local slurm_tasks="${tasks}"
   local slurm_nslots="${nslots}"
-  readonly fit_pgs_jid=$( sbatch \
-    --account="${slurm_project}" \
-    --job-name="${slurm_jname}" \
-    --output="logs/${slurm_jname}.log" \
-    --error="logs/${slurm_jname}.errors.log" \
-    --chdir="$(pwd)" \
-    --partition="${slurm_queue}" \
-    --cpus-per-task="${slurm_nslots}" \
-    --array=${slurm_tasks} \
-    --parsable \
-    "${bash_script}" \
-    "${rscript}" \
-    "${pred}" \
-    "${ldsc}" \
-    "${ld_dir}" \
-    "${method}" \
-    "${impute}" \
-    "${out_prefix}" )
+  if [ "${cluster}" = "slurm" ]; then
+    readonly fit_pgs_jid=$( sbatch \
+      --account="${slurm_project}" \
+      --job-name="${prs_jname}" \
+      --output="logs/${prs_jname}.log" \
+      --error="logs/${prs_jname}.errors.log" \
+      --chdir="$(pwd)" \
+      --partition="${slurm_queue}" \
+      --cpus-per-task="${slurm_nslots}" \
+      --array=${slurm_tasks} \
+      --parsable \
+      "${bash_script}" \
+      "${rscript}" \
+      "${pred}" \
+      "${ldsc}" \
+      "${ld_dir}" \
+      "${method}" \
+      "${impute}" \
+      "${out_prefix}" )
+  elif [ "${cluster}" = "sge" ]; then
+    qsub -N "${prs_jname}" \
+      -t ${slurm_tasks} \
+      -q ${sge_queue} \
+      -P lindgren.prjc \
+      -wd $(pwd) \
+      -pe shmem "${slurm_nslots}" \
+      "${bash_script}" \
+      "${rscript}" \
+      "${pred}" \
+      "${ldsc}" \
+      "${ld_dir}" \
+      "${method}" \
+      "${impute}" \
+      "${out_prefix}"
+  else
+    >&2 echo "${cluster} is not valid!"
+  fi
+
 }
 
 
 aggr_pgs()
 {
-  local slurm_jname="${qsub_aggr}"
+  readonly aggr_jname="${qsub_aggr}"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
+  local sge_queue="short.qc"
   local slurm_tasks="1"
   local slurm_nslots="1"
-  readonly aggr_pgs_jid=$( sbatch \
-    --account="${slurm_project}" \
-    --job-name="${slurm_jname}" \
-    --output="logs/${slurm_jname}.log" \
-    --error="logs/${slurm_jname}.errors.log" \
-    --chdir="$(pwd)" \
-    --partition="${slurm_queue}" \
-    --cpus-per-task="${slurm_nslots}" \
-    --array=${slurm_tasks} \
-    --dependency="afterok:${fit_pgs_jid}" \
-    --parsable \
-    "${aggr_script}" \
-    "${phenotype}" \
-    "${out_dir}" \
-    "${mrg_dir}" )
+  if [ "${cluster}" = "slurm" ]; then
+    readonly aggr_pgs_jid=$( sbatch \
+      --account="${slurm_project}" \
+      --job-name="${aggr_jname}" \
+      --output="logs/${aggr_jname}.log" \
+      --error="logs/${aggr_jname}.errors.log" \
+      --chdir="$(pwd)" \
+      --partition="${slurm_queue}" \
+      --cpus-per-task="${slurm_nslots}" \
+      --array=${slurm_tasks} \
+      --dependency="afterok:${fit_pgs_jid}" \
+      --parsable \
+      "${aggr_script}" \
+      "${phenotype}" \
+      "${out_dir}" \
+      "${mrg_dir}" )
+  elif [ "${cluster}" = "sge" ]; then
+    qsub -N "${qsub_aggr}" \
+      -q test.qc \
+      -P lindgren.prjc \
+      -pe shmem 1 \
+      -wd $(pwd) \
+      -hold_jid "${prs_jname}" \
+      "${aggr_script}" \
+      "${phenotype}" \
+      "${out_dir}" \
+      "${mrg_dir}"
+  else
+    >&2 echo "${cluster} is not valid"
+  fi
+
 }
 
 
 clean_pgs()
 {
-  local slurm_jname="${qsub_clean}"
+  readonly clean_jname="${qsub_clean}"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
   local slurm_tasks="${tasks}"
   local slurm_nslots="1"
-  readonly clean_pgs_jid=$( sbatch \
-    --account="${slurm_project}" \
-    --job-name="${slurm_jname}" \
-    --output="logs/${slurm_jname}.log" \
-    --error="logs/${slurm_jname}.errors.log" \
-    --chdir="$(pwd)" \
-    --partition="${slurm_queue}" \
-    --cpus-per-task="${slurm_nslots}" \
-    --array=${slurm_tasks} \
-    --dependency="after:${fit_pgs_jid}" \
-    --parsable \
-    -hold_jid_ad "_prs_${phenotype}" \
-    "${clean_script}" \
-    "${pred}" \
-    "${out_prefix}" )
+  if [ "${cluster}" = "slurm" ]; then
+    readonly clean_pgs_jid=$( sbatch \
+      --account="${slurm_project}" \
+      --job-name="${clean_jname}" \
+      --output="logs/${clean_jname}.log" \
+      --error="logs/${clean_jname}.errors.log" \
+      --chdir="$(pwd)" \
+      --partition="${slurm_queue}" \
+      --cpus-per-task="${slurm_nslots}" \
+      --array=${slurm_tasks} \
+      --dependency="aftercorr:${fit_pgs_jid}" \
+      --parsable \
+      "${clean_script}" \
+      "${pred}" \
+      "${out_prefix}" )
+  elif [ "${cluster}" = "sge" ]; then
+    qsub -N "${qsub_clean}" \
+      -t ${tasks} \
+      -q test.qc \
+      -P lindgren.prjc \
+      -wd $(pwd) \
+      -pe shmem 1 \
+      -hold_jid_ad "${prs_jname}" \
+      "${clean_script}" \
+      "${pred}" \
+      "${out_prefix}" 
+  else
+    >&2 echo "${cluster} is not valid"
+  fi
+
 }
 
 # parameters
 readonly queue="short"
 readonly project="lindgren.prj"
-readonly tasks=1-22 #1-22
+readonly tasks=21 #1-22
 
 submit_ldpred2 "auto" "2" "${phenotype_binary}"
 #submit_ldpred2 "auto" "6" "${phenotype_cts}_int"
