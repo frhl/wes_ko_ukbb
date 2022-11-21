@@ -110,6 +110,8 @@ fit_pgs()
     qsub -N "${prs_jname}" \
       -t ${slurm_tasks} \
       -q ${sge_queue} \
+      -o "logs/${prs_jname}.log" \
+      -e "logs/${prs_jname}.errors.log" \
       -P lindgren.prjc \
       -wd $(pwd) \
       -pe shmem "${slurm_nslots}" \
