@@ -156,6 +156,8 @@ aggr_pgs()
     qsub -N "${qsub_aggr}" \
       -q test.qc \
       -P lindgren.prjc \
+      -o "logs/${aggr_jname}.log" \
+      -e "logs/${aggr_jname}.errors.log" \
       -pe shmem 1 \
       -wd $(pwd) \
       -hold_jid "${prs_jname}" \
@@ -197,6 +199,8 @@ clean_pgs()
       -t ${tasks} \
       -q test.qc \
       -P lindgren.prjc \
+      -o "logs/${clean_jname}.log" \
+      -e "logs/${clean_jname}.errors.log" \
       -wd $(pwd) \
       -pe shmem 1 \
       -hold_jid_ad "${prs_jname}" \
