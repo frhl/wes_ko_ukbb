@@ -5,6 +5,7 @@ import argparse
 import pandas as pd
 import random
 import string
+import sys
 
 from ukb_utils import hail_init
 from ukb_utils import samples
@@ -43,10 +44,12 @@ def main(args):
     hail_init.hail_bmrc_init('logs/hail/knockout.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1')
     mt = io.import_table(input_path, input_type, calc_info = False)
+    #mt = mt.repartition(512)
 
     # subset to current csqs category
     mt = mt.filter_rows(hl.literal(set(csqs_category)).contains(mt.consequence_category))
-
+    n_csqs = mt.count()[0]
+    sys.stderr.write(f"Filtering to {n_csqs} variants that are {csqs_category}.")
     # perform an aggregation based on "collect", which requires a lot
     # of memory but allows the variant ID to be returned as well alongside
     # with information of cis/trans-CHs and heterozygotes.
@@ -73,6 +76,8 @@ def main(args):
     # checkpoint for more effecient data use
     if checkpoint or aggr_method in "collect":
         genes = genes.checkpoint(out_prefix + "_checkpoint.mt", overwrite=True)
+        n_genes = genes.count()[0]
+        sys.stderr.write(f"Aggregated variants to {n_genes} gene(s).")
 
     # setup sites and alleles
     rows = genes.count()[0]
@@ -88,8 +93,6 @@ def main(args):
 
     # annotate knockout matrix
     prob = genes.annotate_entries(DS=genes.pKO * 2)
-    prob = prob.annotate_entries(GT=ko.get_gt_from_floor_ds(prob.DS))
-    prob = prob.select_entries(*[prob.DS, prob.GT])
     prob = prob.select_entries(prob.DS)
     prob = prob.add_row_index()
     prob = prob.annotate_rows(
@@ -112,11 +115,6 @@ def main(args):
     # remove invariant sites
     prob = prob.annotate_rows(stdev = hl.agg.stats(prob.DS).stdev)
     prob = prob.filter_rows(prob.stdev > 0)
-
-    # discard effects owed to unphased singletons
-    if discard_prob_dosages:
-        new_DS = ko.discard_prob_dosages(prob.DS)
-        prob = prob.transmute_entries(DS = new_DS)
 
     # write matrix-table which contains dosages. VCF with only
     # dosages can't be re-read in HAIL, so we write a MatrixTable

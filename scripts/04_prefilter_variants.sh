@@ -18,9 +18,9 @@
 #$ -o logs/prefilter_variants.log
 #$ -e logs/prefilter_variants.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 2
-#$ -q short.qc
-#$ -t 1-19
+#$ -pe shmem 1
+#$ -q short.qa
+#$ -t 1-22
 #$ -V
 
 set -o errexit
@@ -40,8 +40,8 @@ readonly in_dir="data/mt/annotated"
 readonly input_prefix="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.mt"
 readonly input_type="mt"
 
-readonly out_dir="data/mt/prefilter"
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp95.maf0_005"
+readonly out_dir="data/mt/prefilter/final_99"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp99.maf0_005"
 readonly out_type="mt"
 
 # remove these common plofs (90% pop)
@@ -49,7 +49,8 @@ readonly exclude="data/genes/220310_common_plofs_to_exclude.txt"
 
 readonly maf_min=0.00
 readonly maf_max=0.05
-readonly pp_cutoff=0.95
+readonly pp_cutoff=0.99
+readonly partitions=256
 
 mkdir -p ${out_dir}
 
@@ -65,6 +66,7 @@ python3 "${hail_script}" \
    --maf_min ${maf_min} \
    --maf_max ${maf_max} \
    --exclude ${exclude} \
+   --partitions ${partitions} \
    && print_update "Finished annotating MatrixTables chr${chr}" ${SECONDS} \
    || raise_error "Annotating MatrixTables for chr${chr} failed"
 

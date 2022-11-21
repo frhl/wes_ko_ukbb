@@ -8,9 +8,18 @@
 #SBATCH --output=logs/knockouts.log
 #SBATCH --error=logs/knockouts.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 22
+#SBATCH --cpus-per-task 1
 #SBATCH --requeue
-
+#
+#
+#$ -N knockouts
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#$ -o logs/knockouts.log
+#$ -e logs/knockouts.errors.log
+#$ -P lindgren.prjc
+#$ -pe shmem 1
+#$ -q short.qa
+#$ -V
 
 set -o errexit
 set -o nounset
@@ -23,12 +32,16 @@ readonly curwd=$(pwd)
 readonly spark_dir="data/tmp/spark"
 readonly bash_script="scripts/_encode_knockouts.sh"
 
-readonly in_dir="data/mt/annotated/prefilter"
-readonly out_dir="data/knockouts/alt/test"
-readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp95.maf0_005.mt"
+readonly cluster=$( get_current_cluster)
+readonly task_id=$( get_array_task_id )
+readonly chr=$( get_chr ${task_id} )
+
+readonly in_dir="data/mt/prefilter/test"
+readonly out_dir="data/knockouts/alt/collect_test"
+readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chrCHR.loftee.worst_csq_by_gene_canonical.pp95.maf0_005.mt"
 readonly in_type="mt"
 
-readonly out_prefix="${out_dir}/ukb_eur_wes_200k"
+readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chrCHR"
 readonly out_type="vcf"
 
 # Note: ~24 slots are needed for running chr1. 
@@ -40,10 +53,8 @@ readonly project="lindgren.prj"
 # should only VCF be produced?
 readonly only_vcf=""
 
-# should singletons be removed? Set to empty for FALSE
-readonly discard_prob_dosages=""
-
 mkdir -p ${out_dir}
+
 
 submit_knockout_job() 
 {
@@ -60,45 +71,57 @@ submit_knockout_job()
   local slurm_lname="logs/_knockouts"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
+  local sge_queue="short.qa"
   local slurm_nslots="${nslots}"
-  readonly jid=$( sbatch \
-    --account="${slurm_project}" \
-    --job-name="${slurm_jname}" \
-    --output="${slurm_lname}.log" \
-    --error="${slurm_lname}.errors.log" \
-    --chdir="${curwd}" \
-    --partition="${slurm_queue}" \
-    --cpus-per-task="${slurm_nslots}" \
-    --array=${slurm_tasks} \
-    --parsable \
-    "${bash_script}" \
-    "${in_prefix}" \
-    "${in_type}" \
-    "${annotation}" \
-    "${only_vcf}" \
-    "${aggr_method}" \
-    "${out_prefix_csqs}" \
-    "${out_type}" )
+  if [ "${cluster}" = "slurm" ]; then
+    sbatch \
+      --account="${slurm_project}" \
+      --job-name="${slurm_jname}" \
+      --output="${slurm_lname}.log" \
+      --error="${slurm_lname}.errors.log" \
+      --chdir="${curwd}" \
+      --partition="${slurm_queue}" \
+      --cpus-per-task="${slurm_nslots}" \
+      --array=${slurm_tasks} \
+      --parsable \
+      "${bash_script}" \
+      "${in_prefix}" \
+      "${in_type}" \
+      "${annotation}" \
+      "${only_vcf}" \
+      "${aggr_method}" \
+      "${out_prefix_csqs}" \
+      "${out_type}" 
+  elif [ "${cluster}" = "sge" ]; then
+    qsub -N "${slurm_jname}" \
+      -o "${slurm_lname}.log" \
+      -e "${slurm_lname}.errors.log" \
+      -P lindgren.prjc \
+      -wd $(pwd) \
+      -t ${tasks} \
+      -q "${sge_queue}" \
+      -t "${slurm_tasks}" \
+      -pe shmem ${slurm_nslots} \
+      "${bash_script}" \
+      "${in_prefix}" \
+      "${in_type}" \
+      "${annotation}" \
+      "${only_vcf}" \
+      "${aggr_method}" \
+      "${out_prefix_csqs}" \
+      "${out_type}" 
+  else
+    >&2 echo "${cluster} is not a valid cluster."
+  fi
   # clean up after checkpints when
   if [ -f "${out_checkpoint}" ]; then
     rm -rf ${out_checkpoint}
   fi
 }
 
-#submit_knockout_job "synonymous" "5" "fast"
-#submit_knockout_job "other_missense" "5" "fast"
-submit_knockout_job "pLoF" "2" "fast"
-#submit_knockout_job "pLoF,LC" "5" "fast"
-#submit_knockout_job "pLoF,LC,damaging_missense" "5" "fast"
-#submit_knockout_job "damaging_missense" "5" "fast"
-#
-
-#submit_knockout_job "pLoF,damaging_missense" "24" "collect"
-#submit_knockout_job "pLoF,damaging_missense" "6" "only_homs"
-#submit_knockout_job "pLoF" "24" "collect"
-#submit_knockout_job "pLoF,damaging_missense" "6" "fast"
-#submit_knockout_job "pLoF,LC" "6" "fast"
-#submit_knockout_job "synonymous" "6" "fast"
+submit_knockout_job "pLoF" "4" "collect"
+submit_knockout_job "pLoF,damaging_missense" "4" "collect"
+submit_knockout_job "synonymous" "4" "collect"
 
 
 

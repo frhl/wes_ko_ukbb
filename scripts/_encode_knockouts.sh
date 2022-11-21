@@ -28,6 +28,7 @@ evaluate_knockouts() {
   SECONDS=0
   set_up_hail
   set_up_pythonpath_legacy
+  set -x
   python3 "${hail_script}" \
       --chrom ${chr} \
       --input_path ${input_path_chr} \
@@ -41,7 +42,8 @@ evaluate_knockouts() {
       --checkpoint \
       && print_update "Finished evaluation knockouts for chr${chr}" ${SECONDS} \
       || raise_error "Evaluating knockouts for chr${chr} failed"
-  rm -rf "${out_prefix_chr}_checkpoint.mt"
+  set +x
+#  rm -rf "${out_prefix_chr}_checkpoint.mt"
 }
 
 
