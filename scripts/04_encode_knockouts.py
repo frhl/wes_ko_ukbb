@@ -125,9 +125,19 @@ def main(args):
     io.export_table(prob, out_prefix, out_type)
     if not only_vcf:
         if export_all_gts:
-            genes.filter_entries(hl.is_defined(genes.knockout)).entries().flatten().export(out_prefix + "_all.tsv.gz")
+            genes = genes.filter_entries(hl.is_defined(genes.knockout)).entries()
+            genes = genes.transmute(
+                    gts = hl.delimit(genes.gts, ";"),
+                    varid = hl.delimit(genes.varid, ";")
+                    )
+            genes.flatten().export(out_prefix + "_all.tsv.gz")
         else:
-            genes.filter_entries(genes.pKO > 0).entries().flatten().export(out_prefix + ".tsv.gz")
+            genes = genes.filter_entries(genes.pKO > 0).entries()
+            genes = genes.transmute(
+                    gts = hl.delimit(genes.gts, ";"),
+                    varid = hl.delimit(genes.varid, ";")
+                    )
+            genes.flatten().export(out_prefix + ".tsv.gz")
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()

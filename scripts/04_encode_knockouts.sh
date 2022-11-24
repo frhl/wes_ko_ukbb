@@ -36,9 +36,9 @@ readonly cluster=$( get_current_cluster)
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
-readonly in_dir="data/mt/prefilter/test"
-readonly out_dir="data/knockouts/alt/collect_test"
-readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chrCHR.loftee.worst_csq_by_gene_canonical.pp95.maf0_005.mt"
+readonly in_dir="data/mt/prefilter/final_99"
+readonly out_dir="data/knockouts/alt"
+readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chrCHR.loftee.worst_csq_by_gene_canonical.pp99.maf0_005.mt"
 readonly in_type="mt"
 
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chrCHR"
@@ -46,7 +46,7 @@ readonly out_type="vcf"
 
 # Note: ~24 slots are needed for running chr1. 
 # Note: long queue may be required for chr1.
-readonly tasks="21" # 1-22
+readonly tasks="22" # 1-22
 readonly queue="short"
 readonly project="lindgren.prj"
 
@@ -119,9 +119,10 @@ submit_knockout_job()
   fi
 }
 
-submit_knockout_job "pLoF" "4" "collect"
 submit_knockout_job "pLoF,damaging_missense" "4" "collect"
-submit_knockout_job "synonymous" "4" "collect"
+submit_knockout_job "pLoF" "4" "collect"
+submit_knockout_job "damaging_missense" "4" "collect"
+submit_knockout_job "synonymous" "6" "collect"
 
 
 
