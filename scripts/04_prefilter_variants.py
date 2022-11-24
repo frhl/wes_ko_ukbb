@@ -27,9 +27,7 @@ def main(args):
     # import phased/unphased data
     hail_init.hail_bmrc_init('logs/hail/knockout.log', 'GRCh38')
     mt = io.import_table(input_path, input_type, calc_info = True) 
-    if partitions:
-        mt = mt.repartition(int(partitions))
-    # check that all sites are phased
+   # check that all sites are phased
     #unphased_expr = (~ko.is_phased(mt.GT)) & (hl.is_defined(mt.GT))
     #unphased_sites = mt.aggregate_entries(hl.agg.sum(unphased_expr))
     #if unphased_sites > 0:
@@ -66,12 +64,15 @@ def main(args):
                 worst_csq_expr=mt.consequence.vep[csqs_expr],
                 use_loftee=use_loftee))
 
+    # repartition
+    if partitions:
+        mt = mt.repartition(int(partitions))
+ 
     io.export_table(mt, out_prefix, out_type)
-    
     # export involved variants
-    ht = mt.rows()
-    ht.select(*[ht.info, ht.gene_id, ht.consequence_category])
-    ht.flatten().export(out_prefix + ".txt.gz")
+    #ht = mt.rows()
+    #ht.select(*[ht.info, ht.gene_id, ht.consequence_category])
+    #ht.flatten().export(out_prefix + ".txt.gz")
 
 
 if __name__=='__main__':

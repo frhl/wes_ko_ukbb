@@ -26,7 +26,7 @@ readonly rscript="scripts/phasing/phasing/07_switch.R"
 readonly ligated_dir="data/phased/wes_union_calls/200k/shapeit5/parents"
 readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/switch"
 
-readonly out_prefix="${out_dir}/221117_switch_error_rates"
+readonly out_prefix="${out_dir}/221124_switch_error_rates"
 
 readonly wes_variants="/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list"
 

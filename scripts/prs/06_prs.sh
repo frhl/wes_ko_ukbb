@@ -7,7 +7,7 @@
 #SBATCH --error=logs/prs.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=171
+#SBATCH --array=121-150
 #
 #
 #$ -N prs
@@ -17,7 +17,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 171
+#$ -t 111
 #$ -V
 
 set -o errexit
@@ -81,7 +81,8 @@ submit_ldpred2()
 
 fit_pgs()
 {
-  readonly prs_jname="_prs"
+  readonly prs_jname="${qsub_fit}"
+  readonly prs_lname="_prs"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
   local sge_queue="short.qc"
@@ -91,8 +92,8 @@ fit_pgs()
     readonly fit_pgs_jid=$( sbatch \
       --account="${slurm_project}" \
       --job-name="${prs_jname}" \
-      --output="logs/${prs_jname}.log" \
-      --error="logs/${prs_jname}.errors.log" \
+      --output="logs/${prs_lname}.log" \
+      --error="logs/${prs_lname}.errors.log" \
       --chdir="$(pwd)" \
       --partition="${slurm_queue}" \
       --cpus-per-task="${slurm_nslots}" \
@@ -110,8 +111,8 @@ fit_pgs()
     qsub -N "${prs_jname}" \
       -t ${slurm_tasks} \
       -q ${sge_queue} \
-      -o "logs/${prs_jname}.log" \
-      -e "logs/${prs_jname}.errors.log" \
+      -o "logs/${prs_lname}.log" \
+      -e "logs/${prs_lname}.errors.log" \
       -P lindgren.prjc \
       -wd $(pwd) \
       -pe shmem "${slurm_nslots}" \
@@ -133,6 +134,7 @@ fit_pgs()
 aggr_pgs()
 {
   readonly aggr_jname="${qsub_aggr}"
+  readonly aggr_lname="_prs_aggr"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
   local sge_queue="short.qc"
@@ -158,8 +160,8 @@ aggr_pgs()
     qsub -N "${qsub_aggr}" \
       -q test.qc \
       -P lindgren.prjc \
-      -o "logs/${aggr_jname}.log" \
-      -e "logs/${aggr_jname}.errors.log" \
+      -o "logs/${aggr_lname}.log" \
+      -e "logs/${aggr_lname}.errors.log" \
       -pe shmem 1 \
       -wd $(pwd) \
       -hold_jid "${prs_jname}" \
@@ -177,6 +179,7 @@ aggr_pgs()
 clean_pgs()
 {
   readonly clean_jname="${qsub_clean}"
+  readonly clean_lname="_prs_clean"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
   local slurm_tasks="${tasks}"
@@ -185,8 +188,8 @@ clean_pgs()
     readonly clean_pgs_jid=$( sbatch \
       --account="${slurm_project}" \
       --job-name="${clean_jname}" \
-      --output="logs/${clean_jname}.log" \
-      --error="logs/${clean_jname}.errors.log" \
+      --output="logs/${clean_lname}.log" \
+      --error="logs/${clean_lname}.errors.log" \
       --chdir="$(pwd)" \
       --partition="${slurm_queue}" \
       --cpus-per-task="${slurm_nslots}" \
@@ -201,8 +204,8 @@ clean_pgs()
       -t ${tasks} \
       -q test.qc \
       -P lindgren.prjc \
-      -o "logs/${clean_jname}.log" \
-      -e "logs/${clean_jname}.errors.log" \
+      -o "logs/${clean_lname}.log" \
+      -e "logs/${clean_lname}.errors.log" \
       -wd $(pwd) \
       -pe shmem 1 \
       -hold_jid_ad "${prs_jname}" \
@@ -218,7 +221,7 @@ clean_pgs()
 # parameters
 readonly queue="short"
 readonly project="lindgren.prj"
-readonly tasks=21 #1-22
+readonly tasks=1-22
 
 submit_ldpred2 "auto" "2" "${phenotype_binary}"
 #submit_ldpred2 "auto" "6" "${phenotype_cts}_int"

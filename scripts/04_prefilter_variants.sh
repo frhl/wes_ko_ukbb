@@ -18,9 +18,9 @@
 #$ -o logs/prefilter_variants.log
 #$ -e logs/prefilter_variants.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 1
+#$ -pe shmem 2
 #$ -q short.qa
-#$ -t 1-22
+#$ -t 1
 #$ -V
 
 set -o errexit
@@ -50,26 +50,30 @@ readonly exclude="data/genes/220310_common_plofs_to_exclude.txt"
 readonly maf_min=0.00
 readonly maf_max=0.05
 readonly pp_cutoff=0.99
-readonly partitions=256
+readonly partitions=512 # need at least 512 partitions for certain chroms/annotations
 
 mkdir -p ${out_dir}
 
-SECONDS=0
-set_up_hail
-set_up_pythonpath_legacy
-python3 "${hail_script}" \
-   --input_path ${input_prefix}\
-   --input_type ${input_type} \
-   --out_prefix ${out_prefix} \
-   --out_type ${out_type} \
-   --pp_cutoff ${pp_cutoff} \
-   --maf_min ${maf_min} \
-   --maf_max ${maf_max} \
-   --exclude ${exclude} \
-   --partitions ${partitions} \
-   && print_update "Finished annotating MatrixTables chr${chr}" ${SECONDS} \
-   || raise_error "Annotating MatrixTables for chr${chr} failed"
-
+if [ ! -f "${out_prefix}.mt/_SUCCESS" ]; then
+  rm -rf "${out_prefix}.mt/"
+  SECONDS=0
+  set_up_hail
+  set_up_pythonpath_legacy
+  python3 "${hail_script}" \
+     --input_path ${input_prefix}\
+     --input_type ${input_type} \
+     --out_prefix ${out_prefix} \
+     --out_type ${out_type} \
+     --pp_cutoff ${pp_cutoff} \
+     --maf_min ${maf_min} \
+     --maf_max ${maf_max} \
+     --exclude ${exclude} \
+     --partitions ${partitions} \
+     && print_update "Finished annotating MatrixTables chr${chr}" ${SECONDS} \
+     || raise_error "Annotating MatrixTables for chr${chr} failed"
+else
+  >&2 echo "${out_prefix}.mt already exists! Skipping"
+fi
 
 
 

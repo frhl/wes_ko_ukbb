@@ -15,7 +15,7 @@
 #$ -e logs/agreement.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q short.qc
+#$ -q long.qc
 #$ -V
 
 source utils/bash_utils.sh
@@ -24,7 +24,7 @@ readonly rscript="scripts/phasing/prephasing/07_agreement.R"
 readonly input_path="data/phased/wes_union_calls/200k/calibration/ukb_shapeit5_whatshap_variants_chr21.PS.txt.gz"
 
 readonly out_dir="data/prephased/wes_union_calls/"
-readonly out_prefix="${out_dir}/221124_whatshap_s5_agreement_n10000.txt"
+readonly out_prefix="${out_dir}/221124_whatshap_s5_agreement_n50000.txt"
 
 readonly wes_variants="/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list"
 
@@ -33,7 +33,7 @@ mkdir -p ${out_dir}
 set_up_rpy
 Rscript ${rscript} \
   --input_path "${input_path}" \
-  --n_samples 10000 \
+  --n_samples 50000 \
   --seed 11415 \
   --sites "${wes_variants}" \
   --output_path "${out_prefix}" 

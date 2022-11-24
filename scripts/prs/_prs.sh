@@ -21,6 +21,8 @@ readonly chr=$( get_chr ${index} )
 readonly pred_chr=$(echo ${pred} | sed -e "s/CHR/${chr}/g")
 readonly out_prefix_chr=$(echo ${prefix} | sed -e "s/CHR/${chr}/g")
 readonly tmp_bfile="${out_prefix_chr}.bfile"
+readonly tmp_bk="${tmp_bfile}.bk"
+readonly tmp_rds="${tmp_bfile}.rds"
 
 export OPENBLAS_NUM_THREADS=1 # avoid two levels of parallelization
 
@@ -36,6 +38,9 @@ if [ ! -f "${out_prefix_chr}.txt.gz" ]; then
       --method "${method}" \
       --tmp_bfile "${tmp_bfile}" \
       --out_prefix "${out_prefix_chr}"
+  # always remove temporary bk files as these
+  # tend to become extremely large  
+  rm ${tmp_bk} ${tmp_rds}
 else
   echo "Note: ${out_prefix_chr} already exists. Skipping.."
 fi

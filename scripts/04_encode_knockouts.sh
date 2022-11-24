@@ -18,8 +18,9 @@
 #$ -e logs/knockouts.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q short.qa
+#$ -q short.qc
 #$ -V
+#$ -hold_jid 79483349
 
 set -o errexit
 set -o nounset
@@ -46,7 +47,7 @@ readonly out_type="vcf"
 
 # Note: ~24 slots are needed for running chr1. 
 # Note: long queue may be required for chr1.
-readonly tasks="22" # 1-22
+readonly tasks="1-22" # 1-22
 readonly queue="short"
 readonly project="lindgren.prj"
 
@@ -119,10 +120,10 @@ submit_knockout_job()
   fi
 }
 
-submit_knockout_job "pLoF,damaging_missense" "4" "collect"
-submit_knockout_job "pLoF" "4" "collect"
-submit_knockout_job "damaging_missense" "4" "collect"
-submit_knockout_job "synonymous" "6" "collect"
+submit_knockout_job "pLoF,damaging_missense" "16" "collect"
+submit_knockout_job "pLoF" "10" "collect"
+submit_knockout_job "damaging_missense" "10" "collect"
+submit_knockout_job "synonymous" "10" "collect"
 
 
 

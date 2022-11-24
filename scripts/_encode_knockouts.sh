@@ -19,16 +19,16 @@ readonly out_prefix=${6?Error: Missing arg6 (path prefix for saige output)}
 readonly out_type=${7?Error: Missing arg7 (output type e.g., mt,vcf or plink)}
 
 readonly task_id=$( get_array_task_id )
-readonly chr=$( get_chr ${task_id} )
+readonly chr=${task_id}
 
 readonly input_path_chr=$(echo ${input_path} | sed -e "s/CHR/${chr}/g")
 readonly out_prefix_chr=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
 
 evaluate_knockouts() {
+  echo "Evaluating ${out_prefix_chr}.vcf.bgz.."
   SECONDS=0
   set_up_hail
   set_up_pythonpath_legacy
-  set -x
   python3 "${hail_script}" \
       --chrom ${chr} \
       --input_path ${input_path_chr} \
@@ -42,17 +42,16 @@ evaluate_knockouts() {
       --checkpoint \
       && print_update "Finished evaluation knockouts for chr${chr}" ${SECONDS} \
       || raise_error "Evaluating knockouts for chr${chr} failed"
-  set +x
-#  rm -rf "${out_prefix_chr}_checkpoint.mt"
+  rm -rf "${out_prefix_chr}_checkpoint.mt"
 }
 
 
-# Find knockouts in data
-#if [ ! -f "${out_prefix_chr}.vcf.bgz" ]; then
+if [ ! -f "${out_prefix_chr}.vcf.bgz" ]; then
   evaluate_knockouts
-#else
-#  >&2 echo "${out_prefix_chr}.vcf.bgz already exists. Skipping.."
-#fi 
+else
+  >&2 echo "${out_prefix_chr}.vcf.bgz already exists. Skipping!"
+fi
+
 
 # index resulting knockout VCF for future SAIGE analysis
 if [ ! -f "${out_prefix_chr}.vcf.csi" ]; then
