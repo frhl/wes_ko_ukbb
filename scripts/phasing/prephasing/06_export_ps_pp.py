@@ -18,11 +18,11 @@ def main(args):
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
     mt = io.import_table(phased_path, phased_type, calc_info = False)
     mt = mt.annotate_rows(AC = mt.info.AC)
-    mt = mt.annotate_rows(AF = mt.info.AF)
+    mt = mt.annotate_rows(MAC = variants.get_mac_expr(mt))
     mt = mt.filter_entries(hl.is_defined(mt.PS_rb))
     mt = mt.select_entries(*[mt.PP, mt.GT, mt.PS_rb, mt.GT_rb])
     mt = mt.transmute_rows(rsid = variants.get_variant_expr(mt.locus, mt.alleles))
-    mt = mt.select_rows(*[mt.rsid, mt.AC, mt.AF])
+    mt = mt.select_rows(*[mt.rsid, mt.AC, mt.MAC])
     
     ht = mt.entries()
     ht.export(out_prefix + ".PP.PS.txt.gz")

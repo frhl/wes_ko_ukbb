@@ -8,7 +8,7 @@
 #SBATCH --error=logs/combine_ps_pp.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 3
-#SBATCH --array=21
+#SBATCH --array=20,22
 #
 #$ -N combine_ps_pp
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
