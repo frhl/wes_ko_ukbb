@@ -29,6 +29,7 @@ main <- function(args){
 
     # get WES sites
     n_samples <- as.numeric(args$n_samples)
+    pp_cutoff <- as.numeric(args$pp_cutoff)
     seed <- as.numeric(args$seed)
     sites <- args$sites
     input_path <- args$input_path    
@@ -58,29 +59,10 @@ main <- function(args){
     dt <- dt[dt$s %in% my_samples,]
 
     # eval 
-    pp_50 <- eval_phase(eval_gt_agreement_by_bin(dt, labels[1:8]), labels)
-    pp_60 <- eval_phase(eval_gt_agreement_by_bin(dt, labels[1:8]), labels)
-    pp_70 <- eval_phase(eval_gt_agreement_by_bin(dt, labels[1:8]), labels)
-    pp_75 <- eval_phase(eval_gt_agreement_by_bin(dt, labels[1:8]), labels)
-    pp_80 <- eval_phase(eval_gt_agreement_by_bin(dt, labels[1:8]), labels)
-    pp_85 <- eval_phase(eval_gt_agreement_by_bin(dt, labels[1:8]), labels)
-    pp_90 <- eval_phase(eval_gt_agreement_by_bin(dt, labels[1:8]), labels)
-    pp_95 <- eval_phase(eval_gt_agreement_by_bin(dt, labels[1:8]), labels)
-    pp_99 <- eval_phase(eval_gt_agreement_by_bin(dt, labels[1:8]), labels)
-    
-    # annotate
-    pp_50$pp <- 0.50
-    pp_60$pp <- 0.60
-    pp_70$pp <- 0.70
-    pp_75$pp <- 0.75
-    pp_80$pp <- 0.80
-    pp_85$pp <- 0.85
-    pp_90$pp <- 0.90
-    pp_95$pp <- 0.95
-    pp_99$pp <- 0.99
+    final <- eval_phase(eval_gt_agreement_by_bin(dt, labels[1:8]), labels)
+    final$pp <- as.numeric(pp_cutoff)
 
     # combine
-    final <- rbind(pp_50, pp_60, pp_70, pp_75, pp_80, pp_85, pp_90, pp_95, pp_99)
     final$pp <- factor(final$pp)
     final$bin <- factor(final$bin, levels = labels) 
     fwrite(final, output_path, sep = '\t')
@@ -94,6 +76,7 @@ parser$add_argument("--sites", default=NULL, required = TRUE, help = "path to qu
 parser$add_argument("--output_path", default=NULL, required = TRUE, help = "")
 parser$add_argument("--n_samples", default=10, required = TRUE, help = "")
 parser$add_argument("--seed", default=52, required = TRUE, help = "")
+parser$add_argument("--pp_cutoff", default=NULL, required = TRUE, help = "")
 args <- parser$parse_args()
 
 main(args)
