@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
-#
-#$ -N phenotypes_binary
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/phenotypes_binary.log
-#$ -e logs/phenotypes_binary.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qf
-#$ -V
+
+#SBATCH -A lindgren.prj
+#SBATCH -J phenotypes_binary
+#SBATCH -D /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/phenotypes_binary.log
+#SBATCH --error=logs/phenotypes_binary.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 5
 
 source utils/bash_utils.sh
 source utils/hail_utils.sh
@@ -21,9 +20,9 @@ readonly covar_dir="data/phenotypes"
 readonly out_dir="data/phenotypes"
 
 readonly in_bin="${in_dir}/curated_phenotypes_binary.tsv"
-readonly tmp_bin="${out_dir}/curated_covar_phenotypes_binary.tsv.gz"
-readonly out_bin_500k="${out_dir}/curated_covar_phenotypes_binary_500k"
-readonly out_bin_200k="${out_dir}/curated_covar_phenotypes_binary_200k"
+readonly tmp_bin="${out_dir}/spiros_brava_phenotypes_binary.tsv.gz"
+readonly out_bin_500k="${out_dir}/spiros_brava_phenotypes_binary_500k"
+readonly out_bin_200k="${out_dir}/spiros_brava_phenotypes_binary_200k"
 
 readonly final_sample_list="/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list"
 
@@ -31,14 +30,20 @@ readonly path_covars="${covar_dir}/covars1.csv"
 readonly covariates="$(cat ${path_covars})"
 
 mkdir -p ${out_dir}
+mkdir -p ${spark_dir}
 
 # Pre-processing of phenotypes
-set_up_rpy
-Rscript ${r_script} \
-  --input_path ${in_bin} \
-  --covariates ${covariates} \
-  --out_path ${tmp_bin}
-
+if [ ! -f ${tmp_bin} ]; then
+  set_up_rpy
+  Rscript ${r_script} \
+    --input_path ${in_bin} \
+    --covariates ${covariates} \
+    --qc_samples ${final_sample_list} \
+    --case_count_cutoff "50" \
+    --include_spiros \
+    --include_brava \
+    --out_path ${tmp_bin}
+fi
 
 # set up python
 set +eu
@@ -47,21 +52,33 @@ set_up_hail
 set_up_pythonpath_legacy
 set -eu
 
-# get 500k IMP samples
+# get 500k WES samples
+if [ ! -f ${out_bin_500k} ]; then
 python3 "${hail_script}" \
      --input_path "${tmp_bin}" \
      --export_header \
      --count_case_control \
      --out_prefix "${out_bin_500k}"
+fi
 
+
+if [ ! -f "${out_bin_500k}.tsv.gz" ]; then
+  gzip "${out_bin_500k}.tsv"
+fi
 
 # Get 200k WES samples
+if [ ! -f ${out_bin_200k} ]; then
 python3 "${hail_script}" \
      --input_path "${tmp_bin}" \
      --extract_samples "${final_sample_list}" \
      --export_header \
      --count_case_control \
      --out_prefix "${out_bin_200k}"
+fi
+
+if [ ! -f "${out_bin_500k}.tsv.gz" ]; then
+  gzip "${out_bin_200k}.tsv"
+fi
 
 
 

@@ -19,7 +19,7 @@ def main(args):
     # setup flags
     hail_init.hail_bmrc_init_local('logs/hail/phenotypes.log', 'GRCh38')
 
-    ht = hl.import_table(input_path, impute = True, key = 'eid', missing = ["NA",""], types = {"eid": hl.tstr}, force = True)
+    ht = hl.import_table(input_path, impute = True, key = 'eid', missing = ["NA",""," "], types = {"eid": hl.tstr}, force = True)
 
     if extract_samples:
         samples = hl.import_table(extract_samples,no_header=True, key='f0',delimiter=',')
@@ -48,6 +48,7 @@ def main(args):
 
     if count_case_control:
         outfile = out_prefix + "_counts.tsv"
+        print(ht.describe())
         with open(outfile, "w") as outfile:
             for pheno in phenos:
                 cases = ht.aggregate(hl.agg.sum(ht[pheno] == True))

@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 #
-#$ -N extract_marker_gt
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/extract_marker_gt.log
-#$ -e logs/extract_marker_gt.errors.log
-#$ -P lindgren.prjc
-#$ -q short.qa
-#$ -pe shmem 5
-#$ -V
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=extract_marker_gt
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/extract_marker_gt.log
+#SBATCH --error=logs/extract_marker_gt.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 5
+#SBATCH --requeue
 
 # Takes ~13h with 3a cores
 

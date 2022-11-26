@@ -26,21 +26,26 @@ readonly out_prefix=${4?Error: Missing arg4 (out_prefix)}
 readonly out_type=${5?Error: Missing arg5 (out_type)}
 readonly genes=${6?Error: Missing arg6 (genes)}
 
-readonly NUM=${SGE_TASK_ID}
+readonly NUM=${SLURM_ARRAY_TASK_ID}
 readonly gene="$(zcat ${genes} | grep -w "chr${chr}" | grep "ENSG" | cut -f1 | sed ${NUM}'q;d' )"
 readonly out_prefix_gene="${out_prefix}_${gene}"
+readonly out="${out_prefix}.tsv.gz"
 
-SECONDS=0
-set_up_hail
-set_up_pythonpath_legacy
-python3 ${hail_script} \
-  --chrom ${chr} \
-  --input_path ${input_path} \
-  --input_type ${input_type} \
-  --out_prefix ${out_prefix_gene} \
-  --out_type ${out_type} \
-  --gene ${gene} \
-  && print_update "Finished writing gene for chr${chr}" ${SECONDS} \
-  || raise_error "writing gene for chr${chr} failed"
+if [ ! -f "${out}" ]; then
+  SECONDS=0
+  set_up_hail
+  set_up_pythonpath_legacy
+  python3 ${hail_script} \
+    --chrom ${chr} \
+    --input_path ${input_path} \
+    --input_type ${input_type} \
+    --out_prefix ${out_prefix_gene} \
+    --out_type ${out_type} \
+    --gene ${gene} \
+    && print_update "Finished writing gene for chr${chr}" ${SECONDS} \
+    || raise_error "writing gene for chr${chr} failed"
+else 
+ >&2 echo "${out} already exists. Skipping.."
+fi
 
 

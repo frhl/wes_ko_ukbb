@@ -1,14 +1,4 @@
 #!/usr/bin/env bash
-#
-#
-#$ -N _permute
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_permute.log
-#$ -e logs/_permute.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q lindgren.qe
-#$ -V
 
 set -o errexit
 set -o nounset
@@ -22,7 +12,9 @@ readonly spa_script="scripts/permute/_gene_spa.sh"
 readonly merge_script="scripts/permute/_merge_permuted_spa.sh"
 readonly calc_script="scripts/permute/_calc_p.sh"
 
-readonly index=${SGE_TASK_ID}
+readonly curwd=$(pwd)
+readonly project="lindgren.prj"
+readonly index=${SLURM_ARRAY_TASK_ID}
 
 # input arguments
 readonly chr=${1?Error: Missing arg1}
@@ -54,12 +46,12 @@ permutation_supply=${26?Error: Missing arg23 (How many permutations have been ac
 top_p=${27?Error: Missing arg24 (What index of the lowest P-value should be used to determien covergence (10 or 100)}
 
 # set final paths depending on gene
-readonly gene="$(zcat ${genes_path} | grep "chr${chr}" | cut -f1 | sed ${index}'q;d' )"
+readonly gene="$(zcat ${genes_path} | grep -w "chr${chr}" | cut -f1 | sed ${index}'q;d' )"
 readonly input_path=$(echo ${input_path_prelim} | sed -e "s/GENE/${gene}/g")
 readonly out_prefix=$(echo ${out_prefix_prelim} | sed -e "s/GENE/${gene}/g")
 readonly write_dir="$( dirname ${out_prefix})"
 readonly tested_phenos="${out_prefix}.phenos"
-readonly empirical_p="${out_prefix}.permuted"
+readonly status_phenos="${out_prefix}.permuted"
 readonly file_cutoff="${out_prefix}.cutoff"
 
 # qsub names
@@ -69,11 +61,15 @@ readonly name_merge="_mrg_${gene}"
 readonly name_calc="_p_${gene}"
 readonly name_main="_i${iteration}_${gene}"
 
+
 # get logs
 readonly log="${write_dir}/${gene}.log"
 readonly log_saige="${write_dir}/saige.log"
 readonly log_errors="${write_dir}/${gene}.errors.log"
 readonly log_saige_errors="${write_dir}/saige.errors.log"
+
+
+
 
 # check if permute gene even exists:
 if [ ! -f "${input_path}" ]; then
@@ -82,16 +78,10 @@ elif [ $( zcat ${input_path} | wc -l ) -le 1 ]; then
   raise_error "${input_path} only contains a header!"
 fi
 
-
-
 # create files and dirs
 mkdir -p ${write_dir}
 touch ${tested_phenos}
-
-#if [ ! -z ${empirical_p} ]; then
-#  echo -e "gene\tphenotype\tn_shuffle\ttrue_p\tpermuted_p\tempirical_p\tstatus" > ${empirical_p}
-#fi
-
+touch ${status_phenos}
 
 set_arr_phenos() {
   trait=${1}
@@ -154,43 +144,49 @@ get_trait_from_pheno() {
 # been completed. Will wait for the qsub script to run before proceeding.
 submit_shuffle_phase() {
 
-  
   permutation_supply=$( get_permutation_supply )
   local permutations_demand=${1}
   local n_tasks_required=$(( (${permutations_demand} / ${replicates}) - ${permutation_supply} ))
   local sge_seed=3
-
   if [ ${n_tasks_required} -ge 1 ]; then
-
     echo "Running shuffle phase ${n_tasks_required} time(s)."
     local tasks_lower_bound=$(( ${permutation_supply} + 1 ))
     local tasks_upper_bound=$(( ${permutation_supply} + ${n_tasks_required} ))
     local tasks_permute=${tasks_lower_bound}-${tasks_upper_bound}
     #permutation_supply=$(( ${permutation_supply} + ${n_tasks_required}))
-
     local out_permute_success="${out_prefix}_${tasks_permute}"
     local out_permute_upper_bound="${out_prefix}_${tasks_upper_bound}"
-
     # if the permutation already exists. Skip submission..
     if [ ! -f "${out_permute_upper_bound}.vcf.gz" ]; then
-
-      qsub -N "${name_shuffle}" \
-          -t ${tasks_permute} \
-          -o ${log} \
-          -e ${log_errors} \
-          -q ${queue_permute} \
-          -pe shmem ${n_slots_permute} \
-          ${bash_script} \
-          ${chr} \
-          ${input_path} \
-          ${out_prefix} \
-          ${out_permute_success} \
-          ${sge_seed} \
-          ${gene} \
-          ${replicates} \
-          ${cond_genotypes} \
-          ${use_cond_common}
-
+      local slurm_tasks="${tasks_permute}"
+      local slurm_jname="${name_shuffle}"
+      local slurm_lname_e="${log_errors}"
+      local slurm_lname_o="${log}"
+      local slurm_project="${project}"
+      local slurm_queue="${queue_permute}"
+      local slurm_nslots="${n_slots_permute}"
+      qshuffle_jid=$( sbatch \
+        --account="${slurm_project}" \
+        --job-name="${slurm_jname}" \
+        --output="${slurm_lname_o}" \
+        --error="${slurm_lname_e}" \
+        --open-mode="append" \
+        --chdir="${curwd}" \
+        --partition="${slurm_queue}" \
+        --cpus-per-task="${slurm_nslots}" \
+        --array=${slurm_tasks} \
+        --parsable \
+        ${bash_script} \
+        ${chr} \
+        ${input_path} \
+        ${out_prefix} \
+        ${out_permute_success} \
+        ${sge_seed} \
+        ${gene} \
+        ${replicates} \
+        ${cond_genotypes} \
+        ${use_cond_common} )
+      echo "Submitting shuffle script (JID=${qshuffle_jid})"
     else
       echo >&2 "${out_permute_upper_bound} already exists. Skipping.."
     fi
@@ -206,31 +202,41 @@ submit_saige() {
   local saige_demand=${1}
   local pheno_saige_supply=$(get_saige_supply)
   local n_tasks_required=$(( (${saige_demand} / ${replicates}) - ${pheno_saige_supply} ))
-
   if [ ${n_tasks_required} -ge 1 ]; then
-
     echo "Running saige for ${phenotype} with ${n_tasks_required} job(s)."
     local tasks_lower_bound=$(( ${pheno_saige_supply} + 1 ))
     local tasks_upper_bound=$(( ${pheno_saige_supply} + ${n_tasks_required} ))
     local tasks_spa=${tasks_lower_bound}-${tasks_upper_bound}
+    
     #saige_supply[${phenotype}]=$(( ${pheno_saige_supply} + ${n_tasks_required}))
-
     local vcf_gene_spa="${out_prefix}"
     local out_gene_spa="${out_prefix}_${phenotype}"
     local out_spa_success="${out_gene_spa}_${tasks_spa}"
     local out_spa_upper_bound="${out_gene_spa}_${tasks_upper_bound}"
-
     #local spa_name="spa_${gene}_${tasks_spa}_${phenotype}"
-
+    
     # if the SPA has already been performed. Skip it.
     if [ ! -f "${out_spa_upper_bound}.txt" ]; then
-      qsub -N "${name_saige_pheno}" \
-        -o ${log_saige} \
-        -e ${log_saige_errors} \
-        -t ${tasks_spa} \
-        -q ${queue_saige} \
-        -pe shmem ${n_slots_saige} \
-        -hold_jid ${name_shuffle} \
+      
+      local slurm_tasks="${tasks_spa}"
+      local slurm_jname="${name_saige_pheno}"
+      local slurm_lname_e="${log_saige_errors}"
+      local slurm_lname_o="${log_saige}"
+      local slurm_project="${project}"
+      local slurm_queue="${queue_saige}"
+      local slurm_nslots="${n_slots_saige}"
+      spa_jid=$( sbatch \
+        ${qshuffle_jid:+--dependency="afterok:${qshuffle_jid}"} \
+        --account="${slurm_project}" \
+        --job-name="${slurm_jname}" \
+        --output="${slurm_lname_o}" \
+        --error="${slurm_lname_e}" \
+        --chdir="${curwd}" \
+        --partition="${slurm_queue}" \
+        --cpus-per-task="${slurm_nslots}" \
+        --array=${slurm_tasks} \
+        --open-mode="append" \
+        --parsable \
         "${spa_script}" \
         "${chr}" \
         "${vcf_gene_spa}" \
@@ -244,7 +250,8 @@ submit_saige() {
         "${gene}" \
         "${min_mac}" \
         "${cond_markers}" \
-        "${use_cond_common}"
+        "${use_cond_common}")
+      echo "Submitting SPA on shuffled VCFs (JID=${spa_jid})"
     else
       echo >&2 "${out_spa_upper_bound} already exists. Skipping.."
     fi
@@ -256,33 +263,52 @@ submit_saige() {
 
 
 submit_merge() {
-  set -x
-  qsub -N "${name_merge_pheno}" \
-    -o ${log} \
-    -e ${log_errors} \
-    -q ${queue_merge} \
-    -pe shmem 1 \
-    -hold_jid "${name_saige_pheno}" \
+  local slurm_jname="${name_merge_pheno}"
+  local slurm_lname_e="${log_errors}"
+  local slurm_lname_o="${log}"
+  local slurm_project="${project}"
+  local slurm_queue="${queue_merge}"
+  local slurm_nslots="1"
+  merge_jid=$( sbatch \
+    ${spa_jid:+--dependency="afterany:${spa_jid}"} \
+    --account="${slurm_project}" \
+    --job-name="${slurm_jname}" \
+    --output="${slurm_lname_o}" \
+    --error="${slurm_lname_e}" \
+    --chdir="${curwd}" \
+    --partition="${slurm_queue}" \
+    --cpus-per-task="${slurm_nslots}" \
+    --open-mode="append" \
+    --parsable \
     "${merge_script}" \
     "${n_shuffle}" \
     "${replicates}" \
     "${phenotype}" \
+    "${iteration}" \
     "${out_prefix}" \
-    "${path_merged}"
-  set +x 
+    "${path_merged}" )
+  echo "Submitting merge (JID=${merge_jid}).."
 }
 
 submit_calc_p() {
   # check if actual PRS is used in SAIGE
-
-  echo "Calculating empirical P."
-  set -x
-  qsub -N "${name_calc_pheno}" \
-    -o ${log} \
-    -e ${log_errors} \
-    -q ${queue_merge} \
-    -pe shmem 1 \
-    -hold_jid "${name_merge_pheno}" \
+  local slurm_jname="${name_calc_pheno}"
+  local slurm_lname_e="${log_errors}"
+  local slurm_lname_o="${log}"
+  local slurm_project="${project}"
+  local slurm_queue="${queue_merge}"
+  local slurm_nslots="1"
+  calc_p_jid=$( sbatch \
+    ${merge_jid:+--dependency="afterok:${merge_jid}"} \
+    --account="${slurm_project}" \
+    --job-name="${slurm_jname}" \
+    --output="${slurm_lname_o}" \
+    --error="${slurm_lname_e}" \
+    --chdir="${curwd}" \
+    --partition="${slurm_queue}" \
+    --cpus-per-task="${slurm_nslots}" \
+    --open-mode="append" \
+    --parsable \
     "${calc_script}" \
     "${gene}" \
     "${phenotype}" \
@@ -294,18 +320,32 @@ submit_calc_p() {
     "${top_p}" \
     "${true_p_path}" \
     "${n_shuffle}" \
-    "${out_prefix}"
-  set +x
+    "${iteration}" \
+    "${out_prefix}")
+  echo "${calc_p_jid}"
 }
 
 resubmit_loop() {
-  echo "Resubmitting loop."
-  set -x
-  qsub -N "${name_main}" \
-    -q "${queue_master}" \
-    -pe shmem "1" \
-    -t ${SGE_TASK_ID} \
-    -hold_jid "${name_calc_pheno}" \
+  local slurm_tasks="${SLURM_ARRAY_TASK_ID}"
+  local slurm_jname="${name_main}"
+  local slurm_lname_e="${log_errors}"
+  local slurm_lname_o="${log}"
+  local slurm_project="${project}"
+  local slurm_queue="${queue_master}"
+  local slurm_nslots="1"
+  #loop_jid=( 
+  sbatch \
+    --dependency="afterok:${wait_on_jids}" \
+    --account="${slurm_project}" \
+    --job-name="${slurm_jname}" \
+    --output="${slurm_lname_o}" \
+    --error="${slurm_lname_e}" \
+    --chdir="${curwd}" \
+    --partition="${slurm_queue}" \
+    --cpus-per-task="${slurm_nslots}" \
+    --array=${slurm_tasks} \
+    --open-mode="append" \
+    --parsable \
     "${this_script}" \
     "${chr}" \
     "${grm_mtx}" \
@@ -333,14 +373,15 @@ resubmit_loop() {
     "${cond_genotypes}" \
     "${iteration}" \
     "${permutation_supply}" \
-    "${new_top_p}" 
-  set +x
+    "${new_top_p}"
+
+  echo "Re-submitted main script for another iteration!"
 }
 
 check_if_done() {
   local file="${out_prefix}.permuted"
   if [ -f ${file} ]; then
-    local fcount="$(cat ${file} | grep "OK" | awk -v var="${phenotype}" '$2 == var' | wc -l)"
+    local fcount="$(cat ${file} | grep -w "OK" | awk -v var="${phenotype}" '$2 == var' | wc -l)"
     if [ ${fcount} -ge "1" ]; then
       echo "1"
     else
@@ -353,12 +394,13 @@ check_if_done() {
 
 
 check_if_all_done() {
-  local file="${out_prefix}.permuted"
-  if [ -f ${file} ]; then
-    local obs_count="$(cat ${file} | grep "OK" | cut -f2 | sort | uniq | wc -l)"
-    local expt_count="$(cat ${tested_phenos} | sort | uniq | wc -l)"
+  local file=${1}
+  local tested=${2}
+  if [ -f "${file}" ]; then
+    local obs_count="$(cat ${file} | grep -w "OK" | cut -f2 | sort | uniq | wc -l)"
+    local expt_count="$(cat ${tested} | sort | uniq | wc -l)"
     if [ "${obs_count}" -ge "1" ]; then
-      if [ ${expt_count} -eq ${obs_count} ]; then
+      if [ "${expt_count}" -eq "${obs_count}" ]; then
         echo "1"
       else
         echo "0"
@@ -387,20 +429,24 @@ get_saige_supply() {
 SECONDS=0
 do_extra_loop=0
 iteration=$((${iteration} + 1))
-set_arr_phenos "both"
-arr_phenos=( "Alanine_aminotransferase_residual" "Calcium_residual" "WHR_adj_BMI" "BMI" "Apolipoprotein_B_residual")
+wait_on_jids=""
+set_arr_phenos "binary"
+#arr_phenos=( "Alanine_aminotransferase_residual" "Calcium_residual" "WHR_adj_BMI" "BMI" "Apolipoprotein_B_residual")
 #arr_phenos=( "Alanine_aminotransferase_residual" )
+arr_phenos=( "CC_combined" "DEM_combined" "AD_combined" "BC_combined" )
 #arr_phenos=( "Alanine_aminotransferase_residual" "BMI" )
 
-
-echo "Starting iteration ${iteration}"
 if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then
-  if [ $(check_if_all_done) -eq "0" ]; then
+  readonly is_all_done=$( check_if_all_done ${status_phenos} ${tested_phenos} )
+  if [ "${is_all_done}" -eq "0" ]; then
+    echo "Starting iteration ${iteration}."
     submit_shuffle_phase ${n_shuffle}
     for phenotype in "${arr_phenos[@]}"; do
       name_saige_pheno="_spa_${gene}_${phenotype}"
       name_merge_pheno="_mrg_${gene}_${phenotype}"
       name_calc_pheno="_p_${gene}_${phenotype}"
+      name_calc_gene="_p_${gene}"
+      echo "Testing phenotype ${phenotype} at iteration ${iteration}."
       echo ${phenotype} >> ${tested_phenos}
       if [ $(check_if_done) -eq "0" ]; then
         set_arr_saige ${phenotype}
@@ -413,11 +459,14 @@ if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then
           if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then
             path_merged="${out_prefix}_${phenotype}_merged.txt"
             if [ ! -f ${path_merged} ]; then
+              echo "Running phenotype ${phenotype} with SAIGE at iteration ${iteration}"
               submit_saige ${n_shuffle}
               submit_merge 
             fi
-            submit_calc_p
+            # only re-submit loop once all of the previous jobs (per phenotype) have completed
             do_extra_loop=1
+            last_jid=$(submit_calc_p)
+            wait_on_jids=$( echo "${last_jid}:${wait_on_jids}" | sed 's/:$//g' )
           fi
        fi
       fi

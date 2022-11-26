@@ -1,13 +1,25 @@
 #!/usr/bin/env bash
 #
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=ldsc
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/ldsc.log
+#SBATCH --error=logs/ldsc.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 1
+#SBATCH --array=1-220
+#SBATCH --requeue
+#
+#
 #$ -N ldsc
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/ldsc.log
 #$ -e logs/ldsc.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 3
-#$ -q short.qe
-#$ -t 1-75
+#$ -pe shmem 1
+#$ -q short.qc
+#$ -t 1-220
 #$ -V
 
 set -o errexit
@@ -26,14 +38,15 @@ readonly pheno_dir="data/phenotypes"
 readonly ld_bed="${bed_dir}/short_merged_ukb_hapmap_rand_10k_eur.bed"
 readonly ld_dir="data/prs/hapmap/ld/matrix_unrel_kin"
 
-readonly index=${SGE_TASK_ID}
+readonly cluster=$( get_current_cluster )
+readonly index=$( get_array_task_id )
 
 readonly file_cts="${pheno_dir}/curated_covar_phenotypes_cts.tsv.gz"
 readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
 readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
 
-readonly file_binary="${pheno_dir}/curated_covar_phenotypes_binary.tsv.gz"
-readonly pheno_list_binary="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
+readonly file_binary="${pheno_dir}/spiros_brava_phenotypes_binary_500k.tsv.gz"
+readonly pheno_list_binary="${pheno_dir}/spiros_brava_phenotypes_binary_500k_header.tsv"
 readonly phenotype_binary=$( sed "${index}q;d" ${pheno_list_binary} )
 
 

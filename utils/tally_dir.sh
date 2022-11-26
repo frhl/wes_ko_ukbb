@@ -6,7 +6,7 @@
 #$ -e tally.txt
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q short.qf
+#$ -q short.qc
 #$ -V
 
 readonly thetime=`date`

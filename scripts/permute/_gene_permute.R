@@ -3,24 +3,86 @@
 library(argparse)
 library(data.table)
 
+
+# hash dosage as a string. This function simply concatenates all the dosgae counts
+# into a long string, and subsequently applies a hash to this string. 
+hash_dosage <- function(DS_matrix, algo = "xxhash32"){
+    require(digest)
+    dosage_string <- unlist(apply(DS_matrix, 1, function(x) as.character(paste(x, collapse = '-'))))
+    the_hash <- unlist(lapply(dosage_string, function(x) digest(x, algo=algo)))
+    return(the_hash)
+}
+
+# get probability of knockout given number of heterozygotes
+naive_knockout_p <- function(hets){
+    if (hets > 1){
+        return(1 - (2*((1/2)^hets)))
+    } else {
+        return(0)
+    }
+}
+
+# fast way to calculate probability of being KO
+calc_knockout_p_fast <- function(d){
+    
+    # hom ref are always zero
+    d$P <- 0
+    # hom alt are always one
+    d$P[d$hom_alt_n > 1] <- 1
+    # depends on count for phased hets
+    index <- which((d$phased_het > 1) & (d$hom_alt_n == 0))
+    for (idx in index){
+        hets <- d$phased_het[idx]
+        d$P[idx] <- naive_knockout_p(hets)
+    }
+    
+    return(d$P)
+    
+}
+
 # simple method to shuffle knockouts
 shuffle_knockouts <- function(d){
-    d$KO <- rbinom(n=nrow(d), size=1, prob = d$pTKO)
-    d$pKO <- ifelse((d$KO == 1 & d$unphased_het == 0), 1,
-         ifelse((d$KO == 1 & d$hom_alt_n > 0), 1,
-         ifelse((d$phased_het == 1 & d$unphased_het > 0), 1 - 1*(1/2)^d$unphased_het,
-         ifelse((d$phased_het == 0 & d$unphased_het > 1), 1 - 2*(1/2)^d$unphased_het, 0))))
-    return(d$pKO)
+    
+    # header of d
+    # gene_id   s   unphased_het    phased_het  hom_alt_n   het pTKO
+    # <chr> <int>   <int>   <int>   <int>   <int>   <dbl>
+    # ENSG00000027644   1000028 0   0   0   0   0
+    # ENSG00000027644   1000034 0   0   0   0   0
+    # ENSG00000027644   1000087 0   0   0   0   0
+    
+    n <- nrow(d)
+    p <- calc_knockout_p_fast(d)
+    B <- rbinom(n = n, size = 1, prob = p)
+
+    return(B)
 }
 
 # make header of VCF file
-make_vcf_dosage_header <- function(chrom){    
+make_vcf_dosage_header <- function(chrom){
     vcf_format <- '##fileformat=VCFv4.2'
     vcf_entry <-  '##FORMAT=<ID=DS,Number=1,Type=Float,Description="">'
     vcf_filter <- '##FILTER=<ID=PASS,Description="All filters passed">"'
+    vcf_i1 <- '##INFO=<ID=AC,Number=A,Type=Integer,Description="Knockout count multiplied by two">'
+    vcf_i2 <- '##INFO=<ID=HASH,Number=A,Type=String,Description="Hash function applied to dosages">'
     vcf_contig <- paste0('##contig=<ID=',chrom,',length=81195210>')
-    vcf_out <- paste(vcf_format, vcf_entry, vcf_filter, vcf_contig, sep = '\n')
+    vcf_out <- paste(vcf_format, vcf_entry, vcf_filter, vcf_i1, vcf_i2, vcf_contig, sep = '\n')
     return(vcf_out)
+}
+
+# aggregate information from dosage matrix to create INFO rows
+calc_info <- function(DS_matrix){
+    stopifnot(ncol(DS_matrix) > 1)
+    stopifnot(nrow(DS_matrix) > 1)
+    # create INFO row by comining strings column wise
+    d_info <- data.table(
+        allele_count = rowSums(DS_matrix, na.rm = TRUE),
+        hashes = hash_dosage(DS_matrix)    
+    )
+    # append identifiers as specified in header
+    d_info$allele_count <- paste0("AC=",d_info$allele_count,";")
+    d_info$hashes <- paste0("HASH=",d_info$hashes)
+    info_rows <- apply(d_info, 1, paste, collapse = "")
+    return(info_rows)
 }
 
 
@@ -101,7 +163,7 @@ format_real_variant_long_to_wide <- function(dt, position_last = 20000){
 
 main <- function(args){
 
-    #print(args)
+    # print(args)
 
     autosomes <- paste0("chr",1:22)
     stopifnot(file.exists(args$input_path))
@@ -111,8 +173,13 @@ main <- function(args){
     stopifnot(args$chrom %in% autosomes)
     stopifnot(!is.null(args$enable_cond_pipeline))
     # conditional pipeline
-    if (args$enable_cond_pipeline) stopifnot(file.exists(args$input_path_cond_genotypes))
-    
+    if (args$enable_cond_pipeline) {
+      cpath = args$input_path_cond_genotypes  
+      if (!file.exists(cpath)){
+        stop(paste("Can't find conditional markers at: ", cpath))
+      }
+    }
+
     # seed for reproducibility
     seed <- as.numeric(args$seed)
     set.seed(seed)
@@ -144,8 +211,11 @@ main <- function(args){
       n_real_markers <- 0
     }
 
-    # if there are conditioning markers available include them downstream.
+    # if there are conditiONIng markers available include them downstream.
     if (n_real_markers > 0){
+
+        # how many markers were found?
+        write(paste("Note:",n_real_markers, "real marker(s) found. These will be included as unshuffled in permuted VCF."),stdout())
 
         # ensure that samples are overlapping
         sample_overlap <- unique(intersect(cond_dt$s, d$s))
@@ -172,7 +242,17 @@ main <- function(args){
         combined_dosages <- rbind(dosage, cond_dosage) 
         combined_meta <- rbind(rows, cond_rows)
         final <- cbind(combined_meta, combined_dosages)
-        sds <- unlist(apply(combined_dosages, 1, sd))
+        
+        # calculate some info stats
+        sds <- unlist(apply(combined_dosages, 1, function(x) sd(x, na.rm = TRUE)))
+
+        # calculate INFO column
+        final$INFO <- calc_info(combined_dosages)
+
+        # how many real markers have missing dosages
+        n_real_count <- nrow(cond_dosage)
+        n_real_miss <- sum(is.na(apply(cond_dosage, 1, sd)))
+        write(paste0("Note: ", n_real_miss, " of ", n_real_count, " real markers have one or more missing dosages."), stdout())
 
         # debugging - are SNPs monoprhic and thus
         # the resulting matrix not invertible?
@@ -186,14 +266,19 @@ main <- function(args){
         rows <- make_vcf_dosage_rows(args$chrom, 1:n, args$vcf_id)
         rows_dosage <- cbind(rows, dosage)
         final <- rows_dosage
+        final$INFO <- calc_info(dosage)
         sds <- unlist(apply(dosage, 1, sd))
     }
 
+
+
     # Sometimes markers with zero AC are crated,
     # let's remove them before entering SAIGE.
+    if (any(is.na(sds))) stop("Some standard devations are NA! Something went wrong with shuffle")
     if (args$remove_invariant_markers){
         bool_invariant <- sds == 0
         n_invariant <- sum(bool_invariant)
+        print(n_invariant)
         if (n_invariant > 0){
             final <- final[!bool_invariant,]
             write(paste("[_gene_permute.R]: Removed", n_invariant, "invariant markers."), stderr())

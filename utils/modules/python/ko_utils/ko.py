@@ -18,17 +18,20 @@ OTHER_CSQS = ["mature_miRNA_variant", "5_prime_UTR_variant",
               "regulatory_region_variant", "feature_truncation", "intergenic_variant"]
 
 
-def csqs_case_builder(worst_csq_expr: hl.StringExpression, use_loftee: bool = True):
+def csqs_case_builder(worst_csq_expr: hl.StringExpression, use_loftee: bool = True, loftee_lc_annotation="damaging_missense"):
     r'''Annotate consequence categories for downstream analysis
     
     :param worst_csq_by_gene_canonical_expr: A struct that should contain "most_severe_consequence"
     :param use_loftee: if True will annotate PTVs as either high confidence (ptv) or low confidence (ptv_LC)
+    :param loftee_lc_annotation: low confidence
     '''
     case = hl.case(missing_false=True)
     if use_loftee:
+        assert loftee_lc_annotation in ("LC", "damaging_missense")
+        print(f"Note: LOFTEE Low Confidence PTVs will be annotated as {loftee_lc_annotation}.")
         case = (case
                 .when(worst_csq_expr.lof == 'HC', 'pLoF')
-                .when(worst_csq_expr.lof == 'LC', 'LC')
+                .when(worst_csq_expr.lof == 'LC', loftee_lc_annotation)
                 )
     else:
         case = case.when(
@@ -59,6 +62,23 @@ def set_to_phased_call(gt: hl.call):
     .when(gt == hl.parse_call("0/0"), hl.parse_call("0|0"))
     .or_missing()))
 
+
+def unphase(gt: hl.call):
+    """ unphase a genotype call 
+    
+    :param gt: GT (call)
+    """
+    assert str(gt.dtype) == 'call'
+    return((hl.case()
+    .when(gt == hl.parse_call("1|0"), hl.parse_call("0/1"))
+    .when(gt == hl.parse_call("0|1"), hl.parse_call("0/1"))
+    .when(gt == hl.parse_call("1|1"), hl.parse_call("1/1"))
+    .when(gt == hl.parse_call("0|0"), hl.parse_call("0/0"))
+    .when(gt == hl.parse_call("1/0"), hl.parse_call("0/1"))
+    .when(gt == hl.parse_call("0/1"), hl.parse_call("0/1"))
+    .when(gt == hl.parse_call("1/1"), hl.parse_call("1/1"))
+    .when(gt == hl.parse_call("0/0"), hl.parse_call("0/0"))
+    .or_missing()))
 
 
 def is_phased(gt: hl.call):
@@ -129,16 +149,25 @@ def aggr_count_calls(mt: hl.MatrixTable, phased: bool = True):
     return((gt10,gt01))
 
 
-def collect_phase_count_by_expr(mt: hl.MatrixTable, expr: hl.StringExpression):
+def collect_phase_count_by_expr(mt: hl.MatrixTable, expr: hl.StringExpression,
+        include_phase_conf: bool = False):
     """Create a hail table of aggregated genotypes by expr
     
     :param mt: MatrixTable to be used
     :param expr: what expression to collapse on, e.g. "gene_id"
     """
-    return mt.group_rows_by(expr).aggregate(
-              gts=hl.agg.filter(mt.GT.is_non_ref(), hl.agg.collect(mt.GT)),
-              varid=hl.agg.filter(mt.GT.is_non_ref(), hl.agg.collect(mt.varid))
-            )
+    if include_phase_conf:
+        return mt.group_rows_by(expr).aggregate(
+                  gts=hl.agg.filter(mt.GT.is_non_ref(), hl.agg.collect(mt.GT)),
+                  conf=hl.agg.filter(mt.GT.is_non_ref(), hl.agg.collect(mt.PP)),
+                  varid=hl.agg.filter(mt.GT.is_non_ref(), hl.agg.collect(mt.varid))
+                )
+    else:
+         return mt.group_rows_by(expr).aggregate(
+                  gts=hl.agg.filter(mt.GT.is_non_ref(), hl.agg.collect(mt.GT)),
+                  varid=hl.agg.filter(mt.GT.is_non_ref(), hl.agg.collect(mt.varid))
+                )
+
 
 
 def aggr_phase_count_by_expr(mt: hl.MatrixTable, expr):
@@ -197,32 +226,39 @@ def sum_gts_entries(mt: hl.MatrixTable):
 
    
 
-def calc_prob_ko(hom_expr, phased_expr, unphased_expr):
+def calc_prob_ko(hom_expr, phased_expr, unphased_expr, only_homs=False):
     """Calculate probability of knockout based on phased 
        and unphased alleles (requires sum_gts_entries)
     
     :param hom_expr: integer for homozygous count 
     :param phased_expr: struct with integers a1 and a2
     :param unphased_expr: struct with integers a1 and a2
+    :param only_homs: only count homozygotes as knockouts.
     """
     
     n = unphased_expr.n
     #n = unphased_expr.a1 + unphased_expr.a2 
-    return (hl.case()
-           .when(hom_expr > 0, 1) # homozygote
-           .when(
-               (phased_expr.a1 > 0) & # compound het
-               (phased_expr.a2 > 0), 1)
-           .when(
-               ((phased_expr.a1 == 1) | # likely compound het (one phased het)
-                (phased_expr.a2 == 1)) &
-                (n > 0), 1 - (1 / 2) ** n)
-           .when(
-               ((phased_expr.a1 == 0) | # likely compound het (zero phased het)
-                (phased_expr.a2 == 0)) &
-                (n > 1), 1 - 2 * (1 / 2) ** n)
-           .default(0)
-            )
+    if only_homs:
+        return (hl.case()
+               .when(hom_expr > 0, 1) # homozygote
+               .default(0)
+               )
+    else:
+        return (hl.case()
+               .when(hom_expr > 0, 1) # homozygote
+               .when(
+                   (phased_expr.a1 > 0) & # compound het
+                   (phased_expr.a2 > 0), 1)
+               .when(
+                   ((phased_expr.a1 == 1) | # likely compound het (one phased het)
+                    (phased_expr.a2 == 1)) &
+                    (n > 0), 1 - (1 / 2) ** n)
+               .when(
+                   ((phased_expr.a1 == 0) | # likely compound het (zero phased het)
+                    (phased_expr.a2 == 0)) &
+                    (n > 1), 1 - 2 * (1 / 2) ** n)
+               .default(0)
+                )
 
 
 def calc_prob_ko_by_count(ko_expr, phased_expr, unphased_expr):

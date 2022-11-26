@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 #
-#$ -N count_hets
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/count_hets.log
-#$ -e logs/count_hets.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 2
-#$ -q short.qc
-#$ -t 1-21
-#$ -V
+# script that counts number of heterozygote alleles in a gene
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=count_hets
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/count_hets.log
+#SBATCH --error=logs/count_hets.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 2
+#SBATCH --array=1
+#SBATCH --requeue
 
 set -o errexit
 set -o nounset
@@ -22,7 +24,7 @@ readonly hail_script="scripts/permute/02_count_hets.py"
 readonly in_dir="data/mt/annotated"
 readonly out_dir="data/permute/counts"
 
-readonly chr="${SGE_TASK_ID}"
+readonly chr="${SLURM_ARRAY_TASK_ID}"
 readonly input_path="${in_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.mt"
 readonly input_type='mt'
 

@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 #
-#$ -N sample_bed
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/sample_bed.log
-#$ -e logs/sample_bed.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 3
-#$ -q long.qc@@long.hga
-#$ -t 1-21
-#$ -V
+# @description: Sample 10K indiviudals used to generate a LD-Matrix on HapMap3 SNPS. 
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=sample_bed
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/sample_bed.log
+#SBATCH --error=logs/sampled_bed.errors.log
+#SBATCH --partition=long
+#SBATCH --cpus-per-task 3
+#SBATCH --array=1-22
+#SBATCH --requeue
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
@@ -18,7 +20,7 @@ readonly hail_script="scripts/prs/00_bed_gen.py"
 readonly spark_dir="data/tmp/spark_dir"
 readonly hap_dir="/well/lindgren/flassen/ressources/hapmap"
 
-readonly chr=$( get_chr ${SGE_TASK_ID} )
+readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
 readonly out_dir="data/prs/hapmap/ld/unrel_kin_eur_10k"
 readonly out_prefix="${out_dir}/short_ukb_hapmap_rand_10k_eur_chr${chr}"
 readonly hap_file="${hap_dir}/weights.l2.ldscore.liftover.ht"
@@ -31,11 +33,9 @@ mkdir -p ${out_dir}
 if [ ! -f "${out_prefix}.bed" ]; then
   set_up_hail
   set_up_pythonpath_legacy
-  set -x
   python3 "${hail_script}" \
      --chrom "${chr}" \
      --dataset "imp" \
-     --exclude_related \
      --filter_missing 0.01 \
      --random_samples 10000 \
      --filter_to_unrelated_using_kinship_coef \
@@ -48,7 +48,6 @@ if [ ! -f "${out_prefix}.bed" ]; then
      --only_valid_contigs \
      --out_prefix "${out_prefix}" \
      --out_type "plink" 
-  set +x
 else
   print_update "file ${out} already exists. Skipping!"
 fi

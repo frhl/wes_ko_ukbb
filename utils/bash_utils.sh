@@ -87,6 +87,20 @@ set_up_conda() {
   unset __conda_setup
 }
 
+set_up_shapeit5 () {
+  module purge
+  module load HTSlib/1.14-GCC-11.2.0
+  local _version="${1:-0}"
+  local _dir="/well/lindgren/flassen/software/SHAPEIT5/v${_version}/shapeit5"
+  local phase_rare="${_dir}/phase_rare/bin/SHAPEIT5_phase_rare"
+  local phase_common="${_dir}/phase_common/bin/SHAPEIT5_phase_common"
+  local switch="${_dir}/switch/bin/SHAPEIT5_switch"
+  SHAPEIT_phase_rare="${phase_rare}"
+  SHAPEIT_phase_common="${phase_common}"
+  SHAPEIT_switch="${switch}"
+  >&2 echo "Loading SHAPEIT5 v${_version}."
+}
+
 #get_hail_memory() {
 #  if [[ -z ${QUEUE} || -z ${NSLOTS} ]]; then
 #    raise_error "QUEUE and NSLOTS must both be defined"
@@ -169,12 +183,44 @@ set_up_rpy() {
   set -eu
 }
 
+set_up_phaser() {
+  set +eu
+  module load Anaconda3/2020.07
+  module load java/1.8.0_latest
+  source "/apps/eb/skylake/software/Anaconda3/2020.07/etc/profile.d/conda.sh"
+  conda activate phaser
+  set -eu
+  readonly PHASER_PATH="/well/lindgren/flassen/software/phaser/phaser/phaser/phaser.py"
+}
+
+set_up_whatshap() {
+  set +eu
+  module load Anaconda3/2020.07
+  module load java/1.8.0_latest
+  source "/apps/eb/skylake/software/Anaconda3/2020.07/etc/profile.d/conda.sh"
+  conda activate whatshap
+  set -eu
+}
+
+set_up_smartphase() {
+  set +eu
+  module load Anaconda3/2020.07
+  module load java/10.0.1
+  source "/apps/eb/skylake/software/Anaconda3/2020.07/etc/profile.d/conda.sh"
+  conda activate smartphase
+  readonly SMARTPHASE_PATH="/well/lindgren/flassen/software/smart-phase/smartPhase.jar"
+  set -eu
+}
+
+
+
+
 set_up_ldpred2() {
   set +eu
   module load Anaconda3/2020.07
   module load java/1.8.0_latest
   source "/apps/eb/skylake/software/Anaconda3/2020.07/etc/profile.d/conda.sh"
-  conda activate bigsnpr-v1.10
+  conda activate bigsnpr-v1.11.6
   set -eu
 }
 
@@ -192,8 +238,5 @@ set_up_tensorflow() {
 #  module load samtools/1.8-gcc5.4.0 # required for LOFTEE 
 #  export PERL5LIB=$PERL5LIB:/well/lindgren/flassen/software/VEP/plugins_grch38/
 #}
-
-
-
 
 

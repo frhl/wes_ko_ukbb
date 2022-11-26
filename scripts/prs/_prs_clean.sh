@@ -1,15 +1,13 @@
 #!/usr/bin/env bash
-#
-#$ -N _prs_clean
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_prs_clean.log
-#$ -e logs/_prs_clean.errors.log
-#$ -V
+
+source utils/qsub_utils.sh
 
 readonly pred=${1?Error: Missing arg3 (prediction file)}
 readonly prefix=${2?Error: Missing arg8 (prefix)}
 
-readonly chr="${SGE_TASK_ID}"
+readonly cluster=$( get_current_cluster )
+readonly chr=$( get_array_task_id )
+
 readonly out_prefix_chr=$(echo ${prefix} | sed -e "s/CHR/${chr}/g")
 readonly tmp_bfile="${out_prefix_chr}.bfile"
 

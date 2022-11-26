@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 #
-#$ -N calc_auc
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/calc_auc.log
-#$ -e logs/calc_auc.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qf
-#$ -V
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=calc_auc
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/calc_auc.log
+#SBATCH --error=logs/calc_auc.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 1
+#SBATCH --requeue
 
 set -o errexit
 set -o nounset

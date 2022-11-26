@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 #
-#$ -N _prs_aggr
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_prs_aggr.log
-#$ -e logs/_prs_aggr.errors.log
-#$ -V
+#
+#
 
 source utils/bash_utils.sh
 

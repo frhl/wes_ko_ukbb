@@ -1,13 +1,7 @@
 #!/usr/bin/env bash
 #
-#
-#$ -N _spa_common_iter
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_spa_common_iter.log
-#$ -e logs/_spa_common_iter.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q lindgren.qe
+# * Performs sequential conditional analysis on common variants.
+# * This script is called by spa_iter_common.sh as an array job
 
 set -o errexit
 set -o nounset

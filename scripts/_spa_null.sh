@@ -1,12 +1,4 @@
 #!/usr/bin/env bash
-#
-#$ -N _spa_null
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_spa_null.log
-#$ -e logs/_spa_null.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q lindgren.qe
 
 set -o errexit
 set -o nounset
@@ -26,7 +18,7 @@ readonly use_loco_prs=${9?Error: Missing arg8(inv_normalize)}
 readonly out_prefix=${10?Error: Missing arg10 (out_prefix)}
 
 readonly step1_fitNULLGLMM="utils/saige/step1_fitNULLGLMM.R"
-readonly threads=$(( ${NSLOTS}-1 ))
+readonly threads=$(( $SLURM_CPUS_PER_TASK-1 ))
 
 fit_null() {
    if [ ! -f "${real_out_prefix}.rda" ]; then
@@ -72,10 +64,7 @@ get_loco_seq(){
 
 # set up LOCO PRS conditioning
 if [ "${use_loco_prs}" -eq "1" ]; then
-  readonly chr="chr${SGE_TASK_ID}"
-  #readonly chr="chr${SGE_TASK_ID}"
-  #readonly loco=$( get_loco_seq ${chr} )
-  #readonly covariates="${in_covariates},${loco}"
+  readonly chr="chr${SLURM_ARRAY_TASK_ID}"
   readonly loco_chr="loco_${chr}"
   readonly covariates="${in_covariates},${loco_chr}"
   readonly real_out_prefix="${out_prefix}_${chr}"

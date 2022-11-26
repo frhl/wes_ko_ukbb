@@ -24,8 +24,8 @@ readonly spa_script="scripts/_spa_test.sh"
 readonly merge_script="scripts/_spa_merge.sh"
 readonly vcf_prefix="ukb_eur_wes_200k_chrCHR_maf0to5e-2"
 
-readonly grm_dir="data/saige/grm/input"
-readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+readonly grm_dir="data/saige/grm/input/dnanexus"
+readonly grm_mtx="${grm_dir}/ukb_eur_200k_grm_fitted_relatednessCutoff_0.05_2000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
 
 readonly conditioning_markers=""
@@ -82,9 +82,13 @@ submit_spa_with_csqs()
 
 
 submit_spa_job() {
+  >&2 echo "Submitting SPA Job"
   mkdir -p ${step2_dir}
   set -x
   qsub -N "spa_${phenotype}_${annotation}" \
+    -o "logs/_fit_simulated_alt.log" \
+    -e "logs/_fit_simulated_alt.errors.log" \
+    -wd $(pwd) \
     -t ${tasks} \
     -q "${queue}" \
     -pe shmem ${nslots} \
@@ -104,8 +108,8 @@ submit_spa_job() {
 
 readonly annotation="pLoF_damaging_missense"
 
-run_with_params 0.00 0.00 0.00 0.01 0.01 600
-
+# this works and results in nice phenotypes
+#run_with_params 0.00 0.00 0.00 0.01 0.01 600
 #run_with_params 0.001 0.10 99.0 0.20 0.20 601
 #run_with_params 0.002 0.10 99.0 0.20 0.20 602
 #run_with_params 0.005 0.10 99.0 0.20 0.20 603
@@ -120,11 +124,12 @@ run_with_params 0.00 0.00 0.00 0.01 0.01 600
 #run_with_params 0.02 0.10 99.0 1.00 1.00 605
 #run_with_params 0.05 0.10 99.0 1.00 1.00 606
 
-#run_with_params 0.001 10.0 0.10 0.20 0.20 501
-#run_with_params 0.001 0.10 0.10 0.20 0.20 501
-#run_with_params 0.001 0.10 1.00 0.20 0.20 502
-#run_with_params 0.001 0.10 10.0 0.20 0.20 503
-#run_with_params 0.001 0.10 99.0 0.20 0.20 504
+
+run_with_params 0.001 10.0 0.10 0.20 0.20 601
+run_with_params 0.001 0.10 0.10 0.20 0.20 601
+run_with_params 0.001 0.10 1.00 0.20 0.20 602
+run_with_params 0.001 0.10 10.0 0.20 0.20 603
+run_with_params 0.001 0.10 99.0 0.20 0.20 604
 
 #run_with_params 0.005 10.0 0.10 0.20 0.20 501
 #run_with_params 0.005 0.10 0.10 0.20 0.20 501
@@ -132,15 +137,15 @@ run_with_params 0.00 0.00 0.00 0.01 0.01 600
 #run_with_params 0.005 0.10 10.0 0.20 0.20 503
 #run_with_params 0.005 0.10 99.0 0.20 0.20 504
 
-run_with_params 0.01 10.0 0.10 0.20 0.20 501
-run_with_params 0.01 0.10 0.10 0.20 0.20 501
-run_with_params 0.01 0.10 1.00 0.20 0.20 502
-run_with_params 0.01 0.10 10.0 0.20 0.20 503
-run_with_params 0.01 0.10 99.0 0.20 0.20 504
+#run_with_params 0.01 10.0 0.10 0.20 0.20 501
+#run_with_params 0.01 0.10 0.10 0.20 0.20 501
+#run_with_params 0.01 0.10 1.00 0.20 0.20 502
+#run_with_params 0.01 0.10 10.0 0.20 0.20 503
+#run_with_params 0.01 0.10 99.0 0.20 0.20 504
 
-run_with_params 0.10 10.0 0.10 0.20 0.20 501
-run_with_params 0.10 0.10 0.10 0.20 0.20 501
-run_with_params 0.10 0.10 1.00 0.20 0.20 502
-run_with_params 0.10 0.10 10.0 0.20 0.20 503
-run_with_params 0.10 0.10 99.0 0.20 0.20 504
+#run_with_params 0.10 10.0 0.10 0.20 0.20 501
+#run_with_params 0.10 0.10 0.10 0.20 0.20 501
+#run_with_params 0.10 0.10 1.00 0.20 0.20 502
+#run_with_params 0.10 0.10 10.0 0.20 0.20 503
+#run_with_params 0.10 0.10 99.0 0.20 0.20 504
 

@@ -11,11 +11,12 @@ set -o nounset
 
 source utils/bash_utils.sh
 
-readonly shuffles=${1?Error: Missing arg1 (prefix)}
-readonly replicates=${2?Error: Missing arg1 (prefix)}
-readonly phenotype=${3?Error: Missing arg1 (prefix)}
-readonly out_prefix=${4?Error: Missing arg2 (n_tasks)}
-readonly out=${5?Error: Missing arg2 (n_tasks)}
+readonly shuffles=${1?Error: Missing arg1 (shuffles)}
+readonly replicates=${2?Error: Missing arg2 (replicates)}
+readonly phenotype=${3?Error: Missing arg3 (phenotype)}
+readonly iteration=${4?Error: Missing arg4 (iteration)}
+readonly out_prefix=${5?Error: Missing arg5 (out_prefix)}
+readonly out=${6?Error: Missing arg6 (out)}
 
 aggregate_saige() {
 

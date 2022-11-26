@@ -1,13 +1,4 @@
 #!/usr/bin/env bash
-#
-#
-#$ -N _gene_permute
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_gene_permute.log
-#$ -e logs/_gene_permute.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q lindgren.qe
 
 set -o errexit
 set -o nounset
@@ -30,42 +21,55 @@ readonly replicates=${7?Error: Missing arg7 (replicates)}
 readonly cond_genotypes=${8?Error: Missing arg8 (cond_genotypes)}
 readonly use_cond_common=${9?Error: Missing arg9 (use_cond_common)}
 
-readonly id=${SGE_TASK_ID}
+# keep track of ID
+readonly id=${SLURM_ARRAY_TASK_ID}
 readonly sge_seed=$(( ${id} * ${seed}))
 readonly out_prefix_id="${out_prefix}_${id}"
 readonly out_file_success="${out_prefix_success}_${id}.SUCCESS"
 
+# setup common conditionion if needed
 if [ "${use_cond_common}" -eq "1" ]; then
   readonly enable_cond_pipeline="YES"
 else
   readonly enable_cond_pipeline=""
 fi
 
-if [ -f "${input_path}" ]; then
-  if [ ! -f "${out_prefix_id}.vcf.gz" ]; then
-    set_up_rpy
-    Rscript ${rscript} \
-      --chrom "chr${chr}" \
-      --input_path ${input_path} \
-      --input_path_cond_genotypes ${cond_genotypes} \
-      --permutations ${replicates} \
-      --remove_invariant_markers \
-      ${enable_cond_pipeline:+--enable_cond_pipeline} \
-      --out_prefix ${out_prefix_id} \
-      --vcf_id ${gene} \
-      --seed ${sge_seed} \
-      && print_update "Finished permuting phase for chr${chr}-${gene} using seed ${sge_seed}" ${SECONDS} \
-      || raise_error "Permuting phase for chr${chr} failed"
-    module purge
-    module load BCFtools/1.12-GCC-10.3.0
-    bgzip "${out_prefix_id}.vcf"
-    rm -f "${out_prefix_id}.vcf"
-    make_tabix "${out_prefix_id}.vcf.gz" "csi"
+# what phenotypes are tested and have been tested?
+readonly phenos="${out_prefix}.phenos"
+readonly permuted="${out_prefix}.permuted"
+
+# only continue if phenos remain to be tested
+readonly total_phenos="$( cat ${phenos} | sort | uniq | wc -l)"
+readonly tested_phenos="$( cat ${permuted} | grep -v "gene" | grep -w "OK" | sort | uniq | wc -l)"
+
+if [ "${total_phenos}" -ne "${tested_phenos}" ]; then
+  if [ -f "${input_path}" ]; then
+    if [ ! -f "${out_prefix_id}.vcf.gz" ]; then
+      set_up_rpy
+      Rscript ${rscript} \
+        --chrom "chr${chr}" \
+        --input_path ${input_path} \
+        --input_path_cond_genotypes ${cond_genotypes} \
+        --permutations ${replicates} \
+        --remove_invariant_markers \
+        ${enable_cond_pipeline:+--enable_cond_pipeline} \
+        --out_prefix ${out_prefix_id} \
+        --vcf_id ${gene} \
+        --seed ${sge_seed} \
+        && print_update "Finished permuting phase for chr${chr}-${gene} using seed ${sge_seed}" ${SECONDS} \
+        || raise_error "Permuting phase for chr${chr} failed"
+      module purge
+      module load BCFtools/1.12-GCC-10.3.0
+      bgzip "${out_prefix_id}.vcf"
+      rm -f "${out_prefix_id}.vcf"
+      make_tabix "${out_prefix_id}.vcf.gz" "csi"
+    else
+      >&2 echo "Error: ${out_prefix_id}.vcf.bgz already exists. Skipping.."
+    fi
   else
-    >&2 echo "Error: ${out_prefix_id}.vcf.bgz already exists. Skipping.."
+    >&2 echo "Error: ${input_path} does not exist!"
   fi
 else
-  >&2 echo "Error: ${input_path} does not exist!"
+  >&2 echo "Skipping: All phenotypes have been adequately permuted."
 fi
-
 

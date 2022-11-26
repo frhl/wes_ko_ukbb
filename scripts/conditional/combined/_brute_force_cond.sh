@@ -1,13 +1,7 @@
 #!/usr/bin/env bash
 #
 #
-#$ -N _brute_force_cond
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_brute_force_cond.log
-#$ -e logs/_brute_force_cond.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q lindgren.qe
+#
 
 set -o errexit
 set -o nounset
@@ -15,7 +9,6 @@ set -o nounset
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
-readonly threads=$(( ${NSLOTS}-1 ))
 readonly step2_SPAtests="utils/saige/step2_SPAtests_cond.R"
 readonly rscript_rare="scripts/conditional/rare/_spa_cond_rare.R"
 readonly rscript_common="scripts/conditional/common/_spa_cond_common.R"
@@ -37,7 +30,7 @@ readonly markers_rare_cond_min_mac=${13?Error: Missing arg10 (markers_rare_ac)}
 readonly cond_rare_file=${14?Error: Missing arg11 (cond_rare_file)}
 readonly cond_common_file=${15?Error: Missing arg12 (cond_common_file)}
 readonly cond_annotation=${16?Error: Missing arg13 (cond_annotation)}
-readonly chr=${SGE_TASK_ID}
+readonly chr=${SLURM_ARRAY_TASK_ID}
 
 # Need to change CHR input depending on current task-id
 readonly gmat=$(echo ${in_gmat} | sed -e "s/CHR/${chr}/g")
@@ -103,7 +96,7 @@ spa_test() {
        --varianceRatioFile=${var} \
        --SAIGEOutputFile=${out} \
        --LOCO=FALSE \
-       --condition_file "${out_common_markers_file}" \
+       --condition_file "${out_markers_file}" \
        && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
        || raise_error "Saddle-point approximation for chr${chr} failed"
   else

@@ -1,16 +1,18 @@
 #!/usr/bin/env bash
 #
-# Takes gene hits that are significant in primary analysis
-# and digs out all variants in the gene as annotated by VEP.#
+# @description Takes gene hits that are significant in primary analysis
+# and digs out all variants in the gene as annotated by VEP.
 #
-#$ -N sig_gene_markers
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/sig_gene_markers.log
-#$ -e logs/sig_gene_markers.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q test.qc
-#$ -t 1-80
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=sig_gene_markers
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/sig_gene_markers.log
+#SBATCH --error=logs/sig_gene_markers.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 1
+#SBATCH --array=1-80
+#SBATCH --requeue
+
 
 set -o errexit
 set -o nounset
@@ -37,13 +39,15 @@ readonly pheno_dir="data/phenotypes"
 readonly in_prefix="ukb_eur_wes_200k"
 readonly vep_path="${vep_dir}/ukb_eur_wes_union_calls_200k_chrCHR.tsv.gz" # CHR to be gsubbed in Rscript
 
+readonly index=${SLURM_ARRAY_TASK_ID}
+
 mkdir -p ${out_dir}
 
 get_sig_gene_markers_binary()
 {
   local annotation="${1?Error: Missing arg1 (annotation)}"
   local pheno_list="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
-  local phenotype=$( sed "${SGE_TASK_ID}q;d" ${pheno_list} )
+  local phenotype=$( sed "${index}q;d" ${pheno_list} )
   submit_sig_genes "${annotation}" "${phenotype}" "binary"
 }
 
@@ -51,7 +55,7 @@ get_sig_gene_markers_cts()
 {
   local annotation="${1?Error: Missing arg1 (annotation)}"
   local pheno_list="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
-  local phenotype=$( sed "${SGE_TASK_ID}q;d" ${pheno_list} )
+  local phenotype=$( sed "${index}q;d" ${pheno_list} )
   submit_sig_genes "${annotation}" "${phenotype}" "cts"
 }
 

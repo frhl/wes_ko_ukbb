@@ -1,14 +1,8 @@
 #!/usr/bin/env bash
 #
-# extract genotypes in regions near genes that are significant in primary analysis
-#
-#$ -N _filter_genotypes
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_filter_genotypes.log
-#$ -e logs/_filter_genotypes.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 4
-#$ -q short.qc
+# * extract genotypes in regions near genes that are significant in primary analysis
+# * This script is called by filter_genotypes.sh as an arary job.
+# 
 
 module load BCFtools/1.12-GCC-10.3.0
 

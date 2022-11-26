@@ -82,13 +82,28 @@ def main(args):
 
     # combine into single dosage (G) matrix 
     mt = mt.annotate_entries(G=hl.int32(mt.H1+mt.H2))
-    mt = mt.annotate_rows(**{'stats': hl.agg.stats(mt.G)})
-    mt = mt.filter_rows(mt.stats.stdev > 0)
+    mt = mt.annotate_rows(**{'stats_add': hl.agg.stats(mt.G)})
+    mt = mt.filter_rows(mt.stats_add.stdev > 0)
     mt = mt.annotate_entries(
-        G_norm=(mt.G-mt.stats.mean)/mt.stats.stdev
+        G_add_norm=(mt.G-mt.stats_add.mean)/mt.stats_add.stdev
     )
     
-
+    # G_norm but only with alternate alleles
+    mt = mt.annotate_entries(
+            G_rec = (hl.case().when(mt.G == 2, mt.G).default(0))
+    )
+    
+    # normalize by additive psuedo variant count
+    mt = mt.annotate_entries(
+            G_rec_norm_by_add = (mt.G_rec - mt.stats_add.mean)/mt.stats_add.stdev
+    )
+ 
+    # normalize by recessive pseudo variant count
+    mt = mt.annotate_rows(**{'stats_rec': hl.agg.stats(mt.G_rec)})
+    mt = mt.annotate_entries(
+            G_rec_norm_by_rec = (mt.G_rec - mt.stats_rec.mean)/mt.stats_rec.stdev
+    )
+    
     # setup sites and alleles
     rows = mt.count()[0]
     locus = [ "chr%s:%s" % (chrom, str(i+1)) for i in range(rows)]
@@ -104,7 +119,7 @@ def main(args):
     # annotate knockout matrix
     prob = mt.annotate_entries(DS=mt.pKO * 2)
     prob = prob.annotate_entries(GT=ko.get_gt_from_floor_ds(prob.DS))
-    prob = prob.select_entries(*[prob.DS, prob.GT, prob.pKO, prob.knockout, prob.G, prob.G_norm])
+    prob = prob.select_entries(*[prob.DS, prob.GT, prob.pKO, prob.knockout, prob.G, prob.G_add_norm, prob.G_rec, prob.G_rec_norm_by_add, prob.G_rec_norm_by_rec])
     #prob = prob.select_entries(prob.DS)
     prob = prob.add_row_index()
     prob = prob.annotate_rows(
@@ -135,7 +150,8 @@ def main(args):
         print("discarding singletons")
 
     # export genes with knockouts
-    genes = prob.drop(prob.stats)
+    genes = prob.drop(prob.stats_add)
+    genes = genes.drop(genes.stats_rec)
     genes = genes.drop(genes.stdev)
     genes.filter_entries(genes.DS > 0).entries().flatten().export(out_prefix + ".tsv.gz")
 

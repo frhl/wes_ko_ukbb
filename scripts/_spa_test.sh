@@ -1,16 +1,9 @@
 #!/usr/bin/env bash
-#
-#
-#$ -N _spa_test
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_spa_test.log
-#$ -e logs/_spa_test.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
 
 set -o errexit
 set -o nounset
 
+source utils/qsub_utils.sh
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
@@ -24,7 +17,7 @@ readonly grm_sam=${7?Error: Missing arg7 (grm_sam)}
 readonly min_mac=${8?Error: Missing arg6 (min_mac)} 
 readonly out_prefix=${9?Error: Missing arg7 (path prefix for saige output)}
 readonly in_markers="${10}" # optional conditioning markers
-readonly chr=${SGE_TASK_ID}
+readonly chr=$( get_array_task_id )
 
 
 # chromosome specified at in_gmat and in_var
@@ -42,7 +35,6 @@ readonly csi=$(echo ${in_csi} | sed -e "s/CHR/${chr}/g")
 readonly markers=$(cat $(echo ${in_markers} | sed -e "s/CHR/${chr}/g"))
 readonly out=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
 
-readonly threads=$(( ${NSLOTS}-1 ))
 readonly step2_SPAtests="utils/saige/step2_SPAtests.R"
 
 spa_test() {

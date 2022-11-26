@@ -1,10 +1,4 @@
 #!/usr/bin/env bash
-#
-#$ -N _spa_merge
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_spa_merge.log
-#$ -e logs/_spa_merge.errors.log
-#$ -V
 
 set -o errexit
 set -o nounset

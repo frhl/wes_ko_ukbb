@@ -37,11 +37,20 @@ option_list <- list(
 parser <- OptionParser(usage="%prog [options]", option_list=option_list)
 args <- parse_args(parser, positional_arguments = 0)
 opt <- args$options
+
+# add Bed/bim/fam path
+opt$bedFile <- paste0(opt$plinkFile,".bed")
+opt$bimFile <- paste0(opt$plinkFile,".bim")
+opt$famFile <- paste0(opt$plinkFile,".fam")
+
 print(opt)
 
 set.seed(1)
 
-createSparseGRM(plinkFile = opt$plinkFile,
+createSparseGRM(bedFile = opt$bedFile,
+                bimFile = opt$bimFile,
+                famFile = opt$famFile,
+                #plinkFile = opt$plinkFile,
                 outputPrefix=opt$outputPrefix,
                 numRandomMarkerforSparseKin = opt$numRandomMarkerforSparseKin,
                 relatednessCutoff = opt$relatednessCutoff,

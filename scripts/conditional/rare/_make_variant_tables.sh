@@ -1,13 +1,4 @@
 #!/usr/bin/env bash
-#
-#$ -N _make_variant_tables
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_make_variant_tables.log
-#$ -e logs/_make_variant_tables.errors.log
-#$ -P lindgren.prjc
-#$ -q short.qa
-#$ -pe shmem 1
-#$ -V
 
 set -o errexit
 set -o nounset

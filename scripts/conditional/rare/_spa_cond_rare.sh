@@ -1,13 +1,5 @@
 #!/usr/bin/env bash
 #
-#
-#$ -N _spa_cond_rare
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_spa_cond_rare.log
-#$ -e logs/_spa_cond_rare.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q lindgren.qe
 
 set -o errexit
 set -o nounset
@@ -35,7 +27,7 @@ readonly out_prefix=${13?Error: Missing arg10 (out_prefix)}
 readonly cond_markers="${14}"
 readonly cond_annotation="${15}"
 
-readonly chr=${SGE_TASK_ID}
+readonly chr=${SLURM_ARRAY_TASK_ID}
 
 # Change CHR to current chromosome based on task-ID
 readonly gmat=$(echo ${in_gmat} | sed -e "s/CHR/${chr}/g")

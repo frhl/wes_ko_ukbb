@@ -6,14 +6,15 @@ library(data.table)
 
 main <- function(args){
     
-    stopifnot(file.exists(args$input_path))
+     
+    if (!file.exists(args$input_path)) stop(paste(args$input_path, "does not exist!"))
 
     d <- fread(args$input_path)
     p <- as.numeric(d$p.value)
     sorted_p <- sort(p)
     top_p <- sorted_p[as.numeric(args$select_min_p)]
     top_p <- top_p * as.numeric(args$multiply_p)
-    write(format(top_p, scientific = FALSE), stdout())
+    write(top_p, stdout())
 
 
 }

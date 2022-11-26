@@ -2,15 +2,15 @@
 #
 # Append pseudovariants and common markers
 #
-#$ -N append_vcf_common
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/append_vcf_common.log
-#$ -e logs/append_vcf_common.errors.log
-#$ -P lindgren.prjc
-#$ -q short.qc
-#$ -pe shmem 3
-#$ -t 1-22
-#$ -V
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=append_vcf_common
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/append_vcf_common.log
+#SBATCH --error=logs/append_vcf_common.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 3
+#SBATCH --array=1-22
+#SBATCH --requeue
 
 source utils/vcf_utils.sh
 source utils/bash_utils.sh
@@ -19,7 +19,7 @@ source utils/hail_utils.sh
 readonly spark_dir="data/tmp/spark"
 readonly hail_script="scripts/conditional/common/05_append_vcf_common.py"
 
-readonly chr="${SGE_TASK_ID}"
+readonly chr="${SLURM_ARRAY_TASK_ID}"
 
 readonly ko_dir="data/knockouts/alt"
 readonly common_dir="data/conditional/common/markers_with_gt/final"

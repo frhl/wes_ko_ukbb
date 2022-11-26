@@ -1,16 +1,9 @@
 #!/usr/bin/env bash
 #
-# Note: we assume that all phenotypes have common markers present, i.e.
+# * Perform SPA conditional analysis based on common markers
+# * Note we assume that all phenotypes have common markers present, i.e.
 # there is no need to subset to non-monomorphic markers in a phenotype
 # dependent manner (see scripts/conditional/rare/_spa_cond_rare.sh).
-#
-#$ -N _spa_cond_rare
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_spa_cond_common.log
-#$ -e logs/_spa_cond_common.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q lindgren.qe
 
 set -o errexit
 set -o nounset
@@ -18,7 +11,6 @@ set -o nounset
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
-readonly threads=$(( ${NSLOTS}-1 ))
 readonly step2_SPAtests="utils/saige/step2_SPAtests_cond.R"
 readonly rscript="scripts/conditional/common/_spa_cond_common.R"
 
@@ -33,7 +25,7 @@ readonly min_mac=${8?Error: Missing arg8 (min_mac)}
 readonly out_prefix=${9?Error: Missing arg10 (out_prefix)}
 readonly cond_markers="${10}"
 readonly cond_cat="${11}"
-readonly chr=${SGE_TASK_ID}
+readonly chr=${SLURM_ARRAY_TASK_ID}
 
 readonly gmat=$(echo ${in_gmat} | sed -e "s/CHR/${chr}/g")
 readonly var=$(echo ${in_var} | sed -e "s/CHR/${chr}/g")
@@ -59,7 +51,6 @@ fi
 
 
 spa_test() {
-
   if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then 
     SECONDS=0
     Rscript "${step2_SPAtests}"	\

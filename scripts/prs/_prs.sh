@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
-#
-#$ -N _prs_test
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_prs.log
-#$ -e logs/_prs.errors.log
-#$ -V
+
+set -o errexit
+set -o nounset
 
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
@@ -17,17 +14,21 @@ readonly method=${5?Error: Missing arg2 (method)}
 readonly impute=${6?Error: Missing arg2 (impute)}
 readonly prefix=${7?Error: Missing arg8 (prefix)}
 
-readonly chr="${SGE_TASK_ID}"
+readonly cluster=$( get_current_cluster )
+readonly index=$( get_array_task_id )
+readonly chr=$( get_chr ${index} )
+
 readonly pred_chr=$(echo ${pred} | sed -e "s/CHR/${chr}/g")
 readonly out_prefix_chr=$(echo ${prefix} | sed -e "s/CHR/${chr}/g")
 readonly tmp_bfile="${out_prefix_chr}.bfile"
+readonly tmp_bk="${tmp_bfile}.bk"
+readonly tmp_rds="${tmp_bfile}.rds"
 
 export OPENBLAS_NUM_THREADS=1 # avoid two levels of parallelization
 
 if [ ! -f "${out_prefix_chr}.txt.gz" ]; then
+  #set_up_ldpred2
   set_up_rpy
-  duration=SECONDS
-  set -x
   Rscript "${r_script}" \
       --chrom "chr${chr}" \
       --pred "${pred_chr}" \
@@ -37,8 +38,9 @@ if [ ! -f "${out_prefix_chr}.txt.gz" ]; then
       --method "${method}" \
       --tmp_bfile "${tmp_bfile}" \
       --out_prefix "${out_prefix_chr}"
-  set +x
-  log_runtime $duration
+  # always remove temporary bk files as these
+  # tend to become extremely large  
+  rm ${tmp_bk} ${tmp_rds}
 else
   echo "Note: ${out_prefix_chr} already exists. Skipping.."
 fi

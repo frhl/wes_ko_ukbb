@@ -24,7 +24,6 @@ def main(args):
     ancestry = args.ancestry
     dbsnp = args.dbsnp
     filter_missing = args.filter_missing
-    exclude_related = args.exclude_related
     random_samples = args.random_samples
     random_seed = args.random_seed
     min_maf = args.min_maf
@@ -60,10 +59,6 @@ def main(args):
         ht_samples = hl.import_table(exclude_samples, no_header=True, key='f0', delimiter=',')
         mt = mt.filter_cols(~hl.is_defined(ht_samples[mt.col_key]))
   
-    if exclude_related:
-        related = samples.get_ukb_is_related_using_kinship_expr(mt)
-        mt = mt.filter_cols(~related) 
-
     if filter_to_unrelated_using_kinship_coef:
         mt = samples.filter_ukb_to_unrelated_using_kinship(mt)
 
@@ -112,7 +107,6 @@ if __name__=='__main__':
     parser.add_argument('--min_info', default=None, help='minimum info score (only imputed data)')
     parser.add_argument('--liftover', default=None, action='store_true', help='perform liftover')
     parser.add_argument('--dbsnp', default=None, action='store_true', help='Annotate rsids.')
-    parser.add_argument('--exclude_related', default=None, action='store_true', help='Exclude any related individuals.')
     parser.add_argument('--filter_to_unrelated_using_kinship_coef', default=None, action='store_true', help='Exclude any related individuals.')
     parser.add_argument('--filter_missing', default=None, help='Filter to variants with lt value in genotype missingness.')
     parser.add_argument('--extract_samples', default=None, help='Subset to sample IDs in MatrixTable')

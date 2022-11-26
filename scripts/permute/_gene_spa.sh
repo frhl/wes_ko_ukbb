@@ -1,14 +1,4 @@
 #!/usr/bin/env bash
-#
-#
-#$ -N _gene_spa
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_gene_spa.log
-#$ -e logs/_gene_spa.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q lindgren.qe
-#$ -V
 
 set -o errexit
 set -o nounset
@@ -18,6 +8,7 @@ source utils/qsub_utils.sh
 
 readonly spark_dir="data/tmp/spark"
 readonly step2_SPAtests="utils/saige/step2_SPAtests_cond.R"
+readonly rscript="scripts/conditional/common/_spa_cond_common.R"
 
 readonly chr=${1?Error: Missing arg1 (chr)}
 readonly in_vcf=${2?Error: Missing arg2 (in_vcf)}
@@ -36,17 +27,28 @@ readonly use_cond_common=${13?Error: Missing arg11 (1 or 0 - condition on common
 readonly var_bytes=$( file_size ${in_var} )
 readonly gmat_bytes=$( file_size ${in_gmat} )
 
-readonly id=${SGE_TASK_ID}
+readonly id=${SLURM_ARRAY_TASK_ID}
 readonly vcf="${in_vcf}_${id}.vcf.gz"
-readonly csi="${vcf}_${id}.csi"
+readonly csi="${in_vcf}_${id}.vcf.gz.csi"
 readonly out_gene_task="${out_gene}_${id}.txt"
 
-# read in conditional markers
-if [ "${use_cond_common}" -eq "1" ]; then
-  readonly markers=$(zcat ${cond_markers} | grep chr${chr} | cut -f3 | paste -s -d ',')
-else 
-  readonly markers=""
+# get conditional markers for current phenotype
+if [ -f "${cond_markers}" ]; then
+  readonly cond_markers_chr=$(echo ${cond_markers} | sed -e "s/CHR/${chr}/g")
+  readonly out_markers="${out_gene/CHR/${chr}}.common.markers"
+  if [ -f "${cond_markers_chr}" ]; then
+    if [ ! -f "${out_markers}" ]; then
+      set_up_rpy
+      Rscript ${rscript} \
+        --infile ${cond_markers_chr} \
+        --phenotype ${phenotype} \
+        --pheno_col 6 \
+        --outfile ${out_markers}
+    fi
+  fi
 fi
+
+
 
 if [ ! -f ${out_gene_task} ]; then
   echo "var_bytes=${var_bytes} at ${in_var}"
@@ -67,8 +69,8 @@ if [ ! -f ${out_gene_task} ]; then
        --GMMATmodelFile=${in_gmat} \
        --varianceRatioFile=${in_var} \
        --SAIGEOutputFile=${out_gene_task} \
-       --LOCO=FALSE \
-       ${markers:+--condition="${markers}"} 
+       --condition_file=${out_markers} \
+       --LOCO=FALSE
     set +x
     rm -f "${out_gene_task}.index"
     gzip ${out_gene_task}
