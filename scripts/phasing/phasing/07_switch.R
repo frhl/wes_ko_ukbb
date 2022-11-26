@@ -19,6 +19,9 @@ fread_phased_sites <- function(file, ...){
 
     # append to data.table
     d <- fread(file, ...)
+    if (! ("AC" in colnames(d))) stop(paste("column AC not in file:", file))
+    if (! ("AN" in colnames(d))) stop(paste("column AN not in file:", file))
+
     d$AN_m_AC <- as.numeric(d$AN - d$AC)
     d$MAC <- as.numeric(apply(d[,c("AC","AN_m_AC")], 1, min))
     d$locus <- paste0(d$CHR,":",d$POS)

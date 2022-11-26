@@ -7,7 +7,7 @@
 #SBATCH --error=logs/prs.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=121-150
+#SBATCH --array=120-160
 #
 #
 #$ -N prs
@@ -17,7 +17,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 111
+#$ -t 200-300
 #$ -V
 
 set -o errexit
@@ -62,16 +62,21 @@ submit_ldpred2()
   local pred="${pred_dir}/ukb_hapmap_500k_eur_chrCHR.bed"
   local ldsc="${ldsc_dir}/ldsc_${phenotype}.rds"
   local out_prefix="${out_dir}/prs_${method}_${phenotype}_chrCHR"
+  local merged="${mrg_dir}/${phenotype}_pgs.txt.gz"
 
   local qsub_fit="_prs_${phenotype}"
   local qsub_aggr="_aggr_${phenotype}"
   local qsub_clean="_clean_${phenotype}"
 
   if [ ! -z ${phenotype} ]; then
-    # fit actual pgs
-    fit_pgs
-    # aggregate into matrix
-    aggr_pgs
+    if [ ! -f "${merged}" ]; then
+      # fit actual pgs
+      fit_pgs
+      # aggregate into matrix
+      aggr_pgs
+    else
+      >&2 echo "${merged} already exists. Skipping.."
+    fi
     # remove disk backing files
     clean_pgs
   fi
@@ -164,7 +169,7 @@ aggr_pgs()
       -e "logs/${aggr_lname}.errors.log" \
       -pe shmem 1 \
       -wd $(pwd) \
-      -hold_jid "${prs_jname}" \
+      -hold_jid "${qsub_fit}" \
       "${aggr_script}" \
       "${phenotype}" \
       "${out_dir}" \
@@ -208,7 +213,7 @@ clean_pgs()
       -e "logs/${clean_lname}.errors.log" \
       -wd $(pwd) \
       -pe shmem 1 \
-      -hold_jid_ad "${prs_jname}" \
+      -hold_jid_ad "${qsub_fit}" \
       "${clean_script}" \
       "${pred}" \
       "${out_prefix}" 

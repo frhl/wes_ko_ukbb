@@ -44,7 +44,7 @@ def main(args):
     hail_init.hail_bmrc_init('logs/hail/knockout.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1')
     mt = io.import_table(input_path, input_type, calc_info = False)
-    mt = mt.repartition(512)
+    mt = mt.repartition(1024)
 
     # subset to current csqs category
     mt = mt.filter_rows(hl.literal(set(csqs_category)).contains(mt.consequence_category))

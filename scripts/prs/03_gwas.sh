@@ -71,8 +71,8 @@ submit_gwas_job()
         local slurm_lname="logs/_gwas_epyc"
         local slurm_project="lindgren.prj"
         local slurm_tasks="${tasks}"
-        local slurm_queue="long"
-        local slurm_shmem="2"
+        local slurm_queue="short"
+        local slurm_shmem="3"
         if [ ${cluster} == "slurm" ]; then
           readonly gwas_jid=$( sbatch \
             --account="${slurm_project}" \

@@ -150,7 +150,7 @@ submit_spa_null() {
 }
 
 # Parameters
-readonly use_prs=1
+readonly use_prs=0
 readonly nslots=2
 readonly queue="short"
 readonly project="lindgren.prj"

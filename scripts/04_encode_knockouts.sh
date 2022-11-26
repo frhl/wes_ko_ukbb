@@ -19,8 +19,9 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
+#$ -t 5
 #$ -V
-#$ -hold_jid 79483349
+#$ -hold_jid 79592241
 
 set -o errexit
 set -o nounset
@@ -47,7 +48,6 @@ readonly out_type="vcf"
 
 # Note: ~24 slots are needed for running chr1. 
 # Note: long queue may be required for chr1.
-readonly tasks="1-22" # 1-22
 readonly queue="short"
 readonly project="lindgren.prj"
 
@@ -67,8 +67,7 @@ submit_knockout_job()
   local out_checkpoint="${out_prefix_csqs}_checkpoint.mt"
   
   # slurm specific paramters 
-  local slurm_tasks="${tasks}"
-  local slurm_jname="_ko_${annotation}"
+  local slurm_jname="_c${chr}_ko_${annotation}"
   local slurm_lname="logs/_knockouts"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
@@ -83,7 +82,7 @@ submit_knockout_job()
       --chdir="${curwd}" \
       --partition="${slurm_queue}" \
       --cpus-per-task="${slurm_nslots}" \
-      --array=${slurm_tasks} \
+      --array=${task_id} \
       --parsable \
       "${bash_script}" \
       "${in_prefix}" \
@@ -99,9 +98,8 @@ submit_knockout_job()
       -e "${slurm_lname}.errors.log" \
       -P lindgren.prjc \
       -wd $(pwd) \
-      -t ${tasks} \
+      -t ${task_id} \
       -q "${sge_queue}" \
-      -t "${slurm_tasks}" \
       -pe shmem ${slurm_nslots} \
       "${bash_script}" \
       "${in_prefix}" \
@@ -120,10 +118,10 @@ submit_knockout_job()
   fi
 }
 
-submit_knockout_job "pLoF,damaging_missense" "16" "collect"
-submit_knockout_job "pLoF" "10" "collect"
-submit_knockout_job "damaging_missense" "10" "collect"
-submit_knockout_job "synonymous" "10" "collect"
+submit_knockout_job "pLoF,damaging_missense" "22" "collect"
+submit_knockout_job "pLoF" "22" "collect"
+submit_knockout_job "damaging_missense" "22" "collect"
+submit_knockout_job "synonymous" "22" "collect"
 
 
 
