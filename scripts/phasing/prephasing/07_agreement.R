@@ -59,7 +59,7 @@ main <- function(args){
     dt <- dt[dt$s %in% my_samples,]
 
     # eval 
-    final <- eval_phase(eval_gt_agreement_by_bin(dt, labels[1:8]), labels)
+    final <- eval_phase(eval_gt_agreement_by_bin(dt, labels[1:8], pp_cutoff), labels)
     final$pp <- as.numeric(pp_cutoff)
 
     # combine
