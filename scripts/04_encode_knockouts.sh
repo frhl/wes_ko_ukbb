@@ -19,9 +19,9 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 5
+#$ -t 1
 #$ -V
-#$ -hold_jid 79592241
+#$ -hold_jid 79672533
 
 set -o errexit
 set -o nounset
@@ -71,7 +71,7 @@ submit_knockout_job()
   local slurm_lname="logs/_knockouts"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
-  local sge_queue="short.qa"
+  local sge_queue="short.qe"
   local slurm_nslots="${nslots}"
   if [ "${cluster}" = "slurm" ]; then
     sbatch \
@@ -118,10 +118,10 @@ submit_knockout_job()
   fi
 }
 
-submit_knockout_job "pLoF,damaging_missense" "22" "collect"
-submit_knockout_job "pLoF" "22" "collect"
-submit_knockout_job "damaging_missense" "22" "collect"
-submit_knockout_job "synonymous" "22" "collect"
+submit_knockout_job "pLoF,damaging_missense" "30" "collect"
+#submit_knockout_job "pLoF" "16" "collect"
+#submit_knockout_job "damaging_missense" "30" "collect"
+#submit_knockout_job "synonymous" "30" "collect"
 
 
 

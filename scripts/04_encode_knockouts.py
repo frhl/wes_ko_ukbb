@@ -6,10 +6,9 @@ import pandas as pd
 import random
 import string
 import sys
+import os.path
 
 from ukb_utils import hail_init
-from ukb_utils import samples
-from ko_utils import variants
 from ko_utils import io
 from ko_utils import ko
 
@@ -38,13 +37,20 @@ def main(args):
 
     export_all_gts = args.export_all_gts
     csqs_category = args.csqs_category
-    discard_prob_dosages = args.discard_prob_dosages
 
     # import phased/unphased data
     hail_init.hail_bmrc_init('logs/hail/knockout.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1')
-    mt = io.import_table(input_path, input_type, calc_info = False)
-    mt = mt.repartition(1024)
+
+    # for debugging
+    precheckpoint = out_prefix + "_precheckpoint.mt"
+    fname = precheckpoint + "/_SUCCESS"
+
+    if not os.path.isfile(fname): 
+        mt = io.import_table(input_path, input_type, calc_info = False)
+        mt = mt.repartition(4096)
+    else:
+        mt = mt.checkpoint(precheckpoint, overwrite = True)
 
     # subset to current csqs category
     mt = mt.filter_rows(hl.literal(set(csqs_category)).contains(mt.consequence_category))
