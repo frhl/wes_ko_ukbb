@@ -9,7 +9,7 @@
 #SBATCH --error=logs/extract_knockouts.errors.log
 #SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
-#SBATCH --array=21
+#SBATCH --array=20
 #
 #
 #$ -N extract_knockouts
@@ -19,7 +19,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 1,5
+#$ -t 22
 #$ -V
 
 set -o errexit
@@ -32,6 +32,7 @@ source utils/vcf_utils.sh
 readonly curwd=$(pwd)
 readonly spark_dir="data/tmp/spark"
 readonly bash_script="scripts/_extract_knockouts.sh"
+readonly merge_script="scripts/_merge_knockouts.sh"
 readonly hail_script="scripts/_write_gene_intervals.py"
 
 readonly cluster=$( get_current_cluster)
@@ -39,16 +40,22 @@ readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
 readonly in_dir="data/mt/prefilter/final_99"
+readonly merge_dir="data/knockouts/extracted"
 readonly out_dir="data/knockouts/extracted/chr${chr}"
+# in parameters
 readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp99.maf0_005.mt"
 readonly in_type="mt"
-
+# prefix for indiviual genes and final merged file
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}"
+readonly out_merge="${merge_dir}/ukb_eur_wes_200k_chr${chr}"
+# interval file to keep track of genes to assess
 readonly out_interval="${out_prefix}_interval.txt"
 
-readonly queue="epyc"
-readonly project="lindgren.prj"
-readonly only_vcf=""
+# slurm/sge paramters
+readonly sge_project="lindgren.prjc"
+readonly slurm_project="lindgren.prj"
+readonly slurm_queue="epyc"
+readonly sge_queue="short" 
 
 mkdir -p ${out_dir}
 
@@ -72,6 +79,41 @@ extract_genes
 readonly n_genes=$( cat ${out_interval} | wc -l )
 readonly array_id="1" #-${n_genes}"
 
+submit_merge_job()
+{
+  local regex_prefix="${1}"
+  local outfile="${2}"
+  local jname="_c${chr}_mrg_ko"
+  local lname="logs/_merge_knockouts"
+  local nslots="1"
+  if [ "${cluster}" = "slurm" ]; then
+    sbatch \
+      --account="${slurm_project}" \
+      --job-name="${jname}" \
+      --output="${lname}.log" \
+      --error="${lname}.errors.log" \
+      --chdir="${curwd}" \
+      --partition="${slurm_queue}" \
+      --cpus-per-task="${nslots}" \
+      "${merge_script}" \
+      "${regex_prefix}" \
+      "${out_interval}" \
+      "${outfile}" 
+  elif [ "${cluster}" = "sge" ]; then
+     qsub -N "${jname}" \
+      -o "${lname}.log" \
+      -e "${lname}.errors.log" \
+      -P ${sge_project} \
+      -wd $(pwd) \
+      -q "${sge_queue}" \
+      -pe shmem ${nslots} \
+      "${merge_script}" \
+      "${regex_prefix}" \
+      "${out_interval}" \
+      "${outfile}"
+  fi
+}
+
 
 submit_knockout_job() 
 {
@@ -83,9 +125,6 @@ submit_knockout_job()
   # slurm specific paramters 
   local slurm_jname="_c${chr}_extr_${annotation}"
   local slurm_lname="logs/_extract_knockouts"
-  local slurm_project="${project}"
-  local slurm_queue="${queue}"
-  local sge_queue="short.qe"
   local slurm_nslots="${nslots}"
   if [ "${cluster}" = "slurm" ]; then
     sbatch \
@@ -95,7 +134,7 @@ submit_knockout_job()
       --error="${slurm_lname}.errors.log" \
       --chdir="${curwd}" \
       --partition="${slurm_queue}" \
-      --cpus-per-task="${slurm_nslots}" \
+      --cpus-per-task="${nslots}" \
       --array=${array_id} \
       --parsable \
       "${bash_script}" \
@@ -109,11 +148,11 @@ submit_knockout_job()
     qsub -N "${slurm_jname}" \
       -o "${slurm_lname}.log" \
       -e "${slurm_lname}.errors.log" \
-      -P lindgren.prjc \
+      -P ${sge_project} \
       -wd $(pwd) \
       -t ${array_id} \
       -q "${sge_queue}" \
-      -pe shmem ${slurm_nslots} \
+      -pe shmem ${nslots} \
       "${bash_script}" \
       "${in_prefix}" \
       "${in_type}" \
