@@ -16,7 +16,6 @@ def main(args):
     input_path = args.input_path
     input_type = args.input_type
     out_prefix = args.out_prefix
-    csqs_category = args.csqs_category
 
     # import phased/unphased data
     hail_init.hail_bmrc_init('logs/hail/_write_gene_intervals.log', 'GRCh38')
@@ -24,15 +23,14 @@ def main(args):
 
     # collect unique genes to investigate
     mt = io.import_table(input_path, input_type, calc_info=False)
-    mt = mt.filter_rows(hl.literal(set(csqs_category)).contains(mt.consequence_category))
     gene_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
     genes = list(set(gene_expr.collect()))
     
     # write genes to be assessed
     idx = 1
-    with open(out_prefix + ".txt", "w") as outfile:
+    with open(out_prefix, "w") as outfile:
         for gene in genes:
-            outfile.write(f"{idx}\t{gene}")
+            outfile.write(f"{idx}\t{gene}\n")
             idx += 1
 
 if __name__=='__main__':
@@ -40,7 +38,6 @@ if __name__=='__main__':
     parser.add_argument('--input_path', default=None, help='Path to input')
     parser.add_argument('--input_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
-    parser.add_argument('--csqs_category', default=None, action=SplitArgs, help='What categories should be subsetted to?')
     args = parser.parse_args()
 
     main(args)
