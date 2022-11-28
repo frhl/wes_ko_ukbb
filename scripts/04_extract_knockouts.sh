@@ -14,7 +14,7 @@
 #
 #$ -N extract_knockouts
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/exctract_knockouts.log
+#$ -o logs/extract_knockouts.log
 #$ -e logs/extract_knockouts.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
@@ -39,7 +39,7 @@ readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
 readonly in_dir="data/mt/prefilter/final_99"
-readonly out_dir="data/knockouts/extracted"
+readonly out_dir="data/knockouts/extracted/chr${chr}"
 readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp99.maf0_005.mt"
 readonly in_type="mt"
 
@@ -67,12 +67,10 @@ extract_genes() {
 }
 
 
-
-# get number of tasks
+# Get number of genes to run
 extract_genes
 readonly n_genes=$( cat ${out_interval} | wc -l )
-readonly task_id="1-${n_genes}"
-echo "Tasks: ${task_id}"
+readonly array_id="1" #-${n_genes}"
 
 
 submit_knockout_job() 
@@ -80,13 +78,11 @@ submit_knockout_job()
   # I/O
   local annotation=${1}
   local nslots=${2}
-  local aggr_method=${3}
   local out_prefix_csqs="${out_prefix}_${annotation/,/_}"
-  local out_checkpoint="${out_prefix_csqs}_checkpoint.mt"
   
   # slurm specific paramters 
-  local slurm_jname="_c${chr}_ko_${annotation}"
-  local slurm_lname="logs/_knockouts"
+  local slurm_jname="_c${chr}_extr_${annotation}"
+  local slurm_lname="logs/_extract_knockouts"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
   local sge_queue="short.qe"
@@ -100,21 +96,22 @@ submit_knockout_job()
       --chdir="${curwd}" \
       --partition="${slurm_queue}" \
       --cpus-per-task="${slurm_nslots}" \
-      --array=${task_id} \
+      --array=${array_id} \
       --parsable \
       "${bash_script}" \
       "${in_prefix}" \
       "${in_type}" \
       "${annotation}" \
       "${out_interval}" \
-      "${out_prefix_csqs}"
+      "${out_prefix_csqs}" \
+      "${chr}"
   elif [ "${cluster}" = "sge" ]; then
     qsub -N "${slurm_jname}" \
       -o "${slurm_lname}.log" \
       -e "${slurm_lname}.errors.log" \
       -P lindgren.prjc \
       -wd $(pwd) \
-      -t ${task_id} \
+      -t ${array_id} \
       -q "${sge_queue}" \
       -pe shmem ${slurm_nslots} \
       "${bash_script}" \
@@ -122,16 +119,14 @@ submit_knockout_job()
       "${in_type}" \
       "${annotation}" \
       "${out_interval}" \
-      "${out_prefix_csqs}" 
+      "${out_prefix_csqs}" \
+      "${chr}"
   else
     >&2 echo "${cluster} is not a valid cluster."
   fi
 }
 
-#submit_knockout_job "pLoF,damaging_missense" "30" "collect"
-#submit_knockout_job "pLoF" "4" "fast"
-#submit_knockout_job "damaging_missense" "4" "fast"
-#submit_knockout_job "synonymous" "4" "fast"
+submit_knockout_job "pLoF,damaging_missense" "1"
 
 
 
