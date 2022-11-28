@@ -48,7 +48,7 @@ def main(args):
 
     if not os.path.isfile(fname): 
         mt = io.import_table(input_path, input_type, calc_info = False)
-        mt = mt.repartition(4096)
+        mt = mt.repartition(8192)
     else:
         mt = mt.checkpoint(precheckpoint, overwrite = True)
 

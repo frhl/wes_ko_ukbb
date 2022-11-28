@@ -7,7 +7,7 @@
 #SBATCH --error=logs/prs.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=120-160
+#SBATCH --array=80-300
 #
 #
 #$ -N prs

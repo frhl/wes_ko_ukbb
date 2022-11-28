@@ -21,10 +21,13 @@ source utils/bash_utils.sh
 readonly vcf_dir="data/knockouts/alt"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
-readonly grm_dir="data/saige/grm/input"
 
-readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+readonly plink_dir="data/saige/grm/input"
+readonly grm_dir="data/saige/grm/input/dnanexus"
+
+readonly grm_mtx="${grm_dir}/ukb_eur_200k_grm_fitted_relatednessCutoff_0.05_2000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
+readonly plink_file="${grm_dir}/ukb_eur_200k_grm_grch38_rv_merged"
 
 readonly spa_script="scripts/_spa_test.sh"
 readonly merge_script="scripts/_spa_merge.sh"
@@ -36,7 +39,7 @@ readonly curwd=$(pwd)
 submit_spa_binary_with_csqs()
 {
   local annotation="${1?Error: Missing arg1 (annotation)}"
-  local pheno_list="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
+  local pheno_list="${pheno_dir}/spiros_brava_phenotypes_binary_200k_header.tsv"
   local phenotype=$( sed "${index}q;d" ${pheno_list} )
   submit_spa_with_csqs "${annotation}" "${phenotype}" "binary"
 }

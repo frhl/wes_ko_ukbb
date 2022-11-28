@@ -20,7 +20,7 @@ readonly rscript="scripts/survival/01_write_gene_ko.R"
 
 readonly in_pattern="pLoF_damaging_missense_all.tsv.gz"
 readonly in_dir="data/knockouts/alt"
-readonly out_dir="data/survival/knockouts/eur_no_fin/pLoF_damaging_missense"
+readonly out_dir="data/survival/knockouts/eur/pLoF_damaging_missense"
 
 mkdir -p ${out_dir}
 

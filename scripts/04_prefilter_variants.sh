@@ -9,7 +9,7 @@
 #SBATCH --error=logs/prefilter_variants.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=1-22
+#SBATCH --array=1-19
 #SBATCH --requeue
 #
 #
@@ -40,8 +40,8 @@ readonly in_dir="data/mt/annotated"
 readonly input_prefix="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.mt"
 readonly input_type="mt"
 
-readonly out_dir="data/mt/prefilter/final_99"
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp99.maf0_005"
+readonly out_dir="data/mt/prefilter/final_90"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005"
 readonly out_type="mt"
 
 # remove these common plofs (90% pop)
@@ -49,7 +49,7 @@ readonly exclude="data/genes/220310_common_plofs_to_exclude.txt"
 
 readonly maf_min=0.00
 readonly maf_max=0.05
-readonly pp_cutoff=0.99
+readonly pp_cutoff=0.90
 readonly partitions=512 # need at least 512 partitions for certain chroms/annotations
 
 mkdir -p ${out_dir}

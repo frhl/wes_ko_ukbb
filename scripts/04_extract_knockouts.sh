@@ -38,7 +38,7 @@ readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
 readonly in_dir="data/mt/prefilter/final_99"
-readonly out_dir="data/knockouts/alt_collect_epyc30_chr5_p8192p"
+readonly out_dir="data/knockouts/alt_collect_epyc30_chr5_512p"
 readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chrCHR.loftee.worst_csq_by_gene_canonical.pp99.maf0_005.mt"
 readonly in_type="mt"
 
@@ -117,7 +117,7 @@ submit_knockout_job()
   fi
 }
 
-submit_knockout_job "pLoF,damaging_missense" "24" "collect"
+submit_knockout_job "pLoF,damaging_missense" "30" "collect"
 #submit_knockout_job "pLoF" "4" "fast"
 #submit_knockout_job "damaging_missense" "4" "fast"
 #submit_knockout_job "synonymous" "4" "fast"
