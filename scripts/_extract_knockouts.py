@@ -37,8 +37,8 @@ def main(args):
     csqs_expr = hl.literal(set(csqs_category)).contains(mt.consequence_category)
     gene_expr = hl.literal(subset_gene).contains(gene_expr)
     mt = mt.filter_rows((csqs_expr & gene_expr))
-    n_csqs = mt.count()[0]
-    sys.stderr.write(f"Filtering to {n_csqs} variants that are {csqs_category} for gene {subset_gene}.")
+    #n_csqs = mt.count()[0]
+    #sys.stderr.write(f"Filtering to {n_csqs} variants that are {csqs_category} for gene {subset_gene}.")
 
     # aggregate knockouts by gene 
     gene_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id

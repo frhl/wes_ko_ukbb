@@ -7,9 +7,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/extract_knockouts.log
 #SBATCH --error=logs/extract_knockouts.errors.log
-#SBATCH --partition=epyc
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=4-5
+#SBATCH --array=6-22
 #
 #
 #$ -N extract_knockouts
