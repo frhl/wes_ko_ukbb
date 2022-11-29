@@ -77,7 +77,7 @@ extract_genes() {
 # Get number of genes to run
 extract_genes
 readonly n_genes=$( cat ${out_interval} | wc -l )
-readonly array_id="1" #-${n_genes}"
+readonly array_id="2-${n_genes}"
 
 submit_merge_job()
 {
@@ -178,6 +178,7 @@ submit_knockout_job()
 
 
 submit_knockout_job "pLoF,damaging_missense" "1"
+
 
 
 

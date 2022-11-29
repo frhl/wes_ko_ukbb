@@ -64,15 +64,12 @@ def main(args):
                 worst_csq_expr=mt.consequence.vep[csqs_expr],
                 use_loftee=use_loftee))
 
-    # repartition
+    # repartition data
     if partitions:
         mt = mt.repartition(int(partitions))
- 
+
+    # export result
     io.export_table(mt, out_prefix, out_type)
-    # export involved variants
-    #ht = mt.rows()
-    #ht.select(*[ht.info, ht.gene_id, ht.consequence_category])
-    #ht.flatten().export(out_prefix + ".txt.gz")
 
 
 if __name__=='__main__':
