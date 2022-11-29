@@ -9,7 +9,7 @@
 #SBATCH --error=logs/extract_knockouts.errors.log
 #SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
-#SBATCH --array=22
+#SBATCH --array=4-5
 #
 #
 #$ -N extract_knockouts
@@ -19,7 +19,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 5
+#$ -t 1-3
 #$ -V
 
 set -o errexit
@@ -39,11 +39,11 @@ readonly cluster=$( get_current_cluster)
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
-readonly in_dir="data/mt/prefilter/final_99"
-readonly merge_dir="data/knockouts/extracted"
-readonly out_dir="data/knockouts/extracted/chr${chr}"
+readonly in_dir="data/mt/prefilter/final_90"
+readonly merge_dir="data/knockouts/extracted/pp90"
+readonly out_dir="data/knockouts/extracted/pp90/chr${chr}"
 # in parameters
-readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp99.maf0_005.mt"
+readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.mt"
 readonly in_type="mt"
 # prefix for indiviual genes and final merged file
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}"
@@ -77,7 +77,7 @@ extract_genes() {
 # Get number of genes to run
 extract_genes
 readonly n_genes=$( cat ${out_interval} | wc -l )
-readonly array_id="2-${n_genes}"
+readonly array_id="1-${n_genes}"
 
 submit_merge_job()
 {

@@ -7,9 +7,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/knockouts.log
 #SBATCH --error=logs/knockouts.errors.log
-#SBATCH --partition=epyc
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=5
+#SBATCH --array=1-22
 #
 #
 #$ -N knockouts
@@ -19,7 +19,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 1,5
+#$ -t 1,
 #$ -V
 
 set -o errexit
@@ -37,17 +37,15 @@ readonly cluster=$( get_current_cluster)
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
-readonly in_dir="data/mt/prefilter/final_99"
-readonly out_dir="data/knockouts/alt_24cores"
-readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chrCHR.loftee.worst_csq_by_gene_canonical.pp99.maf0_005.mt"
+readonly in_dir="data/mt/prefilter/final_90"
+readonly out_dir="data/knockouts/pp90"
+readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chrCHR.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.mt"
 readonly in_type="mt"
 
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chrCHR"
 readonly out_type="vcf"
 
-# Note: ~24 slots are needed for running chr1. 
-# Note: long queue may be required for chr1.
-readonly queue="epyc"
+readonly queue="short"
 readonly project="lindgren.prj"
 
 # should only VCF be produced?
@@ -111,14 +109,10 @@ submit_knockout_job()
   else
     >&2 echo "${cluster} is not a valid cluster."
   fi
-  # clean up after checkpints when
-  if [ -f "${out_checkpoint}" ]; then
-    rm -rf ${out_checkpoint}
-  fi
 }
 
-submit_knockout_job "pLoF,damaging_missense" "24" "collect"
-#submit_knockout_job "pLoF" "4" "fast"
+submit_knockout_job "pLoF,damaging_missense" "4" "fast"
+submit_knockout_job "pLoF" "4" "fast"
 #submit_knockout_job "damaging_missense" "4" "fast"
 #submit_knockout_job "synonymous" "4" "fast"
 
