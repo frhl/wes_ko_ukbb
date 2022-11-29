@@ -44,6 +44,7 @@ readonly pedigree="${pedigree_dir}/ukb11867_pedigree.fam"
 # for shapeit5 phasing
 readonly phased_dir="data/phased/wes_union_calls/200k/shapeit5/parents"
 readonly phased_path="${phased_dir}/ukb_wes_union_calls_200k_shapeit5_parents_chr${chr}.vcf.gz"
+readonly phased_type="vcf"
 readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/switch"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_shapeit5_chr${chr}_pp${pp_cutoff}"
 # out paths and types
@@ -55,6 +56,8 @@ readonly out_type="vcf"
 mkdir -p ${out_dir}
 
 if [ ! -f "${out_vcf}" ]; then
+  set_up_hail
+  set_up_pythonpath_legacy
   python3 ${hail_script} \
     --phased_path ${phased_path} \
     --phased_type ${phased_type} \
