@@ -23,10 +23,11 @@
 source utils/bash_utils.sh
 
 readonly rscript="scripts/phasing/phasing/07_switch.R"
-readonly ligated_dir="data/phased/wes_union_calls/200k/shapeit5/parents"
-readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/switch"
+readonly switch_dir="data/phased/wes_union_calls/200k/shapeit5/parents"
+readonly switch_regex="ukb_wes_union_calls_200k_shapeit5_parents_chr[0-9]+.txt"
 
-readonly out_prefix="${out_dir}/221124_switch_error_rates"
+readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/tables"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_shapeit5_parents_trio_switch"
 
 readonly wes_variants="/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list"
 
@@ -34,7 +35,8 @@ mkdir -p ${out_dir}
 
 set_up_rpy
 Rscript ${rscript} \
-  --ligated_dir "${ligated_dir}" \
+  --switch_dir "${switch_dir}" \
+  --switch_file "${switch_regex}" \
   --sites "${wes_variants}" \
   --out_prefix "${out_prefix}" 
 
