@@ -10,16 +10,16 @@
 #SBATCH --error=logs/parents.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=20
+#SBATCH --array=21
 #
 #$ -N parents
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/parents.log
 #$ -e logs/parents.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 3
+#$ -pe shmem 2
 #$ -q short.qc
-#$ -t 20
+#$ -t 21
 #$ -V
 
 set -o errexit
@@ -38,49 +38,43 @@ readonly chr=$( get_chr ${array_idx} )
 readonly pedigree_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 readonly pedigree="${pedigree_dir}/ukb11867_pedigree.fam"
 # parental genotypes that were not phased
-readonly parents_dir="data/unphased/wes_union_calls/prefilter_no_maf_cutoff/200k"
+readonly parents_dir="data/unphased/wes_union_calls/prefilter/200k"
 readonly parents_path="${parents_dir}/ukb_wes_union_calls_chr${chr}_parents.vcf.gz"
-# standard genotypes that were phased
-readonly phased_dir="data/phased/wes_union_calls/200k/shapeit5/ligated"
-readonly phased_path="${phased_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.bgz"
-
-#readonly phased_dir="data/phased/wes_scaffold_calls/200k_from_500k/ligated"
-#readonly phased_path="${phased_dir}/ukb_wes_scaffold_calls_200k_from_500k_chr${chr}.vcf.bgz"
+# for shapeit5 phasing
+#readonly phased_dir="data/phased/wes_union_calls/200k/shapeit5/ligated"
+#readonly phased_path="${phased_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.bgz"
+#readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/parents"
+#readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_shapeit5_parents_chr${chr}"
+# for eagle2 and shapeit4 testing
+readonly phased_dir="data/phased/wes_union_calls/200k/shapeit4/ukb_wes_union_calls_shapeit4_200k_chr${chr}-16xshort"
+readonly phased_path="${phased_dir}/shapeit4_prs100000_pro25000_mprs150000.1of1.vcf.gz"
+readonly out_dir="data/phased/wes_union_calls/200k/shapeit4/parents"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_shapeit4_parents_chr${chr}"
 # out paths and types
-readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/parents"
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_shapeit5_parents_chr${chr}"
 readonly out_vcf="${out_prefix}.vcf.gz"
 readonly out_trio="${out_prefix}.trio"
+readonly out_info="${out_prefix}.info"
 readonly out_trio_by_site="${out_prefix}.txt"
 readonly out_type="vcf"
 
 mkdir -p ${out_dir}
 
+module purge
+module load BCFtools/1.12-GCC-10.3.0
 
+
+# Now merging vcf using BCFtools instead of hail fro speed
 if [ ! -f "${out_vcf}" ]; then
-  echo "Merging parents.."
-  module load BCFtools/1.12-GCC-10.3.0
   make_tabix "${parents_path}" "tbi"
   make_tabix "${phased_path}" "tbi"
   bcftools merge ${phased_path} ${parents_path} -Oz -o ${out_vcf}
 fi
 
-# combine parents and children in same vcf
-# note: we can't combine data using bcftools beacuse some variants
-# share the same position (but not same reference alleles)
-#if [ ! -f "${out_vcf}" ]; then
-#  module purge
-#  set_up_hail
-#  set_up_pythonpath_legacy
-#  python3 ${hail_script} \
-#    --parents_path ${parents_path} \
-#    --phased_path ${phased_path} \
-#    --out_prefix ${out_prefix} \
-#    --out_type ${out_type}
-#fi
-
-module purge
-module load BCFtools/1.12-GCC-10.3.0
+# write info AC/AN as seperate file
+if [ ! -f "${out_info}" ]; then
+  zcat ${out_vcf} | grep -v "#" | cut -f3,8 > ${out_info}
+  gzip ${out_info}
+fi
 
 # calculate switch errors using trio samples
 if [ ! -f "${out_trio}" ]; then
@@ -88,7 +82,7 @@ if [ ! -f "${out_trio}" ]; then
   bcftools +trio-switch-rate ${out_vcf} -- -p ${pedigree} > ${out_trio}
 fi
 
-# c
+# calculate switch errors by site
 if [ ! -f "${out_trio_by_site}" ]; then
   switch_errors_by_site ${out_vcf} ${pedigree}
 fi

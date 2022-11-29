@@ -39,18 +39,19 @@ def main(args):
     csqs_category = args.csqs_category
 
     # import phased/unphased data
-    hail_init.hail_bmrc_init('logs/hail/knockout.log', 'GRCh38')
+    hail_init.hail_bmrc_init(log='logs/hail/knockout.log', default_reference='GRCh38', min_block_size=128)
+    
     hl._set_flags(no_whole_stage_codegen='1')
 
     # for debugging
     precheckpoint = out_prefix + "_precheckpoint.mt"
     fname = precheckpoint + "/_SUCCESS"
 
-    if not os.path.isfile(fname): 
-        mt = io.import_table(input_path, input_type, calc_info = False)
-        mt = mt.repartition(8192)
-    else:
-        mt = mt.checkpoint(precheckpoint, overwrite = True)
+    #if not os.path.isfile(fname): 
+    mt = io.import_table(input_path, input_type, calc_info = False)
+    #mt = mt.repartition(256)
+    #else:
+    #mt = mt.checkpoint(precheckpoint, overwrite = True)
 
     # subset to current csqs category
     mt = mt.filter_rows(hl.literal(set(csqs_category)).contains(mt.consequence_category))

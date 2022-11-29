@@ -37,6 +37,9 @@ evaluate_knockouts() {
 }
 
 
-evaluate_knockouts
-
+if [ ! -f "${out_prefix_gene}.tsv.gz" ]; then
+  evaluate_knockouts
+else
+  >&2 echo "${out_prefix_gene} already exists!"
+fi
 

@@ -9,7 +9,7 @@
 #SBATCH --error=logs/extract_knockouts.errors.log
 #SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
-#SBATCH --array=20
+#SBATCH --array=22
 #
 #
 #$ -N extract_knockouts
@@ -19,7 +19,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 22
+#$ -t 21
 #$ -V
 
 set -o errexit
@@ -55,7 +55,7 @@ readonly out_interval="${out_prefix}_interval.txt"
 readonly sge_project="lindgren.prjc"
 readonly slurm_project="lindgren.prj"
 readonly slurm_queue="epyc"
-readonly sge_queue="short" 
+readonly sge_queue="short.qc" 
 
 mkdir -p ${out_dir}
 
@@ -81,8 +81,11 @@ readonly array_id="1" #-${n_genes}"
 
 submit_merge_job()
 {
+  echo "Submitting merge job."
   local regex_prefix="${1}"
   local outfile="${2}"
+  local sge_dependency="${3}"
+  local slurm_dependency="${4}"
   local jname="_c${chr}_mrg_ko"
   local lname="logs/_merge_knockouts"
   local nslots="1"
@@ -95,6 +98,7 @@ submit_merge_job()
       --chdir="${curwd}" \
       --partition="${slurm_queue}" \
       --cpus-per-task="${nslots}" \
+      --dependency="${slurm_dependency}" \
       "${merge_script}" \
       "${regex_prefix}" \
       "${out_interval}" \
@@ -107,6 +111,7 @@ submit_merge_job()
       -wd $(pwd) \
       -q "${sge_queue}" \
       -pe shmem ${nslots} \
+      -hold_jid ${sge_dependency} \
       "${merge_script}" \
       "${regex_prefix}" \
       "${out_interval}" \
@@ -121,17 +126,20 @@ submit_knockout_job()
   local annotation=${1}
   local nslots=${2}
   local out_prefix_csqs="${out_prefix}_${annotation/,/_}"
-  
+  local out_prefix_merge="${out_merge}_${annotation/,/_}"
+  local merge_prefix_regex="${out_prefix_csqs}_ENSG"
+
   # slurm specific paramters 
-  local slurm_jname="_c${chr}_extr_${annotation}"
-  local slurm_lname="logs/_extract_knockouts"
+  local ko_jname="_c${chr}_extr_${annotation}"
+  local ko_lname="logs/_extract_knockouts"
   local slurm_nslots="${nslots}"
+  local slurm_jid="na"
   if [ "${cluster}" = "slurm" ]; then
-    sbatch \
+    local slurm_jid=$( sbatch \
       --account="${slurm_project}" \
-      --job-name="${slurm_jname}" \
-      --output="${slurm_lname}.log" \
-      --error="${slurm_lname}.errors.log" \
+      --job-name="${ko_jname}" \
+      --output="${ko_lname}.log" \
+      --error="${ko_lname}.errors.log" \
       --chdir="${curwd}" \
       --partition="${slurm_queue}" \
       --cpus-per-task="${nslots}" \
@@ -143,11 +151,11 @@ submit_knockout_job()
       "${annotation}" \
       "${out_interval}" \
       "${out_prefix_csqs}" \
-      "${chr}"
+      "${chr}" )
   elif [ "${cluster}" = "sge" ]; then
-    qsub -N "${slurm_jname}" \
-      -o "${slurm_lname}.log" \
-      -e "${slurm_lname}.errors.log" \
+    qsub -N "${ko_jname}" \
+      -o "${ko_lname}.log" \
+      -e "${ko_lname}.errors.log" \
       -P ${sge_project} \
       -wd $(pwd) \
       -t ${array_id} \
@@ -163,7 +171,11 @@ submit_knockout_job()
   else
     >&2 echo "${cluster} is not a valid cluster."
   fi
+  # note that this function waits for "ko_jname" (sge) which
+  # is used as a dependency before starting job.
+  submit_merge_job ${merge_prefix_regex} ${out_prefix_merge} ${ko_jname} ${slurm_jid}
 }
+
 
 submit_knockout_job "pLoF,damaging_missense" "1"
 

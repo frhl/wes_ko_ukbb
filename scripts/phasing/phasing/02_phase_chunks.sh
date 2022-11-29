@@ -60,9 +60,9 @@ readonly phasing_region_overlap=$(( ${phasing_region_size}/4 ))
 readonly max_phasing_region_size=150000
 
 # clsurm/sge parameters
-readonly software="shapeit4" #"shapeit5" #"shapeit4" or "eagle2"
+readonly software="eagle2" #"shapeit5" #"shapeit4" or "eagle2"
 readonly project="lindgren.prj"
-readonly queue="short"
+readonly queue="long"
 readonly nslots=16
 
 ## paramters for phasing with shapeit
