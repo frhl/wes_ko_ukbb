@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 #
-# @description merge phased vcf with unphased switch_pp_subset for later switch error calculation.
-# @note - takes about ~ 24h with 1 a core
 #
 #SBATCH --account=lindgren.prj
 #SBATCH --job-name=switch_pp_subset
@@ -10,16 +8,17 @@
 #SBATCH --error=logs/switch_pp_subset.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=21
+#SBATCH --array=1-22
+#SBATCH --dependency="after:9530918"
 #
 #$ -N switch_pp_subset
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/switch_pp_subset.log
 #$ -e logs/switch_pp_subset.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 2
-#$ -q short.qc
-#$ -t 21
+#$ -pe shmem 1
+#$ -q short.qe
+#$ -t 1-22
 #$ -V
 
 set -o errexit

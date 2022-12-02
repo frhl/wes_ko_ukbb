@@ -19,8 +19,8 @@ fread_phased_sites <- function(file, ...){
 
     # append to data.table
     d <- fread(file, ...)
-    if (! ("AC" in colnames(d))) stop(paste("column AC not in file:", file))
-    if (! ("AN" in colnames(d))) stop(paste("column AN not in file:", file))
+    #if (!("AC" in colnames(d))) stop(paste("column AC not in file:", file))
+    #if (!("AN" in colnames(d))) stop(paste("column AN not in file:", file))
 
     d$AN_m_AC <- as.numeric(d$AN - d$AC)
     d$MAC <- as.numeric(apply(d[,c("AC","AN_m_AC")], 1, min))
@@ -100,7 +100,8 @@ main <- function(args){
     stopifnot(dir.exists(args$switch_dir))
     files <- list.files(args$switch_dir, pattern = args$switch_file)
     files <- file.path(args$switch_dir, files)
-    stopifnot(length(files) > 0)  
+    stopifnot(length(files) > 0)
+    stopifnot(length(files) > 21)  
 
     sites <- args$sites
     out_prefix <- args$out_prefix
