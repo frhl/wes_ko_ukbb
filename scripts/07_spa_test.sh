@@ -9,7 +9,7 @@
 #SBATCH --error=logs/spa_test.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-80
+#SBATCH --array=100
 #SBATCH --requeue
 
 set -o errexit
@@ -17,8 +17,9 @@ set -o nounset
 
 module purge
 source utils/bash_utils.sh
+source utils/qsub_utils.sh
 
-readonly vcf_dir="data/knockouts/alt"
+readonly vcf_dir="data/knockouts/alt/pp90/combined"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
 
@@ -33,7 +34,8 @@ readonly spa_script="scripts/_spa_test.sh"
 readonly merge_script="scripts/_spa_merge.sh"
 readonly in_prefix="ukb_eur_wes_200k"
 
-readonly index=${SLURM_ARRAY_TASK_ID}
+readonly cluster=$( get_current_cluster)
+readonly index=$( get_array_task_id )
 readonly curwd=$(pwd)
 
 submit_spa_binary_with_csqs()
@@ -61,13 +63,13 @@ submit_spa_with_csqs()
 
     local step1_dir="data/saige/output/${trait}/step1"
     local step2_dir="data/saige/output/${trait}/step2/min_mac${min_mac}"
-    local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${maf}_${annotation}.vcf.bgz"
+    local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${annotation}.vcf.bgz"
     mkdir -p ${step2_dir}
 
     local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
     local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
-    local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}"
-    local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}.txt.gz"
+    local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${phenotype}_${annotation}"
+    local out_mrg="${step2_dir}/${in_prefix}_${phenotype}_${annotation}.txt.gz"
 
     if [ "${use_prs}" -eq "1" ]; then
       local in_gmat_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.rda"
@@ -75,8 +77,8 @@ submit_spa_with_csqs()
       if [ -f "${in_gmat_prs/CHR/21}" ] & [ -f "${in_var_prs/CHR/21}" ]; then
         local in_gmat=${in_gmat_prs}
         local in_var=${in_var_prs}
-        local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}_locoprs"
-        local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}_locoprs.txt.gz"
+        local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${phenotype}_${annotation}_locoprs"
+        local out_mrg="${step2_dir}/${in_prefix}_${phenotype}_${annotation}_locoprs.txt.gz"
       else
         >&2 echo "Saige NULL (PRS) ${in_gmat_prs}/${in_var_prs} does not exist. Using without PRS."
       fi 
@@ -156,19 +158,17 @@ submit_merge_job()
 
 # parameters
 readonly conditioning_markers=""
-readonly use_prs="1"
+readonly use_prs="0"
 readonly min_mac=4
 readonly project="lindgren.prj"
 readonly tasks=1-22
 readonly queue="short"
 readonly nslots=1
 
-# Binary traits
-maf="maf0to5e-2"
 
 # cts traits
-submit_spa_cts_with_csqs "pLoF_damaging_missense"
-#submit_spa_binary_with_csqs "pLoF_damaging_missense"
+#submit_spa_cts_with_csqs "pLoF_damaging_missense"
+submit_spa_binary_with_csqs "pLoF_damaging_missense"
 
 #sleep 10
 #submit_spa_cts_with_csqs "pLoF"
