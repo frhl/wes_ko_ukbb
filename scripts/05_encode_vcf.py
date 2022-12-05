@@ -49,8 +49,7 @@ def main(args):
 
     #if not os.path.isfile(fname): 
     mt = io.import_table(input_path, input_type, calc_info = False)
-    #mt = mt.repartition(256)
-    #else:
+    #mt = mt.repartition(2048)
     #mt = mt.checkpoint(precheckpoint, overwrite = True)
 
     # subset to current csqs category

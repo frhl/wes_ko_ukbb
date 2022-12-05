@@ -3,23 +3,23 @@
 # @description: amalgamate variants by phase to infer knockouts by genes.
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=knockouts
+#SBATCH --job-name=encode_vcf
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/knockouts.log
-#SBATCH --error=logs/knockouts.errors.log
+#SBATCH --output=logs/encode_vcf.log
+#SBATCH --error=logs/encode_vcf.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-22
+#SBATCH --array=2,5
 #
 #
-#$ -N knockouts
+#$ -N encode_vcf
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/knockouts.log
-#$ -e logs/knockouts.errors.log
+#$ -o logs/encode_vcf.log
+#$ -e logs/encode_vcf.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q short.qc
-#$ -t 1,
+#$ -q short.qe
+#$ -t 22
 #$ -V
 
 set -o errexit
@@ -31,14 +31,14 @@ source utils/vcf_utils.sh
 
 readonly curwd=$(pwd)
 readonly spark_dir="data/tmp/spark"
-readonly bash_script="scripts/_encode_knockouts.sh"
+readonly bash_script="scripts/_encode_vcf.sh"
 
 readonly cluster=$( get_current_cluster)
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
 readonly in_dir="data/mt/prefilter/final_90"
-readonly out_dir="data/knockouts/pp90"
+readonly out_dir="data/knockouts/alt/pp90/fast"
 readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chrCHR.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.mt"
 readonly in_type="mt"
 
@@ -54,7 +54,7 @@ readonly only_vcf=""
 mkdir -p ${out_dir}
 
 
-submit_knockout_job() 
+submit_encode_job() 
 {
   # I/O
   local annotation=${1}
@@ -65,10 +65,10 @@ submit_knockout_job()
   
   # slurm specific paramters 
   local slurm_jname="_c${chr}_ko_${annotation}"
-  local slurm_lname="logs/_knockouts"
+  local slurm_lname="logs/_encode_vcf"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
-  local sge_queue="short.qe"
+  local sge_queue="short.qc"
   local slurm_nslots="${nslots}"
   if [ "${cluster}" = "slurm" ]; then
     sbatch \
@@ -111,10 +111,11 @@ submit_knockout_job()
   fi
 }
 
-submit_knockout_job "pLoF,damaging_missense" "4" "fast"
-submit_knockout_job "pLoF" "4" "fast"
-#submit_knockout_job "damaging_missense" "4" "fast"
-#submit_knockout_job "synonymous" "4" "fast"
+#submit_encode_job "pLoF,damaging_missense" "32" "collect"
+#submit_encode_job "pLoF,damaging_missense" "12" "fast"
+submit_encode_job "pLoF" "4" "fast"
+submit_encode_job "damaging_missense" "4" "fast"
+submit_encode_job "synonymous" "4" "fast"
 
 
 

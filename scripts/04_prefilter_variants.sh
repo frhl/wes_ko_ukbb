@@ -49,7 +49,7 @@ readonly exclude="data/genes/220310_common_plofs_to_exclude.txt"
 
 readonly maf_min=0.00
 readonly maf_max=0.05
-readonly pp_cutoff=0.80
+readonly pp_cutoff=0.90
 readonly partitions=256 # need at least 512 partitions for certain chroms/annotations
 
 mkdir -p ${out_dir}
