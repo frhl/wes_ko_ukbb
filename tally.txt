@@ -1,0 +1,3 @@
+### Sun Nov 27 21:29:29 GMT 2022 ###
+3.8T data/prs 1.8T data/unphased 1.8T data/phased 759G data/saige 482G data/mt 401G data/tmp 182G data/conditional 33G data/knockouts 19G data/prephased 9.1G data/phenotypes 6.6G data/vep 4.3G data/simulation 2.9G data/permute 2.1G data/survival 717M data/samples 173M data/genes 15M data/geneset 2.0M data/post_hoc 1.4M data/help 35K data/intervals
+### (end) ###

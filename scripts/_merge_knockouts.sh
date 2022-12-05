@@ -13,7 +13,7 @@ readonly regex_prefix=${1?Error: Missing arg1 (input_path)}
 readonly intervals=${2?Error: Missing arg4 (gene_intervals)}
 readonly outfile=${3?Error: Missing arg5 (path prefix for saige output)}
 
-readonly out_txt="${outfile}.txt"
+readonly out_txt="${outfile}_all.txt"
 readonly out_gzip="${out_txt}.gz"
 
 readonly directory="$( dirname ${regex_prefix} )"

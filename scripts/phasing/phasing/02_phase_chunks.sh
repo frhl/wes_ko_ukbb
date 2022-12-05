@@ -63,7 +63,7 @@ readonly max_phasing_region_size=150000
 readonly software="eagle2" #"shapeit5" #"shapeit4" or "eagle2"
 readonly project="lindgren.prj"
 readonly queue="long"
-readonly nslots=16
+readonly nslots=20
 
 ## paramters for phasing with shapeit
 readonly phased_set_error="0.0001" # 0.0001

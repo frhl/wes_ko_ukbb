@@ -18,6 +18,7 @@ def main(args):
     hail_init.hail_bmrc_init_local('logs/hail/switch_pp_subset.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1') # from zulipi
     # note, we don't recalculate INFO after including parents
+    # as this will make singletons into doubletons/tripletons.
     mt = io.import_table(phased_path, phased_type, calc_info = False, find_replace=(':-?nan', ':NaN'))
     # note that PPs are only af MAF < 0.1%
     mt = mt.select_entries(*[mt.PP, mt.GT])
