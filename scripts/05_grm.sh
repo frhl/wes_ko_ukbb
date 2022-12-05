@@ -39,6 +39,8 @@ readonly rare_markers_per_chrom=100
 readonly low_freq_markers_per_chrom=100
 
 # get NFE samples to keep (Note, PLINK2 requires two columns)
+# use python to get samples that should be kept.
+
 cat ${final_sample_list} | grep NFE | cut -d"," -f1 | awk '{print $0,$NF}' > ${samples_keep}
 
 mkdir -p ${out_dir}
@@ -207,13 +209,13 @@ readonly prefix_rv_liftover="${prefix}_grch38_rv"
 readonly prefix_rv_merged="${prefix}_grch38_rv_merged"
 
 # step B1: create rare variant plink files
-#rv_jid=$(create_plink_vr ${prefix_rv} )
+rv_jid=$(create_plink_vr ${prefix_rv} )
 
 # step B2: liftover rare variant plink files
-#liftover_rv_jid=$( liftover_plink ${prefix_rv} ${prefix_rv_liftover} ${rv_jid} )
+liftover_rv_jid=$( liftover_plink ${prefix_rv} ${prefix_rv_liftover} ${rv_jid} )
 
 # step B3: combine rare variant plink files
-#merge_plink ${prefix_rv_liftover} ${prefix_rv_merged} ${liftover_rv_jid}
+merge_plink ${prefix_rv_liftover} ${prefix_rv_merged} ${liftover_rv_jid}
 
 
 
