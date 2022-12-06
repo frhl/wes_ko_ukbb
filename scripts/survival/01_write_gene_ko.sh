@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 1
+#$ -t 21
 #$ -tc 1
 #$ -V
 
@@ -15,20 +15,26 @@ set -o errexit
 set -o nounset
 
 source utils/bash_utils.sh
+source utils/qsub_utils.sh
+
+readonly cluster=$( get_current_cluster)
+readonly task_id=$( get_array_task_id )
+readonly chr=$( get_chr ${task_id} )
 
 readonly rscript="scripts/survival/01_write_gene_ko.R"
 
-readonly in_pattern="pLoF_damaging_missense_all.tsv.gz"
-readonly in_dir="data/knockouts/alt"
-readonly out_dir="data/survival/knockouts/eur/pLoF_damaging_missense"
+readonly in_dir="data/knockouts/alt/pp90/combined"
+readonly in_file="${in_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense_all.tsv.gz"
+
+readonly out_dir="data/survival/knockouts/pLoF_damaging_missense/chr${chr}"
+readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense"
 
 mkdir -p ${out_dir}
 
 set_up_rpy
 Rscript ${rscript} \
-  --in_pattern ${in_pattern} \
-  --in_dir ${in_dir} \
-  --out_dir ${out_dir}
+  --in_file ${in_file} \
+  --out_prefix ${out_prefix}
 
 
 

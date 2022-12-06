@@ -42,6 +42,17 @@ main <- function(args){
     d$annotation <- labels[d$annotation]
     d$variants <- format_from_hail(d$variants)    
 
+    # get genes
+    unique_genes <- unique(d$ensembl_gene_id)
+    for (gene in unique_genes){
+        out_gene_prefix <- paste0(args$out_prefix, "_", gene, ".txt.gz")
+        rows_to_keep <- d$ensembl_gene_id %in% gene
+        d_out <- d[rows_to_keep, ]
+        if (nrow(d_out) > 0){
+            fwrite(d_out, out_gene_prefix, sep = "\t", quote = FALSE)
+            #break
+        }
+    }
 
 
 }
@@ -49,7 +60,7 @@ main <- function(args){
 # add arguments
 parser <- ArgumentParser()
 parser$add_argument("--in_file", default=NULL, required = TRUE, help = "Directory in which to search for knockouts")
-parser$add_argument("--out_dir", default=NULL, required = TRUE, help = "Directory for which to output results (will create a file for each gene)")
+parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Directory for which to output results (will create a file for each gene)")
 args <- parser$parse_args()
 
 main(args)
