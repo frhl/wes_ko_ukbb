@@ -125,24 +125,22 @@ def main(args):
     # write matrix-table which contains dosages. VCF with only
     # dosages can't be re-read in HAIL, so we write a MatrixTable
     if out_prefix not in "mt":
-        io.export_table(prob, out_prefix, "mt")
-    
+        #io.export_table(prob, out_prefix, "mt")
+        prob = prob.checkpoint(out_prefix + ".mt", overwrite = True)
+
     # write out variants involved and vcf
     io.export_table(prob, out_prefix, out_type)
     if not only_vcf:
+        if aggr_method == "collect":
+            genes = genes.transmute(
+                        gts=hl.delimit(genes.gts, ";"),
+                        varid=hl.delimit(genes.varid, ";")
+                        )
         if export_all_gts:
             genes = genes.filter_entries(hl.is_defined(genes.knockout)).entries()
-            genes = genes.transmute(
-                    gts = hl.delimit(genes.gts, ";"),
-                    varid = hl.delimit(genes.varid, ";")
-                    )
             genes.flatten().export(out_prefix + "_all.tsv.gz")
         else:
             genes = genes.filter_entries(genes.pKO > 0).entries()
-            genes = genes.transmute(
-                    gts = hl.delimit(genes.gts, ";"),
-                    varid = hl.delimit(genes.varid, ";")
-                    )
             genes.flatten().export(out_prefix + ".tsv.gz")
 
 if __name__=='__main__':
