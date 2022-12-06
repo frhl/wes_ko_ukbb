@@ -23,19 +23,27 @@ readonly chr=$( get_chr ${task_id} )
 
 readonly rscript="scripts/survival/01_write_gene_ko.R"
 
-readonly in_dir="data/knockouts/alt/pp90/combined"
-readonly in_file="${in_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense_all.tsv.gz"
-
-readonly out_dir="data/survival/knockouts/pLoF_damaging_missense/chr${chr}"
-readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense"
-
-mkdir -p ${out_dir}
-
 set_up_rpy
-Rscript ${rscript} \
-  --in_file ${in_file} \
-  --out_prefix ${out_prefix}
 
+extract_genes_by_annotation() {
+  local annotation=${1}
+  local in_dir="data/knockouts/alt/pp90/combined"
+  local in_file="${in_dir}/ukb_eur_wes_200k_chr${chr}_${annotation}_all.tsv.gz"
+  local out_dir="data/survival/knockouts/${annotation}/chr${chr}"
+  local out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_${annotation}"
+  if [ -f "${in_file}" ]; then
+    mkdir -p ${out_dir}
+    Rscript ${rscript} \
+      --in_file ${in_file} \
+      --out_prefix ${out_prefix}
+  else
+    >&2 echo "${in_file} does not exist."
+  fi
+
+ }
+
+#extract_genes_by_annotation "pLoF_damaging_missense"
+#extract_genes_by_annotation "pLoF"
 
 
 

@@ -19,7 +19,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qe
-#$ -t 21
+#$ -t 1-22
 #$ -V
 
 set -o errexit
@@ -113,9 +113,9 @@ submit_encode_job()
 
 #submit_encode_job "pLoF,damaging_missense" "32" "collect"
 #submit_encode_job "pLoF,damaging_missense" "12" "fast"
-submit_encode_job "pLoF" "4" "fast"
-submit_encode_job "damaging_missense" "4" "fast"
-submit_encode_job "synonymous" "4" "fast"
+submit_encode_job "pLoF" "2" "fast"
+submit_encode_job "damaging_missense" "2" "fast"
+submit_encode_job "synonymous" "2" "fast"
 
 
 
