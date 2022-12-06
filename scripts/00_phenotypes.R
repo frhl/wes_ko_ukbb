@@ -127,6 +127,7 @@ main <- function(args){
 
         # load samples that are QCed
         qc_samples <- fread(args$qc_samples)$V1
+        
 
         # discard phenotypes with less than 50 cases in quality controlled samples (200k)
         dt_subset_by_qced_samples <- dt[dt$eid %in% qc_samples,]
