@@ -47,11 +47,11 @@ evaluate_knockouts() {
 }
 
 
-if [ ! -f "${out_prefix_chr}.vcf.bgz" ]; then
+#if [ ! -f "${out_prefix_chr}.vcf.bgz" ]; then
   evaluate_knockouts
-else
-  >&2 echo "${out_prefix_chr}.vcf.bgz already exists. Skipping!"
-fi
+#else
+#  >&2 echo "${out_prefix_chr}.vcf.bgz already exists. Skipping!"
+#fi
 
 
 # index resulting knockout VCF for future SAIGE analysis

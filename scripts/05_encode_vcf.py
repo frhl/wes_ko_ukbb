@@ -129,7 +129,7 @@ def main(args):
         prob = prob.checkpoint(out_prefix + ".mt", overwrite = True)
 
     # write out variants involved and vcf
-    io.export_table(prob, out_prefix, out_type)
+    #io.export_table(prob, out_prefix, out_type)
     if not only_vcf:
         if aggr_method == "collect":
             genes = genes.transmute(

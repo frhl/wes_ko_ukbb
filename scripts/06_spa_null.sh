@@ -9,7 +9,7 @@
 #SBATCH --error=logs/spa_null.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-300
+#SBATCH --array=100
 
 
 # all binary: 1 - 71
@@ -30,7 +30,8 @@ readonly prs_dir="data/prs/scores"
 readonly ldsc_dir="data/prs/ldsc"
 
 readonly grm_mtx="${grm_dir}/ukb_eur_200k_grm_fitted_relatednessCutoff_0.05_2000_randomMarkersUsed.sparseGRM.mtx"
-readonly grm_sam="${grm_mtx}.sampleIDs.txt"
+#readonly grm_sam="${grm_mtx}.sampleIDs.txt"
+readonly grm_sam="${grm_mtx}.sampleIDs_head10000.txt"
 readonly plink_file="${grm_dir}/ukb_eur_200k_grm_grch38_rv_merged"
 readonly covar_file="${covar_dir}/covars1.csv"
 readonly covariates=$( cat ${covar_file} )
