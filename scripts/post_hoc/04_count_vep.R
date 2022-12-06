@@ -4,6 +4,23 @@ library(argparse)
 library(data.table)
 
 
+plof_csqs = c("transcript_ablation", "splice_acceptor_variant",
+             "splice_donor_variant", "stop_gained", "frameshift_variant")
+
+missense_csqs = c("stop_lost", "start_lost", "transcript_amplification",
+                 "inframe_insertion", "inframe_deletion", "missense_variant")
+
+synonymous_csqs = c("stop_retained_variant", "synonymous_variant")
+
+other_csqs = c("mature_miRNA_variant", "5_prime_UTR_variant",
+              "3_prime_UTR_variant", "non_coding_transcript_exon_variant", "intron_variant",
+              "NMD_transcript_variant", "non_coding_transcript_variant", "upstream_gene_variant",
+              "downstream_gene_variant", "TFBS_ablation", "TFBS_amplification", "TF_binding_site_variant",
+              "regulatory_region_ablation", "regulatory_region_amplification", "feature_elongation",
+              "regulatory_region_variant", "feature_truncation", "intergenic_variant")
+
+
+# get counts of variants by category
 tabulate_variants <- function(chr, vep_path, vep_min_mac_path = NULL){
     # read in data
     path_chr <- gsub("CHR", chr, vep_path)
@@ -46,7 +63,7 @@ tabulate_variants <- function(chr, vep_path, vep_min_mac_path = NULL){
     
 }
 
-# read in all data
+# read in all chromosomes and combine counts of variants by category
 get_vep_table <- function(vep_path, vep_min_mac_path = NULL){
     if (!is.null(vep_min_mac_path)) write(paste("Using min_mac from ", basename(vep_min_mac_path)), stdout())
     autosomes <- 1:22
@@ -59,7 +76,7 @@ get_vep_table <- function(vep_path, vep_min_mac_path = NULL){
     return(dt_variant_category)
 }
 
-# create table by cateogries
+# create super categories
 create_variant_table <- function(dt_variant_category){
     # combine into single table
     dt_aggr_variant_category <- data.table(
@@ -84,6 +101,7 @@ create_variant_table <- function(dt_variant_category){
     return(dt)
 }
 
+# clean up and make pretty
 make_variant_table_pretty <- function(dt){
     categories <- c("PTV", "Missense","Synonymous", "Non-coding")
     lst <- lapply(categories, function(category){
@@ -128,7 +146,7 @@ main <- function(args){
     dt1 <- create_variant_table(dt1)
     dt1 <- make_variant_table_pretty(dt1)
     outfile1 <- paste0(out_prefix, "_prefilter.txt.gz")
-    fwrite(dt1, outfile, sep = "\t")
+    fwrite(dt1, outfile1, sep = "\t")
      
     # pre and post-filtered VEP variants (note that we use 
     # the MAC from the old file to figure out exactly how 
@@ -137,7 +155,7 @@ main <- function(args){
     dt2 <- create_variant_table(dt2)
     dt2 <- make_variant_table_pretty(dt2)
     outfile2 <- paste0(out_prefix, "_postfilter.txt.gz")
-    fwrite(dt2, outfile, sep = "\t")
+    fwrite(dt2, outfile2, sep = "\t")
      
 }
 
