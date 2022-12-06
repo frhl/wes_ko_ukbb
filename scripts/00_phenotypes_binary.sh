@@ -62,13 +62,14 @@ set_up_pythonpath_legacy
 set -eu
 
 # get 500k WES samples
-if [ ! -f ${out_bin_500k} ]; then
-python3 "${hail_script}" \
-     --input_path "${tmp_bin}" \
-     --export_header \
-     --count_case_control \
-     --out_prefix "${out_bin_500k}"
-fi
+#if [ ! -f ${out_bin_500k} ]; then
+#  >&2 echo "Genertating 500K.."
+#  python3 "${hail_script}" \
+#     --input_path "${tmp_bin}" \
+#     --export_header \
+#     --count_case_control \
+#     --out_prefix "${out_bin_500k}"
+#fi
 
 
 if [ ! -f "${out_bin_500k}.tsv.gz" ]; then
@@ -77,7 +78,8 @@ fi
 
 # Get 200k WES samples
 if [ ! -f ${out_bin_200k} ]; then
-python3 "${hail_script}" \
+  >&2 echo "Generating 200K.."
+  python3 "${hail_script}" \
      --input_path "${tmp_bin}" \
      --extract_samples "${final_sample_list}" \
      --extract_phased_samples "${phased_sample_list}" \

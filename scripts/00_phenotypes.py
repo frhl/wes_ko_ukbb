@@ -27,7 +27,7 @@ def main(args):
         ht = ht.filter(hl.is_defined(samples[ht.key]))
 
     if extract_phased_samples:
-        phased_samples = hl.import_table(phased_samples, no_header=True, key='f0')
+        phased_samples = hl.import_table(extract_phased_samples, no_header=True, key='f0')
         ht = ht.filter(hl.is_defined(phased_samples[ht.key]))
 
     if only_females:
