@@ -29,7 +29,7 @@ source utils/vcf_utils.sh
 source utils/hail_utils.sh
 source utils/qsub_utils.sh
 
-readonly hail_script="scripts/04_export_pp.py"
+readonly hail_script="scripts/05_export_pp.py"
 readonly spark_dir="data/tmp/spark"
 
 readonly array_idx=$( get_array_task_id )
