@@ -100,6 +100,7 @@ main <- function(args){
     stopifnot(dir.exists(args$switch_dir))
     files <- list.files(args$switch_dir, pattern = args$switch_file)
     files <- file.path(args$switch_dir, files)
+    print(files)
     stopifnot(length(files) > 0)
     stopifnot(length(files) > 21)  
 

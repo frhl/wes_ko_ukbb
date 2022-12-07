@@ -9,7 +9,7 @@
 #SBATCH --error=logs/encode_vcf.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=2,5
+#SBATCH --array=1-5
 #
 #
 #$ -N encode_vcf
@@ -18,8 +18,8 @@
 #$ -e logs/encode_vcf.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q short.qe
-#$ -t 1-22
+#$ -q short.qc
+#$ -t 21
 #$ -V
 
 set -o errexit
@@ -38,7 +38,7 @@ readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
 readonly in_dir="data/mt/prefilter/final_90"
-readonly out_dir="data/knockouts/alt/pp90/fast"
+readonly out_dir="data/knockouts/alt/pp90/fast_damaging_missense_test2"
 readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chrCHR.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.mt"
 readonly in_type="mt"
 
@@ -112,10 +112,11 @@ submit_encode_job()
 }
 
 #submit_encode_job "pLoF,damaging_missense" "32" "collect"
-#submit_encode_job "pLoF,damaging_missense" "12" "fast"
-submit_encode_job "pLoF" "2" "fast"
-submit_encode_job "damaging_missense" "2" "fast"
-submit_encode_job "synonymous" "2" "fast"
+submit_encode_job "pLoF,damaging_missense" "2" "fast"
+#submit_encode_job "pLoF" "2" "fast"
+#submit_encode_job "other_missense" "2" "fast"
+#submit_encode_job "damaging_missense" "3" "fast"
+#submit_encode_job "synonymous" "2" "fast"
 
 
 

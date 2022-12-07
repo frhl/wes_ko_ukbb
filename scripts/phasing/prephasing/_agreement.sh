@@ -18,7 +18,7 @@ set_up_rpy
 Rscript ${rscript} \
   --input_path "${input_path}" \
   --n_samples ${n_samples} \
-  --seed 11415 \
+  --seed 904 \
   --pp_cutoff ${pp_cutoff} \
   --sites "${wes_variants}" \
   --output_path "${output_path}"

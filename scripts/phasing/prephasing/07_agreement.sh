@@ -25,7 +25,7 @@ readonly bashscript="scripts/phasing/prephasing/_agreement.sh"
 readonly input_path="data/phased/wes_union_calls/200k/calibration/ukb_shapeit5_whatshap_variants_chr21.PS.txt.gz"
 
 readonly out_dir="data/prephased/wes_union_calls"
-readonly out_prefix="${out_dir}/221128_phasing_agreement_n20000"
+readonly out_prefix="${out_dir}/221206_phasing_agreement_n20000"
 
 readonly wes_variants="/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list"
 
@@ -38,7 +38,7 @@ qsub_agreement() {
   local output_path="${out_prefix}_pp${pp_cutoff#*.}.txt"
   qsub -N "_agreement" \
     -o "logs/_agreement.log" \
-    -e "logs/_agreement..errors.log" \
+    -e "logs/_agreement.errors.log" \
     -q "long.qc" \
     -P "lindgren.prjc" \
     -pe shmem 1 \

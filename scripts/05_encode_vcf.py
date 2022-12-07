@@ -129,7 +129,7 @@ def main(args):
         prob = prob.checkpoint(out_prefix + ".mt", overwrite = True)
 
     # write out variants involved and vcf
-    #io.export_table(prob, out_prefix, out_type)
+    io.export_table(prob, out_prefix, out_type)
     if not only_vcf:
         if aggr_method == "collect":
             genes = genes.transmute(
@@ -137,7 +137,7 @@ def main(args):
                         varid=hl.delimit(genes.varid, ";")
                         )
         if export_all_gts:
-            genes = genes.filter_entries(hl.is_defined(genes.knockout)).entries()
+            genes = genes.filter_entries(genes.pKO >= 0).entries()
             genes.flatten().export(out_prefix + "_all.tsv.gz")
         else:
             genes = genes.filter_entries(genes.pKO > 0).entries()

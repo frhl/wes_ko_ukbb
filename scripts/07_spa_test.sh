@@ -9,7 +9,7 @@
 #SBATCH --error=logs/spa_test.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=100
+#SBATCH --array=1-300
 #SBATCH --requeue
 
 set -o errexit
@@ -87,8 +87,9 @@ submit_spa_with_csqs()
     if [ ! -f "${out_mrg}" ]; then
       local slurm_spa_name="spa_${phenotype}_${annotation}"
       local slurm_merge_name="_mrg_${phenotype}_${annotation}"
-      submit_spa_job
-      submit_merge_job
+      set -x
+      jid=$(submit_spa_job)
+      submit_merge_job ${jid}
     else
       >&2 echo "Phenotype ${phenotype} with annotation ${annotation} already exists! Skipping.." 
     fi
@@ -106,7 +107,7 @@ submit_spa_job() {
   local slurm_project="${project}"
   local slurm_queue="${queue}"
   local slurm_nslots="${nslots}"
-  readonly spa_jid=$( sbatch \
+  local spa_jid=$( sbatch \
     --account="${slurm_project}" \
     --job-name="${slurm_jname}" \
     --output="${slurm_lname}.log" \
@@ -127,12 +128,13 @@ submit_spa_job() {
     "${min_mac}" \
     "${out_prefix}" \
     "${conditioning_markers}" )
-  echo "Submitting ${phenotype} (JID=${spa_jid}).."
+  echo ${spa_jid}
 }
 
 
 submit_merge_job()
 {
+  local waitfor="${1}"
   local remove_by_chr="Y"
   local slurm_jname="${slurm_merge_name}"
   local slurm_lname="logs/_spa_merge"
@@ -147,9 +149,8 @@ submit_merge_job()
     --chdir="${curwd}" \
     --partition="${slurm_queue}" \
     --cpus-per-task="${slurm_nslots}" \
-    --dependency="afterok:${spa_jid}" \
+    --dependency="afterok:${waitfor}" \
     --open-mode="append" \
-    --parsable \
     "${merge_script}" \
     "${out_prefix}" \
     "${out_mrg}" \
@@ -161,7 +162,7 @@ readonly conditioning_markers=""
 readonly use_prs="1"
 readonly min_mac=4
 readonly project="lindgren.prj"
-readonly tasks=22
+readonly tasks=1-22
 readonly queue="short"
 readonly nslots=1
 

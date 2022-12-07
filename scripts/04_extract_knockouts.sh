@@ -19,7 +19,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 2
+#$ -t 21
 #$ -V
 
 set -o errexit
@@ -39,11 +39,11 @@ readonly cluster=$( get_current_cluster)
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
-readonly in_dir="data/mt/prefilter/final_90"
-readonly merge_dir="data/knockouts/alt/pp90/extracted"
-readonly out_dir="data/knockouts/alt/pp90/extracted/chr${chr}"
+readonly in_dir="data/mt/prefilter/final_50"
+readonly merge_dir="data/knockouts/alt/pp50/extracted"
+readonly out_dir="data/knockouts/alt/pp50/extracted/chr${chr}"
 # in parameters
-readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.mt"
+readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp50.maf0_005.mt"
 readonly in_type="mt"
 # prefix for indiviual genes and final merged file
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}"
@@ -58,6 +58,7 @@ readonly slurm_queue="short"
 readonly sge_queue="short.qc" 
 
 mkdir -p ${out_dir}
+mkdir -p ${merge_dir}
 
 # create a file containing genes used in analysis
 extract_genes() {
@@ -177,7 +178,8 @@ submit_knockout_job()
 }
 
 
-submit_knockout_job "pLoF,damaging_missense" "2"
+#submit_knockout_job "pLoF,damaging_missense" "2"
+submit_knockout_job "damaging_missense" "1"
 
 
 

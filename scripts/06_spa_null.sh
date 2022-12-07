@@ -9,7 +9,7 @@
 #SBATCH --error=logs/spa_null.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-99
+#SBATCH --array=1-300
 
 
 # all binary: 1 - 71
@@ -150,7 +150,7 @@ submit_spa_null() {
 }
 
 # Parameters
-readonly use_prs=0
+readonly use_prs=1
 readonly nslots=2
 readonly queue="short"
 readonly project="lindgren.prj"

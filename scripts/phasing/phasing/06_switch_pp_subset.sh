@@ -8,17 +8,16 @@
 #SBATCH --error=logs/switch_pp_subset.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=1-22
-#SBATCH --dependency="after:9530918"
+#SBATCH --array=22
 #
 #$ -N switch_pp_subset
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/switch_pp_subset.log
 #$ -e logs/switch_pp_subset.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 1
+#$ -pe shmem 2
 #$ -q short.qe
-#$ -t 1-22
+#$ -t 1-21
 #$ -V
 
 set -o errexit
@@ -41,10 +40,10 @@ readonly pp_cutoff=0.90
 readonly pedigree_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 readonly pedigree="${pedigree_dir}/ukb11867_pedigree.fam"
 # for shapeit5 phasing
-readonly phased_dir="data/phased/wes_union_calls/200k/shapeit5/parents"
+readonly phased_dir="data/phased/wes_union_calls/200k/shapeit5/parents_improved"
 readonly phased_path="${phased_dir}/ukb_wes_union_calls_200k_shapeit5_parents_chr${chr}.vcf.gz"
 readonly phased_type="vcf"
-readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/switch"
+readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/switch_improved"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_shapeit5_chr${chr}_pp${pp_cutoff}"
 # out paths and types
 readonly out_vcf="${out_prefix}.vcf.bgz"

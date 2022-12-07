@@ -8,7 +8,7 @@
 #SBATCH --error=logs/ldsc.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-220
+#SBATCH --array=1-300
 #SBATCH --requeue
 #
 #
