@@ -7,9 +7,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/prefilter_wes.log
 #SBATCH --error=logs/prefilter_wes.errors.log
-#SBATCH --partition=short
-#SBATCH --cpus-per-task 1
-#SBATCH --array=21
+#SBATCH --partition=epyc
+#SBATCH --cpus-per-task 2
+#SBATCH --array=1-22
 #
 #$ -N prefilter_wes
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
