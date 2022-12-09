@@ -28,7 +28,7 @@ def main(args):
     # annotate variant QC
     ht = ht.annotate(AC=mt.rows().index(ht.key).info.AC)
     ht = ht.annotate(AN=mt.rows().index(ht.key).info.AN)
-    ht = ht.annotate(MAC=mt.rows().index(ht.key).info.MAC)
+    ht = ht.annotate(MAC=mt.rows().index(ht.key).MAC)
     # output
     ht.export(out_prefix + ".txt.gz")
 
