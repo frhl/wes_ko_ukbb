@@ -5,7 +5,7 @@
 #$ -o logs/logit_burden.log
 #$ -e logs/logit_burden.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 1
+#$ -pe shmem 3
 #$ -q short.qc
 #$ -V
 
@@ -38,8 +38,8 @@ Rscript "${rscript}" \
  --covars_path ${covars_path} \
  --knockout_dir ${knockout_dir} \
  --knockout_pattern ${knockout_regex} \
- --out_prefix "${out_prefix}"
-
+ --out_prefix "${out_prefix}" \
+ --variable "ko"
 
 
 

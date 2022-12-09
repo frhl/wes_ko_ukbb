@@ -88,11 +88,13 @@ main <- function(args){
 
     # run all phenotypes
     phenotypes <- header$V1[header$V1 %in% colnames(ph)]
+    v <- args$variable
+    stopifnot(v %in% colnames(final))
     fits <- lapply(phenotypes, function(pheno){
         write(pheno, stderr())
         # setup model
         covariates <- paste0(covars, collapse = "+")
-        model_str <- paste0(pheno ,"~ ko +", covariates)
+        model_str <- paste0(pheno ,"~",v,"+", covariates)
         model <- as.formula(model_str)
         # run model
         fit <- glm(
@@ -101,7 +103,6 @@ main <- function(args){
             family = binomial(link="logit")
         )
         return(fit)
-        
     })
 
     # setup names
@@ -128,6 +129,7 @@ parser$add_argument("--unrelated_path", default=NULL, required = TRUE, help = "C
 parser$add_argument("--covars_path", default=NULL, required = TRUE, help = "Chromosome")
 parser$add_argument("--knockout_dir", default=NULL, required = TRUE, help = "Chromosome")
 parser$add_argument("--knockout_pattern", default=NULL, required = TRUE, help = "Chromosome")
+parser$add_argument("--variable", default="ko", required = TRUE, help = "what variable to regress (ko, chet, het, homs)")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()
 
