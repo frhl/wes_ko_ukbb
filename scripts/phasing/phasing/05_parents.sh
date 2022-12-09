@@ -30,7 +30,8 @@ source utils/vcf_utils.sh
 source utils/hail_utils.sh
 source utils/qsub_utils.sh
 
-#readonly hail_script="scripts/phasing/05_parents.py"
+readonly hail_script="scripts/phasing/05_parents.py"
+
 readonly spark_dir="data/tmp/spark"
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
@@ -44,15 +45,16 @@ readonly parents_path="${parents_dir}/ukb_wes_union_calls_chr${chr}_parents.vcf.
 # for shapeit5 phasing
 readonly phased_dir="data/phased/wes_union_calls/200k/shapeit5/ligated"
 readonly phased_path="${phased_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.bgz"
-readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/parents_with_invariant_sites"
+readonly phased_type="vcf"
+readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/parents_with_hail_count"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_shapeit5_parents_chr${chr}"
 # out paths and types
-readonly out_tmp_vcf="${out_prefix}_tmp.vcf.gz"
 readonly out_vcf="${out_prefix}.vcf.gz"
 readonly out_trio="${out_prefix}.trio"
 readonly out_info="${out_prefix}.info"
 readonly out_info_gz="${out_prefix}.info.gz"
 readonly out_trio_by_site="${out_prefix}.txt"
+readonly out_trio_by_site_mac="${out_prefix}.mac"
 readonly out_type="vcf"
 
 mkdir -p ${out_dir}
@@ -60,30 +62,34 @@ mkdir -p ${out_dir}
 module purge
 module load BCFtools/1.12-GCC-10.3.0
 
-# annotate original (child) file with fill tags. 
-# Note: this step takes ~16+ Hours
-if [ ! -f "${out_tmp_vcf}" ]; then
-  echo "+fill-tags: ${phased_path}"
-  bcftools +fill-tags ${phased_path} -Oz -o ${out_tmp_vcf}
-fi
-
-# Now merging vcf using BCFtools instead of hail fro speed
+# merging files using BCFtools
 if [ ! -f "${out_vcf}" ]; then
   echo "merge parents / children: ${out_vcf}"
   make_tabix "${parents_path}" "tbi"
-  make_tabix "${out_tmp_vcf}" "tbi"
-  bcftools merge ${out_tmp_vcf} ${parents_path} -Oz -o ${out_vcf}
+  make_tabix "${phased_path}" "tbi"
+  bcftools merge ${phased_path} ${parents_path} -Oz -o ${out_vcf}
 fi
 
 # calculate switch errors by site
 if [ ! -f "${out_trio_by_site}" ]; then
   echo "SERs by site: ${out_vcf}"
   switch_errors_by_site ${out_vcf} ${pedigree}
+  echo "Appending variant stats."
+  module purge
+  set_up_hail
+  set_up_pythonpath_legacy
+  python3 ${hail_script} \
+    --children_path ${phased_path} \
+    --children_type ${phased_type} \
+    --trio_path ${out_trio_by_site} \
+    --out_prefix ${out_trio_by_site_mac}
 fi
 
-# calculate switch errors using trio samples
+# calculate switch errors using trio samples (standard non-hacky way)
 if [ ! -f "${out_trio}" ]; then
   echo "SERs by trio: ${out_trio}"
+  module purge
+  module load BCFtools/1.12-GCC-10.3.0
   make_tabix ${out_vcf} "tbi"
   bcftools +trio-switch-rate ${out_vcf} -- -p ${pedigree} > ${out_trio}
 fi
