@@ -74,7 +74,10 @@ fi
 if [ ! -f "${out_trio_by_site}" ]; then
   echo "SERs by site: ${out_vcf}"
   switch_errors_by_site ${out_vcf} ${pedigree}
-  echo "Appending variant stats."
+ fi
+
+# append MAC/AC count 
+if [ ! -f "${out_trio_by_site_mac}.txt.gz" ]; then
   module purge
   set_up_hail
   set_up_pythonpath_legacy
