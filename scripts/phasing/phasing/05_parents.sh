@@ -11,7 +11,7 @@
 #SBATCH --constraint="skl-compat"
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=1-21
+#SBATCH --array=21
 #
 #$ -N parents
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -30,7 +30,7 @@ source utils/vcf_utils.sh
 source utils/hail_utils.sh
 source utils/qsub_utils.sh
 
-readonly hail_script="scripts/phasing/05_parents.py"
+readonly hail_script="scripts/phasing/phasing/05_parents.py"
 
 readonly spark_dir="data/tmp/spark"
 readonly array_idx=$( get_array_task_id )
