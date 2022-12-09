@@ -74,7 +74,7 @@ main <- function(args){
           )
     mrg[is.na(mrg)] <- 0
     colnames(mrg)[colnames(mrg) == "s"] <- "eid"
-    outfile <- paste0(args$out_prefix, ".counts.txt.gz")
+    outfile <- paste0(args$out_prefix, ".unrel.counts.txt.gz")
     fwrite(mrg, outfile)
 
     # merge with phenotypes
@@ -114,7 +114,7 @@ main <- function(args){
         return(ko_coef)
     }))
 
-    outfile = paste0(args$out_prefix, ".glm.txt.gz")
+    outfile = paste0(args$out_prefix, ".unrel.glm.txt.gz")
     write(paste0("writing to ", outfile), stderr())
     fwrite(dt, coeffecients, sep = '\t')
 
