@@ -32,6 +32,7 @@ if (ncol(vcf) == 10) colnames(vcf) <- c('ID', 'CHR', 'POS', 'REF', 'ALT', 'MAF',
 if (ncol(vcf) == 8) colnames(vcf) <- c('ID', 'CHR', 'POS', 'REF', 'ALT', 'MAF', 'AF', 'HWE')
 if (ncol(vcf) == 7) colnames(vcf) <- c('ID', 'CHR', 'POS', 'REF', 'ALT', 'MAF', 'AF')
 if (ncol(vcf) == 6) colnames(vcf) <- c('ID', 'CHR', 'POS', 'REF', 'ALT', 'MAF')
+if (ncol(vcf) == 5) colnames(vcf) <- c('ID', 'CHR', 'POS', 'REF', 'ALT')
 ndt <- cbind(vcf[dt$index,], dt)
 
 # write out

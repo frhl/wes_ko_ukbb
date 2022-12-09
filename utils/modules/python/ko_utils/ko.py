@@ -150,17 +150,15 @@ def aggr_count_calls(mt: hl.MatrixTable, phased: bool = True):
 
 
 def collect_phase_count_by_expr(mt: hl.MatrixTable, expr: hl.StringExpression,
-        include_phase_conf: bool = False):
+        only_gt: bool = False):
     """Create a hail table of aggregated genotypes by expr
     
     :param mt: MatrixTable to be used
     :param expr: what expression to collapse on, e.g. "gene_id"
     """
-    if include_phase_conf:
+    if only_gt:
         return mt.group_rows_by(expr).aggregate(
-                  gts=hl.agg.filter(mt.GT.is_non_ref(), hl.agg.collect(mt.GT)),
-                  conf=hl.agg.filter(mt.GT.is_non_ref(), hl.agg.collect(mt.PP)),
-                  varid=hl.agg.filter(mt.GT.is_non_ref(), hl.agg.collect(mt.varid))
+                  gts=hl.agg.filter(mt.GT.is_non_ref(), hl.agg.collect(mt.GT))
                 )
     else:
          return mt.group_rows_by(expr).aggregate(
