@@ -40,10 +40,10 @@ readonly chr=$( get_chr ${array_idx} )
 readonly pedigree_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 readonly pedigree="${pedigree_dir}/ukb11867_pedigree.fam"
 # for shapeit5 phasing
-readonly phased_dir="data/phased/wes_union_calls/200k/shapeit5/parents_improved"
+readonly phased_dir="data/phased/wes_union_calls/200k/shapeit5/parents_with_invariant_sites"
 readonly phased_path="${phased_dir}/ukb_wes_union_calls_200k_shapeit5_parents_chr${chr}.vcf.gz"
 readonly phased_type="vcf"
-readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/trios"
+readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/trios_with_invariant_sites"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_trios_chr${chr}"
 # out paths and types
 readonly out_vcf="${out_prefix}.vcf.gz"

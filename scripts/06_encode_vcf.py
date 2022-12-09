@@ -6,7 +6,7 @@ import pandas as pd
 import random
 import string
 import sys
-import os.path
+import os
 
 from ukb_utils import hail_init
 from ko_utils import io
@@ -34,7 +34,7 @@ def main(args):
     only_vcf = args.only_vcf
     checkpoint = args.checkpoint
     aggr_method = args.aggr_method
-
+    repartition = args.repartition
     export_all_gts = args.export_all_gts
     csqs_category = args.csqs_category
 
@@ -42,48 +42,48 @@ def main(args):
     hail_init.hail_bmrc_init(log='logs/hail/knockout.log', default_reference='GRCh38', min_block_size=128)
     
     hl._set_flags(no_whole_stage_codegen='1')
+    gene_checkpoint = out_prefix + "_checkpoint.mt"
+    if not os.path.isfile(gene_checkpoint + "/_SUCCESS"): 
+        sys.stderr.write("No checkpoint found. Reading raw genotypes..")
+        mt = io.import_table(input_path, input_type, calc_info = False)
+        if repartition:
+            mt = mt.repartition(int(repartition))
+        # subset to current csqs category
+        mt = mt.filter_rows(hl.literal(set(csqs_category)).contains(mt.consequence_category))
+        n_csqs = mt.count()[0]
+        sys.stderr.write(f"Filtering to {n_csqs} variants that are {csqs_category}.")
+        # perform an aggregation based on "collect", which requires a lot
+        # of memory but allows the variant ID to be returned as well alongside
+        # with information of cis/trans-CHs and heterozygotes.
+        gene_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
+        if aggr_method in "fast":
+            genes = ko.aggr_phase_count_by_expr(mt, gene_expr)
+            expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased, only_homs=False)
+            expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko)
+        elif aggr_method in "only_homs":
+            genes = ko.aggr_phase_count_by_expr(mt, gene_expr)
+            expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased, only_homs=True)
+            expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko)
+        elif aggr_method in "collect":
+            genes = ko.collect_phase_count_by_expr(mt, gene_expr)
+            genes = ko.sum_gts_entries(genes)
+            expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased)
+            expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko, genes.phased)
+        else:
+            raise TypeError(str(aggr_method) + " is not allowed!")
 
-    # for debugging
-    precheckpoint = out_prefix + "_precheckpoint.mt"
-    fname = precheckpoint + "/_SUCCESS"
-
-    #if not os.path.isfile(fname): 
-    mt = io.import_table(input_path, input_type, calc_info = False)
-    #mt = mt.repartition(2048)
-    #mt = mt.checkpoint(precheckpoint, overwrite = True)
-
-    # subset to current csqs category
-    mt = mt.filter_rows(hl.literal(set(csqs_category)).contains(mt.consequence_category))
-    n_csqs = mt.count()[0]
-    sys.stderr.write(f"Filtering to {n_csqs} variants that are {csqs_category}.")
-    # perform an aggregation based on "collect", which requires a lot
-    # of memory but allows the variant ID to be returned as well alongside
-    # with information of cis/trans-CHs and heterozygotes.
-    gene_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
-    if aggr_method in "fast":
-        genes = ko.aggr_phase_count_by_expr(mt, gene_expr)
-        expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased, only_homs=False)
-        expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko)
-    elif aggr_method in "only_homs":
-        genes = ko.aggr_phase_count_by_expr(mt, gene_expr)
-        expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased, only_homs=True)
-        expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko)
-    elif aggr_method in "collect":
-        genes = ko.collect_phase_count_by_expr(mt, gene_expr)
-        genes = ko.sum_gts_entries(genes)
-        expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased)
-        expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko, genes.phased)
+        # calculate probability of being knocked out based on phased counts
+        genes = genes.annotate_entries(pKO=expr_pko, knockout=expr_ko)
+        if checkpoint or aggr_method in "collect":
+            genes = genes.checkpoint(out_prefix + "_checkpoint.mt", overwrite=True)
+            n_genes = genes.count()[0]
+            sys.stderr.write(f"Aggregated variants to {n_genes} gene(s).")
+    
+    # if checkpoitn has already been created
     else:
-        raise TypeError(str(aggr_method) + " is not allowed!")
-
-    # calculate probability of being knocked out based on phased counts
-    genes = genes.annotate_entries(pKO=expr_pko, knockout=expr_ko)
-
-    # checkpoint for more effecient data use
-    if checkpoint or aggr_method in "collect":
-        genes = genes.checkpoint(out_prefix + "_checkpoint.mt", overwrite=True)
+        genes = io.import_table(gene_checkpoint, "mt", calc_info = False) 
         n_genes = genes.count()[0]
-        sys.stderr.write(f"Aggregated variants to {n_genes} gene(s).")
+        sys.stderr.write(f"Aggregated variants to {n_genes} gene(s) using checkpoint.")
 
     # setup sites and alleles
     rows = genes.count()[0]
@@ -124,23 +124,22 @@ def main(args):
 
     # write matrix-table which contains dosages. VCF with only
     # dosages can't be re-read in HAIL, so we write a MatrixTable
-    if out_prefix not in "mt":
-        #io.export_table(prob, out_prefix, "mt")
-        prob = prob.checkpoint(out_prefix + ".mt", overwrite = True)
+    if out_type not in "mt":
+        prob = prob.checkpoint(out_prefix + ".mt", overwrite=True)
 
     # write out variants involved and vcf
-    io.export_table(prob, out_prefix, out_type)
+    #io.export_table(prob, out_prefix, out_type)
     if not only_vcf:
+        genes = genes.filter_entries(hl.is_defined(genes.knockout)).entries()
         if aggr_method == "collect":
             genes = genes.transmute(
                         gts=hl.delimit(genes.gts, ";"),
                         varid=hl.delimit(genes.varid, ";")
                         )
         if export_all_gts:
-            genes = genes.filter_entries(genes.pKO >= 0).entries()
             genes.flatten().export(out_prefix + "_all.tsv.gz")
         else:
-            genes = genes.filter_entries(genes.pKO > 0).entries()
+            genes = genes.filter(genes.pKO > 0)
             genes.flatten().export(out_prefix + ".tsv.gz")
 
 if __name__=='__main__':
@@ -151,6 +150,7 @@ if __name__=='__main__':
     parser.add_argument('--input_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Type of output dataset (options: mt, vcf, plink)')
+    parser.add_argument('--repartition', default=None, help='Hail repartition files')
     parser.add_argument('--only_vcf', default=False, action='store_true', help='Only return VCF (less memory required when running)')
     parser.add_argument('--checkpoint', default=False, action='store_true', help='Checkpoint gene-aggregation matrix to avoid Spark Memory overflow errors') 
     parser.add_argument('--aggr_method', default="collect", help='How should the CH matrix be generated?')

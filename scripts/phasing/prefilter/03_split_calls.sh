@@ -8,8 +8,8 @@
 #SBATCH --output=logs/split_calls.log
 #SBATCH --error=logs/split_calls.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 2
-#SBATCH --array=1-22
+#SBATCH --cpus-per-task 3
+#SBATCH --array=20
 #
 #$ -N split_calls
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
