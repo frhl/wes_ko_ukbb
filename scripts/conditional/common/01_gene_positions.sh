@@ -9,7 +9,7 @@
 #SBATCH --error=logs/gene_positions.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-80
+#SBATCH --array=1-10
 #SBATCH --requeue
 
 set -o errexit
@@ -20,7 +20,6 @@ source utils/bash_utils.sh
 
 readonly rscript="scripts/conditional/common/01_gene_positions.R"
 
-readonly maf="0to5e-2"
 readonly min_mac=4
 
 readonly genes="data/genes/220310_ensgid_grch38_pos.tsv.gz"
@@ -33,7 +32,7 @@ mkdir -p ${out_dir}
 submit_binary_intervals()
 {
   local annotation="${1?Error: Missing arg1 (annotation)}"
-  local pheno_list="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
+  local pheno_list="${pheno_dir}/spiros_brava_phenotypes_binary_200k_header.tsv"
   local phenotype=$( sed "${SLURM_ARRAY_TASK_ID}q;d" ${pheno_list} )
   submit_intervals "${annotation}" "${phenotype}" "binary"
 }
@@ -55,10 +54,10 @@ submit_intervals()
   local step2_dir="data/saige/output/${trait}/step2/min_mac${min_mac}"
   
   # Only use PRS if enabled and PRS file present
-  local in_file_loco="${step2_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}_locoprs.txt.gz"
-  local in_file_std="${step2_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}.txt.gz"
-  #local out_prefix_loco="${out_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}_locoprs"
-  local out_prefix_std="${out_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}"
+  local in_file_loco="${step2_dir}/${in_prefix}_${phenotype}_${annotation}_locoprs.txt.gz"
+  local in_file_std="${step2_dir}/${in_prefix}_${phenotype}_${annotation}.txt.gz"
+  #local out_prefix_loco="${out_dir}/${in_prefix}_${phenotype}_${annotation}_locoprs"
+  local out_prefix_std="${out_dir}/${in_prefix}_${phenotype}_${annotation}"
   if [ "${use_prs}" -eq "1" ] & [ -f "${in_file_loco}" ]; then
     echo "Note: Using PRS results from ${phenotype}"
     local in_file=${in_file_loco}
