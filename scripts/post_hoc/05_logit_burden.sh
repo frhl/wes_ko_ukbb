@@ -30,16 +30,25 @@ readonly out_prefix="${out_dir}/pLoF_damaging_missense_full_burden_logit"
 
 mkdir -p ${out_dir}
 
-set_up_rpy
-Rscript "${rscript}" \
- --phenotypes_path ${phenotypes_path} \
- --phenotypes_header ${phenotypes_header} \
- --unrelated_path ${unrelated_path} \
- --covars_path ${covars_path} \
- --knockout_dir ${knockout_dir} \
- --knockout_pattern ${knockout_regex} \
- --out_prefix "${out_prefix}" \
- --variable "ko"
 
+calc_burden() {
+  local variable=${1}
+  local out_prefix_variable="${out_prefix}.${variable}"
+  set_up_rpy
+  Rscript "${rscript}" \
+   --phenotypes_path ${phenotypes_path} \
+   --phenotypes_header ${phenotypes_header} \
+   --unrelated_path ${unrelated_path} \
+   --covars_path ${covars_path} \
+   --knockout_dir ${knockout_dir} \
+   --knockout_pattern ${knockout_regex} \
+   --out_prefix "${out_prefix_variable}" \
+   --variable "${variable}"
+}
+
+calc_burden "het"
+calc_burden "ko"
+calc_burden "chet"
+calc_burden "homs"
 
 

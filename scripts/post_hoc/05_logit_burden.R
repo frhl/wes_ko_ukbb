@@ -88,21 +88,27 @@ main <- function(args){
 
     # run all phenotypes
     phenotypes <- header$V1[header$V1 %in% colnames(ph)]
-    v <- args$variable
-    stopifnot(v %in% colnames(final))
+    phenotypes <- phenotypes[1:300]
+    v <- as.character(args$variable)
+    print(v)
+    print(colnames(final))
+
+    if (!(v %in% colnames(final))) stop(paste(v, "is not among column names!"))
     fits <- lapply(phenotypes, function(pheno){
         write(pheno, stderr())
         # setup model
-        covariates <- paste0(covars, collapse = "+")
-        model_str <- paste0(pheno ,"~",v,"+", covariates)
-        model <- as.formula(model_str)
-        # run model
-        fit <- glm(
-            formula = model,
-            data = final,
-            family = binomial(link="logit")
-        )
-        return(fit)
+        if (is.logical(final[[pheno]])){
+            covariates <- paste0(covars, collapse = "+")
+            model_str <- paste0(pheno ,"~",v,"+", covariates)
+            model <- as.formula(model_str)
+            # run model
+            fit <- glm(
+                formula = model,
+                data = final,
+                family = binomial(link="logit")
+            )
+            return(fit)
+        }
     })
 
     # setup names
@@ -117,7 +123,7 @@ main <- function(args){
 
     outfile = paste0(args$out_prefix, ".unrel.glm.txt.gz")
     write(paste0("writing to ", outfile), stderr())
-    fwrite(dt, coeffecients, sep = '\t')
+    fwrite( coeffecients, outfile, sep = '\t')
 
 }
 
