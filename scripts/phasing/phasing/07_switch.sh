@@ -23,11 +23,13 @@
 source utils/bash_utils.sh
 
 readonly rscript="scripts/phasing/phasing/07_switch.R"
-readonly switch_dir="data/phased/wes_union_calls/200k/shapeit5/parents_improved"
-readonly switch_regex="ukb_wes_union_calls_200k_shapeit5_parents_chr[0-9]+.txt"
+readonly switch_dir="data/phased/wes_union_calls/200k/shapeit5/parents_with_hail_count"
+readonly switch_regex="ukb_wes_union_calls_200k_shapeit5_parents_chr[0-9]+.long.mac.txt"
+
+# ukb_wes_union_calls_200k_shapeit5_parents_chr8.long.mac.txt.gz
 
 readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/tables"
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_shapeit5_parents_trio_switch_improved"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_shapeit5_parents_hail"
 
 readonly wes_variants="/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list"
 
