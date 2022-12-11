@@ -9,9 +9,9 @@
 #SBATCH --output=logs/parents.log
 #SBATCH --error=logs/parents.errors.log
 #SBATCH --constraint="skl-compat"
-#SBATCH --partition=short
-#SBATCH --cpus-per-task 2
-#SBATCH --array=21
+#SBATCH --partition=long
+#SBATCH --cpus-per-task 4
+#SBATCH --array=1-22
 #
 #$ -N parents
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -54,7 +54,7 @@ readonly out_trio="${out_prefix}.trio"
 readonly out_info="${out_prefix}.info"
 readonly out_info_gz="${out_prefix}.info.gz"
 readonly out_trio_by_site="${out_prefix}.txt"
-readonly out_trio_by_site_mac="${out_prefix}.mac"
+readonly out_trio_by_site_mac="${out_prefix}.long.mac"
 readonly out_type="vcf"
 
 mkdir -p ${out_dir}
@@ -74,7 +74,7 @@ fi
 if [ ! -f "${out_trio_by_site}" ]; then
   echo "SERs by site: ${out_vcf}"
   switch_errors_by_site ${out_vcf} ${pedigree}
- fi
+fi
 
 # append MAC/AC count 
 if [ ! -f "${out_trio_by_site_mac}.txt.gz" ]; then
