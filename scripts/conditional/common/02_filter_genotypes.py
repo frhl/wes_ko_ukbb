@@ -129,7 +129,7 @@ def main(args):
     mt = mt.drop('info')
 
     # perform liftover to GRCh38 and filter to intervals
-    mt = variants.liftover(mt)
+    mt = variants.liftover(mt, fix_ref = True)
     hail_intervals = ht.intervals.collect()
     mt = hl.filter_intervals(mt, hail_intervals)
 

@@ -7,7 +7,7 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/filter_genotypes.log
 #SBATCH --error=logs/filter_genotypes.errors.log
-#SBATCH --partition=test
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 #SBATCH --array=1-10
 
@@ -23,7 +23,7 @@ readonly bash_script="scripts/conditional/common/_filter_genotypes.sh"
 readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
 
 # padding upstream/downstream
-readonly padding=1000000
+readonly padding=1000000 # 1 Megabase
 # minimum maf and imputation score extracted
 readonly min_maf=0.01
 readonly min_info=0.8
@@ -33,15 +33,14 @@ readonly in_dir="data/conditional/common/gene_positions/min_mac${min_mac}"
 readonly out_dir="data/conditional/common/intervals/min_mac${min_mac}"
 readonly pheno_dir="data/phenotypes"
 readonly in_prefix="ukb_eur_wes_200k"
-readonly maf="0to5e-2"
 
 mkdir -p ${out_dir}
 
 submit_binary_analysis()
 {
   local annotation="${1?Error: Missing arg1 (annotation)}"
-  local pheno_list="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
-  local pheno_file="${pheno_dir}/filtered_covar_phenotypes_binary.tsv.gz"
+  local pheno_list="${pheno_dir}/spiros_brava_phenotypes_binary_200k_header.tsv"
+  local pheno_file="${pheno_dir}/spiros_brava_phenotypes_binary_200k.tsv"
   local phenotype=$( sed "${SLURM_ARRAY_TASK_ID}q;d" ${pheno_list} )
   submit_intervals "${annotation}" "${phenotype}" "binary" "${pheno_file}"
 }
@@ -61,8 +60,8 @@ submit_intervals()
   local phenotype=${2?Error: Missing arg2 (phenotype)}
   local trait=${3?Error: Missing arg3 (trait)}
   local pheno_file=${4?Error: Missing arg4 (pheno_file)}
-  local genes="${in_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}.tsv.gz"
-  local out_prefix="${out_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}"
+  local genes="${in_dir}/${in_prefix}_${phenotype}_${annotation}.tsv.gz"
+  local out_prefix="${out_dir}/${in_prefix}_${phenotype}_${annotation}"
   if [ ! -z "${phenotype}" ]; then
     if [ -f ${genes} ]; then
       readonly slurm_tasks="${SLURM_ARRAY_TASK_ID}"
