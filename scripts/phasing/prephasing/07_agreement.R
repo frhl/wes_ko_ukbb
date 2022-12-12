@@ -41,14 +41,16 @@ main <- function(args){
     d <- fread(args$input_path)
     keep <- d$locus %in% variants$locus
     d <- d[keep,] 
-
+    
+    # bins
+    bins <- c(0,1,5,10,20,50,100,200,500,1000,2000,5000,10000, Inf)
+    
     # keep phased sets with at least one rare variant
-    bool_keep <- (!is.na(d$PP) & d$AC < 1001)
+    bool_keep <- (!is.na(d$PP) & d$AC < 10001)
     ps_to_keep <- unique(d$PS_rb[bool_keep])
     dt <- d[d$PS_rb %in% ps_to_keep,]
 
     # use same bins as in S5 paper
-    bins <- c(0,1,5,10,20,50,100,200,500,1000, Inf)
     labels <- unlist(lapply(2:length(bins), function(i){paste0(bins[i-1]+1,"-",bins[i])}))
     labels[labels == '1-1'] <- "singleton"
     dt$bin <- cut(dt$AC, breaks = bins, labels = labels)
