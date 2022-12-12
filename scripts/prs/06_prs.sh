@@ -7,7 +7,7 @@
 #SBATCH --error=logs/prs.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=250-300
+#SBATCH --array=200-210
 #
 #
 #$ -N prs
@@ -93,8 +93,9 @@ fit_pgs()
   local sge_queue="short.qc"
   local slurm_tasks="${tasks}"
   local slurm_nslots="${nslots}"
+  fit_pgs_jid=""
   if [ "${cluster}" = "slurm" ]; then
-    readonly fit_pgs_jid=$( sbatch \
+    fit_pgs_jid=$( sbatch \
       --account="${slurm_project}" \
       --job-name="${prs_jname}" \
       --output="logs/${prs_lname}.log" \
@@ -228,7 +229,7 @@ readonly queue="short"
 readonly project="lindgren.prj"
 readonly tasks=1-22
 
-submit_ldpred2 "auto" "2" "${phenotype_binary}"
+submit_ldpred2 "auto" "3" "${phenotype_binary}"
 #submit_ldpred2 "auto" "6" "${phenotype_cts}_int"
 #submit_ldpred2 "auto" "6" "${phenotype_cts}"
 
