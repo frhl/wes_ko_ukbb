@@ -46,9 +46,10 @@ calc_burden() {
    --variable "${variable}"
 }
 
-calc_burden "het"
+#calc_burden "cis"
+#calc_burden "hom"
 calc_burden "ko"
-calc_burden "chet"
-calc_burden "homs"
+#calc_burden "chet"
+calc_burden "het"
 
 

@@ -1,7 +1,7 @@
 
 library(data.table)
 library(argparse)
-
+library(pscl)
 
 main <- function(args){
    
@@ -40,6 +40,9 @@ main <- function(args){
     common_plofs <- counts[counts$N > 10000,]
     dt_all <- dt_all[!(dt_all$gene_id %in% common_plofs$V1),]
     print(paste("excluded",nrow(common_plofs),"common knockouts."))
+
+    # filter genes
+    
 
     dt_het <- dt_all[dt_all$knockout %in% het,]
     dt_cis <- dt_all[dt_all$knockout %in% cis,]
@@ -94,19 +97,28 @@ main <- function(args){
     print(colnames(final))
 
     if (!(v %in% colnames(final))) stop(paste(v, "is not among column names!"))
+    
+    # standard glm
     fits <- lapply(phenotypes, function(pheno){
         write(pheno, stderr())
         # setup model
         if (is.logical(final[[pheno]])){
-            covariates <- paste0(covars, collapse = "+")
-            model_str <- paste0(pheno ,"~",v,"+", covariates)
-            model <- as.formula(model_str)
-            # run model
-            fit <- glm(
-                formula = model,
-                data = final,
-                family = binomial(link="logit")
-            )
+            if (args$method == "poisson") {
+                covariates <- paste0(covars, collapse = "+")
+                model_str <- paste0(v ,"~",pheno,"+", covariates)
+                model <- as.formula(model_str)
+                # run model
+                fit <- glm(
+                    formula = model,
+                    data = final,
+                    family = poisson(link = "log")
+                )
+            } else if (args$method == "zip"){
+                covariates <- paste0(covars, collapse = "+")
+                model_str <- paste0(v ,"~",pheno,"+", covariates,"|1") # assume zero comes from random process
+                model <- as.formula(model_str)
+                fit <- zeroinfl(model, data = final)
+            }
             return(fit)
         }
     })
@@ -121,7 +133,7 @@ main <- function(args){
         return(ko_coef)
     }))
 
-    outfile = paste0(args$out_prefix, ".unrel.glm.txt.gz")
+    outfile = paste0(args$out_prefix, ".unrel.poissonglm.txt.gz")
     write(paste0("writing to ", outfile), stderr())
     fwrite( coeffecients, outfile, sep = '\t')
 
@@ -136,6 +148,7 @@ parser$add_argument("--covars_path", default=NULL, required = TRUE, help = "Chro
 parser$add_argument("--knockout_dir", default=NULL, required = TRUE, help = "Chromosome")
 parser$add_argument("--knockout_pattern", default=NULL, required = TRUE, help = "Chromosome")
 parser$add_argument("--variable", default="ko", required = TRUE, help = "what variable to regress (ko, chet, het, homs)")
+parser$add_argument("--method", default="poisson", required = TRUE, help = "what variable to regress (ko, chet, het, homs)")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()
 
