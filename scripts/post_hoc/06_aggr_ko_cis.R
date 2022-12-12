@@ -2,6 +2,11 @@
 library(data.table)
 library(argparse)
 
+# mapping to HGNC symbol
+bridge <- fread("/well/lindgren/flassen/ressources/genesets/genesets/data/biomart/220524_hgnc_ensg_enst_chr_pos.txt.gz")
+ensembl_to_hgnc <- bridge$hgnc_symbol
+names(ensembl_to_hgnc) <- bridge$ensembl_gene_id
+
 
 main <- function(args){
    
@@ -14,6 +19,8 @@ main <- function(args){
         d <- fread(path)
         d$s <- as.character(d$s)
         d <- d[,c("gene_id","s","knockout","pKO")]
+        d$chromosome <- stringr::str_extract("chr[0-9]+", path)
+        d$hgnc_symbol <- ensembl_to_hgnc[d$gene_id]
         return(d)
     })
 
@@ -30,7 +37,7 @@ main <- function(args){
     common_plofs <- counts[counts$N > 10000,]
     dt_all <- dt_all[!(dt_all$gene_id %in% common_plofs$V1),]
     print(paste("excluded",nrow(common_plofs),"common knockouts."))
-    
+
     # create file with them 
     dt_out <- dt_all[(dt_all$knockout %in% c(chet, homs, cis)),]
     dt_out$is_chet <- dt_out$knockout %in% chet
