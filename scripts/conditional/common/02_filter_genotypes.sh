@@ -9,8 +9,7 @@
 #SBATCH --error=logs/filter_genotypes.errors.log
 #SBATCH --partition=test
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-80
-#SBATCH --requeue
+#SBATCH --array=1-10
 
 set -o errexit
 set -o nounset

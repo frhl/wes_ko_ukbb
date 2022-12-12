@@ -7,16 +7,27 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/gene_positions.log
 #SBATCH --error=logs/gene_positions.errors.log
-#SBATCH --partition=short
+#SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-10
-#SBATCH --requeue
+#SBATCH --array=1-300
+
+#$ -N gene_positions
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#$ -o logs/gene_positions.log
+#$ -e logs/gene_positions.errors.log
+#$ -P lindgren.prjc
+#$ -pe shmem 1
+#$ -q short.qa
+#$ -t 1-300
+#$ -V
 
 set -o errexit
 set -o nounset
 
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
+
+readonly task_id=$( get_array_task_id )
 
 readonly rscript="scripts/conditional/common/01_gene_positions.R"
 
@@ -33,7 +44,7 @@ submit_binary_intervals()
 {
   local annotation="${1?Error: Missing arg1 (annotation)}"
   local pheno_list="${pheno_dir}/spiros_brava_phenotypes_binary_200k_header.tsv"
-  local phenotype=$( sed "${SLURM_ARRAY_TASK_ID}q;d" ${pheno_list} )
+  local phenotype=$( sed "${task_id}q;d" ${pheno_list} )
   submit_intervals "${annotation}" "${phenotype}" "binary"
 }
 
@@ -41,7 +52,7 @@ submit_cts_intervals()
 {
   local annotation="${1?Error: Missing arg1 (annotation)}"
   local pheno_list="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
-  local phenotype=$( sed "${SLURM_ARRAY_TASK_ID}q;d" ${pheno_list} )
+  local phenotype=$( sed "${task_id}q;d" ${pheno_list} )
   submit_intervals "${annotation}" "${phenotype}" "cts"
 }
 
