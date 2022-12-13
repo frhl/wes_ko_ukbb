@@ -11,7 +11,8 @@ readonly out_prefix=${2?Error: Missing arg3 (out_prefix)}
 readonly n_samples=${3?Error: Missing arg3 (n_samples)}
 readonly wes_variants=${4?Error: Missing arg4 (wes_variants)}
 readonly pp_cutoff=${5?Error: Missing arg5 (pp_cutoff)}
-readonly rscript=${6?Error: Missing arg6 (rscript)}
+readonly mac_bin=${6?Error: Missing arg6 (mac_bin)}
+readonly rscript=${7?Error: Missing arg7 (rscript)}
 
 
 set_up_rpy
@@ -20,6 +21,7 @@ Rscript ${rscript} \
   --n_samples ${n_samples} \
   --seed 52 \
   --pp_cutoff ${pp_cutoff} \
+  --mac_bin ${mac_bin} \
   --sites "${wes_variants}" \
   --out_prefix "${out_prefix}"
 
