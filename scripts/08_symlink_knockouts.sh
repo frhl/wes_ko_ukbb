@@ -31,13 +31,13 @@ readonly in_extract_dir="$(pwd)/data/knockouts/alt/pp90/extracted"
 readonly out_dir="$(pwd)/data/knockouts/alt/pp90/combined"
 readonly prefix="ukb_eur_wes_200k"
 
+# symlink knockouts where only vcf encoding has been created
+ln -fs ${in_fast_dir}/${prefix}* ${out_dir}/.
+
 # symlink the knockouts that have been created on a gene
 # by gene basis (and could not be created throughout the 
 # previous step due to memory contraints).
 ln -fs ${in_extract_dir}/${prefix}* ${out_dir}/.
-
-# symlink knockouts where only vcf encoding has been created
-ln -fs ${in_fast_dir}/${prefix}* ${out_dir}/.
 
 # symlink all knockouts that have been collected
 # using a single script in hail

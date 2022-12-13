@@ -42,13 +42,11 @@ main <- function(args){
   N_total <- nrow(gwas)
   N_chr <- sum(gwas$chr == args$chrom)
   h2_init <- h2 * (N_chr / N_total)
+  
+  # check if estimates are ok
   if (N_total < 1) stop(paste0("No rows in GWAS: ", args$ldsc))
   if (N_chr < 1) stop(paste0("No matching chromsomes in gwas rows: ", args$ldsc))
-  if (h2 =< 0) stop(paste0("h2_init is negative!", args$ldsc))
-  # 
-  msg <- paste(h2 * (N_chr / N_total))
-
-
+  if (h2_init <= 0) stop(paste0("h2_init (",h2_init ,") is zero or negative:",  args$ldsc))
 
   # check estimates and ensure that
   # the trait is actually heritable 

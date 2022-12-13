@@ -33,7 +33,7 @@ main <- function(args){
     seed <- as.numeric(args$seed)
     sites <- args$sites
     input_path <- args$input_path    
-    output_path <- args$output_path
+    out_prefix <- args$out_prefix
     stopifnot(file.exists(sites))
     variants <- fread(sites)
 
@@ -60,14 +60,20 @@ main <- function(args){
     my_samples <- sample(unique(dt$s), n_samples, replace = FALSE)
     dt <- dt[dt$s %in% my_samples,]
 
-    # eval 
-    final <- eval_phase(eval_gt_agreement_by_bin(dt, labels[1:8], pp_cutoff), labels)
+    # eval gt agreement
+    gt_agreement <- eval_gt_agreement_by_bin(dt, labels[1:11], pp_cutoff)
+    outfile <- paste0(out_prefix, ".txt.gz")
+    fwrite(gt_agreement, outfile, sep = '\t')
+
+    # combien and count
+    final <- eval_phase(gt_agreement, labels)
     final$pp <- as.numeric(pp_cutoff)
 
     # combine
     final$pp <- factor(final$pp)
-    final$bin <- factor(final$bin, levels = labels) 
-    fwrite(final, output_path, sep = '\t')
+    final$bin <- factor(final$bin, levels = labels)
+    outfile <- paste0(out_prefix, ".summary.txt.gz")
+    fwrite(final, outfile, sep = '\t')
 
 }
 
@@ -75,7 +81,7 @@ main <- function(args){
 parser <- ArgumentParser()
 parser$add_argument("--input_path", default=NULL, required = TRUE, help = "path to file with PS_rb, GT_rb and GT sites.")
 parser$add_argument("--sites", default=NULL, required = TRUE, help = "path to quality controlled variant sites")
-parser$add_argument("--output_path", default=NULL, required = TRUE, help = "")
+parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "")
 parser$add_argument("--n_samples", default=10, required = TRUE, help = "")
 parser$add_argument("--seed", default=52, required = TRUE, help = "")
 parser$add_argument("--pp_cutoff", default=NULL, required = TRUE, help = "")

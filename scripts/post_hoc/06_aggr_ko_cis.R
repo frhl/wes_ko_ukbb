@@ -19,7 +19,7 @@ main <- function(args){
         d <- fread(path)
         d$s <- as.character(d$s)
         d <- d[,c("gene_id","s","knockout","pKO")]
-        d$chromosome <- stringr::str_extract("chr[0-9]+", path)
+        d$chromosome <- stringr::str_extract(path, "chr[0-9]+")
         d$hgnc_symbol <- ensembl_to_hgnc[d$gene_id]
         return(d)
     })

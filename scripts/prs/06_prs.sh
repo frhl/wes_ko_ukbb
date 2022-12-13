@@ -7,7 +7,7 @@
 #SBATCH --error=logs/prs.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=200-210
+#SBATCH --array=1-300
 #
 #
 #$ -N prs
@@ -17,7 +17,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 200-300
+#$ -t 1-300
 #$ -V
 
 set -o errexit
@@ -229,7 +229,7 @@ readonly queue="short"
 readonly project="lindgren.prj"
 readonly tasks=1-22
 
-submit_ldpred2 "auto" "3" "${phenotype_binary}"
+submit_ldpred2 "auto" "4" "${phenotype_binary}"
 #submit_ldpred2 "auto" "6" "${phenotype_cts}_int"
 #submit_ldpred2 "auto" "6" "${phenotype_cts}"
 

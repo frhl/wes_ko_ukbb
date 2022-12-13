@@ -41,8 +41,15 @@ main <- function(args){
     dt_all <- dt_all[!(dt_all$gene_id %in% common_plofs$V1),]
     print(paste("excluded",nrow(common_plofs),"common knockouts."))
 
-    # filter genes
-    
+    # filter go genes that are likely recessive
+    const <- fread("/well/lindgren/flassen/ressources/genesets/genesets/data/gnomad/karczewski2020/supplementary_dataset_11_full_constraint_metrics.tsv")
+    const <- const[const$canonical == TRUE,]
+    loeuf <- const$oe_lof_upper_bin #const$oe_lof_upper
+    names(loeuf) <- const$gene_id
+    dt_all$loeuf <- loeuf[dt_all$gene_id]
+    dt_all <- dt_all[(dt_all$loeuf < 6) & (dt_all$loeuf >= 2),]
+
+
 
     dt_het <- dt_all[dt_all$knockout %in% het,]
     dt_cis <- dt_all[dt_all$knockout %in% cis,]

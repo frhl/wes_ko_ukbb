@@ -17,7 +17,7 @@ readonly rscript="scripts/post_hoc/06_aggr_ko_cis.R"
 readonly knockout_dir="data/knockouts/alt/pp90/combined"
 
 readonly out_dir="data/knockouts/tables"
-readonly out_prefix="${out_dir}/aggr_ko_table"
+readonly out_prefix="${out_dir}/221312_aggr_ko_table"
 
 mkdir -p ${out_dir}
 

@@ -10,7 +10,6 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 #SBATCH --array=1-300
-#SBATCH --requeue
 
 set -o errexit
 set -o nounset
@@ -163,7 +162,7 @@ readonly use_prs="1"
 readonly min_mac=4
 readonly project="lindgren.prj"
 readonly tasks=1-22
-readonly queue="short"
+readonly queue="epyc"
 readonly nslots=1
 
 
@@ -182,7 +181,6 @@ submit_spa_binary_with_csqs "pLoF_damaging_missense"
 #sleep 10
 #submit_spa_cts_with_csqs "synonymous"
 #submit_spa_binary_with_csqs "synonymous"
-
 
 
 

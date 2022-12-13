@@ -26,7 +26,7 @@ readonly knockout_dir="data/knockouts/alt/pp90/combined"
 readonly knockout_regex="pLoF_damaging_missense_all"
 
 readonly out_dir="data/knockouts/tables"
-readonly out_prefix="${out_dir}/pLoF_damaging_missense_full_burden_logit"
+readonly out_prefix="${out_dir}/pLoF_damaging_missense_full_burden_logit_loeuf"
 
 mkdir -p ${out_dir}
 

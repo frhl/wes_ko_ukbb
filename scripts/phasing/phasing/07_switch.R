@@ -104,7 +104,7 @@ main <- function(args){
     variants <- fread(sites) 
 
     # create mac bin labels
-    bins <- c(0,1,5,10,20,50,100,200,500,1000, 10000, Inf)
+    bins <- c(0,1,5,10,20,50,100,200,500,1000,2000,5000, 10000, Inf)
     labels <- unlist(lapply(2:length(bins), function(i){paste0(bins[i-1]+1,"-",bins[i])}))
     labels[labels == '1-1'] <- "singleton"
 

@@ -28,7 +28,7 @@ readonly switch_regex="ukb_wes_union_calls_200k_shapeit5_parents_chr[0-9]+.long.
 
 # ukb_wes_union_calls_200k_shapeit5_parents_chr8.long.mac.txt.gz
 
-readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/tables"
+readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/tables/switch_error_rate"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_shapeit5_parents_hail"
 
 readonly wes_variants="/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list"

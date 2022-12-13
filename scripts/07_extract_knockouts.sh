@@ -9,7 +9,7 @@
 #SBATCH --error=logs/extract_knockouts.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-2
+#SBATCH --array=1
 #
 #
 #$ -N extract_knockouts
@@ -19,7 +19,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 1-2
+#$ -t 1
 #$ -V
 
 set -o errexit
@@ -179,8 +179,8 @@ submit_knockout_job()
 
 
 #submit_knockout_job "pLoF,damaging_missense" "2"
-submit_knockout_job "damaging_missense" "3"
-submit_knockout_job "pLoF" "3"
+#submit_knockout_job "damaging_missense" "2"
+submit_knockout_job "pLoF" "2"
 
 
 

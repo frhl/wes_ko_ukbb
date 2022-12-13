@@ -39,7 +39,7 @@ if [ ! -f "${out_prefix_chr}.txt.gz" ]; then
       --tmp_bfile "${tmp_bfile}" \
       --out_prefix "${out_prefix_chr}"
   # always remove temporary bk files as these
-  # tend to become extremely large  
+  # tend to become extremely large (In the magnitude of terrabytes)  
   rm ${tmp_bk} ${tmp_rds}
 else
   echo "Note: ${out_prefix_chr} already exists. Skipping.."

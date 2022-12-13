@@ -9,7 +9,7 @@
 #SBATCH --error=logs/filter_genotypes.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-10
+#SBATCH --array=101-300
 
 set -o errexit
 set -o nounset
@@ -40,7 +40,7 @@ submit_binary_analysis()
 {
   local annotation="${1?Error: Missing arg1 (annotation)}"
   local pheno_list="${pheno_dir}/spiros_brava_phenotypes_binary_200k_header.tsv"
-  local pheno_file="${pheno_dir}/spiros_brava_phenotypes_binary_200k.tsv"
+  local pheno_file="${pheno_dir}/spiros_brava_phenotypes_binary_200k.tsv.gz"
   local phenotype=$( sed "${SLURM_ARRAY_TASK_ID}q;d" ${pheno_list} )
   submit_intervals "${annotation}" "${phenotype}" "binary" "${pheno_file}"
 }
@@ -66,7 +66,7 @@ submit_intervals()
     if [ -f ${genes} ]; then
       readonly slurm_tasks="${SLURM_ARRAY_TASK_ID}"
       readonly slurm_jname="_filter_genotypes_${1}"
-      readonly slurm_lname="_filter_genotypes"
+      readonly slurm_lname="logs/_filter_genotypes"
       readonly slurm_project="lindgren.prj"
       readonly slurm_queue="long"
       readonly slurm_shmem="4"
