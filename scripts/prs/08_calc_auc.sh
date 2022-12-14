@@ -7,8 +7,7 @@
 #SBATCH --output=logs/calc_auc.log
 #SBATCH --error=logs/calc_auc.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 1
-#SBATCH --requeue
+#SBATCH --cpus-per-task 2
 
 set -o errexit
 set -o nounset
@@ -22,8 +21,9 @@ readonly pgs_dir="data/prs/scores"
 readonly out_dir="data/prs/validation"
 readonly pheno_dir="data/phenotypes"
 
-readonly phenotypes="${pheno_dir}/curated_covar_phenotypes_binary.tsv.gz"
-readonly out_prefix="${out_dir}/pgs_auc_summary"
+#readonly phenotypes="${pheno_dir}/curated_covar_phenotypes_binary.tsv.gz"
+readonly phenotypes="${pheno_dir}/spiros_brava_phenotypes_binary_500k.tsv"
+readonly out_prefix="${out_dir}/spiro_pgs_auc_summary"
 
 mkdir -p ${out_dir}
 

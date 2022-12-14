@@ -33,6 +33,7 @@ main <- function(args){
     # calculate AUC 
     cols <- cols[!cols %in% "eid"]
     lst <- lapply(cols, function(col){
+        write(paste("calculating auc for", col), stderr())
         col_pgs <- paste0(col,'_pgs')
         boot <- dt[,colnames(dt) %in% c('eid',col,col_pgs), with = FALSE]
         boot <- boot[!is.na(boot[[col]]) & !is.na(boot[[col_pgs]]),]
