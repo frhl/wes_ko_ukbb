@@ -100,6 +100,8 @@ main <- function(args){
   if (args$standardized_gt){
      means <- as.numeric(unlist(lapply(1:cols, function(i) mean(genotypes[,i], na.rm = TRUE))))
      sds <- as.numeric(unlist(lapply(1:cols, function(i) sd(genotypes[,i], na.rm = TRUE))))
+     stopifnot(sum(is.na(means))==0)
+     stopifnot(sum(is.na(sds))==0)
   }
 
   if (args$method %in% "inf"){
@@ -116,12 +118,16 @@ main <- function(args){
 
   } else if (args$method %in% "auto") {
 
+     # use proper vec p init
+     vec_p_ranges <- max(NCORES, as.numeric(args$vec_p_init_n))
+     if (vec_p_ranges < 3) stop("You should ideally have 10-30 chains! set vec_p_init_n.")
+     
      write("Running multi_auto", stderr())
      multi_auto <- snp_ldpred2_auto(
         corr = snp$corr,
         df_beta = gwas,
         h2_init = h2_init,
-        vec_p_init = seq_log(1e-4, 0.9, NCORES), # using cores instead 30
+        vec_p_init = seq_log(1e-4, 0.9, vec_p_ranges), # using cores instead 30
         ncores = NCORES)
 
      # save data chains
@@ -142,12 +148,27 @@ main <- function(args){
           labs(y = "h2"),
         ncol = 1, align = "hv"
       )
+     
      # save plot
      ggsave(plot=p,filename=paste0(args$out_prefix, "_chains.png"))
 
      # get estimates with indicies corresponding to pred genotypes
      beta_auto <- sapply(multi_auto, function(auto){
           auto$beta_est})
+
+     # ensure that no missing values are present,
+     # note: that some columns can be zero for more intiial p_vec
+     stopifnot(all(rowSums(!is.na(beta_auto)) > 0))
+
+     # check if initial estimate caused any problems.
+     stopifnot(all(rowSums(!is.na(beta_auto)) > 0))
+     na_cols <- colSums(is.na(beta_auto)) == nrow(beta_auto)
+     n_na_cols <- sum(sum(na_cols))
+     n_cols <- ncol(beta_auto)
+     if (n_na_cols > 0){
+        write(paste0("Note: ",n_na_cols," of ",n_cols," beta_auto NA cols will be discarded."), stdout()) 
+        beta_auto <- beta_auto[,!na_cols]
+     } 
 
      # perform matrix multiplication
      pred_auto <- big_prodMat(
@@ -160,6 +181,7 @@ main <- function(args){
      # quality controls on chains
      sc <- apply(pred_auto, 2, sd, na.rm = TRUE)
      keep <- abs(sc - median(sc)) < 3 * mad(sc)
+     stopifnot(!any(is.na(keep)))
      final_beta_auto <- rowMeans(beta_auto[, keep], na.rm = TRUE) 
      
      # get final predicton
@@ -177,9 +199,15 @@ main <- function(args){
 
     }
 
-  
+
+  # count PRS that could not be generated
+  missing_prs <- round(sum(is.na(final_pred))/length(final_pred)*100, 2)
+
   # save parameters 
   model <- data.table(
+     ldsc = args$ldsc,
+     pred = args$pred,
+     chrom = args$chrom,
      method = args$method,
      n_samples = unique(gwas$n),
      n_eff = unique(gwas$n_eff),
@@ -190,14 +218,15 @@ main <- function(args){
      standardized_gt = args$standardized_gt,
      gt_rows = rows,
      gt_cols = cols,
-     missing_gt = missing_gt
+     missing_gt = missing_gt,
+     missing_prs_pct = missing_prs
      )
   
   # save results
   PGS <- data.table(
     sid = pred$sid, 
     prs = final_pred
-    )
+  )
 
   write(paste0(args$pred, ".. done! Writing to ", args$out_prefix, ".txt.gz"), stdout())
   fwrite(PGS, file = paste0(args$out_prefix,".txt.gz"), sep = '\t')
@@ -213,6 +242,7 @@ parser$add_argument("--method", default=NULL, required = TRUE, help = "either 'i
 parser$add_argument("--pred", default=NULL, required = TRUE, help = "Path to plink (bed) for PGS prediction")
 parser$add_argument("--ldsc", default=NULL, required = TRUE, help = ".rds object containing QCed GWAS and ldsc heritability estimates")
 parser$add_argument("--standardized_gt", default=1, required = FALSE, help = "Should genotypes be standardized?")
+parser$add_argument("--vec_p_init_n", default=15, required = FALSE, help = "number of intial estimates to sample form (should be at least 5)")
 parser$add_argument("--tmp_bfile", default=NULL, required = TRUE, help = "File path to temporary backing files")
 parser$add_argument("--ld_dir", default=NULL, required = TRUE, help = "Path to directory with pre-calcualted SNP correlations and LD (.rds files)")
 parser$add_argument("--impute", default=NULL, required = TRUE, help = "Should missing genotypes be imputed? (See https://privefl.github.io/bigsnpr/reference/snp_fastImputeSimple.html)")

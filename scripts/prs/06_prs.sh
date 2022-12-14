@@ -17,7 +17,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-300
+#$ -t 150-152
 #$ -V
 
 set -o errexit
@@ -35,7 +35,7 @@ readonly ldsc_dir="data/prs/ldsc"
 readonly pred_dir="data/prs/hapmap/ukb_500k/validation"
 readonly ld_dir="data/prs/hapmap/ld/matrix_unrel_kin"
 readonly pheno_dir="data/phenotypes"
-readonly out_dir="data/prs/scores/auto/test"
+readonly out_dir="data/prs/scores/auto"
 readonly mrg_dir="data/prs/scores"
 
 readonly cluster=$( get_current_cluster )
@@ -229,7 +229,7 @@ readonly queue="short"
 readonly project="lindgren.prj"
 readonly tasks=1-22
 
-submit_ldpred2 "auto" "4" "${phenotype_binary}"
+submit_ldpred2 "auto" "1" "${phenotype_binary}"
 #submit_ldpred2 "auto" "6" "${phenotype_cts}_int"
 #submit_ldpred2 "auto" "6" "${phenotype_cts}"
 

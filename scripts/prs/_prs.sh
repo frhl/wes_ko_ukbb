@@ -27,8 +27,7 @@ readonly tmp_rds="${tmp_bfile}.rds"
 export OPENBLAS_NUM_THREADS=1 # avoid two levels of parallelization
 
 if [ ! -f "${out_prefix_chr}.txt.gz" ]; then
-  #set_up_ldpred2
-  set_up_rpy
+  set_up_ldpred2
   Rscript "${r_script}" \
       --chrom "chr${chr}" \
       --pred "${pred_chr}" \
