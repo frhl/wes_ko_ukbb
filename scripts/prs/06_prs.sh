@@ -5,9 +5,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/prs.log
 #SBATCH --error=logs/prs.errors.log
-#SBATCH --partition=short
+#SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-300
+#SBATCH --array=50-100
 #
 #
 #$ -N prs
@@ -17,7 +17,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 150-152
+#$ -t 200-300
 #$ -V
 
 set -o errexit
@@ -37,6 +37,10 @@ readonly ld_dir="data/prs/hapmap/ld/matrix_unrel_kin"
 readonly pheno_dir="data/phenotypes"
 readonly out_dir="data/prs/scores/auto"
 readonly mrg_dir="data/prs/scores"
+
+# do not run files that have h2 estimates
+# above the given p-value cutoff (nominal).
+readonly ldsc_pvalue_cutoff=0.001
 
 readonly cluster=$( get_current_cluster )
 readonly index=$( get_array_task_id )
@@ -112,6 +116,7 @@ fit_pgs()
       "${ld_dir}" \
       "${method}" \
       "${impute}" \
+      "${ldsc_pvalue_cutoff}" \
       "${out_prefix}" )
   elif [ "${cluster}" = "sge" ]; then
     qsub -N "${prs_jname}" \
@@ -129,6 +134,7 @@ fit_pgs()
       "${ld_dir}" \
       "${method}" \
       "${impute}" \
+      "${ldsc_pvalue_cutoff}" \
       "${out_prefix}"
   else
     >&2 echo "${cluster} is not valid!"
@@ -225,7 +231,7 @@ clean_pgs()
 }
 
 # parameters
-readonly queue="short"
+readonly queue="epyc"
 readonly project="lindgren.prj"
 readonly tasks=1-22
 

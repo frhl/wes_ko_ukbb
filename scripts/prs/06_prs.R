@@ -38,6 +38,14 @@ main <- function(args){
   h2 <- ldsc$coefficients$estimate[2]
   pvalue <- ldsc$coefficients$pvalue[2]
 
+  # cutoff prs if z-score estimate is not good enough
+  if (!is.null(ldsc_pvalue_cutoff)){
+    ldsc_pvalue_cutoff <- as.numeric(ldsc_pvalue_cutoff)
+    if (pvalue > ldsc_pvalue_cutoff){
+      stop(paste("p-value",pvalue,">", ldsc_pvalue_cutoff, "(cutoff). Stopping.")).
+    }
+  }
+
   # Estimate h2 chromosome-wide
   N_total <- nrow(gwas)
   N_chr <- sum(gwas$chr == args$chrom)
@@ -241,6 +249,7 @@ parser$add_argument("--chrom", default=NULL, required = TRUE, help = "chromosome
 parser$add_argument("--method", default=NULL, required = TRUE, help = "either 'inf' or 'auto'")
 parser$add_argument("--pred", default=NULL, required = TRUE, help = "Path to plink (bed) for PGS prediction")
 parser$add_argument("--ldsc", default=NULL, required = TRUE, help = ".rds object containing QCed GWAS and ldsc heritability estimates")
+parser$add_argument("--ldsc_pvalue_cutoff", default=NULL, help = "cancel the run if the ldsc heritability p-value is not below the given treshold.")
 parser$add_argument("--standardized_gt", default=1, required = FALSE, help = "Should genotypes be standardized?")
 parser$add_argument("--vec_p_init_n", default=15, required = FALSE, help = "number of intial estimates to sample form (should be at least 5)")
 parser$add_argument("--tmp_bfile", default=NULL, required = TRUE, help = "File path to temporary backing files")

@@ -12,7 +12,8 @@ readonly ldsc=${3?Error: Missing arg2 (ld_matrix)}
 readonly ld_dir=${4?Error: Missing arg2 (ld_matrix)}
 readonly method=${5?Error: Missing arg2 (method)}
 readonly impute=${6?Error: Missing arg2 (impute)}
-readonly prefix=${7?Error: Missing arg8 (prefix)}
+readonly ldsc_pvalue_cutoff=${7?Error: Missing arg2 (impute)}
+readonly prefix=${8?Error: Missing arg8 (prefix)}
 
 readonly cluster=$( get_current_cluster )
 readonly index=$( get_array_task_id )
@@ -35,6 +36,7 @@ if [ ! -f "${out_prefix_chr}.txt.gz" ]; then
       --ld_dir "${ld_dir}" \
       --impute "${impute}" \
       --method "${method}" \
+      --ldsc_pvalue_cutoff "${ldsc_pvalue_cutoff}" \
       --tmp_bfile "${tmp_bfile}" \
       --out_prefix "${out_prefix_chr}"
   # always remove temporary bk files as these
