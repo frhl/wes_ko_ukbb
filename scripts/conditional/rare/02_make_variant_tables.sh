@@ -7,9 +7,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/make_variant_tables.log
 #SBATCH --error=logs/make_variant_tables.errors.log
-#SBATCH --partition=short
+#SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
-#SBATCH --array=22
+#SBATCH --array=20
 
 set -o errexit
 set -o nounset
@@ -48,7 +48,7 @@ readonly lines_per_chunk=1000
 readonly chunks=$( int_div ${vcf_lines} ${lines_per_chunk})
 
 # hpc paramaters
-readonly queue="short"
+readonly queue="epyc"
 readonly project="lindgren.prj"
 readonly nslots=2
 readonly tasks="1-${chunks}"
@@ -80,10 +80,9 @@ submit_qc_job()
   local pheno_list_csv=$(cat ${pheno_list} | tr "\n" ",")
   local out_prefix_trait="${out_prefix}_${trait}"
 
-  # need to fix this ....
   local slurm_main_tasks="${tasks}"
-  local slurm_main_jname="_pref_c${chr}_${trait}"
-  local slurm_main_lname="${out_prefix}"
+  local slurm_main_jname="_make_variant_tables_c${chr}_${trait}"
+  local slurm_main_lname="logs/_make_variant_tables"
   local slurm_main_project="${project}"
   local slurm_main_queue="${queue}"
   local slurm_main_nslots="${nslots}"
@@ -108,7 +107,7 @@ submit_qc_job()
     "${out_prefix}" )
 
   local slurm_merge_jname="_mrg_c${chr}"
-  local slurm_merge_lname="${out_prefix}"
+  local slurm_merge_lname="logs/_merge_variant_tables"
   local slurm_merge_project="${project}"
   local slurm_merge_queue="${queue}"
   local slurm_merge_nslots="1"

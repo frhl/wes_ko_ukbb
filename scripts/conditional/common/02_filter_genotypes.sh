@@ -9,7 +9,7 @@
 #SBATCH --error=logs/filter_genotypes.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=101-300
+#SBATCH --array=1-10
 
 set -o errexit
 set -o nounset
@@ -30,7 +30,7 @@ readonly min_info=0.8
 readonly min_mac=4
 
 readonly in_dir="data/conditional/common/gene_positions/min_mac${min_mac}"
-readonly out_dir="data/conditional/common/intervals/min_mac${min_mac}"
+readonly out_dir="data/conditional/common/intervals/new/min_mac${min_mac}"
 readonly pheno_dir="data/phenotypes"
 readonly in_prefix="ukb_eur_wes_200k"
 
@@ -68,7 +68,7 @@ submit_intervals()
       readonly slurm_jname="_filter_genotypes_${1}"
       readonly slurm_lname="logs/_filter_genotypes"
       readonly slurm_project="lindgren.prj"
-      readonly slurm_queue="long"
+      readonly slurm_queue="short"
       readonly slurm_shmem="4"
       set -x
       sbatch \

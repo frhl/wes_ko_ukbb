@@ -6,9 +6,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/switch_pp_subset.log
 #SBATCH --error=logs/switch_pp_subset.errors.log
-#SBATCH --partition=short
-#SBATCH --cpus-per-task 2
-#SBATCH --array=3
+#SBATCH --partition=epyc
+#SBATCH --cpus-per-task 4
+#SBATCH --array=1
 #
 #$ -N switch_pp_subset
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -50,25 +50,25 @@ readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_shapeit5_chr${chr}_pp90
 readonly out_vcf="${out_prefix}.vcf.bgz"
 readonly out_trio="${out_prefix}.trio"
 readonly out_trio_by_site="${out_prefix}.txt"
-readonly out_trio_by_site_mac="${out_prefix}.long.mac"
+readonly out_trio_by_site_mac="${out_prefix}.long.2.mac"
 readonly out_type="vcf"
 
 mkdir -p ${out_dir}
 
-if [ ! -f "${out_vcf}" ]; then
-  set_up_hail
-  set_up_pythonpath_legacy
-  python3 ${hail_script_subset} \
-    --phased_path ${phased_path} \
-    --phased_type ${phased_type} \
-    --out_prefix ${out_prefix} \
-    --pp_cutoff ${pp_cutoff}
-fi
+#if [ ! -f "${out_vcf}" ]; then
+#  set_up_hail
+#  set_up_pythonpath_legacy
+#  python3 ${hail_script_subset} \
+#    --phased_path ${phased_path} \
+#    --phased_type ${phased_type} \
+#    --out_prefix ${out_prefix} \
+#    --pp_cutoff ${pp_cutoff}
+#fi
 
 # calculate switch errors by site
-if [ ! -f "${out_trio_by_site}" ]; then
-  switch_errors_by_site ${out_vcf} ${pedigree}
-fi
+#if [ ! -f "${out_trio_by_site}" ]; then
+#  switch_errors_by_site ${out_vcf} ${pedigree}
+#fi
 
 if [ ! -f "${out_trio_by_site_mac}.txt.gz" ]; then
   module purge
@@ -82,12 +82,12 @@ if [ ! -f "${out_trio_by_site_mac}.txt.gz" ]; then
 fi
 
 # calculate switch errors using trio samples
-if [ ! -f "${out_trio}" ]; then
-  module purge
-  module load BCFtools/1.12-GCC-10.3.0
-  make_tabix ${out_vcf} "tbi"
-  bcftools +trio-switch-rate ${out_vcf} -- -p ${pedigree} > ${out_trio}
-fi
+#if [ ! -f "${out_trio}" ]; then
+#  module purge
+#  module load BCFtools/1.12-GCC-10.3.0
+#  make_tabix ${out_vcf} "tbi"
+#  bcftools +trio-switch-rate ${out_vcf} -- -p ${pedigree} > ${out_trio}
+#fi
 
 
 

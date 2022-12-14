@@ -43,7 +43,8 @@ calc_burden() {
    --knockout_dir ${knockout_dir} \
    --knockout_pattern ${knockout_regex} \
    --out_prefix "${out_prefix_variable}" \
-   --variable "${variable}"
+   --variable "${variable}" \
+   --method "poisson"
 }
 
 #calc_burden "cis"

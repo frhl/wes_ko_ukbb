@@ -21,10 +21,13 @@ readonly phenotype=${9?Error: Missing arg9 (phenotype)}
 
 readonly spark_dir="data/tmp/spark"
 readonly hail_script="scripts/conditional/common/02_filter_genotypes.py"
+readonly rstatus="${out_prefix}.running"
+
 
 filter_genotypes() 
 {
   if [ ! -f ${out_prefix}.vcf.bgz ]; then
+    touch ${rstatus} 
     python3 "${hail_script}" \
        --min_maf ${min_maf} \
        --min_info ${min_info} \
@@ -38,6 +41,7 @@ filter_genotypes()
        --min_maf_by_case_control \
        && print_update "Finished filtering imputed genotypes ${out_prefix}" ${SECONDS} \
        || raise_error "Filtering imputed genotypes for for ${out_prefix} failed!"
+  rm ${rstatus}
   else
     >%2 echo "${out_prefix}.vcf.bgz already exists. Skipping.."
   fi

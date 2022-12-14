@@ -3,6 +3,7 @@
 set -o errexit
 set -o nounset
 
+source utils/qsub_utils.sh
 source utils/bash_utils.sh
 
 readonly rscript="scripts/conditional/rare/_make_variant_tables.R"
@@ -16,7 +17,8 @@ readonly pheno_list_csv=${6?Error: Missing arg6 (pheno_list_csv)}
 readonly covar_path=${7?Error: Missing arg7 (covar_path)}
 readonly out_prefix=${8?Error: Missing arg8 (out_prefix)}
 
-readonly chunk=${SGE_TASK_ID}
+readonly cluster=$( get_current_cluster)
+readonly chunk=$( get_array_task_id )
 readonly out_prefix_chunk="${out_prefix}.${chunk}of${total_chunks}"
 
 readonly hash_file="${out_prefix_chunk}.hash.txt.gz" 

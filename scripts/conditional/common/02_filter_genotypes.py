@@ -25,6 +25,7 @@ def main(args):
     pheno_file = args.pheno_file
     phenotype = args.phenotype
     trait = args.trait 
+    checkpoint = args.checkpoint
 
     reference_genome = 'GRCh38'
     hail_init.hail_bmrc_init_local(
@@ -143,6 +144,9 @@ def main(args):
                     ':')
                 ) 
 
+    if checkpoint:
+        mt = mt.checkpoint(out_prefix + "_checkpoint.mt", overwrite = True)
+
     # Import phenotypes for MAF thresholding
     if  pheno_file and min_maf_by_case_control and trait in "binary":
         ht = hl.import_table(pheno_file,
@@ -152,9 +156,9 @@ def main(args):
                      force=True,
                      key='eid')
         # subset min-maf by case controls
-        mt = mt.annotate_cols(pheno=ht[mt.s])
-        cases = mt.aggregate_cols(hl.agg.sum(mt.pheno[phenotype] == 1))
-        controls = mt.aggregate_cols(hl.agg.sum(mt.pheno[phenotype] == 0)) 
+        mt = mt.annotate_cols(pheno=ht[mt.s][phenotype])
+        cases = mt.aggregate_cols(hl.agg.sum(mt[phenotype] == 1))
+        controls = mt.aggregate_cols(hl.agg.sum(mt[phenotype] == 0)) 
         min_maf = hl.max(0.01, 25/(2 * hl.min([cases, controls]))).collect()[0]
         
         # write to outfile
@@ -183,6 +187,7 @@ if __name__ == '__main__':
     parser.add_argument('--phenotype', default=None, help='Actual phenotpe for min_maf thresholding')
     parser.add_argument('--pheno_file', default=None, help='Path to phenotypes for min_maf thresholding')
     parser.add_argument('--min_maf_by_case_control', default=None, action="store_true", help='Should min_maf be set by case-control ratio?')
+    parser.add_argument('--checkpoint', default=None, action="store_true", help='Should checkpoints be created along the way')
     parser.add_argument('--trait', default=None, help='What is the trait?')
     args = parser.parse_args()
 

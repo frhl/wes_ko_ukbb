@@ -59,14 +59,14 @@ qsub_by_mac_bin() {
   local bin=${1}
   echo "Submitting by mac_bin ${bin}.."
   qsub_agreement 0.50 ${bin}
-  qsub_agreement 0.60 ${bin}
-  qsub_agreement 0.70 ${bin}
-  qsub_agreement 0.75 ${bin}
-  qsub_agreement 0.80 ${bin}
-  qsub_agreement 0.85 ${bin}
+  #qsub_agreement 0.60 ${bin}
+  #qsub_agreement 0.70 ${bin}
+  #qsub_agreement 0.75 ${bin}
+  #qsub_agreement 0.80 ${bin}
+  #qsub_agreement 0.85 ${bin}
   qsub_agreement 0.90 ${bin}
-  qsub_agreement 0.95 ${bin}
-  qsub_agreement 0.99 ${bin}
+  #qsub_agreement 0.95 ${bin}
+  #qsub_agreement 0.99 ${bin}
 }
 
 qsub_by_mac_bin "singleton"

@@ -91,7 +91,7 @@ submit_intervals()
 }
 
 # Use PRS when available
-readonly use_prs=1
+readonly use_prs=0
 
 submit_binary_intervals "pLoF_damaging_missense"
 #submit_cts_intervals "pLoF_damaging_missense"
