@@ -34,10 +34,10 @@ def main(args):
    
     mt = io.import_table(var_path, var_type, calc_info=False)
     
-    if sex not in 'both':
-        mt = samples.filter_to_sex(mt, sex)
-    if maf_max and maf_min:
-        mt = variants.filter_maf(mt, max_maf=float(maf_max), min_maf=float(maf_min))
+    #if sex not in 'both':
+    #    mt = samples.filter_to_sex(mt, sex)
+    #if maf_max and maf_min:
+    #    mt = variants.filter_maf(mt, max_maf=float(maf_max), min_maf=float(maf_min))
     if exclude:
         ht = hl.import_table(exclude, impute=True).key_by('varid')
         mt = mt.filter_rows(~hl.literal(set(ht.varid.collect())).contains(mt.varid))
@@ -50,10 +50,10 @@ def main(args):
     # we will not need to explode, beacuse we consider only one variant at the time
     #mt = mt.explode_rows(mt.consequence.vep.worst_csq_for_variant_canonical)
     
-    mt = mt.annotate_rows(
-        consequence_category=ko.csqs_case_builder(
-                worst_csq_expr=mt.consequence.vep.worst_csq_for_variant_canonical,
-                use_loftee=use_loftee))
+    #mt = mt.annotate_rows(
+    #    consequence_category=ko.csqs_case_builder(
+    #            worst_csq_expr=mt.consequence.vep.worst_csq_for_variant_canonical,
+    #            use_loftee=use_loftee))
 
     # subset to current csqs category
     mt = mt.filter_rows(hl.literal(set(csqs_category)).contains(mt.consequence_category)) 
@@ -71,9 +71,7 @@ def main(args):
     mt = mt.annotate_rows(rsid=varid)
 
     # get MAC
-    mt = mt.annotate_rows(
-            MAC=hl.min(hl.agg.call_stats(mt.GT, mt.alleles).AC)
-            )
+    mt = mt.annotate_rows(MAC=hl.min(hl.agg.call_stats(mt.GT, mt.alleles).AC))
 
     # create list of markers in data
     ht = mt.rows()

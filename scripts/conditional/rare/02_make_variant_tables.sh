@@ -9,28 +9,32 @@
 #SBATCH --error=logs/make_variant_tables.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1,17
+#SBATCH --array=22
 
 set -o errexit
 set -o nounset
 
-module purge
+source utils/qsub_utils.sh
 source utils/bash_utils.sh
+source utils/vcf_utils.sh
 
 readonly curwd=$(pwd)
 readonly make_script="scripts/conditional/rare/_make_variant_tables.sh"
 readonly merge_script="scripts/conditional/rare/_merge_variant_tables.sh"
 
-readonly chr="${SLURM_ARRAY_TASK_ID}"
+readonly cluster=$( get_current_cluster)
+readonly task_id=$( get_array_task_id )
+readonly chr=$( get_chr ${task_id} )
+
 readonly pheno_dir="data/phenotypes"
-readonly in_dir="data/conditional/rare/combined"
+readonly in_dir="data/conditional/rare/combined/mt"
 readonly out_dir="data/conditional/rare/combined/chunks"
 
-readonly in_vcf="${in_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense.vcf.bgz"
+readonly in_vcf="${in_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense.vcf.bgz"
 readonly covar_path="${pheno_dir}/covars1.csv"
 
-readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense"
-readonly out_mrg="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense"
+readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense"
+readonly out_mrg="${out_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense"
 
 mkdir -p ${out_dir}
 
@@ -38,7 +42,6 @@ mkdir -p ${out_dir}
 int_div () {
   echo $(( $(( ${1} + ${2} - 1)) / ${2} ))
 }
-
 # how many chunks should be employed (up to 2 qc cores needed for 1000 lines chunks).
 readonly vcf_lines=$( zcat "${in_vcf}" | grep -v "#" | cut -f1 | wc -l )
 readonly lines_per_chunk=1000
@@ -50,10 +53,11 @@ readonly project="lindgren.prj"
 readonly nslots=2
 readonly tasks="1-${chunks}"
 
+
 submit_binary(){
   local trait="binary"
-  local pheno_list="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
-  local pheno_file="${pheno_dir}/curated_covar_phenotypes_binary_200k.tsv" 
+  local pheno_list="${pheno_dir}/spiros_brava_phenotypes_binary_200k_header.tsv"
+  local pheno_file="${pheno_dir}/spiros_brava_phenotypes_binary_200k.tsv.gz"
   submit_qc_job ${pheno_list} ${pheno_file} ${trait}
 }
 
@@ -84,7 +88,7 @@ submit_qc_job()
   local slurm_main_queue="${queue}"
   local slurm_main_nslots="${nslots}"
   readonly make_jid=$( sbatch \
-    --account="${slurm_project}" \
+    --account="${slurm_main_project}" \
     --job-name="${slurm_main_jname}" \
     --output="${slurm_main_lname}.log" \
     --error="${slurm_main_lname}.errors.log" \
@@ -109,7 +113,7 @@ submit_qc_job()
   local slurm_merge_queue="${queue}"
   local slurm_merge_nslots="1"
   readonly merge_jid=$( sbatch \
-    --account="${slurm_project}" \
+    --account="${slurm_merge_project}" \
     --job-name="${slurm_merge_jname}" \
     --output="${slurm_merge_lname}.log" \
     --error="${slurm_merge_lname}.errors.log" \
