@@ -5,7 +5,7 @@
 #$ -o logs/case_overlap.log
 #$ -e logs/case_overlap.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 3
+#$ -pe shmem 1
 #$ -q short.qc
 #$ -V
 
@@ -27,7 +27,7 @@ mkdir -p ${out_dir}
 set_up_rpy
 Rscript ${rscript} \
   --phenos ${phenos} \
-  --header ${phenos} \
+  --header ${header} \
   --out_prefix ${out_prefix}
 
 
