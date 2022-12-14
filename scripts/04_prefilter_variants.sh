@@ -40,8 +40,8 @@ readonly in_dir="data/mt/annotated"
 readonly input_prefix="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.mt"
 readonly input_type="mt"
 
-readonly out_dir="data/mt/prefilter/final_80"
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp80.maf0_005"
+readonly out_dir="data/mt/prefilter/final_90_loftee"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005"
 readonly out_type="mt"
 
 # remove these common plofs (90% pop)

@@ -20,7 +20,6 @@ def main(args):
     maf_max = args.maf_max
     maf_min = args.maf_min
     exclude = args.exclude
-    use_loftee = args.use_loftee
     pp_cutoff = args.pp_cutoff
     partitions = args.partitions
 
@@ -62,7 +61,7 @@ def main(args):
         transcript_id=mt.consequence.vep[csqs_expr].transcript_id,
         consequence_category=ko.csqs_case_builder(
                 worst_csq_expr=mt.consequence.vep[csqs_expr],
-                use_loftee=use_loftee))
+                use_loftee=True))
 
     # repartition data
     if partitions:
@@ -84,7 +83,6 @@ if __name__=='__main__':
     parser.add_argument('--exclude', default=None, help='exclude variants by rsid and/or variant id')
     parser.add_argument('--pp_cutoff', default=None, help='exclude variants by rsid and/or variant id')
     parser.add_argument('--partitions', default=None, help='Should the data be repartitioned')
-    parser.add_argument('--use_loftee', default=False, action='store_true', help='use LOFTEE to distinghiush between high confidence PTVs')
 
     args = parser.parse_args()
 
