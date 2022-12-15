@@ -5,7 +5,7 @@
 #SBATCH -D /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/phenotypes_binary.log
 #SBATCH --error=logs/phenotypes_binary.errors.log
-#SBATCH --partition=short
+#SBATCH --partition=epyc
 #SBATCH --cpus-per-task 5
 
 source utils/bash_utils.sh
@@ -20,9 +20,10 @@ readonly covar_dir="data/phenotypes"
 readonly out_dir="data/phenotypes"
 
 readonly in_bin="${in_dir}/curated_phenotypes_binary.tsv"
-readonly tmp_bin="${out_dir}/spiros_brava_phenotypes_binary.tsv.gz"
-readonly out_bin_500k="${out_dir}/spiros_brava_phenotypes_binary_500k"
-readonly out_bin_200k="${out_dir}/spiros_brava_phenotypes_binary_200k"
+readonly in_cts="${in_dir}/curated_phenotypes_cts.tsv"
+readonly tmp_bin="${out_dir}/dec22_phenotypes_binary.tsv.gz"
+readonly out_bin_500k="${out_dir}/dec22_phenotypes_binary_500k"
+readonly out_bin_200k="${out_dir}/dec22_phenotypes_binary_200k"
 
 readonly vcf_sample_dir="data/phased/wes_union_calls/200k/shapeit5/ligated"
 readonly vcf_sample="${vcf_sample_dir}/ukb_wes_union_calls_200k_chr22.vcf.bgz"
@@ -48,9 +49,11 @@ if [ ! -f ${tmp_bin} ]; then
     --input_path ${in_bin} \
     --covariates ${covariates} \
     --qc_samples ${final_sample_list} \
+    --input_path_cts_to_bin ${in_cts} \
     --case_count_cutoff "50" \
     --include_spiros \
     --include_brava \
+    --include_lindgren \
     --out_path ${tmp_bin}
 fi
 
@@ -62,14 +65,14 @@ set_up_pythonpath_legacy
 set -eu
 
 # get 500k WES samples
-#if [ ! -f ${out_bin_500k} ]; then
-#  >&2 echo "Genertating 500K.."
-#  python3 "${hail_script}" \
-#     --input_path "${tmp_bin}" \
-#     --export_header \
-#     --count_case_control \
-#     --out_prefix "${out_bin_500k}"
-#fi
+if [ ! -f ${out_bin_500k} ]; then
+  >&2 echo "Genertating 500K.."
+  python3 "${hail_script}" \
+     --input_path "${tmp_bin}" \
+     --export_header \
+     --count_case_control \
+     --out_prefix "${out_bin_500k}"
+fi
 
 
 if [ ! -f "${out_bin_500k}.tsv.gz" ]; then
