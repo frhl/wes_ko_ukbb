@@ -20,7 +20,7 @@ readonly trait=${8?Error: Missing arg8 (trait)}
 readonly phenotype=${9?Error: Missing arg9 (phenotype)}
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/conditional/common/02_filter_genotypes.py"
+readonly hail_script="scripts/conditional/common/04_filter_genotypes.py"
 readonly rstatus="${out_prefix}.running"
 readonly checkpoint="${out_prefix}_checkpoint.mt"
 
