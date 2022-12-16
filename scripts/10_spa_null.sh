@@ -152,7 +152,7 @@ submit_spa_null() {
 # Parameters
 readonly use_prs=1
 readonly nslots=2
-readonly queue="epyc"
+readonly queue="short"
 readonly project="lindgren.prj"
 
 # Fit null model for binary/cts traits

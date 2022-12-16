@@ -26,7 +26,7 @@ def main(args):
     # import phased/unphased data
     hail_init.hail_bmrc_init('logs/hail/knockout.log', 'GRCh38')
     mt = io.import_table(input_path, input_type, calc_info = True) 
-   # check that all sites are phased
+    # check that all sites are phased
     #unphased_expr = (~ko.is_phased(mt.GT)) & (hl.is_defined(mt.GT))
     #unphased_sites = mt.aggregate_entries(hl.agg.sum(unphased_expr))
     #if unphased_sites > 0:

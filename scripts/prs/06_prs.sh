@@ -5,9 +5,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/prs.log
 #SBATCH --error=logs/prs.errors.log
-#SBATCH --partition=epyc
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=50-100
+#SBATCH --array=1-300
 #
 #
 #$ -N prs
@@ -17,7 +17,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 200-300
+#$ -t 1-250
 #$ -V
 
 set -o errexit
@@ -40,7 +40,7 @@ readonly mrg_dir="data/prs/scores"
 
 # do not run files that have h2 estimates
 # above the given p-value cutoff (nominal).
-readonly ldsc_pvalue_cutoff=0.001
+readonly ldsc_pvalue_cutoff=0.05
 
 readonly cluster=$( get_current_cluster )
 readonly index=$( get_array_task_id )
@@ -231,11 +231,11 @@ clean_pgs()
 }
 
 # parameters
-readonly queue="epyc"
+readonly queue="short"
 readonly project="lindgren.prj"
 readonly tasks=1-22
 
-submit_ldpred2 "auto" "1" "${phenotype_binary}"
+submit_ldpred2 "auto" "2" "${phenotype_binary}"
 #submit_ldpred2 "auto" "6" "${phenotype_cts}_int"
 #submit_ldpred2 "auto" "6" "${phenotype_cts}"
 

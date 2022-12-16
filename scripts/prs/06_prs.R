@@ -39,11 +39,11 @@ main <- function(args){
   pvalue <- ldsc$coefficients$pvalue[2]
 
   # cutoff prs if z-score estimate is not good enough
-  if (!is.null(ldsc_pvalue_cutoff)){
-    ldsc_pvalue_cutoff <- as.numeric(ldsc_pvalue_cutoff)
-    if (pvalue > ldsc_pvalue_cutoff){
-      stop(paste("p-value",pvalue,">", ldsc_pvalue_cutoff, "(cutoff). Stopping.")).
-    }
+  if (!is.null(args$ldsc_pvalue_cutoff)){
+    pvalue_cutoff <- as.numeric(args$ldsc_pvalue_cutoff)
+    if (pvalue > pvalue_cutoff) stop("phenotype does not pass threshold")
+    #stop(paste("p-value",pvalue,">", ldsc_pvalue_cutoff, "(cutoff). Stopping.")).
+    #}
   }
 
   # Estimate h2 chromosome-wide
