@@ -7,20 +7,16 @@ import argparse
 from ukb_utils import hail_init
 from ukb_utils import genotypes
 from ukb_utils import variants
-from ukb_utils import samples
-from ko_utils import io
-from ko_utils.variants import filter_min_maf, filter_missing
 
 
 def main(args):
 
     out_prefix = args.out_prefix
-    gene_table = args.gene_table
+    intervals = args.intervals
     extract = args.extract
     min_info = float(args.min_info)
     min_maf = float(args.min_maf)
     missing = float(args.missing)
-    padding = int(float(args.padding))
     min_maf_by_case_control = args.min_maf_by_case_control
     pheno_file = args.pheno_file
     phenotype = args.phenotype
@@ -28,111 +24,53 @@ def main(args):
     checkpoint = args.checkpoint
 
     reference_genome = 'GRCh38'
-    hail_init.hail_bmrc_init_local(
-        'logs/hail/hail_conditional_tables.log',
-        reference_genome)
-    hl._set_flags(no_whole_stage_codegen='1')
-
-    # import table of start/end contigs
-    ht = hl.import_table(
-        gene_table,
-        force=True,
-        delimiter='\t',
-        missing='',
-        types={
-            'contig': hl.tstr,
-            'start': hl.tint,
-            'end': hl.tint})
-    ht = ht.annotate(contig=hl.delimit(['chr', ht.contig], ''))
+    hail_init.hail_bmrc_init(log='logs/hail/filter_genotyoes.log', default_reference=reference_genome, min_block_size=128) 
     
-    # get refernece genome with lengths
-    rg = hl.get_reference('GRCh38')
-    chr_lens = hl.literal(rg.lengths)
-    ht = ht.annotate(contig_length=chr_lens[ht.contig])
-
-    # annotate regions with padding
-    ht = ht.annotate(ranges=hl.array([ht.start, ht.end]))
-    ht = ht.annotate(
-        end=hl.max(ht.ranges),
-        start=hl.min(ht.ranges))
-    ht = ht.annotate(
-        end_with_padding=hl.min(hl.array([ht.end + padding, ht.contig_length])),
-        start_with_padding=hl.max(hl.array([ht.start - padding, 1])))
-    ht = ht.drop(ht.ranges)
-
-    # check if locus is valid, i.e. does it go above contig
-    # length? This is only an issue when padding is large
-    ht = ht.annotate(
-        start_valid=hl.is_valid_locus(
-            ht.contig,
-            ht.start_with_padding,
-            reference_genome))
-    ht = ht.annotate(
-        end_valid=hl.is_valid_locus(
-            ht.contig,
-            ht.end_with_padding,
-            reference_genome))
-    ht = ht.annotate(
-            valid_intervals=ht.start_valid & ht.end_valid)
-
-    defined_coords = hl.is_defined(ht.valid_intervals)
-    n_drop = ht.filter(~defined_coords).count()
-    if n_drop > 0:
-        print(f'Dropping {n_drop} undefined start/end genomic coordinates.')
-    ht = ht.filter(defined_coords)
-    invalid_intervals = ht.filter(~ht.valid_intervals).count()
-    assert invalid_intervals == 0, 'Some of the supplied intervals are outside current chromosome contig'
-    
-    # annotate intervals
-    ht = ht.annotate(
-        intervals=hl.locus_interval(
-            ht.contig,
-            ht.start_with_padding,
-            ht.end_with_padding,
-            True,
-            True,
-            reference_genome=reference_genome))
-
-    
+    # read HailTable of intervals
+    ht = hl.read_table(intervals)
     chromosomes = [x.replace('chr', '') for x in list(set(ht.contig.collect()))]
-    
-    # Get imputation scores
+   
+    # get imputation scores for chromosomes required. 
     mfis = list()
     for chrom in chromosomes:
         mfi = genotypes.get_ukb_imputed_v3_mfi(chrom)
         mfi = mfi.annotate(chrom = chrom)
         mfis.append(mfi)
-    
-    #hts = [genotypes.get_ukb_imputed_v3_mfi(chrom) for chrom in chromosomes]
+
+    # get variants from MFI
     mfi = mfis[0].union(*mfis[1:])
     mfi = mfi.annotate(ref = hl.if_else(mfi.f6 == mfi.a1, mfi.a2, mfi.a1))
     mfi = mfi.annotate(variant = hl.delimit([hl.str(mfi.chrom), hl.str(mfi.position), mfi.ref, mfi.f6], ':'))
     mfi = mfi.key_by(**hl.parse_variant(mfi.variant,  reference_genome= 'GRCh37'))
-    mfi = mfi.filter(mfi.info >= min_info)
-    
+
     # get imputed genotypes
     mt = genotypes.get_ukb_imputed_v3_bgen(chromosomes)
-    mt = samples.remove_withdrawn(mt)
-    mt = mt.filter_rows(hl.is_defined(mfi[mt.row_key]))
+    mt = mt.annotate_rows(info_score = mfi[mt.row_key].info)
     mt = mt.select_entries(mt.GT)
 
-    # Filter samples
+    # Filter to relevant samples
     if extract:
         ht_final_samples = hl.import_table(
             extract, no_header=True, key='f0', delimiter=',')
         mt = mt.filter_cols(hl.is_defined(ht_final_samples[mt.col_key]))
 
-    # filter variants based on missingness, 
-    # drop info field so that we don't have to recalculate
-    mt = io.recalc_info(mt)
-    mt = filter_missing(mt, missing)
-    mt = filter_min_maf(mt, min_maf)
-    mt = mt.drop('info')
-
-    # perform liftover to GRCh38 and filter to intervals
-    mt = variants.liftover(mt, fix_ref = True)
+    # perform variant filtering after subsetting samples
+    info_expr = mt.info_score > min_info
+    maf_expr = variants.get_maf_expr(mt) > min_maf
+    missing_expr = variants.get_missing_expr(mt) < missing
+    mt = mt.filter_rows((info_expr) & (maf_expr) & (missing_expr))
+    
+    # perform liftover
+    mt = variants.liftover(mt, fix_ref = False)
+    
+       # get intervals and filter file by the intervals
     hail_intervals = ht.intervals.collect()
     mt = hl.filter_intervals(mt, hail_intervals)
+    
+    # checkpoint after liftover
+    if checkpoint:
+        mt = mt.checkpoint(out_prefix + "_checkpoint.mt", overwrite = True)
+
 
     # add variant IDs
     mt = mt.annotate_rows(
@@ -144,10 +82,7 @@ def main(args):
                     ':')
                 ) 
 
-    if checkpoint:
-        mt = mt.checkpoint(out_prefix + "_checkpoint.mt", overwrite = True)
-
-    # Import phenotypes for MAF thresholding
+       # Import phenotypes for MAF thresholding
     if  pheno_file and min_maf_by_case_control and trait in "binary":
         ht = hl.import_table(pheno_file,
                      types={'eid': hl.tstr},
@@ -170,16 +105,14 @@ def main(args):
     else:
         raise ValueError("param 'phenotypes' is not set! ")
 
-
     hl.export_vcf(mt, out_prefix + '.vcf.bgz')
 
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--padding', default=0, help='How much extra padding should be included around genes (upstream/downsream)?')
     parser.add_argument('--extract', default=None, help='Path to HailTable that contains the final samples included in the analysis.')
-    parser.add_argument('--gene_table', default=None, help='Path to HailTable that contains the significant genes from primary analysis.')
+    parser.add_argument('--intervals', default=None, help='Path to HailTable that contains the significant genes from primary analysis.')
     parser.add_argument('--min_maf', default=0.01, help='What min_maf threshold should be used?')
     parser.add_argument('--min_info', default=0.8, help='What info threshold should be used?')
     parser.add_argument('--missing', default=0.1, help='What info threshold should be used?')
