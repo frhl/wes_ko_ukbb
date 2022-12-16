@@ -17,7 +17,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc
-#$ -t 1-21
+#$ -t 1-22
 #$ -V
 
 
@@ -41,7 +41,7 @@ readonly min_info=0.8
 readonly missing=0.10
 
 readonly out_dir="data/unphased/imputed/common"
-readonly out_prefix="${out_dir}/ukb_imp_200k_common"
+readonly out_prefix="${out_dir}/ukb_imp_200k_common_chr${chr}"
 readonly out_type="mt"
 
 mkdir -p ${out_dir}
