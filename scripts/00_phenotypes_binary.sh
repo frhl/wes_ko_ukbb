@@ -7,6 +7,16 @@
 #SBATCH --error=logs/phenotypes_binary.errors.log
 #SBATCH --partition=epyc
 #SBATCH --cpus-per-task 5
+#
+#
+#$ -N phenotypes_binary
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#$ -o logs/phenotypes_binary.log
+#$ -e logs/phenotypes_binary.errors.log
+#$ -P lindgren.prjc
+#$ -pe shmem 4
+#$ -q short.qc
+#$ -V
 
 source utils/bash_utils.sh
 source utils/hail_utils.sh
