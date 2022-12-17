@@ -102,6 +102,7 @@ main <- function(args){
     dt$AF <- map_by_variant(dt$id, map_af, message = "af")
     dt$AC <- map_by_variant(dt$id, map_ac, message = "ac")
     dt$AN <- map_by_variant(dt$id, map_an, message = "an")
+    dt$id <- NULL
 
     # make columns nicer
     new_order <- c("s","gene_id","transcript_id","varid","gts","AC", "AF", "AN", "hom_alt_n", "phased.a1", "phased.a2",
