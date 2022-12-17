@@ -48,8 +48,8 @@ def main(args):
                      key='eid')
         # subset min-maf by case controls
         mt = mt.annotate_cols(pheno=ht[mt.s][phenotype])
-        cases = mt.aggregate_cols(hl.agg.sum(mt.pheno[phenotype] == 1))
-        controls = mt.aggregate_cols(hl.agg.sum(mt.pheno[phenotype] == 0)) 
+        cases = mt.aggregate_cols(hl.agg.sum(mt.pheno[phenotype] == True))
+        controls = mt.aggregate_cols(hl.agg.sum(mt.pheno[phenotype] == False)) 
         min_maf = hl.max(0.01, 25/(2 * hl.min([cases, controls]))).collect()[0]
         
         # write to outfile
