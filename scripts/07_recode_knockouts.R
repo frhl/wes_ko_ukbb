@@ -5,7 +5,7 @@ library(data.table)
 library(stringr)
 
 # create mapping to used by map_by_variant
-create_mapping <- function(dt, what, id="varid"){
+create_mapping <- function(dt, what, id="id"){
     stopifnot(what %in% colnames(dt))
     stopifnot(id %in% colnames(dt))
     mapping <- dt[[what]]
@@ -13,10 +13,32 @@ create_mapping <- function(dt, what, id="varid"){
     return(mapping)
 }
 
+# create ID based on variant id and gene id
+create_id <- function(dt){
+    stopifnot("gene_id" %in% colnames(dt))
+    stopifnot("varid" %in% colnames(dt))
+    n <- nrow(dt)
+    ids <- unlist(lapply(1:n, function(idx){
+        variant <- dt$varid[idx]
+        gene <- dt$gene_id[idx]
+        at_least_two <- stringr::str_detect(variant, ";")
+         if (at_least_two){
+            id <- unlist(strsplit(variant, ";"))
+            id <- paste(gene, id, sep = ":")
+            return(paste0(id, collapse = ";"))
+        } else {
+            id <- paste(gene, variant, sep = ":")
+            return(id)
+        }
+    }))
+    return(ids)
+}
+
 # map by variant
-map_by_variant <- function(variants, mapping, allow_dups=TRUE){
-    stopifnot(any(names(mapping) %in% variants))
-    mapped <- unlist(lapply(variants, function(v){
+map_by_variant <- function(ids, mapping, allow_dups=TRUE, message=""){
+    stopifnot(any(names(mapping) %in% ids))
+    if (nchar(message)>0) write(message,stdout())
+    mapped <- unlist(lapply(ids, function(v){
         at_least_two <- stringr::str_detect(v, ";")
         if (at_least_two){
             vs <- unlist(strsplit(v, ";"))
@@ -32,6 +54,8 @@ map_by_variant <- function(variants, mapping, allow_dups=TRUE){
     return(mapped)
 }
 
+
+
 main <- function(args){
 
     input_path <- args$input_path
@@ -41,44 +65,52 @@ main <- function(args){
     dt <- fread(input_path)
     annotation <- fread(vep_path)
 
+    # create ID fields for mapping
+    colnames(annotation) <- gsub("worst_csq_by_gene_canonical\\.","",colnames(annotation))
+    annotation$id <- paste0(annotation$gene_id,":", annotation$varid)
+    dt$id <- create_id(dt) 
+
     # check that all variants are contained
-    variants_in_dt <- unlist(strsplit(dt$varid, split = ";"))
-    ok <- as.logical(sum(variants_in_dt %in% annotation$varid)/length(variants_in_dt))
+    variants_in_dt <- unlist(strsplit(dt$id, split = ";"))
+    ok <- as.logical(sum(variants_in_dt %in% annotation$id)/length(variants_in_dt))
     stopifnot(ok)
     
-    # create mapping
-    map_mac <- create_mapping(annotation, "MAC")
-    map_af <- create_mapping(annotation, "info.AF")
-    map_maf <- create_mapping(annotation, "MAF")
-    map_enstid <- create_mapping(annotation, "csqs.transcript_id")
-    map_exon <- create_mapping(annotation, "csqs.exon")
-    map_intron <- create_mapping(annotation, "csqs.intron")
-    map_revel <- create_mapping(annotation, "csqs.revel_score")
-    map_cadd <- create_mapping(annotation, "csqs.cadd_phred")
-    map_function_csqs <- create_mapping(annotation, "csqs.most_severe_consequence")
+    # create mapping to VEP annotations
+    map_enstid <- create_mapping(annotation, "transcript_id")
+    map_exon <- create_mapping(annotation, "exon")
+    map_intron <- create_mapping(annotation, "intron")
+    map_revel <- create_mapping(annotation, "revel_score")
+    map_cadd <- create_mapping(annotation, "cadd_phred")
+    map_function_csqs <- create_mapping(annotation, "most_severe_consequence")
     map_csqs <- create_mapping(annotation, "consequence_category")
-    map_codons <- create_mapping(annotation, "csqs.codons")
-    map_amino_acids <- create_mapping(annotation, "csqs.amino_acids")
+    map_codons <- create_mapping(annotation, "codons")
+    map_amino_acids <- create_mapping(annotation, "amino_acids")
 
-    # map items from vep
-    dt$consequence_category <- map_by_variant(dt$varid, map_csqs)
-    dt$most_severe_consequence <- map_by_variant(dt$varid, map_function_csqs)
-    dt$AF <- map_by_variant(dt$varid, map_af)
-    dt$MAF <- map_by_variant(dt$varid, map_maf)
-    dt$MAC <- map_by_variant(dt$varid, map_mac)
-    dt$transcript <- map_by_variant(dt$varid, map_enstid, allow_dups = FALSE)
-    dt$exon <- map_by_variant(dt$varid, map_exon)
-    dt$intron <- map_by_variant(dt$varid, map_intron)
-    dt$codons <- map_by_variant(dt$varid, map_codons)
-    dt$amino_acids <- map_by_variant(dt$varid, map_amino_acids)
+    # cerarte mapping to INFO annotations
+    map_af <- create_mapping(annotation, "info.AF")
+    map_ac <- create_mapping(annotation, "info.AC")
+    map_an <- create_mapping(annotation, "info.AN")
+
+    # map items from 
+    dt$consequence_category <- map_by_variant(dt$id, map_csqs, message="csqs_category")
+    dt$most_severe_consequence <- map_by_variant(dt$id, map_function_csqs, message="most_severe_csqs")
+    dt$transcript_id <- map_by_variant(dt$id, map_enstid, allow_dups = FALSE, message="trancript")
+    dt$exon <- map_by_variant(dt$id, map_exon, message="exon")
+    dt$intron <- map_by_variant(dt$id, map_intron, message="intron")
+    dt$revel_score <- map_by_variant(dt$id, map_revel, message="revel_score")
+    dt$cadd_phred <- map_by_variant(dt$id, map_cadd, message="cadd_phred")
+    dt$AF <- map_by_variant(dt$id, map_af, message = "af")
+    dt$AC <- map_by_variant(dt$id, map_ac, message = "ac")
+    dt$AN <- map_by_variant(dt$id, map_an, message = "an")
 
     # make columns nicer
-    new_order <- c("s","gene_id","transcript","varid","gts","hom_alt_n", "phased.a1", "phased.a2",
-                   "unphased.n", "pKO" ,"knockout", "consequence_category", "most_severe_consequence",
-                   'AF', 'MAF', 'MAC', 'transcript','exon','intron','codons','amino_acids')
+    new_order <- c("s","gene_id","transcript_id","varid","gts","AC", "AF", "AN", "hom_alt_n", "phased.a1", "phased.a2",
+                   "unphased.n", "pKO" ,"knockout","consequence_category", "most_severe_consequence",
+                   "revel_score", "cadd_phred",'exon','intron')
     stopifnot(all(new_order %in% colnames(dt)))
     stopifnot(all(colnames(dt) %in% new_order))
-    
+    dt <- dt[,new_order, with=FALSE]
+
     # create subsets and export
     only_plofs <- grepl("pLoF", dt$consequence_category) & !grepl("damaging_missense", dt$consequence_category)
     only_missense <- !grepl("pLoF", dt$consequence_category) & grepl("damaging_missense", dt$consequence_category)

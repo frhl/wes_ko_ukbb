@@ -32,13 +32,13 @@ readonly cluster=$( get_current_cluster )
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
-readonly vep_dir="data/mt/vep/worst_csq_by_gene_canonical"
-readonly vep_file="${vep_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.pp90.tsv.gz"
+readonly vep_dir="data/mt/prefilter/final_90_loftee"
+readonly vep_file="${vep_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.csqs.txt.gz"
 
 readonly in_dir="data/knockouts/alt/pp90/combined"
 readonly input_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense_all.tsv.gz"
 
-readonly out_dir="data/knockouts/alt/pp90/recoded"
+readonly out_dir="data/knockouts/alt/pp90/recoded_test"
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}.pp90.recoded"
 
 mkdir -p ${out_dir}
