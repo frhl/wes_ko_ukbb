@@ -6,8 +6,8 @@
 #SBATCH --output=logs/export_imputed.log
 #SBATCH --error=logs/export_imputed.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 1
-#SBATCH --array=6
+#SBATCH --cpus-per-task 8
+#SBATCH --array=1-22
 #
 #
 #$ -N export_imputed
@@ -15,9 +15,9 @@
 #$ -o logs/export_imputed.log
 #$ -e logs/export_imputed.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 2
+#$ -pe shmem 6
 #$ -q short.qc
-#$ -t 1-22
+#$ -t 3-19
 #$ -V
 
 
@@ -40,24 +40,28 @@ readonly min_maf=0.01
 readonly min_info=0.8
 readonly missing=0.10
 
-readonly out_dir="data/unphased/imputed/common"
+readonly out_dir="data/unphased/imputed/common_8cores"
 readonly out_prefix="${out_dir}/ukb_imp_200k_common_chr${chr}"
 readonly out_type="mt"
 
+readonly out_checkpoint="${out_prefix}_checkpoint.mt"
+
 mkdir -p ${out_dir}
 
-set_up_hail
-set_up_pythonpath_legacy
-python3 "${hail_script}" \
-     --chrom ${chr} \
-     --min_maf ${min_maf} \
-     --min_info ${min_info} \
-     --missing ${missing} \
-     --extract ${final_sample_list} \
-     --out_prefix ${out_prefix} \
-     --out_type ${out_type} \
-     && print_update "Finished filtering imputed genotypes ${out_prefix}" ${SECONDS} \
-     || raise_error "Filtering imputed genotypes for for ${out_prefix} failed!"
-
-
+if [ ! -f "${out_prefix}.mt/_SUCCESS" ]; then
+  rm -rf "${out_prefix}.mt"
+  set_up_hail
+  set_up_pythonpath_legacy
+  python3 "${hail_script}" \
+       --chrom ${chr} \
+       --min_maf ${min_maf} \
+       --min_info ${min_info} \
+       --missing ${missing} \
+       --extract ${final_sample_list} \
+       --out_prefix ${out_prefix} \
+       --out_type ${out_type} \
+       && print_update "Finished filtering imputed genotypes ${out_prefix}" ${SECONDS} \
+       || raise_error "Filtering imputed genotypes for for ${out_prefix} failed!"
+  rm -rf ${out_checkpoint}
+fi
 

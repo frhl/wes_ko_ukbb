@@ -94,11 +94,7 @@ submit_intervals()
           --parsable \
           "${bash_script}" \
           "${intervals}" \
-          "${final_sample_list}" \
           "${out_prefix}" \
-          "${min_maf}" \
-          "${min_info}" \
-          "${missing}" \
           "${pheno_file}" \
           "${trait}" \
           "${phenotype}"
@@ -113,11 +109,7 @@ submit_intervals()
           -pe shmem ${slurm_shmem} \
           "${bash_script}" \
           "${intervals}" \
-          "${final_sample_list}" \
           "${out_prefix}" \
-          "${min_maf}" \
-          "${min_info}" \
-          "${missing}" \
           "${pheno_file}" \
           "${trait}" \
           "${phenotype}"

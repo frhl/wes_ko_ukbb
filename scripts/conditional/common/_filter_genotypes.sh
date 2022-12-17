@@ -10,14 +10,10 @@ source utils/vcf_utils.sh
 source utils/hail_utils.sh
 
 readonly intervals=${1?Error: Missing arg1 (Gene table intervals)}
-readonly final_sample_list=${2?Error: Missing arg2 (samples to include)}
-readonly out_prefix=${3?Error: Missing arg3 (out prefix)}
-readonly min_maf=${4?Error: Missing arg5 (Filter variants by min MAF)}
-readonly min_info=${5?Error: Missing arg1 (Filter variants by min INFO)}
-readonly missing=${6?Error: Missing arg1 (Filter variants by min INFO)}
-readonly pheno_file=${7?Error: Missing arg7 (pheno_file)}
-readonly trait=${8?Error: Missing arg8 (trait)}
-readonly phenotype=${9?Error: Missing arg9 (phenotype)}
+readonly out_prefix=${2?Error: Missing arg3 (out prefix)}
+readonly pheno_file=${3?Error: Missing arg7 (pheno_file)}
+readonly trait=${4?Error: Missing arg8 (trait)}
+readonly phenotype=${5?Error: Missing arg9 (phenotype)}
 
 readonly spark_dir="data/tmp/spark"
 readonly hail_script="scripts/conditional/common/04_filter_genotypes.py"
@@ -31,16 +27,11 @@ filter_genotypes()
     >&2 echo "Python will be used now:"
     touch ${rstatus} 
     python3 "${hail_script}" \
-       --min_maf ${min_maf} \
-       --min_info ${min_info} \
-       --missing ${missing} \
        --intervals ${intervals} \
-       --extract ${final_sample_list} \
        --out_prefix ${out_prefix} \
        --pheno_file ${pheno_file} \
        --phenotype ${phenotype} \
        --trait ${trait} \
-       --checkpoint \
        --min_maf_by_case_control \
        && print_update "Finished filtering imputed genotypes ${out_prefix}" ${SECONDS} \
        || raise_error "Filtering imputed genotypes for for ${out_prefix} failed!"
