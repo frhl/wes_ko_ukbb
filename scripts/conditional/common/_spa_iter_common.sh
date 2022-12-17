@@ -6,6 +6,7 @@
 set -o errexit
 set -o nounset
 
+source utils/qsub_utils.sh
 source utils/bash_utils.sh
 
 readonly in_gmat=${1?Error: Missing arg1 (in_gmat)}

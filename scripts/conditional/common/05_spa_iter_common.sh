@@ -12,16 +12,31 @@
 #SBATCH --error=logs/spa_iter_common.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-5
-#SBATCH --requeue
+#SBATCH --array=1-10
+#
+#
+#$ -N spa_iter_common
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#$ -o logs/spa_iter_common.log
+#$ -e logs/spa_iter_common.errors.log
+#$ -P lindgren.prjc
+#$ -pe shmem 6
+#$ -q short.qc
+#$ -t 1-10
+#$ -V
 
 
 set -o errexit
 set -o nounset
 
+source utils/qsub_utils.sh
+source utils/bash_utils.sh
+
 readonly curwd=$(pwd)
 readonly bash_script="scripts/conditional/common/_spa_iter_common.sh"
 
+readonly cluster=$( get_current_cluster)
+readonly task_id=$( get_array_task_id )
 
 # parameters
 readonly min_maf=0.01
@@ -32,7 +47,7 @@ readonly P_cutoff="5e-6"
 # directories and paths
 readonly pheno_dir="data/phenotypes"
 readonly interval_dir="data/conditional/common/intervals/min_mac${min_mac}"
-readonly out_dir="data/conditional/common/spa_iter/"
+readonly out_dir="data/conditional/common/spa_iter"
 
 readonly grm_dir="data/saige/grm/input/dnanexus"
 readonly grm_mtx="${grm_dir}/ukb_eur_200k_grm_fitted_relatednessCutoff_0.05_2000_randomMarkersUsed.sparseGRM.mtx"
@@ -43,8 +58,8 @@ readonly in_prefix="ukb_eur_wes_200k"
 submit_binary_analysis()
 {
   local annotation="${1?Error: Missing arg1 (annotation)}"
-  local pheno_list="${pheno_dir}/spiros_brava_phenotypes_binary_200k_header.tsv"
-  local phenotype=$( sed "${SLURM_ARRAY_TASK_ID}q;d" ${pheno_list} )
+  local pheno_list="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
+  local phenotype=$( sed "${task_id}q;d" ${pheno_list} )
   submit_cond_spa "${annotation}" "${phenotype}" "binary"
 }
 
@@ -52,7 +67,7 @@ submit_cts_analysis()
 {
   local annotation="${1?Error: Missing arg1 (annotation)}"
   local pheno_list="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
-  local phenotype=$( sed "${SLURM_ARRAY_TASK_ID}q;d" ${pheno_list} )
+  local phenotype=$( sed "${task_id}q;d" ${pheno_list} )
   submit_cond_spa "${annotation}" "${phenotype}" "cts"
 }
 
@@ -73,36 +88,57 @@ submit_cond_spa()
 
   mkdir -p ${out_dir}
   if [ -f "${interval_vcf}" ]; then 
-    readonly slurm_tasks="${SLURM_ARRAY_TASK_ID}"
     readonly slurm_jname="_cond_${phenotype}"
     readonly slurm_lname="${out_prefix}"
     readonly slurm_project="lindgren.prj"
     readonly slurm_queue="long"
+    readonly sge_queue="short.qc"
     readonly slurm_shmem="1"
-    set -x
-    sbatch \
-      --account="${slurm_project}" \
-      --job-name="${slurm_jname}" \
-      --output="${slurm_lname}.log" \
-      --error="${slurm_lname}.errors.log" \
-      --chdir="${curwd}" \
-      --partition="${slurm_queue}" \
-      --cpus-per-task="${slurm_shmem}" \
-      --array=${slurm_tasks} \
-      --parsable \
-      "${bash_script}" \
-      "${in_gmat}" \
-      "${in_var}" \
-      "${interval_vcf}" \
-      "${out_prefix}" \
-      "${P_cutoff}" \
-      "${max_iter}" \
-      "${min_mac}" \
-      "${grm_mtx}" \
-      "${grm_sam}" \
-      "${phenotype}" \
-      "${min_maf}"
-    set +x
+    if [ "${cluster}" = "slurm" ]; then
+      sbatch \
+        --account="${slurm_project}" \
+        --job-name="${slurm_jname}" \
+        --output="${slurm_lname}.log" \
+        --error="${slurm_lname}.errors.log" \
+        --chdir="${curwd}" \
+        --partition="${slurm_queue}" \
+        --cpus-per-task="${slurm_shmem}" \
+        --array=${task_id} \
+        --parsable \
+        "${bash_script}" \
+        "${in_gmat}" \
+        "${in_var}" \
+        "${interval_vcf}" \
+        "${out_prefix}" \
+        "${P_cutoff}" \
+        "${max_iter}" \
+        "${min_mac}" \
+        "${grm_mtx}" \
+        "${grm_sam}" \
+        "${phenotype}" \
+        "${min_maf}"
+    elif [ "${cluster}" = "sge" ]; then
+     qsub -N "${slurm_jname}" \
+        -o "${slurm_lname}.log" \
+        -e "${slurm_lname}.errors.log" \
+        -P lindgren.prjc \
+        -wd $(pwd) \
+        -t ${task_id} \
+        -q "${sge_queue}" \
+        -pe shmem ${slurm_shmem} \
+        "${bash_script}" \
+        "${in_gmat}" \
+        "${in_var}" \
+        "${interval_vcf}" \
+        "${out_prefix}" \
+        "${P_cutoff}" \
+        "${max_iter}" \
+        "${min_mac}" \
+        "${grm_mtx}" \
+        "${grm_sam}" \
+        "${phenotype}" \
+        "${min_maf}"
+      fi
   else
     >&2 echo "${interval_vcf} (interval) does not exist. Exiting.."
   fi
