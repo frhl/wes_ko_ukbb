@@ -20,7 +20,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qa
-#$ -t 1
+#$ -t 1-22
 #$ -V
 
 set -o errexit
@@ -50,12 +50,12 @@ readonly exclude="data/genes/220310_common_plofs_to_exclude.txt"
 readonly maf_min=0.00
 readonly maf_max=0.05
 readonly pp_cutoff=0.90
-readonly partitions=256 # need at least 512 partitions for certain chroms/annotations
+readonly partitions=128
 
 mkdir -p ${out_dir}
 
-if [ ! -f "${out_prefix}.mt/_SUCCESS" ]; then
-  rm -rf "${out_prefix}.mt/"
+#if [ ! -f "${out_prefix}.mt/_SUCCESS" ]; then
+  #rm -rf "${out_prefix}.mt/"
   SECONDS=0
   set_up_hail
   set_up_pythonpath_legacy
@@ -71,9 +71,9 @@ if [ ! -f "${out_prefix}.mt/_SUCCESS" ]; then
      --partitions ${partitions} \
      && print_update "Finished annotating MatrixTables chr${chr}" ${SECONDS} \
      || raise_error "Annotating MatrixTables for chr${chr} failed"
-else
-  >&2 echo "${out_prefix}.mt already exists! Skipping"
-fi
+#else
+#  >&2 echo "${out_prefix}.mt already exists! Skipping"
+#fi
 
 
 

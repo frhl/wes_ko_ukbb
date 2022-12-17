@@ -9,7 +9,7 @@
 #SBATCH --error=logs/spa_null.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-300
+#SBATCH --array=1-320
 
 
 # all binary: 1 - 71
@@ -42,10 +42,11 @@ fit_binary_traits() {
   local trait_type="binary"
   local inv_normalize="FALSE"
   local out_dir="data/saige/output/binary/step1"
-  local pheno_list="${pheno_dir}/spiros_brava_phenotypes_binary_200k_header.tsv"
+  local pheno_list="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
   local phenotype=$( sed "${index}q;d" ${pheno_list} )
   local out="${out_dir}/${out_prefix}_${phenotype}"
-  pheno_file="${pheno_dir}/spiros_brava_phenotypes_binary_200k.tsv"
+  pheno_file="${pheno_dir}/dec22_phenotypes_binary_200k.tsv.gz"
+  #pheno_file="${pheno_dir}/spiros_brava_phenotypes_binary_200k.tsv"
   
   local out_pheno_prs="${out_dir}/${phenotype}_prs.txt.gz"
   local prs="${prs_dir}/${phenotype}_pgs_chrom.txt.gz"
@@ -150,7 +151,7 @@ submit_spa_null() {
 }
 
 # Parameters
-readonly use_prs=1
+readonly use_prs=0
 readonly nslots=2
 readonly queue="short"
 readonly project="lindgren.prj"

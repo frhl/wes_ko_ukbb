@@ -18,10 +18,13 @@ def main(args):
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
 
     # get file and annotate
-    mt = io.import_table(input_path=input_path, input_type=input_type, calc_info = False) # 12788
-    ht = mt.rows()
-    ht = ht.drop(ht.info)
-    hl.export_vcf(ht, out_prefix + ".vcf", tabix=True)
+    mt = io.import_table(input_path, input_type, calc_info = False)
+    samples = mt.s.collect()[1]
+    mt = mt.filter_cols(hl.literal(samples).contains(mt.s))
+    mt = mt.select_entries(mt.GT)
+    mt = mt.select_rows(mt.info)
+    mt = mt.drop(mt.info)
+    hl.export_vcf(mt, out_prefix + ".vcf")
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()

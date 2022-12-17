@@ -26,12 +26,6 @@ def main(args):
     # import phased/unphased data
     hail_init.hail_bmrc_init('logs/hail/knockout.log', 'GRCh38')
     mt = io.import_table(input_path, input_type, calc_info = True) 
-    # check that all sites are phased
-    #unphased_expr = (~ko.is_phased(mt.GT)) & (hl.is_defined(mt.GT))
-    #unphased_sites = mt.aggregate_entries(hl.agg.sum(unphased_expr))
-    #if unphased_sites > 0:
-    #    raise ValueError(f"{unphased_sites} genotypes are not phased!")
-    # some filtering 
     if sex not in 'both':
         mt = samples.filter_to_sex(mt, sex)
     if maf_min:
@@ -68,7 +62,20 @@ def main(args):
         mt = mt.repartition(int(partitions))
 
     # export result
-    io.export_table(mt, out_prefix, out_type)
+    #io.export_table(mt, out_prefix, out_type)
+
+    # export info
+    #ht = mt.rows()
+    #ht = ht.select(*[ht.varid, ht.info])
+    #ht.flatten().export(out_prefix + ".info.gz")
+    
+    # export info
+    ht = mt.rows()
+    ht = ht.select(*[ht.varid, ht.info, ht.consequence_category, ht.consequence.vep[csqs_expr]])
+    ht.flatten().export(out_prefix + ".csqs.txt.gz")
+
+
+
 
 
 if __name__=='__main__':

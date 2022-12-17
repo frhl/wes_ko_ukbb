@@ -22,9 +22,9 @@ readonly grch38="/well/lindgren/flassen/software/SpliceAI/spliceai/annotations/g
 readonly genome="/well/lindgren/flassen/software/SpliceAI/fasta/hg38.fa.gz"
 
 readonly chr=$( get_chr ${SGE_TASK_ID} ) 
-readonly in_file="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.vcf.bgz"
+readonly in_file="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.mt"
 readonly tmp_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_rows_chr${chr}"
-readonly tmp_file="${tmp_prefix}.mt"
+readonly tmp_file="${tmp_prefix}.vcf"
 readonly out_file="${out_dir}/ukb_wes_200k_full_spliceai_chr${chr}.vcf"
 
 readonly hail_script="scripts/01_spliceai.py"
@@ -37,7 +37,7 @@ set_up_hail
 set_up_pythonpath_legacy
 python3 "${hail_script}" \
      --input_path "${in_file}" \
-     --input_type "vcf" \
+     --input_type "mt" \
      --out_prefix "${tmp_prefix}" \
      && print_update "Finished writing rows for chr${chr}" ${SECONDS} \
      || raise_error "Hail writing rows for chr${chr} failed"

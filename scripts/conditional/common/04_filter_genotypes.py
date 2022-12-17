@@ -18,7 +18,7 @@ def main(args):
     phenotype = args.phenotype
     trait = args.trait 
 
-    print(f"running {trait}")
+    print(f"running {phenotype} using Hail..")
     reference_genome = 'GRCh38'
     hail_init.hail_bmrc_init(log='logs/hail/filter_genotyoes.log', default_reference=reference_genome, min_block_size=128) 
     
@@ -48,8 +48,8 @@ def main(args):
                      key='eid')
         # subset min-maf by case controls
         mt = mt.annotate_cols(pheno=ht[mt.s][phenotype])
-        cases = mt.aggregate_cols(hl.agg.sum(mt.pheno[phenotype] == True))
-        controls = mt.aggregate_cols(hl.agg.sum(mt.pheno[phenotype] == False)) 
+        cases = mt.aggregate_cols(hl.agg.sum(mt.pheno == True))
+        controls = mt.aggregate_cols(hl.agg.sum(mt.pheno == False)) 
         min_maf = hl.max(0.01, 25/(2 * hl.min([cases, controls]))).collect()[0]
         
         # write to outfile

@@ -40,7 +40,7 @@ readonly curwd=$(pwd)
 submit_spa_binary_with_csqs()
 {
   local annotation="${1?Error: Missing arg1 (annotation)}"
-  local pheno_list="${pheno_dir}/spiros_brava_phenotypes_binary_200k_header.tsv"
+  local pheno_list="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
   local phenotype=$( sed "${index}q;d" ${pheno_list} )
   submit_spa_with_csqs "${annotation}" "${phenotype}" "binary"
 }
