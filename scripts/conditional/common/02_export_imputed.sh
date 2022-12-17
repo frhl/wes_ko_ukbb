@@ -17,7 +17,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 6
 #$ -q short.qc
-#$ -t 3-19
+#$ -t 1-22
 #$ -V
 
 
@@ -34,7 +34,7 @@ readonly chr=$( get_chr ${task_id} )
 
 readonly hail_script="scripts/conditional/common/02_export_imputed.py"
 
-readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
+readonly phased_sample_list="data/phenotypes/phased_sample_list.txt"
 
 readonly min_maf=0.01
 readonly min_info=0.8
@@ -57,7 +57,7 @@ if [ ! -f "${out_prefix}.mt/_SUCCESS" ]; then
        --min_maf ${min_maf} \
        --min_info ${min_info} \
        --missing ${missing} \
-       --extract ${final_sample_list} \
+       --extract ${phased_sample_list} \
        --out_prefix ${out_prefix} \
        --out_type ${out_type} \
        && print_update "Finished filtering imputed genotypes ${out_prefix}" ${SECONDS} \

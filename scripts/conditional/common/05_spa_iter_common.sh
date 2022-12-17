@@ -22,7 +22,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 6
 #$ -q short.qc
-#$ -t 1-10
+#$ -t 11-100
 #$ -V
 
 
@@ -92,7 +92,7 @@ submit_cond_spa()
     readonly slurm_lname="${out_prefix}"
     readonly slurm_project="lindgren.prj"
     readonly slurm_queue="long"
-    readonly sge_queue="short.qc"
+    readonly sge_queue="long.qc"
     readonly slurm_shmem="1"
     if [ "${cluster}" = "slurm" ]; then
       sbatch \

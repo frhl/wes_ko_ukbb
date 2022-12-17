@@ -19,7 +19,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 11-100
+#$ -t 101-320
 #$ -V
 
 
@@ -50,8 +50,8 @@ mkdir -p ${out_dir}
 submit_binary_analysis()
 {
   local annotation="${1?Error: Missing arg1 (annotation)}"
-  local pheno_list="${pheno_dir}/spiros_brava_phenotypes_binary_200k_header.tsv"
-  local pheno_file="${pheno_dir}/spiros_brava_phenotypes_binary_200k.tsv.gz"
+  local pheno_list="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
+  local pheno_file="${pheno_dir}/dec22_phenotypes_binary_200k.tsv.gz"
   local phenotype=$( sed "${task_id}q;d" ${pheno_list} )
   submit_intervals "${annotation}" "${phenotype}" "binary" "${pheno_file}"
 }

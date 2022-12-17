@@ -27,8 +27,6 @@ def main(args):
     checkpoint_file = checkpoint_dir + "/_SUCCESS"
 
     if not os.path.isfile(checkpoint_file):
-        print("running from scratch")
-        sys.stderr.write("Runing from scratch.")
         # load chromosome
         mfi = genotypes.get_ukb_imputed_v3_mfi(chrom)
         mfi = mfi.annotate(chrom = chrom)
@@ -57,8 +55,6 @@ def main(args):
         mt = mt.repartition(64)
         mt = mt.checkpoint(out_prefix + "_checkpoint.mt")
     else:
-        print("loading checkoint!")
-        sys.stderr.write("Loading checkpoint")
         mt = io.import_table(checkpoint_dir, "mt", calc_info = False)
         mt = mt.repartition(64)
 
