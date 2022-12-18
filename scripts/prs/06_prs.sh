@@ -17,7 +17,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-300
+#$ -t 1-320
 #$ -V
 
 set -o errexit
@@ -49,8 +49,8 @@ readonly file_cts="${pheno_dir}/curated_covar_phenotypes_cts.tsv.gz"
 readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
 readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
 
-readonly file_binary="${pheno_dir}/spiros_brava_phenotypes_binary_500k.tsv.gz"
-readonly pheno_list_binary="${pheno_dir}/spiros_brava_phenotypes_binary_500k_header.tsv"
+readonly file_binary="${pheno_dir}/dec22_phenotypes_binary_500k.tsv.gz"
+readonly pheno_list_binary="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
 readonly phenotype_binary=$( sed "${index}q;d" ${pheno_list_binary} )
 
 # ldpred2 parameters
