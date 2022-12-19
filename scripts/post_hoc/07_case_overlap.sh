@@ -17,8 +17,8 @@ source utils/bash_utils.sh
 readonly rscript="scripts/post_hoc/07_case_overlap.R"
 
 readonly pheno_dir="data/phenotypes"
-readonly phenos="${pheno_dir}/spiros_brava_phenotypes_binary_200k.tsv.gz"
-readonly header="${pheno_dir}/spiros_brava_phenotypes_binary_200k_header.tsv"
+readonly phenos="${pheno_dir}/dec22_phenotypes_binary_200k.tsv.gz"
+readonly header="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
 readonly out_dir="data/post_hoc/results"
 readonly out_prefix="${out_dir}/case_control_overlap"
 
