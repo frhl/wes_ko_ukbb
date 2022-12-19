@@ -16,8 +16,8 @@
 #$ -e logs/recode_knockouts.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q short.qc
-#$ -t 1
+#$ -q long.qc
+#$ -t 1-22
 #$ -V
 
 set -o errexit
@@ -38,7 +38,7 @@ readonly vep_file="${vep_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_cs
 readonly in_dir="data/knockouts/alt/pp90/combined"
 readonly input_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense_all.tsv.gz"
 
-readonly out_dir="data/knockouts/alt/pp90/recoded_test"
+readonly out_dir="data/knockouts/alt/pp90/recoded_new_new"
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}.pp90.recoded"
 
 mkdir -p ${out_dir}

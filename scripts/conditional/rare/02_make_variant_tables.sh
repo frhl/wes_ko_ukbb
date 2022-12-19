@@ -7,9 +7,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/make_variant_tables.log
 #SBATCH --error=logs/make_variant_tables.errors.log
-#SBATCH --partition=epyc
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=20
+#SBATCH --array=1-22
 
 set -o errexit
 set -o nounset
@@ -48,7 +48,7 @@ readonly lines_per_chunk=1000
 readonly chunks=$( int_div ${vcf_lines} ${lines_per_chunk})
 
 # hpc paramaters
-readonly queue="epyc"
+readonly queue="short"
 readonly project="lindgren.prj"
 readonly nslots=2
 readonly tasks="1-${chunks}"
@@ -56,8 +56,8 @@ readonly tasks="1-${chunks}"
 
 submit_binary(){
   local trait="binary"
-  local pheno_list="${pheno_dir}/spiros_brava_phenotypes_binary_200k_header.tsv"
-  local pheno_file="${pheno_dir}/spiros_brava_phenotypes_binary_200k.tsv.gz"
+  local pheno_list="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
+  local pheno_file="${pheno_dir}/dec22_phenotypes_binary_200k.tsv.gz"
   submit_qc_job ${pheno_list} ${pheno_file} ${trait}
 }
 

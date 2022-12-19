@@ -17,7 +17,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-320
+#$ -t 290-320
 #$ -V
 
 set -o errexit
@@ -146,7 +146,7 @@ fit_pgs()
 aggr_pgs()
 {
   readonly aggr_jname="${qsub_aggr}"
-  readonly aggr_lname="_prs_aggr"
+  readonly aggr_lname="_aggr_prs"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
   local sge_queue="short.qc"
@@ -174,9 +174,9 @@ aggr_pgs()
       -P lindgren.prjc \
       -o "logs/${aggr_lname}.log" \
       -e "logs/${aggr_lname}.errors.log" \
+      -hold_jid "${qsub_fit}" \
       -pe shmem 1 \
       -wd $(pwd) \
-      -hold_jid "${qsub_fit}" \
       "${aggr_script}" \
       "${phenotype}" \
       "${out_dir}" \
