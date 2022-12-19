@@ -38,8 +38,10 @@ def main(args):
 
         # load imputed
         mt = genotypes.get_ukb_imputed_v3_bgen([chrom])
+        mt = mt.repartition(64)
         mt = mt.annotate_rows(info_score = mfi[mt.row_key].info)
         mt = mt.select_entries(mt.GT)
+        
 
         # Filter to relevant samples
         if extract:
@@ -53,7 +55,7 @@ def main(args):
         missing_expr = variants.get_missing_expr(mt) < missing
         mt = mt.filter_rows((info_expr) & (maf_expr) & (missing_expr))
         mt = mt.repartition(64)
-        mt = mt.checkpoint(out_prefix + "_checkpoint.mt")
+        mt = mt.checkpoint(out_prefix + "_checkpoint.mt", overwrite = True)
     else:
         mt = io.import_table(checkpoint_dir, "mt", calc_info = False)
         mt = mt.repartition(64)

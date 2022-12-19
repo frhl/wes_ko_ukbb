@@ -15,9 +15,9 @@
 #$ -o logs/export_imputed.log
 #$ -e logs/export_imputed.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 6
+#$ -pe shmem 10
 #$ -q short.qc
-#$ -t 1-22
+#$ -t 1-16
 #$ -V
 
 
