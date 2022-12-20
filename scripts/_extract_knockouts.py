@@ -23,6 +23,8 @@ def main(args):
     out_prefix = args.out_prefix
     csqs_category = args.csqs_category
     subset_gene = args.subset_gene
+    chunk_idx = args.chunk_idx
+    genes_per_chunk = args.genes_per_chunk
 
     # import phased/unphased data
     hail_init.hail_bmrc_init('logs/hail/_extract_knockouts.log', 'GRCh38')
@@ -30,16 +32,24 @@ def main(args):
     mt = io.import_table(input_path, input_type, calc_info=False)
 
     # create list for subsetting
-    subset_gene = list(subset_gene)
-
-    # subset to current csqs category
-    gene_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
-    csqs_expr = hl.literal(set(csqs_category)).contains(mt.consequence_category)
-    gene_expr = hl.literal(subset_gene).contains(gene_expr)
-    mt = mt.filter_rows((csqs_expr & gene_expr))
-    #n_csqs = mt.count()[0]
-    #sys.stderr.write(f"Filtering to {n_csqs} variants that are {csqs_category} for gene {subset_gene}.")
-
+    if subset_gene:
+        subset_gene = list(subset_gene)
+        gene_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
+        csqs_expr = hl.literal(set(csqs_category)).contains(mt.consequence_category)
+        gene_expr = hl.literal(subset_gene).contains(gene_expr)
+        mt = mt.filter_rows((csqs_expr & gene_expr))
+    if chunk_idx:
+        assert int(genes_per_chunk) > 0
+        assert int(chunk_idx) > 0
+        gene_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
+        genes = sort(gene_expr.collect())
+        genes_idx0 = (int(chunk_idx)-1) * int(genes_per_chunk)
+        genes_idx1 = (int(chunk_idx)) * int(genes_per_chunk)
+        subset_gene = genes[genes_idx0:genes_idx1]
+        csqs_expr = hl.literal(set(csqs_category)).contains(mt.consequence_category)
+        gene_expr = hl.literal(subset_gene).contains(gene_expr)
+        mt = mt.filter_rows((csqs_expr & gene_expr))
+ 
     # aggregate knockouts by gene 
     gene_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
     genes = ko.collect_phase_count_by_expr(mt, gene_expr)
@@ -66,6 +76,8 @@ if __name__=='__main__':
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--csqs_category', default=None, action=SplitArgs, help='What categories should be subsetted to?')
     parser.add_argument('--subset_gene', default=None, action=SplitArgs, help='Subset gene?')
+    parser.add_argument('--chunk_idx', default=None, help='what chunk should be subset to?')
+    parser.add_argument('--genes_per_chunk', default=None, help='How many genes per chunk?')
 
     args = parser.parse_args()
 
