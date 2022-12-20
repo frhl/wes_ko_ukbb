@@ -21,7 +21,7 @@ def main(args):
     out_type = args.out_type
 
     reference_genome = 'GRCh38'
-    hail_init.hail_bmrc_init(log='logs/hail/filter_genotyoes.log', default_reference=reference_genome) 
+    hail_init.hail_bmrc_init(log='logs/hail/export_imputed.log', default_reference=reference_genome) 
 
     checkpoint_dir = out_prefix + "_checkpoint.mt"
     checkpoint_file = checkpoint_dir + "/_SUCCESS"

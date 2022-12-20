@@ -7,7 +7,7 @@
 #SBATCH --error=logs/export_imputed.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 8
-#SBATCH --array=1-22
+#SBATCH --array=2
 #
 #
 #$ -N export_imputed
@@ -15,9 +15,9 @@
 #$ -o logs/export_imputed.log
 #$ -e logs/export_imputed.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 10
+#$ -pe shmem 8
 #$ -q short.qc
-#$ -t 1-15
+#$ -t 2
 #$ -V
 
 
@@ -28,6 +28,7 @@ source utils/qsub_utils.sh
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
+readonly spark_dir="data/tmp/spark"
 readonly cluster=$( get_current_cluster)
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
@@ -40,7 +41,7 @@ readonly min_maf=0.01
 readonly min_info=0.8
 readonly missing=0.10
 
-readonly out_dir="data/unphased/imputed/common_8cores"
+readonly out_dir="data/unphased/imputed/common_8cores/chr2_remake"
 readonly out_prefix="${out_dir}/ukb_imp_200k_common_chr${chr}"
 readonly out_type="mt"
 

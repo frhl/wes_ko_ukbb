@@ -9,7 +9,7 @@
 #SBATCH --error=logs/filter_genotypes.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=6
+#SBATCH --array=1-10
 #
 #
 #$ -N filter_genotypess
@@ -80,7 +80,7 @@ submit_intervals()
       readonly slurm_project="lindgren.prj"
       readonly slurm_queue="short"
       readonly sge_queue="short.qc"
-      readonly slurm_shmem="6"
+      readonly slurm_shmem="3"
       if [ "${cluster}" = "slurm" ]; then
         sbatch \
           --account="${slurm_project}" \
@@ -90,7 +90,7 @@ submit_intervals()
           --chdir="$(pwd)" \
           --partition="${slurm_queue}" \
           --cpus-per-task="${slurm_shmem}" \
-          --array=${slurm_tasks} \
+          --array=${task_id} \
           --parsable \
           "${bash_script}" \
           "${intervals}" \
