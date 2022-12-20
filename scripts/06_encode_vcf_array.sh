@@ -32,15 +32,15 @@ source utils/vcf_utils.sh
 readonly curwd=$(pwd)
 readonly spark_dir="data/tmp/spark"
 readonly bash_script="scripts/_encode_vcf_array.sh"
-readonly merge_script="scripts/_merge_knockouts.sh"
+readonly merge_script="scripts/_merge_encode_vcf_array.sh"
 readonly hail_script="scripts/_write_gene_intervals.py"
 
 readonly cluster=$( get_current_cluster)
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
-readonly in_dir="data/mt/prefilter/final_90"
-readonly merge_dir="data/knockouts/alt/pp90/extracted"
+readonly in_dir="data/mt/prefilter/pp90"
+readonly merge_dir="data/knockouts/alt/pp90/extracted_array"
 readonly out_dir="data/knockouts/alt/pp90/extracted_array/chr${chr}"
 # in parameters
 readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.mt"
@@ -104,7 +104,7 @@ submit_merge_job()
       --dependency="${slurm_dependency}" \
       "${merge_script}" \
       "${regex_prefix}" \
-      "${out_interval}" \
+      "${chunks}" \
       "${outfile}" 
   elif [ "${cluster}" = "sge" ]; then
      qsub -N "${jname}" \
@@ -117,7 +117,7 @@ submit_merge_job()
       -hold_jid ${sge_dependency} \
       "${merge_script}" \
       "${regex_prefix}" \
-      "${out_interval}" \
+      "${chunks}" \
       "${outfile}"
   fi
 }
@@ -130,7 +130,7 @@ submit_knockout_job()
   local nslots=${2}
   local out_prefix_csqs="${out_prefix}_${annotation/,/_}"
   local out_prefix_merge="${out_merge}_${annotation/,/_}"
-  local merge_prefix_regex="${out_prefix_csqs}_ENSG"
+  local merge_prefix_regex="${out_prefix_csqs}_ESNG"
 
   # slurm specific paramters 
   local ko_jname="_c${chr}_extr_${annotation}"
@@ -180,7 +180,7 @@ submit_knockout_job()
   fi
   # note that this function waits for "ko_jname" (sge) which
   # is used as a dependency before starting job.
-  #submit_merge_job ${merge_prefix_regex} ${out_prefix_merge} ${ko_jname} ${slurm_jid}
+  submit_merge_job ${merge_prefix_regex} ${out_prefix_merge} ${ko_jname} ${slurm_jid}
 }
 
 
