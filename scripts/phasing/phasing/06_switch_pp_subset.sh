@@ -16,8 +16,8 @@
 #$ -e logs/switch_pp_subset.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 2
-#$ -q short.qe
-#$ -t 22
+#$ -q short.qc
+#$ -t 1-22
 #$ -V
 
 set -o errexit
@@ -41,7 +41,10 @@ readonly pp_cutoff=0.90
 readonly pedigree_dir="/well/lindgren/UKBIOBANK/nbaya/resources"
 readonly pedigree="${pedigree_dir}/ukb11867_pedigree.fam"
 # for shapeit5 phasing
-readonly phased_dir="data/phased/wes_union_calls/200k/shapeit5/parents_with_hail_count"
+readonly children_dir="data/phased/wes_union_calls/200k/shapeit5/ligated"
+readonly children_path="${children_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.bgz"
+readonly children_type="vcf"
+readonly phased_dir="data/phased/wes_union_calls/200k/shapeit5/parents"
 readonly phased_path="${phased_dir}/ukb_wes_union_calls_200k_shapeit5_parents_chr${chr}.vcf.gz"
 readonly phased_type="vcf"
 readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/switch_pp90"
@@ -50,7 +53,7 @@ readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_shapeit5_chr${chr}_pp90
 readonly out_vcf="${out_prefix}.vcf.bgz"
 readonly out_trio="${out_prefix}.trio"
 readonly out_trio_by_site="${out_prefix}.txt"
-readonly out_trio_by_site_mac="${out_prefix}.long.2.mac"
+readonly out_trio_by_site_mac="${out_prefix}.long.mac.new"
 readonly out_type="vcf"
 
 mkdir -p ${out_dir}
@@ -75,8 +78,8 @@ if [ ! -f "${out_trio_by_site_mac}.txt.gz" ]; then
   set_up_hail
   set_up_pythonpath_legacy
   python3 ${hail_script_info} \
-    --children_path ${phased_path} \
-    --children_type ${phased_type} \
+    --children_path ${children_path} \
+    --children_type ${children_type} \
     --trio_path ${out_trio_by_site} \
     --out_prefix ${out_trio_by_site_mac}
 fi

@@ -128,16 +128,17 @@ main <- function(args){
 
      # use proper vec p init
      vec_p_ranges <- max(NCORES, as.numeric(args$vec_p_init_n))
-     if (vec_p_ranges < 3) stop("You should ideally have 10-30 chains! set vec_p_init_n.")
+     if (vec_p_ranges < 10) stop("You should ideally have 10-30 chains! set vec_p_init_n.")
      
      write("Running multi_auto", stderr())
      multi_auto <- snp_ldpred2_auto(
         corr = snp$corr,
         df_beta = gwas,
         h2_init = h2_init,
-        vec_p_init = seq_log(1e-4, 0.9, vec_p_ranges), # using cores instead 30
+        vec_p_init = seq_log(1e-5, 10, length.out=vec_p_ranges), # using cores instead 30
         ncores = NCORES)
 
+     #vec_p_init = seq_log(1e-4, 0.3, length.out=vec_p_ranges), # using cores instead 30
      # save data chains
      multi_auto_path <- paste0(args$out_prefix,'_chains.rda')
      saveRDS(multi_auto, multi_auto_path, compress = 'xz')
@@ -174,7 +175,7 @@ main <- function(args){
      n_na_cols <- sum(sum(na_cols))
      n_cols <- ncol(beta_auto)
      if (n_na_cols > 0){
-        write(paste0("Note: ",n_na_cols," of ",n_cols," beta_auto NA cols will be discarded."), stdout()) 
+        write(paste0("Note: ",n_na_cols," of ",n_cols," beta_auto NA cols will be discarded (", basename(args$out_prefix), ")"), stdout()) 
         beta_auto <- beta_auto[,!na_cols]
      } 
 
@@ -251,7 +252,7 @@ parser$add_argument("--pred", default=NULL, required = TRUE, help = "Path to pli
 parser$add_argument("--ldsc", default=NULL, required = TRUE, help = ".rds object containing QCed GWAS and ldsc heritability estimates")
 parser$add_argument("--ldsc_pvalue_cutoff", default=NULL, help = "cancel the run if the ldsc heritability p-value is not below the given treshold.")
 parser$add_argument("--standardized_gt", default=1, required = FALSE, help = "Should genotypes be standardized?")
-parser$add_argument("--vec_p_init_n", default=15, required = FALSE, help = "number of intial estimates to sample form (should be at least 5)")
+parser$add_argument("--vec_p_init_n", default=100, required = FALSE, help = "number of intial estimates to sample form (should be at least 5)")
 parser$add_argument("--tmp_bfile", default=NULL, required = TRUE, help = "File path to temporary backing files")
 parser$add_argument("--ld_dir", default=NULL, required = TRUE, help = "Path to directory with pre-calcualted SNP correlations and LD (.rds files)")
 parser$add_argument("--impute", default=NULL, required = TRUE, help = "Should missing genotypes be imputed? (See https://privefl.github.io/bigsnpr/reference/snp_fastImputeSimple.html)")

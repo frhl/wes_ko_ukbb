@@ -9,7 +9,7 @@
 #SBATCH --error=logs/extract_knockouts.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1
+#SBATCH --array=1-2
 #
 #
 #$ -N extract_knockouts
@@ -181,6 +181,7 @@ submit_knockout_job()
 #submit_knockout_job "pLoF,damaging_missense" "2"
 #submit_knockout_job "damaging_missense" "2"
 submit_knockout_job "pLoF" "2"
+submit_knockout_job "synonymous" "2"
 
 
 

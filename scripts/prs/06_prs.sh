@@ -7,7 +7,7 @@
 #SBATCH --error=logs/prs.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-300
+#SBATCH --array=1-320
 #
 #
 #$ -N prs
@@ -17,7 +17,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 290-320
+#$ -t 1-320
 #$ -V
 
 set -o errexit
@@ -75,7 +75,7 @@ submit_ldpred2()
   if [ ! -z ${phenotype} ]; then
     if [ ! -f "${merged}" ]; then
       # fit actual pgs
-      fit_pgs
+      #fit_pgs
       # aggregate into matrix
       aggr_pgs
     else
@@ -174,13 +174,13 @@ aggr_pgs()
       -P lindgren.prjc \
       -o "logs/${aggr_lname}.log" \
       -e "logs/${aggr_lname}.errors.log" \
-      -hold_jid "${qsub_fit}" \
       -pe shmem 1 \
       -wd $(pwd) \
       "${aggr_script}" \
       "${phenotype}" \
       "${out_dir}" \
       "${mrg_dir}"
+      #-hold_jid "${qsub_fit}" \
   else
     >&2 echo "${cluster} is not valid"
   fi
@@ -235,7 +235,7 @@ readonly queue="short"
 readonly project="lindgren.prj"
 readonly tasks=1-22
 
-submit_ldpred2 "auto" "2" "${phenotype_binary}"
+submit_ldpred2 "auto" "3" "${phenotype_binary}"
 #submit_ldpred2 "auto" "6" "${phenotype_cts}_int"
 #submit_ldpred2 "auto" "6" "${phenotype_cts}"
 
