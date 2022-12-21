@@ -6,7 +6,7 @@
 #SBATCH --output=logs/phenotypes_binary.log
 #SBATCH --error=logs/phenotypes_binary.errors.log
 #SBATCH --partition=epyc
-#SBATCH --cpus-per-task 5
+#SBATCH --cpus-per-task 4
 #
 #
 #$ -N phenotypes_binary
@@ -17,6 +17,9 @@
 #$ -pe shmem 4
 #$ -q short.qc
 #$ -V
+
+set -o errexit
+set -o nounset
 
 source utils/bash_utils.sh
 source utils/hail_utils.sh
@@ -33,21 +36,16 @@ readonly in_bin="${in_dir}/curated_phenotypes_binary.tsv"
 readonly in_cts="${in_dir}/curated_phenotypes_cts.tsv"
 readonly tmp_bin="${out_dir}/dec22_phenotypes_binary.tsv.gz"
 readonly out_bin_500k="${out_dir}/dec22_phenotypes_binary_500k"
-readonly out_bin_200k="${out_dir}/dec22_phenotypes_binary_200k"
+readonly out_bin_200k="${out_dir}/new_dec22_phenotypes_binary_200k"
 
 readonly vcf_sample_dir="data/phased/wes_union_calls/200k/shapeit5/ligated"
 readonly vcf_sample="${vcf_sample_dir}/ukb_wes_union_calls_200k_chr22.vcf.bgz"
 
-readonly phased_sample_list="data/phenotypes/phased_sample_list.txt"
 readonly final_sample_list="/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list"
+readonly final_ko_sample_list="data/phenotypes/samples/ukb_wes_ko.imputed.qc.samples"
 
 readonly path_covars="${covar_dir}/covars1.csv"
 readonly covariates="$(cat ${path_covars})"
-
-module load BCFtools/1.12-GCC-10.3.0
-bcftools query -l ${vcf_sample} > ${phased_sample_list}
-module purge
-
 mkdir -p ${out_dir}
 mkdir -p ${spark_dir}
 
@@ -95,7 +93,7 @@ if [ ! -f ${out_bin_200k} ]; then
   python3 "${hail_script}" \
      --input_path "${tmp_bin}" \
      --extract_samples "${final_sample_list}" \
-     --extract_phased_samples "${phased_sample_list}" \
+     --extract_phased_samples "${final_ko_sample_list}" \
      --export_header \
      --count_case_control \
      --out_prefix "${out_bin_200k}"
@@ -104,6 +102,8 @@ fi
 if [ ! -f "${out_bin_200k}.tsv.gz" ]; then
   gzip "${out_bin_200k}.tsv"
 fi
+
+
 
 
 
