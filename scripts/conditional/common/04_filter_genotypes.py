@@ -30,7 +30,7 @@ def main(args):
     # get all the relevant chromsomes
     mts = list()
     for chrom in chromosomes:
-        path = f"data/unphased/imputed/common_8cores/ukb_imp_200k_common_chr{chrom}.mt"
+        path = f"data/unphased/imputed/common_new/ukb_imp_200k_common_chr{chrom}.mt"
         mt = hl.read_matrix_table(path)
         mts.append(mt)  
     

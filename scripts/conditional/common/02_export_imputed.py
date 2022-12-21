@@ -14,6 +14,7 @@ def main(args):
 
     chrom = args.chrom
     extract = args.extract
+    extract2 = args.extract2
     min_info = float(args.min_info)
     min_maf = float(args.min_maf)
     missing = float(args.missing)
@@ -42,12 +43,17 @@ def main(args):
         mt = mt.annotate_rows(info_score = mfi[mt.row_key].info)
         mt = mt.select_entries(mt.GT)
         
-
         # Filter to relevant samples
         if extract:
             ht_final_samples = hl.import_table(
                 extract, no_header=True, key='f0', delimiter=',')
             mt = mt.filter_cols(hl.is_defined(ht_final_samples[mt.col_key]))
+
+        # Filter to relevant samples
+        if extract2:
+            ht_final_samples2 = hl.import_table(
+                extract2, no_header=True, key='f0', delimiter=',')
+            mt = mt.filter_cols(hl.is_defined(ht_final_samples2[mt.col_key]))
 
         # perform variant filtering after subsetting samples
         info_expr = mt.info_score > min_info
@@ -81,6 +87,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--chrom', default=None, required=True, help='chromosome to load')
     parser.add_argument('--extract', default=None, help='Path to HailTable that contains the final samples included in the analysis.')
+    parser.add_argument('--extract2', default=None, help='Path to HailTable that contains the final samples included in the analysis.')
     parser.add_argument('--min_maf', default=0.01, help='What min_maf threshold should be used?')
     parser.add_argument('--min_info', default=0.8, help='What info threshold should be used?')
     parser.add_argument('--missing', default=0.1, help='What info threshold should be used?')
