@@ -119,7 +119,7 @@ submit_encode_job()
 #submit_encode_job "pLoF" "2" "fast"
 #submit_encode_job "other_missense" "2" "fast"
 #submit_encode_job "damaging_missense" "3" "fast"
-submit_encode_job "synonymous" "4" "fast"
+submit_encode_job "synonymous" "3" "fast"
 
 
 

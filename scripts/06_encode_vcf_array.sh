@@ -19,7 +19,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 20-22
+#$ -t 1-22
 #$ -V
 
 set -o errexit
@@ -76,7 +76,7 @@ extract_genes() {
 
 # How many chunks should be run
 extract_genes
-readonly genes_per_chunk=200 
+readonly genes_per_chunk=100 
 readonly n_genes=$( cat ${out_interval} | wc -l )
 readonly chunks=$(( (${genes_per_chunk}+${n_genes}-1) / ${genes_per_chunk} ))
 readonly array_id="1-${chunks}"
@@ -187,7 +187,8 @@ submit_knockout_job()
 #submit_knockout_job "pLoF,damaging_missense" "2"
 #submit_knockout_job "damaging_missense" "2"
 #submit_knockout_job "pLoF" "2"
-submit_knockout_job "synonymous" "3"
+submit_knockout_job "synonymous" "2"
+#submit_knockout_job "other_missense" "3"
 
 
 

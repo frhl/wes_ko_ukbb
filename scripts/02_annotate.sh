@@ -7,23 +7,19 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/annotate.log
 #SBATCH --error=logs/annotate.errors.log
-#SBATCH --partition=epyc
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 2
 #SBATCH --array=1-22
-#SBATCH --requeue
-#
 #
 #$ -N annotate
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/annotate.log
 #$ -e logs/annotate.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 2
+#$ -pe shmem 3
 #$ -q short.qc
-#$ -t 1-22
+#$ -t 6-22
 #$ -V
-
-# -q long.qc@@long.hga
 
 # Note: long.qc@@long.hga with 4 slots required to run full pipeline
 # -q long.qc@@long.hga
@@ -46,14 +42,14 @@ readonly in_dir="data/phased/wes_union_calls/200k/shapeit5/ligated"
 readonly input_prefix="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.bgz"
 readonly input_type="vcf"
 
-readonly out_dir="data/mt/annotated/replace_nan"
+readonly out_dir="data/mt/annotated/new"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
 readonly out_type="mt"
 readonly out="${out_prefix}.mt"
 
 readonly annotation_table="data/vep/hail/ukb_wes_200k_chr${chr}_vep.ht"
 
-readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
+readonly final_sample_list='data/phenotypes/samples/ukb_wes_ko.imputed.qc.samples'
 readonly final_variant_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list'
 
 mkdir -p ${out_dir}
@@ -71,22 +67,7 @@ if [ ! -f ${out} ]; then
      --out_prefix ${out_prefix} \
      --out_type "${out_type}" \
      --dbsnp_path "155" \
-     --annotate_snp_id \
-     && print_update "Finished annotating MatrixTables chr${chr}" ${SECONDS} \
-     || raise_error "Annotating MatrixTables for chr${chr} failed"
+     --annotate_snp_id
 fi
-
-
-
-
-
-#if [ -f "${out}" ]; then
-#  module purge
-#  module load BCFtools/1.12-GCC-10.3.0
-#  make_tabix "${out_prefix}.vcf.bgz" "csi"
-#fi
-
-#make_tabix "${out_prefix}.vcf.bgz" "tbi"
-
 
 
