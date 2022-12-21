@@ -5,9 +5,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/prs.log
 #SBATCH --error=logs/prs.errors.log
-#SBATCH --partition=short
+#SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-320
+#SBATCH --array=6
 #
 #
 #$ -N prs
@@ -17,7 +17,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-320
+#$ -t 
 #$ -V
 
 set -o errexit
@@ -28,6 +28,7 @@ source utils/qsub_utils.sh
 
 readonly bash_script="scripts/prs/_prs.sh"
 readonly rscript="scripts/prs/06_prs.R"
+readonly rscript_ldsc="scripts/prs/_check_ldsc.R"
 readonly clean_script="scripts/prs/_prs_clean.sh"
 readonly aggr_script="scripts/prs/_prs_aggr.sh"
 
@@ -40,7 +41,7 @@ readonly mrg_dir="data/prs/scores"
 
 # do not run files that have h2 estimates
 # above the given p-value cutoff (nominal).
-readonly ldsc_pvalue_cutoff=0.05
+readonly ldsc_pvalue_cutoff="0.01"
 
 readonly cluster=$( get_current_cluster )
 readonly index=$( get_array_task_id )
@@ -72,10 +73,16 @@ submit_ldpred2()
   local qsub_aggr="_aggr_${phenotype}"
   local qsub_clean="_clean_${phenotype}"
 
+  # submit phenotype
   if [ ! -z ${phenotype} ]; then
     if [ ! -f "${merged}" ]; then
+      # check that p-value passes thresholds
+      #set_up_rpy
+      #Rscript ${rscript_ldsc} \
+      #3  --ldsc ${ldsc} \
+      #  --ldsc_pvalue_cutoff ${ldsc_pvalue_cutoff}
       # fit actual pgs
-      #fit_pgs
+      fit_pgs
       # aggregate into matrix
       aggr_pgs
     else
@@ -175,12 +182,12 @@ aggr_pgs()
       -o "logs/${aggr_lname}.log" \
       -e "logs/${aggr_lname}.errors.log" \
       -pe shmem 1 \
+      -hold_jid "${qsub_fit}" \
       -wd $(pwd) \
       "${aggr_script}" \
       "${phenotype}" \
       "${out_dir}" \
       "${mrg_dir}"
-      #-hold_jid "${qsub_fit}" \
   else
     >&2 echo "${cluster} is not valid"
   fi
@@ -231,9 +238,9 @@ clean_pgs()
 }
 
 # parameters
-readonly queue="short"
+readonly queue="epyc"
 readonly project="lindgren.prj"
-readonly tasks=1-22
+readonly tasks=20-22
 
 submit_ldpred2 "auto" "3" "${phenotype_binary}"
 #submit_ldpred2 "auto" "6" "${phenotype_cts}_int"
