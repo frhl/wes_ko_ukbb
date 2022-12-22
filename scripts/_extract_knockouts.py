@@ -5,6 +5,7 @@ import argparse
 import random
 import string
 import sys
+import os.path
 
 from ukb_utils import hail_init
 from ko_utils import io
@@ -29,27 +30,29 @@ def main(args):
     # import phased/unphased data
     hail_init.hail_bmrc_init('logs/hail/_extract_knockouts.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1')
-    mt = io.import_table(input_path, input_type, calc_info=False)
+    
+    checkpoint_dir = out_prefix + "_checkpoint.mt"
+    checkpoint_file = checkpoint_dir + "/_SUCCESS"
 
-    # create list for subsetting
-    if subset_gene:
-        subset_gene = list(subset_gene)
-        gene_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
-        csqs_expr = hl.literal(set(csqs_category)).contains(mt.consequence_category)
-        gene_expr = hl.literal(subset_gene).contains(gene_expr)
-        mt = mt.filter_rows((csqs_expr & gene_expr))
-    if chunk_idx:
-        assert int(genes_per_chunk) > 0
-        assert int(chunk_idx) > 0
-        gene_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
-        genes = sort(gene_expr.collect())
-        genes_idx0 = (int(chunk_idx)-1) * int(genes_per_chunk)
-        genes_idx1 = (int(chunk_idx)) * int(genes_per_chunk)
-        subset_gene = genes[genes_idx0:genes_idx1]
-        csqs_expr = hl.literal(set(csqs_category)).contains(mt.consequence_category)
-        gene_expr = hl.literal(subset_gene).contains(gene_expr)
-        mt = mt.filter_rows((csqs_expr & gene_expr))
- 
+    if not os.path.isfile(checkpoint_file):
+        mt = io.import_table(input_path, input_type, calc_info=False)
+        
+        # create list for subsetting
+        if subset_gene:
+            subset_gene = list(set(subset_gene))
+            subset_gene = list(filter(None, subset_gene))
+            assert len(set(subset_gene)) > 1 
+            gene_id_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
+            csqs_expr = hl.literal(set(csqs_category)).contains(mt.consequence_category)
+            gene_expr = hl.literal(subset_gene).contains(gene_id_expr)
+            mt = mt.filter_rows((csqs_expr & gene_expr))
+
+        # checkpoint and write
+        mt = mt.repartition(32)
+        mt = mt.checkpoint(out_prefix + "_checkpoint.mt", overwrite = True)
+    else:
+        mt = hl.read_matrix_table(checkpoint_dir)
+
     # aggregate knockouts by gene 
     gene_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
     genes = ko.collect_phase_count_by_expr(mt, gene_expr)

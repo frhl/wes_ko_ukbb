@@ -10,8 +10,7 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
 #SBATCH --array=1-22
-#SBATCH --requeue
-#
+#SBATCH --dependency="afterok:10047864"
 #
 #$ -N prefilter_variants
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -36,11 +35,11 @@ readonly hail_script="scripts/04_prefilter_variants.py"
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
-readonly in_dir="data/mt/annotated"
+readonly in_dir="data/mt/annotated/new"
 readonly input_prefix="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.mt"
 readonly input_type="mt"
 
-readonly out_dir="data/mt/prefilter/final_90_loftee"
+readonly out_dir="data/mt/prefilter/loftee_worst_csq_by_gene_canonical/pp90"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005"
 readonly out_type="mt"
 
@@ -50,7 +49,7 @@ readonly exclude="data/genes/220310_common_plofs_to_exclude.txt"
 readonly maf_min=0.00
 readonly maf_max=0.05
 readonly pp_cutoff=0.90
-readonly partitions=128
+readonly partitions=64
 
 mkdir -p ${out_dir}
 

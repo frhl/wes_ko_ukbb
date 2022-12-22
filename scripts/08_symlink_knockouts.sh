@@ -28,6 +28,7 @@ readonly cluster=$( get_current_cluster)
 readonly in_fast_dir="$(pwd)/data/knockouts/alt/pp90/fast"
 readonly in_collect_dir="$(pwd)/data/knockouts/alt/pp90/collected"
 readonly in_extract_dir="$(pwd)/data/knockouts/alt/pp90/extracted"
+readonly in_extract_array_dir="$(pwd)/data/knockouts/alt/pp90/extracted_array"
 readonly out_dir="$(pwd)/data/knockouts/alt/pp90/combined"
 readonly prefix="ukb_eur_wes_200k"
 
@@ -38,6 +39,7 @@ ln -fs ${in_fast_dir}/${prefix}* ${out_dir}/.
 # by gene basis (and could not be created throughout the 
 # previous step due to memory contraints).
 ln -fs ${in_extract_dir}/${prefix}* ${out_dir}/.
+ln -fs ${in_extract_array_dir}/${prefix}* ${out_dir}/.
 
 # symlink all knockouts that have been collected
 # using a single script in hail

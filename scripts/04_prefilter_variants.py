@@ -62,21 +62,12 @@ def main(args):
         mt = mt.repartition(int(partitions))
 
     # export result
-    #io.export_table(mt, out_prefix, out_type)
-
-    # export info
-    #ht = mt.rows()
-    #ht = ht.select(*[ht.varid, ht.info])
-    #ht.flatten().export(out_prefix + ".info.gz")
+    io.export_table(mt, out_prefix, out_type)
     
     # export info
     ht = mt.rows()
     ht = ht.select(*[ht.varid, ht.info, ht.consequence_category, ht.consequence.vep[csqs_expr]])
     ht.flatten().export(out_prefix + ".csqs.txt.gz")
-
-
-
-
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()

@@ -18,8 +18,8 @@
 #$ -e logs/encode_vcf_array.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q short.qc
-#$ -t 1-22
+#$ -q test.qc
+#$ -t 3-22
 #$ -V
 
 set -o errexit
@@ -90,7 +90,7 @@ submit_merge_job()
   local sge_dependency="${3}"
   local slurm_dependency="${4}"
   local jname="_c${chr}_mrg_ko"
-  local lname="logs/_merge_knockouts"
+  local lname="logs/_merge_encode_vcf_array"
   local nslots="1"
   if [ "${cluster}" = "slurm" ]; then
     sbatch \
@@ -130,7 +130,7 @@ submit_knockout_job()
   local nslots=${2}
   local out_prefix_csqs="${out_prefix}_${annotation/,/_}"
   local out_prefix_merge="${out_merge}_${annotation/,/_}"
-  local merge_prefix_regex="${out_prefix_csqs}_ESNG"
+  local merge_prefix_regex="${out_prefix_csqs}"
 
   # slurm specific paramters 
   local ko_jname="_c${chr}_extr_${annotation}"
@@ -187,8 +187,8 @@ submit_knockout_job()
 #submit_knockout_job "pLoF,damaging_missense" "2"
 #submit_knockout_job "damaging_missense" "2"
 #submit_knockout_job "pLoF" "2"
-submit_knockout_job "synonymous" "2"
-#submit_knockout_job "other_missense" "3"
+#submit_knockout_job "synonymous" "1"
+submit_knockout_job "other_missense" "1"
 
 
 

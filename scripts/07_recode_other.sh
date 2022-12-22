@@ -15,8 +15,8 @@
 #$ -e logs/recode_other.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q short.qc
-#$ -t 1-22
+#$ -q long.qc
+#$ -t 1-19
 #$ -V
 
 set -o errexit

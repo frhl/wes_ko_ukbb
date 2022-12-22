@@ -21,6 +21,13 @@ readonly chr=${7?Error: Missing arg6 (chr)}
 
 readonly chunk_id=$( get_array_task_id )
 readonly out_prefix_chunk="${out_prefix}.${chunk_id}of${total_chunks}"
+readonly out_prefix_checkpoint="${out_prefix_chunk}.mt/"
+
+readonly idx_start="$(( ((${chunk_id}-1) * ${genes_per_chunk})+1 ))"
+readonly idx_end="$(( ${chunk_id} * ${genes_per_chunk}))"
+readonly idx_quit=$((${idx_end}+1))
+readonly genes=$(cat ${gene_intervals} | sed -n "${idx_start},${idx_end}p;${idx_quit}q" | cut -f2 | tr "\n" ",")
+echo ${genes}
 
 evaluate_knockouts() {
   set_up_hail
@@ -29,11 +36,11 @@ evaluate_knockouts() {
       --input_path ${input_path} \
       --input_type ${input_type} \
       --csqs_category ${in_category} \
-      --chunk_idx ${chunk_id} \
-      --genes_per_chunk ${genes_per_chunk} \
-      --out_prefix ${out_prefix_chunk}
+      --out_prefix ${out_prefix_chunk} \
+      --subset_gene ${genes}
+ rm -rf "${out_prefix_checkpoint}"
 }
-
+    
 
 if [ ! -f "${out_prefix_chunk}.tsv.gz" ]; then
   evaluate_knockouts
