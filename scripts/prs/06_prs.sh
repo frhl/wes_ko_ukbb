@@ -5,6 +5,7 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/prs.log
 #SBATCH --error=logs/prs.errors.log
+#SBATCH --open-mode=append
 #SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
 #SBATCH --array=6
@@ -17,7 +18,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 
+#$ -t 1-320 
 #$ -V
 
 set -o errexit
@@ -114,6 +115,7 @@ fit_pgs()
       --chdir="$(pwd)" \
       --partition="${slurm_queue}" \
       --cpus-per-task="${slurm_nslots}" \
+      --open-mode=append \
       --array=${slurm_tasks} \
       --parsable \
       "${bash_script}" \
@@ -169,6 +171,7 @@ aggr_pgs()
       --partition="${slurm_queue}" \
       --cpus-per-task="${slurm_nslots}" \
       --array=${slurm_tasks} \
+      --open-mode=append \
       --dependency="afterok:${fit_pgs_jid}" \
       --parsable \
       "${aggr_script}" \
@@ -214,6 +217,7 @@ clean_pgs()
       --cpus-per-task="${slurm_nslots}" \
       --array=${slurm_tasks} \
       --dependency="aftercorr:${fit_pgs_jid}" \
+      --open-mode=append \
       --parsable \
       "${clean_script}" \
       "${pred}" \
@@ -238,11 +242,11 @@ clean_pgs()
 }
 
 # parameters
-readonly queue="epyc"
+readonly queue="short"
 readonly project="lindgren.prj"
-readonly tasks=20-22
+readonly tasks=1-22
 
-submit_ldpred2 "auto" "3" "${phenotype_binary}"
+submit_ldpred2 "auto" "2" "${phenotype_binary}"
 #submit_ldpred2 "auto" "6" "${phenotype_cts}_int"
 #submit_ldpred2 "auto" "6" "${phenotype_cts}"
 

@@ -7,8 +7,8 @@
 #SBATCH --error=logs/export_imputed.errors.log
 #SBATCH --partition=epyc
 #SBATCH --cpus-per-task 8
-#SBATCH --array=4-9
-#
+#SBATCH --array=2
+#SBATCH --dependency="afternotok:10047864"
 #
 #$ -N export_imputed
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

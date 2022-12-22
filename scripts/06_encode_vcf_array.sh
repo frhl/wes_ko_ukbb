@@ -18,8 +18,8 @@
 #$ -e logs/encode_vcf_array.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q test.qc
-#$ -t 3-22
+#$ -q short.qc
+#$ -t 17-22
 #$ -V
 
 set -o errexit
@@ -188,7 +188,7 @@ submit_knockout_job()
 #submit_knockout_job "damaging_missense" "2"
 #submit_knockout_job "pLoF" "2"
 #submit_knockout_job "synonymous" "1"
-submit_knockout_job "other_missense" "1"
+submit_knockout_job "other_missense" "3"
 
 
 

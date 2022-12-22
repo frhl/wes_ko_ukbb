@@ -12,7 +12,7 @@
 #SBATCH --error=logs/spa_iter_common.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-100
+#SBATCH --array=1-10
 #
 #
 #$ -N spa_iter_common
@@ -20,9 +20,9 @@
 #$ -o logs/spa_iter_common.log
 #$ -e logs/spa_iter_common.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 6
+#$ -pe shmem 1
 #$ -q short.qc
-#$ -t 11-100
+#$ -t 1-10
 #$ -V
 
 

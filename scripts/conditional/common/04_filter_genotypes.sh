@@ -7,9 +7,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/filter_genotypes.log
 #SBATCH --error=logs/filter_genotypes.errors.log
-#SBATCH --partition=epyc
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=24-100
+#SBATCH --array=11-320
 #
 #
 #$ -N filter_genotypess
