@@ -19,7 +19,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 17-22
+#$ -t 1-22
 #$ -V
 
 set -o errexit
@@ -131,56 +131,61 @@ submit_knockout_job()
   local out_prefix_csqs="${out_prefix}_${annotation/,/_}"
   local out_prefix_merge="${out_merge}_${annotation/,/_}"
   local merge_prefix_regex="${out_prefix_csqs}"
+  local merge_file="${out_prefix_merge}_all.tsv.gz"
 
-  # slurm specific paramters 
-  local ko_jname="_c${chr}_extr_${annotation}"
-  local ko_lname="logs/_encode_vcf_array"
-  local slurm_nslots="${nslots}"
-  local slurm_jid="na"
-  if [ "${cluster}" = "slurm" ]; then
-    local slurm_jid=$( sbatch \
-      --account="${slurm_project}" \
-      --job-name="${ko_jname}" \
-      --output="${ko_lname}.log" \
-      --error="${ko_lname}.errors.log" \
-      --chdir="${curwd}" \
-      --partition="${slurm_queue}" \
-      --cpus-per-task="${nslots}" \
-      --array=${array_id} \
-      --parsable \
-      "${bash_script}" \
-      "${in_prefix}" \
-      "${in_type}" \
-      "${annotation}" \
-      "${out_interval}" \
-      "${out_prefix_csqs}" \
-      "${genes_per_chunk}" \
-      "${chunks}" \
-      "${chr}" )
-  elif [ "${cluster}" = "sge" ]; then
-    qsub -N "${ko_jname}" \
-      -o "${ko_lname}.log" \
-      -e "${ko_lname}.errors.log" \
-      -P ${sge_project} \
-      -wd $(pwd) \
-      -t ${array_id} \
-      -q "${sge_queue}" \
-      -pe shmem ${nslots} \
-      "${bash_script}" \
-      "${in_prefix}" \
-      "${in_type}" \
-      "${annotation}" \
-      "${out_interval}" \
-      "${out_prefix_csqs}" \
-      "${genes_per_chunk}" \
-      "${chunks}" \
-      "${chr}"
+  if [ ! -f "${merge_file}" ]; then
+    local ko_jname="_c${chr}_extr_${annotation}"
+    local ko_lname="logs/_encode_vcf_array"
+    local slurm_nslots="${nslots}"
+    local slurm_jid="na"
+    if [ "${cluster}" = "slurm" ]; then
+      local slurm_jid=$( sbatch \
+        --account="${slurm_project}" \
+        --job-name="${ko_jname}" \
+        --output="${ko_lname}.log" \
+        --error="${ko_lname}.errors.log" \
+        --chdir="${curwd}" \
+        --partition="${slurm_queue}" \
+        --cpus-per-task="${nslots}" \
+        --array=${array_id} \
+        --parsable \
+        "${bash_script}" \
+        "${in_prefix}" \
+        "${in_type}" \
+        "${annotation}" \
+        "${out_interval}" \
+        "${out_prefix_csqs}" \
+        "${genes_per_chunk}" \
+        "${chunks}" \
+        "${chr}" )
+    elif [ "${cluster}" = "sge" ]; then
+      qsub -N "${ko_jname}" \
+        -o "${ko_lname}.log" \
+        -e "${ko_lname}.errors.log" \
+        -P ${sge_project} \
+        -wd $(pwd) \
+        -t ${array_id} \
+        -q "${sge_queue}" \
+        -pe shmem ${nslots} \
+        "${bash_script}" \
+        "${in_prefix}" \
+        "${in_type}" \
+        "${annotation}" \
+        "${out_interval}" \
+        "${out_prefix_csqs}" \
+        "${genes_per_chunk}" \
+        "${chunks}" \
+        "${chr}"
+    else
+      >&2 echo "${cluster} is not a valid cluster."
+    fi
+    # note that this function waits for "ko_jname" (sge) which
+    # is used as a dependency before starting job.
+    submit_merge_job ${merge_prefix_regex} ${out_prefix_merge} ${ko_jname} ${slurm_jid}
   else
-    >&2 echo "${cluster} is not a valid cluster."
+    >&2 echo "${merge_file} already exists. Skipping!"
   fi
-  # note that this function waits for "ko_jname" (sge) which
-  # is used as a dependency before starting job.
-  submit_merge_job ${merge_prefix_regex} ${out_prefix_merge} ${ko_jname} ${slurm_jid}
+
 }
 
 
@@ -188,7 +193,7 @@ submit_knockout_job()
 #submit_knockout_job "damaging_missense" "2"
 #submit_knockout_job "pLoF" "2"
 #submit_knockout_job "synonymous" "1"
-submit_knockout_job "other_missense" "3"
+submit_knockout_job "other_missense" "4"
 
 
 
