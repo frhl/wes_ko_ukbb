@@ -12,7 +12,7 @@
 #SBATCH --error=logs/spa_iter_common.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-10
+#SBATCH --array=11-320
 #
 #
 #$ -N spa_iter_common
@@ -22,7 +22,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 1-10
+#$ -t 5
 #$ -V
 
 
@@ -47,13 +47,16 @@ readonly P_cutoff="5e-6"
 # directories and paths
 readonly pheno_dir="data/phenotypes"
 readonly interval_dir="data/conditional/common/intervals/min_mac${min_mac}"
-readonly out_dir="data/conditional/common/spa_iter"
+readonly out_dir="data/conditional/common/spa_iter_cond_prs"
 
 readonly grm_dir="data/saige/grm/input/dnanexus"
 readonly grm_mtx="${grm_dir}/ukb_eur_200k_grm_fitted_relatednessCutoff_0.05_2000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
 
 readonly in_prefix="ukb_eur_wes_200k"
+
+# use PRS and give error if not available
+readonly force_prs="1"
 
 submit_binary_analysis()
 {
@@ -76,13 +79,19 @@ submit_cond_spa()
   local annotation=${1?Error: Missing arg1 (consequence)}
   local phenotype=${2?Error: Missing arg2 (phenotype)}
   local trait=${3?Error: Missing arg3 (trait)}
-
-  local step1_dir="data/saige/output/${trait}/step1"
-  local step2_dir="data/saige/output/${trait}/step2/minmac${min_mac}"
-  local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
-  local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
   local interval_vcf="${interval_dir}/${in_prefix}_${phenotype}_${annotation}.vcf.bgz"
   local out_prefix="${out_dir}/${in_prefix}_${phenotype}_${annotation}_cond"
+  local step1_dir="data/saige/output/${trait}/step1"
+  local step2_dir="data/saige/output/${trait}/step2/minmac${min_mac}"
+  
+  if [ "${force_prs}" -eq "1" ]; then
+    local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.rda"
+    local in_var="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.varianceRatio.txt"
+    local out_prefix="${out_prefix}_locoprs"
+  else
+    local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
+    local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
+  fi
 
   echo "interval_vcf: $( ls -l ${interval_vcf})"
 

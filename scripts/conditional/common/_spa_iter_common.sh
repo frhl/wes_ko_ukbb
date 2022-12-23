@@ -67,6 +67,8 @@ spa_chr_loop() {
    for chr in ${CHROMS}; do
       local out_spa="${spa_prefix}${chr}"
       local spa_copy="${spa_prefix}${chr}.txt"
+      local chr_gmat=$(echo ${in_gmat} | sed -e "s/CHR/${chr}/g")
+      local chr_var=$(echo ${in_var} | sed -e "s/CHR/${chr}/g")
       if [ ! -f "${out_spa}" ]; then
         Rscript "${step2_SPAtests}"  \
            --vcfFile="${vcf}" \
@@ -77,8 +79,8 @@ spa_chr_loop() {
            --chrom="chr${chr}" \
            --minMAF="${min_maf}" \
            --minMAC="${min_mac}" \
-           --GMMATmodelFile="${in_gmat}" \
-           --varianceRatioFile="${in_var}" \
+           --GMMATmodelFile="${chr_gmat}" \
+           --varianceRatioFile="${chr_var}" \
            --SAIGEOutputFile="${out_spa}" \
            --LOCO=FALSE \
            ${markers:+--condition "$markers"}
