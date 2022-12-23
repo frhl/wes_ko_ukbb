@@ -7,21 +7,25 @@
 #SBATCH --error=logs/spa_cond_rare.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-10
-#SBATCH --requeue
+#SBATCH --array=5
 
 set -o errexit
 set -o nounset
 
-module purge
+source utils/qsub_utils.sh
 source utils/bash_utils.sh
+
+readonly cluster=$( get_current_cluster)
+readonly index=$( get_array_task_id )
 
 readonly vcf_dir="data/conditional/rare/combined"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
-readonly grm_dir="data/saige/grm/input"
-readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+
+readonly grm_dir="data/saige/grm/input/dnanexus"
+readonly grm_mtx="${grm_dir}/ukb_eur_200k_grm_fitted_relatednessCutoff_0.05_2000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
+readonly plink_file="${grm_dir}/ukb_eur_200k_grm_grch38_rv_merged"
 
 readonly spa_script="scripts/conditional/rare/_spa_cond_rare.sh"
 readonly merge_script="scripts/_spa_merge.sh"
@@ -31,20 +35,19 @@ readonly in_prefix="ukb_eur_wes_200k"
 readonly markers_by_gene_dir="data/conditional/rare/combined/genes/min_mac4"
 
 # directory to conditioning markers
-readonly cond_rare_dir="data/conditional/rare/combined"
-readonly cond_rare_file="${cond_rare_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_markers.txt.gz"
+readonly cond_rare_dir="data/conditional/rare/combined/mt"
+readonly cond_rare_file="${cond_rare_dir}/ukb_eur_wes_200k_chrCHR_pLoF_damaging_missense_markers.txt.gz"
 # path to file with allele count by phenotype (need to avoid conditioning on monomorphic SNPs)
-readonly markers_ac="${cond_rare_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_AC.txt.gz"
-readonly markers_hash="${cond_rare_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_hash.txt.gz"
+readonly markers_ac="${cond_rare_dir}/ukb_eur_wes_200k_chrCHR_pLoF_damaging_missense_AC.txt.gz"
+readonly markers_hash="${cond_rare_dir}/ukb_eur_wes_200k_chrCHR_pLoF_damaging_missense_hash.txt.gz"
 # category group for markers to condition on (csv)
 readonly cond_cat="pLoF,damaging_missense" 
 
-readonly index=${SLURM_ARRAY_TASK_ID}
 
 submit_spa_binary_with_csqs()
 {
   local annotation="${1?Error: Missing arg1 (annotation)}"
-  local pheno_list="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
+  local pheno_list="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
   local phenotype=$( sed "${index}q;d" ${pheno_list} )
   submit_spa_with_csqs "${annotation}" "${phenotype}" "binary"
 }
@@ -66,15 +69,15 @@ submit_spa_with_csqs()
 
     # setup input and outputs
     local step1_dir="data/saige/output/${trait}/step1"
-    local step2_dir="data/saige/output/${trait}/step2_rare_cond_v1116_retest/min_mac${min_mac}"
-    local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${maf}_${annotation}.vcf.bgz"
+    local step2_dir="data/saige/output/${trait}/step2_rare_cond/min_mac${min_mac}"
+    local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${annotation}.vcf.bgz"
     mkdir -p ${step2_dir}
 
     # setup paths to saige step 1
     local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
     local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
-    local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}"
-    local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}.txt.gz"
+    local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${phenotype}_${annotation}"
+    local out_mrg="${step2_dir}/${in_prefix}_${phenotype}_${annotation}.txt.gz"
 
     # setup paths to saige step 1 PRS scores
    if [ "${use_prs}" -eq "1" ]; then
@@ -83,8 +86,8 @@ submit_spa_with_csqs()
       if [ -f "${in_gmat_prs/CHR/21}" ] & [ -f "${in_var_prs/CHR/21}" ]; then
         local in_gmat=${in_gmat_prs}
         local in_var=${in_var_prs}
-        local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}_locoprs"
-        local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}_locoprs.txt.gz"
+        local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${phenotype}_${annotation}_locoprs"
+        local out_mrg="${step2_dir}/${in_prefix}_${phenotype}_${annotation}_locoprs.txt.gz"
       else
         >&2 echo "Saige NULL (PRS) ${in_gmat_prs}/${in_var_prs} does not exist. Using without PRS."
       fi
@@ -92,7 +95,7 @@ submit_spa_with_csqs()
 
     # setup paths to variants in genes by phenotype (We don't care about PRS here, since
     # this step is just for selecting variants within genes).
-    local markers_by_gene="${markers_by_gene_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}.txt.gz"
+    local markers_by_gene="${markers_by_gene_dir}/${in_prefix}_${phenotype}_${annotation}.txt.gz"
 
     if [ -f ${markers_by_gene} ]; then
       if [ ! -f "${out_mrg}" ]; then
@@ -118,13 +121,14 @@ submit_spa_job() {
   local slurm_lname="${out_prefix}"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
+  local sge_queue="short.qc"
   local slurm_nslots="${nslots}"
   readonly spa_jid=$( sbatch \
     --account="${slurm_project}" \
     --job-name="${slurm_jname}" \
     --output="${slurm_lname}.log" \
     --error="${slurm_lname}.errors.log" \
-    --chdir="${curwd}" \
+    --chdir="$(pwd)" \
     --partition="${slurm_queue}" \
     --cpus-per-task="${slurm_nslots}" \
     --array=${slurm_tasks} \
@@ -160,7 +164,7 @@ submit_merge_job() {
     --job-name="${slurm_jname}" \
     --output="${slurm_lname}.log" \
     --error="${slurm_lname}.errors.log" \
-    --chdir="${curwd}" \
+    --chdir="$(pwd)" \
     --partition="${slurm_queue}" \
     --cpus-per-task="${slurm_nslots}" \
     --dependency="afterok:${spa_jid}" \
@@ -174,17 +178,14 @@ submit_merge_job() {
 
 # parameters
 readonly markers_cond_min_mac=4  #3
-readonly use_prs="1"
+readonly use_prs="0"
 readonly min_mac=4
 readonly tasks=1-22
-readonly queue="short.qc"
+readonly queue="short"
 readonly project="lindgren.prj"
-readonly nslots=5
+readonly nslots=4
 
 
-
-# Binary traits
-maf="maf0to5e-2"
 
 # cts traits
 #submit_spa_cts_with_csqs "pLoF_damaging_missense"
