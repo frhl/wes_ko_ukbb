@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 #
-#
-#
 #SBATCH --account=lindgren.prj
 #SBATCH --job-name=spa_cond_rare
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -9,7 +7,7 @@
 #SBATCH --error=logs/spa_cond_rare.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-80
+#SBATCH --array=1-10
 #SBATCH --requeue
 
 set -o errexit
