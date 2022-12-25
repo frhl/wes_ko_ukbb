@@ -128,10 +128,10 @@ main <- function(args){
      multi_auto <- snp_ldpred2_auto(
         corr = snp$corr,
         df_beta = gwas,
-        num_iter = 500,
-        burn_in = 1000,
-        h2_init = h2_init*10,
-        vec_p_init = seq(0.001, 0.8, length.out=vec_p_ranges), # using cores instead 30
+        num_iter = 2000, # try with 500
+        burn_in = 1000, 
+        h2_init = h2_init*100, # try with 10
+        vec_p_init = seq_log(0.00001, 0.8, length.out=vec_p_ranges), # using cores instead 30
         ncores = NCORES)
     ### attempt rescue smaller chromsome end
 
@@ -252,7 +252,7 @@ parser$add_argument("--pred", default=NULL, required = TRUE, help = "Path to pli
 parser$add_argument("--ldsc", default=NULL, required = TRUE, help = ".rds object containing QCed GWAS and ldsc heritability estimates")
 parser$add_argument("--ldsc_pvalue_cutoff", default=NULL, help = "cancel the run if the ldsc heritability p-value is not below the given treshold.")
 parser$add_argument("--standardized_gt", default=1, required = FALSE, help = "Should genotypes be standardized?")
-parser$add_argument("--vec_p_init_n", default=200, required = FALSE, help = "number of intial estimates to sample form (should be at least 5)")
+parser$add_argument("--vec_p_init_n", default=500, required = FALSE, help = "number of intial estimates to sample form (should be at least 5)")
 parser$add_argument("--tmp_bfile", default=NULL, required = TRUE, help = "File path to temporary backing files")
 parser$add_argument("--ld_dir", default=NULL, required = TRUE, help = "Path to directory with pre-calcualted SNP correlations and LD (.rds files)")
 parser$add_argument("--impute", default=NULL, required = TRUE, help = "Should missing genotypes be imputed? (See https://privefl.github.io/bigsnpr/reference/snp_fastImputeSimple.html)")

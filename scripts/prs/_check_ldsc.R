@@ -5,14 +5,26 @@ main <- function(args){
   stopifnot(file.exists(args$ldsc))
     
   # laod ldsc and qced GWAS
+  ok <- TRUE
   ldsc <- readRDS(args$ldsc)
   h2 <- ldsc$coefficients$estimate[2]
   pvalue <- ldsc$coefficients$pvalue[2]
   pvalue_cutoff <- as.numeric(args$ldsc_pvalue_cutoff)
-  if (pvalue > pvalue_cutoff) stop(paste(args$ldsc, "does not pass P-value threshold."))
-  if (h2 <= 0) stop(paste0("h2 (",h2 ,") is zero or negative:",  args$ldsc))
-  write(paste0(ldsc, ".. ok!"), stderr())
-  
+  if (pvalue > pvalue_cutoff){
+      write(paste(args$ldsc, "does not pass P-value threshold."),stderr())
+      ok <- FALSE
+  } 
+  if (h2 <= 0) {
+    write(paste0("h2 (",h2 ,") is zero or negative:",  args$ldsc),stderr())
+    ok <- FALSE
+  }
+ 
+  if (ok){
+    write(1, stdout())
+  } else {
+    write(0, stdout())
+  }
+
 }
 
 # add arguments

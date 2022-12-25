@@ -17,8 +17,8 @@
 #$ -e logs/prs.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q test.qc
-#$ -t 1-320 
+#$ -q short.qc
+#$ -t 11-320 
 #$ -V
 
 set -o errexit
@@ -42,7 +42,7 @@ readonly mrg_dir="data/prs/scores"
 
 # do not run files that have h2 estimates
 # above the given p-value cutoff (nominal).
-readonly ldsc_pvalue_cutoff="0.01"
+readonly ldsc_pvalue_cutoff="0.001"
 
 readonly cluster=$( get_current_cluster )
 readonly index=$( get_array_task_id )
@@ -78,19 +78,19 @@ submit_ldpred2()
   if [ ! -z ${phenotype} ]; then
     if [ ! -f "${merged}" ]; then
       # check that p-value passes thresholds
-      #set_up_rpy
-      #Rscript ${rscript_ldsc} \
-      #3  --ldsc ${ldsc} \
-      #  --ldsc_pvalue_cutoff ${ldsc_pvalue_cutoff}
-      # fit actual pgs
-      fit_pgs
-      # aggregate into matrix
-      aggr_pgs
+      set_up_rpy
+      local pass_qc=$( Rscript ${rscript_ldsc} --ldsc ${ldsc} --ldsc_pvalue_cutoff ${ldsc_pvalue_cutoff} )
+      if [ "${pass_qc}" = "1" ]; then
+        fit_pgs
+        aggr_pgs
+        clean_pgs
+      else
+        >&2 echo "${phenotype} does not pass LDSC QC."
+      fi
     else
       >&2 echo "${merged} already exists. Skipping.."
     fi
     # remove disk backing files
-    clean_pgs
   fi
 
 }
