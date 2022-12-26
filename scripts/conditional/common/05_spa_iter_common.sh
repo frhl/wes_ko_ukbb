@@ -12,7 +12,7 @@
 #SBATCH --error=logs/spa_iter_common.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=11-320
+#SBATCH --array=1-320
 #
 #
 #$ -N spa_iter_common
@@ -47,7 +47,7 @@ readonly P_cutoff="5e-6"
 # directories and paths
 readonly pheno_dir="data/phenotypes"
 readonly interval_dir="data/conditional/common/intervals/min_mac${min_mac}"
-readonly out_dir="data/conditional/common/spa_iter_cond_prs"
+readonly out_dir="data/conditional/common/spa_iter_new/spa_iter_cond"
 
 readonly grm_dir="data/saige/grm/input/dnanexus"
 readonly grm_mtx="${grm_dir}/ukb_eur_200k_grm_fitted_relatednessCutoff_0.05_2000_randomMarkersUsed.sparseGRM.mtx"
