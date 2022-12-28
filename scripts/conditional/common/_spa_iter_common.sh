@@ -156,10 +156,16 @@ conditional_analysis() {
 
 readonly cluster=$( get_current_cluster)
 readonly task_id=$( get_array_task_id )
-readonly vcf=$( sed "${task_id}q;d" ${intervals} | cut -f4)
+readonly gene=$( sed "${task_id}q;d" ${intervals} | cut -f2)
+readonly chromosome=$( sed "${task_id}q;d" ${intervals} | cut -f3)
+readonly region_start=$( sed "${task_id}q;d" ${intervals} | cut -f4)
+readonly region_end=$( sed "${task_id}q;d" ${intervals} | cut -f5)
+readonly vcf=$( sed "${task_id}q;d" ${intervals} | cut -f6)
 readonly csi="${vcf}.csi"
-readonly gene=$( sed "${task_id}q;d" ${intervals} | cut -f3)
-readonly out_prefix="${tmp_prefix}.${gene}"
+readonly out_prefix="${tmp_prefix}_${gene}"
+
+echo "gene: ${gene}"
+echo "vcf: ${vcf}"
 
 if [ ! -f "${csi}" ]; then
   make_tabix "${vcf}" "csi"
@@ -167,6 +173,7 @@ fi
 
 # setup permenant variables
 readonly CHROMS=$(extract_chr_from_vcf ${vcf}) 
+echo "CHROMS:'${CHROMS}'"
 readonly final_markers="${out_prefix}.markers"
 rm -f ${final_markers}
 

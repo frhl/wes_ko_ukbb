@@ -2,7 +2,6 @@
 
 
 import hail as hl
-import pandas as pd
 import argparse
 
 from ukb_utils import hail_init
@@ -25,27 +24,35 @@ def main(args):
     
     # get chromosomes and ranges to extract    
     ht = hl.read_table(intervals)
-    df = ht.to_pandas()    
- 
-    outfile = out_prefix + "_intervals.txt"
-    with open(outfile, "w") as outfile:
-        for idx, row in df.iterrows():
-            # iterate over rows
-            gene = row['gene']
-            contig = row['contig']
-            start = row['start_with_padding']
-            end = row['end_with_padding']
-            interval = f"{contig}:{start}-{end}"
-            hail_interval = hl.parse_locus_interval(interval, reference_genome='GRCh38')
-            # create interval per region
-            path = f"data/unphased/imputed/common_append_missing/ukb_imp_200k_common_append_missing_{contig}.mt"
-            mt = hl.read_matrix_table(path)
-            mt = hl.filter_intervals(mt, hl.literal([hail_interval])) 
-            # create outfile 
-            out_prefix_gene = out_prefix + "_" + gene + ".vcf.bgz"
-            #hl.export_vcf(mt, out_prefix_gene)
-            line = ("%s\t%s\t%s\t%s\t%s\t%s" % (phenotype, gene, contig, start, end, out_prefix_gene))
+    chromosomes = [x.replace('chr', '') for x in list(set(ht.contig.collect()))]
+    hail_intervals = ht.intervals.collect()
+  
+    # get all the relevant chromsomes
+    path = f"data/unphased/imputed/common_append_missing/ukb_imp_200k_common_append_missing_chr21.mt"
+    mt = hl.read_matrix_table(path)
+    
+    # Import phenotypes for MAF thresholding
+    if  pheno_file and min_maf_by_case_control and trait in "binary":
+        ht = hl.import_table(pheno_file,
+                     types={'eid': hl.tstr},
+                     missing=["",'""',"NA"],
+                     impute=True,
+                     force=True,
+                     key='eid')
+        # subset min-maf by case controls
+        mt = mt.annotate_cols(pheno=ht[mt.s][phenotype])
+        cases = mt.aggregate_cols(hl.agg.sum(mt.pheno == True))
+        controls = mt.aggregate_cols(hl.agg.sum(mt.pheno == False)) 
+        min_maf = hl.max(0.01, 25/(2 * hl.min([cases, controls]))).collect()[0]
+        
+        # write to outfile
+        outfile = out_prefix + "_min_maf.tsv"
+        with open(outfile, "w") as outfile:
+            line = ("%s\t%d\t%d\t%f" % (phenotype, cases, controls, min_maf))  
             outfile.write(line + "\n")
+
+    else:
+        raise ValueError("param 'phenotypes' is not set! ")
 
 
 

@@ -12,7 +12,7 @@
 #SBATCH --error=logs/spa_iter_common.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=22
+#SBATCH --array=1-320
 #
 #
 #$ -N spa_iter_common
@@ -47,7 +47,7 @@ readonly P_cutoff="5e-6"
 # directories and paths
 readonly pheno_dir="data/phenotypes"
 readonly interval_dir="data/conditional/common/intervals/min_mac${min_mac}"
-readonly out_dir="data/conditional/common/spa_iter_new_chr/spa_iter"
+readonly out_dir="data/conditional/common/spa_iter"
 
 readonly grm_dir="data/saige/grm/input/dnanexus"
 readonly grm_mtx="${grm_dir}/ukb_eur_200k_grm_fitted_relatednessCutoff_0.05_2000_randomMarkersUsed.sparseGRM.mtx"
@@ -83,6 +83,7 @@ submit_cond_spa()
   local step1_dir="data/saige/output/${trait}/step1"
   local step2_dir="data/saige/output/${trait}/step2/minmac${min_mac}"
   
+ 
   if [ "${force_prs}" -eq "1" ]; then
     local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.rda"
     local in_var="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.varianceRatio.txt"
@@ -93,7 +94,9 @@ submit_cond_spa()
   fi
   mkdir -p ${out_dir}
   local intervals="${interval_dir}/${in_prefix}_${phenotype}_${annotation}_intervals.txt"
-  if [ -f "${intervals}" ]; then 
+  local path_min_maf="${interval_dir}/${in_prefix}_${phenotype}_${annotation}_min_maf.tsv"
+  local new_min_maf=$( sed "1q;d" ${path_min_maf} | cut -f4) 
+  if [ -f "${intervals}" ] & [ -f "${path_min_maf}" ]; then 
     local n_vcfs=$( cat ${intervals} | wc -l )
     local tasks="1-${n_vcfs}"
     readonly slurm_jname="_cond_${phenotype}"
@@ -124,7 +127,7 @@ submit_cond_spa()
         "${grm_mtx}" \
         "${grm_sam}" \
         "${phenotype}" \
-        "${min_maf}"
+        "${new_min_maf}"
     elif [ "${cluster}" = "sge" ]; then
      qsub -N "${slurm_jname}" \
         -o "${slurm_lname}.log" \
@@ -145,7 +148,7 @@ submit_cond_spa()
         "${grm_mtx}" \
         "${grm_sam}" \
         "${phenotype}" \
-        "${min_maf}"
+        "${new_min_maf}"
       fi
   else
     >&2 echo "${intervals} (interval) does not exist. Exiting.."
