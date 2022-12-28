@@ -16,14 +16,14 @@ readonly trait=${4?Error: Missing arg8 (trait)}
 readonly phenotype=${5?Error: Missing arg9 (phenotype)}
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/conditional/common/04_filter_genotypes.py"
+readonly hail_script="scripts/conditional/common/04_filter_genotypes_gene.py"
 readonly rstatus="${out_prefix}.running"
 readonly checkpoint="${out_prefix}_checkpoint.mt"
 
 filter_genotypes() 
 {
   >&2 echo "Running if statement."
-  if [ ! -f "${out_prefix}.vcf.bgz" ]; then
+  if [ ! -f "${out_prefix}_gene.vcf.bgz" ]; then
     >&2 echo "Python will be used now:"
     touch ${rstatus} 
     python3 "${hail_script}" \
@@ -47,6 +47,6 @@ set_up_hail
 set_up_pythonpath_legacy
 >&2 echo "starting analysis for ${phenotype}.."
 filter_genotypes
-make_tabix "${out_prefix}.vcf.bgz" "csi"
+#make_tabix "${out_prefix}.vcf.bgz" "csi"
 >&2 echo "All done for ${phenotype}"
 

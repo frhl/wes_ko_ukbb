@@ -79,7 +79,8 @@ def main(args):
             reference_genome=reference_genome))
 
     # write hail talbe
-    ht.write(out_prefix + ".ht")
+    #ht.write(out_prefix + ".ht")
+    ht.export(out_prefix + ".txt.gz")
 
 if __name__ == '__main__':
 

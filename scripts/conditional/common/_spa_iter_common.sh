@@ -8,11 +8,12 @@ set -o nounset
 
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
+source utils/vcf_utils.sh
 
 readonly in_gmat=${1?Error: Missing arg1 (in_gmat)}
 readonly in_var=${2?Error: Missing arg2 (in_var)}
-readonly vcf=${3?Error: Missing arg3 (vcf)}
-readonly out_prefix=${4?Error: Missing arg4 (out_prefix)}
+readonly intervals=${3?Error: Missing arg3 (intervals)}
+readonly tmp_prefix=${4?Error: Missing arg4 (out_prefix)}
 readonly P_cutoff=${5?Error: Missing arg5 (P_cutoff)}
 readonly max_iter=${6?Error: Missing arg6 (max_iter)}
 readonly min_mac=${7?Error: Missing arg7 (min_mac)}
@@ -23,7 +24,6 @@ readonly min_maf=${11?Error: Missing arg11 (min_maf)}
 
 readonly variant_category="common"
 
-readonly csi="${vcf}.csi"
 readonly step2_SPAtests="utils/saige/step2_SPAtests.R"
 readonly shell_spa="scripts/conditional/common/_chr_spa.sh"
 readonly rscript="scripts/conditional/common/03_spa_conditional.R"
@@ -154,6 +154,17 @@ conditional_analysis() {
 # main script #
 ##############
 
+readonly cluster=$( get_current_cluster)
+readonly task_id=$( get_array_task_id )
+readonly vcf=$( sed "${task_id}q;d" ${intervals} | cut -f4)
+readonly csi="${vcf}.csi"
+readonly gene=$( sed "${task_id}q;d" ${intervals} | cut -f3)
+readonly out_prefix="${tmp_prefix}.${gene}"
+
+if [ ! -f "${csi}" ]; then
+  make_tabix "${vcf}" "csi"
+fi
+
 # setup permenant variables
 readonly CHROMS=$(extract_chr_from_vcf ${vcf}) 
 readonly final_markers="${out_prefix}.markers"
@@ -166,5 +177,6 @@ set +eu
 
 # Run conditional analysis
 conditional_analysis ${vcf} ${out_prefix}
+
 
 

@@ -12,7 +12,7 @@
 #SBATCH --error=logs/spa_iter_common.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-320
+#SBATCH --array=22
 #
 #
 #$ -N spa_iter_common
@@ -47,7 +47,7 @@ readonly P_cutoff="5e-6"
 # directories and paths
 readonly pheno_dir="data/phenotypes"
 readonly interval_dir="data/conditional/common/intervals/min_mac${min_mac}"
-readonly out_dir="data/conditional/common/spa_iter_new/spa_iter_cond"
+readonly out_dir="data/conditional/common/spa_iter_new_chr/spa_iter"
 
 readonly grm_dir="data/saige/grm/input/dnanexus"
 readonly grm_mtx="${grm_dir}/ukb_eur_200k_grm_fitted_relatednessCutoff_0.05_2000_randomMarkersUsed.sparseGRM.mtx"
@@ -56,7 +56,7 @@ readonly grm_sam="${grm_mtx}.sampleIDs.txt"
 readonly in_prefix="ukb_eur_wes_200k"
 
 # use PRS and give error if not available
-readonly force_prs="1"
+readonly force_prs="0"
 
 submit_binary_analysis()
 {
@@ -79,7 +79,6 @@ submit_cond_spa()
   local annotation=${1?Error: Missing arg1 (consequence)}
   local phenotype=${2?Error: Missing arg2 (phenotype)}
   local trait=${3?Error: Missing arg3 (trait)}
-  local interval_vcf="${interval_dir}/${in_prefix}_${phenotype}_${annotation}.vcf.bgz"
   local out_prefix="${out_dir}/${in_prefix}_${phenotype}_${annotation}_cond"
   local step1_dir="data/saige/output/${trait}/step1"
   local step2_dir="data/saige/output/${trait}/step2/minmac${min_mac}"
@@ -92,11 +91,11 @@ submit_cond_spa()
     local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
     local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
   fi
-
-  echo "interval_vcf: $( ls -l ${interval_vcf})"
-
   mkdir -p ${out_dir}
-  if [ -f "${interval_vcf}" ]; then 
+  local intervals="${interval_dir}/${in_prefix}_${phenotype}_${annotation}_intervals.txt"
+  if [ -f "${intervals}" ]; then 
+    local n_vcfs=$( cat ${intervals} | wc -l )
+    local tasks="1-${n_vcfs}"
     readonly slurm_jname="_cond_${phenotype}"
     readonly slurm_lname="${out_prefix}"
     readonly slurm_project="lindgren.prj"
@@ -112,12 +111,12 @@ submit_cond_spa()
         --chdir="${curwd}" \
         --partition="${slurm_queue}" \
         --cpus-per-task="${slurm_shmem}" \
-        --array=${task_id} \
+        --array=${tasks} \
         --parsable \
         "${bash_script}" \
         "${in_gmat}" \
         "${in_var}" \
-        "${interval_vcf}" \
+        "${intervals}" \
         "${out_prefix}" \
         "${P_cutoff}" \
         "${max_iter}" \
@@ -132,13 +131,13 @@ submit_cond_spa()
         -e "${slurm_lname}.errors.log" \
         -P lindgren.prjc \
         -wd $(pwd) \
-        -t ${task_id} \
+        -t ${tasks}  \
         -q "${sge_queue}" \
         -pe shmem ${slurm_shmem} \
         "${bash_script}" \
         "${in_gmat}" \
         "${in_var}" \
-        "${interval_vcf}" \
+        "${intervals}" \
         "${out_prefix}" \
         "${P_cutoff}" \
         "${max_iter}" \
@@ -149,7 +148,7 @@ submit_cond_spa()
         "${min_maf}"
       fi
   else
-    >&2 echo "${interval_vcf} (interval) does not exist. Exiting.."
+    >&2 echo "${intervals} (interval) does not exist. Exiting.."
   fi
 
 }
