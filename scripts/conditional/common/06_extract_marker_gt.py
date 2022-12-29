@@ -5,18 +5,14 @@ import argparse
 
 import pandas as pd
 from ukb_utils import hail_init
-from ukb_utils import genotypes
-from ukb_utils import variants
 from ko_utils import io
 
-AUTOSOMES = list(map(str, range(1, 23)))
 
 def main(args):
     
     markers = args.markers
     out_prefix = args.out_prefix
     out_type = args.out_type
-    final_sample_list = args.final_sample_list
     
     hail_init.hail_bmrc_init('logs/hail/extract_markers.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1')
@@ -51,47 +47,27 @@ def main(args):
             marker = ht.marker
         )
     )
-   
-    # assume input is grch38 and translate to grch37 
-    from_build = 'GRCh38'
-    to_build = 'GRCh37'
-    liftover_path = variants.get_liftover_chain_path(from_build,to_build)
-    rg_from = hl.get_reference(from_build)  
-    rg_to = hl.get_reference(to_build)
-    if not rg_from.has_liftover(rg_to):
-        rg_from.add_liftover(liftover_path, rg_to)   
-
-    # liftover to grch37
-    ht = ht.annotate(new_locus=hl.liftover(ht.locus, to_build, include_strand=True),old_locus=ht.locus)
-    ht = ht.filter(hl.is_defined(ht.new_locus))
-    ht = ht.annotate(new_alleles=hl.if_else(ht.new_locus.is_negative_strand, [variants.flip_base(ht.alleles[0]), variants.flip_base(ht.alleles[1])],ht.alleles))
-    ht = ht.key_by(locus=ht.new_locus.result, alleles=ht.new_alleles)
-   
-    # get chromosomes aad subset imputed data to varaints in hailTable
-    chroms = set(ht.locus.contig.collect())
-    mt = genotypes.get_ukb_imputed_v3_bgen(chroms)
+    
+    # get chromosomes to import
+    ht = ht.key_by(locus=ht.locus, alleles=ht.alleles)
+    chromosomes = set(ht.locus.contig.collect())
+    
+    mts = list()
+    for chrom in chromosomes:
+        path = f"data/unphased/imputed/common_append_missing/ukb_imp_200k_common_append_missing_{chrom}.mt"
+        mt = hl.read_matrix_table(path)
+        mts.append(mt)
+    
+    # combine and subset
+    mt = mts[0].union_rows(*mts[1:]) 
     mt = mt.filter_rows(hl.is_defined(ht[mt.row_key]))
-    mt = mt.annotate_rows(grch38 = ht[mt.row_key].grch38)
-    mt = mt.key_rows_by(locus=mt.grch38.locus, alleles=mt.grch38.alleles)     
-
-    # We are interested in dosages
+    
+    # We are interested in dosages for SAIGE
     mt = mt.annotate_entries(DS=hl.float64(mt.GT.n_alt_alleles()))
     mt = mt.select_entries(*[mt.DS, mt.GT])
-    mt = mt.drop(mt.grch38)
-
-    # fitler to releveant samples
-    if final_sample_list:
-        ht_final_samples = hl.import_table(
-                final_sample_list,
-                no_header=True, key='f0',
-                delimiter=',')
-        mt = mt.filter_cols(hl.is_defined(ht_final_samples[mt.col_key]))
 
     # export variants to be used for conditional analysis
     io.export_table(mt, out_prefix, "mt")
-    mt = io.import_table(out_prefix + ".mt", "mt")
-
-    # write VCF
     if out_prefix not in "mt":
         io.export_table(mt, out_prefix, out_type)
     
@@ -110,7 +86,6 @@ if __name__=='__main__':
     parser.add_argument('--markers', default=None, help='')
     parser.add_argument('--out_prefix', default=None, help='')
     parser.add_argument('--out_type', default=None, help='')
-    parser.add_argument('--final_sample_list', default=None, help='')
     args = parser.parse_args()
 
     main(args)

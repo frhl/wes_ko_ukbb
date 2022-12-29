@@ -8,9 +8,6 @@
 #SBATCH --error=logs/extract_marker_gt.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 5
-#SBATCH --requeue
-
-# Takes ~13h with 3a cores
 
 set -o errexit
 set -o nounset
@@ -20,23 +17,22 @@ source utils/bash_utils.sh
 source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/conditional/common/04_extract_marker_gt.py"
+readonly hail_script="scripts/conditional/common/06_extract_marker_gt.py"
 
-readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
-
-readonly out_dir="data/conditional/common/markers_with_gt/final"
+readonly out_dir="data/conditional/common/markers/test"
 readonly out_prefix="${out_dir}/common_conditional"
 readonly out_checkpoint="${out_prefix}_checkpoint.mt"
 readonly out_type="vcf"
 
-readonly markers_dir="data/conditional/common/spa_iter/final"
+readonly markers_dir="data/conditional/common/spa_iter"
 readonly markers=$(cat ${markers_dir}/*.markers | cut -f2 | sort -u | tr "\n" ",")
 readonly chroms=$(cat ${markers_dir}/*.markers | sed '/^[[:space:]]*$/d' | cut -d":" -f1)
+
+mkdir -p ${out_dir}
 
 # create new file containing all the aggregated results
 cat ${markers_dir}/*.markers > "${out_prefix}.markers"
 
-mkdir -p ${out_dir}
 
 # Get matrix filtered to common variants that pass our conditional analysis
 if [ ! -d "${out_prefix}.mt" ]; then 
