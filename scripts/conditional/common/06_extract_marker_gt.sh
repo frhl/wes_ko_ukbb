@@ -19,7 +19,7 @@ source utils/hail_utils.sh
 readonly spark_dir="data/tmp/spark"
 readonly hail_script="scripts/conditional/common/06_extract_marker_gt.py"
 
-readonly out_dir="data/conditional/common/markers/test"
+readonly out_dir="data/conditional/common/markers"
 readonly out_prefix="${out_dir}/common_conditional"
 readonly out_checkpoint="${out_prefix}_checkpoint.mt"
 readonly out_type="vcf"

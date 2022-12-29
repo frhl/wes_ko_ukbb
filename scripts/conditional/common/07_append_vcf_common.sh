@@ -11,21 +11,33 @@
 #SBATCH --cpus-per-task 3
 #SBATCH --array=1-22
 #SBATCH --requeue
+#
+#$ -N append_vcf_common
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#$ -o logs/append_vcf_common.log
+#$ -e logs/append_vcf_common.errors.log
+#$ -P lindgren.prjc
+#$ -pe shmem 2
+#$ -q short.qc
+#$ -t 1-22
+#$ -V
 
 source utils/vcf_utils.sh
 source utils/bash_utils.sh
 source utils/hail_utils.sh
+source utils/qsub_utils.sh
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/conditional/common/05_append_vcf_common.py"
+readonly hail_script="scripts/conditional/common/07_append_vcf_common.py"
 
-readonly chr="${SLURM_ARRAY_TASK_ID}"
+readonly array_idx=$( get_array_task_id )
+readonly chr=$( get_chr ${array_idx} )
 
-readonly ko_dir="data/knockouts/alt"
-readonly common_dir="data/conditional/common/markers_with_gt/final"
-readonly out_dir="data/conditional/common/combined/final"
+readonly ko_dir="data/knockouts/alt/pp90/combined"
+readonly common_dir="data/conditional/common/markers"
+readonly out_dir="data/conditional/common/combined"
 
-readonly ko_path_wo_ext="${ko_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense"
+readonly ko_path_wo_ext="${ko_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense"
 readonly common_path_wo_ext="${common_dir}/common_conditional"
 
 readonly ko_path_mt="${ko_path_wo_ext}.mt"
@@ -33,7 +45,7 @@ readonly ko_path_vcf="${ko_path_wo_ext}.vcf.bgz"
 readonly common_path_mt="${common_path_wo_ext}.mt"
 readonly common_path_vcf="${common_path_wo_ext}.vcf.bgz"
 
-readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense_w_common"
+readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense_w_common"
 readonly tmp_markers="${out_prefix}_markers.tmp"
 readonly out_markers="${out_prefix}_markers.txt"
 readonly out_markers_sorted="${out_prefix}_markers_sorted.txt"
