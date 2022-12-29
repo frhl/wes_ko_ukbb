@@ -32,15 +32,16 @@ ukb_wes_ko_path <- function(annotation = "pLoF_damaging_missense", chr = "21"){
 
 # get path to full file of ukb wes knockouts
 ukb_wes_syn_path <- function(annotation = "synonymous", chr = "21"){
-    thedir <- paste0("data/knockouts/alt/pp90/recoded_tmp")
-    thefile <- paste0("ukb_eur_wes_200k_chr",chr,"_",annotation,"_all.tsv.gz")
+    #thedir <- paste0("data/knockouts/alt/pp90/recoded_tmp")
+    thedir <- paste0("data/knockouts/alt/pp90/recoded_other_by_merge")
+    thefile <- paste0("ukb_eur_wes_200k_chr",chr,".pp90.recoded.",annotation,".txt.gz")
     path <- file.path(thedir, thefile)
     if (!file.exists(path)) stop(paste(path, "does not exist!"))
     return(path)
 }
 
 # read full paths
-read_ukb_wes_kos <- function(annotation, chromosomes=1:22, allow_hets = FALSE){
+read_ukb_wes_kos <- function(annotation, chromosomes=1:22, allow_hets = TRUE){
     d <- do.call(rbind, lapply(chromosomes, function(chr){
         if (annotation %in% c("pLoF", "damaging_missense", "pLoF_damaging_missense")){
             path <- ukb_wes_ko_path(annotation, chr)
