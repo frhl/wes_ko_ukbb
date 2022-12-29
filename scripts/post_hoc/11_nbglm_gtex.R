@@ -36,7 +36,7 @@ main <- function(args){
         lst_subset <- lapply(names(lst_data), function(dt_name){
             # create subset to be used
             dt_fit <- lst_data[[dt_name]]
-            dt_fit <- merge(dt_fit, gtex, by = c("ensembl_gene_id"), all.x = TRUE)
+            dt_fit <- merge(dt_fit, gtex, by = c("ensembl_gene_id","ensembl_transcript_id"), all.x = TRUE)
             # iterate through every category
             lst_category <- lapply(categories, function(category){
                 print(paste(category, anno, dt_name))
