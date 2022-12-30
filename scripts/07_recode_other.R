@@ -66,6 +66,9 @@ main <- function(args){
     dt <- fread(input_path)
     annotation <- fread(vep_path)
 
+    if (!"varid" %in% colnames(dt)) stop(paste("Columm 'varid' not in", input_path))
+    if (!"gene_id" %in% colnames(dt)) stop(paste("Columm 'gene_id' not in", input_path))
+
     # create ID fields for mapping
     colnames(annotation) <- gsub("worst_csq_by_gene_canonical\\.","",colnames(annotation))
     annotation$id <- paste0(annotation$gene_id,":", annotation$varid)
@@ -92,17 +95,22 @@ main <- function(args){
     map_ac <- create_mapping(annotation, "info.AC")
     map_an <- create_mapping(annotation, "info.AN")
 
+    # quick merge
+    vep <- annotation[,c("transcript_id","gene_id")]
+    vep <- vep[!duplicated(vep),]
+    dt <- merge(dt, vep, all.x = TRUE, by = "gene_id")
+
     # map items from 
     dt$consequence_category <- csqs #" #map_by_variant(dt$id, map_csqs, message="csqs_category")
     dt$most_severe_consequence <- NA #map_by_variant(dt$id, map_function_csqs, message="most_severe_csqs")
-    dt$transcript_id <- map_by_variant(dt$id, map_enstid, allow_dups = FALSE, message="trancript")
+    #dt$transcript_id <- map_by_variant(dt$id, map_enstid, allow_dups = FALSE, message="transcript")
     dt$exon <- NA #map_by_variant(dt$id, map_exon, message="exon")
     dt$intron <- NA #map_by_variant(dt$id, map_intron, message="intron")
     dt$revel_score <- NA #map_by_variant(dt$id, map_revel, message="revel_score")
     dt$cadd_phred <- NA #map_by_variant(dt$id, map_cadd, message="cadd_phred")
     dt$AF <- NA #map_by_variant(dt$id, map_af, message = "af")
-    dt$AC <- map_by_variant(dt$id, map_ac, message = "ac")
-    dt$AN <- map_by_variant(dt$id, map_an, message = "an")
+    dt$AC <- NA #<- map_by_variant(dt$id, map_ac, message = "ac")
+    dt$AN <- NA#<- map_by_variant(dt$id, map_an, message = "an")
     dt$id <- NULL
 
     # make columns nicer

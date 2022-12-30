@@ -25,9 +25,9 @@ readonly p_cutoff="5e-7"
 
 # directories and out paths
 readonly basename_prefix="ukb_eur_wes_200k_maf0to5e-2"
-readonly spa_cts_dir="data/saige/output/cts/step2_common_cond/min_mac${min_mac}"
-readonly spa_bin_dir="data/saige/output/binary/step2_common_cond/min_mac${min_mac}"
-readonly out_dir="data/permute/overview/min_mac${min_mac}/phased_only"
+readonly spa_cts_dir="data/saige/output/cts/step2cond/min_mac${min_mac}"
+readonly spa_bin_dir="data/saige/output/binary/step2/min_mac${min_mac}"
+readonly out_dir="data/permute/overview/min_mac${min_mac}/no_cond"
 readonly out_prefix="${out_dir}/main"
 mkdir -p ${out_dir}
 

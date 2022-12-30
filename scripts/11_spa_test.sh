@@ -9,7 +9,7 @@
 #SBATCH --error=logs/spa_test.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-300
+#SBATCH --array=1-320
 
 set -o errexit
 set -o nounset
@@ -162,7 +162,7 @@ readonly use_prs="1"
 readonly min_mac=4
 readonly project="lindgren.prj"
 readonly tasks=1-22
-readonly queue="epyc"
+readonly queue="short"
 readonly nslots=1
 
 

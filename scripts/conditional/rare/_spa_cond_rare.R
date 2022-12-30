@@ -150,6 +150,9 @@ main <- function(args){
   d_gene_filter <- filter_to_candidates(d_gene, args$phenotype, args$chromosome)
   markers_in_gene <- d_gene_filter$id
 
+  # 
+  if (!args$chromosome %in% d_gene_filter$chr) write(paste("Note: No significant genes for",phenotype,"on",chromosome), stdout())
+
   # filter hash and phenotype markers based on markers in gene
   d_phenos <- d_phenos[d_phenos$id %in% markers_in_gene,]
   d_hash <- d_hash[d_hash$id %in% markers_in_gene,]

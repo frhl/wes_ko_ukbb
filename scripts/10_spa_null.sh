@@ -41,7 +41,7 @@ readonly index=${SLURM_ARRAY_TASK_ID}
 fit_binary_traits() {
   local trait_type="binary"
   local inv_normalize="FALSE"
-  local out_dir="data/saige/output/binary/step1"
+  local out_dir="data/saige/output/binary/step1_locoprs"
   local pheno_list="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
   local phenotype=$( sed "${index}q;d" ${pheno_list} )
   local out="${out_dir}/${out_prefix}_${phenotype}"
@@ -152,7 +152,7 @@ submit_spa_null() {
 
 # Parameters
 readonly use_prs=1
-readonly nslots=2
+readonly nslots=3
 readonly queue="short"
 readonly project="lindgren.prj"
 

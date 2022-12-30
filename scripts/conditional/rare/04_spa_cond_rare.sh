@@ -7,7 +7,7 @@
 #SBATCH --error=logs/spa_cond_rare.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=5
+#SBATCH --array=1-320
 
 set -o errexit
 set -o nounset
@@ -18,7 +18,7 @@ source utils/bash_utils.sh
 readonly cluster=$( get_current_cluster)
 readonly index=$( get_array_task_id )
 
-readonly vcf_dir="data/conditional/rare/combined"
+readonly vcf_dir="data/conditional/rare/combined/mt"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
 

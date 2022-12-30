@@ -22,23 +22,24 @@ fread_with_basename <- function(f){
 main <- function(args){
 
     print(args)
-    stopifnot(dir.exists(args$spa_cts_dir))
+    #stopifnot(dir.exists(args$spa_cts_dir))
     stopifnot(dir.exists(args$spa_bin_dir))
 
-    spa_cts_files <- list.files(args$spa_cts_dir, pattern = ".txt.gz", full.names = TRUE)
+    #spa_cts_files <- list.files(args$spa_cts_dir, pattern = ".txt.gz", full.names = TRUE)
     spa_bin_files <- list.files(args$spa_bin_dir, pattern = ".txt.gz", full.names = TRUE)
 
     # read in all the SPA step 2 results
-    spa_cts_full <- rbindlist(lapply(spa_cts_files, fread_with_basename), fill = TRUE)
+    #spa_cts_full <- rbindlist(lapply(spa_cts_files, fread_with_basename), fill = TRUE)
     spa_bin_full <- rbindlist(lapply(spa_bin_files, fread_with_basename), fill = TRUE)
     write("Loaded all cts/binary files..", stdout())
 
-    print(head(spa_cts_full, n=2))
+    #print(head(spa_cts_full, n=2))
     print(head(spa_bin_full, n=2))
     
         # combine and subset
     keep <- c("CHR","MarkerID","basename", "p.value", "Tstat", "p.value_c", "Tstat_c")
-    spa_full <- rbindlist(list(spa_cts_full, spa_bin_full))
+    #spa_full <- rbindlist(list(spa_cts_full, spa_bin_full))
+    spa_full <- spa_bin_full
     spa_full <- spa_full[, colnames(spa_full) %in% keep, with = FALSE]
     spa_full <- spa_full[,..keep]
     

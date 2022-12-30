@@ -74,6 +74,20 @@ aggregate_by_mac <- function(files, mac_bins, mac_bins_labels, variants){
     return(counts)
 }
 
+# get errors by gene (how many genes are perfectly phased)
+aggregate_errors_by_gene <- function(files, variants){
+    lst <- lapply(files, function(file){
+        print(file)
+        d <- fread_phased_sites(file)
+        d$wes_variant <- d$locus %in% variants$locus
+        d <- d[d$wes_variant == TRUE,]
+        chrom <- gsub("chr","",unique(d$CHR))
+        d <- get_switch_error_per_gene(pos = d$POS, switches = d$switches, chrom = chrom)
+        d$chr <- paste0("chr",chrom)
+        return(d)
+    })
+    return(lst)
+}
 
 # iterate over a matrix of switch errors and tested columns and append with
 # binomial confidence intervals for the switch error rate
@@ -102,6 +116,17 @@ main <- function(args){
     # read wes variants
     sites <- "/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list"
     variants <- fread(sites) 
+
+    # get switch errors per gene
+    lst_by_gene <- aggregate_errors_by_gene(files, variants)
+    counts_by_gene <- do.call(rbind, lst_by_gene)
+    counts_by_gene$wes_label <- "wes"
+    
+    out_gene <- paste0(out_prefix, "_gene.txt.gz")
+    fwrite(counts_by_gene, out_gene, sep = "\t")
+    write(paste("writing",out_gene), stderr())
+
+    stop("stopped here")
 
     # create mac bin labels
     bins <- c(0,1,5,10,20,50,100,200,500,1000,2000,5000, 10000, Inf)

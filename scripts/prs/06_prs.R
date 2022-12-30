@@ -31,8 +31,6 @@ main <- function(args){
   if (!is.null(args$ldsc_pvalue_cutoff)){
     pvalue_cutoff <- as.numeric(args$ldsc_pvalue_cutoff)
     if (pvalue > pvalue_cutoff) stop("phenotype does not pass threshold")
-    #stop(paste("p-value",pvalue,">", ldsc_pvalue_cutoff, "(cutoff). Stopping.")).
-    #}
   }
 
   # Estimate h2 chromosome-wide
@@ -43,6 +41,7 @@ main <- function(args){
   # check if estimates are ok
   if (N_total < 1) stop(paste0("No rows in GWAS: ", args$ldsc))
   if (N_chr < 1) stop(paste0("No matching chromsomes in gwas rows: ", args$ldsc))
+  if (N_chr < 10000) stop(paste0("Less than 10K variants in GWAS rows: ", args$ldsc)) 
   if (h2_init <= 0) stop(paste0("h2_init (",h2_init ,") is zero or negative:",  args$ldsc))
 
   # check estimates and ensure that
@@ -119,30 +118,50 @@ main <- function(args){
 
      # use proper vec p init
      vec_p_ranges <- max(NCORES, as.numeric(args$vec_p_init_n))
-     if (vec_p_ranges < 10) stop("You should ideally have 10-30 chains! set vec_p_init_n.")
+     if (vec_p_ranges < 10) stop("You need at least 10 chains! set vec_p_init_n>=10.")
      
-     # minimum proportion (vec_p)
-     p_min <- (1/N_chr)
+     #num_iter = 1000
+     #burn_in = 1000
 
-     write("Running multi_auto", stderr())
+     #num_iter=100
+     #burn_in=100
+
+     num_iter=round(runif(1, 100, 200))
+     burn_in=round(runif(1, 100, 200))
+
+     vec_p_init = seq(0.005, 0.10, length.out=vec_p_ranges)
+     #vec_p_init = seq(0.001, 0.9, length.out=100)
+
+     write(paste0("Starting LDPred2-auto for ",args$out_prefix,".."), stderr())
+     #write(paste0("h2=",h2, "\nh2_chrom=",h2_init,"\nn_variants=",N_chr), stderr())
+     #write(paste0("iter=",num_iter,"\nburn_in=",burn_in,"\nvec_p_ranges=",vec_p_ranges), stderr())
      multi_auto <- snp_ldpred2_auto(
         corr = snp$corr,
         df_beta = gwas,
-        num_iter = 2000, # try with 500
-        burn_in = 1000, 
-        h2_init = h2_init*100, # try with 10
-        vec_p_init = seq_log(0.00001, 0.8, length.out=vec_p_ranges), # using cores instead 30
+        num_iter = num_iter,
+        burn_in = burn_in,
+        h2_init = h2_init,
+        vec_p_init = vec_p_init,
         ncores = NCORES)
-    ### attempt rescue smaller chromsome end
+     
+     beta_auto <- sapply(multi_auto, function(auto){auto$beta_est})
+     converged <- which(colSums(is.na(beta_auto))==0)
 
      #vec_p_init = seq_log(p_min, 0.6, length.out=vec_p_ranges), # using cores instead 30
      #vec_p_init = seq_log(1e-4, 0.3, length.out=vec_p_ranges), # using cores instead 30
-     # save data chains
+
+     # ensure that no missing values are present,
+     msg <- paste0("Error: Stopping since all chains are NA: ", args$out_prefix)
+     if (length(converged) == 0) stop(msg)
+     write(paste0("Success! ",length(converged)," chain(s) passed for", args$out_prefix), stderr())
+
+     # save chains
      multi_auto_path <- paste0(args$out_prefix,'_chains.rda')
      saveRDS(multi_auto, multi_auto_path, compress = 'xz')
 
-     # plot chains
-     auto <- multi_auto[[1]]
+     # plot example chain of one that is not NA
+     converged_index <- converged[1]
+     auto <- multi_auto[[converged_index]]
      p <- plot_grid(
         qplot(y = auto$path_p_est) + 
           theme_bigstatsr() + 
@@ -158,16 +177,6 @@ main <- function(args){
      
      # save plot
      ggsave(plot=p,filename=paste0(args$out_prefix, "_chains.png"))
-
-     # get estimates with indicies corresponding to pred genotypes
-     beta_auto <- sapply(multi_auto, function(auto){
-          auto$beta_est})
-
-     # ensure that no missing values are present,
-     # note: that some columns can be zero for more intiial p_vec
-     msg <- paste0("Error: all chains are NA:", args$out_prefix)
-     if (all(rowSums(!is.na(beta_auto)) == 0)) stop(msg)
-     stopifnot(all(rowSums(!is.na(beta_auto)) > 0))
 
      # check if initial estimate caused any problems.
      stopifnot(all(rowSums(!is.na(beta_auto)) > 0))

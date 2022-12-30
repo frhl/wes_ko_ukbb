@@ -19,7 +19,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 1-22
+#$ -t 15
 #$ -V
 
 set -o errexit

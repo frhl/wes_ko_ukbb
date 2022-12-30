@@ -18,7 +18,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 11-320 
+#$ -t 1-320 
 #$ -V
 
 set -o errexit
@@ -42,7 +42,7 @@ readonly mrg_dir="data/prs/scores"
 
 # do not run files that have h2 estimates
 # above the given p-value cutoff (nominal).
-readonly ldsc_pvalue_cutoff="0.001"
+readonly ldsc_pvalue_cutoff="0.05"
 
 readonly cluster=$( get_current_cluster )
 readonly index=$( get_array_task_id )

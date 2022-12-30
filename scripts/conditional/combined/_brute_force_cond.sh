@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
-#
-#
-#
 
 set -o errexit
 set -o nounset
 
 source utils/bash_utils.sh
 source utils/hail_utils.sh
+source utils/qsub_utils.sh
 
 readonly step2_SPAtests="utils/saige/step2_SPAtests_cond.R"
 readonly rscript_rare="scripts/conditional/rare/_spa_cond_rare.R"
@@ -30,7 +28,9 @@ readonly markers_rare_cond_min_mac=${13?Error: Missing arg10 (markers_rare_ac)}
 readonly cond_rare_file=${14?Error: Missing arg11 (cond_rare_file)}
 readonly cond_common_file=${15?Error: Missing arg12 (cond_common_file)}
 readonly cond_annotation=${16?Error: Missing arg13 (cond_annotation)}
-readonly chr=${SLURM_ARRAY_TASK_ID}
+readonly array_idx=$( get_array_task_id )
+readonly chr=$( get_chr ${array_idx} )
+
 
 # Need to change CHR input depending on current task-id
 readonly gmat=$(echo ${in_gmat} | sed -e "s/CHR/${chr}/g")
@@ -51,6 +51,9 @@ set_up_rpy
 
 # create subset of rare (conding) markers to be used in analysis
 readonly out_rare_markers_file="${out_prefix/CHR/${chr}}.rare.markers"
+stopifnot_file_exists ${markers_rare_ac}
+stopifnot_file_exists ${markers_rare_hash}
+stopifnot_file_exists ${markers_rare_by_gene}
 Rscript "${rscript_rare}" \
   --chromosome "chr${chr}" \
   --phenotype "${phenotype}" \
