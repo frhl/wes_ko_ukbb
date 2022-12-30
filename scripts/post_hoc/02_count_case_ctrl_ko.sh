@@ -17,7 +17,7 @@ source utils/bash_utils.sh
 readonly rscript="scripts/post_hoc/02_count_case_ctrl_ko.R"
 
 readonly pheno_dir="data/phenotypes"
-readonly phenos="${pheno_dir}/spiros_brava_phenotypes_binary_200k.tsv.gz"
+readonly phenos="${pheno_dir}/dec22_phenotypes_binary_200k.tsv.gz"
 readonly ko_dir="data/knockouts/alt/pp90/combined"
 readonly out_dir="data/post_hoc/results"
 
@@ -39,6 +39,8 @@ count_ko_case_ctrl() {
 count_ko_case_ctrl "pLoF"
 count_ko_case_ctrl "damaging_missense"
 count_ko_case_ctrl "pLoF_damaging_missense"
+count_ko_case_ctrl "other_missense"
+count_ko_case_ctrl "synonymous"
 
 
 
