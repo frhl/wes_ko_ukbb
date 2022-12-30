@@ -10,6 +10,7 @@ set -o nounset
 
 source utils/bash_utils.sh
 source utils/hail_utils.sh
+source utils/qsub_utils.sh
 
 readonly step2_SPAtests="utils/saige/step2_SPAtests_cond.R"
 readonly rscript="scripts/conditional/common/_spa_cond_common.R"
@@ -25,7 +26,9 @@ readonly min_mac=${8?Error: Missing arg8 (min_mac)}
 readonly out_prefix=${9?Error: Missing arg10 (out_prefix)}
 readonly cond_markers="${10}"
 readonly cond_cat="${11}"
-readonly chr=${SLURM_ARRAY_TASK_ID}
+
+readonly array_idx=$( get_array_task_id )
+readonly chr=$( get_chr ${array_idx} )
 
 readonly gmat=$(echo ${in_gmat} | sed -e "s/CHR/${chr}/g")
 readonly var=$(echo ${in_var} | sed -e "s/CHR/${chr}/g")

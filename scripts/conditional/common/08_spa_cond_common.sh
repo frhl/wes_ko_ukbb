@@ -9,16 +9,20 @@
 #SBATCH --error=logs/spa_cond_common.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-44
+#SBATCH --array=23-320
 
 set -o errexit
 set -o nounset
 
 module purge
 source utils/bash_utils.sh
+source utils/qsub_utils.sh
+
+readonly cluster=$( get_current_cluster)
+readonly index=$( get_array_task_id )
 
 readonly curwd="$(pwd)"
-readonly vcf_dir="data/conditional/common/combined/final"
+readonly vcf_dir="data/conditional/common/combined"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
 
@@ -26,20 +30,21 @@ readonly spa_script="scripts/conditional/common/_spa_cond_common.sh"
 readonly merge_script="scripts/_spa_merge.sh"
 readonly in_prefix="ukb_eur_wes_200k"
 
-readonly cond_dir="data/conditional/common/combined/final"
-readonly cond_file="${cond_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_w_common_markers.txt"
+readonly cond_dir="data/conditional/common/combined"
+readonly cond_file="${cond_dir}/ukb_eur_wes_200k_chrCHR_pLoF_damaging_missense_w_common_markers.txt"
 readonly cond_cat="common" 
 
-readonly grm_dir="data/saige/grm/input"
-readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
+readonly grm_dir="data/saige/grm/input/dnanexus"
+readonly grm_mtx="${grm_dir}/ukb_eur_200k_grm_fitted_relatednessCutoff_0.05_2000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
+readonly plink_file="${grm_dir}/ukb_eur_200k_grm_grch38_rv_merged"
 
 
 submit_spa_binary_with_csqs()
 {
   local annotation="${1?Error: Missing arg1 (annotation)}"
-  local pheno_list="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
-  local phenotype=$( sed "${SLURM_ARRAY_TASK_ID}q;d" ${pheno_list} )
+  local pheno_list="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
+  local phenotype=$( sed "${index}q;d" ${pheno_list} )
   submit_spa_with_csqs "${annotation}" "${phenotype}" "binary"
 }
 
@@ -47,7 +52,7 @@ submit_spa_cts_with_csqs()
 {
   local annotation="${1?Error: Missing arg1 (annotation)}"
   local pheno_list="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
-  local phenotype=$( sed "${SLURM_ARRAY_TASK_ID}q;d" ${pheno_list} )
+  local phenotype=$( sed "${index}q;d" ${pheno_list} )
   submit_spa_with_csqs "${annotation}" "${phenotype}" "cts"
 }
 
@@ -60,13 +65,13 @@ submit_spa_with_csqs()
 
     local step1_dir="data/saige/output/${trait}/step1"
     local step2_dir="data/saige/output/${trait}/step2_common_cond/min_mac${min_mac}"
-    local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${maf}_${annotation}_w_common.vcf.bgz"
+    local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${annotation}_w_common.vcf.bgz"
     mkdir -p ${step2_dir}
 
     local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
     local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
-    local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}"
-    local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}.txt.gz"
+    local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${phenotype}_${annotation}"
+    local out_mrg="${step2_dir}/${in_prefix}_${phenotype}_${annotation}.txt.gz"
 
    if [ "${use_prs}" -eq "1" ]; then
       local in_gmat_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.rda"
@@ -74,8 +79,8 @@ submit_spa_with_csqs()
       if [ -f "${in_gmat_prs/CHR/21}" ] & [ -f "${in_var_prs/CHR/21}" ]; then
         local in_gmat=${in_gmat_prs}
         local in_var=${in_var_prs}
-        local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${maf}_${phenotype}_${annotation}_locoprs"
-        local out_mrg="${step2_dir}/${in_prefix}_${maf}_${phenotype}_${annotation}_locoprs.txt.gz"
+        local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${phenotype}_${annotation}_locoprs"
+        local out_mrg="${step2_dir}/${in_prefix}_${phenotype}_${annotation}_locoprs.txt.gz"
       else
         >&2 echo "Saige NULL (PRS) ${in_gmat_prs}/${in_var_prs} does not exist. Using without PRS."
       fi
@@ -90,7 +95,7 @@ submit_spa_with_csqs()
       >&2 echo "Phenotype ${phenotype} with annotation ${annotation} already exists! Skipping.." 
     fi
   else
-    >&2 echo "No phenotype at index ${SLURM_ARRAY_TASK_ID}. Exiting.." 
+    >&2 echo "No phenotype at index ${index}. Exiting.." 
   fi 
 }
 
@@ -99,7 +104,7 @@ submit_spa_job() {
   mkdir -p ${step2_dir}
   local slurm_tasks="${tasks}"
   local slurm_jname="${slurm_spa_name}"
-  local slurm_lname="${out_prefix}"
+  local slurm_lname="logs/_spa_cond_common"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
   local slurm_nslots="${nslots}"
@@ -164,9 +169,6 @@ readonly project="lindgren.prj"
 readonly nslots=2
 
 
-
-# Binary traits
-maf="maf0to5e-2"
 
 # cts traits
 #submit_spa_cts_with_csqs "pLoF_damaging_missense"
