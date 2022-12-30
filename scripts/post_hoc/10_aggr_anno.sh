@@ -15,7 +15,7 @@ source utils/qsub_utils.sh
 readonly rscript="scripts/post_hoc/10_aggr_anno.R"
 
 readonly out_dir="data/knockouts/tables"
-readonly out_prefix="${out_dir}/combined_annotations_by_sample"
+readonly out_prefix="${out_dir}/combined_annotations_by_sample_nocutoff"
 
 mkdir -p ${out_dir}
 

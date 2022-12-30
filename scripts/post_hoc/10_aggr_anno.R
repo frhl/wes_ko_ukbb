@@ -56,41 +56,44 @@ main <- function(args){
     counts2 <- data.table(table(dt2$is_ko, dt2$gene_id))
     counts2 <- counts2[counts2$V1 == TRUE,]
     counts2 <- counts2[rev(order(counts2$N))]
-    counts2$excluded <- counts2$N > 50000
-    gene_id_exclude2 <- counts2$V2[counts2$N > 50000]
+    counts2$excluded <- counts2$N > 100000
+    gene_id_exclude2 <- counts2$V2[counts2$N > 100000]
     dt2 <- dt2[!(dt2$gene_id %in% gene_id_exclude2),]
     outfile <- paste0(args$out_prefix, ".excl.other.count.txt.gz")
     fwrite(counts2, outfile, sep = "\t")
 
     # write file containing all annotations 
     dt <- rbind(dt, dt2)
+    colnames(dt)[colnames(dt) == "gene_id"] <- "ensembl_gene_id"
+    colnames(dt)[colnames(dt) == "transcript_id"] <- "ensembl_transcript_id"
+    
     print(table(dt$annotation))
     outfile <- paste0(args$out_prefix, ".nohets.txt.gz")
     fwrite(dt, outfile, sep = "\t")
 
     # aggregate all by chet and cis
     full <- dt[dt$is_chet | dt$is_cis, ]
-    aggr_ko <- aggregate(pKO ~ gene_id + transcript_id + annotation, data = full, FUN=sum)
-    aggr_full <- aggregate(pKO ~ gene_id + transcript_id + annotation, data = full, FUN=length)
-    aggr <- merge(aggr_ko, aggr_full, by = c("gene_id","transcript_id", "annotation"))
+    aggr_ko <- aggregate(pKO ~ ensembl_gene_id + ensembl_transcript_id + annotation, data = full, FUN=sum)
+    aggr_full <- aggregate(pKO ~ ensembl_gene_id + ensembl_transcript_id + annotation, data = full, FUN=length)
+    aggr <- merge(aggr_ko, aggr_full, by = c("ensembl_gene_id","ensembl_transcript_id", "annotation"))
     colnames(aggr) <- c("ensembl_gene_id", "ensembl_transcript_id", "annotation", "n","total")
     aggr$subset <- "chet+cis"
     aggr_chet_cis <- aggr
 
     # aggregate all by hom and cis
     full <- dt[dt$is_hom | dt$is_cis, ]
-    aggr_ko <- aggregate(pKO ~ gene_id + transcript_id + annotation, data = full, FUN=sum)
-    aggr_full <- aggregate(pKO ~ gene_id + transcript_id + annotation, data = full, FUN=length)
-    aggr <- merge(aggr_ko, aggr_full, by = c("gene_id","transcript_id", "annotation"))
+    aggr_ko <- aggregate(pKO ~ ensembl_gene_id + ensembl_transcript_id + annotation, data = full, FUN=sum)
+    aggr_full <- aggregate(pKO ~ ensembl_gene_id + ensembl_transcript_id + annotation, data = full, FUN=length)
+    aggr <- merge(aggr_ko, aggr_full, by = c("ensembl_gene_id","ensembl_transcript_id", "annotation"))
     colnames(aggr) <- c("ensembl_gene_id", "ensembl_transcript_id", "annotation", "n","total")
     aggr$subset <- "hom+cis"
     aggr_hom_cis <- aggr
 
     # aggregate all by knockout and cis
     full <- dt[dt$is_ko | dt$is_cis, ]
-    aggr_ko <- aggregate(pKO ~ gene_id + transcript_id + annotation, data = full, FUN=sum)
-    aggr_full <- aggregate(pKO ~ gene_id + transcript_id + annotation, data = full, FUN=length)
-    aggr <- merge(aggr_ko, aggr_full, by = c("gene_id","transcript_id", "annotation"))
+    aggr_ko <- aggregate(pKO ~ ensembl_gene_id + ensembl_transcript_id + annotation, data = full, FUN=sum)
+    aggr_full <- aggregate(pKO ~ ensembl_gene_id + ensembl_transcript_id + annotation, data = full, FUN=length)
+    aggr <- merge(aggr_ko, aggr_full, by = c("ensembl_gene_id","ensembl_transcript_id", "annotation"))
     colnames(aggr) <- c("ensembl_gene_id", "ensembl_transcript_id", "annotation", "n","total")
     aggr$subset <- "ko+cis"
     aggr_ko_cis <- aggr
@@ -98,8 +101,16 @@ main <- function(args){
     # get transcript lengths and mapping
     transcript <- fread("/well/lindgren/flassen/ressources/genesets/genesets/data/biomart/221216_enstid_ensgid_lengths.txt.gz")
     transcript <- transcript[,c("ensembl_gene_id", "ensembl_transcript_id", "hgnc_symbol", "chromosome_name", "length")]
+    transcript$length2 <- transcript$norm_length ^ 2
     transcript$norm_length <- (transcript$length-mean(transcript$length))/sd(transcript$length)
-    transcript$norm_length2 <- transcript$norm_length ^ 2
+    transcript$norm_length2 <- transcript$norm_length^2
+
+    # get GC content
+    dgc <- fread("/well/lindgren/flassen/ressources/genesets/genesets/data/biomart/221229_ensgid_gc_content.txt.gz")
+    dgc$gc <- dgc$percentage_gene_gc_content
+    dgc$gc_norm <- (dgc$gc - mean(dgc$gc))/sd(dgc$gc)
+    dgc$percentage_gene_gc_content <- NULL
+    transcript <- merge(transcript, dgc, all.x = TRUE, by = "ensembl_gene_id")
 
     # merge with transcript
     combined <- rbind(aggr_chet_cis, aggr_hom_cis, aggr_ko_cis)
