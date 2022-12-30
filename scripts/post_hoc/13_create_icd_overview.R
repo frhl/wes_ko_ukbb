@@ -197,6 +197,7 @@ main <- function(args){
 
     # load samvidas phenotypes
     defs <- fread("/well/lindgren-ukbb/projects/ukbb-11867/samvida/general_resources/UKB_codelists/chronological-map-phenotypes/annot_dictionary_with_unix_codes.txt")
+    defs$unix_code <- paste0("spiro_",defs$unix_code)
     icd_desc_map <- defs$ICD_chapter_desc
     names(icd_desc_map) <- defs$ICD_chapter
 
@@ -251,16 +252,21 @@ main <- function(args){
     # combine them
     combined <- rbind(dt, df_plos_genetics)
     combined$unix_code <- paste0(combined$unix_code,"_combined")
-
     dt_out <- rbind(combined, defs[,c("phenotype","ICD_chapter","ICD_chapter_desc","unix_code")])
+    
+    # filter down to the ones we aree keeping
+    phenotypes_to_keep <- fread(args$phenotypes_to_keep, header = FALSE)   
+    dt_out <- dt_out[dt_out$unix_code %in% phenotypes_to_keep$V1 ]
+
     outfile <- paste0(args$out_prefix,".txt")
-    fwrite(dt_out, outfile)
+    fwrite(dt_out, outfile, sep = "\t", quote=FALSE)
 
 }
 
 # add arguments
 parser <- ArgumentParser()
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
+parser$add_argument("--phenotypes_to_keep", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()
 
 main(args)

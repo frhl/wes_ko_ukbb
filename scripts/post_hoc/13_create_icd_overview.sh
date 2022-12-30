@@ -14,14 +14,17 @@ source utils/qsub_utils.sh
 
 readonly rscript="scripts/post_hoc/13_create_icd_overview.R"
 
-readonly out_dir="data/knockouts/tables"
+readonly in_dir="data/phenotypes"
+readonly in_file="${in_dir}/dec22_phenotypes_binary_200k_header.tsv"
+
+readonly out_dir="data/phenotypes"
 readonly out_prefix="${out_dir}/phenotype_icd_chapter"
 
 mkdir -p ${out_dir}
 
 set_up_rpy
 Rscript "${rscript}" \
- --out_prefix "${out_prefix}" \
-
+  --out_prefix "${out_prefix}" \
+  --phenotypes_to_keep "${in_file}"
 
 
