@@ -15,7 +15,7 @@ source utils/qsub_utils.sh
 readonly rscript="scripts/post_hoc/11_nbglm_gtex.R"
 
 readonly in_dir="data/knockouts/tables"
-readonly in_file="${in_dir}/combined_annotations_by_sample.counts.txt.gz"
+readonly in_file="${in_dir}/combined_annotations_by_sample.nohets.txt.gz"
 
 readonly out_dir="data/knockouts/tables"
 readonly out_prefix="${out_dir}/nbglm_gtex"
