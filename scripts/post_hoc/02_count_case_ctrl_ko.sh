@@ -5,7 +5,7 @@
 #$ -o logs/count_case_control_ko.log
 #$ -e logs/count_case_control_ko.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 1
+#$ -pe shmem 12
 #$ -q short.qc
 #$ -V
 
@@ -36,9 +36,9 @@ count_ko_case_ctrl() {
 }
 
 
-count_ko_case_ctrl "pLoF"
-count_ko_case_ctrl "damaging_missense"
-count_ko_case_ctrl "pLoF_damaging_missense"
+#count_ko_case_ctrl "pLoF"
+#count_ko_case_ctrl "damaging_missense"
+#count_ko_case_ctrl "pLoF_damaging_missense"
 count_ko_case_ctrl "other_missense"
 count_ko_case_ctrl "synonymous"
 
