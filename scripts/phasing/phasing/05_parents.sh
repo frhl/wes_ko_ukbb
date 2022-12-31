@@ -45,18 +45,18 @@ readonly parents_path="${parents_dir}/ukb_wes_union_calls_chr${chr}_parents.vcf.
 # fore eagle2 phasing
 #readonly phased_dir="data/phased/wes_union_calls/200k/eagle2/ligated"
 #readonly phased_path="${phased_dir}/eagle2_prs100000_pro25000_mprs150000.1of1.vcf.gz"
-#readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/parents"
+#readonly out_dir="data/phased/wes_union_calls/200k/eagle2/parents"
 #readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_eagle2_parents_chr${chr}"
 # for shapeit4 phasing
-readonly phased_dir="data/phased/wes_union_calls/200k/shapeit4/ligated"
-readonly phased_path="${phased_dir}/shapeit4_prs100000_pro25000_mprs150000.1of1.vcf.gz"
-readonly out_dir="data/phased/wes_union_calls/200k/shapeit4/parents"
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_shapeit4_parents_chr${chr}"
+#readonly phased_dir="data/phased/wes_union_calls/200k/shapeit4/ligated"
+#readonly phased_path="${phased_dir}/shapeit4_prs100000_pro25000_mprs150000.1of1.vcf.gz"
+#readonly out_dir="data/phased/wes_union_calls/200k/shapeit4/parents"
+#readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_shapeit4_parents_chr${chr}"
 # for shapeit5 phasing
-#readonly phased_dir="data/phased/wes_union_calls/200k/shapeit5/ligated"
-#readonly phased_path="${phased_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.bgz"
-#readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/parents_with_hail_count"
-#readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_shapeit5_parents_chr${chr}"
+readonly phased_dir="data/phased/wes_union_calls/200k/shapeit5/ligated"
+readonly phased_path="${phased_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.bgz"
+readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/parents_with_hail_count"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_shapeit5_parents_chr${chr}"
 # out paths and types
 readonly phased_type="vcf"
 readonly out_vcf="${out_prefix}.vcf.gz"
