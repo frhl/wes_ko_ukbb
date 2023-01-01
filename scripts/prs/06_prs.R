@@ -54,6 +54,13 @@ main <- function(args){
   pred <- load_bigsnp_from_bed(args$pred)
   gwas <- gwas[gwas$rsid %in% pred$map$rsid,]
 
+  # need to keep track of matching SNPs.
+  n_pred_in_gwas <- sum(pred$map$rsid %in% gwas$rsid)
+  total <- nrow(pred$map)
+  pct <- paste0("(",round((n_pred_in_gwas/total)*100, 2),"%)")
+  msg <- paste("Only",n_pred_in_gwas,"of",total,"SNPs", pct,"GWAS and prediction SNVs:", args$out_prefix)
+  if (n_pred_in_gwas < 1000) stop(msg)
+      
   # get SNP correlations and LD
   snp <- get_single_ld_matrix(gwas, chr = args$chrom, ld_dir = args$ld_dir)
  

@@ -8,7 +8,7 @@
 #SBATCH --open-mode=append
 #SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
-#SBATCH --array=6
+#SBATCH --array=1-320
 #
 #
 #$ -N prs
