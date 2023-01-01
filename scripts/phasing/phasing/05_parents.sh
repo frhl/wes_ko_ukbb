@@ -65,8 +65,8 @@ readonly out_info="${out_prefix}.info"
 readonly out_info_gz="${out_prefix}.info.gz"
 readonly out_trio_by_site="${out_prefix}.txt"
 readonly out_trio_by_site_mac="${out_prefix}.mac"
-readonly out_type="vcf"
-
+readonlyd(s5_pp90)
+table(d$info.AC==1)out_type="vcf"
 mkdir -p ${out_dir}
 
 module purge
