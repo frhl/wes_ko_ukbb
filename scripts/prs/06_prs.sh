@@ -6,9 +6,9 @@
 #SBATCH --output=logs/prs.log
 #SBATCH --error=logs/prs.errors.log
 #SBATCH --open-mode=append
-#SBATCH --partition=short
+#SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
-#SBATCH --array=51-100
+#SBATCH --array=251-320
 # --begin=now+2hour
 #
 #$ -N prs
@@ -18,7 +18,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 51-100
+#$ -t 1-200
 #$ -V
 
 set -o errexit
@@ -38,7 +38,7 @@ readonly pred_dir="data/prs/hapmap/ukb_500k_new/validation"
 readonly ld_dir="data/prs/hapmap/ld/matrix_unrel_kin"
 readonly pheno_dir="data/phenotypes"
 readonly out_dir="data/prs/scores/auto"
-readonly mrg_dir="data/prs/scores"
+readonly mrg_dir="data/prs/scores_new"
 
 # do not run files that have h2 estimates
 # above the given p-value cutoff (nominal).
@@ -69,7 +69,7 @@ submit_ldpred2()
   local pred="${pred_dir}/ukb_hapmap_500k_eur_chrCHR.bed"
   local ldsc="${ldsc_dir}/ldsc_${phenotype}.rds"
   local out_prefix="${out_dir}/prs_${method}_${phenotype}_chrCHR"
-  local merged="${mrg_dir}/${phenotype}_pgs_new.txt.gz"
+  local merged="${mrg_dir}/${phenotype}_pgs.txt.gz"
 
   local qsub_fit="_prs_${phenotype}"
   local qsub_aggr="_aggr_${phenotype}"
@@ -243,7 +243,7 @@ clean_pgs()
 }
 
 # parameters
-readonly queue="short"
+readonly queue="epyc"
 readonly project="lindgren.prj"
 readonly tasks=1-22
 

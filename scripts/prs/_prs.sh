@@ -31,7 +31,7 @@ readonly tmp_rds="${tmp_bfile}.rds"
 
 export OPENBLAS_NUM_THREADS=1 # avoid two levels of parallelization
 
-#if [ ! -f "${out_prefix_chr}.txt.gz" ]; then
+if [ ! -f "${out_prefix_chr_new}.txt.gz" ]; then
   set_up_ldpred2
   Rscript "${r_script}" \
       --chrom "chr${chr}" \
@@ -47,7 +47,7 @@ export OPENBLAS_NUM_THREADS=1 # avoid two levels of parallelization
   # always remove temporary bk files as these
   # tend to become extremely large (In the magnitude of terrabytes)  
   rm ${tmp_bk} ${tmp_rds}
-#else
-#  echo "Note: ${out_prefix_chr} already exists. Skipping.."
-#fi
+else
+  echo "Note: ${out_prefix_chr} already exists. Skipping.."
+fi
 
