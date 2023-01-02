@@ -8,6 +8,7 @@ main <- function(args){
   stopifnot(dir.exists(args$in_dir))
   stopifnot(dir.exists(args$out_dir))
   files <- list.files(args$in_dir, pattern = paste0(args$phenotype,"_chr[0-9]+.txt.gz"), full.names = TRUE)
+  if (!is.null(args$regex)) files <- files[grepl(args$regex, files)]
   n <- length(files)
   if (n < 22) {
     stop(paste("Found ",n, "files for", args$phenotype))
@@ -52,6 +53,7 @@ main <- function(args){
 parser <- ArgumentParser()
 parser$add_argument("--in_dir", default=NULL, required = TRUE, help = "Directory for (chromosome-wise) PRS")
 parser$add_argument("--phenotype", default=NULL, required = TRUE, help = "")
+parser$add_argument("--regex", default=NULL, required = TRUE, help = "")
 parser$add_argument("--out_dir", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()
 

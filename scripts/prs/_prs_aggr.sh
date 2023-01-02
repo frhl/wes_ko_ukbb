@@ -14,7 +14,8 @@ set_up_rpy
 Rscript ${rscript} \
   --phenotype ${phenotype} \
   --in_dir ${in_dir} \
-  --out_dir ${out_dir}
+  --out_dir ${out_dir} \
+  --regex "new"
 
 
 

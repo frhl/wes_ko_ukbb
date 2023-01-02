@@ -17,7 +17,7 @@ source utils/qsub_utils.sh
 source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
-readonly hail_script="scripts/prs/00_bed_gen.py"
+readonly hail_script="scripts/prs/00_bed_gen_fit.py"
 readonly spark_dir="data/tmp/spark_dir"
 readonly hap_dir="/well/lindgren/flassen/ressources/hapmap"
 

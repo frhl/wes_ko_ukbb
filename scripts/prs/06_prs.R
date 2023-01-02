@@ -13,9 +13,9 @@ main <- function(args){
   stopifnot(dir.exists(args$ld_dir))
   stopifnot(args$chrom %in% paste0("chr",1:22))
   stopifnot(dir.exists(dirname(args$out_prefix)))
-  stopifnot(args$method %in% c('inf', 'auto'))
+  stopifnot(args$method %in% c('auto'))
 
-  log <- paste0(args$out_prefix,".log")
+  print(args)
 
   # setup parallel environment
   NCORES <- max(1, nb_cores())
@@ -23,11 +23,22 @@ main <- function(args){
 
   # laod ldsc and qced GWAS
   ldsc <- readRDS(args$ldsc)
-  gwas <- ldsc$gwas
   h2 <- ldsc$coefficients$estimate[2]
   pvalue <- ldsc$coefficients$pvalue[2]
 
-  # cutoff prs if z-score estimate is not good enough
+  # if we just want to use betas that have 
+  # been pre-calculated for prediction
+  if (args$calc_betas) {
+    gwas <- ldsc$gwas
+  } else {
+    stopifnot(file.exists(args$path_betas))
+    gwas <- fread(args$path_betas)
+    stopifnot("final_beta_auto" %in% colnames(gwas))
+    write(paste("Using betas from", args$path_betas), stdout())
+    stopifnot(sum(is.na(gwas$final_beta_auto))<1000)
+  }
+
+    # cutoff prs if z-score estimate is not good enough
   if (!is.null(args$ldsc_pvalue_cutoff)){
     pvalue_cutoff <- as.numeric(args$ldsc_pvalue_cutoff)
     if (pvalue > pvalue_cutoff) stop("phenotype does not pass threshold")
@@ -109,32 +120,22 @@ main <- function(args){
      stopifnot(sum(is.na(sds))==0)
   }
 
-  if (args$method %in% "inf"){
 
-    beta_inf <- snp_ldpred2_inf(snp$corr, gwas, h2_init)
-    beta_inf <- beta_inf[indicies] 
-    final_pred_inf <- big_prodVec(
-          genotypes, 
-          beta_inf,
-          center = means,
-          scale = sds,
-          ncores = NCORES)  
-    final_pred <- final_pred_inf
-
-  } else if (args$method %in% "auto") {
+  if (args$calc_betas) {
 
      # use proper vec p init
      vec_p_ranges <- max(NCORES, as.numeric(args$vec_p_init_n))
      if (vec_p_ranges < 10) stop("You need at least 10 chains! set vec_p_init_n>=10.")
      
-     num_iter = 1000
-     burn_in = 1000
+     num_iter = 500
+     burn_in = 500
 
 
      #num_iter=round(runif(1, 100, 200))
      #burn_in=round(runif(1, 100, 200))
 
-     vec_p_init = seq(0.001, 0.60, length.out=vec_p_ranges)
+     #vec_p_init = seq(0.001, 0.60, length.out=vec_p_ranges)
+     vec_p_init = seq_log(0.0001, 0.70, length.out=vec_p_ranges)
      #vec_p_init = seq(0.001, 0.9, length.out=100)
 
      write(paste0("Starting LDPred2-auto for ",args$out_prefix,".."), stderr())
@@ -151,9 +152,6 @@ main <- function(args){
      
      beta_auto <- sapply(multi_auto, function(auto){auto$beta_est})
      converged <- which(colSums(is.na(beta_auto))==0)
-
-     #vec_p_init = seq_log(p_min, 0.6, length.out=vec_p_ranges), # using cores instead 30
-     #vec_p_init = seq_log(1e-4, 0.3, length.out=vec_p_ranges), # using cores instead 30
 
      # ensure that no missing values are present,
      msg <- paste0("Error: Stopping since all chains are NA: ", args$out_prefix)
@@ -206,22 +204,20 @@ main <- function(args){
      keep <- abs(sc - median(sc)) < 3 * mad(sc)
      stopifnot(!any(is.na(keep)))
      final_beta_auto <- rowMeans(beta_auto[, keep], na.rm = TRUE) 
-     
-     # get final predicton
-     final_pred_auto <- big_prodVec(
-       genotypes, 
-       final_beta_auto,
-       center = means,
-       scale = sds,
-       ncores = NCORES)
-
-     # keep 
-     final_pred <- final_pred_auto
      beta_out <- cbind(gwas, final_beta_auto)
-     fwrite(beta_out, file = paste0(args$out_prefix,"_betas.txt.gz"), sep = '\t')
+     fwrite(beta_out, file = args$path_betas, sep = '\t')
 
-    }
+   } else {
+   final_beta_auto <- gwas$final_beta_auto
+  } 
 
+  # perform prediction
+  final_pred <- big_prodVec(
+     genotypes, 
+     final_beta_auto,
+     center = means,
+     scale = sds,
+     ncores = NCORES)
 
   # count PRS that could not be generated
   missing_prs <- round(sum(is.na(final_pred))/length(final_pred)*100, 2)
@@ -266,11 +262,13 @@ parser$add_argument("--pred", default=NULL, required = TRUE, help = "Path to pli
 parser$add_argument("--ldsc", default=NULL, required = TRUE, help = ".rds object containing QCed GWAS and ldsc heritability estimates")
 parser$add_argument("--ldsc_pvalue_cutoff", default=NULL, help = "cancel the run if the ldsc heritability p-value is not below the given treshold.")
 parser$add_argument("--standardized_gt", default=1, required = FALSE, help = "Should genotypes be standardized?")
-parser$add_argument("--vec_p_init_n", default=200, required = FALSE, help = "number of intial estimates to sample form (should be at least 5)")
+parser$add_argument("--vec_p_init_n", default=50, required = FALSE, help = "number of intial estimates to sample form (should be at least 5)")
 parser$add_argument("--tmp_bfile", default=NULL, required = TRUE, help = "File path to temporary backing files")
 parser$add_argument("--ld_dir", default=NULL, required = TRUE, help = "Path to directory with pre-calcualted SNP correlations and LD (.rds files)")
 parser$add_argument("--impute", default=NULL, required = TRUE, help = "Should missing genotypes be imputed? (See https://privefl.github.io/bigsnpr/reference/snp_fastImputeSimple.html)")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
+parser$add_argument("--calc_betas", default=FALSE, action="store_true", help = "Should betas be estimated? If not assumes that betas have already been calculated and will be used for prediction.")
+parser$add_argument("--path_betas", default=NULL, help = "What is the path to the betas that should be used?")
 args <- parser$parse_args()
 
 main(args)
