@@ -7,14 +7,26 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/spa_null.log
 #SBATCH --error=logs/spa_null.errors.log
-#SBATCH --partition=short
+#SBATCH --partition=relion
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-320
+#SBATCH --array=101
+#
+#
+#$ -N spa_null
+#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#$ -o logs/spa_null.log
+#$ -e logs/spa_null.errors.log
+#$ -P lindgren.prjc
+#$ -pe shmem 1
+#$ -q short.qc
+#$ -t 320-200
+#$ -V
 
-
-# all binary: 1 - 71
+set -o errexit
+set -o nounset
 
 source utils/bash_utils.sh
+source utils/qsub_utils.sh
 source utils/hail_utils.sh
 
 readonly curwd=$(pwd)
@@ -26,7 +38,7 @@ readonly plink_dir="data/saige/grm/input"
 readonly grm_dir="data/saige/grm/input/dnanexus"
 readonly covar_dir="data/phenotypes"
 readonly pheno_dir="data/phenotypes"
-readonly prs_dir="data/prs/scores"
+readonly prs_dir="data/prs/scores_new"
 readonly ldsc_dir="data/prs/ldsc"
 
 readonly grm_mtx="${grm_dir}/ukb_eur_200k_grm_fitted_relatednessCutoff_0.05_2000_randomMarkersUsed.sparseGRM.mtx"
@@ -36,12 +48,15 @@ readonly covar_file="${covar_dir}/covars1.csv"
 readonly covariates=$( cat ${covar_file} )
 
 readonly out_prefix="ukb_wes_200k"
-readonly index=${SLURM_ARRAY_TASK_ID}
+
+# use either slurm or SGE
+readonly cluster=$( get_current_cluster )
+readonly index=$( get_array_task_id )
 
 fit_binary_traits() {
   local trait_type="binary"
   local inv_normalize="FALSE"
-  local out_dir="data/saige/output/binary/step1_locoprs"
+  local out_dir="data/saige/output/binary/step1_new"
   local pheno_list="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
   local phenotype=$( sed "${index}q;d" ${pheno_list} )
   local out="${out_dir}/${out_prefix}_${phenotype}"
@@ -120,27 +135,51 @@ submit_spa_null() {
         local slurm_project="${project}"
         local slurm_queue="${queue}"
         local slurm_nslots="${nslots}"
-        readonly spa_null_jid=$( sbatch \
-          --account="${slurm_project}" \
-          --job-name="${slurm_jname}" \
-          --output="${slurm_lname}.log" \
-          --error="${slurm_lname}.errors.log" \
-          --chdir="$(pwd)" \
-          --partition="${slurm_queue}" \
-          --cpus-per-task="${slurm_nslots}" \
-          --array=${slurm_tasks} \
-          --parsable \
-          "${spa_null_script}" \
-          "${plink_file}" \
-          "${pheno_file}" \
-          "${phenotype}" \
-          "${covariates}" \
-          "${trait_type}" \
-          "${grm_mtx}" \
-          "${grm_sam}" \
-          "${inv_normalize}" \
-          "${use_prs}" \
-          "${out}" )
+        if [ ${cluster} == "slurm" ]; then
+          readonly spa_null_jid=$( sbatch \
+            --account="${slurm_project}" \
+            --job-name="${slurm_jname}" \
+            --output="${slurm_lname}.log" \
+            --error="${slurm_lname}.errors.log" \
+            --chdir="$(pwd)" \
+            --partition="${slurm_queue}" \
+            --cpus-per-task="${slurm_nslots}" \
+            --array=${slurm_tasks} \
+            --parsable \
+            "${spa_null_script}" \
+            "${plink_file}" \
+            "${pheno_file}" \
+            "${phenotype}" \
+            "${covariates}" \
+            "${trait_type}" \
+            "${grm_mtx}" \
+            "${grm_sam}" \
+            "${inv_normalize}" \
+            "${use_prs}" \
+            "${out}" )
+        elif [ "${cluster}" == "sge" ]; then
+          qsub -N "${slurm_jname}" \
+            -q ${sge_queue} \
+            -pe shmem ${slurm_nslots} \
+            -P lindgren.prjc \
+            -o "${slurm_lname}.log" \
+            -e "${slurm_lname}.errors.log" \
+            -t "${slurm_tasks}" \
+            -wd $(pwd) \
+            "${spa_null_script}" \
+            "${plink_file}" \
+            "${pheno_file}" \
+            "${phenotype}" \
+            "${covariates}" \
+            "${trait_type}" \
+            "${grm_mtx}" \
+            "${grm_sam}" \
+            "${inv_normalize}" \
+            "${use_prs}" \
+            "${out}"
+        else 
+           >&2 echo "${cluster} is not a valid cluster. Exiting!"
+        fi
       else
         >&2 echo "${out_prefix} already exists. Skipping.."
       fi
@@ -153,7 +192,8 @@ submit_spa_null() {
 # Parameters
 readonly use_prs=1
 readonly nslots=3
-readonly queue="short"
+readonly queue="epyc"
+readonly sge_queue="short.qc"
 readonly project="lindgren.prj"
 
 # Fit null model for binary/cts traits
