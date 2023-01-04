@@ -14,8 +14,8 @@ main <- function(args){
   stopifnot(args$chrom %in% paste0("chr",1:22))
   stopifnot(dir.exists(dirname(args$out_prefix)))
   stopifnot(args$method %in% c('auto'))
-
-  print(args)
+  stopifnot(dir.exists(dirname(args$path_betas)))
+  stopifnot(file.exists(args$path_betas))
 
   # setup parallel environment
   NCORES <- max(1, nb_cores())
@@ -131,11 +131,11 @@ main <- function(args){
      burn_in = 500
 
 
-     #num_iter=round(runif(1, 100, 200))
-     #burn_in=round(runif(1, 100, 200))
+     num_iter=round(runif(1, 100, 300))
+     burn_in=round(runif(1, 100, 300))
 
      #vec_p_init = seq(0.001, 0.60, length.out=vec_p_ranges)
-     vec_p_init = seq_log(0.0001, 0.70, length.out=vec_p_ranges)
+     vec_p_init = seq(0.001, 0.60, length.out=vec_p_ranges)
      #vec_p_init = seq(0.001, 0.9, length.out=100)
 
      write(paste0("Starting LDPred2-auto for ",args$out_prefix,".."), stderr())
@@ -262,13 +262,13 @@ parser$add_argument("--pred", default=NULL, required = TRUE, help = "Path to pli
 parser$add_argument("--ldsc", default=NULL, required = TRUE, help = ".rds object containing QCed GWAS and ldsc heritability estimates")
 parser$add_argument("--ldsc_pvalue_cutoff", default=NULL, help = "cancel the run if the ldsc heritability p-value is not below the given treshold.")
 parser$add_argument("--standardized_gt", default=1, required = FALSE, help = "Should genotypes be standardized?")
-parser$add_argument("--vec_p_init_n", default=50, required = FALSE, help = "number of intial estimates to sample form (should be at least 5)")
+parser$add_argument("--vec_p_init_n", default=100, required = FALSE, help = "number of intial estimates to sample form (should be at least 5)")
 parser$add_argument("--tmp_bfile", default=NULL, required = TRUE, help = "File path to temporary backing files")
 parser$add_argument("--ld_dir", default=NULL, required = TRUE, help = "Path to directory with pre-calcualted SNP correlations and LD (.rds files)")
 parser$add_argument("--impute", default=NULL, required = TRUE, help = "Should missing genotypes be imputed? (See https://privefl.github.io/bigsnpr/reference/snp_fastImputeSimple.html)")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 parser$add_argument("--calc_betas", default=FALSE, action="store_true", help = "Should betas be estimated? If not assumes that betas have already been calculated and will be used for prediction.")
-parser$add_argument("--path_betas", default=NULL, help = "What is the path to the betas that should be used?")
+parser$add_argument("--path_betas", default=NULL, required = TRUE, help = "What is the path to the betas that should be used?")
 args <- parser$parse_args()
 
 main(args)
