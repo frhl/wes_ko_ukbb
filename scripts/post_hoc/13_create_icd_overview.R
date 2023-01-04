@@ -258,8 +258,17 @@ main <- function(args){
     phenotypes_to_keep <- fread(args$phenotypes_to_keep, header = FALSE)   
     dt_out <- dt_out[dt_out$unix_code %in% phenotypes_to_keep$V1 ]
 
+    # for now, manually setup remaining phenotypes
+    dt_remaining <- data.table(
+        phenotype=c("Type 2 diabetes", "Type 2 Diabetes", "Gestational diabetes", "Obesity", "Waist-to-hip ratio"),
+        ICD_chapter=c("E", "E", "E", NA, NA),
+        unix_code=c('DM_T1D','DM_T2D','DM_GD','lindgren_obesity','lindgren_whr'))
+    dt_remaining$ICD_chapter_desc <- icd_desc_map[dt_remaining$ICD_chapter]                    
+    dt_remaining <- dt_remaining[,c("phenotype","ICD_chapter","ICD_chapter_desc","unix_code")]
+    dt_out <- rbind(dt_out, dt_remaining)
+
     outfile <- paste0(args$out_prefix,".txt")
-    fwrite(dt_out, outfile, sep = "\t", quote=FALSE)
+    fwrite(dt_out, outfile, sep = "\t", quote=FALSE, na="NA")
 
 }
 

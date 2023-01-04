@@ -64,7 +64,7 @@ main <- function(args){
     
     # write file containing all annotations 
     outfile <- paste0(args$out_prefix, ".txt.gz")
-    fwrite(mrg, outfile, sep = "\t")
+    fwrite(mrg, outfile, sep = "\t", na="NA")
 
 }
 
