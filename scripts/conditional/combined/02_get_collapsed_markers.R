@@ -84,8 +84,8 @@ main <- function(args){
     # merge and write file
     final_with_csqs <- merge(final, pseudo_csqs,  all.x = TRUE)
     outfile = paste0(args$out_prefix, ".txt.gz")
+    write(paste("Succes! Writing to", outfile), stdout())
     fwrite(final_with_csqs, outfile, quote = FALSE, sep = '\t', col.names = TRUE)
-
 }
 
 # add arguments

@@ -33,7 +33,7 @@ readonly vcf_dir="data/mt/dosages/pp90"
 readonly vcf="${vcf_dir}/ukb_eur_wes_200k_chr${chr}_max_ds.vcf.bgz"
 
 readonly out_dir="data/mt/dosages/pp90"
-readonly out_prefix="ukb_eur_wes_200k_chr${chr}_max_ds"
+readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_max_ds"
 
 mkdir -p ${out_dir}
 
