@@ -3,19 +3,19 @@
 # @description: amalgamate variants by phase to infer knockouts by genes.
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=encode_vcf_array
+#SBATCH --job-name=collapse_variants
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/encode_vcf_array.log
-#SBATCH --error=logs/encode_vcf_array.errors.log
+#SBATCH --output=logs/collapse_variants.log
+#SBATCH --error=logs/collapse_variants.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 1
-#SBATCH --array=1-2
+#SBATCH --cpus-per-task 4
+#SBATCH --array=21
 #
 #
-#$ -N encode_vcf_array
+#$ -N collapse_variants
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/encode_vcf_array.log
-#$ -e logs/encode_vcf_array.errors.log
+#$ -o logs/collapse_variants.log
+#$ -e logs/collapse_variants.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
@@ -31,9 +31,7 @@ source utils/vcf_utils.sh
 
 readonly curwd=$(pwd)
 readonly spark_dir="data/tmp/spark"
-readonly bash_script="scripts/_encode_vcf_array.sh"
-readonly merge_script="scripts/_merge_encode_vcf_array.sh"
-readonly hail_script="scripts/_write_gene_intervals.py"
+readonly hail_script="scripts/conditional/combined/02_collapse_variants.py"
 
 readonly cluster=$( get_current_cluster)
 readonly task_id=$( get_array_task_id )
