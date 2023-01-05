@@ -82,8 +82,8 @@ def main(args):
 
     # write matrix-table which contains dosages. VCF with only
     # dosages can't be re-read in HAIL, so we write a MatrixTable
-    #if out_type not in "mt":
-    #    prob = prob.checkpoint(out_prefix + ".mt", overwrite=True)
+    if out_type not in "mt":
+        prob = prob.checkpoint(out_prefix + ".mt", overwrite=True)
     io.export_table(prob, out_prefix, out_type)
 
 if __name__=='__main__':

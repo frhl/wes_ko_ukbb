@@ -25,9 +25,14 @@ def main(args):
     # there will always be rare variant
     ko = io.import_table(ko_path, ko_type, calc_info=False)
     rare = io.import_table(rare_path, rare_type, calc_info=False)
-    rare = tables.order_cols(ko, rare)
-    combined = io.rbind_matrix_tables(rare, ko)
     
+    # ensure same type before merging
+    ko = ko.transmute_entries(DS = hl.int32(ko.DS))
+
+    # merge
+    rare = tables.order_cols(rare, ko)
+    combined = io.rbind_matrix_tables(rare, ko)
+
     # there will not always be common variants
     if common_path:
         contig = "chr" + chrom
