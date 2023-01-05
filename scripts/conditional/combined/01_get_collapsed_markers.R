@@ -40,6 +40,11 @@ main <- function(args){
         return(mv$rsid[mv$ensembl_gene_id %in% g])
     })
 
+    genotypes <- l$genotypes
+    metarow <- l$metadata
+    row_gene <- toupper(metarow$ID)
+    row_marker <- paste0(metarow$`#CHROM`,":",metarow$POS,":",metarow$REF,":",metarow$ALT)
+
     # ensure correct format
     genotypes[genotypes=="."] <- NA
     genotypes[genotypes=="0.00000"] <- 0
