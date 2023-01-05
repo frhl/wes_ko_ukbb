@@ -38,8 +38,10 @@ def main(args):
         contig = "chr" + chrom
         common = io.import_table(common_path, common_type, calc_info=False)
         common = common.filter_rows(common.locus.contig == contig)
-        common = tables.order_cols(ko, common)
-        combined = io.rbind_matrix_tables(common, combined)
+        common = tables.order_cols(common, ko)
+        common = common.transmute_entries(DS = hl.int32(common.DS))
+        print(common.count())
+        combined = io.rbind_matrix_tables(combined, common)
 
     # merge tables and export
     io.export_table(combined, out_prefix, out_type)

@@ -9,7 +9,7 @@
 #SBATCH --error=logs/combine_collapsed.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=6
+#SBATCH --array=1
 #
 #$ -N combine_collapsed
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -81,7 +81,7 @@ if [ ! -f "${out_prefix}.vcf.bgz" ]; then
   set -u
   set_up_pythonpath_legacy
   if [ "${chr_common_present}" -eq "0" ]; then
-    echo "No common markers for ${chr} in ${common_path_vcf}. Using rare and KOs."
+    echo "No common markers for chr${chr} in ${common_path_vcf}. Using rare and KOs."
     python3 "${hail_script}" \
        --chrom ${chr} \
        --ko_path ${ko_path} \
@@ -91,7 +91,7 @@ if [ ! -f "${out_prefix}.vcf.bgz" ]; then
        --out_prefix ${out_prefix} \
        --out_type ${out_type}
   else
-    echo "Found common markers for ${chr} in ${common_path_vcf}!"
+    echo "Found common markers for chr${chr} in ${common_path_vcf}!"
     python3 "${hail_script}" \
        --chrom ${chr} \
        --ko_path ${ko_path} \

@@ -9,7 +9,7 @@
 #SBATCH --error=logs/get_collapsed_markers.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=21
+#SBATCH --array=1-22
 
 
 set -o errexit

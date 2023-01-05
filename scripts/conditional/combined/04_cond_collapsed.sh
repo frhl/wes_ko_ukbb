@@ -42,14 +42,18 @@ readonly grm_mtx="${grm_dir}/ukb_eur_200k_grm_fitted_relatednessCutoff_0.05_2000
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
 readonly plink_file="${grm_dir}/ukb_eur_200k_grm_grch38_rv_merged"
 
-readonly spa_script="scripts/conditional/combined/_cond_everything.sh"
+readonly spa_script="scripts/conditional/combined/_cond_collapsed.sh"
 readonly merge_script="scripts/_spa_merge.sh"
 readonly in_prefix="ukb_eur_wes_200k"
 
+# list of genes that passes significance cutoffs
 readonly markers_rare_by_gene_dir="data/conditional/rare/combined/genes/min_mac4"
-readonly cond_rare_dir="data/conditional/combined/collapsed"
-readonly cond_rare_file="${cond_rare_dir}/ukb_eur_wes_200k_chrCHR_pLoF_damaging_missense_collapsed.markers"
 
+# list of rare pseudo variants to condition on
+readonly cond_rare_dir="data/mt/dosages/pp90"
+readonly cond_rare_file="${cond_rare_dir}/ukb_eur_wes_200k_chrCHR_max_ds.txt.gz"
+
+# list of common markers to condition on
 readonly cond_common_dir="data/conditional/common/combined"
 readonly cond_common_file="${cond_common_dir}/ukb_eur_wes_200k_chrCHR_pLoF_damaging_missense_w_common_markers.txt"
 
@@ -81,7 +85,7 @@ submit_spa_with_csqs()
   if [ ! -z ${phenotype} ]; then
 
     local step1_dir="data/saige/output/${trait}/step1"
-    local step2_dir="data/saige/output/${trait}/step2_everything/min_mac${min_mac}"
+    local step2_dir="data/saige/output/${trait}/step2_collapsed/min_mac${min_mac}"
     local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${annotation}.vcf.bgz"
     mkdir -p ${step2_dir}
 
