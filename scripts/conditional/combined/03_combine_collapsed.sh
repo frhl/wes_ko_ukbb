@@ -8,8 +8,8 @@
 #SBATCH --output=logs/combine_collapsed.log
 #SBATCH --error=logs/combine_collapsed.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 2
-#SBATCH --array=21
+#SBATCH --cpus-per-task 1
+#SBATCH --array=6
 #
 #$ -N combine_collapsed
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -21,19 +21,18 @@
 #$ -t 21
 #$ -V
 
-#set -o errexit
-#set -o nounset
+set -o errexit
+set -o nounset
 
 source utils/vcf_utils.sh
 source utils/qsub_utils.sh
-source utils/bash_utils.sh
 source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark"
 readonly hail_script="scripts/conditional/combined/03_combine_collapsed.py"
 
 readonly array_idx=$( get_array_task_id )
-readonly chr=$( get_chr ${array_idx} )
+readonly chr="$( get_chr ${array_idx} )"
 readonly variants_dir="data/mt/annotated"
 
 # note: assuming ko and rare variants have already been merged
@@ -44,13 +43,13 @@ readonly common_dir="data/conditional/common/markers"
 readonly rare_path_wo_ext="${rare_dir}/ukb_eur_wes_200k_chr${chr}_max_ds"
 readonly common_path_wo_ext="${common_dir}/common_conditional"
 
-
 readonly ko_path="${ko_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense.mt"
 readonly ko_type="mt"
 
 readonly rare_path="${rare_path_wo_ext}.mt"
 readonly rare_type="mt"
 
+readonly common_path_vcf="${common_path_wo_ext}.vcf.bgz"
 readonly common_path="${common_path_wo_ext}.mt"
 readonly common_type="mt"
 
@@ -77,12 +76,12 @@ readonly chr_common=$(extract_chr_from_vcf ${common_path_vcf})
 readonly chr_common_present=$(echo ${chr_common} | grep -ow "chr${chr}" | wc -l)
 
 if [ ! -f "${out_prefix}.vcf.bgz" ]; then
-   module purge
-   set_up_hail
-   set_up_pythonpath_legacy
-   
+  set +u
+  set_up_hail
+  set -u
+  set_up_pythonpath_legacy
   if [ "${chr_common_present}" -eq "0" ]; then
-    echo "No common markers for ${chr} in ${common_path_vcf}. Creating symlink to rare variants"
+    echo "No common markers for ${chr} in ${common_path_vcf}. Using rare and KOs."
     python3 "${hail_script}" \
        --chrom ${chr} \
        --ko_path ${ko_path} \
@@ -92,6 +91,7 @@ if [ ! -f "${out_prefix}.vcf.bgz" ]; then
        --out_prefix ${out_prefix} \
        --out_type ${out_type}
   else
+    echo "Found common markers for ${chr} in ${common_path_vcf}!"
     python3 "${hail_script}" \
        --chrom ${chr} \
        --ko_path ${ko_path} \
