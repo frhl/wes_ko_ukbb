@@ -15,7 +15,7 @@ main <- function(args){
     # subset to pseudo marker
     d_gene <- d_gene[d_gene$ensembl_gene_id %in% gene,]
     stopifnot(nrow(d_gene) > 0)
-    markers <- d_gene$pseudo_marker
+    markers <- d_gene$psuedo_marker
     fwrite(data.table(x=markers), outfile, row.names=FALSE, col.names=FALSE)
 
 

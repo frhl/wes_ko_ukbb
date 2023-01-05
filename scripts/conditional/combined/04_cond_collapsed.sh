@@ -33,7 +33,7 @@ readonly cluster=$( get_current_cluster)
 readonly index=$( get_array_task_id )
 
 readonly curwd=$(pwd)
-readonly vcf_dir="data/conditional/combined/collapsed"
+readonly vcf_dir="data/conditional/combined/combine_collapsed"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
 

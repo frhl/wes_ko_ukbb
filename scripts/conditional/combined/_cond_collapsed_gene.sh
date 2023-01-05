@@ -31,6 +31,7 @@ readonly chr=${15?Error: Missing arg13 (cond_annotation)}
 readonly index=$( get_array_task_id )
 readonly gene_id=$( zcat ${sig_genes} | grep -w ${phenotype} | grep -w "chr${chr}" | sed "${index}q;d" | cut -f3 )
 readonly out_prefix="${out_prefix_chr}_${gene_id}"
+readonly out="${out_prefix}"
 
 echo "Starting testing on chr${chr} for ${gene_id}."
 
@@ -65,27 +66,24 @@ Rscript ${rscript_merge} \
 
 
 spa_test() {
-  if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then
-    SECONDS=0
-    Rscript "${step2_SPAtests}" \
-       --vcfFile=${vcf} \
-       --vcfFileIndex=${csi} \
-       --vcfField="DS" \
-       --sparseGRMFile=${grm_mtx} \
-       --sparseGRMSampleIDFile=${grm_sam}  \
-       --chrom="chr${chr}" \
-       --minMAF=0.0000001 \
-       --minMAC=${min_mac} \
-       --GMMATmodelFile=${gmat} \
-       --varianceRatioFile=${var} \
-       --SAIGEOutputFile=${out} \
-       --LOCO=FALSE \
-       --condition_file "${out_markers_file}" \
-       && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
-       || raise_error "Saddle-point approximation for chr${chr} failed"
-  else
-    raise_error "${var} or ${gmat} does not contain any bytes!"
-  fi
+  set -x
+  Rscript "${step2_SPAtests}" \
+     --vcfFile=${vcf} \
+     --vcfFileIndex=${csi} \
+     --vcfField="DS" \
+     --sparseGRMFile=${grm_mtx} \
+     --sparseGRMSampleIDFile=${grm_sam}  \
+     --chrom="chr${chr}" \
+     --minMAF=0.0000001 \
+     --minMAC=${min_mac} \
+     --GMMATmodelFile=${gmat} \
+     --varianceRatioFile=${var} \
+     --SAIGEOutputFile=${out} \
+     --LOCO=FALSE \
+     --condition_file "${out_markers_file}" \
+     && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
+     || raise_error "Saddle-point approximation for chr${chr} failed"
+  set +x
 }
 if [ ! -f ${out} ]; then
   set +eu
