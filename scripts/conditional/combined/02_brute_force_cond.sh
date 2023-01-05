@@ -84,7 +84,7 @@ submit_spa_with_csqs()
   if [ ! -z ${phenotype} ]; then
 
     local step1_dir="data/saige/output/${trait}/step1"
-    local step2_dir="data/saige/output/${trait}/step2_brute_force/min_mac${min_mac}"
+    local step2_dir="data/saige/output/${trait}/step2_combined/min_mac${min_mac}"
     local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${annotation}.vcf.bgz"
     mkdir -p ${step2_dir}
 
@@ -243,7 +243,7 @@ submit_merge_job()
 
 # parameters
 readonly markers_rare_cond_min_mac=4
-readonly use_prs="1"
+readonly use_prs="0"
 readonly min_mac=4
 readonly tasks=1-22
 readonly project="lindgren.prj"
