@@ -3,20 +3,18 @@
 # Append pseudo variants with actual variants for downstream conditional analysis.
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=combine_ko_rare_common
+#SBATCH --job-name=combine_collapsed
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/combine_ko_rare_common.log
+#SBATCH --output=logs/combine_collapsed.log
 #SBATCH --error=logs/combine_ko_rare_cond_common.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 5
 #SBATCH --array=22
 #
-#
-#
-#$ -N combine_ko_rare_common
+#$ -N combine_collapsed
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/combine_ko_rare_common.log
-#$ -e logs/combine_ko_rare_common.errors.log
+#$ -o logs/combine_collapsed.log
+#$ -e logs/combine_collapsed.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 4
 #$ -q short.qc
@@ -32,7 +30,7 @@ source utils/bash_utils.sh
 source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/conditional/combined/01_combine_ko_rare_common.py"
+readonly hail_script="scripts/conditional/combined/03_combine_collpased.py"
 
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
@@ -41,7 +39,6 @@ readonly variants_dir="data/mt/annotated"
 # note: assuming ko and rare variants have already been merged
 readonly ko_rare_dir="data/conditional/rare/combined/mt"
 readonly common_dir="data/conditional/common/markers"
-readonly out_dir="data/conditional/combined"
 
 readonly ko_rare_path_wo_ext="${ko_rare_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense"
 readonly common_path_wo_ext="${common_dir}/common_conditional"
@@ -55,6 +52,7 @@ readonly markers_common="${common_path_wo_ext}.markers"
 # one file of rare markers for each chromosome
 readonly markers_rare="${ko_rare_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense_markers.txt.gz"
 
+readonly out_dir="data/conditional/combined/combine_collpased"
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense"
 
 readonly ko_rare_type="mt"

@@ -31,7 +31,7 @@ source utils/vcf_utils.sh
 
 readonly curwd=$(pwd)
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/conditional/combined/02_collapse_variants.py"
+readonly hail_script="scripts/conditional/combined/01_collapse_variants.py"
 
 readonly cluster=$( get_current_cluster)
 readonly task_id=$( get_array_task_id )

@@ -19,7 +19,7 @@ source utils/vcf_utils.sh
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
 
-readonly rscript="scripts/conditional/combined/01_get_collapsed_markers.R"
+readonly rscript="scripts/conditional/combined/02_get_collapsed_markers.R"
 
 readonly chr="${SLURM_ARRAY_TASK_ID}"
 
