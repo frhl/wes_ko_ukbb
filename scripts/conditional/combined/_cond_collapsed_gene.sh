@@ -8,77 +8,58 @@ source utils/hail_utils.sh
 source utils/qsub_utils.sh
 
 readonly step2_SPAtests="utils/saige/step2_SPAtests_cond.R"
-readonly rscript_rare="scripts/conditional/rare/_spa_cond_rare.R"
+readonly rscript_collapsed="scripts/conditional/combined/_spa_cond_collapsed.R"
 readonly rscript_common="scripts/conditional/common/_spa_cond_common.R"
 readonly rscript_merge="scripts/conditional/combined/_brute_force_cond.R"
 
 readonly phenotype=${1?Error: Missing arg1 (phenotype)}
-readonly in_vcf=${2?Error: Missing arg2 (in_vcf)}
-readonly in_csi=${3?Error: Missing arg3 (in_csi)}
-readonly in_gmat=${4?Error: Missing arg4 (in_gmat)}
-readonly in_var=${5?Error: Missing arg5 (in_var)}
+readonly vcf=${2?Error: Missing arg2 (in_vcf)}
+readonly csi=${3?Error: Missing arg3 (in_csi)}
+readonly gmat=${4?Error: Missing arg4 (in_gmat)}
+readonly var=${5?Error: Missing arg5 (in_var)}
 readonly grm_mtx=${6?Error: Missing arg6 (grm_mtx)}
 readonly grm_sam=${7?Error: Missing arg7 (grm_sam)}
 readonly min_mac=${8?Error: Missing arg8 (min_mac)}
-readonly out_prefix=${9?Error: Missing arg9 (out_prefix)}
-readonly in_markers_rare_ac=${10?Error: Missing arg10 (markers_rare_ac)}
-readonly in_markers_rare_hash=${11?Error: Missing arg10 (markers_rare_ac)}
-readonly markers_rare_by_gene=${12?Error: Missing arg10 (markers_rare_ac)}
-readonly markers_rare_cond_min_mac=${13?Error: Missing arg10 (markers_rare_ac)}
-readonly cond_rare_file=${14?Error: Missing arg11 (cond_rare_file)}
-readonly cond_common_file=${15?Error: Missing arg12 (cond_common_file)}
-readonly cond_annotation=${16?Error: Missing arg13 (cond_annotation)}
-readonly array_idx=$( get_array_task_id )
-readonly chr=$( get_chr ${array_idx} )
+readonly out_prefix_chr=${9?Error: Missing arg9 (out_prefix)}
+readonly sig_genes=${10?Error: Missing arg10 (markers_rare_ac)}
+readonly markers_rare_cond_min_mac=${11?Error: Missing arg10 (markers_rare_ac)}
+readonly cond_rare_file=${12?Error: Missing arg11 (cond_rare_file)}
+readonly cond_common_file=${13?Error: Missing arg12 (cond_common_file)}
+readonly cond_annotation=${14?Error: Missing arg13 (cond_annotation)}
+readonly chr=${15?Error: Missing arg13 (cond_annotation)}
 
+readonly index=$( get_array_task_id )
+readonly gene_id=$( zcat ${sig_genes} | grep -w ${phenotype} | grep -w "chr${chr}" | sed "${index}q;d" | cut -f3 )
+readonly out_prefix="${out_prefix_chr}_${gene_id}"
 
-# Need to change CHR input depending on current task-id
-readonly gmat=$(echo ${in_gmat} | sed -e "s/CHR/${chr}/g")
-readonly var=$(echo ${in_var} | sed -e "s/CHR/${chr}/g")
-readonly vcf=$(echo ${in_vcf} | sed -e "s/CHR/${chr}/g")
-readonly csi=$(echo ${in_csi} | sed -e "s/CHR/${chr}/g")
-readonly out=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
-readonly markers_rare_ac=$(echo ${in_markers_rare_ac} | sed -e "s/CHR/${chr}/g")
-readonly markers_rare_hash=$(echo ${in_markers_rare_hash} | sed -e "s/CHR/${chr}/g")
+echo "Starting testing on chr${chr} for ${gene_id}."
 
-# Check that SAIGE step 1 has been run
-readonly var_bytes=$( file_size ${var} )
-readonly gmat_bytes=$( file_size ${gmat} )
->&2 echo "Found ${gmat} and ${var} with ${phenotype}"
-
-# set up R
 set_up_rpy
-
-# create subset of rare (conding) markers to be used in analysis
-readonly out_rare_markers_file="${out_prefix/CHR/${chr}}.rare.markers"
-stopifnot_file_exists ${markers_rare_ac}
-stopifnot_file_exists ${markers_rare_hash}
-stopifnot_file_exists ${markers_rare_by_gene}
-Rscript "${rscript_rare}" \
-  --chromosome "chr${chr}" \
-  --phenotype "${phenotype}" \
-  --annotation "${cond_annotation}" \
-  --path_ac_by_phenotypes "${markers_rare_ac}" \
-  --path_hash_by_phenotypes "${markers_rare_hash}" \
-  --path_markers_by_gene "${markers_rare_by_gene}" \
-  --outfile "${out_rare_markers_file}" \
-  --min_mac ${markers_rare_cond_min_mac}
 
 # create a subset of common (non-coding) makers to be used in analysis
 readonly out_common_markers_file="${out_prefix/CHR/${chr}}.common.markers"
-readonly cond_chr_common_file=$(echo ${cond_common_file} | sed -e "s/CHR/${chr}/g")
-if [ -f ${cond_chr_common_file} ]; then
-  Rscript ${rscript_common} \
-    --infile ${cond_chr_common_file} \
-    --phenotype ${phenotype} \
-    --outfile ${out_common_markers_file} \
+if [ -f ${cond_common_file} ]; then
+  Rscript "${rscript_common}" \
+    --infile "${cond_common_file}" \
+    --phenotype "${phenotype}" \
+    --outfile "${out_common_markers_file}" \
     --pheno_col 6
 fi
+
+
+# create subset of rare (conding) markers to be used in analysis
+readonly out_collapsed_markers_file="${out_prefix/CHR/${chr}}.rare.markers"
+Rscript "${rscript_collapsed}" \
+  --gene_id "${gene_id}" \
+  --phenotype "${phenotype}" \
+  --path_markers "${cond_rare_file}" \
+  --min_mac "${markers_rare_cond_min_mac}" \
+  --outfile "${out_collapsed_markers_file}"
 
 # merge the two subsets
 readonly out_markers_file="${out_prefix/CHR/${chr}}.final.markers"
 Rscript ${rscript_merge} \
-  --file_rare_markers ${out_rare_markers_file} \
+  --file_rare_markers ${out_collapsed_markers_file} \
   --file_common_markers ${out_common_markers_file} \
   --outfile ${out_markers_file}
 

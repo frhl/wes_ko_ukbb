@@ -7,6 +7,8 @@ source utils/bash_utils.sh
 source utils/hail_utils.sh
 source utils/qsub_utils.sh
 
+readonly cluster=$( get_current_cluster )
+
 readonly bash_script="scripts/conditional/combined/_cond_collapsed_gene.sh"
 
 readonly phenotype=${1?Error: Missing arg1 (phenotype)}
@@ -56,7 +58,7 @@ if [ "${n_sig_genes}" -gt 0 ]; then
       --job-name="${slurm_jname}" \
       --output="${slurm_lname}.log" \
       --error="${slurm_lname}.errors.log" \
-      --chdir="${curwd}" \
+      --chdir="$(pwd)" \
       --partition="${slurm_queue}" \
       --cpus-per-task="${slurm_nslots}" \
       --array=${gene_array} \
@@ -75,7 +77,8 @@ if [ "${n_sig_genes}" -gt 0 ]; then
       "${markers_rare_cond_min_mac}" \
       "${cond_rare_file}" \
       "${cond_common_file}" \
-      "${cond_annotation}" 
+      "${cond_annotation}" \
+      "${chr}"
   else
     >&2 echo "${cluster} is not a valid cluster."
   fi  

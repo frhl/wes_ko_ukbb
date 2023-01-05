@@ -132,8 +132,8 @@ submit_spa_job() {
   local slurm_jname="_${phenotype}_${annotation}"
   local slurm_lname="logs/_cond_collapsed"
   local slurm_project="${project}"
-  local slurm_queue="${queue}"
-  local slurm_nslots="${nslots}"
+  local slurm_queue="short"
+  local slurm_nslots="1"
   readonly spa_jid=$( sbatch \
     --account="${slurm_project}" \
     --job-name="${slurm_jname}" \
@@ -193,12 +193,10 @@ submit_merge_job()
 
 # parameters
 readonly markers_rare_cond_min_mac=4
-readonly use_prs="0"
+readonly use_prs="1"
 readonly min_mac=4
 readonly tasks=1-22
 readonly project="lindgren.prj"
-readonly queue="short"
-readonly nslots=3
 
 # cts traits
 #submit_spa_cts_with_csqs "pLoF_damaging_missense"
