@@ -7,10 +7,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/spa_null.log
 #SBATCH --error=logs/spa_null.errors.log
-#SBATCH --partition=relion
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=101
-#
+#SBATCH --array=1-320
 #
 #$ -N spa_null
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -19,7 +18,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 320-200
+#$ -t 100-200
 #$ -V
 
 set -o errexit
@@ -56,7 +55,7 @@ readonly index=$( get_array_task_id )
 fit_binary_traits() {
   local trait_type="binary"
   local inv_normalize="FALSE"
-  local out_dir="data/saige/output/binary/step1_new"
+  local out_dir="data/saige/output/binary/step1"
   local pheno_list="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
   local phenotype=$( sed "${index}q;d" ${pheno_list} )
   local out="${out_dir}/${out_prefix}_${phenotype}"
@@ -192,7 +191,7 @@ submit_spa_null() {
 # Parameters
 readonly use_prs=1
 readonly nslots=3
-readonly queue="epyc"
+readonly queue="short"
 readonly sge_queue="short.qc"
 readonly project="lindgren.prj"
 

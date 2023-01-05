@@ -109,11 +109,12 @@ submit_encode_job()
 #submit_encode_job "pLoF" "32" "collect"
 #submit_encode_job "pLoF" "2" "fast"
 #submit_encode_job "other_missense" "2" "fast"
-#submit_encode_job "damaging_missense" "3" "fast"
-#submit_encode_job "pLoF,damaging_missense" "1" "fast"
-#submit_encode_job "other_missense" "1" "fast"
-submit_encode_job "pLoF" "1" "fast"
-submit_encode_job "synonymous" "2" "fast"
+
+submit_encode_job "damaging_missense" "2" "fast"
+submit_encode_job "pLoF,damaging_missense" "2" "fast"
+submit_encode_job "other_missense" "2" "fast"
+submit_encode_job "pLoF" "2" "fast"
+#submit_encode_job "synonymous" "2" "fast"
 
 
 

@@ -8,7 +8,7 @@
 #SBATCH --open-mode=append
 #SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
-#SBATCH --array=251-320
+#SBATCH --array=2
 # --begin=now+2hour
 #
 #$ -N prs
@@ -18,7 +18,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 1-200
+#$ -t 1-320
 #$ -V
 
 set -o errexit
@@ -42,7 +42,7 @@ readonly mrg_dir="data/prs/scores_new"
 
 # do not run files that have h2 estimates
 # above the given p-value cutoff (nominal).
-readonly ldsc_pvalue_cutoff="0.0001"
+readonly ldsc_pvalue_cutoff="0.05"
 
 readonly cluster=$( get_current_cluster )
 readonly index=$( get_array_task_id )
@@ -222,7 +222,7 @@ clean_pgs()
       --parsable \
       "${clean_script}" \
       "${pred}" \
-      "${out_prefix}" )
+      "${out_prefix}_new" )
   elif [ "${cluster}" = "sge" ]; then
     qsub -N "${qsub_clean}" \
       -t ${tasks} \
@@ -235,7 +235,7 @@ clean_pgs()
       -hold_jid_ad "${qsub_fit}" \
       "${clean_script}" \
       "${pred}" \
-      "${out_prefix}" 
+      "${out_prefix}_new" 
   else
     >&2 echo "${cluster} is not valid"
   fi

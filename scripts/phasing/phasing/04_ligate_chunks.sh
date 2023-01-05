@@ -18,7 +18,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 3
 #$ -q short.qc
-#$ -t 21
+#$ -t 20-22
 #$ -V
 
 set -o errexit
@@ -33,9 +33,31 @@ readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
 readonly PWD=$(pwd)
-readonly in_dir="data/phased/wes_union_calls/200k/shapeit5/trimmed"
-readonly in_prefix="${in_dir}/ukb_wes_union_calls_shapeit5_200k_chr${chr}"
+
+# eagle2
+#readonly in_dir="data/phased/wes_union_calls/200k/eagle2/trimmed"
+#readonly in_prefix="${in_dir}/ukb_wes_union_calls_eagle2_200k_chr${chr}"
+#readonly in_trim="${in_prefix}_trim_trim"
+#readonly out_dir="data/phased/wes_union_calls/200k/eagle2/ligated"
+#readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
+#readonly out="${out_prefix}.vcf.bgz"
+
+# SHAPEIT4
+readonly in_dir="data/phased/wes_union_calls/200k/shapeit4/trimmed"
+readonly in_prefix="${in_dir}/ukb_wes_union_calls_shapeit4_200k_chr${chr}"
 readonly in_trim="${in_prefix}_trim_trim"
+readonly out_dir="data/phased/wes_union_calls/200k/shapeit4/ligated"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
+readonly out="${out_prefix}.vcf.bgz"
+
+# SHAPEIT5
+#readonly in_dir="data/phased/wes_union_calls/200k/shapeit5/trimmed"
+#readonly in_prefix="${in_dir}/ukb_wes_union_calls_shapeit5_200k_chr${chr}"
+#readonly in_trim="${in_prefix}_trim_trim"
+#readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/ligated"
+#readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
+#readonly out="${out_prefix}.vcf.bgz"
+
 
 set_up_rpy
 module load BCFtools/1.12-GCC-10.3.0
@@ -48,10 +70,6 @@ readonly n=$(echo ${files} | tr " " "\n" | wc -l)
 
 echo $files
 echo "\nNote: Chunks found ${n}"
-
-readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/ligated"
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
-readonly out="${out_prefix}.vcf.bgz"
 
 mkdir -p ${out_dir}
 

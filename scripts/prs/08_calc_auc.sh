@@ -8,6 +8,7 @@
 #SBATCH --error=logs/calc_auc.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
+#SBATCH --begin=now+120
 #
 #
 #$ -N calc_auc
@@ -29,7 +30,7 @@ source utils/qsub_utils.sh
 
 readonly rscript="scripts/prs/08_calc_auc.R"
 
-readonly pgs_dir="data/prs/scores"
+readonly pgs_dir="data/prs/scores_new"
 readonly out_dir="data/prs/validation"
 readonly pheno_dir="data/phenotypes"
 
