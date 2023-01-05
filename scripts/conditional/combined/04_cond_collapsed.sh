@@ -4,18 +4,18 @@
 # associations are still significant. These would be driven by Compound heterozygotes.
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=cond_everything
+#SBATCH --job-name=cond_collapsed
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/cond_everything.log
-#SBATCH --error=logs/cond_everything.errors.log
+#SBATCH --output=logs/cond_collapsed.log
+#SBATCH --error=logs/cond_collapsed.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-320
+#SBATCH --array=5
 #
-#$ -N cond_everything
+#$ -N cond_collapsed
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/cond_everything.log
-#$ -e logs/cond_everything.errors.log
+#$ -o logs/cond_collapsed.log
+#$ -e logs/cond_collapsed.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
@@ -47,7 +47,8 @@ readonly merge_script="scripts/_spa_merge.sh"
 readonly in_prefix="ukb_eur_wes_200k"
 
 # list of genes that passes significance cutoffs
-readonly markers_rare_by_gene_dir="data/conditional/rare/combined/genes/min_mac4"
+readonly sig_genes_dir="data/conditional/combined/sig_genes"
+readonly sig_genes="${sig_genes_dir}/sig_genes_after_prs.txt.gz"
 
 # list of rare pseudo variants to condition on
 readonly cond_rare_dir="data/mt/dosages/pp90"
@@ -108,13 +109,13 @@ submit_spa_with_csqs()
     fi
 
     # setup paths to variants in genes by phenotypes
-    local markers_rare_by_gene="${markers_rare_by_gene_dir}/${in_prefix}_${phenotype}_${annotation}.txt.gz"
+    #local markers_rare_by_gene="${markers_rare_by_gene_dir}/${in_prefix}_${phenotype}_${annotation}.txt.gz"
 
     if [ ! -f "${out_mrg}" ]; then
       local qsub_spa_name="spa_${phenotype}_${annotation}"
       local qsub_merge_name="_mrg_${phenotype}_${annotation}" 
       submit_spa_job
-      submit_merge_job
+      #submit_merge_job
     else
       >&2 echo "Phenotype ${phenotype} with annotation ${annotation} already exists! Skipping.."
     fi
@@ -124,61 +125,12 @@ submit_spa_with_csqs()
 }
 
 
-submit_spa_job_sge() {
-  mkdir -p ${step2_dir}
-  set -x
-  qsub -N "${qsub_spa_name}" \
-    -t ${tasks} \
-    -q "${queue}" \
-    -pe shmem ${nslots} \
-    -wd $(pwd) \
-    -P "lindgren.prjc" \
-    -V \
-    "${spa_script}" \
-    "${phenotype}" \
-    "${in_vcf}" \
-    "${in_vcf}.csi" \
-    "${in_gmat}" \
-    "${in_var}" \
-    "${grm_mtx}" \
-    "${grm_sam}" \
-    "${min_mac}" \
-    "${out_prefix}" \
-    "${markers_rare_by_gene}" \
-    "${markers_rare_cond_min_mac}" \
-    "${cond_rare_file}" \
-    "${cond_common_file}" \
-    "${cond_cat}"
-  set +x
-}
-
-
-submit_merge_job_sge()
-{
-  local remove_by_chr="Y"
-  set -x
-  qsub -N "${qsub_merge_name}" \
-    -q short.qc@@short.hge \
-    -pe shmem 1 \
-    -wd $(pwd) \
-    -P "lindgren.prjc" \
-    -V \
-    -hold_jid "${qsub_spa_name}" \
-    "${merge_script}" \
-    "${out_prefix}" \
-    "${out_mrg}" \
-    "${remove_by_chr}"
-  set +x
-
-}
-
-
 
 submit_spa_job() {
   mkdir -p ${step2_dir}
   local slurm_tasks="${tasks}"
   local slurm_jname="_${phenotype}_${annotation}"
-  local slurm_lname="logs/_cond_everything"
+  local slurm_lname="logs/_cond_collapsed"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
   local slurm_nslots="${nslots}"
@@ -190,6 +142,7 @@ submit_spa_job() {
     --chdir="${curwd}" \
     --partition="${slurm_queue}" \
     --cpus-per-task="${slurm_nslots}" \
+    --open-mode="append" \
     --array=${slurm_tasks} \
     --parsable \
     "${spa_script}" \
@@ -202,7 +155,7 @@ submit_spa_job() {
     "${grm_sam}" \
     "${min_mac}" \
     "${out_prefix}" \
-    "${markers_rare_by_gene}" \
+    "${sig_genes}" \
     "${markers_rare_cond_min_mac}" \
     "${cond_rare_file}" \
     "${cond_common_file}" \
@@ -215,7 +168,7 @@ submit_merge_job()
 {
   local remove_by_chr="Y"
   local slurm_jname="_m_${phenotype}_${annotation}"
-  local slurm_lname="logs/_mrg_cond_everything"
+  local slurm_lname="logs/_mrg_cond_collapsed"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
   local slurm_nslots="1"

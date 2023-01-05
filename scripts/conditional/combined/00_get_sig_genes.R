@@ -83,6 +83,7 @@ main <- function(args){
         if (nrow(d)){
             out <- data.table(
                 trait = trait,
+                chromosome = d$CHR,
                 gene = d$MarkerID,
                 pvalues = d$p.value,
                 cond = d$cond
