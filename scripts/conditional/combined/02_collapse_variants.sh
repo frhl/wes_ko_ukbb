@@ -3,13 +3,13 @@
 # @description Append pseudo variants with actual variants for downstream conditional analysis.
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=collapse_varaints
+#SBATCH --job-name=collapse_variants
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/collapse_varaints.log
-#SBATCH --error=logs/collapse_varaints.errors.log
+#SBATCH --output=logs/collapse_variants.log
+#SBATCH --error=logs/collapse_variants.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 2
-#SBATCH --array=21
+#SBATCH --cpus-per-task 4
+#SBATCH --array=1-22
 
 
 set -o errexit
@@ -33,7 +33,7 @@ readonly vcf_dir="data/conditional/rare/combined/mt"
 readonly vcf="${vcf_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense.vcf.bgz"
 
 readonly out_dir="data/conditional/combined/collapsed"
-readonly out_prefix="ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense_collapsed"
+readonly out_prefix="ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense_collapsed/sleep"
 readonly out="${out_prefix}.vcf"
 
 mkdir -p ${out_dir}
@@ -50,7 +50,7 @@ fi
 
 if [ ! -f "${out}.gz" ]; then
   module load BCFtools/1.12-GCC-10.3.0
-  bgzip ${out}
+  bgzip -c ${out} > "${out}.gz"
 fi
 
 if [ ! -f "${out}.gz.csi" ]; then
