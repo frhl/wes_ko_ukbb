@@ -11,6 +11,7 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 #SBATCH --array=1-100
+#SBATCH --dependency="afterok:10270041"
 #
 #$ -N cond_collapsed
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

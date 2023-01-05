@@ -10,7 +10,7 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 #SBATCH --array=1-22
-
+#SBATCH --dependency="aftercorr:10270008"
 
 set -o errexit
 set -o nounset

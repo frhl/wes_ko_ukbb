@@ -8,7 +8,7 @@
 #SBATCH --output=logs/collapse_variants.log
 #SBATCH --error=logs/collapse_variants.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 2
+#SBATCH --cpus-per-task 3
 #SBATCH --array=1-22
 #
 #
@@ -50,7 +50,9 @@ readonly csqs_category="pLoF,damaging_missense"
 
 mkdir -p ${out_dir}
 
+set +u
 set_up_hail
+set -u
 set_up_pythonpath_legacy
 python3 "${hail_script}" \
   --chrom ${chr} \
