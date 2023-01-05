@@ -66,7 +66,6 @@ Rscript ${rscript_merge} \
 
 
 spa_test() {
-  set -x
   Rscript "${step2_SPAtests}" \
      --vcfFile=${vcf} \
      --vcfFileIndex=${csi} \
@@ -83,7 +82,6 @@ spa_test() {
      --condition_file "${out_markers_file}" \
      && print_update "Finished saddle-point approximation for chr${chr}" ${SECONDS} \
      || raise_error "Saddle-point approximation for chr${chr} failed"
-  set +x
 }
 if [ ! -f ${out} ]; then
   set +eu
