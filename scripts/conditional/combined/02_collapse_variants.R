@@ -78,6 +78,8 @@ main <- function(args){
     pseudo_gts <- lapply(pseudo_rsids, function(rsids){
         idx <- which(l$metadata$ID %in% rsids)
         g <- genotypes[idx,]
+        print(nrow(g))
+        print(ncol(g))
         pseudo_gt <- apply(g, 2, function(x) max(x, na.rm = TRUE))
         return(pseudo_gt)
     })
