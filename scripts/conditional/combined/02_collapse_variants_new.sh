@@ -8,8 +8,8 @@
 #SBATCH --output=logs/collapse_variants.log
 #SBATCH --error=logs/collapse_variants.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 4
-#SBATCH --array=21
+#SBATCH --cpus-per-task 2
+#SBATCH --array=1-22
 #
 #
 #$ -N collapse_variants
@@ -44,7 +44,7 @@ readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_cs
 readonly in_type="mt"
 # prefix for indiviual genes and final merged file
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_max_ds"
-readonly out_type="vcf"
+readonly out_type="mt"
 
 readonly csqs_category="pLoF,damaging_missense"
 
@@ -59,4 +59,6 @@ python3 "${hail_script}" \
   --out_prefix ${out_prefix} \
   --out_type ${out_type} \
   --csqs_category ${csqs_category}
+
+
 

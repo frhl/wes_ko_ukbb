@@ -44,7 +44,7 @@ def main(args):
     
     # setup sites and alleles
     rows = genes.count()[0]
-    rng = range((rows+1), (rows+1)*2)
+    rng = range((rows)+1, (rows*2)+1)
     locus = [ "chr%s:%s" % (chrom, str(i+1)) for i in rng]
     ref = [ get_tid(4) for i in rng]
     alt = [ get_tid(4) for i in rng]
@@ -56,7 +56,7 @@ def main(args):
     ht = ht.key_by('idx')
 
     # annotate knockout matrix
-    prob = genes.annotate_entries(DS=genes.pKO * 2)
+    prob = genes
     prob = prob.select_entries(prob.DS)
     prob = prob.add_row_index()
     prob = prob.annotate_rows(
