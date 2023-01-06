@@ -153,11 +153,15 @@ main <- function(args){
     d1 <- d[d$N_ko_case == 1,]
     d2 <- d[d$N_ko_case >= 2,]
     d <- rbind(d2, d1)
-        
+
+    # clean up
+    d$hgnc_symbol[d$hgnc_symbol==""] <- NA
+    d$hgnc_symbol[d$hgnc_symbol==" "] <- NA
+    
     # put
     outfile <- paste0(args$out_prefix, ".txt.gz")
     write(paste0("writing ", outfile), stdout())
-    fwrite(d, outfile, sep = "\t")
+    fwrite(d, outfile, sep = "\t", na = "n/a")
 
 }
 
