@@ -267,7 +267,13 @@ main <- function(args){
     dt_remaining <- dt_remaining[,c("phenotype","ICD_chapter","ICD_chapter_desc","unix_code")]
     dt_out <- rbind(dt_out, dt_remaining)
 
+    # merge on short descriptions
+    dt_desc_short <- fread(args$path_icd_desc_short)
+    dt_desc_short <- dt_desc_short[,c(1,3)]
+    dt_out <- merge(dt_out, dt_desc_short, all.x = TRUE, by = "ICD_chapter")
+    
     outfile <- paste0(args$out_prefix,".txt")
+    write(paste("writing to", outfile), stdout())
     fwrite(dt_out, outfile, sep = "\t", quote=FALSE, na="NA")
 
 }
@@ -275,6 +281,7 @@ main <- function(args){
 # add arguments
 parser <- ArgumentParser()
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
+parser$add_argument("--path_icd_desc_short", default=NULL, required = TRUE, help = "short descriptions")
 parser$add_argument("--phenotypes_to_keep", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()
 
