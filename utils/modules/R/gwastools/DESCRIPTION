@@ -24,3 +24,7 @@ Collate:
     'order_markers.R'
     'residualize_trait.R'
     'residualize_trait_by_sex.R'
+    'unique_but_prefer_regex.R'
+
+
+
