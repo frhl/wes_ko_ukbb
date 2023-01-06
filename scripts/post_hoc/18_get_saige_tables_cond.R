@@ -13,49 +13,6 @@ names(ensembl_to_pos) <- bridge$ensembl_gene_id
 ensembl_to_contig <- bridge$chromosome_name
 names(ensembl_to_contig) <- bridge$ensembl_gene_id
 
-
-list_files_saige <- function(cond="none", prs="include", regex = "\\.txt\\.gz"){
-
-    # set up paths
-    wd <- "/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb"
-    step2_dir <- file.path(wd, "data/saige/output/binary/step2/min_mac4")
-    step2_common_dir <- file.path(wd, "data/saige/output/binary/step2_common/min_mac4")
-    step2_rare_dir <- file.path(wd, "data/saige/output/binary/step2_rare_cond/min_mac4")
-    step2_combined_dir <- file.path(wd, "data/saige/output/binary/step2_rare_cond/min_mac4")
-    #step2_collapsed_dir <- file.path(wd, "data/saige/output/binary/step2_collapsed/min_mac4")
-    
-    # subset paths based on condions
-    if (cond %in% "none"){
-        files <- list.files(step2_dir, full.names = TRUE, pattern = regex)
-    } else if (cond %in% "common"){
-        files <- list.files(step2_common_dir, full.names = TRUE, pattern = regex)
-    } else if (cond %in% "rare"){
-        files <- list.files(step2_rare_dir, full.names = TRUE, pattern = regex)
-    } else if (cond %in% "combined"){
-        files <- list.files(step2_combined_dir, full.names = TRUE, pattern = regex)
-    } else {
-        stop(paste(cond, "is not a valid. Try 'none','common','rare' or 'combined'"))
-    }
-    
-    # perform final subset by PRS
-    files <- sort(files)
-    is_prs <- grepl("locoprs.txt.gz", files)
-    if (prs %in% "include"){
-        return(files)
-    } else if (prs %in% "exclude"){
-        # exclude any PRS files
-        return(files[!is_prs])
-    } else if (prs %in% "only") {
-        # only include PRS
-        return(files[is_prs])
-    } else if (prs %in% "prefer") {
-        return(gwastools::unique_but_prefer_regex(files, regex="_locoprs"))
-    } else {
-        stop(paste(prs, "is not valid. Must be either 'include','exclude','prefer' or 'only'."))
-    }
-    
-}
-
 process_saige_df <- function(d, f){
     # deal with conditional P-values
     if ("p.value_c" %in% colnames(d)) {
@@ -119,22 +76,32 @@ main <- function(args){
 
     N_ko_cutoff <- as.numeric(args$N_ko_cutoff)
     N_ko_case_cutoff <- as.numeric(args$N_ko_case_cutoff)
-    p_cutoff <- as.numeric(args$p_cutoff)
-    path_header <- args$path_header
-    header <- fread(path_header, header=FALSE)$V1
 
-    # get files
-    files <- list_files_saige(cond = args$cond, prs = args$prs)
-    print(head(files))
-    
-    # read files and format
-    d <- get_formatted_df(files)
-    d <- d[d$phenotype %in% header,]
-  
+    # ensure we are using saige with PRS when possible
+    ref <- fread(args$ref_file)
+    ref$ID <- paste0(ref$MarkerID,"_",ref$phenotype)
+    mapping_n_ko_case <- ref$N_ko_case
+    mapping_n_ko_ctrl <- ref$N_ko_ctrl
+    names(mapping_n_ko_case) <- ref$ID
+    names(mapping_n_ko_ctrl) <- ref$ID 
+
+    # we only include things that were significant in the primary analysis
+    d <- fread(args$merged_hits)
+    d$ID <- paste0(d$MarkerID,"_",d$phenotype)
+    d$N_case_hom <- mapping_n_ko_case[d$ID]
+    d$N_ctrl_hom <- mapping_n_ko_ctrl[d$ID]
+    d <- d[d$ID %in% ref$ID,]     
+
+    # wei has not added N_ko_case and N_ko_ctrl so we need to grab them from the past file
+    d <- rbindlist(lapply(1:nrow(d), function(idx){
+        dt <- d[idx,]
+        path <- dt$filepath
+        return(process_saige_df(dt, path))    
+    }))
+
     # perform subsets
     d <- d[d$N_ko >= N_ko_cutoff,]
     d <- d[d$N_ko_case >= N_ko_case_cutoff,]
-    d <- d[d$p.value < p_cutoff,]
     d <- d[order(d$p.value), ]
 
     # columsn to keep
@@ -167,12 +134,10 @@ main <- function(args){
 
 # add arguments
 parser <- ArgumentParser()
-parser$add_argument("--path_header", default=NULL, required = TRUE, help = "")
-parser$add_argument("--p_cutoff", default=NULL, required = TRUE, help = "")
+parser$add_argument("--ref_file", default=NULL, required = TRUE, help = "")
+parser$add_argument("--merged_hits", default=NULL, required = TRUE, help = "")
 parser$add_argument("--N_ko_case_cutoff", default=NULL, required = TRUE, help = "")
 parser$add_argument("--N_ko_cutoff", default=NULL, required = TRUE, help = "")
-parser$add_argument("--cond", default="none", required = TRUE, help = "")
-parser$add_argument("--prs", default=NULL, required = TRUE, help = "")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "")
 args <- parser$parse_args()
 

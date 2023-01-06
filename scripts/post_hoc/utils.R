@@ -90,6 +90,14 @@ get_mapping_ensembl_to_hgnc <- function(){
     return(ensembl_to_hgnc)
 }
 
+get_mapping_ensembl_to_contig <- function(){
+    bridge <- fread("/well/lindgren/flassen/ressources/genesets/genesets/data/biomart/220524_hgnc_ensg_enst_chr_pos.txt.gz")
+    ensembl_to_contig <- bridge$chromosome_name
+    names(ensembl_to_contig) <- bridge$ensembl_gene_id
+    return(ensembl_to_contig)
+}
+
+
 
 # collapse categories into a single column
 collapse_categories <- function(dt, annotation){

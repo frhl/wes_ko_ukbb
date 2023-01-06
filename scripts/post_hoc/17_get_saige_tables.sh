@@ -33,9 +33,10 @@ get_table() {
   local out_prefix="${out_dir}/${1}"
   local cond=${2}
   local prs=${3}
+  local p=${4}
   Rscript "${rscript}" \
     --path_header ${header_file} \
-    --p_cutoff ${p_cutoff} \
+    --p_cutoff ${p} \
     --N_ko_case_cutoff ${N_ko_case_cutoff} \
     --N_ko_cutoff ${N_ko_cutoff} \
     --cond ${cond} \
@@ -44,8 +45,13 @@ get_table() {
 }
 
 set_up_rpy
-get_table "saige_resuls_excluding_prs" "none" "exclude"
-get_table "saige_resuls_only_prs" "none" "only"
-get_table "saige_resuls_prefer_prs" "none" "prefer"
+get_table "saige_sig_merge_excluding_prs" "none" "exclude" "${p_cutoff}"
+get_table "saige_sig_merge_only_prs" "none" "only" "${p_cutoff}"
+get_table "saige_sig_merge_prefer_prs" "none" "prefer" "${p_cutoff}"
+
+get_table "saige_merge_excluding_prs" "none" "exclude" "1"
+get_table "saige_merge_only_prs" "none" "only" "1"
+get_table "saige_merge_prefer_prs" "none" "prefer" "1"
+
 
 
