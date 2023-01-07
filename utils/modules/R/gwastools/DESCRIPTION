@@ -18,6 +18,7 @@ Suggests:
     testthat (>= 2.1.0)
 RoxygenNote: 7.1.2
 Collate:
+    'beta_power_curve.R'
     'get_expected_p.R'
     'get_int.R'
     'get_rint.R'
