@@ -32,18 +32,19 @@ main <- function(args){
     colnames(mv)[6] <- "ensembl_gene_id"
     genes <- unique(mv$ensembl_gene_id)
 
+    # get marker to gene
+    marker_to_gene <- mv$ensembl_gene_id
+    names(marker_to_gene) <- mv$rsid
+    marker_to_csqs <- mv$consequence_category
+    names(marker_to_csqs) <- mv$rsid
+
     # read vcf and meta-data
     l <- fread_vcf(args$path_vcf)
-
-    # get genes and their corresponding variants
-    pseudo_rsids <- lapply(genes, function(g){
-        return(mv$rsid[mv$ensembl_gene_id %in% g])
-    })
-
     genotypes <- l$genotypes
     metarow <- l$metadata
-    row_gene <- toupper(metarow$ID)
-    row_marker <- paste0(metarow$`#CHROM`,":",metarow$POS,":",metarow$REF,":",metarow$ALT)
+    row_marker <- as.character(paste0(metarow$`#CHROM`,":",metarow$POS,":",metarow$REF,":",metarow$ALT))
+    row_gene <- as.character(marker_to_gene[row_marker])
+    row_csqs <- as.character(marker_to_csqs[row_marker])
 
     # ensure correct format
     genotypes[genotypes=="."] <- NA
@@ -56,36 +57,19 @@ main <- function(args){
     pseudo_AC <- apply(genotypes, 1, function(gts) sum(gts, na.rm = TRUE))
     pseudo_hash <- apply(genotypes, 1, function(gts) digest(gts, algo="xxhash32"))
 
-    # get overview
+    # combine everything 
     final <- data.table(
-        chrom = args$chrom,
         ensembl_gene_id = row_gene,
-        psuedo_marker = row_marker,
-        pseudo_AC = pseudo_AC,
-        pseudo_hash = pseudo_hash
+        marker = row_marker,
+        AC = pseudo_AC,
+        hash = pseudo_hash,
+        csqs = row_csqs
     )
 
-    # get genes and their corresponding variants by category
-    categories <- unique(mv$consequence_category)
-    pseudo_csqs <- rbindlist(lapply(genes, function(g){
-        ds <- data.table(table(mv$consequence_category[mv$ensembl_gene_id %in% g]))
-        ds <- data.table(t(ds))
-        colnames(ds) <- as.character(ds[1,])
-        ds <- ds[2,]
-        # ugly hack to add missing categories
-        categories_missing <- categories[!categories %in% colnames(ds)]
-        for (cat in categories_missing){ds[[cat]] <- NA}
-        ds <- ds[,..categories]
-        ds$ensembl_gene_id <- g
-        return(ds)
-    }))
-    colnames(pseudo_csqs)[1:2] <- paste0("n_",colnames(pseudo_csqs)[1:2])
-    
     # merge and write file
-    final_with_csqs <- merge(final, pseudo_csqs,  all.x = TRUE)
     outfile = paste0(args$out_prefix, ".txt.gz")
     write(paste("Succes! Writing to", outfile), stdout())
-    fwrite(final_with_csqs, outfile, quote = FALSE, sep = '\t', col.names = TRUE)
+    fwrite(final, outfile, quote = FALSE, sep = '\t', col.names = TRUE)
 }
 
 # add arguments

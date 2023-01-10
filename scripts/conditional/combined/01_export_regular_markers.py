@@ -38,6 +38,8 @@ def main(args):
     mt = mt.filter_rows(mt.MAC > int(mac_cutoff))
     mt = mt.annotate_entries(DS = mt.GT.n_alt_alleles())
     mt = mt.select_entries(mt.DS)
+    if out_type not in "mt":
+        mt = mt.checkpoint(out_prefix + ".mt", overwrite=True) 
     io.export_table(mt, out_prefix, out_type)
 
 if __name__=='__main__':

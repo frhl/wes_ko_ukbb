@@ -17,7 +17,7 @@
 #$ -o logs/combine_collapsed.log
 #$ -e logs/combine_collapsed.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 4
+#$ -pe shmem 2
 #$ -q short.qc
 #$ -t 21
 #$ -V
@@ -38,14 +38,19 @@ readonly variants_dir="data/mt/annotated"
 
 # note: assuming ko and rare variants have already been merged
 readonly ko_dir="data/knockouts/alt/pp90/combined"
-readonly rare_dir="data/mt/dosages/pp90"
+readonly collpased_dir="data/mt/dosages_urv/pp90"
+readonly rare_dir="data/mt/dosages_urv/pp90"
 readonly common_dir="data/conditional/common/markers"
 
-readonly rare_path_wo_ext="${rare_dir}/ukb_eur_wes_200k_chr${chr}_max_ds"
+readonly collapsed_path_wo_ext="${rare_dir}/ukb_eur_wes_200k_chr${chr}_max_ds"
+readonly rare_path_wo_ext="${rare_dir}/ukb_eur_wes_200k_chr${chr}_mac_gt10"
 readonly common_path_wo_ext="${common_dir}/common_conditional"
 
 readonly ko_path="${ko_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense.mt"
 readonly ko_type="mt"
+
+readonly collapsed_path="${collapsed_path_wo_ext}.mt"
+readonly collapsed_type="mt"
 
 readonly rare_path="${rare_path_wo_ext}.mt"
 readonly rare_type="mt"
@@ -56,7 +61,7 @@ readonly common_type="mt"
 
 readonly markers_common="${common_path_wo_ext}.markers"
 
-readonly out_dir="data/conditional/combined/combine_collapsed"
+readonly out_dir="data/conditional/combined/combine_collapsed_urv"
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense"
 readonly out_type="vcf"
 readonly out="${out_prefix}.vcf.bgz"
@@ -87,6 +92,8 @@ if [ ! -f "${out_prefix}.vcf.bgz" ]; then
        --chrom ${chr} \
        --ko_path ${ko_path} \
        --ko_type ${ko_type} \
+       --collapsed_path ${collapsed_path} \
+       --collapsed_type ${collapsed_type} \
        --rare_path ${rare_path} \
        --rare_type ${rare_type} \
        --out_prefix ${out_prefix} \
@@ -97,6 +104,8 @@ if [ ! -f "${out_prefix}.vcf.bgz" ]; then
        --chrom ${chr} \
        --ko_path ${ko_path} \
        --ko_type ${ko_type} \
+       --collapsed_path ${collapsed_path} \
+       --collapsed_type ${collapsed_type} \
        --rare_path ${rare_path} \
        --rare_type ${rare_type} \
        --common_path ${common_path} \

@@ -50,6 +50,9 @@ readonly in_prefix="ukb_eur_wes_200k"
 readonly sig_genes_dir="data/conditional/combined/sig_genes"
 readonly sig_genes="${sig_genes_dir}/sig_genes_after_prs.txt.gz"
 
+# list of collapsed rare variants to condition on
+readonly cond_rare_dir="data/mt/dosages/pp90"
+
 # list of rare pseudo variants to condition on
 readonly cond_rare_dir="data/mt/dosages/pp90"
 readonly cond_rare_file="${cond_rare_dir}/ukb_eur_wes_200k_chrCHR_max_ds.txt.gz"

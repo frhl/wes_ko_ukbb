@@ -16,6 +16,8 @@ def main(args):
     common_type = args.common_type
     rare_path = args.rare_path
     rare_type = args.rare_type
+    collapsed_path = args.collapsed_path
+    collapsed_type = args.collapsed_type
     out_prefix = args.out_prefix
     out_type = args.out_type
    
@@ -24,14 +26,22 @@ def main(args):
  
     # there will always be rare variant
     ko = io.import_table(ko_path, ko_type, calc_info=False)
-    rare = io.import_table(rare_path, rare_type, calc_info=False)
+    collapsed = io.import_table(collapsed_path, collapsed_type, calc_info=False)
     
     # ensure same type before merging
     ko = ko.transmute_entries(DS = hl.int32(ko.DS))
 
-    # merge
-    rare = tables.order_cols(rare, ko)
-    combined = io.rbind_matrix_tables(rare, ko)
+    # merge collapsed and rare
+    collapsed = tables.order_cols(collapsed, ko)
+    combined = io.rbind_matrix_tables(collapsed, ko)
+
+    # merge rare uncollapsed markers
+    if rare_path:
+        rare = io.import_table(rare_path, rare_type, calc_info=False)
+        rare = tables.order_cols(rare, ko)
+        rare = rare.transmute_entries(DS = hl.int32(rare.DS))
+        print(rare.count())
+        combined = io.rbind_matrix_tables(combined, rare)
 
     # there will not always be common variants
     if common_path:
@@ -53,6 +63,8 @@ if __name__=='__main__':
     parser.add_argument('--ko_type', default=None, help='')
     parser.add_argument('--common_path', default=None, help='')
     parser.add_argument('--common_type', default=None, help='')
+    parser.add_argument('--collapsed_path', default=None, help='')
+    parser.add_argument('--collapsed_type', default=None, help='')
     parser.add_argument('--rare_path', default=None, help='')
     parser.add_argument('--rare_type', default=None, help='')
     parser.add_argument('--out_prefix', default=None, help='')
