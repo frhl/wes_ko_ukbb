@@ -10,8 +10,9 @@
 #SBATCH --error=logs/brute_force_cond.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-200
-#SBATCH --depedency="afterok:10270041"
+#SBATCH --array=1-160
+#SBATCH --begin=now+4hour
+
 
 #$ -N brute_force_cond
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

@@ -10,7 +10,7 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 #SBATCH --array=1-22
-#SBATCH --dependency="aftercorr:10270030"
+#SBATCH --dependency="aftercorr:10270075"
 #
 #$ -N combine_collapsed
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

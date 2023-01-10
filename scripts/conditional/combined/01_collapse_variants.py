@@ -5,10 +5,10 @@ import argparse
 import pandas as pd
 import random
 import string
-import sys
-import os
+
 
 from ukb_utils import hail_init
+from ukb_utils import variants
 from ko_utils import io
 from ko_utils import ko
 
@@ -26,6 +26,7 @@ def get_tid(length=5):
 
 def main(args):
 
+    mac_cutoff = args.mac_cutoff
     input_path = args.input_path
     input_type = args.input_type
     out_prefix = args.out_prefix
@@ -35,13 +36,19 @@ def main(args):
 
     # import phased/unphased data
     hail_init.hail_bmrc_init(log='logs/hail/knockout.log', default_reference='GRCh38', min_block_size=128)
-    
     hl._set_flags(no_whole_stage_codegen='1')
     mt = io.import_table(input_path, input_type, calc_info = False)
     mt = mt.filter_rows(hl.literal(set(csqs_category)).contains(mt.consequence_category))
+    
+    # only collapse ultra rare variants
+    if mac_cutoff:
+        mt = mt.annotate_rows(MAC = variants.get_mac_expr(mt))
+        mt = mt.filter_rows(mt.MAC <= int(mac_cutoff))
+    
+    # collapse to genes
     gene_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
     genes = mt.group_rows_by(gene_expr).aggregate(DS=hl.agg.max(mt.GT.n_alt_alleles()))
-    
+
     # setup sites and alleles
     rows = genes.count()[0]
     rng = range((rows)+1, (rows*2)+1)
@@ -88,8 +95,8 @@ def main(args):
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
-    
     parser.add_argument('--chrom', default=None, help='Chromosome to be used') 
+    parser.add_argument('--mac_cutoff', default=None, help='What mac_count should be used for collapsing') 
     parser.add_argument('--input_path', default=None, help='Path to input')
     parser.add_argument('--input_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')

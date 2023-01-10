@@ -72,7 +72,10 @@ main <- function(args){
         trait <- gsub("200k_", "", trait)
         trait <- gsub("_pLoF_damaging_missense", "", trait)
         d <- fread(f)
+        stopifnot("MarkerID" %in% colnames(d))
+        stopifnot("N_case_hom" %in% colnames(d))
         d <- d[grepl("ENSG", d$MarkerID),]
+        d <- d[(d$N_case_hom > 0),]
         if ("p.value_c" %in% colnames(d)) {
             d$p.value <- d$p.value_c 
             d$cond <- TRUE

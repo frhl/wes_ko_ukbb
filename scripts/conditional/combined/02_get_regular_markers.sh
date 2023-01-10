@@ -3,14 +3,13 @@
 # @description Append pseudo variants with actual variants for downstream conditional analysis.
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=get_collapsed_markers
+#SBATCH --job-name=get_regular_markers
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/get_collapsed_markers.log
-#SBATCH --error=logs/get_collapsed_markers.errors.log
+#SBATCH --output=logs/get_regular_markers.log
+#SBATCH --error=logs/get_regular_markers.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 #SBATCH --array=1-22
-#SBATCH --dependency="aftercorr:10270053"
 
 set -o errexit
 set -o nounset
@@ -19,7 +18,7 @@ source utils/vcf_utils.sh
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
 
-readonly rscript="scripts/conditional/combined/02_get_collapsed_markers.R"
+readonly rscript="scripts/conditional/combined/02_get_regular_markers.R"
 
 readonly chr="${SLURM_ARRAY_TASK_ID}"
 

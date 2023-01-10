@@ -3,23 +3,23 @@
 # @description: amalgamate variants by phase to infer knockouts by genes.
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=collapse_variants
+#SBATCH --job-name=export_regular_markers
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/collapse_variants.log
-#SBATCH --error=logs/collapse_variants.errors.log
+#SBATCH --output=logs/export_regular_markers.log
+#SBATCH --error=logs/export_regular_markers.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 3
 #SBATCH --array=1-22
 #
 #
-#$ -N collapse_variants
+#$ -N export_regular_markers
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/collapse_variants.log
-#$ -e logs/collapse_variants.errors.log
+#$ -o logs/export_regular_markers.log
+#$ -e logs/export_regular_markers.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 22
+#$ -t 1-22
 #$ -V
 
 set -o errexit
@@ -31,7 +31,7 @@ source utils/vcf_utils.sh
 
 readonly curwd=$(pwd)
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/conditional/combined/01_collapse_variants.py"
+readonly hail_script="scripts/conditional/combined/01_export_regular_markers.py"
 
 readonly cluster=$( get_current_cluster)
 readonly task_id=$( get_array_task_id )
@@ -43,11 +43,11 @@ readonly out_dir="data/mt/dosages_urv/pp90"
 readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.mt"
 readonly in_type="mt"
 # prefix for indiviual genes and final merged file
-readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_max_ds"
+readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_mac_gt10"
 readonly out_type="vcf"
 
 readonly csqs_category="pLoF,damaging_missense"
-readonly mac_cutoff=10 # only less than or equal to 10 variants
+readonly mac_cutoff=10 
 
 mkdir -p ${out_dir}
 
