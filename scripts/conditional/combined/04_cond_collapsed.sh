@@ -10,7 +10,7 @@
 #SBATCH --error=logs/cond_collapsed.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-320
+#SBATCH --array=187
 #
 #$ -N cond_collapsed
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -33,7 +33,7 @@ readonly cluster=$( get_current_cluster)
 readonly index=$( get_array_task_id )
 
 readonly curwd=$(pwd)
-readonly vcf_dir="data/conditional/combined/combine_collapsed"
+readonly vcf_dir="data/conditional/combined/combine_collapsed_urv"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
 
@@ -51,11 +51,12 @@ readonly sig_genes_dir="data/conditional/combined/sig_genes"
 readonly sig_genes="${sig_genes_dir}/sig_genes_after_prs.txt.gz"
 
 # list of collapsed rare variants to condition on
-readonly cond_rare_dir="data/mt/dosages/pp90"
+readonly cond_rare_dir="data/mt/dosages_urv/pp90"
+readonly cond_rare_file="${cond_rare_dir}/ukb_eur_wes_200k_chrCHR_mac_gt10.txt.gz"
 
 # list of rare pseudo variants to condition on
-readonly cond_rare_dir="data/mt/dosages/pp90"
-readonly cond_rare_file="${cond_rare_dir}/ukb_eur_wes_200k_chrCHR_max_ds.txt.gz"
+readonly cond_collapsed_dir="data/mt/dosages_urv/pp90"
+readonly cond_collapsed_file="${cond_collapsed_dir}/ukb_eur_wes_200k_chrCHR_max_ds.txt.gz"
 
 # list of common markers to condition on
 readonly cond_common_dir="data/conditional/common/combined"
@@ -89,7 +90,7 @@ submit_spa_with_csqs()
   if [ ! -z ${phenotype} ]; then
 
     local step1_dir="data/saige/output/${trait}/step1"
-    local step2_dir="data/saige/output/${trait}/step2_collapsed/min_mac${min_mac}"
+    local step2_dir="data/saige/output/${trait}/step2_collapsed_urv/min_mac${min_mac}"
     local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${annotation}.vcf.bgz"
     mkdir -p ${step2_dir}
 
@@ -161,9 +162,10 @@ submit_spa_job() {
     "${sig_genes}" \
     "${markers_rare_cond_min_mac}" \
     "${cond_rare_file}" \
+    "${cond_collapsed_file}" \
     "${cond_common_file}" \
     "${cond_cat}" )
-  echo "Submitted brute force spa (jid=${spa_jid})"
+  echo "Submitted ${slurm_jname} ${spa_jid} "
 }
 
 
@@ -198,7 +200,7 @@ submit_merge_job()
 readonly markers_rare_cond_min_mac=4
 readonly use_prs="1"
 readonly min_mac=4
-readonly tasks=1-22
+readonly tasks=21
 readonly project="lindgren.prj"
 
 # cts traits

@@ -23,8 +23,9 @@ readonly out_prefix=${9?Error: Missing arg9 (out_prefix)}
 readonly sig_genes=${10?Error: Missing arg10 (markers_rare_ac)}
 readonly markers_rare_cond_min_mac=${11?Error: Missing arg10 (markers_rare_ac)}
 readonly in_cond_rare_file=${12?Error: Missing arg11 (cond_rare_file)}
-readonly in_cond_common_file=${13?Error: Missing arg12 (cond_common_file)}
-readonly cond_annotation=${14?Error: Missing arg13 (cond_annotation)}
+readonly in_cond_collapsed_file=${13?Error: Missing arg11 (cond_rare_file)}
+readonly in_cond_common_file=${14?Error: Missing arg12 (cond_common_file)}
+readonly cond_annotation=${15?Error: Missing arg13 (cond_annotation)}
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
@@ -38,6 +39,7 @@ readonly vcf=$(echo ${in_vcf} | sed -e "s/CHR/${chr}/g")
 readonly csi=$(echo ${in_csi} | sed -e "s/CHR/${chr}/g")
 readonly out=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
 readonly cond_rare_file=$(echo ${in_cond_rare_file} | sed -e "s/CHR/${chr}/g")
+readonly cond_collapsed_file=$(echo ${in_cond_collapsed_file} | sed -e "s/CHR/${chr}/g")
 readonly cond_common_file=$(echo ${in_cond_common_file} | sed -e "s/CHR/${chr}/g")
 
 # Check that SAIGE step 1 has been run
@@ -76,6 +78,7 @@ if [ "${n_sig_genes}" -gt 0 ]; then
       "${sig_genes}" \
       "${markers_rare_cond_min_mac}" \
       "${cond_rare_file}" \
+      "${cond_collapsed_file}" \
       "${cond_common_file}" \
       "${cond_annotation}" \
       "${chr}"

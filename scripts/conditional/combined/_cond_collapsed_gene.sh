@@ -9,6 +9,7 @@ source utils/qsub_utils.sh
 
 readonly step2_SPAtests="utils/saige/step2_SPAtests_cond.R"
 readonly rscript_collapsed="scripts/conditional/combined/_spa_cond_collapsed.R"
+readonly rscript_rare="scripts/conditional/combined/_spa_cond_rare.R"
 readonly rscript_common="scripts/conditional/common/_spa_cond_common.R"
 readonly rscript_merge="scripts/conditional/combined/_brute_force_cond.R"
 
@@ -24,9 +25,10 @@ readonly out_prefix_chr=${9?Error: Missing arg9 (out_prefix)}
 readonly sig_genes=${10?Error: Missing arg10 (markers_rare_ac)}
 readonly markers_rare_cond_min_mac=${11?Error: Missing arg10 (markers_rare_ac)}
 readonly cond_rare_file=${12?Error: Missing arg11 (cond_rare_file)}
-readonly cond_common_file=${13?Error: Missing arg12 (cond_common_file)}
-readonly cond_annotation=${14?Error: Missing arg13 (cond_annotation)}
-readonly chr=${15?Error: Missing arg13 (cond_annotation)}
+readonly cond_collapsed_file=${13?Error: Missing arg11 (cond_rare_file)}
+readonly cond_common_file=${14?Error: Missing arg12 (cond_common_file)}
+readonly cond_annotation=${15?Error: Missing arg13 (cond_annotation)}
+readonly chr=${16?Error: Missing arg13 (cond_annotation)}
 
 readonly index=$( get_array_task_id )
 readonly gene_id=$( zcat ${sig_genes} | grep -w ${phenotype} | grep -w "chr${chr}" | sed "${index}q;d" | cut -f3 )
@@ -47,20 +49,29 @@ if [ -f ${cond_common_file} ]; then
     --pheno_col 6
 fi
 
+# create subset of rare (conding) markers to be used in analysis
+readonly out_rare_markers_file="${out_prefix/CHR/${chr}}.rare.markers"
+Rscript "${rscript_rare}" \
+  --gene_id "${gene_id}" \
+  --phenotype "${phenotype}" \
+  --path_markers "${cond_collapsed_file}" \
+  --min_mac "${markers_rare_cond_min_mac}" \
+  --outfile "${out_rare_markers_file}"
 
 # create subset of rare (conding) markers to be used in analysis
-readonly out_collapsed_markers_file="${out_prefix/CHR/${chr}}.rare.markers"
+readonly out_collapsed_markers_file="${out_prefix/CHR/${chr}}.collapsed.markers"
 Rscript "${rscript_collapsed}" \
   --gene_id "${gene_id}" \
   --phenotype "${phenotype}" \
-  --path_markers "${cond_rare_file}" \
+  --path_markers "${cond_collapsed_file}" \
   --min_mac "${markers_rare_cond_min_mac}" \
   --outfile "${out_collapsed_markers_file}"
 
 # merge the two subsets
 readonly out_markers_file="${out_prefix/CHR/${chr}}.final.markers"
 Rscript ${rscript_merge} \
-  --file_rare_markers ${out_collapsed_markers_file} \
+  --file_rare_markers ${out_rare_markers_file} \
+  --file_collapsed_markers ${out_collapsed_markers_file} \
   --file_common_markers ${out_common_markers_file} \
   --outfile ${out_markers_file}
 
