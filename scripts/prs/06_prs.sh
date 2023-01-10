@@ -8,7 +8,7 @@
 #SBATCH --open-mode=append
 #SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
-#SBATCH --array=2
+#SBATCH --array=8
 # --begin=now+2hour
 #
 #$ -N prs
@@ -37,7 +37,7 @@ readonly ldsc_dir="data/prs/ldsc"
 readonly pred_dir="data/prs/hapmap/ukb_500k_new/validation"
 readonly ld_dir="data/prs/hapmap/ld/matrix_unrel_kin"
 readonly pheno_dir="data/phenotypes"
-readonly out_dir="data/prs/scores/auto"
+readonly out_dir="data/prs/scores_new/auto"
 readonly mrg_dir="data/prs/scores_new"
 
 # do not run files that have h2 estimates

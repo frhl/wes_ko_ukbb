@@ -126,16 +126,14 @@ main <- function(args){
      vec_p_ranges <- max(NCORES, as.numeric(args$vec_p_init_n))
      if (vec_p_ranges < 10) stop("You need at least 10 chains! set vec_p_init_n>=10.")
      
-     num_iter = 500
+     num_iter = 1000
      burn_in = 500
-
-
      #num_iter=round(runif(1, 200, 400))
      #burn_in=round(runif(1, 200, 400))
 
      #vec_p_init = seq(0.001, 0.60, length.out=vec_p_ranges)
-     vec_p_init = seq(0.0001, 0.70, length.out=vec_p_ranges)
-     #vec_p_init = seq(0.001, 0.9, length.out=100)
+     #vec_p_init = seq(0.0001, 0.70, length.out=vec_p_ranges)
+     vec_p_init = seq_log(1e-4, 0.6, length.out=100)
 
      write(paste0("Starting LDPred2-auto for ",args$out_prefix,".."), stderr())
      #write(paste0("h2=",h2, "\nh2_chrom=",h2_init,"\nn_variants=",N_chr), stderr())
@@ -262,7 +260,7 @@ parser$add_argument("--pred", default=NULL, required = TRUE, help = "Path to pli
 parser$add_argument("--ldsc", default=NULL, required = TRUE, help = ".rds object containing QCed GWAS and ldsc heritability estimates")
 parser$add_argument("--ldsc_pvalue_cutoff", default=NULL, help = "cancel the run if the ldsc heritability p-value is not below the given treshold.")
 parser$add_argument("--standardized_gt", default=1, required = FALSE, help = "Should genotypes be standardized?")
-parser$add_argument("--vec_p_init_n", default=30, required = FALSE, help = "number of intial estimates to sample form (should be at least 5)")
+parser$add_argument("--vec_p_init_n", default=50, required = FALSE, help = "number of intial estimates to sample form (should be at least 5)")
 parser$add_argument("--tmp_bfile", default=NULL, required = TRUE, help = "File path to temporary backing files")
 parser$add_argument("--ld_dir", default=NULL, required = TRUE, help = "Path to directory with pre-calcualted SNP correlations and LD (.rds files)")
 parser$add_argument("--impute", default=NULL, required = TRUE, help = "Should missing genotypes be imputed? (See https://privefl.github.io/bigsnpr/reference/snp_fastImputeSimple.html)")
