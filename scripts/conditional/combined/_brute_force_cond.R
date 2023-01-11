@@ -12,23 +12,33 @@ main <- function(args){
   exit_without_writing <- FALSE  
   
   if (common_exists & rare_exists & collapsed_exists) {
+    write(paste("Using common/rare/collapsed for", args$outfile), stderr())
     d1 <- fread(args$file_common_markers, header = FALSE)
     d2 <- fread(args$file_rare_markers, header = FALSE)
     d3 <- fread(args$file_collapsed_markers, header = FALSE)
     d <- rbind(d1, d2, d3)
+  } else if (rare_exists & collapsed_exists) {
+    write(paste("Using rare/collapsed for", args$outfile), stderr())
+    d1 <- fread(args$file_collapsed_markers, header = FALSE)
+    d2 <- fread(args$file_rare_markers, header = FALSE)
+    d <- rbind(d1, d2)
   } else if (common_exists & collapsed_exists) {
+    write(paste("Using common/collapsed for", args$outfile), stderr())
     d1 <- fread(args$file_common_markers, header = FALSE)
     d2 <- fread(args$file_collapsed_markers, header = FALSE)
     d <- rbind(d1, d2)
   } else if (common_exists & rare_exists) {
+    write(paste("Using common/rare for", args$outfile), stderr())
     d1 <- fread(args$file_common_markers, header = FALSE)
     d2 <- fread(args$file_rare_markers, header = FALSE)
     d <- rbind(d1, d2)
   } else if (collapsed_exists) {
+    write(paste("Using collapsed for", args$outfile), stderr())
     d <- fread(args$file_collapsed_markers, header = FALSE)
   } else if (common_exists) {
     d <- fread(args$file_common_markers, header = FALSE)
   } else if (rare_exists) {
+    write(paste("Using are for", args$outfile), stderr())
     d <- fread(args$file_rare_markers, header = FALSE)
   } else {
     write(paste("Expected at least", args$file_rare_marker, "or", args$file_common_markers, "to exist. No marker file created."), stderr())

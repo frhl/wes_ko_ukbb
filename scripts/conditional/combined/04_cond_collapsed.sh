@@ -10,7 +10,7 @@
 #SBATCH --error=logs/cond_collapsed.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=187
+#SBATCH --array=22
 #
 #$ -N cond_collapsed
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -19,8 +19,9 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 5
+#$ -t 151-320
 #$ -V
+#$ -hold_jid 80056213
 
 set -o errexit
 set -o nounset
@@ -48,7 +49,7 @@ readonly in_prefix="ukb_eur_wes_200k"
 
 # list of genes that passes significance cutoffs
 readonly sig_genes_dir="data/conditional/combined/sig_genes"
-readonly sig_genes="${sig_genes_dir}/sig_genes_after_prs.txt.gz"
+readonly sig_genes="${sig_genes_dir}/sig_genes_after_prs_165k.txt.gz"
 
 # list of collapsed rare variants to condition on
 readonly cond_rare_dir="data/mt/dosages_urv/pp90"
@@ -200,7 +201,7 @@ submit_merge_job()
 readonly markers_rare_cond_min_mac=4
 readonly use_prs="1"
 readonly min_mac=4
-readonly tasks=21
+readonly tasks=1-22 # 1-22
 readonly project="lindgren.prj"
 
 # cts traits

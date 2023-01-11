@@ -8,18 +8,20 @@
 #SBATCH --output=logs/get_regular_markers.log
 #SBATCH --error=logs/get_regular_markers.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 1
-#SBATCH --array=21
+#SBATCH --cpus-per-task 2
+#SBATCH --array=1
 
 #$ -N get_regular_markers
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/get_regular_markers.log
 #$ -e logs/get_regular_markers.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 1
+#$ -pe shmem 5
 #$ -q short.qc
-#$ -t 21
+#$ -t 1
 #$ -V
+
+#: note chr1 requires 5 slots (memory)
 
 set -o errexit
 set -o nounset

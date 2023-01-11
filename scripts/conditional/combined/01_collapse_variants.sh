@@ -17,9 +17,9 @@
 #$ -o logs/collapse_variants.log
 #$ -e logs/collapse_variants.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 1
+#$ -pe shmem 3
 #$ -q short.qc
-#$ -t 22
+#$ -t 1,19
 #$ -V
 
 set -o errexit
@@ -38,7 +38,7 @@ readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
 readonly in_dir="data/mt/prefilter/pp90"
-readonly out_dir="data/mt/dosages_urv/pp90"
+readonly out_dir="data/mt/dosages_urv/pp90_test"
 # in parameters
 readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.mt"
 readonly in_type="mt"

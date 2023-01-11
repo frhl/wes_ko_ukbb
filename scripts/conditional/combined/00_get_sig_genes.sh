@@ -30,7 +30,7 @@ readonly p_cutoff="5e-7"
 readonly prs="prefer"
 
 readonly out_dir="data/conditional/combined/sig_genes"
-readonly out_prefix="${out_dir}/sig_genes_after_prs"
+readonly out_prefix="${out_dir}/sig_genes_after_prs_165k"
 
 mkdir -p ${out_dir}
 

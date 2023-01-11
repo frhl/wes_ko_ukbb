@@ -19,8 +19,9 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc
-#$ -t 21
+#$ -t 1-21
 #$ -V
+#$ -hold_jid_ad 80055415
 
 set -o errexit
 set -o nounset

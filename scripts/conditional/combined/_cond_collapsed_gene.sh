@@ -54,7 +54,7 @@ readonly out_rare_markers_file="${out_prefix/CHR/${chr}}.rare.markers"
 Rscript "${rscript_rare}" \
   --gene_id "${gene_id}" \
   --phenotype "${phenotype}" \
-  --path_markers "${cond_collapsed_file}" \
+  --path_markers "${cond_rare_file}" \
   --min_mac "${markers_rare_cond_min_mac}" \
   --outfile "${out_rare_markers_file}"
 
@@ -67,6 +67,7 @@ Rscript "${rscript_collapsed}" \
   --min_mac "${markers_rare_cond_min_mac}" \
   --outfile "${out_collapsed_markers_file}"
 
+set -x
 # merge the two subsets
 readonly out_markers_file="${out_prefix/CHR/${chr}}.final.markers"
 Rscript ${rscript_merge} \
@@ -74,7 +75,7 @@ Rscript ${rscript_merge} \
   --file_collapsed_markers ${out_collapsed_markers_file} \
   --file_common_markers ${out_common_markers_file} \
   --outfile ${out_markers_file}
-
+set +x
 
 spa_test() {
   Rscript "${step2_SPAtests}" \
