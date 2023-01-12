@@ -126,7 +126,7 @@ main <- function(args){
      vec_p_ranges <- max(NCORES, as.numeric(args$vec_p_init_n))
      if (vec_p_ranges < 10) stop("You need at least 10 chains! set vec_p_init_n>=10.")
      
-     num_iter = 1000
+     num_iter = 200
      burn_in = 500
      #num_iter=round(runif(1, 200, 400))
      #burn_in=round(runif(1, 200, 400))
@@ -219,6 +219,10 @@ main <- function(args){
 
   # count PRS that could not be generated
   missing_prs <- round(sum(is.na(final_pred))/length(final_pred)*100, 2)
+
+  # check if all PRS values are predicted as zero
+  if (all(is.na(final_pred))) stop(paste("Error! Predicted PRS scores are all NA for", args$out_prefix )
+  if (all(as.numeric(na.omit(final_pred))==0)) stop(paste("Error! Predicted PRS scores are all zero for", args$out_prefix )
 
   # save parameters 
   model <- data.table(

@@ -8,7 +8,7 @@
 #SBATCH --open-mode=append
 #SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
-#SBATCH --array=8
+#SBATCH --array=8-15
 # --begin=now+2hour
 #
 #$ -N prs
@@ -18,7 +18,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 1-320
+#$ -t 9-15
 #$ -V
 
 set -o errexit
