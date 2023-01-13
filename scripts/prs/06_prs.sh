@@ -6,9 +6,9 @@
 #SBATCH --output=logs/prs.log
 #SBATCH --error=logs/prs.errors.log
 #SBATCH --open-mode=append
-#SBATCH --partition=epyc
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=8-15
+#SBATCH --array=16-18
 # --begin=now+2hour
 #
 #$ -N prs
@@ -42,7 +42,7 @@ readonly mrg_dir="data/prs/scores_new"
 
 # do not run files that have h2 estimates
 # above the given p-value cutoff (nominal).
-readonly ldsc_pvalue_cutoff="0.05"
+readonly ldsc_pvalue_cutoff="0.001"
 
 readonly cluster=$( get_current_cluster )
 readonly index=$( get_array_task_id )
@@ -243,7 +243,7 @@ clean_pgs()
 }
 
 # parameters
-readonly queue="epyc"
+readonly queue="short"
 readonly project="lindgren.prj"
 readonly tasks=1-22
 

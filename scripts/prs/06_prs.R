@@ -7,6 +7,8 @@ library(ggplot2)
 
 main <- function(args){
 
+  set.seed(1)
+
   stopifnot(file.exists(args$pred))
   stopifnot(file.exists(args$ldsc))
   stopifnot(!file.exists(args$tmp_bfile))
@@ -125,19 +127,15 @@ main <- function(args){
      # use proper vec p init
      vec_p_ranges <- max(NCORES, as.numeric(args$vec_p_init_n))
      if (vec_p_ranges < 10) stop("You need at least 10 chains! set vec_p_init_n>=10.")
-     
+    
+     # parmaters 
      num_iter = 200
      burn_in = 500
-     #num_iter=round(runif(1, 200, 400))
-     #burn_in=round(runif(1, 200, 400))
-
-     #vec_p_init = seq(0.001, 0.60, length.out=vec_p_ranges)
-     #vec_p_init = seq(0.0001, 0.70, length.out=vec_p_ranges)
-     vec_p_init = seq_log(1e-4, 0.6, length.out=100)
+     vec_p_init = seq_log(1e-4, 0.60, length.out=vec_p_ranges)
 
      write(paste0("Starting LDPred2-auto for ",args$out_prefix,".."), stderr())
-     #write(paste0("h2=",h2, "\nh2_chrom=",h2_init,"\nn_variants=",N_chr), stderr())
-     #write(paste0("iter=",num_iter,"\nburn_in=",burn_in,"\nvec_p_ranges=",vec_p_ranges), stderr())
+     write(paste0("h2=",h2, "\nh2_chrom=",h2_init,"\nn_variants=",N_chr), stderr())
+     write(paste0("iter=",num_iter,"\nburn_in=",burn_in,"\nvec_p_ranges=",vec_p_ranges), stderr())
      multi_auto <- snp_ldpred2_auto(
         corr = snp$corr,
         df_beta = gwas,
@@ -145,40 +143,23 @@ main <- function(args){
         burn_in = burn_in,
         h2_init = h2_init,
         vec_p_init = vec_p_init,
+        # use_MLE = FALSE # uncomment if you have convergence issues (need v1.11.9)
+        allow_jump_sign = FALSE,
+        shrink_corr = 0.95,
         ncores = NCORES)
-     
-     beta_auto <- sapply(multi_auto, function(auto){auto$beta_est})
-     converged <- which(colSums(is.na(beta_auto))==0)
 
-     # ensure that no missing values are present,
+     # simpler approach to filtering
+     range <- sapply(multi_auto, function(auto) diff(range(auto$corr_est)))
+     keep <- (range > (0.95 * quantile(range, 0.95)))
+     beta_auto <- rowMeans(sapply(multi_auto[keep], function(auto) auto$beta_est))
+
+     # feedback on convergence
+     converged <- which(colSums(is.na(beta_auto))==0)
      msg <- paste0("Error: Stopping since all chains are NA: ", args$out_prefix)
      if (length(converged) == 0) stop(msg)
      write(paste0("Success! ",length(converged)," chain(s) passed for", args$out_prefix), stderr())
 
-     # save chains
-     multi_auto_path <- paste0(args$out_prefix,'_chains.rda')
-     saveRDS(multi_auto, multi_auto_path, compress = 'xz')
-
-     # plot example chain of one that is not NA
-     converged_index <- converged[1]
-     auto <- multi_auto[[converged_index]]
-     p <- plot_grid(
-        qplot(y = auto$path_p_est) + 
-          theme_bigstatsr() + 
-          geom_hline(yintercept = auto$p_est, col = "blue") +
-          scale_y_log10() +
-          labs(y = "p"),
-        qplot(y = auto$path_h2_est) + 
-          theme_bigstatsr() + 
-          geom_hline(yintercept = auto$h2_est, col = "blue") +
-          labs(y = "h2"),
-        ncol = 1, align = "hv"
-      )
-     
-     # save plot
-     ggsave(plot=p,filename=paste0(args$out_prefix, "_chains.png"))
-
-     # check if initial estimate caused any problems.
+      # check if initial estimate caused any problems.
      stopifnot(all(rowSums(!is.na(beta_auto)) > 0))
      na_cols <- colSums(is.na(beta_auto)) == nrow(beta_auto)
      n_na_cols <- sum(sum(na_cols))
@@ -187,28 +168,19 @@ main <- function(args){
         write(paste0("Note: ",n_na_cols," of ",n_cols," beta_auto NA cols will be discarded (", basename(args$out_prefix), ")"), stdout()) 
         beta_auto <- beta_auto[,!na_cols]
      } 
-
-     # perform matrix multiplication
-     pred_auto <- big_prodMat(
-        genotypes,
-        beta_auto,
-        center = means,
-        scale = sds,
-        ncores = NCORES)
-
-     # quality controls on chains
-     sc <- apply(pred_auto, 2, sd, na.rm = TRUE)
-     keep <- abs(sc - median(sc)) < 3 * mad(sc)
-     print(head(keep))
-     stopifnot(!any(is.na(keep)))
-     final_beta_auto <- rowMeans(beta_auto[, keep], na.rm = TRUE) 
+     
+     # save chains for future inspection
+     multi_auto_path <- paste0(args$out_prefix,'_chains.rda')
+     saveRDS(multi_auto, multi_auto_path, compress = 'xz')
+     
+     # save betas by variants
      beta_out <- cbind(gwas, final_beta_auto)
      fwrite(beta_out, file = args$path_betas, sep = '\t')
 
    } else {
    final_beta_auto <- gwas$final_beta_auto
   } 
-
+    
   # perform prediction
   final_pred <- big_prodVec(
      genotypes, 
@@ -221,8 +193,8 @@ main <- function(args){
   missing_prs <- round(sum(is.na(final_pred))/length(final_pred)*100, 2)
 
   # check if all PRS values are predicted as zero
-  if (all(is.na(final_pred))) stop(paste("Error! Predicted PRS scores are all NA for", args$out_prefix )
-  if (all(as.numeric(na.omit(final_pred))==0)) stop(paste("Error! Predicted PRS scores are all zero for", args$out_prefix )
+  if (all(is.na(final_pred))) stop(paste("Error! Predicted PRS scores are all NA for", args$out_prefix))
+  if (all(as.numeric(na.omit(final_pred))==0)) stop(paste("Error! Predicted PRS scores are all zero for", args$out_prefix))
 
   # save parameters 
   model <- data.table(
