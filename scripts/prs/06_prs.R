@@ -7,8 +7,6 @@ library(ggplot2)
 
 main <- function(args){
 
-  set.seed(1)
-
   stopifnot(file.exists(args$pred))
   stopifnot(file.exists(args$ldsc))
   stopifnot(!file.exists(args$tmp_bfile))
@@ -124,63 +122,95 @@ main <- function(args){
 
   if (args$calc_betas) {
 
+     ldpred_with_params <- function(num_iter, burn_in, h2_init, vec_p_init, seed=NULL) { 
+        if (!is.null(seed)) set.seed(seed)
+        #write(paste0("LDPred2-auto for ",args$out_prefix,".."), stderr())
+        #write(paste0("h2=",h2, "\nh2_chrom=",h2_init,"\nn_variants=",N_chr), stderr())
+        #write(paste0("iter=",num_iter,"\nburn_in=",burn_in,"\nvec_p_ranges=",vec_p_ranges), stderr())
+        multi_auto <- snp_ldpred2_auto(
+            corr = snp$corr,
+            df_beta = gwas,
+            num_iter = num_iter,
+            burn_in = burn_in,
+            h2_init = h2_init,
+            vec_p_init = vec_p_init,
+            ncores = NCORES)
+         beta_auto <- sapply(multi_auto, function(auto){auto$beta_est})
+         chains_converged <- which(colSums(is.na(beta_auto))==0)
+         converged <- length(chains_converged) >= 3 #  want at least 3 chains
+         return(list(beta_auto=beta_auto, multi_auto=multi_auto, chains_converged=chains_converged, converged=converged))       
+     }
+
      # use proper vec p init
      vec_p_ranges <- max(NCORES, as.numeric(args$vec_p_init_n))
      if (vec_p_ranges < 10) stop("You need at least 10 chains! set vec_p_init_n>=10.")
-    
-     # parmaters 
-     num_iter = 200
-     burn_in = 500
-     vec_p_init = seq_log(1e-4, 0.60, length.out=vec_p_ranges)
+     
+     # try the following combination of paramters in case of instability
+     grid_params <- list(
+        list(iter=200, burn_in=500, h2_init=h2_init, vec_p_init=seq(1e-4, 0.35, length.out=vec_p_ranges), seed=1),
+        list(iter=200, burn_in=500, h2_init=h2_init, vec_p_init=seq(0.001, 0.35, length.out=vec_p_ranges), seed=1),
+        list(iter=200, burn_in=500, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.35, length.out=vec_p_ranges), seed=1),
+        list(iter=100, burn_in=200, h2_init=h2_init, vec_p_init=seq(1e-4, 0.35, length.out=vec_p_ranges), seed=1),
+        list(iter=100, burn_in=200, h2_init=h2_init, vec_p_init=seq(0.01, 0.35, length.out=vec_p_ranges), seed=1),
+        list(iter=100, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.35, length.out=vec_p_ranges), seed=1)
+     )
+     
+     step <- 0
+     for (par in grid_params) {
+            step <- step + 1
+            write(paste("Beginning step", step, "for", args$out_prefix), stderr())
+            ldpred_result <- ldpred_with_params(
+                num_iter=par$iter,
+                burn_in=par$burn_in,
+                h2_init=par$h2_init,
+                vec_p_init=par$vec_p_init,
+                seed=par$seed
+            )
+            converged <- ldpred_result$converged
+            multi_auto <- ldpred_result$multi_auto
+            beta_auto <- ldpred_result$beta_auto
+            if (converged) break 
+     }
 
-     write(paste0("Starting LDPred2-auto for ",args$out_prefix,".."), stderr())
-     write(paste0("h2=",h2, "\nh2_chrom=",h2_init,"\nn_variants=",N_chr), stderr())
-     write(paste0("iter=",num_iter,"\nburn_in=",burn_in,"\nvec_p_ranges=",vec_p_ranges), stderr())
-     multi_auto <- snp_ldpred2_auto(
-        corr = snp$corr,
-        df_beta = gwas,
-        num_iter = num_iter,
-        burn_in = burn_in,
-        h2_init = h2_init,
-        vec_p_init = vec_p_init,
-        # use_MLE = FALSE # uncomment if you have convergence issues (need v1.11.9)
-        allow_jump_sign = FALSE,
-        shrink_corr = 0.95,
-        ncores = NCORES)
-
-     # simpler approach to filtering
-     range <- sapply(multi_auto, function(auto) diff(range(auto$corr_est)))
-     keep <- (range > (0.95 * quantile(range, 0.95)))
-     beta_auto <- rowMeans(sapply(multi_auto[keep], function(auto) auto$beta_est))
-
-     # feedback on convergence
-     converged <- which(colSums(is.na(beta_auto))==0)
+     # ensure that no missing values are present,
      msg <- paste0("Error: Stopping since all chains are NA: ", args$out_prefix)
      if (length(converged) == 0) stop(msg)
      write(paste0("Success! ",length(converged)," chain(s) passed for", args$out_prefix), stderr())
 
-      # check if initial estimate caused any problems.
+     # save chains
+     multi_auto_path <- paste0(args$out_prefix,'_chains.rda')
+     saveRDS(multi_auto, multi_auto_path, compress = 'xz')
+
+     # check if initial estimate caused any problems.
      stopifnot(all(rowSums(!is.na(beta_auto)) > 0))
      na_cols <- colSums(is.na(beta_auto)) == nrow(beta_auto)
      n_na_cols <- sum(sum(na_cols))
      n_cols <- ncol(beta_auto)
      if (n_na_cols > 0){
-        write(paste0("Note: ",n_na_cols," of ",n_cols," beta_auto NA cols will be discarded (", basename(args$out_prefix), ")"), stdout()) 
+        write(paste0("Note: ",n_na_cols," of ",n_cols," beta_auto NA cols will be discarded (", basename(args$out_prefix), ")"), stderr()) 
         beta_auto <- beta_auto[,!na_cols]
      } 
-     
-     # save chains for future inspection
-     multi_auto_path <- paste0(args$out_prefix,'_chains.rda')
-     saveRDS(multi_auto, multi_auto_path, compress = 'xz')
-     
-     # save betas by variants
+
+     # perform matrix multiplication
+     pred_auto <- big_prodMat(
+        genotypes,
+        beta_auto,
+        center = means,
+        scale = sds,
+        ncores = NCORES)
+
+     # quality controls on chains
+     sc <- apply(pred_auto, 2, sd, na.rm = TRUE)
+     keep <- abs(sc - median(sc)) < 3 * mad(sc)
+     if (all(is.na(keep))) stop("all 'keep' are NAs")
+     final_beta_auto <- rowMeans(beta_auto[, keep], na.rm = TRUE) 
      beta_out <- cbind(gwas, final_beta_auto)
      fwrite(beta_out, file = args$path_betas, sep = '\t')
 
    } else {
    final_beta_auto <- gwas$final_beta_auto
   } 
-    
+
   # perform prediction
   final_pred <- big_prodVec(
      genotypes, 
@@ -193,8 +223,8 @@ main <- function(args){
   missing_prs <- round(sum(is.na(final_pred))/length(final_pred)*100, 2)
 
   # check if all PRS values are predicted as zero
-  if (all(is.na(final_pred))) stop(paste("Error! Predicted PRS scores are all NA for", args$out_prefix))
-  if (all(as.numeric(na.omit(final_pred))==0)) stop(paste("Error! Predicted PRS scores are all zero for", args$out_prefix))
+  if (all(is.na(final_pred))) stop(paste("Error! Predicted PRS scores are all NA for", args$out_prefix ))
+  if (all(as.numeric(na.omit(final_pred))==0)) stop(paste("Error! Predicted PRS scores are all zero for", args$out_prefix ))
 
   # save parameters 
   model <- data.table(
@@ -236,7 +266,7 @@ parser$add_argument("--pred", default=NULL, required = TRUE, help = "Path to pli
 parser$add_argument("--ldsc", default=NULL, required = TRUE, help = ".rds object containing QCed GWAS and ldsc heritability estimates")
 parser$add_argument("--ldsc_pvalue_cutoff", default=NULL, help = "cancel the run if the ldsc heritability p-value is not below the given treshold.")
 parser$add_argument("--standardized_gt", default=1, required = FALSE, help = "Should genotypes be standardized?")
-parser$add_argument("--vec_p_init_n", default=50, required = FALSE, help = "number of intial estimates to sample form (should be at least 5)")
+parser$add_argument("--vec_p_init_n", default=30, required = FALSE, help = "number of intial estimates to sample form (should be at least 5)")
 parser$add_argument("--tmp_bfile", default=NULL, required = TRUE, help = "File path to temporary backing files")
 parser$add_argument("--ld_dir", default=NULL, required = TRUE, help = "Path to directory with pre-calcualted SNP correlations and LD (.rds files)")
 parser$add_argument("--impute", default=NULL, required = TRUE, help = "Should missing genotypes be imputed? (See https://privefl.github.io/bigsnpr/reference/snp_fastImputeSimple.html)")
@@ -246,12 +276,5 @@ parser$add_argument("--path_betas", default=NULL, required = TRUE, help = "What 
 args <- parser$parse_args()
 
 main(args)
-
-
-
-
-
-
-
 
 
