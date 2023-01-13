@@ -245,7 +245,7 @@ clean_pgs()
 # parameters
 readonly queue="short"
 readonly project="lindgren.prj"
-readonly tasks=1-22
+readonly tasks=19
 
 submit_ldpred2 "auto" "2" "${phenotype_binary}"
 #submit_ldpred2 "auto" "6" "${phenotype_cts}_int"

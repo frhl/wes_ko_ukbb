@@ -37,6 +37,7 @@ main <- function(args){
     stopifnot(sum(is.na(gwas$final_beta_auto))<1000)
   }
 
+
     # cutoff prs if z-score estimate is not good enough
   if (!is.null(args$ldsc_pvalue_cutoff)){
     pvalue_cutoff <- as.numeric(args$ldsc_pvalue_cutoff)
@@ -147,12 +148,10 @@ main <- function(args){
      
      # try the following combination of paramters in case of instability
      grid_params <- list(
-        list(iter=200, burn_in=500, h2_init=h2_init, vec_p_init=seq(1e-4, 0.35, length.out=vec_p_ranges), seed=1),
-        list(iter=200, burn_in=500, h2_init=h2_init, vec_p_init=seq(0.001, 0.35, length.out=vec_p_ranges), seed=1),
-        list(iter=200, burn_in=500, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.35, length.out=vec_p_ranges), seed=1),
-        list(iter=100, burn_in=200, h2_init=h2_init, vec_p_init=seq(1e-4, 0.35, length.out=vec_p_ranges), seed=1),
-        list(iter=100, burn_in=200, h2_init=h2_init, vec_p_init=seq(0.01, 0.35, length.out=vec_p_ranges), seed=1),
-        list(iter=100, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.35, length.out=vec_p_ranges), seed=1)
+        list(iter=100, burn_in=100, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.40, length.out=vec_p_ranges), seed=1),
+        list(iter=100, burn_in=100, h2_init=h2_init, vec_p_init=seq(1e-4, 0.40, length.out=vec_p_ranges), seed=1),
+        list(iter=200, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.40, length.out=vec_p_ranges), seed=2),
+        list(iter=200, burn_in=200, h2_init=h2_init, vec_p_init=seq(1e-4, 0.40, length.out=vec_p_ranges), seed=2)
      )
      
      step <- 0
