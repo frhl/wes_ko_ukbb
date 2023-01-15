@@ -15,9 +15,9 @@ def main(args):
     chrom = args.chrom
     extract = args.extract
     extract2 = args.extract2
-    min_info = float(args.min_info)
-    min_maf = float(args.min_maf)
-    missing = float(args.missing)
+    #min_info = float(args.min_info)
+    #min_maf = float(args.min_maf)
+    #missing = float(args.missing)
     out_prefix = args.out_prefix
     out_type = args.out_type
 
@@ -56,15 +56,12 @@ def main(args):
             mt = mt.filter_cols(hl.is_defined(ht_final_samples2[mt.col_key]))
 
         # perform variant filtering after subsetting samples
-        info_expr = mt.info_score > min_info
-        maf_expr = variants.get_maf_expr(mt) > min_maf
-        missing_expr = variants.get_missing_expr(mt) < missing
-        mt = mt.filter_rows((info_expr) & (maf_expr) & (missing_expr))
-        mt = mt.repartition(64)
+        mt = mt.annotate_rows(stdev = hl.agg.stats(mt.GT.n_alt_alleles()).stdev)
+        mt = mt.filter_rows(mt.stdev > 0) 
+        mt = mt.repartition(32)
         mt = mt.checkpoint(out_prefix + "_checkpoint.mt", overwrite = True)
     else:
         mt = io.import_table(checkpoint_dir, "mt", calc_info = False)
-        mt = mt.repartition(64)
 
     # perform liftover
     mt = variants.liftover(mt, fix_ref = False)
@@ -88,9 +85,9 @@ if __name__ == '__main__':
     parser.add_argument('--chrom', default=None, required=True, help='chromosome to load')
     parser.add_argument('--extract', default=None, help='Path to HailTable that contains the final samples included in the analysis.')
     parser.add_argument('--extract2', default=None, help='Path to HailTable that contains the final samples included in the analysis.')
-    parser.add_argument('--min_maf', default=0.01, help='What min_maf threshold should be used?')
-    parser.add_argument('--min_info', default=0.8, help='What info threshold should be used?')
-    parser.add_argument('--missing', default=0.1, help='What info threshold should be used?')
+    #parser.add_argument('--min_maf', default=0.01, help='What min_maf threshold should be used?')
+    #parser.add_argument('--min_info', default=0.8, help='What info threshold should be used?')
+    #parser.add_argument('--missing', default=0.1, help='What info threshold should be used?')
     parser.add_argument('--out_prefix', default=None, required=True, help='Path prefix for output dataset (plink format)')
     parser.add_argument('--out_type', default=None, required=True, help='Path prefix for output dataset (plink format)')
     args = parser.parse_args()

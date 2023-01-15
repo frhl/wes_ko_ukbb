@@ -5,19 +5,19 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/export_imputed.log
 #SBATCH --error=logs/export_imputed.errors.log
-#SBATCH --partition=epyc
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 8
-#SBATCH --array=2
-#SBATCH --dependency="afternotok:10047864"
+#SBATCH --array=1-9
+# --dependency="afternotok:10047864"
 #
 #$ -N export_imputed
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/export_imputed.log
 #$ -e logs/export_imputed.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 8
+#$ -pe shmem 4
 #$ -q short.qc
-#$ -t 1-9
+#$ -t 10-21
 #$ -V
 
 
@@ -38,12 +38,12 @@ readonly hail_script="scripts/conditional/common/02_export_imputed.py"
 readonly phased_sample_list="data/phenotypes/phased_sample_list.txt"
 readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
 
-readonly min_maf=0.01
-readonly min_info=0.8
-readonly missing=0.10
+#readonly min_maf=0.01
+#readonly min_info=0.8
+#readonly missing=0.10
 
-readonly out_dir="data/unphased/imputed/common_new"
-readonly out_prefix="${out_dir}/ukb_imp_200k_common_chr${chr}"
+readonly out_dir="data/unphased/imputed/liftover"
+readonly out_prefix="${out_dir}/ukb_imp_200k_chr${chr}"
 readonly out_type="mt"
 
 readonly out_checkpoint="${out_prefix}_checkpoint.mt"
@@ -56,9 +56,6 @@ if [ ! -f "${out_prefix}.mt/_SUCCESS" ]; then
   set_up_pythonpath_legacy
   python3 "${hail_script}" \
        --chrom ${chr} \
-       --min_maf ${min_maf} \
-       --min_info ${min_info} \
-       --missing ${missing} \
        --extract ${final_sample_list} \
        --extract2 ${phased_sample_list} \
        --out_prefix ${out_prefix} \

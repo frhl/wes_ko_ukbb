@@ -1,4 +1,0 @@
-Traceback (most recent call last):
-  File "/var/spool/slurmd/job10142617/slurm_script", line 4, in <module>
-    import hail as hl
-ModuleNotFoundError: No module named 'hail'
