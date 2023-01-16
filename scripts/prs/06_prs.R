@@ -102,6 +102,13 @@ main <- function(args){
   rows <- genotypes$`.->nrow` # samples
   missing_gt <- NA
 
+  print(paste(cols, "variants"))
+
+  # check if any SNVs are invariant
+  snv_var <- as.numeric(unlist(lapply(1:cols, function(i) var(genotypes[,i], na.rm = TRUE))))
+  invariant_index <- which(snv_var == 0)                                    
+  if (length(invariant_index) > 0) stop(paste(length(invariant_index),"SNVs are invariant!"))
+
   # need to impute missing SNPs
   if (!is.null(args$impute)){
     write(paste0("Imputing genotypes in ", args$out_prefix), stderr())
@@ -149,9 +156,7 @@ main <- function(args){
      # try the following combination of paramters in case of instability
      grid_params <- list(
         list(iter=100, burn_in=100, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.40, length.out=vec_p_ranges), seed=1),
-        list(iter=100, burn_in=100, h2_init=h2_init, vec_p_init=seq(1e-4, 0.40, length.out=vec_p_ranges), seed=1),
-        list(iter=200, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.40, length.out=vec_p_ranges), seed=2),
-        list(iter=200, burn_in=200, h2_init=h2_init, vec_p_init=seq(1e-4, 0.40, length.out=vec_p_ranges), seed=2)
+        list(iter=200, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.40, length.out=vec_p_ranges), seed=2)
      )
      
      step <- 0
@@ -172,39 +177,21 @@ main <- function(args){
      }
 
      # ensure that no missing values are present,
-     msg <- paste0("Error: Stopping since all chains are NA: ", args$out_prefix)
-     if (length(converged) == 0) stop(msg)
-     write(paste0("Success! ",length(converged)," chain(s) passed for", args$out_prefix), stderr())
+     #msg <- paste0("Error: Stopping since all chains are NA: ", args$out_prefix)
+     #if (length(converged) == 0) stop(msg)
+     #write(paste0("Success! ",length(converged)," chain(s) passed for", args$out_prefix), stderr())
+
+     (range <- sapply(multi_auto, function(auto) diff(range(auto$corr_est))))
+     (keep <- (range > (0.95 * quantile(range, 0.95, na.rm=TRUE))))
+     keep[is.na(keep)] <- FALSE
+
+     stopifnot(sum(keep) > 0)
 
      # save chains
      multi_auto_path <- paste0(args$out_prefix,'_chains.rda')
      saveRDS(multi_auto, multi_auto_path, compress = 'xz')
 
-     # check if initial estimate caused any problems.
-     stopifnot(all(rowSums(!is.na(beta_auto)) > 0))
-     na_cols <- colSums(is.na(beta_auto)) == nrow(beta_auto)
-     n_na_cols <- sum(sum(na_cols))
-     n_cols <- ncol(beta_auto)
-     if (n_na_cols > 0){
-        write(paste0("Note: ",n_na_cols," of ",n_cols," beta_auto NA cols will be discarded (", basename(args$out_prefix), ")"), stderr()) 
-        beta_auto <- beta_auto[,!na_cols]
-     } 
-
-     # perform matrix multiplication
-     pred_auto <- big_prodMat(
-        genotypes,
-        beta_auto,
-        center = means,
-        scale = sds,
-        ncores = NCORES)
-
-     # quality controls on chains
-     sc <- apply(pred_auto, 2, sd, na.rm = TRUE)
-     keep <- abs(sc - median(sc)) < 3 * mad(sc)
-     if (all(is.na(keep))) stop("all 'keep' are NAs")
-     final_beta_auto <- rowMeans(beta_auto[, keep], na.rm = TRUE) 
-     beta_out <- cbind(gwas, final_beta_auto)
-     fwrite(beta_out, file = args$path_betas, sep = '\t')
+     final_beta_auto <- rowMeans(sapply(multi_auto[keep], function(auto) auto$beta_est))
 
    } else {
    final_beta_auto <- gwas$final_beta_auto
@@ -265,7 +252,7 @@ parser$add_argument("--pred", default=NULL, required = TRUE, help = "Path to pli
 parser$add_argument("--ldsc", default=NULL, required = TRUE, help = ".rds object containing QCed GWAS and ldsc heritability estimates")
 parser$add_argument("--ldsc_pvalue_cutoff", default=NULL, help = "cancel the run if the ldsc heritability p-value is not below the given treshold.")
 parser$add_argument("--standardized_gt", default=1, required = FALSE, help = "Should genotypes be standardized?")
-parser$add_argument("--vec_p_init_n", default=30, required = FALSE, help = "number of intial estimates to sample form (should be at least 5)")
+parser$add_argument("--vec_p_init_n", default=50, required = FALSE, help = "number of intial estimates to sample form (should be at least 5)")
 parser$add_argument("--tmp_bfile", default=NULL, required = TRUE, help = "File path to temporary backing files")
 parser$add_argument("--ld_dir", default=NULL, required = TRUE, help = "Path to directory with pre-calcualted SNP correlations and LD (.rds files)")
 parser$add_argument("--impute", default=NULL, required = TRUE, help = "Should missing genotypes be imputed? (See https://privefl.github.io/bigsnpr/reference/snp_fastImputeSimple.html)")
@@ -275,5 +262,6 @@ parser$add_argument("--path_betas", default=NULL, required = TRUE, help = "What 
 args <- parser$parse_args()
 
 main(args)
+
 
 

@@ -10,6 +10,7 @@ from ukb_utils import variants
 
 def main(args):
 
+    filter_invariant = args.filter_invariant
     common_path = args.common_path
     common_type = args.common_type
     write_samples = args.write_samples
@@ -38,6 +39,11 @@ def main(args):
     if min_maf:
         mt = mt.filter_rows(variants.get_maf_expr(mt) > float(min_maf))
 
+    if filter_invariant:
+        mt = mt.annotate_rows(stdev = hl.agg.stats(mt.GT.n_alt_alleles()).stdev)
+        expr_invariant = mt.stdev > 0
+        mt = mt.filter_rows(expr_invariant)
+
     if dbsnp:
         ht = variants.get_dbsnp_table(version=155, build='GRCh38')
         mt = mt.annotate_rows(rsid = ht.rows()[mt.row_key].rsid)
@@ -65,6 +71,7 @@ if __name__=='__main__':
     parser.add_argument('--write_samples', default=None, action='store_true', help='Write hail table cols of subsetted dataset')
     parser.add_argument('--hapmap', default=None, help='Path to hapmap file')
     parser.add_argument('--only_valid_contigs', default=None, action='store_true', help='Subset variants only normal contigs chr1..22x')
+    parser.add_argument('--filter_invariant', default=None, action='store_true', help='Subset variants only normal contigs chr1..22x')
     parser.add_argument('--min_maf', default=None, help='Subset to variants based on minimum MAF')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--out_type', default=None, help='Either "mt", "vcf" or "plink"')
