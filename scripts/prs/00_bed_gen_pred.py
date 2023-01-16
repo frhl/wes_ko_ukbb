@@ -29,8 +29,9 @@ def main(args):
     
     if hapmap:
         ht = hl.read_table(hapmap)
-        ht = ht.key_by('locus_grch38')
-        mt = mt.filter_rows(hl.is_defined(ht[mt.locus]))
+        ht = ht.key_by(*[ht.locus, ht.alleles])
+        ht = ht.key_by(**hl.parse_variant(ht.grch38_varid, reference_genome = 'GRCh38'))
+        mt = mt.filter_rows(hl.is_defined(ht[mt.row_key]))
     
     if filter_missing:
         missing = hl.agg.mean(hl.is_missing(mt.GT)) <= float(filter_missing)

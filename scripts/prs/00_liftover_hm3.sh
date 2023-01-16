@@ -23,9 +23,8 @@ readonly hm3_out_prefix="${hap_dir}/map_liftover"
 readonly hm3plus_file="${hap_dir}/map_hm3_plus.txt.gz"
 readonly hm3plus_out_prefix="${hap_dir}/map_hm3_plus_liftover"
 
-
 mkdir -p ${spark_dir}
-mkdir -p ${out_dir}
+mkdir -p ${hap_dir}
 
 set_up_hail
 set_up_pythonpath_legacy

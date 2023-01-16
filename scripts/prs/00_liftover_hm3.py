@@ -21,9 +21,8 @@ def main(args):
    
     # load data and annotate
     ht = hl.import_table(hapmap, force = True, impute = True)
-    ht = ht.annotate(grch38_varid = hl.delimit([hl.str(ht.chr), hl.str(ht.pos), hl.str(ht.a0), hl.str(ht.a1)], ':'))
     ht = ht.annotate(grch37_varid = hl.delimit([hl.str(ht.chr), hl.str(ht.pos), hl.str(ht.a0), hl.str(ht.a1)], ':'))
-    ht = ht.key_by(**hl.parse_variant(ht.grch38_varid, reference_genome = 'GRCh37'))
+    ht = ht.key_by(**hl.parse_variant(ht.grch37_varid, reference_genome = 'GRCh37'))
 
     # setup liftover references
     from_build = "GRCh37"
@@ -49,6 +48,9 @@ def main(args):
         ref_allele_mismatch = ht.new_locus.result.sequence_context() != ht.new_alleles[0],
         locus_fail_liftover=hl.is_missing(ht.new_locus.result)
     )
+
+    # annotate new locus
+    ht = ht.annotate(grch38_varid = hl.delimit([hl.str(ht.locus.contig), hl.str(ht.locus.position), hl.str(ht.alleles[0]), hl.str(ht.alleles[1])], ':'))
 
     # export file
     ht = ht.select(*[ht.grch37_varid, ht.grch38_varid, ht.rsid, ht.af_UKBB, ht.ld])

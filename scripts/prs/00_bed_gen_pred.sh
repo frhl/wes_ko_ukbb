@@ -10,7 +10,7 @@
 #SBATCH --error=logs/bed_gen_pred.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=1-22
+#SBATCH --array=21-22
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
@@ -20,14 +20,14 @@ readonly hail_script="scripts/prs/00_bed_gen_pred.py"
 readonly spark_dir="data/tmp/spark_dir"
 
 readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} )
-readonly out_dir="data/prs/hapmap/ukb_500k_new_wo_invariant/validation"
+readonly out_dir="data/prs/hapmap/ukb_500k_hm3/validation"
 readonly out_prefix="${out_dir}/ukb_hapmap_500k_eur_chr${chr}"
 
-readonly common_dir="data/unphased/imputed/common"
-readonly common_path="${common_dir}/ukb_imp_200k_common_chr${chr}.mt"
+readonly common_dir="data/unphased/imputed/liftover"
+readonly common_path="${common_dir}/ukb_imp_200k_chr${chr}.mt"
 
-readonly hap_dir="/well/lindgren/flassen/ressources/hapmap"
-readonly hap_file="${hap_dir}/weights.l2.ldscore.liftover.ht"
+readonly hap_dir="/well/lindgren/flassen/ressources/hapmap/ldpred2"
+readonly hap_file="${hap_dir}/map_liftover.ht"
 
 mkdir -p ${spark_dir}
 mkdir -p ${out_dir}
@@ -38,9 +38,9 @@ if [ ! -f "${out_prefix}.bed" ]; then
   python3 "${hail_script}" \
      --hapmap ${hap_file} \
      --common_path "${common_path}" \
+     --min_maf 0.01 \
      --filter_missing 0.05 \
      --filter_invariant \
-     --dbsnp \
      --out_prefix "${out_prefix}" \
      --out_type "plink" 
 else
