@@ -10,7 +10,7 @@
 #SBATCH --error=logs/filter_hm3.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=21
+#SBATCH --array=1-20
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh

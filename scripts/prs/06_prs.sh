@@ -8,7 +8,7 @@
 #SBATCH --open-mode=append
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-30
+#SBATCH --array=
 # --begin=now+1hour
 #
 #$ -N prs
@@ -18,7 +18,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 1-30
+#$ -t 5
 #$ -V
 
 set -o errexit
@@ -34,7 +34,7 @@ readonly clean_script="scripts/prs/_prs_clean.sh"
 readonly aggr_script="scripts/prs/_prs_aggr.sh"
 
 readonly ldsc_dir="data/prs/ldsc"
-readonly pred_dir="data/prs/hapmap/ukb_500k_new_wo_invariant/validation"
+readonly pred_dir="data/prs/hapmap/ukb_500k_hm3/validation"
 readonly ld_dir="data/prs/hapmap/ld/matrix_unrel_kin"
 readonly pheno_dir="data/phenotypes"
 readonly out_dir="data/prs/scores_new/auto"
@@ -245,7 +245,7 @@ clean_pgs()
 # parameters
 readonly queue="short"
 readonly project="lindgren.prj"
-readonly tasks=1-22
+readonly tasks=21-22
 
 submit_ldpred2 "auto" "2" "${phenotype_binary}"
 #submit_ldpred2 "auto" "6" "${phenotype_cts}_int"

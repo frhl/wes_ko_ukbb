@@ -58,6 +58,15 @@ def main(args):
     if write_samples and out_prefix:
         mt.cols().write(out_prefix + "_samples.ht", overwrite = True)
 
+    # required for match
+    mt = mt.transmute_rows(
+            rsid = hl.delimit(
+                [hl.str(mt.locus.contig), 
+                 hl.str(mt.locus.position), 
+                 hl.str(mt.alleles[0]), 
+                 hl.str(mt.alleles[1])], ':')
+            )    
+
     if out_type and out_prefix:
         io.export_table(mt, out_prefix, out_type)
 
