@@ -10,7 +10,7 @@
 #SBATCH --error=logs/bed_gen_pred.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=21-22
+#SBATCH --array=1-22
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh

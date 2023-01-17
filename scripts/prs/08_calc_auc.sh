@@ -36,7 +36,7 @@ readonly pheno_dir="data/phenotypes"
 
 #readonly phenotypes="${pheno_dir}/curated_covar_phenotypes_binary.tsv.gz"
 readonly phenotypes="${pheno_dir}/dec22_phenotypes_binary_500k.tsv.gz"
-readonly out_prefix="${out_dir}/spiro_pgs_auc_summary"
+readonly out_prefix="${out_dir}/test_spiro_pgs_auc_summary"
 
 mkdir -p ${out_dir}
 

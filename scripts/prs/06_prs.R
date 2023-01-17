@@ -4,6 +4,7 @@
 devtools::load_all('utils/modules/R/prstools')
 library(argparse)
 library(ggplot2)
+library(tictoc)
 
 main <- function(args){
 
@@ -16,6 +17,7 @@ main <- function(args){
   stopifnot(args$method %in% c('auto'))
   stopifnot(dir.exists(dirname(args$path_betas)))
 
+  tic(paste0("LDPred2 ", basename(args$out_prefix)))
   # setup parallel environment
   NCORES <- max(1, nb_cores())
   bigparallelr::assert_cores(NCORES)
@@ -240,7 +242,7 @@ main <- function(args){
   write(paste0(args$pred, ".. done! Writing to ", args$out_prefix, ".txt.gz"), stdout())
   fwrite(PGS, file = paste0(args$out_prefix,".txt.gz"), sep = '\t')
   fwrite(model, file = paste0(args$out_prefix,".model"), sep = '\t')
-
+  toc()
   
 }
 

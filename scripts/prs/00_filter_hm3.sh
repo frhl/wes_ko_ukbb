@@ -9,8 +9,8 @@
 #SBATCH --output=logs/filter_hm3.log
 #SBATCH --error=logs/filter_hm3.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 2
-#SBATCH --array=1-20
+#SBATCH --cpus-per-task 8
+#SBATCH --array=1-4
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
@@ -24,7 +24,7 @@ readonly out_dir="data/imputed/hm3"
 readonly out_prefix="${out_dir}/ukb_hm3_500k_chr${chr}"
 
 readonly hap_dir="/well/lindgren/flassen/ressources/hapmap/ldpred2"
-readonly hap_file="${hap_dir}/map_liftover.ht"
+readonly hap_file="${hap_dir}/map_hm3_plus_liftover.ht"
 
 mkdir -p ${spark_dir}
 mkdir -p ${out_dir}
