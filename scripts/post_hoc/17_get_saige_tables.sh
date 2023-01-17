@@ -45,13 +45,13 @@ get_table() {
 }
 
 set_up_rpy
-get_table "saige_sig_merge_excluding_prs" "none" "exclude" "${p_cutoff}"
-get_table "saige_sig_merge_only_prs" "none" "only" "${p_cutoff}"
-get_table "saige_sig_merge_prefer_prs" "none" "prefer" "${p_cutoff}"
+get_table "165k_saige_sig_merge_excluding_prs" "none" "exclude" "${p_cutoff}"
+get_table "165k_saige_sig_merge_only_prs" "none" "only" "${p_cutoff}"
+get_table "165k_saige_sig_merge_prefer_prs" "none" "prefer" "${p_cutoff}"
 
-get_table "saige_merge_excluding_prs" "none" "exclude" "1"
-get_table "saige_merge_only_prs" "none" "only" "1"
-get_table "saige_merge_prefer_prs" "none" "prefer" "1"
+get_table "165k_saige_merge_excluding_prs" "none" "exclude" "1"
+get_table "165k_saige_merge_only_prs" "none" "only" "1"
+get_table "165k_saige_merge_prefer_prs" "none" "prefer" "1"
 
 
 

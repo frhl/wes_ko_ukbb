@@ -24,18 +24,18 @@ readonly header_file="${header_dir}/dec22_phenotypes_binary_200k_header.tsv"
 # some of the columns when conditioniong on markers, 
 # thus we need to map them manually
 readonly ref_dir="data/post_hoc/results"
-readonly ref_file="${ref_dir}/saige_sig_merge_prefer_prs.txt.gz"
+readonly ref_file="${ref_dir}/165k_saige_sig_merge_prefer_prs.txt.gz"
 
 # get merged hits that unprocessed
 readonly merged_dir="data/conditional/combined/saige"
-readonly merged_hits="${merged_dir}/merged_hits_post_cond.txt.gz"
+readonly merged_hits="${merged_dir}/165k_merged_hits_post_cond.txt.gz"
 
 # paramters for sutff to include
 readonly N_ko_case_cutoff="1"
 readonly N_ko_cutoff="4"
 
 readonly out_dir="data/post_hoc/results"
-readonly out_prefix="${out_dir}/saige_cond_sig_subset_prefer_prs.txt.gz"
+readonly out_prefix="${out_dir}/165k_saige_cond_sig_subset_prefer_prs"
 
 mkdir -p ${out_dir}
 
