@@ -114,9 +114,9 @@ summarize_variant_evidence <- function(gene, phenotype, phenotype_df, path_info,
     colnames(info) <- gsub("info\\.","",colnames(info))
 
     # merge with participates in
-    stopifnot(all(cv$varid %in% info$varid))
+    if (! all(cv$varid %in% info$varid)) warning(paste(gene,":",phenotype, "some clinvar variants not in info."))
     stopifnot(all(info$varid %in% cv$varid))
-    cv <- merge(cv, info, by="varid")
+    cv <- merge(cv, info, by="varid", all=TRUE)
     stopifnot(nrow(cv) > 0 ) # info
                   
     # process a few columns to make them look nicer
