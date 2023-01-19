@@ -9,7 +9,7 @@
 #SBATCH --error=logs/gene_positions.errors.log
 #SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
-#SBATCH --array=301-320
+#SBATCH --array=1-320
 
 #$ -N gene_positions
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -91,7 +91,7 @@ submit_intervals()
 }
 
 # Use PRS when available
-readonly use_prs=0
+readonly use_prs=1
 
 submit_binary_intervals "pLoF_damaging_missense"
 #submit_cts_intervals "pLoF_damaging_missense"

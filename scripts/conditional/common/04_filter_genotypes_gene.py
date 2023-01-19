@@ -43,10 +43,12 @@ def main(args):
             mt = hl.filter_intervals(mt, hl.literal([hail_interval])) 
             # create outfile 
             out_prefix_gene = out_prefix + "_" + gene + ".vcf.bgz"
-            #hl.export_vcf(mt, out_prefix_gene)
+            print(f"Exporting to {out_prefix_gene}.vcf.bgz")
+            hl.export_vcf(mt, out_prefix_gene)
             line = ("%s\t%s\t%s\t%s\t%s\t%s" % (phenotype, gene, contig, start, end, out_prefix_gene))
             outfile.write(line + "\n")
-
+    
+    
 
 
 if __name__ == '__main__':

@@ -9,7 +9,7 @@
 #SBATCH --error=logs/filter_genotypes.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-320
+#SBATCH --array=1-4
 #
 #
 #$ -N filter_genotypess
@@ -19,7 +19,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-100
+#$ -t 6-320
 #$ -V
 
 

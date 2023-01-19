@@ -18,7 +18,6 @@ def main(args):
     phenotype = args.phenotype
     trait = args.trait 
 
-    print(f"running {phenotype} using Hail..")
     reference_genome = 'GRCh38'
     hail_init.hail_bmrc_init(log='logs/hail/filter_genotyoes.log', default_reference=reference_genome, min_block_size=128) 
     
@@ -26,13 +25,14 @@ def main(args):
     ht = hl.read_table(intervals)
     chromosomes = [x.replace('chr', '') for x in list(set(ht.contig.collect()))]
     hail_intervals = ht.intervals.collect()
-  
+    
     # get all the relevant chromsomes
     mts = list()
     for chrom in chromosomes:
         path = f"data/unphased/imputed/common_append_missing/ukb_imp_200k_common_append_missing_chr{chrom}.mt"
         mt = hl.read_matrix_table(path)
-        mts.append(mt)  
+        mts.append(mt) 
+        print(f"loading {path}")
     
     # combine them by variants (across chroms)
     mt = mts[0].union_rows(*mts[1:])
@@ -60,9 +60,6 @@ def main(args):
 
     else:
         raise ValueError("param 'phenotypes' is not set! ")
-
-    hl.export_vcf(mt, out_prefix + '.vcf.bgz')
-
 
 if __name__ == '__main__':
 

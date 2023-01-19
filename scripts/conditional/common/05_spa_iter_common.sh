@@ -41,7 +41,7 @@ readonly task_id=$( get_array_task_id )
 # parameters
 readonly min_maf=0.01
 readonly min_mac=4
-readonly max_iter=30
+readonly max_iter=50
 readonly P_cutoff="5e-6"
 
 # directories and paths
@@ -56,7 +56,9 @@ readonly grm_sam="${grm_mtx}.sampleIDs.txt"
 readonly in_prefix="ukb_eur_wes_200k"
 
 # use PRS and give error if not available
-readonly force_prs="0"
+#readonly force_prs="0"
+# use PRS of available
+readonly use_prs="1"
 
 submit_binary_analysis()
 {
@@ -83,15 +85,30 @@ submit_cond_spa()
   local step1_dir="data/saige/output/${trait}/step1"
   local step2_dir="data/saige/output/${trait}/step2/minmac${min_mac}"
   
+  #if [ "${force_prs}" -eq "1" ]; then
+  #  local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.rda"
+  #  local in_var="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.varianceRatio.txt"
+  #  local out_prefix="${out_prefix}_locoprs"
+  #else
+  #  local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
+  #  local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
+  #fi
  
-  if [ "${force_prs}" -eq "1" ]; then
-    local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.rda"
-    local in_var="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.varianceRatio.txt"
-    local out_prefix="${out_prefix}_locoprs"
-  else
-    local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
-    local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
-  fi
+  if [ "${use_prs}" -eq "1" ]; then
+     local in_gmat_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.rda"
+     local in_var_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.varianceRatio.txt"
+     if [ -f "${in_gmat_prs/CHR/21}" ] & [ -f "${in_var_prs/CHR/21}" ]; then
+        local in_gmat=${in_gmat_prs}
+        local in_var=${in_var_prs}
+        local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${phenotype}_${annotation}_locoprs"
+        local out_mrg="${step2_dir}/${in_prefix}_${phenotype}_${annotation}_locoprs.txt.gz"
+     else
+        >&2 echo "Saige NULL (PRS) ${in_gmat_prs}/${in_var_prs} does not exist. Using without PRS."
+     fi
+  fi 
+  
+
+  
   mkdir -p ${out_dir}
   local intervals="${interval_dir}/${in_prefix}_${phenotype}_${annotation}_intervals.txt"
   local path_min_maf="${interval_dir}/${in_prefix}_${phenotype}_${annotation}_min_maf.tsv"

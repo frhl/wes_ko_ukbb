@@ -3,23 +3,23 @@
 # extract genotypes in regions near genes that are significant in primary analysis
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=make_intervals
+#SBATCH --job-name=calc_min_maf
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/make_intervals.log
-#SBATCH --error=logs/make_intervals.errors.log
+#SBATCH --output=logs/calc_min_maf.log
+#SBATCH --error=logs/calc_min_maf.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=11-320
+#SBATCH --array=1-5
 #
 #
-#$ -N make_intervals
+#$ -N calc_min_mafs
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/make_intervals.log
-#$ -e logs/make_intervals.errors.log
+#$ -o logs/calc_min_maf.log
+#$ -e logs/calc_min_maf.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 11-320
+#$ -t 6-320
 #$ -V
 
 
@@ -32,12 +32,11 @@ source utils/bash_utils.sh
 readonly cluster=$( get_current_cluster)
 readonly task_id=$( get_array_task_id )
 
-readonly bash_script="scripts/conditional/common/_make_intervals.sh"
+readonly bash_script="scripts/conditional/common/_calc_min_maf.sh"
+readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
 
-readonly padding=1000000 # 1 Megabase
 readonly min_mac=4
-
-readonly in_dir="data/conditional/common/gene_positions/min_mac${min_mac}"
+readonly in_dir="data/conditional/common/intervals/min_mac${min_mac}"
 readonly out_dir="data/conditional/common/intervals/min_mac${min_mac}"
 readonly pheno_dir="data/phenotypes"
 readonly in_prefix="ukb_eur_wes_200k"
@@ -68,14 +67,14 @@ submit_intervals()
   local phenotype=${2?Error: Missing arg2 (phenotype)}
   local trait=${3?Error: Missing arg3 (trait)}
   local pheno_file=${4?Error: Missing arg4 (pheno_file)}
-  local genes="${in_dir}/${in_prefix}_${phenotype}_${annotation}.tsv.gz"
+  local intervals="${in_dir}/${in_prefix}_${phenotype}_${annotation}.ht"
   local out_prefix="${out_dir}/${in_prefix}_${phenotype}_${annotation}"
   if [ ! -z "${phenotype}" ]; then
-    if [ -f ${genes} ]; then
-      readonly slurm_jname="_make_intervals_${1}"
-      readonly slurm_lname="logs/_make_intervals"
+    if [ -d "${intervals}" ]; then
+      readonly slurm_jname="_calc_min_maf_${1}"
+      readonly slurm_lname="logs/_calc_min_maf"
       readonly slurm_project="lindgren.prj"
-      readonly slurm_queue="epyc"
+      readonly slurm_queue="short"
       readonly sge_queue="short.qc"
       readonly slurm_shmem="1"
       if [ "${cluster}" = "slurm" ]; then
@@ -88,12 +87,14 @@ submit_intervals()
           --partition="${slurm_queue}" \
           --cpus-per-task="${slurm_shmem}" \
           --array=${task_id} \
+          --parsable \
           "${bash_script}" \
-          "${genes}" \
-          "${padding}" \
-          "${phenotype}" \
-          "${out_prefix}"
-     elif [ "${cluster}" = "sge" ]; then
+          "${intervals}" \
+          "${out_prefix}" \
+          "${pheno_file}" \
+          "${trait}" \
+          "${phenotype}"
+      elif [ "${cluster}" = "sge" ]; then
         qsub -N "${slurm_jname}" \
           -o "${slurm_lname}.log" \
           -e "${slurm_lname}.errors.log" \
@@ -103,18 +104,29 @@ submit_intervals()
           -q "${sge_queue}" \
           -pe shmem ${slurm_shmem} \
           "${bash_script}" \
-          "${genes}" \
-          "${padding}" \
-          "${phenotype}" \
-          "${out_prefix}"
-      fi
+          "${intervals}" \
+          "${out_prefix}" \
+          "${pheno_file}" \
+          "${trait}" \
+          "${phenotype}"
+      fi 
     else
-      >&2 echo "${genes} (${phenotype}) did not pass significance threshols or does not exist. Skipping.."
+      >&2 echo "${intervals} Does not exist. Skipping.."
     fi
   fi
 }
 
 submit_binary_analysis "pLoF_damaging_missense"
+#submit_cts_analysis "pLoF_damaging_missense"
+
+#submit_binary_analysis "pLoF"
+#submit_cts_analysis "pLoF"
+
+#submit_binary_analysis "damaging_missense"
+#submit_cts_analysis "damaging_missense"
+
+#submit_binary_analysis "synonymous"
+#submit_cts_analysis "synonymous"
 
 
 
