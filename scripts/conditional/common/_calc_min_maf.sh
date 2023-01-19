@@ -16,7 +16,7 @@ readonly trait=${4?Error: Missing arg8 (trait)}
 readonly phenotype=${5?Error: Missing arg9 (phenotype)}
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/conditional/common/04_calc_min_maf.py"
+readonly hail_script="scripts/conditional/common/06_calc_min_maf.py"
 readonly checkpoint="${out_prefix}_checkpoint.mt"
 
 calc_min_maf() 

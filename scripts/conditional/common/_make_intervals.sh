@@ -13,7 +13,7 @@ readonly phenotype=${3?Error: Missing arg3 (phenotype)}
 readonly out_prefix=${4?Error: Missing arg4 (out prefix)}
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/conditional/common/03_make_intervals.py"
+readonly hail_script="scripts/conditional/common/04_make_intervals.py"
 
 set_up_hail
 set_up_pythonpath_legacy

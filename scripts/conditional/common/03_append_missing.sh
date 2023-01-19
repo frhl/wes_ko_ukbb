@@ -33,7 +33,7 @@ readonly cluster=$( get_current_cluster)
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
-readonly hail_script="scripts/conditional/common/02_append_missing.py"
+readonly hail_script="scripts/conditional/common/03_append_missing.py"
 
 readonly phased_sample_list="data/phenotypes/phased_sample_list.txt"
 readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'

@@ -28,7 +28,7 @@ source utils/hail_utils.sh
 source utils/qsub_utils.sh
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/conditional/common/07_append_vcf_common.py"
+readonly hail_script="scripts/conditional/common/09_append_vcf_common.py"
 
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )

@@ -17,7 +17,7 @@ source utils/bash_utils.sh
 source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/conditional/common/06_extract_marker_gt.py"
+readonly hail_script="scripts/conditional/common/08_extract_marker_gt.py"
 
 readonly out_dir="data/conditional/common/markers"
 readonly out_prefix="${out_dir}/common_conditional"
