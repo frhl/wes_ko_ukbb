@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 #
 #
-#
 #SBATCH --account=lindgren.prj
 #SBATCH --job-name=spa_test
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -163,7 +162,7 @@ readonly min_mac=4
 readonly project="lindgren.prj"
 readonly tasks=1-22
 readonly queue="short"
-readonly nslots=1
+readonly nslots=2
 
 
 # cts traits

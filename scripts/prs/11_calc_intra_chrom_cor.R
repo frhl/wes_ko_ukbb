@@ -47,37 +47,23 @@ main <- function(args){
         write(paste("running", f), stderr())        
         d <- fread(f) 
         # setup files
+        tested <- c()
         M <-do.call(rbind, lapply(autosomes, function(a1){
             do.call(rbind, lapply(autosomes, function(a2){
-                    if (a1 != a2) {data.frame(boot_cor_ci(d, a1, a2), pvalue = ztest(d, a1, a2))}
+                    testing <- paste0(sort(c(a1, a2)))
+                    out <- NULL
+                    if ((a1 != a2) & (!testing %in% tested)) {out <- data.frame(boot_cor_ci(d, a1, a2), pvalue = ztest(d, a1, a2))}
+                    tested <- c(tested, testing)
+                    return(out)
             }))
         }))
 
         # prepare writing file
         M <- data.table(M)
         M$filepath <- basename(f)
-        f_wo_ext <- tools::file_path_sens_ext(tools::file_path_sans_ext(basename(f))) 
+        f_wo_ext <- tools::file_path_sans_ext(tools::file_path_sans_ext(basename(f))) 
         outfile <- file.path(args$out_dir, paste0(f_wo_ext,".txt.gz"))
         fwrite(M, outfile, sep = "\t")
-        
-        #
-        M$col1 <- factor(M$col1, levels = autosomes)
-        M$col2 <- factor(M$col2, levels = autosomes)
-        M$labels <- ifelse(M$pvalue < 0.05/(22*11-22), '**', ifelse(M$pvalue < 0.05 , '*',''))
-        plt <- ggplot(M, aes(x=col1, y=col2, fill=mean, label = labels)) +
-            geom_tile() +
-            geom_text() +
-            theme_bw() +
-            ylab("Chromosome B") +
-            xlab("Chromosome A") +
-            labs(fill = "") +
-            scale_fill_gradient2(low="blue", mid = 'white', high='red', limits = c(-0.1,0.1)) +
-            theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
-                  legend.position = "top",
-                  plot.title = element_text(hjust = 0.5)
-                 ) +
-            ggtitle(paste0(f_wo_ext,"\nIntra-chromosomal PRS Pearson Correlation and Z-test")) 
-        print(plt)
     }
     graphics.off()
 

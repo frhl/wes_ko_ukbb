@@ -9,7 +9,7 @@
 #SBATCH --error=logs/gene_positions.errors.log
 #SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-300
+#SBATCH --array=301-320
 
 #$ -N gene_positions
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

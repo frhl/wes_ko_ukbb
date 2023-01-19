@@ -27,7 +27,7 @@ def main(args):
     # load data to annotate 
     mt2 = io.import_table(input_path, input_type, calc_info=False) 
     ht2 = mt2.rows()
-    ht2 = ht2.select(*[ht2.info, ht2.consequence.vep.worst_csq_by_gene_canonical])
+    ht2 = ht2.select(*[ht2.info, ht2.consequence.vep.worst_csq_by_gene_canonical, ht2.consequence_category])
     ht2 = ht2.annotate(clinvar=ht1[ht2.key].info)
         
     ht2.flatten().export(out_prefix + ".txt.gz")

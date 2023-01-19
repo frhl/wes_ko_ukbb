@@ -8,7 +8,7 @@
 #SBATCH --open-mode=append
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-10
+#SBATCH --array=1-300
 # --begin=now+6hour
 #
 #$ -N prs
@@ -37,12 +37,12 @@ readonly ldsc_dir="data/prs/ldsc"
 readonly pred_dir="data/prs/hapmap/ukb_500k_hm3/validation"
 readonly ld_dir="data/prs/hapmap/ld/matrix_unrel_kin"
 readonly pheno_dir="data/phenotypes"
-readonly out_dir="data/prs/scores_new/auto"
-readonly mrg_dir="data/prs/scores_new"
+readonly out_dir="data/prs/scores/auto"
+readonly mrg_dir="data/prs/scores_full"
 
 # do not run files that have h2 estimates
 # above the given p-value cutoff (nominal).
-readonly ldsc_pvalue_cutoff="0.001"
+readonly ldsc_pvalue_cutoff="0.05"
 
 readonly cluster=$( get_current_cluster )
 readonly index=$( get_array_task_id )

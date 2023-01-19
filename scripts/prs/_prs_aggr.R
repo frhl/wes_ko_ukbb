@@ -7,8 +7,8 @@ main <- function(args){
   print(args)
   stopifnot(dir.exists(args$in_dir))
   stopifnot(dir.exists(args$out_dir))
-  #files <- list.files(args$in_dir, pattern = paste0(args$phenotype,"_chr[0-9]+_new.txt.gz"), full.names = TRUE)
-  files <- list.files(args$in_dir, pattern = paste0(args$phenotype,"_chr[0-9]+.txt.gz"), full.names = TRUE)
+  files <- list.files(args$in_dir, pattern = paste0(args$phenotype,"_chr[0-9]+_new.txt.gz"), full.names = TRUE)
+  #files <- list.files(args$in_dir, pattern = paste0(args$phenotype,"_chr[0-9]+.txt.gz"), full.names = TRUE)
   n <- length(files)
   if (n < 22) {
     stop(paste("Found ",n, "files for", args$phenotype))
@@ -16,8 +16,8 @@ main <- function(args){
 
   # combine into pgs matrix (chr
   d <- do.call(rbind, lapply(1:22, function(x) {
-      #f <- files[grepl(paste0("chr",x,"_new.txt.gz"),files)]
-      f <- files[grepl(paste0("chr",x,".txt.gz"),files)]
+      f <- files[grepl(paste0("chr",x,"_new.txt.gz"),files)]
+      #f <- files[grepl(paste0("chr",x,".txt.gz"),files)]
       if (length(f)){
           d <- fread(f)
           d$chr <- paste0("chr",x)

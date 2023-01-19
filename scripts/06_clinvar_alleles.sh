@@ -9,7 +9,7 @@
 #SBATCH --error=logs/clinvar_alleles.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-22
+#SBATCH --array=1-19
 #
 #
 #$ -N clinvar_alleles

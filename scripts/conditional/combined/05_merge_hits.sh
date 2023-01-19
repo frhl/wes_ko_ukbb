@@ -28,10 +28,10 @@ readonly rscript="scripts/conditional/combined/05_merge_hits.R"
 readonly header_dir="data/phenotypes"
 readonly header="${header_dir}/dec22_phenotypes_binary_200k_header.tsv"
 readonly sig_genes_dir="data/conditional/combined/sig_genes/"
-readonly sig_genes="${sig_genes_dir}/sig_genes_after_prs.txt.gz"
-readonly in_dir="data/saige/output/binary/step2_collapsed/min_mac4"
+readonly sig_genes="${sig_genes_dir}/sig_genes_after_prs_165k.txt.gz"
+readonly in_dir="data/saige/output/binary/step2_collapsed_urv/min_mac4"
 readonly out_dir="data/conditional/combined/saige"
-readonly out_prefix="${out_dir}/merged_hits_post_cond"
+readonly out_prefix="${out_dir}/165k_merged_hits_post_cond"
 
 mkdir -p ${out_dir}
 
