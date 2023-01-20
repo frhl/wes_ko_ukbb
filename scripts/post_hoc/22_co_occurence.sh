@@ -6,7 +6,7 @@
 #$ -e logs/co_occurence.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q long.qc
+#$ -q short.qc
 #$ -t 1-22
 #$ -V
 

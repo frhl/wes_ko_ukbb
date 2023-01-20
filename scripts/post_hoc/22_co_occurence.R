@@ -17,16 +17,20 @@ main <- function(args){
     d$is_cis <- d$knockout %in% "Compound heterozygote (cis)"
     d$is_chet <- d$knockout %in% "Compound heterozygote"
     d$is_hom <- d$knockout %in% "Homozygote"
+    d <- d[(d$is_cis) | (d$is_chet) | (d$is_hom), ]
+    genes <- unique(d$gene_id)
+    write(paste("Running", length(genes), "genes.."), stderr())
 
     # search for varaints in our format e.g. chr21:41871518:G:A;chr21:41878840:C:CG
     regexify_varid <- function(v) return(paste0("(^",v,"$)|(^",v,";)|(;",v,";)|(;",v,"$)"))
+    # remove duplicate unordered rows in matrix format
+    duplicated_varids <- function(x) duplicated(do.call(rbind, lapply(1:nrow(x), function(idx) sort(data.frame(t(x[idx,]))[,1]) )))
 
     genes <- unique(d$gene_id)
     for (g in genes){
         
         write(paste("Running", g, chrom), stderr())
         d_gene <- d[d$gene_id %in% g,]
-        varids <- unique(unlist(strsplit(d$varid, split = ";")))
         haplotypes <- c("chet","hom","cis") #, "opposite")
         out <- do.call(rbind, lapply(haplotypes, function(h){
             if (h == "chet"){
@@ -39,10 +43,15 @@ main <- function(args){
             # iterate over variants either co-occuring on the same
             # haplotype or oppoposite haplotypes
             if (nrow(d_gene_hap) > 0){
-                do.call(rbind, lapply(varids, function(v1){
+                # dont want to visit the same variant twice
+                varids <- unique(unlist(strsplit(d_gene_hap$varid, split = ";")))
+                grid <- expand.grid(varids, varids)
+                grid <- grid[!duplicated_varids(grid),]
+                colnames(grid) <- c("v1", "v2")
+                do.call(rbind, lapply(grid$v1, function(v1){
                     re_v1 <- regexify_varid(v1)
                     v1_in_d <- grepl(re_v1, d_gene_hap$varid)
-                    do.call(rbind, lapply(varids, function(v2){    
+                    do.call(rbind, lapply(grid$v2, function(v2){    
                         # if the variant is the same it must
                         # be the same row being counted or a homozygote
                         if ((v1 != v2) | (h == "hom")){
