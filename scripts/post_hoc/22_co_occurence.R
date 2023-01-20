@@ -80,6 +80,7 @@ main <- function(args){
        return(out_hap) 
    }))
    out <- out[out$N > 0, ]   
+   out <- out[!duplicated(out),]
    outfile <- paste0(out_prefix,".txt.gz")
    fwrite(out, outfile, sep = "\t")
  
