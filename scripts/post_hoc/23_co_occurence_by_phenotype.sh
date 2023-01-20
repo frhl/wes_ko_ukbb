@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N co_occurence
+#$ -N co_occurence_by_phenotype
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/co_occurence.log
-#$ -e logs/co_occurence.errors.log
+#$ -o logs/co_occurence_by_phenotype.log
+#$ -e logs/co_occurence_by_phenotype.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
@@ -16,10 +16,13 @@ source utils/qsub_utils.sh
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
-readonly rscript="scripts/post_hoc/22_co_occurence.R"
+readonly rscript="scripts/post_hoc/23_co_occurence_by_phenotype.R"
 readonly out_dir="data/knockouts/alt/pp90/co_occurence"
 
-readonly out_prefix="${out_dir}/co_occurence_chr${chr}"
+readonly path_header="data/phenotypes/dec22_phenotypes_binary_200k_header.tsv"
+readonly path_phenotypes="data/phenotypes/dec22_phenotypes_binary_200k.tsv.gz"
+
+readonly out_prefix="${out_dir}/co_occurence_by_phenotype_chr${chr}"
 readonly annotation="pLoF_damaging_missense"
 
 mkdir -p ${out_dir}
@@ -28,6 +31,8 @@ set_up_rpy
 Rscript "${rscript}" \
   --chrom ${chr} \
   --annotation ${annotation} \
+  --path_phenotypes ${path_phenotypes} \
+  --path_header ${path_header} \
   --out_prefix ${out_prefix}
 
 

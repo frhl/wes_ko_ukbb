@@ -27,12 +27,13 @@ main <- function(args){
     duplicated_varids <- function(x) duplicated(do.call(rbind, lapply(1:nrow(x), function(idx) sort(data.frame(t(x[idx,]))[,1]) )))
 
     genes <- unique(d$gene_id)
-    for (g in genes){
-        
+    #for (g in genes){
+    out <- do.call(rbind, lapply(genes, function(g){
+
         write(paste("Running", g, chrom), stderr())
         d_gene <- d[d$gene_id %in% g,]
         haplotypes <- c("chet","hom","cis") #, "opposite")
-        out <- do.call(rbind, lapply(haplotypes, function(h){
+        out_hap <- do.call(rbind, lapply(haplotypes, function(h){
             if (h == "chet"){
                 d_gene_hap <- d_gene[d_gene$is_chet | d_gene$is_hom,]
             } else if (h == "hom"){
@@ -75,11 +76,13 @@ main <- function(args){
                 }))
             }
      
-        })) 
-        outfile <- paste0(out_prefix,"_", g,".txt.gz")
-        fwrite(out, outfile, sep = "\t")
-    }
-
+        }))
+       return(out_hap) 
+   }))
+   out <- out[out$N > 0, ]   
+   outfile <- paste0(out_prefix,".txt.gz")
+   fwrite(out, outfile, sep = "\t")
+ 
 }
 
 
