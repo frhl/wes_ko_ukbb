@@ -12,7 +12,7 @@
 #SBATCH --error=logs/spa_iter_common.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-320
+#SBATCH --array=6-320
 #
 #
 #$ -N spa_iter_common
@@ -22,7 +22,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 5
+#$ -t 6-320
 #$ -V
 
 
@@ -100,8 +100,7 @@ submit_cond_spa()
      if [ -f "${in_gmat_prs/CHR/21}" ] & [ -f "${in_var_prs/CHR/21}" ]; then
         local in_gmat=${in_gmat_prs}
         local in_var=${in_var_prs}
-        local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${phenotype}_${annotation}_locoprs"
-        local out_mrg="${step2_dir}/${in_prefix}_${phenotype}_${annotation}_locoprs.txt.gz"
+        local out_prefix="${out_prefix}_locoprs"
      else
         >&2 echo "Saige NULL (PRS) ${in_gmat_prs}/${in_var_prs} does not exist. Using without PRS."
      fi

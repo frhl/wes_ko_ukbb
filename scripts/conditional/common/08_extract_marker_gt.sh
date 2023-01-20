@@ -37,7 +37,9 @@ cat ${markers_dir}/*.markers > "${out_prefix}.markers"
 # Get matrix filtered to common variants that pass our conditional analysis
 if [ ! -d "${out_prefix}.mt" ]; then 
   SECONDS=0
+  set +u
   set_up_hail
+  set -u
   set_up_pythonpath_legacy
   python3 "${hail_script}" \
      --markers ${markers} \

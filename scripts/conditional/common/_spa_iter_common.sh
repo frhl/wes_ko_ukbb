@@ -9,6 +9,7 @@ set -o nounset
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
 source utils/vcf_utils.sh
+module load BCFtools/1.12-GCC-10.3.0 
 
 readonly in_gmat=${1?Error: Missing arg1 (in_gmat)}
 readonly in_var=${2?Error: Missing arg2 (in_var)}
@@ -26,7 +27,6 @@ readonly variant_category="common"
 
 readonly step2_SPAtests="utils/saige/step2_SPAtests.R"
 readonly shell_spa="scripts/conditional/common/_chr_spa.sh"
-readonly rscript="scripts/conditional/common/03_spa_conditional.R"
 readonly helper="scripts/conditional/common/_spa_iter_common.R"
 readonly order_markers="scripts/conditional/utils/_order_markers.R"
 
