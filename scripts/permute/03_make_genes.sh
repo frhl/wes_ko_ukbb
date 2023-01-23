@@ -5,9 +5,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/make_genes.log
 #SBATCH --error=logs/make_genes.errors.log
-#SBATCH --partition=short
+#SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-22
+#SBATCH --array=21
 
 set -o errexit
 set -o nounset
@@ -16,18 +16,16 @@ source utils/bash_utils.sh
 source utils/hail_utils.sh
 
 readonly curwd="$(pwd)"
-readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
 readonly bash_script="scripts/permute/_make_genes.sh"
 
 readonly chr="${SLURM_ARRAY_TASK_ID}"
 readonly in_dir="data/permute/counts"
-readonly out_dir="data/permute/genes/phased_only/chr${chr}"
+readonly out_dir="data/permute/genes/chr${chr}"
 
-readonly input_path="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_phased_counts_chr${chr}.mt"
-readonly input_type='mt'
+readonly input_path="${in_dir}/kb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.counts.mt"
+readonly input_type="mt"
 
-readonly maf="maf0to5e-2"
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_chr${chr}"
 readonly out_type="mt"
 

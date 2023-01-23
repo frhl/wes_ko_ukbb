@@ -7,9 +7,8 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/calc_min_permutations.log
 #SBATCH --error=logs/calc_min_permutations.errors.log
-#SBATCH --partition=short
-#SBATCH --cpus-per-task 2
-#SBATCH --requeue
+#SBATCH --partition=epyc
+#SBATCH --cpus-per-task 1
 
 set -o errexit
 set -o nounset
@@ -24,31 +23,16 @@ readonly min_mac=4
 readonly p_cutoff="5e-7"
 
 # directories and out paths
-readonly basename_prefix="ukb_eur_wes_200k_maf0to5e-2"
-readonly spa_cts_dir="data/saige/output/cts/step2cond/min_mac${min_mac}"
-readonly spa_bin_dir="data/saige/output/binary/step2/min_mac${min_mac}"
 readonly out_dir="data/permute/overview/min_mac${min_mac}/no_cond"
 readonly out_prefix="${out_dir}/main"
 mkdir -p ${out_dir}
 
-# lookup true dosage hash and AC for the given phenotype
-readonly lookup_dir="data/conditional/rare/combined"
-readonly hash_path="${lookup_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_hash.txt.gz"
-readonly ac_path="${lookup_dir}/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense_AC.txt.gz"
-
-# required to pin down which genes are ch knockout and which are hom alt knockouts
-readonly tsv_path="data/knockouts/alt/ukb_eur_wes_200k_chrCHR_maf0to5e-2_pLoF_damaging_missense.tsv.gz"
-
 set_up_rpy
 Rscript ${rscript} \
-  --tsv_path ${tsv_path} \
-  --spa_cts_dir ${spa_cts_dir} \
-  --spa_bin_dir ${spa_bin_dir} \
-  --basename_prefix ${basename_prefix} \
-  --ac_path ${ac_path} \
-  --hash_path ${hash_path} \
   --out_prefix ${out_prefix} \
-  --use_cond_p
+  --cond "none" \
+  --prs "prefer"
+  #--use_cond_p
 
 
 
