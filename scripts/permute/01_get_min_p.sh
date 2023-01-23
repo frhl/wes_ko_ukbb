@@ -3,10 +3,10 @@
 # @description for each gene across all phenotypes figure out how many permutations are needed
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=calc_min_permutations
+#SBATCH --job-name=get_min_p
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/calc_min_permutations.log
-#SBATCH --error=logs/calc_min_permutations.errors.log
+#SBATCH --output=logs/get_min_p.log
+#SBATCH --error=logs/get_min_p.errors.log
 #SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
 
@@ -16,7 +16,7 @@ set -o nounset
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
-readonly rscript="scripts/permute/01_calc_min_permutations.R"
+readonly rscript="scripts/permute/01_get_min_p.R"
 
 # set parameters
 readonly min_mac=4
