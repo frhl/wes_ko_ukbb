@@ -30,7 +30,7 @@ readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_chr${chr
 readonly out_type="mt"
 
 readonly min_mac=4
-readonly genes="data/permute/overview/min_mac${min_mac}/phased_only/main_genes.tsv.gz"
+readonly genes="data/permute/overview/min_mac${min_mac}/main_genes.tsv.gz"
 
 mkdir -p ${out_dir}
 

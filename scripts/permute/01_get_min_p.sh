@@ -23,8 +23,9 @@ readonly min_mac=4
 readonly p_cutoff="5e-7"
 
 # directories and out paths
-readonly out_dir="data/permute/overview/min_mac${min_mac}/no_cond"
+readonly out_dir="data/permute/overview/min_mac${min_mac}"
 readonly out_prefix="${out_dir}/main"
+
 mkdir -p ${out_dir}
 
 set_up_rpy
