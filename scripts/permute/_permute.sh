@@ -68,9 +68,6 @@ readonly log_saige="${write_dir}/saige.log"
 readonly log_errors="${write_dir}/${gene}.errors.log"
 readonly log_saige_errors="${write_dir}/saige.errors.log"
 
-
-
-
 # check if permute gene even exists:
 if [ ! -f "${input_path}" ]; then
   raise_error "${input_path} does not exist."
@@ -433,7 +430,7 @@ wait_on_jids=""
 set_arr_phenos "binary"
 #arr_phenos=( "Alanine_aminotransferase_residual" "Calcium_residual" "WHR_adj_BMI" "BMI" "Apolipoprotein_B_residual")
 #arr_phenos=( "Alanine_aminotransferase_residual" )
-arr_phenos=( "CC_combined" "DEM_combined" "AD_combined" "BC_combined" )
+arr_phenos=( "spiro_visual_impairment_and_blindness" "spiro_epilepsy" )
 #arr_phenos=( "Alanine_aminotransferase_residual" "BMI" )
 
 if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then

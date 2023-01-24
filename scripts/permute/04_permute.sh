@@ -33,7 +33,7 @@ readonly grm_dir="data/saige/grm/input"
 readonly annotation="pLoF_damaging_missense"
 readonly input_path="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_chr${chr}_GENE.tsv.gz"
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_permuted_chr${chr}_GENE"
-readonly assoc_format="ukb_eur_wes_200k_maf0to5e-2_PHENO_ANNO"
+readonly assoc_format="ukb_eur_wes_200k_PHENO_ANNO"
 readonly grm_mtx="${grm_dir}/211102_long_ukb_wes_200k_sparse_autosomes_relatednessCutoff_0.125_1000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
 
