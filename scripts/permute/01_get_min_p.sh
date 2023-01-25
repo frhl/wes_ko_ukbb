@@ -22,6 +22,14 @@ readonly rscript="scripts/permute/01_get_min_p.R"
 readonly min_mac=4
 readonly p_cutoff="5e-7"
 
+# only permute genes from phentypes where we 
+# have a chance of detecting effecs
+readonly in_dir="data/permute/overview/min_mac4"
+readonly in_file="${in_dir}/phenotypes_with_5cis_5chets.txt.gz"
+
+# subset phenotypes
+readonly phenotypes=$( zcat ${in_file} | cut -f1 | tail -n +2 | tr "\n" ",")
+
 # directories and out paths
 readonly out_dir="data/permute/overview/min_mac${min_mac}"
 readonly out_prefix="${out_dir}/main"
@@ -31,9 +39,10 @@ mkdir -p ${out_dir}
 set_up_rpy
 Rscript ${rscript} \
   --out_prefix ${out_prefix} \
+  --phenotypes ${phenotypes} \
+  --use_cond_p \
   --cond "none" \
   --prs "prefer"
-  #--use_cond_p
 
 
 

@@ -35,9 +35,15 @@ main <- function(args){
     spa_full$annotation <- "pLoF_damaging_missense"    
     spa_full$prs <- ifelse(grepl("locoprs", spa_full$basename), "locoprs", NA)
 
+    # subset to selected phenotypes
+    phenotypes <- unlist(strsplit(args$phenotypes, split = ","))
+    phenotypes <- phenotypes[phenotypes!=""]
+    spa_full <- spa_full[spa_full$phenotype %in% phenotypes,]
+    write(paste("using", length(unique(spa_full$phenotype)), "phenotypes"), stdout())
+        
     # append to column if it does not exists
-    if (!"p.value_c" %in% colnames(spa_full)) spa_full$p.value_c <- NA
-    if (!"Tstat_c" %in% colnames(spa_full)) spa_full$Tstat_c <- NA
+    if (!"p.value_c" %in% colnames(spa_full)) spa_full$p.value_c <- spa_full$p.value
+    if (!"Tstat_c" %in% colnames(spa_full)) spa_full$Tstat_c <- spa_full$Tstat
 
     if (args$use_cond_p) {
        bool_c <- !is.na(spa_full$p.value_c)
@@ -58,7 +64,7 @@ main <- function(args){
         spa_full <- spa_full[!bool_discard,] 
     }
     
-    keep <- c("CHR","MarkerID","basename", "p.value", "Tstat", "p.value_c", "Tstat_c")
+    keep <- c("MarkerID","phenotype","CHR", "p.value", "Tstat", "p.value_c", "Tstat_c","annotation","pvalue", "tstat")
     spa_full <- spa_full[,..keep]
 
     # discard markers from files that are significant
@@ -91,9 +97,10 @@ main <- function(args){
 
 # add arguments
 parser <- ArgumentParser()
-parser$add_argument("--cond", default=NULL, required = TRUE, help = "Path to QCed SNPs")
-parser$add_argument("--prs", default=NULL, required = TRUE, help = "Path to QCed SNPs")
-parser$add_argument("--p_cutoff", default=NULL, required = FALSE, help = "Path to QCed SNPs")
+parser$add_argument("--cond", default=NULL, required = TRUE, help = "")
+parser$add_argument("--prs", default=NULL, required = TRUE, help = "")
+parser$add_argument("--phenotypes", default=NULL, required = TRUE, help = "string of phenotypes seperated by comma")
+parser$add_argument("--p_cutoff", default=NULL, required = FALSE, help = "")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 parser$add_argument("--use_cond_p", default=FALSE, action = "store_true", help = "Where should the results be written?")
 args <- parser$parse_args()

@@ -46,7 +46,7 @@ main <- function(args){
       pvalue_orig <- rep(NA, length(pvalue_orig))
     }
 
-    # write a matrix of t-statistics and p-values
+       # write a matrix of t-statistics and p-values
     out_t <- c(true_t, tstat)
     out_p <- c(true_p, pvalue)
     out_p_orig <- c(true_p, pvalue_orig)
@@ -56,6 +56,12 @@ main <- function(args){
     dt <- data.table(Tstat=out_t, p=out_p, p_orig=out_p_orig, out_marker, out_ac, is_permuted)
     outfile <- paste0(args$out_prefix, ".txt.gz")
     fwrite(dt, outfile, sep = "\t")
+    
+    # count how many times the original P-value could be found
+    idx_same_p <- which(true_p %in% dt$p[dt$is_permuted == 1])  
+    n_same_p <- length(idx_same_p)
+    idx_string <- paste0(idx_same_p, collapse = ",")
+    write(paste("\nThe permuted P-value is equal to the true P-value", n_same_p, "times (idx=",idx_string,"). Saving to", outfile), stdout())
 
     # calculate empirical P-value (note, need to ensure that
     # the correct side is evaluated). 
