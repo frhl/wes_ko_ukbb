@@ -1,3 +1,10 @@
-### Sun Nov 27 21:29:29 GMT 2022 ###
-3.8T data/prs 1.8T data/unphased 1.8T data/phased 759G data/saige 482G data/mt 401G data/tmp 182G data/conditional 33G data/knockouts 19G data/prephased 9.1G data/phenotypes 6.6G data/vep 4.3G data/simulation 2.9G data/permute 2.1G data/survival 717M data/samples 173M data/genes 15M data/geneset 2.0M data/post_hoc 1.4M data/help 35K data/intervals
+### Thu Dec 22 21:42:16 GMT 2022 ###
+4.5T data/tmp 2.5T data/unphased 2.5T data/phased 689G data/saige 683G data/mt 503G data/prs 446G data/conditional 43G data/knockouts 19G data/prephased 17G data/survival 13G data/phenotypes 6.6G data/vep 4.3G data/simulation 2.9G data/permute 717M data/samples 173M data/genes 15M data/geneset 8.5M data/post_hoc 35K data/intervals
 ### (end) ###
+### Sun Jan  1 22:58:30 GMT 2023 ###
+2.5T data/phased 2.4T data/unphased 707G data/saige 683G data/conditional 532G data/prs 276G data/mt 212G data/tmp 48G data/knockouts 19G data/prephased 17G data/survival 13G data/phenotypes 7.7G data/test 6.6G data/vep 4.3G data/simulation 2.9G data/permute 717M data/samples 173M data/genes 15M data/geneset 12M data/post_hoc 35K data/intervals
+### (end) ###
+### Wed Jan 18 14:04:15 GMT 2023 ###
+4.8T data/tmp 3.1T data/unphased 2.5T data/phased 1.7T data/saige 1.1T data/prs 684G data/conditional 277G data/mt 48G data/knockouts 19G data/prephased 17G data/survival 14G data/test 13G data/phenotypes 6.6G data/vep 4.3G data/simulation 2.9G data/permute 717M data/samples 173M data/genes 34M data/post_hoc 15M data/geneset 35K data/intervals
+### (end) ###
+### Wed Jan 25 16:47:30 GMT 2023 ###
