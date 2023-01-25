@@ -61,7 +61,7 @@ main <- function(args){
     idx_same_p <- which(true_p %in% dt$p[dt$is_permuted == 1])  
     n_same_p <- length(idx_same_p)
     idx_string <- paste0(idx_same_p, collapse = ",")
-    write(paste("\nThe permuted P-value is equal to the true P-value", n_same_p, "times (idx=",idx_string,"). Saving to", outfile), stdout())
+    #write(paste("\nThe permuted P-value is equal to the true P-value", n_same_p, "times (idx=",idx_string,"). Saving to", outfile), stdout())
 
     # calculate empirical P-value (note, need to ensure that
     # the correct side is evaluated). 

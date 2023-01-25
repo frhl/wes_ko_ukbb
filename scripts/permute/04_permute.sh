@@ -9,7 +9,7 @@
 #SBATCH --error=logs/permute.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-2
+#SBATCH --array=1
 
 set -o errexit
 set -o nounset
@@ -46,7 +46,7 @@ readonly cond_genotypes="${cond_dir}/common_conditional.tsv.gz"
 readonly min_mac=4
 readonly n_replicates=1000
 readonly n_start_shuffle=1000 #1000
-readonly n_cutoff_shuffle=10000000
+readonly n_cutoff_shuffle=100000 #10000000
 readonly n_slots_saige=1
 readonly n_slots_permute=1
 readonly queue_saige="short"

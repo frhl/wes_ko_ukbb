@@ -2,7 +2,8 @@
 
 library(argparse)
 library(data.table)
-
+# for read_ukb_wes_kos(annotation = "pLoF_damaging_missense", chrom = 1)
+source("scripts/post_hoc/utils.R")
 
 # hash dosage as a string. This function simply concatenates all the dosgae counts
 # into a long string, and subsequently applies a hash to this string. 
@@ -60,6 +61,41 @@ shuffle_knockouts <- function(d){
 
     return(B)
 }
+
+# shuffle knockouts while preserving allele counts.
+shuffle_knockouts2 <- function(d, kos){
+
+    stopifnot("knockout" %in% colnames(kos))
+    stopifnot("s" %in% colnames(kos))
+ 
+    # get ids from the various grous
+    eid_cis <- kos$s[kos$knockout == "Compound heterozygote (cis)"]
+    eid_chet <- kos$s[kos$knockout == "Compound heterozygote"]
+    eid_both <- c(eid_cis, eid_chet)
+    eid_homs <- kos$s[kos$knockout == "Homozygote"]
+    
+    # to preserve the allele count we randomly assign chets between cis & chets
+    n_samples <- length(d$s)
+    v <- rep(0, n_samples)
+
+    # assign homs as these never change
+    v[which(d$s %in% eid_homs)] <- 1
+
+    # randomly assign chets to two-hit variants
+    n_chets <- length(eid_chet)
+    eid_sampled <- sample(eid_both, size = n_chets, replace = FALSE)
+    eid_not_sampled <- eid_both[!eid_both %in% eid_sampled]
+
+    # assing these to be our new knockouts
+    v[which(d$s %in% eid_sampled)] <- 1
+
+    # these are our new cis
+    v[which(d$s %in% eid_not_sampled)] <- 0
+    return(v)
+}
+
+
+
 
 # make header of VCF file
 make_vcf_dosage_header <- function(chrom){
@@ -188,11 +224,18 @@ main <- function(args){
     seed <- as.numeric(args$seed)
     set.seed(seed)
 
+    # read knockouts
+    ko_chrom <- gsub("chr","",args$chrom)
+    kos <- read_ukb_wes_kos(annotation = "pLoF_damaging_missense", chrom = ko_chrom)
+    kos <- kos[!kos$knockout %in% "Heterozygote",]
+    kos <- kos[kos$gene_id %in% args$vcf_id,]
+    stopifnot(nrow(kos) > 0)
+
     # replicate knockout
     n <- as.numeric(args$permutations)
     d <- fread(args$input_path)
     stopifnot(nrow(d) > 0)
-    reps <- replicate(n, shuffle_knockouts(d))
+    reps <- replicate(n, shuffle_knockouts2(d, kos))
     rownames(reps) <- d$s
     reps <- data.table(t(reps))
 
@@ -309,7 +352,7 @@ parser$add_argument("--only_non_prob_ko", action="store_true", default=FALSE, he
 parser$add_argument("--remove_invariant_markers", action="store_true", default=FALSE, help = "Remove markers with AC == 0.")
 parser$add_argument("--enable_cond_pipeline", action="store_true", default=FALSE, help = "Allow the use of conditional markers")
 parser$add_argument("--seed", default=NULL, help = "seed for randomizer")
-parser$add_argument("--vcf_id", default="GENE", help = "Substitute for rsid")
+parser$add_argument("--vcf_id", default="GENE", help = "Substitute for rsid (this is just the gene id string)")
 parser$add_argument("--out_prefix", default=NULL, help = "prefix for out file")
 args <- parser$parse_args()
 
