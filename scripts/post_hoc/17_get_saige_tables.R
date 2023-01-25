@@ -14,48 +14,6 @@ ensembl_to_contig <- bridge$chromosome_name
 names(ensembl_to_contig) <- bridge$ensembl_gene_id
 
 
-list_files_saige <- function(cond="none", prs="include", regex = "\\.txt\\.gz"){
-
-    # set up paths
-    wd <- "/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb"
-    step2_dir <- file.path(wd, "data/saige/output/binary/step2/min_mac4")
-    step2_common_dir <- file.path(wd, "data/saige/output/binary/step2_common/min_mac4")
-    step2_rare_dir <- file.path(wd, "data/saige/output/binary/step2_rare_cond/min_mac4")
-    step2_combined_dir <- file.path(wd, "data/saige/output/binary/step2_rare_cond/min_mac4")
-    #step2_collapsed_dir <- file.path(wd, "data/saige/output/binary/step2_collapsed/min_mac4")
-    
-    # subset paths based on condions
-    if (cond %in% "none"){
-        files <- list.files(step2_dir, full.names = TRUE, pattern = regex)
-    } else if (cond %in% "common"){
-        files <- list.files(step2_common_dir, full.names = TRUE, pattern = regex)
-    } else if (cond %in% "rare"){
-        files <- list.files(step2_rare_dir, full.names = TRUE, pattern = regex)
-    } else if (cond %in% "combined"){
-        files <- list.files(step2_combined_dir, full.names = TRUE, pattern = regex)
-    } else {
-        stop(paste(cond, "is not a valid. Try 'none','common','rare' or 'combined'"))
-    }
-    
-    # perform final subset by PRS
-    files <- sort(files)
-    is_prs <- grepl("locoprs.txt.gz", files)
-    if (prs %in% "include"){
-        return(files)
-    } else if (prs %in% "exclude"){
-        # exclude any PRS files
-        return(files[!is_prs])
-    } else if (prs %in% "only") {
-        # only include PRS
-        return(files[is_prs])
-    } else if (prs %in% "prefer") {
-        return(gwastools::unique_but_prefer_regex(files, regex="_locoprs"))
-    } else {
-        stop(paste(prs, "is not valid. Must be either 'include','exclude','prefer' or 'only'."))
-    }
-    
-}
-
 process_saige_df <- function(d, f){
     # deal with conditional P-values
     if ("p.value_c" %in% colnames(d)) {
@@ -124,7 +82,7 @@ main <- function(args){
     header <- fread(path_header, header=FALSE)$V1
 
     # get files
-    files <- list_files_saige(cond = args$cond, prs = args$prs)
+    files <- gwastools::list_files_saige(cond = args$cond, prs = args$prs)
     print(head(files))
     
     # read files and format

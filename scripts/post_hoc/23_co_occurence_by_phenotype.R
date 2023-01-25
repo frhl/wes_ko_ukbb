@@ -15,6 +15,9 @@ main <- function(args){
     # iterate over phenotypes
     df_phenotype <- fread(path_phenotypes)
     phenotypes <- readLines(path_header)
+    
+    # for time to event we need to add this column
+    if (!"s" %in% colnames(phenotypes)) phenotypes$s <- phenotypes$eid
 
     # read knockouts
     d <- read_ukb_wes_kos(annotation = annotation, chromosomes = chrom)

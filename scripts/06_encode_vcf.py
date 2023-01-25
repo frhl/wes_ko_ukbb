@@ -128,7 +128,7 @@ def main(args):
         prob = prob.checkpoint(out_prefix + ".mt", overwrite=True)
 
     # write out variants involved and vcf
-    #io.export_table(prob, out_prefix, out_type)
+    io.export_table(prob, out_prefix, out_type)
     if not only_vcf:
         genes = genes.filter_entries(hl.is_defined(genes.knockout)).entries()
         if aggr_method == "collect":

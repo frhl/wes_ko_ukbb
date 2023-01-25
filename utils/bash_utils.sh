@@ -4,6 +4,9 @@
 export PATH="${HOME}/htslib_1.11/bin:${PATH}"   # path to htslib 1.11
 
 
+
+
+
 # utility functions
 raise_error() {
   >&2 echo -e "Error: $1. Exiting." && exit 1
@@ -19,6 +22,10 @@ get_chr() {
   else 
     raise_error "chromosome number must be between 1 and 24"
   fi
+}
+
+get_ukbb_free_disk() {
+  echo "$( df -h  "/well/lindgren-ukbb/projects/ukbb-11867" | tail -n1 | tr -s " " | cut -d" " -f4)"
 }
 
 elapsed_time() {
@@ -49,6 +56,15 @@ from_sci() {
     echo ${result}
   fi
 }
+
+stopifnot_file_exists() {
+  if [ ! -f $1 ]; then # check that VCF exists
+    raise_error "$1 does not exist"
+  elif [ ! -s $1 ]; then # check that VCF is not an empty file
+    raise_error "$1 exists but is empty"
+  fi
+}
+
 
 #vcf_check() {
 #  if [ ! -f $1 ]; then # check that VCF exists
@@ -220,7 +236,8 @@ set_up_ldpred2() {
   module load Anaconda3/2020.07
   module load java/1.8.0_latest
   source "/apps/eb/skylake/software/Anaconda3/2020.07/etc/profile.d/conda.sh"
-  conda activate bigsnpr-v1.11.6
+  #conda activate bigsnpr-v1.11.6
+  conda activate bigsnpr-v1.12.1
   set -eu
 }
 

@@ -14,9 +14,9 @@ source utils/qsub_utils.sh
 
 readonly rscript="scripts/post_hoc/20_clinvar_evidence.R"
 readonly out_dir="derived/tables/clinvar"
-readonly out_prefix="${out_dir}/clinvar"
+readonly out_prefix="${out_dir}/176k_clinvar"
 
-readonly path_sig_hits="data/post_hoc/results/165k_saige_cond_sig_subset_prefer_prs.txt.gz"
+readonly path_sig_hits="data/post_hoc/results/176k_saige_cond_sig_subset_prefer_prs.txt.gz"
 readonly path_clinvar="data/knockouts/alt/pp90/clinvar_alleles/ukb_eur_wes_200k_clinvar_chrCHR.txt.gz"
 readonly path_phenotype="data/phenotypes/dec22_phenotypes_binary_200k.tsv.gz"
 readonly path_info="data/mt/prefilter/final_90_loftee/ukb_wes_union_calls_200k_chrCHR.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.csqs.txt.gz"

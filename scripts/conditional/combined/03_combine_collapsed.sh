@@ -9,7 +9,7 @@
 #SBATCH --error=logs/combine_collapsed.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=20-22
+#SBATCH --array=1-19
 # --dependency="aftercorr:10270075"
 #
 #$ -N combine_collapsed
@@ -38,7 +38,8 @@ readonly chr="$( get_chr ${array_idx} )"
 readonly variants_dir="data/mt/annotated"
 
 # note: assuming ko and rare variants have already been merged
-readonly ko_dir="data/knockouts/alt/pp90/combined"
+#readonly ko_dir="data/knockouts/alt/pp90/combined"
+readonly ko_dir="data/knockouts/alt/pp90/only_homs"
 readonly collpased_dir="data/mt/dosages_urv/pp90"
 readonly rare_dir="data/mt/dosages_urv/pp90"
 readonly common_dir="data/conditional/common/markers"
@@ -62,7 +63,7 @@ readonly common_type="mt"
 
 readonly markers_common="${common_path_wo_ext}.markers"
 
-readonly out_dir="data/conditional/combined/combine_collapsed_urv"
+readonly out_dir="data/conditional/combined/combine_collapsed_urv_homs_only"
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense"
 readonly out_type="vcf"
 readonly out="${out_prefix}.vcf.bgz"
