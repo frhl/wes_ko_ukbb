@@ -7,11 +7,10 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/split_wes.log
 #SBATCH --error=logs/split_wes.errors.log
-#SBATCH --partition=short
+#SBATCH --partition=epyc
 #SBATCH --cpus-per-task 2
 #SBATCH --array=1-22
 
-# --dependency="afterok:8444324"
 #
 #$ -N split_wes
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

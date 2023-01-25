@@ -68,9 +68,6 @@ readonly log_saige="${write_dir}/saige.log"
 readonly log_errors="${write_dir}/${gene}.errors.log"
 readonly log_saige_errors="${write_dir}/saige.errors.log"
 
-
-
-
 # check if permute gene even exists:
 if [ ! -f "${input_path}" ]; then
   raise_error "${input_path} does not exist."
@@ -86,7 +83,7 @@ touch ${status_phenos}
 set_arr_phenos() {
   trait=${1}
   if [ ! -z ${pheno_dir} ]; then
-    local pheno_bin="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
+    local pheno_bin="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
     local pheno_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
     readarray -t arr_bin < ${pheno_bin}
     readarray -t arr_cts < ${pheno_cts}
@@ -270,7 +267,7 @@ submit_merge() {
   local slurm_queue="${queue_merge}"
   local slurm_nslots="1"
   merge_jid=$( sbatch \
-    ${spa_jid:+--dependency="afterany:${spa_jid}"} \
+    ${spa_jid:+--dependency="afterok:${spa_jid}"} \
     --account="${slurm_project}" \
     --job-name="${slurm_jname}" \
     --output="${slurm_lname_o}" \
@@ -433,7 +430,8 @@ wait_on_jids=""
 set_arr_phenos "binary"
 #arr_phenos=( "Alanine_aminotransferase_residual" "Calcium_residual" "WHR_adj_BMI" "BMI" "Apolipoprotein_B_residual")
 #arr_phenos=( "Alanine_aminotransferase_residual" )
-arr_phenos=( "CC_combined" "DEM_combined" "AD_combined" "BC_combined" )
+#arr_phenos=( "spiro_visual_impairment_and_blindness" "spiro_epilepsy" )
+arr_phenos=( "spiro_visual_impairment_and_blindness" )
 #arr_phenos=( "Alanine_aminotransferase_residual" "BMI" )
 
 if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then

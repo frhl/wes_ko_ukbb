@@ -10,31 +10,24 @@ fread_phased_sites <- function(file, ...){
 
     # get details about chunks
     bname <- basename(file)
-    chunk_current <- as.numeric(gsub("of","",stringr::str_extract(bname, "[0-9]+of")))
-    chunk_final <- as.numeric(gsub("of","",stringr::str_extract(bname, "of[0-9]+")))
     method <- unlist(strsplit(bname, split = '_'))[1]
-    phasing_region_size <- as.numeric(gsub("_prs","",stringr::str_extract(bname, "_prs[0-9]+")))
-    phasing_overlap_size <- as.numeric(gsub("_pro","",stringr::str_extract(bname, "_pro[0-9]+")))
-    max_phasing_region_size <- as.numeric(gsub("_mprs","",stringr::str_extract(bname, "_mprs[0-9]+")))
 
     # append to data.table
     d <- fread(file, ...)
-    if (! ("AC" in colnames(d))) stop(paste("column AC not in file:", file))
-    if (! ("AN" in colnames(d))) stop(paste("column AN not in file:", file))
+    cnames <- colnames(d)
+    d$AC <- d$info.AC
+    d$AN <- d$info.AN
+    d$info.AC <- NULL
+    d$info.AN <- NULL
 
+    # check that columns are OK
     d$AN_m_AC <- as.numeric(d$AN - d$AC)
     d$MAC <- as.numeric(apply(d[,c("AC","AN_m_AC")], 1, min))
     d$locus <- paste0(d$CHR,":",d$POS)
-    d$chunk_current <- chunk_current
-    d$chunk_final <- chunk_final
     d$method <- method
-    d$phasing_region_size <- phasing_region_size
-    d$phasing_overlap_size <- phasing_overlap_size
-    d$max_phasing_region_size <- max_phasing_region_size
     return(d)
 
 }
-
 
 # aggregate switch errors by chromosome and minor allele frequency bins
 aggregate_by_chrom <- function(files, variants){
@@ -49,29 +42,49 @@ aggregate_by_chrom <- function(files, variants){
     return(lst)
 }
 
-# same as above, but also aggregate my selected MAF bin
-aggregate_by_chrom_and_maf_bin <- function(files, maf_bin, variants){
+# aggregate by MAC by CHROM
+aggregate_by_mac_chrom <- function(files, mac_bins, mac_bins_labels, variants){
+    stopifnot((length(mac_bins)-1) == length(mac_bins_labels))
+    stopifnot(all(mac_bins>=0))
     lst <- lapply(files, function(file){
         d <- fread_phased_sites(file)
         d$wes_variant <- d$locus %in% variants$locus
-        d$maf_bin <- cut(d$MAF, breaks = maf_bin)
-        counts <- aggregate(switches ~ wes_variant + maf_bin + CHR, data = d, FUN = sum)
-        tested <- aggregate(switches ~ wes_variant + maf_bin + CHR, data = d, FUN = length)
+        d$mac_bin <- cut(d$MAC, breaks = mac_bins, labels = mac_bins_labels)
+        counts <- aggregate(switches ~ wes_variant + mac_bin + CHR, data = d, FUN = sum)
+        tested <- aggregate(switches ~ wes_variant + mac_bin + CHR, data = d, FUN = length)
         counts <- data.table(counts, tested = tested$switches)
         return(counts)
     })
     return(lst)
 }
 
-aggregate_by_chrom_and_mac_bin <- function(files, mac_bin, variants){
+# aggregate by across chromsomes
+aggregate_by_mac <- function(files, mac_bins, mac_bins_labels, variants){
+    stopifnot((length(mac_bins)-1) == length(mac_bins_labels))
+    stopifnot(all(mac_bins>=0))
+    dt <- do.call(rbind, lapply(files, function(f){
+        d <- fread_phased_sites(f)
+        d$wes_variant <- d$locus %in% variants$locus
+        d$mac_bin <- cut(d$MAC, breaks = mac_bins, labels = mac_bins_labels)
+        return(d)
+    }))
+    counts <- aggregate(switches ~ wes_variant + mac_bin, data = dt, FUN = sum)
+    tested <- aggregate(switches ~ wes_variant + mac_bin, data = dt, FUN = length)
+    counts <- data.table(counts, tested = tested$switches)
+    return(counts)
+}
+
+# get errors by gene (how many genes are perfectly phased)
+aggregate_errors_by_gene <- function(files, variants){
     lst <- lapply(files, function(file){
+        print(file)
         d <- fread_phased_sites(file)
         d$wes_variant <- d$locus %in% variants$locus
-        d$mac_bin <- cut(d$MAC, breaks = mac_bin)
-        counts <- aggregate(switches ~ wes_variant + mac_bin + CHR, data = d, FUN = sum)
-        tested <- aggregate(switches ~ wes_variant + mac_bin + CHR, data = d, FUN = length)
-        counts <- data.table(counts, tested = tested$switches)
-        return(counts)
+        d <- d[d$wes_variant == TRUE,]
+        chrom <- gsub("chr","",unique(d$CHR))
+        d <- get_switch_error_per_gene(pos = d$POS, switches = d$switches, chrom = chrom)
+        d$chr <- paste0("chr",chrom)
+        return(d)
     })
     return(lst)
 }
@@ -90,165 +103,71 @@ calc_binom_ci <- function(lst){
 
 main <- function(args){
 
-    # parser
-    stopifnot(dir.exists(args$ligated_dir))
-    stopifnot(dir.exists(dirname(args$out_prefix)))
-    stopifnot(file.exists(args$sites))
-    maf_bins <- c(1, 10^-(1:8))
-    mac_bins <- c(Inf,1000, 100, 30, 20, 10, 5,3,1,0)
-    print(maf_bins)
-
-    # get WES sites 
-    variants <- fread(args$sites) 
-   
-    # get files 
-    files <- list.files(args$ligated_dir, pattern = ".txt", full.names = TRUE)
-    if (!is.null(args$files_regex)) files <- files[grepl(args$files_regex, files)]
+    stopifnot(dir.exists(args$switch_dir))
+    files <- list.files(args$switch_dir, pattern = args$switch_file)
+    files <- file.path(args$switch_dir, files)
+    print(files)
     stopifnot(length(files) > 0)
-    autosomes <- paste0("chr",1:22)
-   
+    stopifnot(length(files) > 21)  
 
+    sites <- args$sites
+    out_prefix <- args$out_prefix
+
+    # read wes variants
+    sites <- "/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list"
+    variants <- fread(sites) 
+
+    # get switch errors per gene
+    lst_by_gene <- aggregate_errors_by_gene(files, variants)
+    counts_by_gene <- do.call(rbind, lst_by_gene)
+    counts_by_gene$wes_label <- "wes"
+    
+    out_gene <- paste0(out_prefix, "_gene.txt.gz")
+    fwrite(counts_by_gene, out_gene, sep = "\t")
+    write(paste("writing",out_gene), stderr())
+
+    stop("stopped here")
+
+    # create mac bin labels
+    bins <- c(0,1,5,10,20,50,100,200,500,1000,2000,5000, 10000, Inf)
+    labels <- unlist(lapply(2:length(bins), function(i){paste0(bins[i-1]+1,"-",bins[i])}))
+    labels[labels == '1-1'] <- "singleton"
+
+    # combine by chromosome
     lst_by_chrom <- aggregate_by_chrom(files, variants = variants)
     counts_by_chrom <- calc_binom_ci(lst_by_chrom)
-    counts_by_chrom$wes_label <- ifelse(counts_by_chrom$wes_variant, "Whole Exome Sequencing","Genotyping Array")
+    counts_by_chrom$wes_label <- ifelse(counts_by_chrom$wes_variant, "wes","array")
 
-    # *** plot switch errors by chromosome ***
-    #p1 <- ggplot(counts_by_chrom,
-    #   aes(
-    #       y=factor(CHR, levels = autosomes),
-    #       x=100*pointest,
-    #       xmax = 100*upper,
-    #       xmin = 100*lower,
-    #       color = factor(wes_label)
-    #   )) +
-    #theme_bw() +
-    #geom_pointrange() + 
-    #labs(color = "") +
-    #xlab('% Switch Error Rate (95% CI)') + ylab('') +
-    #scale_color_d3('category20c', limits=NULL) +
-    #scale_x_continuous(breaks=scales::pretty_breaks(n=10)) +
-    #theme(
-    #    legend.position = "top",
-    #    axis.text=element_text(size=10),
-    #    axis.title=element_text(size=10,face="bold"),
-    #    axis.title.x = element_text(margin=ggplot2::margin(t=10)),
-    #    axis.title.y = element_text(margin=ggplot2::margin(r=10)),
-    #    plot.title = element_text(hjust=0.5)
-    #) 
+    out_chrom <- paste0(out_prefix, "_chrom.txt.gz")
+    fwrite(counts_by_chrom, out_chrom, sep = "\t")
+    write(paste("writing",out_chrom), stderr())
 
-    out_p1 <- paste0(args$out_prefix, "_ser_by_chrom")
-    #out_p1_img <- paste0(out_p1, ".png")
-    out_p1_txt <- paste0(out_p1, ".txt.gz")
-    #ggsave(p1, out_p1_img, width = 10, height = 8)
-    fwrite(counts_by_chrom, out_p1_txt, sep = "\t")
-    write(paste("writing",out_p1_txt), stderr())
+    # aggregate by mac bin and chromosome
+    lst_by_mac_chrom <- aggregate_by_mac_chrom(files, bins, labels, variants)
+    counts_by_mac_chrom <- calc_binom_ci(lst_by_mac_chrom)
+    counts_by_mac_chrom$wes_label <- ifelse(counts_by_mac_chrom$wes_variant, "wes","array")
 
-    # *** plot switch errors by chrom and MAF ****
-    lst_by_chrom_by_maf = aggregate_by_chrom_and_maf_bin(files, maf_bins, variants) 
-    counts_by_chrom_by_maf <- calc_binom_ci(lst_by_chrom_by_maf)
-    counts_by_chrom_by_maf$wes_label <- ifelse(counts_by_chrom_by_maf$wes_variant, "Whole Exome Sequencing","Genotyping Array")
-    
-    #p2 <- ggplot(counts_by_chrom_by_maf,
-    #       aes(
-    #           y=maf_bin,
-    #           x=100*pointest,
-    #           xmax = 100*upper,
-    #           xmin = 100*lower,
-    #           color = factor(wes_label)
-    #       )) +
-    #    theme_bw() +
-    #    geom_pointrange() + 
-    #    labs(color = "") +
-    #    xlab('% Switch Error Rate (95% CI)') + ylab('') +
-    #    scale_color_d3('category20c', limits=NULL) +
-    #    scale_x_continuous(breaks=scales::pretty_breaks(n=10)) +
-    #    facet_wrap(~factor(CHR, levels = autosomes)) +
-    #    coord_cartesian(xlim=c(0, 2)) +
-    #    theme(
-    #        legend.position = "top",
-    #        axis.text=element_text(size=10),
-    #        axis.title=element_text(size=10,face="bold"),
-    #        axis.title.x = element_text(margin=ggplot2::margin(t=10)),
-    #        axis.title.y = element_text(margin=ggplot2::margin(r=10)),
-    #        plot.title = element_text(hjust=0.5)
-    #    ) 
+    out_mac_chrom <- paste0(out_prefix, "_mac_chrom.txt.gz")
+    fwrite(counts_by_chrom, out_mac_chrom, sep = "\t")
+    write(paste("writing",out_mac_chrom), stderr())
 
-    out_p2 <- paste0(args$out_prefix, "_ser_by_maf_chrom")
-    #out_p2_img <- paste0(out_p2, ".png")
-    out_p2_txt <- paste0(out_p2, ".txt.gz")
-    #ggsave(p2, out_p2_img, width = 10, height = 8)
-    write(paste("writing",out_p2_txt), stderr())
-    fwrite(counts_by_chrom, out_p2_txt, sep = "\t")
+    # aggregate by mac bin
+    dt_by_mac <- aggregate_by_mac(files, bins, labels, variants)
+    counts_by_mac <- calc_binom_ci(list(dt_by_mac))
+    counts_by_mac$wes_label <- ifelse(counts_by_mac$wes_variant, "wes","array")
 
-
-    # *** counts by maf bin across all chromosomes ***
-    aggr_d <- counts_by_chrom_by_maf
-    aggr_switches <- aggregate(switches ~ wes_variant + maf_bin, data = aggr_d, FUN = sum)
-    aggr_tested <- aggregate(tested ~ wes_variant + maf_bin, data = aggr_d, FUN = sum)
-    aggr_counts <- data.table(aggr_switches, tested = aggr_tested$tested)
-    aggr_counts <- calc_binom_ci(list(aggr_counts))
-    aggr_counts$wes_label <- ifelse(aggr_counts$wes_variant, "Whole Exome Sequencing","Genotyping Array")
-    print(table(aggr_counts$maf_bin))
-
-    #p3 <- ggplot(aggr_counts,
-    #       aes(
-    #           y=maf_bin,
-    #           x=100*pointest,
-    #           xmax = 100*upper,
-    #           xmin = 100*lower,
-    #           color = factor(wes_label)
-    #       )) +
-    #    theme_bw() +
-    #    geom_pointrange() + 
-    #    labs(color = "") +
-    #    xlab('% Switch Error Rate (95% CI)') + ylab('') +
-    #    scale_color_d3('category20c', limits=NULL) +
-    #    scale_x_continuous(breaks=scales::pretty_breaks(n=10)) +
-    #    theme(
-    #        legend.position = "top",
-    #        axis.text=element_text(size=10),
-    #        axis.title=element_text(size=10,face="bold"),
-    #        axis.title.x = element_text(margin=ggplot2::margin(t=10)),
-    #        axis.title.y = element_text(margin=ggplot2::margin(r=10)),
-    #        plot.title = element_text(hjust=0.5)
-    #    ) 
-    #
-    out_p3 <- paste0(args$out_prefix, "_ser_by_maf")
-    #out_p3_img <- paste0(out_p1, ".png")
-    out_p3_txt <- paste0(out_p3, ".txt.gz")
-    write(paste("writing",out_p3_txt), stderr())
-    #ggsave(p3, out_p3_img, width = 8, height = 6)
-    fwrite(aggr_counts, out_p3_txt, sep = "\t")
-
-
-    # *** counts by mac bin and ALL chromosomes ***
-    lst_by_chrom_by_mac <- aggregate_by_chrom_and_mac_bin(files, mac_bins, variants = variants)
-    aggr_d <- calc_binom_ci(lst_by_chrom_by_mac)
-    aggr_d$wes_label <- ifelse(aggr_d$wes_variant, "Whole Exome Sequencing","Genotyping Array")
-    aggr_switches <- aggregate(switches ~ wes_variant + mac_bin, data = aggr_d, FUN = sum)
-    aggr_tested <- aggregate(tested ~ wes_variant + mac_bin, data = aggr_d, FUN = sum)
-    aggr_counts <- data.table(aggr_switches, tested = aggr_tested$tested)
-    aggr_counts <- calc_binom_ci(list(aggr_counts))
-    aggr_counts$wes_label <- ifelse(aggr_counts$wes_variant, "Whole Exome Sequencing","Genotyping Array")
-    print(table(aggr_counts$mac_bin))
-
-    out_p4 <- paste0(args$out_prefix, "_ser_by_mac")
-    #out_p3_img <- paste0(out_p1, ".png")
-    out_p4_txt <- paste0(out_p3, ".txt.gz")
-    write(paste("writing",out_p4_txt), stderr())
-    #ggsave(p3, out_p3_img, width = 8, height = 6)
-    fwrite(aggr_counts, out_p4_txt, sep = "\t")
-
-
+    out_mac <- paste0(out_prefix, "_mac.txt.gz")
+    fwrite(counts_by_mac, out_mac, sep = "\t")
+    write(paste("writing",out_mac), stderr())
 
 
 }
 
 # add arguments
 parser <- ArgumentParser()
-parser$add_argument("--ligated_dir", default=NULL, required = TRUE, help = "The directory containing chunks (to be searched recursively)")
+parser$add_argument("--switch_dir", default=NULL, required = TRUE, help = "The directory containing chunks (to be searched recursively)")
+parser$add_argument("--switch_file", default=NULL, required = FALSE, help = "Perform a subset (regex) based on a string")
 parser$add_argument("--sites", default=NULL, required = TRUE, help = "path to quality controlled variant sites")
-parser$add_argument("--files_regex", default=NULL, required = FALSE, help = "Perform a subset (regex) based on a string")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()
 

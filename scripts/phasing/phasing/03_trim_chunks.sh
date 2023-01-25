@@ -19,7 +19,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 3
 #$ -q short.qc
-#$ -t 21
+#$ -t 20-22
 #$ -V
 
 set -o errexit
@@ -35,14 +35,30 @@ readonly spark_dir="data/tmp/spark"
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
-readonly main_dir="data/phased/wes_union_calls/200k/shapeit5/phase_rare/newrun"
-#readonly main_dir="data/phased/wes_union_calls/200k/whatshap/chunks/shapeit4"
-readonly in_dir="${main_dir}/ukb_wes_union_calls_shapeit5_200k_chr${chr}-20xshort"
-readonly in_prefix_regex="shapeit5_prs100000_pro25000_mprs150000" # need this for regex
 
-readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/trimmed"
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_shapeit5_200k_chr${chr}_trim"
+# For eagle2
+readonly main_dir="data/phased/wes_union_calls/200k/eagle2/chunks"
+readonly in_dir="${main_dir}/ukb_wes_union_calls_eagle2_200k_chr${chr}-20xlong"
+readonly in_prefix_regex="eagle2_prs100000_pro25000_mprs150000" 
+readonly out_dir="data/phased/wes_union_calls/200k/eagle2/trimmed"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_eagle2_200k_chr${chr}_trim"
 readonly out="${out_prefix}.vcf.bgz"
+
+# For SHAPEIT4
+#readonly main_dir="data/phased/wes_union_calls/200k/shapeit4/chunks"
+#readonly in_dir="${main_dir}/ukb_wes_union_calls_shapeit4_200k_chr${chr}-20xlong"
+#readonly in_prefix_regex="shapeit4_prs100000_pro25000_mprs150000" 
+#readonly out_dir="data/phased/wes_union_calls/200k/shapeit4/trimmed"
+#readonly out_prefix="${out_dir}/ukb_wes_union_calls_shapeit4_200k_chr${chr}_trim"
+#readonly out="${out_prefix}.vcf.bgz"
+
+# For SHAPEIT5
+#readonly main_dir="data/phased/wes_union_calls/200k/shapeit5/phase_rare/newrun"
+#readonly in_dir="${main_dir}/ukb_wes_union_calls_shapeit5_200k_chr${chr}-20xshort"
+#readonly in_prefix_regex="shapeit5_prs100000_pro25000_mprs150000" # need this for regex
+#readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/trimmed"
+#readonly out_prefix="${out_dir}/ukb_wes_union_calls_shapeit5_200k_chr${chr}_trim"
+#readonly out="${out_prefix}.vcf.bgz"
 
 #readonly main_dir="data/phased/wes_scaffold_calls/200k_from_500k/chunks/shapeit5"
 #readonly in_dir="${main_dir}/ukb_wes_union_calls_shapeit5_200k_from_500k_chr${chr}-16xshort"

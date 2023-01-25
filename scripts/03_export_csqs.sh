@@ -9,7 +9,7 @@
 #SBATCH --error=logs/export_csqs.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=20-22
+#SBATCH --array=1-21
 #SBATCH --requeue
 # 
 #$ -N export_csqs
@@ -44,6 +44,8 @@ readonly out_dir="data/mt/vep/worst_csq_by_gene_canonical"
 readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
 readonly out_saige="${out_prefix}.saige"
 
+readonly out_pp_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.pp90"
+readonly pp_cutoff="0.90"
 
 mkdir -p ${out_dir}
 
@@ -63,14 +65,31 @@ else
   >&2 echo "${out_prefix} already exists. Skipping.."
 fi 
 
+# Generate for variants after subsetting on PP
+if [ ! -f "${out_pp_prefix}.tsv.gz" ]; then
+  set_up_hail
+  set_up_pythonpath_legacy
+  python3 "${hail_script}" \
+     --in_file ${input_prefix}\
+     --in_type "mt" \
+     --out_prefix ${out_pp_prefix} \
+     --pp_cutoff ${pp_cutoff} \
+     --by "worst_csq_for_variant_canonical" \
+     --out_type "tsv" \
+     && print_update "Finished exporting csqs chr${chr} using PP_cutoff" ${SECONDS} \
+     || raise_error "Exporting csqs for chr${chr} using PP_cutoff failed"
+else
+  >&2 echo "${out_pp_prefix} already exists. Skipping.."
+fi
+
 
 # Generate SAIGE-GENE+ Group file consequence
 # annotations (SAIGE version > 0.99.2)
-module purge
-set_up_rpy
-Rscript ${rscript} \
-  --input_path "${out_prefix}.tsv.gz" \
-  --output_path "${out_saige}" \
-  --delimiter " "
+#module purge
+#set_up_rpy
+#Rscript ${rscript} \
+#  --input_path "${out_prefix}.tsv.gz" \
+#  --output_path "${out_saige}" \
+#  --delimiter " "
 
 

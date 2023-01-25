@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+#
+# We only want to permute phenotypes in which there is a significant assocation
+# and enough chets & multi-hit cis
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=get_phenos_to_run
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/get_phenos_to_run.log
+#SBATCH --error=logs/get_phenos_to_run.errors.log
+#SBATCH --partition=epyc
+#SBATCH --cpus-per-task 1
+
+set -o errexit
+set -o nounset
+
+source utils/bash_utils.sh
+source utils/qsub_utils.sh
+
+readonly rscript="scripts/permute/00_get_phenos_to_run.R"
+
+readonly sig_hits_dir="data/post_hoc/results"
+readonly sig_hits="${sig_hits_dir}/176k_saige_cond_sig_subset_prefer_prs.txt.gz"
+
+readonly out_dir="data/permute/overview/min_mac4"
+readonly out_prefix="${out_dir}/phenotypes_with_5cis_5chets"
+
+mkdir -p ${out_dir}
+
+set_up_rpy
+Rscript ${rscript} \
+  --min_chet 5 \
+  --min_cis 5 \
+  --path_sig_hits ${sig_hits} \
+  --out_prefix ${out_prefix}
+
+
+
+

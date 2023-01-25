@@ -7,7 +7,11 @@ set -o nounset
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
-readonly threads=$(( ${NSLOTS}-1 ))
+readonly cluster=$( get_current_cluster)
+readonly index=$( get_array_task_id )
+readonly chr=$( get_chr ${index} )
+readonly threads=( get_threads )
+
 readonly step2_SPAtests="utils/saige/step2_SPAtests_cond.R"
 readonly rscript="scripts/conditional/rare/_spa_cond_rare.R"
 
@@ -27,7 +31,7 @@ readonly out_prefix=${13?Error: Missing arg10 (out_prefix)}
 readonly cond_markers="${14}"
 readonly cond_annotation="${15}"
 
-readonly chr=${SLURM_ARRAY_TASK_ID}
+
 
 # Change CHR to current chromosome based on task-ID
 readonly gmat=$(echo ${in_gmat} | sed -e "s/CHR/${chr}/g")

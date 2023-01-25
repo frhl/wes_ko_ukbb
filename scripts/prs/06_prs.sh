@@ -5,10 +5,11 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/prs.log
 #SBATCH --error=logs/prs.errors.log
+#SBATCH --open-mode=append
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=120-160
-#
+#SBATCH --array=1-300
+# --begin=now+6hour
 #
 #$ -N prs
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -16,8 +17,8 @@
 #$ -e logs/prs.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q test.qc
-#$ -t 200-300
+#$ -q short.qc
+#$ -t 5
 #$ -V
 
 set -o errexit
@@ -28,15 +29,20 @@ source utils/qsub_utils.sh
 
 readonly bash_script="scripts/prs/_prs.sh"
 readonly rscript="scripts/prs/06_prs.R"
+readonly rscript_ldsc="scripts/prs/_check_ldsc.R"
 readonly clean_script="scripts/prs/_prs_clean.sh"
 readonly aggr_script="scripts/prs/_prs_aggr.sh"
 
 readonly ldsc_dir="data/prs/ldsc"
-readonly pred_dir="data/prs/hapmap/ukb_500k/validation"
+readonly pred_dir="data/prs/hapmap/ukb_500k_hm3/validation"
 readonly ld_dir="data/prs/hapmap/ld/matrix_unrel_kin"
 readonly pheno_dir="data/phenotypes"
-readonly out_dir="data/prs/scores/auto/test"
-readonly mrg_dir="data/prs/scores"
+readonly out_dir="data/prs/scores/auto"
+readonly mrg_dir="data/prs/scores_full"
+
+# do not run files that have h2 estimates
+# above the given p-value cutoff (nominal).
+readonly ldsc_pvalue_cutoff="0.05"
 
 readonly cluster=$( get_current_cluster )
 readonly index=$( get_array_task_id )
@@ -45,14 +51,15 @@ readonly file_cts="${pheno_dir}/curated_covar_phenotypes_cts.tsv.gz"
 readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
 readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
 
-readonly file_binary="${pheno_dir}/spiros_brava_phenotypes_binary_500k.tsv.gz"
-readonly pheno_list_binary="${pheno_dir}/spiros_brava_phenotypes_binary_500k_header.tsv"
+readonly file_binary="${pheno_dir}/dec22_phenotypes_binary_500k.tsv.gz"
+readonly pheno_list_binary="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
 readonly phenotype_binary=$( sed "${index}q;d" ${pheno_list_binary} )
 
 # ldpred2 parameters
 readonly impute="mean2"
 
 mkdir -p ${out_dir}
+mkdir -p ${mrg_dir}
 
 submit_ldpred2()
 { 
@@ -68,17 +75,23 @@ submit_ldpred2()
   local qsub_aggr="_aggr_${phenotype}"
   local qsub_clean="_clean_${phenotype}"
 
+  # submit phenotype
   if [ ! -z ${phenotype} ]; then
     if [ ! -f "${merged}" ]; then
-      # fit actual pgs
-      fit_pgs
-      # aggregate into matrix
-      aggr_pgs
+      # check that p-value passes thresholds
+      set_up_rpy
+      local pass_qc=$( Rscript ${rscript_ldsc} --ldsc ${ldsc} --ldsc_pvalue_cutoff ${ldsc_pvalue_cutoff} )
+      if [ "${pass_qc}" = "1" ]; then
+        fit_pgs
+        aggr_pgs
+        clean_pgs
+      else
+        >&2 echo "${phenotype} does not pass LDSC QC."
+      fi
     else
       >&2 echo "${merged} already exists. Skipping.."
     fi
     # remove disk backing files
-    clean_pgs
   fi
 
 }
@@ -93,8 +106,9 @@ fit_pgs()
   local sge_queue="short.qc"
   local slurm_tasks="${tasks}"
   local slurm_nslots="${nslots}"
+  fit_pgs_jid=""
   if [ "${cluster}" = "slurm" ]; then
-    readonly fit_pgs_jid=$( sbatch \
+    fit_pgs_jid=$( sbatch \
       --account="${slurm_project}" \
       --job-name="${prs_jname}" \
       --output="logs/${prs_lname}.log" \
@@ -102,6 +116,7 @@ fit_pgs()
       --chdir="$(pwd)" \
       --partition="${slurm_queue}" \
       --cpus-per-task="${slurm_nslots}" \
+      --open-mode=append \
       --array=${slurm_tasks} \
       --parsable \
       "${bash_script}" \
@@ -111,6 +126,7 @@ fit_pgs()
       "${ld_dir}" \
       "${method}" \
       "${impute}" \
+      "${ldsc_pvalue_cutoff}" \
       "${out_prefix}" )
   elif [ "${cluster}" = "sge" ]; then
     qsub -N "${prs_jname}" \
@@ -128,6 +144,7 @@ fit_pgs()
       "${ld_dir}" \
       "${method}" \
       "${impute}" \
+      "${ldsc_pvalue_cutoff}" \
       "${out_prefix}"
   else
     >&2 echo "${cluster} is not valid!"
@@ -139,7 +156,7 @@ fit_pgs()
 aggr_pgs()
 {
   readonly aggr_jname="${qsub_aggr}"
-  readonly aggr_lname="_prs_aggr"
+  readonly aggr_lname="_aggr_prs"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
   local sge_queue="short.qc"
@@ -155,6 +172,7 @@ aggr_pgs()
       --partition="${slurm_queue}" \
       --cpus-per-task="${slurm_nslots}" \
       --array=${slurm_tasks} \
+      --open-mode=append \
       --dependency="afterok:${fit_pgs_jid}" \
       --parsable \
       "${aggr_script}" \
@@ -168,8 +186,8 @@ aggr_pgs()
       -o "logs/${aggr_lname}.log" \
       -e "logs/${aggr_lname}.errors.log" \
       -pe shmem 1 \
-      -wd $(pwd) \
       -hold_jid "${qsub_fit}" \
+      -wd $(pwd) \
       "${aggr_script}" \
       "${phenotype}" \
       "${out_dir}" \
@@ -200,10 +218,11 @@ clean_pgs()
       --cpus-per-task="${slurm_nslots}" \
       --array=${slurm_tasks} \
       --dependency="aftercorr:${fit_pgs_jid}" \
+      --open-mode=append \
       --parsable \
       "${clean_script}" \
       "${pred}" \
-      "${out_prefix}" )
+      "${out_prefix}_new" )
   elif [ "${cluster}" = "sge" ]; then
     qsub -N "${qsub_clean}" \
       -t ${tasks} \
@@ -216,7 +235,7 @@ clean_pgs()
       -hold_jid_ad "${qsub_fit}" \
       "${clean_script}" \
       "${pred}" \
-      "${out_prefix}" 
+      "${out_prefix}_new" 
   else
     >&2 echo "${cluster} is not valid"
   fi

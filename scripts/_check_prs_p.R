@@ -15,7 +15,7 @@ main <- function(args){
 # add arguments
 parser <- ArgumentParser()
 parser$add_argument("--ldsc", default=NULL, help = "?")
-parser$add_argument("--p_cutoff", default=1e-5, help = "?")
+parser$add_argument("--p_cutoff", default=0.05, help = "?")
 args <- parser$parse_args()
 
 main(args)

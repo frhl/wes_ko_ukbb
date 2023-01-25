@@ -17,7 +17,8 @@ main <- function(args){
         pvalue = mrg$p.value,
         contig = mrg$chromosome_name,
         start = mrg$start_position - as.numeric(args$flanking_bp),
-        end = mrg$end_position + as.numeric(args$flanking_bp)
+        end = mrg$end_position + as.numeric(args$flanking_bp),
+        prs = grepl("locoprs", args$in_spa_fil)
      )
 
     # filter to signifcant entries
@@ -46,5 +47,4 @@ parser$add_argument("--phenotype", default=NULL, help = "Current phenotype")
 args <- parser$parse_args()
 
 main(args)
-
 

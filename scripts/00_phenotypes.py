@@ -10,6 +10,7 @@ def main(args):
     # parser
     input_path = args.input_path
     extract_samples = args.extract_samples
+    extract_phased_samples = args.extract_phased_samples
     export_header = args.export_header
     count_case_control = args.count_case_control
     only_males = args.only_males
@@ -24,6 +25,10 @@ def main(args):
     if extract_samples:
         samples = hl.import_table(extract_samples,no_header=True, key='f0',delimiter=',')
         ht = ht.filter(hl.is_defined(samples[ht.key]))
+
+    if extract_phased_samples:
+        phased_samples = hl.import_table(extract_phased_samples, no_header=True, key='f0')
+        ht = ht.filter(hl.is_defined(phased_samples[ht.key]))
 
     if only_females:
         ht = ht.filter(ht.sex == 1)
@@ -66,6 +71,7 @@ if __name__=='__main__':
     # initial params
     parser.add_argument('--input_path', default=None, help='Path to input phenotypes')
     parser.add_argument('--extract_samples', default=None, help='Path to dbNSFP annotations')
+    parser.add_argument('--extract_phased_samples', default=None, help='Path to dbNSFP annotations')
     parser.add_argument('--export_header', default=None, action='store_true', help='Path to dbNSFP annotations')
     parser.add_argument('--count_case_control', default=None, action='store_true', help='Path to dbNSFP annotations') 
     parser.add_argument('--only_males', default=None, action='store_true',  help='Path to dbNSFP annotations')

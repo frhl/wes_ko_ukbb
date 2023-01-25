@@ -8,9 +8,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/sig_gene_markers.log
 #SBATCH --error=logs/sig_gene_markers.errors.log
-#SBATCH --partition=short
+#SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-80
+#SBATCH --array=1-300
 #SBATCH --requeue
 
 
@@ -23,7 +23,6 @@ source utils/bash_utils.sh
 readonly rscript="scripts/conditional/rare/00_sig_gene_markers.R"
 
 # parameters
-readonly maf="0to5e-2"
 readonly min_mac=4
 # Note: we generally don't want to use PRS here, since this is just a filter
 # for how many genes to interrogate downstream. We will show PRS P-values regardless, 
@@ -46,7 +45,7 @@ mkdir -p ${out_dir}
 get_sig_gene_markers_binary()
 {
   local annotation="${1?Error: Missing arg1 (annotation)}"
-  local pheno_list="${pheno_dir}/filtered_phenotypes_binary_header.tsv"
+  local pheno_list="${pheno_dir}/spiros_brava_phenotypes_binary_200k_header.tsv"
   local phenotype=$( sed "${index}q;d" ${pheno_list} )
   submit_sig_genes "${annotation}" "${phenotype}" "binary"
 }
@@ -70,9 +69,9 @@ submit_sig_genes()
     if [ -f ${vep_path/CHR/21} ]; then
 
       # the possible paths that we can use
-      local in_file_loco="${step2_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}_locoprs.txt.gz"
-      local in_file_std="${step2_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}.txt.gz"
-      local out_prefix_std="${out_dir}/${in_prefix}_maf${maf}_${phenotype}_${annotation}"
+      local in_file_loco="${step2_dir}/${in_prefix}_${phenotype}_${annotation}_locoprs.txt.gz"
+      local in_file_std="${step2_dir}/${in_prefix}_${phenotype}_${annotation}.txt.gz"
+      local out_prefix_std="${out_dir}/${in_prefix}_${phenotype}_${annotation}"
 
       # depending on whether PRS is available select path
       if [ "${use_prs}" -eq "1" ] && [ -f "${in_file_loco}" ]; then

@@ -16,11 +16,13 @@ def main(args):
     by_explode = args.by_explode
     out_prefix = args.out_prefix
     out_type = args.out_type
+    pp_cutoff = args.pp_cutoff
 
     hail_init.hail_bmrc_init_local('logs/hail/get_csqs.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1')
-
-    mt = io.import_table(in_file, in_type)
+    mt = io.import_table(in_file, in_type, calc_info = False)
+    if pp_cutoff:
+        mt = mt.filter_entries(mt.PP >= float(pp_cutoff))
     mt = io.recalc_info(mt)
     if by_explode:
         mt = mt.explode_rows(mt.consequence.vep[by]) 
@@ -52,6 +54,7 @@ if __name__=='__main__':
     
     parser.add_argument('--in_file', default=None, required = True, help='Path to input')
     parser.add_argument('--in_type', default=None, required = True, help='Input type, either "mt", "vcf" or "plink"')
+    parser.add_argument('--pp_cutoff', default=None, required = True, help='float for phasing confidence cutoff.')
     parser.add_argument('--by', default=None, required = True, help='What should be used for gene annotation')
     parser.add_argument('--by_explode', action='store_true', help='What should be used for gene annotation')
     parser.add_argument('--out_prefix', default=None, required = True, help='Path prefix for output dataset')

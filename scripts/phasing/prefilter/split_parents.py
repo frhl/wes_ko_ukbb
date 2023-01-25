@@ -32,17 +32,15 @@ def main(args):
     
     # filter to subset of samples that are parents
     mt_parents = mt.filter_cols(hl.literal(pids).contains(mt.s))
-    mt_parents = mt_parents.filter_rows(~variants.get_invariant_expr(mt_parents)) 
-    mt_parents = io.recalc_info(mt_parents)
-    io.export_table(mt_parents, out_prefix + "_parents", "mt", auto_metadata=no_metadata)
+    #io.export_table(mt_parents, out_prefix + "_parents", "mt", auto_metadata=no_metadata)
     io.export_table(mt_parents, out_prefix + "_parents", out_type, auto_metadata=no_metadata)
     
     # filter to samples without parents
-    mt = mt.filter_cols(~hl.literal(pids).contains(mt.s))
-    mt = mt.filter_rows(~variants.get_invariant_expr(mt))
-    mt = io.recalc_info(mt)
-    io.export_table(mt, out_prefix + "_no_parents", "mt", auto_metadata=no_metadata) 
-    io.export_table(mt, out_prefix + "_no_parents", out_type, auto_metadata=no_metadata) 
+    #mt = mt.filter_cols(~hl.literal(pids).contains(mt.s))
+    #mt = mt.filter_rows(~variants.get_invariant_expr(mt))
+    #mt = io.recalc_info(mt)
+    #io.export_table(mt, out_prefix + "_no_parents", "mt", auto_metadata=no_metadata) 
+    #io.export_table(mt, out_prefix + "_no_parents", out_type, auto_metadata=no_metadata) 
 
 
 if __name__=='__main__':

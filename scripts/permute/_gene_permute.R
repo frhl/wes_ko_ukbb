@@ -24,15 +24,15 @@ naive_knockout_p <- function(hets){
 
 # fast way to calculate probability of being KO
 calc_knockout_p_fast <- function(d){
-    
-    # hom ref are always zero
+   
+     # hom ref are always zero
     d$P <- 0
     # hom alt are always one
     d$P[d$hom_alt_n > 1] <- 1
     # depends on count for phased hets
-    index <- which((d$phased_het > 1) & (d$hom_alt_n == 0))
+    index <- which((d$het_n > 1) & (d$hom_alt_n == 0))
     for (idx in index){
-        hets <- d$phased_het[idx]
+        hets <- d$het_n[idx]
         d$P[idx] <- naive_knockout_p(hets)
     }
     
@@ -43,12 +43,16 @@ calc_knockout_p_fast <- function(d){
 # simple method to shuffle knockouts
 shuffle_knockouts <- function(d){
     
+
+    # NOTE: we now use "het" instead of "phased_het"
     # header of d
     # gene_id   s   unphased_het    phased_het  hom_alt_n   het pTKO
     # <chr> <int>   <int>   <int>   <int>   <int>   <dbl>
     # ENSG00000027644   1000028 0   0   0   0   0
     # ENSG00000027644   1000034 0   0   0   0   0
     # ENSG00000027644   1000087 0   0   0   0   0
+    stopifnot('het_n' %in% colnames(d))
+    stopifnot('hom_alt_n' %in% colnames(d)) 
     
     n <- nrow(d)
     p <- calc_knockout_p_fast(d)

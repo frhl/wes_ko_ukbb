@@ -18,9 +18,15 @@ Suggests:
     testthat (>= 2.1.0)
 RoxygenNote: 7.1.2
 Collate:
+    'beta_power_curve.R'
     'get_expected_p.R'
     'get_int.R'
     'get_rint.R'
     'order_markers.R'
+    'list_files_saige.R'
     'residualize_trait.R'
     'residualize_trait_by_sex.R'
+    'unique_but_prefer_regex.R'
+
+
+

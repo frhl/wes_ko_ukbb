@@ -11,7 +11,7 @@
 #SBATCH --error=logs/wes_union_calls_parents.errors.log
 #SBATCH --partition=short
 #SBATCH --constraint="skl-compat"
-#SBATCH --cpus-per-task 3
+#SBATCH --cpus-per-task 12
 #SBATCH --array=1-22
 #
 #$ -N wes_union_calls_bcf
@@ -21,7 +21,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qe
-#$ -t 21
+#$ -t 20
 #$ -V
 
 set -o errexit
@@ -42,19 +42,18 @@ readonly in_wes_dir="data/unphased/wes/prefilter/200k"
 readonly in_wes_file="${in_wes_dir}/ukb_split_wes_200k_chr${chr}_parents.vcf.bgz"
 readonly in_wes_type="vcf"
 
-readonly in_calls_dir="data/unphased/calls/prefilter_no_maf_cutoff/200k"
+readonly in_calls_dir="data/unphased/calls/prefilter/200k"
 readonly in_calls_file="${in_calls_dir}/ukb_split_calls_200k_chr${chr}_parents.vcf.bgz"
 readonly in_calls_type="vcf"
 
 readonly prefix="ukb_wes_union_calls_chr${chr}_parents"
 #readonly out_dir="data/unphased/wes_union_calls/200k_from_500k"
-readonly out_dir="data/unphased/wes_union_calls/prefilter_no_maf_cutoff/200k"
+readonly out_dir="data/unphased/wes_union_calls/prefilter/200k"
 
 readonly tmp_prefix="${out_dir}/${prefix}_tmp"
 readonly tmp_file="${tmp_prefix}.vcf.bgz"
 readonly tmp_type="vcf"
 
-readonly sort_file="${out_dir}/${prefix}_sorted.vcf.gz"
 readonly out_file="${out_dir}/${prefix}.vcf.gz"
 
 readonly samples_list="data/unphased/overlap/ukb_calls_wes_samples.txt"
@@ -86,7 +85,6 @@ if [ ! -f "${out_file}" ]; then
     >&2 echo "${tmp_file} exists. Skipping."
   fi
   SECONDS=0
-
   module purge
   module load BCFtools/1.12-GCC-10.3.0
   
@@ -94,23 +92,11 @@ if [ ! -f "${out_file}" ]; then
   make_tabix "${tmp_file}" "tbi"
   
   # 3. combine the two tables by concatenating and sorting variants 
-  vcf_concat_sort ${tmp_file} ${in_wes_file} ${sort_file} ${tmp_write_dir} \
-  && print_update "Finished combining VCFs for chr${chr} using bcftools." "${SECONDS}" \
-  || raise_error "$( print_update "Combining VCFs for chr${chr} using bcftools failed." ${SECONDS} )"
-  make_tabix ${sort_file}
-
-  # 4. calculate AC/AN 
-  bcftools +fill-tags ${sort_file} -Oz -o ${out_file} -- -t AN,AC \
-  && print_update "Finished fill tags for chr${chr} using bcftools." "${SECONDS}" \
-  || raise_error "$( print_update "Fill tag for chr${chr} using bcftools failed." ${SECONDS} )"
+  vcf_concat_sort ${tmp_file} ${in_wes_file} ${out_file} ${tmp_write_dir}
   make_tabix ${out_file}
   
-  echo "Success. Writing to ${out_file}.."
-
   # 5. clean up temporary files
   if [ -f "${out_file}" ]; then
-    rm "${sort_file}" 
-    rm "${sort_file}.tbi"
     rm "${tmp_file}"
     rm "${tmp_file}.tbi"
   fi

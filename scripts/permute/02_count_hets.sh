@@ -8,9 +8,8 @@
 #SBATCH --output=logs/count_hets.log
 #SBATCH --error=logs/count_hets.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 2
-#SBATCH --array=1
-#SBATCH --requeue
+#SBATCH --cpus-per-task 1
+#SBATCH --array=1-22
 
 set -o errexit
 set -o nounset
@@ -21,15 +20,15 @@ source utils/hail_utils.sh
 readonly spark_dir="data/tmp/spark"
 readonly hail_script="scripts/permute/02_count_hets.py"
 
-readonly in_dir="data/mt/annotated"
+readonly in_dir="data/mt/prefilter/pp90"
 readonly out_dir="data/permute/counts"
 
 readonly chr="${SLURM_ARRAY_TASK_ID}"
-readonly input_path="${in_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.mt"
+readonly input_path="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.mt"
 readonly input_type='mt'
 
 readonly csqs="pLoF,damaging_missense"
-readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_phased_counts_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.counts"
 readonly out_type="mt"
 
 mkdir -p ${out_dir}
@@ -42,9 +41,7 @@ if [ ! -d "${out_prefix}.mt" ]; then
     --input_type ${input_type} \
     --out_prefix ${out_prefix} \
     --out_type ${out_type} \
-    --csqs_category ${csqs} \
-    --discard_unphased \
-    --use_loftee
+    --csqs_category ${csqs}
 else
   >&2 echo "${out_prefix}.mt already exists. Skipping.."
 fi

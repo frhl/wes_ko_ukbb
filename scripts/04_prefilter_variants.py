@@ -20,19 +20,12 @@ def main(args):
     maf_max = args.maf_max
     maf_min = args.maf_min
     exclude = args.exclude
-    use_loftee = args.use_loftee
     pp_cutoff = args.pp_cutoff
     partitions = args.partitions
 
     # import phased/unphased data
     hail_init.hail_bmrc_init('logs/hail/knockout.log', 'GRCh38')
     mt = io.import_table(input_path, input_type, calc_info = True) 
-   # check that all sites are phased
-    #unphased_expr = (~ko.is_phased(mt.GT)) & (hl.is_defined(mt.GT))
-    #unphased_sites = mt.aggregate_entries(hl.agg.sum(unphased_expr))
-    #if unphased_sites > 0:
-    #    raise ValueError(f"{unphased_sites} genotypes are not phased!")
-    # some filtering 
     if sex not in 'both':
         mt = samples.filter_to_sex(mt, sex)
     if maf_min:
@@ -62,18 +55,19 @@ def main(args):
         transcript_id=mt.consequence.vep[csqs_expr].transcript_id,
         consequence_category=ko.csqs_case_builder(
                 worst_csq_expr=mt.consequence.vep[csqs_expr],
-                use_loftee=use_loftee))
+                use_loftee=True))
 
-    # repartition
+    # repartition data
     if partitions:
         mt = mt.repartition(int(partitions))
- 
-    io.export_table(mt, out_prefix, out_type)
-    # export involved variants
-    #ht = mt.rows()
-    #ht.select(*[ht.info, ht.gene_id, ht.consequence_category])
-    #ht.flatten().export(out_prefix + ".txt.gz")
 
+    # export result
+    io.export_table(mt, out_prefix, out_type)
+    
+    # export info
+    ht = mt.rows()
+    ht = ht.select(*[ht.varid, ht.info, ht.consequence_category, ht.consequence.vep[csqs_expr]])
+    ht.flatten().export(out_prefix + ".csqs.txt.gz")
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
@@ -87,7 +81,6 @@ if __name__=='__main__':
     parser.add_argument('--exclude', default=None, help='exclude variants by rsid and/or variant id')
     parser.add_argument('--pp_cutoff', default=None, help='exclude variants by rsid and/or variant id')
     parser.add_argument('--partitions', default=None, help='Should the data be repartitioned')
-    parser.add_argument('--use_loftee', default=False, action='store_true', help='use LOFTEE to distinghiush between high confidence PTVs')
 
     args = parser.parse_args()
 

@@ -1,0 +1,78 @@
+2023-01-13 19:32:37 Hail: INFO: Running Hail version 0.2.102-817f6fb3468f
+2023-01-13 19:32:40 SparkContext: WARN: Using an existing SparkContext; some configuration may not take effect.
+2023-01-13 19:32:41 root: INFO: RegionPool: initialized for thread 28: Thread-5
+2023-01-13 19:32:42 root: INFO: globbing path /well/lindgren/flassen/ressources/clinvar/ftp//clinvar_20230107.vcf.gz returned 1 files: clinvar_20230107.vcf.gz
+2023-01-13 19:32:42 root: INFO: globbing path file:/well/lindgren/flassen/ressources/clinvar/ftp/clinvar_20230107.vcf.gz returned 1 files: clinvar_20230107.vcf.gz
+2023-01-13 19:32:42 root: INFO: RegionPool: FREE: 64.0K allocated (64.0K blocks / 0 chunks), regions.size = 1, 0 current java objects, thread 28: Thread-5
+2023-01-13 19:32:42 root: ERROR: HailException: Cannot load file 'file:/well/lindgren/flassen/ressources/clinvar/ftp/clinvar_20230107.vcf.gz'
+  .gz cannot be loaded in parallel. Is the file actually *block* gzipped?
+  If the file is actually block gzipped (even though its extension is .gz),
+  use the 'force_bgz' argument to treat all .gz file extensions as .bgz.
+  If you are sure that you want to load a non-block-gzipped file serially
+  on one core, use the 'force' argument.
+From is.hail.utils.HailException: Cannot load file 'file:/well/lindgren/flassen/ressources/clinvar/ftp/clinvar_20230107.vcf.gz'
+  .gz cannot be loaded in parallel. Is the file actually *block* gzipped?
+  If the file is actually block gzipped (even though its extension is .gz),
+  use the 'force_bgz' argument to treat all .gz file extensions as .bgz.
+  If you are sure that you want to load a non-block-gzipped file serially
+  on one core, use the 'force' argument.
+	at is.hail.utils.ErrorHandling.fatal(ErrorHandling.scala:17)
+	at is.hail.utils.ErrorHandling.fatal$(ErrorHandling.scala:17)
+	at is.hail.utils.package$.fatal(package.scala:78)
+	at is.hail.utils.package$.checkGzippedFile(package.scala:109)
+	at is.hail.io.vcf.LoadVCF$.$anonfun$globAllVCFs$1(LoadVCF.scala:1158)
+	at is.hail.io.vcf.LoadVCF$.$anonfun$globAllVCFs$1$adapted(LoadVCF.scala:1153)
+	at scala.collection.IndexedSeqOptimized.foreach(IndexedSeqOptimized.scala:36)
+	at scala.collection.IndexedSeqOptimized.foreach$(IndexedSeqOptimized.scala:33)
+	at scala.collection.mutable.ArrayOps$ofRef.foreach(ArrayOps.scala:198)
+	at is.hail.io.vcf.LoadVCF$.globAllVCFs(LoadVCF.scala:1153)
+	at is.hail.io.vcf.MatrixVCFReader$.apply(LoadVCF.scala:1590)
+	at is.hail.io.vcf.MatrixVCFReader$.fromJValue(LoadVCF.scala:1665)
+	at is.hail.expr.ir.MatrixReader$.fromJson(MatrixIR.scala:89)
+	at is.hail.expr.ir.IRParser$.matrix_ir_1(Parser.scala:1745)
+	at is.hail.expr.ir.IRParser$.$anonfun$matrix_ir$1(Parser.scala:1665)
+	at is.hail.utils.StackSafe$More.advance(StackSafe.scala:64)
+	at is.hail.utils.StackSafe$.run(StackSafe.scala:16)
+	at is.hail.utils.StackSafe$StackFrame.run(StackSafe.scala:32)
+	at is.hail.expr.ir.IRParser$.$anonfun$parse_matrix_ir$1(Parser.scala:2025)
+	at is.hail.expr.ir.IRParser$.parse(Parser.scala:2010)
+	at is.hail.expr.ir.IRParser$.parse_matrix_ir(Parser.scala:2025)
+	at is.hail.backend.spark.SparkBackend.$anonfun$parse_matrix_ir$2(SparkBackend.scala:692)
+	at is.hail.backend.ExecuteContext$.$anonfun$scoped$3(ExecuteContext.scala:70)
+	at is.hail.utils.package$.using(package.scala:635)
+	at is.hail.backend.ExecuteContext$.$anonfun$scoped$2(ExecuteContext.scala:70)
+	at is.hail.utils.package$.using(package.scala:635)
+	at is.hail.annotations.RegionPool$.scoped(RegionPool.scala:17)
+	at is.hail.backend.ExecuteContext$.scoped(ExecuteContext.scala:59)
+	at is.hail.backend.spark.SparkBackend.withExecuteContext(SparkBackend.scala:310)
+	at is.hail.backend.spark.SparkBackend.$anonfun$parse_matrix_ir$1(SparkBackend.scala:691)
+	at is.hail.utils.ExecutionTimer$.time(ExecutionTimer.scala:52)
+	at is.hail.utils.ExecutionTimer$.logTime(ExecutionTimer.scala:59)
+	at is.hail.backend.spark.SparkBackend.parse_matrix_ir(SparkBackend.scala:690)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at py4j.reflection.MethodInvoker.invoke(MethodInvoker.java:244)
+	at py4j.reflection.ReflectionEngine.invoke(ReflectionEngine.java:357)
+	at py4j.Gateway.invoke(Gateway.java:282)
+	at py4j.commands.AbstractCommand.invokeMethod(AbstractCommand.java:132)
+	at py4j.commands.CallCommand.execute(CallCommand.java:79)
+	at py4j.GatewayConnection.run(GatewayConnection.java:238)
+	at java.lang.Thread.run(Thread.java:748)
+
+
+
+2023-01-13 19:32:56 SparkContext: INFO: Invoking stop() from shutdown hook
+2023-01-13 19:32:57 AbstractConnector: INFO: Stopped Spark@4da3f6e1{HTTP/1.1, (http/1.1)}{0.0.0.0:4040}
+2023-01-13 19:32:57 SparkUI: INFO: Stopped Spark web UI at http://compa017.hpc.in.bmrc.ox.ac.uk:4040
+2023-01-13 19:32:57 MapOutputTrackerMasterEndpoint: INFO: MapOutputTrackerMasterEndpoint stopped!
+2023-01-13 19:32:57 MemoryStore: INFO: MemoryStore cleared
+2023-01-13 19:32:57 BlockManager: INFO: BlockManager stopped
+2023-01-13 19:32:57 BlockManagerMaster: INFO: BlockManagerMaster stopped
+2023-01-13 19:32:57 OutputCommitCoordinator$OutputCommitCoordinatorEndpoint: INFO: OutputCommitCoordinator stopped!
+2023-01-13 19:32:58 SparkContext: INFO: Successfully stopped SparkContext
+2023-01-13 19:32:58 ShutdownHookManager: INFO: Shutdown hook called
+2023-01-13 19:32:58 ShutdownHookManager: INFO: Deleting directory /tmp/spark-3ece21d3-c8ae-4535-b71e-f2d27b28c317
+2023-01-13 19:32:58 ShutdownHookManager: INFO: Deleting directory /gpfs3/well/lindgren/flassen/spark/default/spark-ef83ac76-dfc3-4714-97f1-8f86995756a5/pyspark-2451407e-4027-4b8c-acc5-39152f53ab05
+2023-01-13 19:32:58 ShutdownHookManager: INFO: Deleting directory /gpfs3/well/lindgren/flassen/spark/default/spark-ef83ac76-dfc3-4714-97f1-8f86995756a5

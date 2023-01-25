@@ -8,7 +8,7 @@
 #SBATCH --output=logs/append_vcf_rare.log
 #SBATCH --error=logs/append_vcf_rare.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 3
+#SBATCH --cpus-per-task 1
 #SBATCH --array=1-22
 
 
@@ -24,20 +24,17 @@ readonly spark_dir="data/tmp/spark"
 readonly hail_script="scripts/conditional/rare/01_append_vcf_rare.py"
 
 readonly chr="${SLURM_ARRAY_TASK_ID}"
-readonly variants_dir="data/mt/annotated"
-readonly ko_dir="data/knockouts/alt"
+readonly variants_dir="data/mt/prefilter/pp90"
+readonly ko_dir="data/knockouts/alt/pp90/combined"
 readonly out_dir="data/conditional/rare/combined/mt"
 
-readonly variants_path="${variants_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.mt"
-readonly input_path="${ko_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense.mt"
-readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_maf0to5e-2_pLoF_damaging_missense"
+readonly variants_path="${variants_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.mt"
+readonly input_path="${ko_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense.mt"
+readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense"
 readonly variants_type="mt"
 readonly input_type="mt"
 readonly out_type="vcf"
 
-readonly maf_max=0.05
-readonly maf_min=0.00
-readonly in_sex="both"
 readonly category="pLoF,damaging_missense"
 readonly exclude="data/genes/220310_common_plofs_to_exclude.txt"
 
@@ -58,11 +55,7 @@ if [  -d "${variants_path}" ]; then
        --out_type ${out_type} \
        --out_prefix ${out_prefix} \
        --csqs_category ${category} \
-       --maf_max $maf_max \
-       --maf_min $maf_min \
        --exclude $exclude \
-       --sex $in_sex \
-       --use_loftee \
        && print_update "Finished merging knockouts with markers ${out_prefix}" ${SECONDS} \
        || raise_error "Merging knockouts with markers for ${out_prefix} failed!"
   fi

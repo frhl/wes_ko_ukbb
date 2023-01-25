@@ -34,3 +34,4 @@ Collate:
     'qc_sumstat_binary.R'
     'qc_sumstat_cts.R'
     'snp_as_genetic_position.R'
+    'which_overlap.R'

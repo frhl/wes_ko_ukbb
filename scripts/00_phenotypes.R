@@ -117,6 +117,28 @@ main <- function(args){
         print(head(dt))
     }
 
+    # include BRAVA pgenotypes
+    if (args$include_lindgren) {
+        stopifnot(file.exists(args$input_path_cts_to_bin))
+        lindgren <- fread(args$input_path_cts_to_bin)
+        phenos <- c("BMI","WHR")
+        cols_keep <- colnames(lindgren) %in% c("eid","sex", phenos)
+        lindgren_phenos <- lindgren[,cols_keep,with=FALSE]
+        # define BMI cases
+        lindgren_phenos$lindgren_obesity <- NA
+        lindgren_phenos$lindgren_obesity[lindgren_phenos$BMI >= 35] <- TRUE
+        lindgren_phenos$lindgren_obesity[(lindgren_phenos$BMI >= 18.5) & (lindgren_phenos$BMI < 25)] <- FALSE
+        # define WHR cases
+        lindgren_phenos$lindgren_whr <- NA
+        lindgren_phenos$lindgren_whr[(lindgren_phenos$WHR >= 0.90) & (lindgren_phenos$sex == 1) ] <- TRUE # men case
+        lindgren_phenos$lindgren_whr[(lindgren_phenos$WHR >= 0.85) & (lindgren_phenos$sex == 0) ] <- TRUE # woman case
+        lindgren_phenos$lindgren_whr[(lindgren_phenos$WHR < 0.90) & (lindgren_phenos$sex == 1) ] <- FALSE # man ctrl
+        lindgren_phenos$lindgren_whr[(lindgren_phenos$WHR < 0.80) & (lindgren_phenos$sex == 0) ] <- FALSE # woman ctrl
+        lindgren_phenos <- lindgren_phenos[,c(1,5,6)]
+        dt <- merge(dt, lindgren_phenos, by = "eid", all.x = TRUE)
+        print(head(dt)) 
+    }
+
     if (!is.null(args$case_count_cutoff)) {    
         
         write("Removing phenotypes by case count cutoff", stderr())  
@@ -127,6 +149,7 @@ main <- function(args){
 
         # load samples that are QCed
         qc_samples <- fread(args$qc_samples)$V1
+        
 
         # discard phenotypes with less than 50 cases in quality controlled samples (200k)
         dt_subset_by_qced_samples <- dt[dt$eid %in% qc_samples,]
@@ -174,8 +197,6 @@ main <- function(args){
         dt <- cbind(dt, transformed_phenos)
     }
 
-
-
     # Finally write file
     nrow_dt <- nrow(dt)
     ncol_dt <- ncol(dt)
@@ -188,6 +209,7 @@ main <- function(args){
 parser <- ArgumentParser()
 parser$add_argument("--out_path", default=NULL, help = "Where should the file be written")
 parser$add_argument("--input_path", default=NULL, help = "Curated phenotypes input path")
+parser$add_argument("--input_path_cts_to_bin", default=NULL, help = "Path to cts phenotypes that should be made into binary (See notion 22-12-14)")
 parser$add_argument("--transform_method", default=NULL, help = "Transformation of residuals, either INT or RINT")
 parser$add_argument("--transform", default=NULL, help = "What phenotypes should be transformed?")
 parser$add_argument("--row_na_action", default="keep", help = "set to 'remove' to delete rows with missing covariates")
@@ -196,6 +218,7 @@ parser$add_argument("--qc_samples", default=NULL, help = "link to duncan's quali
 parser$add_argument("--case_count_cutoff", default=NULL, help = "Discard binary phenotypes with less than n cases.")
 parser$add_argument("--include_spiros", default=FALSE, action='store_true', help = "Include spiros phenotypes.")
 parser$add_argument("--include_brava", default=FALSE, action='store_true', help = "Include Brava phenotypes")
+parser$add_argument("--include_lindgren", default=FALSE, action='store_true', help = "Include cecilia's phenotypes")
 args <- parser$parse_args()
 
 main(args)

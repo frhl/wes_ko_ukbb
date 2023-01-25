@@ -41,6 +41,7 @@ main <- function(args){
 
     # create new data.table containing currently used columns
     marker <- apply(d_marker, 1, paste, collapse = ":" )
+    marker <- gsub("\\ +", "", marker)
     dt <- data.table(cur_marker = marker)
     dt$cur_pvalue <- d[[col_pvalue]]
     dt$cur_tstat <- d[[col_tstat]]

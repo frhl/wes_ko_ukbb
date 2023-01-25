@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 1
+#$ -t 1-19
 #$ -tc 1
 #$ -V
 
@@ -15,21 +15,45 @@ set -o errexit
 set -o nounset
 
 source utils/bash_utils.sh
+source utils/qsub_utils.sh
+
+readonly cluster=$( get_current_cluster)
+readonly task_id=$( get_array_task_id )
+readonly chr=$( get_chr ${task_id} )
 
 readonly rscript="scripts/survival/01_write_gene_ko.R"
 
-readonly in_pattern="pLoF_damaging_missense_all.tsv.gz"
-readonly in_dir="data/knockouts/alt"
-readonly out_dir="data/survival/knockouts/eur_no_fin/pLoF_damaging_missense"
+# VCF used to get wildtype (hom ref) samples.
+readonly vcf_dir="data/knockouts/alt/pp90/combined"
+readonly vcf="${vcf_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense.vcf.bgz"
 
-mkdir -p ${out_dir}
+
+
+extract_genes_by_annotation() {
+  local annotation=${1}
+  local in_dir="data/knockouts/alt/pp90/combined"
+  local in_file="${in_dir}/ukb_eur_wes_200k_chr${chr}_${annotation}_all.tsv.gz"
+  local out_dir="data/survival/knockouts/${annotation}/chr${chr}"
+  local out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_${annotation}"
+  local sample_file="${out_prefix}.samples.txt"
+  if [ -f "${in_file}" ]; then
+    mkdir -p ${out_dir}
+    bcftools query -l ${vcf} > ${sample_file}
+    Rscript ${rscript} \
+      --in_file ${in_file} \
+      --sample_file ${sample_file} \
+      --out_prefix ${out_prefix}
+    rm ${sample_file}
+  else
+    >&2 echo "${in_file} does not exist."
+  fi
+
+ }
 
 set_up_rpy
-Rscript ${rscript} \
-  --in_pattern ${in_pattern} \
-  --in_dir ${in_dir} \
-  --out_dir ${out_dir}
-
+module load BCFtools/1.12-GCC-10.3.0
+extract_genes_by_annotation "pLoF_damaging_missense"
+#extract_genes_by_annotation "pLoF"
 
 
 

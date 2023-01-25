@@ -6,6 +6,10 @@ set -o nounset
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
+readonly cluster=$( get_current_cluster )
+readonly index=$( get_array_task_id )
+readonly threads=$( get_threads )
+
 readonly plink_file=${1?Error: Missing arg1 (plink_file)}
 readonly pheno_file=${2?Error: Missing arg2 (pheno_file)}
 readonly phenotype=${3?Error: Missing arg3 (phenotype)}
@@ -18,7 +22,7 @@ readonly use_loco_prs=${9?Error: Missing arg8(inv_normalize)}
 readonly out_prefix=${10?Error: Missing arg10 (out_prefix)}
 
 readonly step1_fitNULLGLMM="utils/saige/step1_fitNULLGLMM.R"
-readonly threads=$(( $SLURM_CPUS_PER_TASK-1 ))
+
 
 fit_null() {
    if [ ! -f "${real_out_prefix}.rda" ]; then
@@ -64,7 +68,7 @@ get_loco_seq(){
 
 # set up LOCO PRS conditioning
 if [ "${use_loco_prs}" -eq "1" ]; then
-  readonly chr="chr${SLURM_ARRAY_TASK_ID}"
+  readonly chr="chr${index}"
   readonly loco_chr="loco_${chr}"
   readonly covariates="${in_covariates},${loco_chr}"
   readonly real_out_prefix="${out_prefix}_${chr}"

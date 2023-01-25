@@ -10,7 +10,7 @@
 #SBATCH --error=logs/phase_chunks.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=21
+#SBATCH --array=20-22
 #
 #
 #$ -N phase_chunks
@@ -20,7 +20,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc
-#$ -t 21
+#$ -t 22
 #$ -V
 
 set -o errexit
@@ -60,15 +60,15 @@ readonly phasing_region_overlap=$(( ${phasing_region_size}/4 ))
 readonly max_phasing_region_size=150000
 
 # clsurm/sge parameters
-readonly software="shapeit5" #"shapeit4" or "eagle2"
+readonly software="shapeit4" #"shapeit5" #"shapeit4" or "eagle2"
 readonly project="lindgren.prj"
-readonly queue="short"
+readonly queue="long"
 readonly nslots=20
 
 ## paramters for phasing with shapeit
 readonly phased_set_error="0.0001" # 0.0001
 readonly pbwt_min_mac=2 # for shapeit5r
-readonly pbwt_depth=5
+readonly pbwt_depth=4 # 5
 readonly pbwt_modulo=0.1 # default is 0.1 but 0.0004 ( 0.2 / 50 ) is default value when using --sequencing arugment
 readonly pbwt_mdr=0.1
 readonly pop_effective_size=15000
@@ -76,21 +76,21 @@ readonly pop_effective_size=15000
 readonly tranche="200k"
 
 # what vcf should be phased
-readonly vcf_dir="data/unphased/wes_union_calls/prefilter_no_maf_cutoff/${tranche}"
+readonly vcf_dir="data/unphased/wes_union_calls/prefilter/${tranche}"
 readonly vcf_to_phase="${vcf_dir}/ukb_wes_union_calls_chr${chr}.vcf.gz"
 
 # SHAPEI5 requires a scaffold
-#readonly scaffold_dir="data/phased/wes_union_calls/${tranche}/shapeit5/phase_common/newrun"
-#readonly vcf_to_scaffold="${scaffold_dir}/ukb_wes_union_calls_${tranche}_chr${chr}_phase_common_sequencing.vcf.gz"
+readonly scaffold_dir="data/phased/wes_union_calls/${tranche}/shapeit5/phase_common/newrun"
+readonly vcf_to_scaffold="${scaffold_dir}/ukb_wes_union_calls_${tranche}_chr${chr}_phase_common.vcf.gz"
 
-readonly scaffold_dir="data/phased/calls/shapeit5/200k_from_500k"
-readonly vcf_to_scaffold="${scaffold_dir}/ukb_phased_calls_200k_from_500k_chr${chr}.vcf.bgz"
+#readonly scaffold_dir="data/phased/calls/shapeit5/200k_from_500k"
+#readonly vcf_to_scaffold="${scaffold_dir}/ukb_phased_calls_200k_from_500k_chr${chr}.vcf.bgz"
 
 # Output paths
-readonly out_dir="data/phased/wes_union_calls/200k_from_500k/shapeit5/phase_rare"
+readonly out_dir="data/phased/wes_union_calls/200k/eagle2/shapeit4/chunks"
 #readonly out_dir="data/phased/wes_union_calls/${tranche}/shapeit5/phase_rare"
 
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_${software}_${tranche}_chr${chr}_sequencing"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_${software}_${tranche}_chr${chr}"
 readonly out_prefix_w_job_config="${out_prefix}-${nslots}x${queue}/${software}_prs${phasing_region_size}_pro${phasing_region_overlap}_mprs${max_phasing_region_size}"
 readonly out="${out_prefix_w_job_config}.vcf.gz"
 readonly out_symlink="${out_prefix}.vcf.gz"

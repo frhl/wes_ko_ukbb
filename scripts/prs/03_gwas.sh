@@ -7,7 +7,7 @@
 #SBATCH --error=logs/gwas.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-100
+#SBATCH --array=1-320
 #
 #$ -N gwas
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -16,7 +16,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 1-300
+#$ -t 290-320
 #$ -V
 
 set -o errexit
@@ -49,8 +49,8 @@ readonly index=$( get_array_task_id )
 #readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
 #readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
 
-readonly file_binary="${pheno_dir}/spiros_brava_phenotypes_binary_500k.tsv.gz"
-readonly pheno_list_binary="${pheno_dir}/spiros_brava_phenotypes_binary_500k_header.tsv"
+readonly file_binary="${pheno_dir}/dec22_phenotypes_binary_500k.tsv.gz"
+readonly pheno_list_binary="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
 readonly phenotype_binary=$( sed "${index}q;d" ${pheno_list_binary} )
 
 # the job will fail if less than X cases

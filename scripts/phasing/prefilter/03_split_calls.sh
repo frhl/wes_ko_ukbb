@@ -8,8 +8,8 @@
 #SBATCH --output=logs/split_calls.log
 #SBATCH --error=logs/split_calls.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 2
-#SBATCH --array=1-2
+#SBATCH --cpus-per-task 3
+#SBATCH --array=20
 #
 #$ -N split_calls
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -35,11 +35,11 @@ readonly chr=$( get_chr ${task_id} )
 
 readonly tranche="200k"
 
-readonly in_dir="data/unphased/calls/prefilter_no_maf_cutoff/${tranche}"
+readonly in_dir="data/unphased/calls/prefilter/${tranche}"
 readonly in_file="${in_dir}/ukb_prefilter_calls_${tranche}_chr${chr}.mt"
 readonly in_type="mt"
 
-readonly out_dir="data/unphased/calls/prefilter_no_maf_cutoff/${tranche}"
+readonly out_dir="data/unphased/calls/prefilter/${tranche}"
 readonly out_prefix="${out_dir}/ukb_split_calls_${tranche}_chr${chr}"
 readonly out_prefix_parents="${out_prefix}_parents"
 readonly out_prefix_no_parents="${out_prefix}_no_parents"
@@ -78,8 +78,6 @@ if [ -f "${out_prefix_parents}.vcf.bgz" ]; then
   make_tabix "${out_prefix_parents}.vcf.bgz" "tbi"
   bcftools +fixref "${out_prefix_no_parents}.vcf.bgz" -- -f ${fasta} > "${out_prefix_no_parents}.fasta.txt"
 fi
-
-
 
 
 
