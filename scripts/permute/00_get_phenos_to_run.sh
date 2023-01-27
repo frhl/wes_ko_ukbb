@@ -25,12 +25,15 @@ readonly sig_hits="${sig_hits_dir}/176k_saige_cond_sig_subset_prefer_prs.txt.gz"
 readonly out_dir="data/permute/overview/min_mac4"
 readonly out_prefix="${out_dir}/phenotypes_with_5cis_5chets"
 
+readonly min_chet=4
+readonly min_cis=4
+
 mkdir -p ${out_dir}
 
 set_up_rpy
 Rscript ${rscript} \
-  --min_chet 5 \
-  --min_cis 5 \
+  --min_chet ${min_chet} \
+  --min_cis ${min_cis} \
   --path_sig_hits ${sig_hits} \
   --out_prefix ${out_prefix}
 

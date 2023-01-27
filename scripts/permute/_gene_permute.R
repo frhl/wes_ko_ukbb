@@ -107,8 +107,8 @@ create_original_ko <- function(d, kos){
     v <- rep(0, n_samples)
 
     # assign homs as these never change
-    v[which(d$s %in% eid_homs)] <- 2
-    v[which(d$s %in% eid_chet)] <- 2
+    v[which(d$s %in% eid_homs)] <- 1
+    v[which(d$s %in% eid_chet)] <- 1
     return(v)
 }
 

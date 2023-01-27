@@ -46,7 +46,7 @@ readonly cond_genotypes="${cond_dir}/common_conditional.tsv.gz"
 readonly min_mac=4
 readonly n_replicates=100
 readonly n_start_shuffle=100 #1000
-readonly n_cutoff_shuffle=1000 #10000000
+readonly n_cutoff_shuffle=100 #10000000
 readonly n_slots_saige=1
 readonly n_slots_permute=1
 readonly queue_saige="short"
@@ -60,9 +60,8 @@ readonly use_prs=1
 readonly use_cond_common=1
 
 # get path to true P-value and t-stats
-readonly overview_dir="data/permute/overview/min_mac${min_mac}"
-readonly genes_path="${overview_dir}/main_genes.tsv.gz"
-readonly true_p_path="${overview_dir}/main_true_p.tsv.gz"
+readonly overview_dir="data/permute/overview"
+readonly genes_path="${overview_dir}/genes_to_run.tsv.gz"
 
 # count how many genes to submit for the given chromosome
 readonly n_genes="$( zcat ${genes_path} | grep -w "chr${chr}" | wc -l)"
@@ -91,7 +90,6 @@ sbatch \
   "${out_prefix}" \
   "${pheno_dir}" \
   "${genes_path}" \
-  "${true_p_path}" \
   "${min_mac}" \
   "${n_replicates}" \
   "${n_start_shuffle}" \

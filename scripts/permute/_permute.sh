@@ -24,26 +24,25 @@ readonly input_path_prelim=${4?Error: Missing arg2}
 readonly out_prefix_prelim=${5?Error: Missing arg3}
 readonly pheno_dir=${6?Error: Missing arg4}
 readonly genes_path=${7?Error: Missing arg5} 
-readonly true_p_path=${8?Error: Missing arg6 (Path to true non-permuted P-values)}
-readonly min_mac=${9?Error: Missing arg7 (Minimum number of knockouts)}
-readonly replicates=${10?Error: Missing arg8 (Shuffles per permute submission)}
-readonly n_shuffle=${11?Error: Missing arg9 (How many shuffles of of phase should be done) }
-readonly n_cutoff_shuffle=${12?Error: Missing arg10 (maximum allowed number of shuffles)}
-readonly n_slots_saige=${13?Error: Missing arg11 (compute slots flor saige script)}
-readonly n_slots_permute=${14?Error: Missing arg12 (compute slots for permute script)}
-readonly queue_saige=${15?Error: Missing arg13 (What queue should be used for SAIGE gwas)}
-readonly queue_permute=${16?Error: Missing arg14 (What queue should be used for permute script)}
-readonly queue_merge=${17?Error: Missing arg15 (What queue should be used for merge script)}
-readonly queue_master=${18?Error: Missing arg16 (What queue should be user for master script)}
-readonly annotation=${19?Error: Missing arg17 (Consequence annotation)}
-readonly static_assoc=${20?Error: Missing arg18 (Prefix for association file)}
-readonly use_prs=${21?Error: Missing arg19 (Should PRS be used)}
-readonly cond_markers=${22?Error: Missing arg20 (List of markers to condition on)}
-readonly use_cond_common=${23?Error: Missing arg20 (List of markers to condition on)}
-readonly cond_genotypes=${24?Error: Missing arg21 (Genotypes/dosages for conditioning markers)}
-iteration=${25?Error: Missing arg22 (What is the current iteration)}
-permutation_supply=${26?Error: Missing arg23 (How many permutations have been accomplished so far)}
-top_p=${27?Error: Missing arg24 (What index of the lowest P-value should be used to determien covergence (10 or 100)}
+readonly min_mac=${8?Error: Missing arg7 (Minimum number of knockouts)}
+readonly replicates=${9?Error: Missing arg8 (Shuffles per permute submission)}
+readonly n_shuffle=${10?Error: Missing arg9 (How many shuffles of of phase should be done) }
+readonly n_cutoff_shuffle=${11?Error: Missing arg10 (maximum allowed number of shuffles)}
+readonly n_slots_saige=${12?Error: Missing arg11 (compute slots flor saige script)}
+readonly n_slots_permute=${13?Error: Missing arg12 (compute slots for permute script)}
+readonly queue_saige=${14?Error: Missing arg13 (What queue should be used for SAIGE gwas)}
+readonly queue_permute=${15?Error: Missing arg14 (What queue should be used for permute script)}
+readonly queue_merge=${16?Error: Missing arg15 (What queue should be used for merge script)}
+readonly queue_master=${17?Error: Missing arg16 (What queue should be user for master script)}
+readonly annotation=${18?Error: Missing arg17 (Consequence annotation)}
+readonly static_assoc=${19?Error: Missing arg18 (Prefix for association file)}
+readonly use_prs=${20?Error: Missing arg19 (Should PRS be used)}
+readonly cond_markers=${21?Error: Missing arg20 (List of markers to condition on)}
+readonly use_cond_common=${22?Error: Missing arg20 (List of markers to condition on)}
+readonly cond_genotypes=${23?Error: Missing arg21 (Genotypes/dosages for conditioning markers)}
+iteration=${24?Error: Missing arg22 (What is the current iteration)}
+permutation_supply=${25?Error: Missing arg23 (How many permutations have been accomplished so far)}
+top_p=${26?Error: Missing arg24 (What index of the lowest P-value should be used to determien covergence (10 or 100)}
 
 # set final paths depending on gene
 readonly gene="$(zcat ${genes_path} | grep -w "chr${chr}" | cut -f1 | sed ${index}'q;d' )"
@@ -315,7 +314,6 @@ submit_calc_p() {
     "${prs_available}" \
     "${path_merged}.gz" \
     "${top_p}" \
-    "${true_p_path}" \
     "${n_shuffle}" \
     "${iteration}" \
     "${out_prefix}")
@@ -351,7 +349,6 @@ resubmit_loop() {
     "${out_prefix}" \
     "${pheno_dir}" \
     "${genes_path}" \
-    "${true_p_path}" \
     "${min_mac}" \
     "${replicates}" \
     "${new_n_shuffle}" \
