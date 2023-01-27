@@ -331,6 +331,7 @@ main <- function(args){
         orig_rows_dosage$INFO <- calc_info(orig_dosage)
         colnames(orig_rows_dosage) <- colnames(final)
         final <- rbind(final, orig_rows_dosage)
+        final <- final[order(as.numeric(final$POS)),]
     }
 
     # Sometimes markers with zero AC are crated,

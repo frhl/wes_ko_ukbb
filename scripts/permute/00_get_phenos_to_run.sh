@@ -22,7 +22,7 @@ readonly rscript="scripts/permute/00_get_phenos_to_run.R"
 readonly sig_hits_dir="data/post_hoc/results"
 readonly sig_hits="${sig_hits_dir}/176k_saige_cond_sig_subset_prefer_prs.txt.gz"
 
-readonly out_dir="data/permute/overview/min_mac4"
+readonly out_dir="data/permute/overview"
 readonly out_prefix="${out_dir}/phenotypes_with_5cis_5chets"
 
 readonly min_chet=4
