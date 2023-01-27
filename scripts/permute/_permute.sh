@@ -82,14 +82,18 @@ touch ${status_phenos}
 set_arr_phenos() {
   trait=${1}
   if [ ! -z ${pheno_dir} ]; then
-    local pheno_bin="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
+    local pheno_bin="data/permute/overview/phenotypes_with_4cis_4chets_header.txt"
     local pheno_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
     readarray -t arr_bin < ${pheno_bin}
     readarray -t arr_cts < ${pheno_cts}
     if [[ "${trait}" == "both" ]]; then
       arr_phenos=("${arr_bin[@]}" "${arr_cts[@]}")
+    elif [[ "${trait}" == "binary" ]]; then
+      arr_phenos=("${arr_bin[@]}")
     elif [[ "${trait}" == "cts" ]]; then
       arr_phenos=("${arr_cts[@]}")
+    else 
+      >&2 echo "trait has not been defined properly."
     fi
   else
     raise_error "global variable 'pheno_dir' has not been defined"
@@ -425,13 +429,9 @@ do_extra_loop=0
 iteration=$((${iteration} + 1))
 wait_on_jids=""
 set_arr_phenos "binary"
-#arr_phenos=( "Alanine_aminotransferase_residual" "Calcium_residual" "WHR_adj_BMI" "BMI" "Apolipoprotein_B_residual")
-#arr_phenos=( "Alanine_aminotransferase_residual" )
-#arr_phenos=( "spiro_visual_impairment_and_blindness" "spiro_epilepsy" "spiro_sick_sinus_syndrome" "spiro_trigeminal_neuralgia" "spiro_polymyalgia_rheumatica" )
+#arr_phenos=( "spiro_visual_impairment_and_blindness" )
 
 
-arr_phenos=( "spiro_visual_impairment_and_blindness" )
-#arr_phenos=( "Alanine_aminotransferase_residual" "BMI" )
 
 if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then
   readonly is_all_done=$( check_if_all_done ${status_phenos} ${tested_phenos} )

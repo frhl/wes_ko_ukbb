@@ -15,6 +15,7 @@ main <- function(args){
     true_p_marker_name <- "actual"
     stopifnot(true_p_marker_name %in% d$MarkerID)
     d_actual <- d[d$MarkerID == true_p_marker_name,]
+
     if ("p.value_c" %in% colnames(d_actual)){
       true_p <- as.numeric(d_actual$p.value_c)
       true_t <- as.numeric(d_actual$Tstat_c)
@@ -22,6 +23,13 @@ main <- function(args){
       true_p <- as.numeric(d_actual$p.value)
       true_t <- as.numeric(d_actual$Tstat)
     }
+
+    # there is one true marker per VCF, we ensure
+    # they are all the same and take the unique
+    true_p <- unique(true_p)
+    true_t <- unique(true_t)
+    stopifnot(length(true_p) == 1)
+    stopifnot(length(true_t) == 1)
     write(true_p, stdout())
 
 }

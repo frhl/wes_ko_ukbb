@@ -19,14 +19,14 @@ source utils/qsub_utils.sh
 
 readonly rscript="scripts/permute/00_get_phenos_to_run.R"
 
+readonly min_chet=4
+readonly min_cis=4
+
 readonly sig_hits_dir="data/post_hoc/results"
 readonly sig_hits="${sig_hits_dir}/176k_saige_cond_sig_subset_prefer_prs.txt.gz"
 
 readonly out_dir="data/permute/overview"
-readonly out_prefix="${out_dir}/phenotypes_with_5cis_5chets"
-
-readonly min_chet=4
-readonly min_cis=4
+readonly out_prefix="${out_dir}/phenotypes_with_${min_cis}cis_${min_chet}chets"
 
 mkdir -p ${out_dir}
 
@@ -36,6 +36,9 @@ Rscript ${rscript} \
   --min_cis ${min_cis} \
   --path_sig_hits ${sig_hits} \
   --out_prefix ${out_prefix}
+
+# create seperate header file containing things to run
+zcat "${out_prefix}.txt.gz" | cut -f1 | tail -n +2 > "${out_prefix}_header.txt"
 
 
 

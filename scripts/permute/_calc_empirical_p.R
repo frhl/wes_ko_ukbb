@@ -34,6 +34,14 @@ main <- function(args){
       true_t <- as.numeric(d_actual$Tstat)
     }
 
+    # if a merged VCF with two actual/real
+    # markers for the non-permuted P is read 
+    # we need to take the unique
+    true_p <- unique(true_p)
+    true_t <- unique(true_t)
+    stopifnot(length(true_p) == 1)
+    stopifnot(length(true_t) == 1)
+
     # exclude real markers (non-permuted stuff)
     stopifnot("MarkerID" %in% colnames(d))
     bool_real_marker <- !grepl("ENSG", d$MarkerID)
