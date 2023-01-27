@@ -25,8 +25,10 @@ readonly time_to_event_dir="/well/lindgren-ukbb/projects/ukbb-11867/samvida/gene
 readonly time_to_event_samvida="${time_to_event_dir}/eid_time_to_event_matrix.txt"
 readonly time_to_event_duncan="${time_to_event_dir}/eid_time_to_event_matrix_duncan_phenotypes.txt"
 
-readonly out_dir="data/knockouts/alt/pp90/co_occurence_time_to_event"
-readonly out_prefix="${out_dir}/co_occurence_samvida_tte_by_phenotype_chr${chr}"
+#readonly out_dir="data/knockouts/alt/pp90/co_occurence_time_to_event"
+#readonly out_prefix="${out_dir}/co_occurence_samvida_tte_by_phenotype_chr${chr}"
+readonly out_dir="data/knockouts/alt/pp90/co_occurence2"
+readonly out_prefix="${out_dir}/co_occurence_by_phenotype_chr${chr}"
 readonly annotation="pLoF_damaging_missense"
 
 mkdir -p ${out_dir}
@@ -35,9 +37,8 @@ set_up_rpy
 Rscript "${rscript}" \
   --chrom ${chr} \
   --annotation ${annotation} \
-  --path_phenotypes ${time_to_event_samvida} \
+  --path_phenotypes ${path_phenotypes} \
   --path_header ${path_header} \
   --out_prefix ${out_prefix}
 
 
-  #--path_phenotypes ${path_phenotypes} \

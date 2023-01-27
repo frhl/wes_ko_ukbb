@@ -9,7 +9,7 @@
 #SBATCH --error=logs/permute.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=6
+#SBATCH --array=1-22
 
 set -o errexit
 set -o nounset
@@ -65,7 +65,7 @@ readonly genes_path="${overview_dir}/genes_to_run.tsv.gz"
 
 # count how many genes to submit for the given chromosome
 readonly n_genes="$( zcat ${genes_path} | grep -w "chr${chr}" | wc -l)"
-readonly slurm_tasks="1" #-${n_genes}"
+readonly slurm_tasks="1-${n_genes}"
 readonly slurm_jname="_chr${chr}_permute"
 readonly slurm_lname="logs/_permute"
 readonly slurm_project="lindgren.prj"

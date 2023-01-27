@@ -17,7 +17,7 @@ main <- function(args){
     phenotypes <- readLines(path_header)
     
     # for time to event we need to add this column
-    if (!"s" %in% colnames(phenotypes)) phenotypes$s <- phenotypes$eid
+    #if (!"s" %in% colnames(phenotypes)) phenotypes$s <- phenotypes$eid <--- causes error
 
     # read knockouts
     d <- read_ukb_wes_kos(annotation = annotation, chromosomes = chrom)

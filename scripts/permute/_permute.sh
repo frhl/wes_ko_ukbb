@@ -425,7 +425,7 @@ do_extra_loop=0
 iteration=$((${iteration} + 1))
 wait_on_jids=""
 set_arr_phenos "binary"
-arr_phenos=( "spiro_visual_impairment_and_blindness" "PSOR_combined" )
+#arr_phenos=( "spiro_visual_impairment_and_blindness" "PSOR_combined" )
 
 
 

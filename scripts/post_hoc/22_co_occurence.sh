@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q long.qc
-#$ -t 1
+#$ -t 2
 #$ -V
 
 source utils/bash_utils.sh
