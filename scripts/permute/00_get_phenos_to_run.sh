@@ -19,8 +19,8 @@ source utils/qsub_utils.sh
 
 readonly rscript="scripts/permute/00_get_phenos_to_run.R"
 
-readonly min_chet=4
-readonly min_cis=4
+readonly min_chet=5
+readonly min_cis=5
 
 readonly sig_hits_dir="data/post_hoc/results"
 readonly sig_hits="${sig_hits_dir}/176k_saige_cond_sig_subset_prefer_prs.txt.gz"

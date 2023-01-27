@@ -18,8 +18,8 @@ source utils/qsub_utils.sh
 
 readonly rscript="scripts/permute/01_get_genes_to_run.R"
 
-readonly min_chet=4
-readonly min_cis=4
+readonly min_chet=5
+readonly min_cis=5
 
 readonly out_dir="data/permute/overview"
 readonly out_prefix="${out_dir}/genes_to_run"

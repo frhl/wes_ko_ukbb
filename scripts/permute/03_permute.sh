@@ -9,7 +9,7 @@
 #SBATCH --error=logs/permute.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-21
+#SBATCH --array=6
 
 set -o errexit
 set -o nounset
@@ -23,7 +23,7 @@ readonly curwd=$(pwd)
 readonly chr="${SLURM_ARRAY_TASK_ID}"
 
 # setup directories
-readonly in_dir="data/permute/genes/chr${chr}"
+readonly in_dir="data/permute/overview"
 readonly out_dir="data/permute/permutations/chr${chr}/GENE"
 readonly pheno_dir="data/phenotypes"
 readonly cond_dir="data/conditional/common/markers"
@@ -31,7 +31,7 @@ readonly grm_dir="data/saige/grm/input/dnanexus"
 
 # setup input and output paths
 readonly annotation="pLoF_damaging_missense"
-readonly input_path="${in_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_chr${chr}_GENE.tsv.gz"
+readonly input_path="${in_dir}/sample_order.txt"
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_pLoF_damaging_missense_permuted_chr${chr}_GENE"
 readonly assoc_format="ukb_eur_wes_200k_PHENO_ANNO"
 readonly grm_mtx="${grm_dir}/ukb_eur_200k_grm_fitted_relatednessCutoff_0.05_2000_randomMarkersUsed.sparseGRM.mtx"
@@ -65,7 +65,7 @@ readonly genes_path="${overview_dir}/genes_to_run.tsv.gz"
 
 # count how many genes to submit for the given chromosome
 readonly n_genes="$( zcat ${genes_path} | grep -w "chr${chr}" | wc -l)"
-readonly slurm_tasks="1-${n_genes}"
+readonly slurm_tasks="1" #-${n_genes}"
 readonly slurm_jname="_chr${chr}_permute"
 readonly slurm_lname="logs/_permute"
 readonly slurm_project="lindgren.prj"
@@ -111,6 +111,7 @@ sbatch \
   "${initial_top_p}"
 set +x
 
-echo "Submitting permute script for chr${chr} (JID=${master_jid})"
+
+
 
 

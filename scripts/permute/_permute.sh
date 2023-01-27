@@ -20,7 +20,7 @@ readonly index=${SLURM_ARRAY_TASK_ID}
 readonly chr=${1?Error: Missing arg1}
 readonly grm_mtx=${2?Error: Missing arg6 (grm_mtx)}
 readonly grm_sam=${3?Error: Missing arg7 (grm_sam)}
-readonly input_path_prelim=${4?Error: Missing arg2}
+readonly input_path=${4?Error: Missing arg2}
 readonly out_prefix_prelim=${5?Error: Missing arg3}
 readonly pheno_dir=${6?Error: Missing arg4}
 readonly genes_path=${7?Error: Missing arg5} 
@@ -46,7 +46,6 @@ top_p=${26?Error: Missing arg24 (What index of the lowest P-value should be used
 
 # set final paths depending on gene
 readonly gene="$(zcat ${genes_path} | grep -w "chr${chr}" | cut -f1 | sed ${index}'q;d' )"
-readonly input_path=$(echo ${input_path_prelim} | sed -e "s/GENE/${gene}/g")
 readonly out_prefix=$(echo ${out_prefix_prelim} | sed -e "s/GENE/${gene}/g")
 readonly write_dir="$( dirname ${out_prefix})"
 readonly tested_phenos="${out_prefix}.phenos"
@@ -60,18 +59,15 @@ readonly name_merge="_mrg_${gene}"
 readonly name_calc="_p_${gene}"
 readonly name_main="_i${iteration}_${gene}"
 
-
 # get logs
 readonly log="${write_dir}/${gene}.log"
 readonly log_saige="${write_dir}/saige.log"
 readonly log_errors="${write_dir}/${gene}.errors.log"
 readonly log_saige_errors="${write_dir}/saige.errors.log"
 
-# check if permute gene even exists:
+# check that path to sample order exists
 if [ ! -f "${input_path}" ]; then
   raise_error "${input_path} does not exist."
-elif [ $( zcat ${input_path} | wc -l ) -le 1 ]; then
-  raise_error "${input_path} only contains a header!"
 fi
 
 # create files and dirs
@@ -429,7 +425,7 @@ do_extra_loop=0
 iteration=$((${iteration} + 1))
 wait_on_jids=""
 set_arr_phenos "binary"
-#arr_phenos=( "spiro_visual_impairment_and_blindness" )
+arr_phenos=( "spiro_visual_impairment_and_blindness" "PSOR_combined" )
 
 
 

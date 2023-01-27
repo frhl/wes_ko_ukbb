@@ -14,60 +14,13 @@ hash_dosage <- function(DS_matrix, algo = "xxhash32"){
     return(the_hash)
 }
 
-# get probability of knockout given number of heterozygotes
-naive_knockout_p <- function(hets){
-    if (hets > 1){
-        return(1 - (2*((1/2)^hets)))
-    } else {
-        return(0)
-    }
-}
-
-# fast way to calculate probability of being KO
-calc_knockout_p_fast <- function(d){
-   
-     # hom ref are always zero
-    d$P <- 0
-    # hom alt are always one
-    d$P[d$hom_alt_n > 1] <- 1
-    # depends on count for phased hets
-    index <- which((d$het_n > 1) & (d$hom_alt_n == 0))
-    for (idx in index){
-        hets <- d$het_n[idx]
-        d$P[idx] <- naive_knockout_p(hets)
-    }
-    
-    return(d$P)
-    
-}
-
-# simple method to shuffle knockouts
-shuffle_knockouts <- function(d){
-    
-
-    # NOTE: we now use "het" instead of "phased_het"
-    # header of d
-    # gene_id   s   unphased_het    phased_het  hom_alt_n   het pTKO
-    # <chr> <int>   <int>   <int>   <int>   <int>   <dbl>
-    # ENSG00000027644   1000028 0   0   0   0   0
-    # ENSG00000027644   1000034 0   0   0   0   0
-    # ENSG00000027644   1000087 0   0   0   0   0
-    stopifnot('het_n' %in% colnames(d))
-    stopifnot('hom_alt_n' %in% colnames(d)) 
-    
-    n <- nrow(d)
-    p <- calc_knockout_p_fast(d)
-    B <- rbinom(n = n, size = 1, prob = p)
-
-    return(B)
-}
-
 # shuffle knockouts while preserving allele counts.
-shuffle_knockouts2 <- function(d, kos){
+shuffle_knockouts2 <- function(samples, kos){
 
     stopifnot("knockout" %in% colnames(kos))
     stopifnot("s" %in% colnames(kos))
- 
+    stopifnot(length(samples) > 100)
+
     # get ids from the various grous
     eid_cis <- kos$s[kos$knockout == "Compound heterozygote (cis)"]
     eid_chet <- kos$s[kos$knockout == "Compound heterozygote"]
@@ -75,11 +28,11 @@ shuffle_knockouts2 <- function(d, kos){
     eid_homs <- kos$s[kos$knockout == "Homozygote"]
     
     # to preserve the allele count we randomly assign chets between cis & chets
-    n_samples <- length(d$s)
+    n_samples <- length(samples)
     v <- rep(0, n_samples)
 
     # assign homs as these never change
-    v[which(d$s %in% eid_homs)] <- 1
+    v[which(samples %in% eid_homs)] <- 1
 
     # randomly assign chets to two-hit variants
     n_chets <- length(eid_chet)
@@ -87,28 +40,28 @@ shuffle_knockouts2 <- function(d, kos){
     eid_not_sampled <- eid_both[!eid_both %in% eid_sampled]
 
     # assing these to be our new knockouts
-    v[which(d$s %in% eid_sampled)] <- 1
+    v[which(samples %in% eid_sampled)] <- 1
 
     # these are our new cis
-    v[which(d$s %in% eid_not_sampled)] <- 0
+    v[which(samples %in% eid_not_sampled)] <- 0
     return(v)
 }
 
 
 # create original knockout as specified by the "kos" data.table
-create_original_ko <- function(d, kos){
+create_original_ko <- function(samples, kos){
     
      # get ids from the various grous
     eid_chet <- kos$s[kos$knockout == "Compound heterozygote"]
     eid_homs <- kos$s[kos$knockout == "Homozygote"]
     
     # to preserve the allele count we randomly assign chets between cis & chets
-    n_samples <- length(d$s)
+    n_samples <- length(samples)
     v <- rep(0, n_samples)
 
     # assign homs as these never change
-    v[which(d$s %in% eid_homs)] <- 1
-    v[which(d$s %in% eid_chet)] <- 1
+    v[which(samples %in% eid_homs)] <- 1
+    v[which(samples %in% eid_chet)] <- 1
     return(v)
 }
 
@@ -248,10 +201,9 @@ main <- function(args){
 
     # replicate knockout
     n <- as.numeric(args$permutations)
-    d <- fread(args$input_path)
-    stopifnot(nrow(d) > 0)
-    reps <- replicate(n, shuffle_knockouts2(d, kos))
-    rownames(reps) <- d$s
+    vcf_samples <- readLines(args$input_path)
+    reps <- replicate(n, shuffle_knockouts2(vcf_samples, kos))
+    rownames(reps) <- vcf_samples
     reps <- data.table(t(reps))
 
     # convert to dosage
@@ -277,7 +229,7 @@ main <- function(args){
         write(paste("Note:",n_real_markers, "real marker(s) found. These will be included as unshuffled in permuted VCF."),stdout())
 
         # ensure that samples are overlapping
-        sample_overlap <- unique(intersect(cond_dt$s, d$s))
+        sample_overlap <- unique(intersect(cond_dt$s, vcf_samples))
 
         # subset dosage matrix (with permuted phased)
         rows <- make_vcf_dosage_rows(args$chrom, 1:n, args$vcf_id)
@@ -324,7 +276,7 @@ main <- function(args){
 
     # Include original marker?
     if (args$include_original_knockout) {
-        orig <- create_original_ko(d, kos)
+        orig <- create_original_ko(vcf_samples, kos)
         orig_dosage <- t(orig * 2)
         orig_rows <- make_vcf_dosage_rows(args$chrom, n+1, "actual")
         orig_rows_dosage <- cbind(orig_rows, orig_dosage)
@@ -360,7 +312,7 @@ main <- function(args){
 # add arguments
 parser <- ArgumentParser()
 parser$add_argument("--chrom", default=NULL, help = "chromosome")
-parser$add_argument("--input_path", default=NULL, help = "path to the input")
+parser$add_argument("--input_path", default=NULL, help = "path a file containing sample ordering to be used")
 parser$add_argument("--input_path_cond_genotypes", default=NULL, help = "path to the file of dosages/genotypes")
 parser$add_argument("--permutations", default=NULL, help = "number of times the gene should be permuted")
 parser$add_argument("--remove_invariant_markers", action="store_true", default=FALSE, help = "Remove markers with AC == 0.")
