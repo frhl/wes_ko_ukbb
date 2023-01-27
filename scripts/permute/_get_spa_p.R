@@ -1,21 +1,21 @@
 #!/usr/bin/env Rscript
 
+# read merged saige file and get the ranked top x p.value
+
 library(argparse)
 library(data.table)
 
 
 main <- function(args){
     
-     
     if (!file.exists(args$input_path)) stop(paste(args$input_path, "does not exist!"))
-
     d <- fread(args$input_path)
+    d <- d[grepl(d$MarkerID, pattern="ENSG"),]
     p <- as.numeric(d$p.value)
     sorted_p <- sort(p)
     top_p <- sorted_p[as.numeric(args$select_min_p)]
     top_p <- top_p * as.numeric(args$multiply_p)
     write(top_p, stdout())
-
 
 }
 

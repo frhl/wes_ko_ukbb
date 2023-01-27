@@ -95,7 +95,22 @@ shuffle_knockouts2 <- function(d, kos){
 }
 
 
+# create original knockout as specified by the "kos" data.table
+create_original_ko <- function(d, kos){
+    
+     # get ids from the various grous
+    eid_chet <- kos$s[kos$knockout == "Compound heterozygote"]
+    eid_homs <- kos$s[kos$knockout == "Homozygote"]
+    
+    # to preserve the allele count we randomly assign chets between cis & chets
+    n_samples <- length(d$s)
+    v <- rep(0, n_samples)
 
+    # assign homs as these never change
+    v[which(d$s %in% eid_homs)] <- 2
+    v[which(d$s %in% eid_chet)] <- 2
+    return(v)
+}
 
 # make header of VCF file
 make_vcf_dosage_header <- function(chrom){
@@ -111,8 +126,8 @@ make_vcf_dosage_header <- function(chrom){
 
 # aggregate information from dosage matrix to create INFO rows
 calc_info <- function(DS_matrix){
-    stopifnot(ncol(DS_matrix) > 1)
-    stopifnot(nrow(DS_matrix) > 1)
+    stopifnot(ncol(DS_matrix) > 0)
+    stopifnot(nrow(DS_matrix) > 0)
     # create INFO row by comining strings column wise
     d_info <- data.table(
         allele_count = rowSums(DS_matrix, na.rm = TRUE),
@@ -242,9 +257,6 @@ main <- function(args){
     # convert to dosage
     dosage <- reps * 2
 
-    # only keep non-probabilistic knockouts
-    if (args$only_non_prob_ko) dosage[dosage < 2] <- 0
-
 
     # load real conditioning variants, i.e. the actual
     # dosages/genotypes of the variants that we would like
@@ -301,13 +313,6 @@ main <- function(args){
         n_real_miss <- sum(is.na(apply(cond_dosage, 1, sd)))
         write(paste0("Note: ", n_real_miss, " of ", n_real_count, " real markers have one or more missing dosages."), stdout())
 
-        # debugging - are SNPs monoprhic and thus
-        # the resulting matrix not invertible?
-        #cond_dosage_sd <- apply(cond_dosage, 1, sd)
-        #cond_dosage_af <- apply(cond_dosage, 1, mean)
-        #cond_rows$sd <- cond_dosage_sd
-        #cond_rows$af <- cond_dosage_af
-
     }  else {
 
         rows <- make_vcf_dosage_rows(args$chrom, 1:n, args$vcf_id)
@@ -317,7 +322,16 @@ main <- function(args){
         sds <- unlist(apply(dosage, 1, sd))
     }
 
-
+    # Include original marker?
+    if (args$include_original_knockout) {
+        orig <- create_original_ko(d, kos)
+        orig_dosage <- t(orig * 2)
+        orig_rows <- make_vcf_dosage_rows(args$chrom, n+1, "actual")
+        orig_rows_dosage <- cbind(orig_rows, orig_dosage)
+        orig_rows_dosage$INFO <- calc_info(orig_dosage)
+        colnames(orig_rows_dosage) <- colnames(final)
+        final <- rbind(final, orig_rows_dosage)
+    }
 
     # Sometimes markers with zero AC are crated,
     # let's remove them before entering SAIGE.
@@ -348,9 +362,9 @@ parser$add_argument("--chrom", default=NULL, help = "chromosome")
 parser$add_argument("--input_path", default=NULL, help = "path to the input")
 parser$add_argument("--input_path_cond_genotypes", default=NULL, help = "path to the file of dosages/genotypes")
 parser$add_argument("--permutations", default=NULL, help = "number of times the gene should be permuted")
-parser$add_argument("--only_non_prob_ko", action="store_true", default=FALSE, help = "Only keep knockouts of phased heterozygotes.")
 parser$add_argument("--remove_invariant_markers", action="store_true", default=FALSE, help = "Remove markers with AC == 0.")
 parser$add_argument("--enable_cond_pipeline", action="store_true", default=FALSE, help = "Allow the use of conditional markers")
+parser$add_argument("--include_original_knockout", action="store_true", default=FALSE, help = "Include the original knockout")
 parser$add_argument("--seed", default=NULL, help = "seed for randomizer")
 parser$add_argument("--vcf_id", default="GENE", help = "Substitute for rsid (this is just the gene id string)")
 parser$add_argument("--out_prefix", default=NULL, help = "prefix for out file")

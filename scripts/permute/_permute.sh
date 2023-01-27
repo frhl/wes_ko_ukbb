@@ -430,7 +430,9 @@ wait_on_jids=""
 set_arr_phenos "binary"
 #arr_phenos=( "Alanine_aminotransferase_residual" "Calcium_residual" "WHR_adj_BMI" "BMI" "Apolipoprotein_B_residual")
 #arr_phenos=( "Alanine_aminotransferase_residual" )
-#arr_phenos=( "spiro_visual_impairment_and_blindness" "spiro_epilepsy" )
+#arr_phenos=( "spiro_visual_impairment_and_blindness" "spiro_epilepsy" "spiro_sick_sinus_syndrome" "spiro_trigeminal_neuralgia" "spiro_polymyalgia_rheumatica" )
+
+
 arr_phenos=( "spiro_visual_impairment_and_blindness" )
 #arr_phenos=( "Alanine_aminotransferase_residual" "BMI" )
 

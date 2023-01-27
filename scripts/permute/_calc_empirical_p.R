@@ -66,7 +66,7 @@ main <- function(args){
     # calculate empirical P-value (note, need to ensure that
     # the correct side is evaluated). 
     count_p_ge_true <- sum(true_p >= pvalue)/length(pvalue) 
-    empirical_p <- 1-count_p_ge_true
+    empirical_p <- count_p_ge_true
     write(empirical_p, stdout())
 
 }
