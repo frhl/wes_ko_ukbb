@@ -6,8 +6,8 @@
 #$ -e logs/co_occurence_by_phenotype.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q long.qc
-#$ -t 2-22
+#$ -q short.qc
+#$ -t 22
 #$ -V
 
 source utils/bash_utils.sh
@@ -27,7 +27,7 @@ readonly time_to_event_duncan="${time_to_event_dir}/eid_time_to_event_matrix_dun
 
 #readonly out_dir="data/knockouts/alt/pp90/co_occurence_time_to_event"
 #readonly out_prefix="${out_dir}/co_occurence_samvida_tte_by_phenotype_chr${chr}"
-readonly out_dir="data/knockouts/alt/pp90/co_occurence2"
+readonly out_dir="data/knockouts/alt/pp90/co_occurence3"
 readonly out_prefix="${out_dir}/co_occurence_by_phenotype_chr${chr}"
 readonly annotation="pLoF_damaging_missense"
 
