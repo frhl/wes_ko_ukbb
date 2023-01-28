@@ -28,7 +28,7 @@ main <- function(args){
         d_cases <- d[d$s %in% case_eid,]
         cases_unpacked <- NULL
         if (nrow(d_cases) > 0) {
-            cases_packed <- gwastools::cooccur_pack_lib(d)
+            cases_packed <- gwastools::cooccur_pack_lib(d_cases)
             cases_unpacked <- gwastools::cooccur_unpack_lib(cases_packed)
             cases_unpacked$phenotype <- pheno
         }
