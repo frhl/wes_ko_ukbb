@@ -19,6 +19,8 @@ Suggests:
 RoxygenNote: 7.1.2
 Collate:
     'beta_power_curve.R'
+    'cooccur_pack_lib.R'
+    'cooccur_unpack_lib.R'
     'get_expected_p.R'
     'get_int.R'
     'get_rint.R'
