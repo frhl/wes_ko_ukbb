@@ -47,6 +47,39 @@ shuffle_knockouts2 <- function(samples, kos){
     return(v)
 }
 
+shuffle_knockouts3 <- function(samples, kos){
+
+    stopifnot("knockout" %in% colnames(kos))
+    stopifnot("s" %in% colnames(kos))
+    stopifnot(length(samples) > 100)
+
+    # get ids from the various grous
+    eid_cis <- kos$s[kos$knockout == "Compound heterozygote (cis)"]
+    eid_chet <- kos$s[kos$knockout == "Compound heterozygote"]
+    eid_both <- c(eid_cis, eid_chet)
+    eid_homs <- kos$s[kos$knockout == "Homozygote"]
+    
+    # to preserve the allele count we randomly assign chets between cis & chets
+    n_samples <- length(samples)
+    v <- rep(0, n_samples)
+
+    # assign homs as these never change
+    v[which(samples %in% eid_homs)] <- 1
+
+    # setup probability of drawing 
+    n_chet <- length(eid_chet)
+    n_cis <- length(eid_cis)
+    n_both <- length(eid_both)
+    prob <- n_chet / (n_both)
+
+    # draw fron binomial distribution
+    draws <- rbinom(n_both, 1, prob)
+    v[which(samples %in% eid_both)] <- draws
+
+    return(v)
+}
+
+
 
 # create original knockout as specified by the "kos" data.table
 create_original_ko <- function(samples, kos){
@@ -202,7 +235,7 @@ main <- function(args){
     # replicate knockout
     n <- as.numeric(args$permutations)
     vcf_samples <- readLines(args$input_path)
-    reps <- replicate(n, shuffle_knockouts2(vcf_samples, kos))
+    reps <- replicate(n, shuffle_knockouts3(vcf_samples, kos))
     rownames(reps) <- vcf_samples
     reps <- data.table(t(reps))
 
@@ -273,6 +306,19 @@ main <- function(args){
         final$INFO <- calc_info(dosage)
         sds <- unlist(apply(dosage, 1, sd))
     }
+    
+    # Sometimes markers with zero AC are crated,
+    # let's remove them before entering SAIGE.
+    if (any(is.na(sds))) stop("Some standard devations are NA! Something went wrong with shuffle")
+    if (args$remove_invariant_markers){
+        bool_invariant <- (sds == 0)
+        n_invariant <- sum(bool_invariant)
+        print(n_invariant)
+        if (n_invariant > 0){
+            final <- final[!bool_invariant,]
+            write(paste("[_gene_permute.R]: Removed", n_invariant, "invariant markers."), stderr())
+        }
+    }
 
     # Include original marker?
     if (args$include_original_knockout) {
@@ -286,19 +332,7 @@ main <- function(args){
         final <- final[order(as.numeric(final$POS)),]
     }
 
-    # Sometimes markers with zero AC are crated,
-    # let's remove them before entering SAIGE.
-    if (any(is.na(sds))) stop("Some standard devations are NA! Something went wrong with shuffle")
-    if (args$remove_invariant_markers){
-        bool_invariant <- sds == 0
-        n_invariant <- sum(bool_invariant)
-        print(n_invariant)
-        if (n_invariant > 0){
-            final <- final[!bool_invariant,]
-            write(paste("[_gene_permute.R]: Removed", n_invariant, "invariant markers."), stderr())
-        }
-    }
-
+    
     # (1) write header of VCF
     vcf_out = make_vcf_dosage_header(args$chrom)
     outfile = paste0(args$out_prefix, ".vcf")

@@ -11,7 +11,12 @@ main <- function(args){
     if (!file.exists(args$input_path)) stop(paste(args$input_path, "does not exist!"))
     d <- fread(args$input_path)
     d <- d[grepl(d$MarkerID, pattern="ENSG"),]
-    p <- as.numeric(d$p.value)
+    # allow conditional P-values
+    if ("p.value_c" %in% colnames(d)){
+      p <- as.numeric(d$p.value_c)
+    } else {
+      p <- as.numeric(d$p.value)
+    } 
     sorted_p <- sort(p)
     top_p <- sorted_p[as.numeric(args$select_min_p)]
     top_p <- top_p * as.numeric(args$multiply_p)
