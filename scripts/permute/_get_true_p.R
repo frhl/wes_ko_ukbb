@@ -30,6 +30,8 @@ main <- function(args){
     true_t <- unique(true_t)
     stopifnot(length(true_p) == 1)
     stopifnot(length(true_t) == 1)
+    if (is.na(true_p)) stop(paste("true P is NA for", args$input_path))
+    
     write(true_p, stdout())
 
 }

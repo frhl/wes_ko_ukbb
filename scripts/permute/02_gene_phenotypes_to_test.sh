@@ -38,6 +38,6 @@ Rscript ${rscript} \
   --out_prefix ${out_prefix} \
 
 # create seperate header file containing things to run
-zcat "${out_prefix}.tsv.gz" | cut -f1 | tail -n +2 > "${out_prefix}_header.txt"
+zcat "${out_prefix}.tsv.gz" | cut -f1 | tail -n +2 | sort | uniq  > "${out_prefix}_header.txt"
 
 
