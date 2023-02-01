@@ -235,7 +235,7 @@ main <- function(args){
     # replicate knockout
     n <- as.numeric(args$permutations)
     vcf_samples <- readLines(args$input_path)
-    reps <- replicate(n, shuffle_knockouts3(vcf_samples, kos))
+    reps <- replicate(n, shuffle_knockouts2(vcf_samples, kos))
     rownames(reps) <- vcf_samples
     reps <- data.table(t(reps))
 

@@ -44,9 +44,9 @@ readonly cond_genotypes="${cond_dir}/common_conditional.tsv.gz"
 
 # parameters for master script
 readonly min_mac=4
-readonly n_replicates=1000
-readonly n_start_shuffle=1000 #1000
-readonly n_cutoff_shuffle=100000 #10000000
+readonly n_replicates=100
+readonly n_start_shuffle=100 #1000
+readonly n_cutoff_shuffle=1000 #100000 #10000000
 readonly n_slots_saige=1
 readonly n_slots_permute=1
 readonly queue_saige="short"
@@ -61,11 +61,11 @@ readonly use_cond_common=1
 
 # get path to true P-value and t-stats
 readonly overview_dir="data/permute/overview"
-readonly genes_path="${overview_dir}/genes_to_run.tsv.gz"
+readonly genes_path="${overview_dir}/genes_to_run_5cis_5chets.tsv.gz"
 
 # count how many genes to submit for the given chromosome
 readonly n_genes="$( zcat ${genes_path} | grep -w "chr${chr}" | wc -l)"
-readonly slurm_tasks="1-${n_genes}"
+readonly slurm_tasks="1" #-${n_genes}"
 readonly slurm_jname="_chr${chr}_permute"
 readonly slurm_lname="logs/_permute"
 readonly slurm_project="lindgren.prj"

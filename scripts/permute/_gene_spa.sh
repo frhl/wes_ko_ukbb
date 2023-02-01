@@ -72,8 +72,13 @@ if [ ! -f ${out_gene_task} ]; then
        --condition_file=${out_markers} \
        --LOCO=FALSE
     set +x
+    if [ ! -f "${out_gene_task}.gz" ]; then
+      gzip ${out_gene_task}
+    else
+      >&2 echo "${out_gene_task}.gz already exists. Skipping gzip."
+    fi
     rm -f "${out_gene_task}.index"
-    gzip ${out_gene_task}
+    rm -f "${out_gene_task}"
   else
     touch ${out_file_failure}
   fi
