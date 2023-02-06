@@ -27,8 +27,8 @@ main <- function(args){
     colnames(pheno_matrix) <- dictionary$unix_code
 
     # subset tte_matrix
-    samples <- fread(args$samples, header = FALSE)
-    tte_matrix <- tte_matrix[tte_matrix$eid %in% samples,]
+    samples_to_keep <- fread(args$samples, header = FALSE)$V1
+    tte_matrix <- tte_matrix[tte_matrix$eid %in% samples_to_keep,]
     
     # rename columns based on current definitions
     header <- fread(args$path_header, header = FALSE)$V1
