@@ -11,32 +11,46 @@ main <- function(args){
     colnames(kos)[colnames(kos) == "gene_id"] <- "ensembl_gene_id"
     kos <- kos[kos$pKO >= 0.5,]
 
-    # get phenotyoes
+    # only extract chet/hom status if the phenotype 
+    # is defined (i.e. not NA) for a given sample.
     phenotype_df <- fread(args$path_phenotypes)
-
-    # load hits that we want to get clinvar data on
     d <- fread(args$path_hits_to_analyze)
-    d$phenotype <- gsub("chr[0-9]+\\_","",d$phenotype)
-    d <- d[d$p.value < (0.05 / (313 * 1143)),]
-    d <- d[d$N_ko_case >= 2]
-    d <- d[,1:3]
-    d <- d[!duplicated(d),]    
+
+    # for now, we need to do slightly different pre-processing
+    if (args$path_hits_type %in% "saige") {
+        # load hits that we want to get clinvar data on
+        d$phenotype <- gsub("chr[0-9]+\\_","",d$phenotype)
+        d <- d[d$p.value < (0.05 / (313 * 1143)),]
+        d <- d[d$N_ko_case >= 2]
+        d <- d[,1:3]
+        d <- d[!duplicated(d),]    
+    } else if (args$path_hits_type %in% "hazard") {
+        # so far no post-processing needed 
+        d <- d
+    }
+
+    # ensure right columsn
+    stopifnot("MarkerID" %in% colnames(d))
+    stopifnot("CHR" %in% colnames(d))
+    stopifnot("phenotype" %in% colnames(d))
+    #stopifnot(any(d$phenotype %in% colnames(phenotype_df)))
 
     # go over all hits and analyze
     for (idx in 1:nrow(d)){
         gene <- d$MarkerID[idx]
         chr <- d$CHR[idx]
         phenotype <- d$phenotype[idx]
+        eids <- phenotype_df$eid[phenotype_df[[phenotype]]]
         path_info_chr <- gsub("chrCHR", chr, args$path_info)
         path_clinvar_chr <- gsub("chrCHR", chr, args$path_clinvar)
         write(paste("running", gene, phenotype), stderr())
         evidence <- summarize_variant_evidence(
             gene = gene,
             phenotype = phenotype,
-            phenotype_df = phenotype_df,
             path_info = path_info_chr,
             path_clinvar = path_clinvar_chr,
-            kos = kos
+            kos = kos,
+            eids = eids
         )
         outfile <- paste0(args$out_prefix,"_",phenotype,"_",gene,".txt")
         fwrite(evidence, outfile, sep = "\t")
@@ -45,7 +59,7 @@ main <- function(args){
 
 }
 
-summarize_variant_evidence <- function(gene, phenotype, phenotype_df, path_info, path_clinvar, kos){
+summarize_variant_evidence <- function(gene, phenotype, path_info, path_clinvar, kos, eids = NULL){
     
     stopifnot(nrow(kos)>0)
     stopifnot(nrow(phenotype) > 0)
@@ -58,7 +72,9 @@ summarize_variant_evidence <- function(gene, phenotype, phenotype_df, path_info,
     stopifnot(chr_info == chr_clinvar)
     
     # load sames that are 
-    eids <- phenotype_df$eid[phenotype_df[[phenotype]]]
+    if (is.null(eids)) {
+        eids <- unique(kos$s) 
+    }
     stopifnot(length(eids) > 1)
     samples <- kos
     samples_with_genes <- samples[samples$ensembl_gene_id %in% gene,]
@@ -170,6 +186,7 @@ parser$add_argument("--path_clinvar", default=NULL, required = TRUE, help = "")
 parser$add_argument("--path_info", default=NULL, required = TRUE, help = "")
 parser$add_argument("--path_phenotypes", default=NULL, required = TRUE, help = "")
 parser$add_argument("--path_hits_to_analyze", default=NULL, required = TRUE, help = "")
+parser$add_argument("--path_hits_type", default="saige", required = TRUE, help = "Either 'saige' or 'hazard'.")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()
 

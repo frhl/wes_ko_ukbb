@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-#$ -N count_case_control_ko
+#$ -N count_cases
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/count_case_control_ko.log
-#$ -e logs/count_case_control_ko.errors.log
+#$ -o logs/count_cases.log
+#$ -e logs/count_cases.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 12
 #$ -q short.qc
@@ -14,12 +14,17 @@ set -o nounset
 
 source utils/bash_utils.sh
 
-readonly rscript="scripts/post_hoc/02_count_case_ctrl_ko.R"
+readonly rscript="scripts/post_hoc/02_count_cases.R"
 
 readonly pheno_dir="data/phenotypes"
 readonly phenos="${pheno_dir}/dec22_phenotypes_binary_200k.tsv.gz"
+
+
+
 readonly ko_dir="data/knockouts/alt/pp90/combined"
 readonly out_dir="data/post_hoc/results"
+
+readonly samples=""
 
 mkdir -p ${out_dir}
 
