@@ -108,9 +108,9 @@ main <- function(args){
 
     # get tier A in the top
     d <- d[order(d$p.value),]
-    d1 <- d[d$N_ko_case == 1,]
-    d2 <- d[d$N_ko_case >= 2,]
-    d <- rbind(d2, d1)
+    #d1 <- d[d$N_ko_case == 1,]
+    #d2 <- d[d$N_ko_case >= 2,]
+    #d <- rbind(d2, d1)
 
     # clean up
     d$hgnc_symbol[d$hgnc_symbol==""] <- NA
