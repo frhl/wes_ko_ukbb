@@ -55,7 +55,7 @@ simulate_phenotypes() {
   local vars="${var_beta}_${var_theta}"
   local pis="${pi_beta}_${pi_theta}"
 
-  local prefix="ukb_eur_h2_${h2}_var_${vars}_pi_${pis}_K${K}_seed${seed}_chr${chr}"
+  local prefix="ukb_wes_union_calls_h2_${h2}_var_${vars}_pi_${pis}_K${K}_seed${seed}_chr${chr}"
   #local prefix="ukb_eur_h2_${h2s}_pi_${pis}_K${K}_seed${seed}_chr${chr}"
   local pheno_file="${pheno_dir}/${prefix}_phenos.tsv.gz"
 
@@ -95,13 +95,13 @@ readonly tasks="1-5"
 
 
 # this works and results in nice phenotypes
-#run_with_params 0.00 0.00 0.00 0.01 0.01 600
-#run_with_params 0.001 0.10 99.0 0.20 0.20 601
-#run_with_params 0.002 0.10 99.0 0.20 0.20 602
-#run_with_params 0.005 0.10 99.0 0.20 0.20 603
-#run_with_params 0.01 0.10 99.0 0.20 0.20 604
-#run_with_params 0.02 0.10 99.0 0.20 0.20 605
-#run_with_params 0.05 0.10 99.0 0.20 0.20 606
+run_with_params 0.00 0.00 0.00 0.01 0.01 100
+run_with_params 0.001 0.10 99.0 0.20 0.20 101
+run_with_params 0.002 0.10 99.0 0.20 0.20 102
+run_with_params 0.005 0.10 99.0 0.20 0.20 103
+run_with_params 0.01 0.10 99.0 0.20 0.20 104
+run_with_params 0.02 0.10 99.0 0.20 0.20 105
+run_with_params 0.05 0.10 99.0 0.20 0.20 106
 
 #run_with_params 0.001 0.10 99.0 1.00 1.00 601
 #run_with_params 0.002 0.10 99.0 1.00 1.00 602
@@ -111,11 +111,11 @@ readonly tasks="1-5"
 #run_with_params 0.05 0.10 99.0 1.00 1.00 606
 
 
-run_with_params 0.001 10.0 0.10 0.20 0.20 601
-run_with_params 0.001 0.10 0.10 0.20 0.20 601
-run_with_params 0.001 0.10 1.00 0.20 0.20 602
-run_with_params 0.001 0.10 10.0 0.20 0.20 603
-run_with_params 0.001 0.10 99.0 0.20 0.20 604
+#run_with_params 0.001 10.0 0.10 0.20 0.20 601
+#run_with_params 0.001 0.10 0.10 0.20 0.20 601
+#run_with_params 0.001 0.10 1.00 0.20 0.20 602
+#run_with_params 0.001 0.10 10.0 0.20 0.20 603
+#run_with_params 0.001 0.10 99.0 0.20 0.20 604
 
 #run_with_params 0.005 10.0 0.10 0.20 0.20 501
 #run_with_params 0.005 0.10 0.10 0.20 0.20 501

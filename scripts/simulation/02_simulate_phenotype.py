@@ -93,7 +93,7 @@ def main(args):
         # both G_add_norm and G_rec_norm are on the same scale, however G_rec_norm
         # has been normalized AFTER excluding DS < 2, i.e. only recessive effects will be allowed.
         mt = mt.annotate_cols(y_no_noise_add=hl.agg.sum(mt.beta * mt.G_add_norm)) # beta
-        mt = mt.annotate_cols(y_no_noise_rec=hl.agg.sum(mt.theta * mt.G_rec_norm)) # theta
+        mt = mt.annotate_cols(y_no_noise_rec=hl.agg.sum(mt.theta * mt.G_rec_norm_by_add)) # theta
         mt = mt.annotate_cols(y_no_noise=mt.y_no_noise_add+mt.y_no_noise_rec)
 
         # re-scale effects genetic effects accordingly 
