@@ -41,8 +41,7 @@ readonly spark_dir="data/tmp/spark"
 readonly samples_per_chunk=100
 # what matrix table should samples be taken from
 readonly input_samples_dir="data/prephased/wes_union_calls/chunks/intervals"
-readonly input_samples="${input_samples_dir}/"
-
+readonly input_samples="${input_samples_dir}/.."
 
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )

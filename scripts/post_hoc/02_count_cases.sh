@@ -5,7 +5,7 @@
 #$ -o logs/count_cases.log
 #$ -e logs/count_cases.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 12
+#$ -pe shmem 2
 #$ -q short.qc
 #$ -V
 
@@ -17,35 +17,38 @@ source utils/bash_utils.sh
 readonly rscript="scripts/post_hoc/02_count_cases.R"
 
 readonly pheno_dir="data/phenotypes"
-readonly phenos="${pheno_dir}/dec22_phenotypes_binary_200k.tsv.gz"
+readonly phenos_boolean="${pheno_dir}/dec22_phenotypes_binary_200k.tsv.gz"
+readonly phenos_header="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
+readonly phenos_tte="${pheno_dir}/tte_matrix_176k.txt.gz"
 
+readonly sample_dir="data/phenotypes/samples"
+readonly samples="${sample_dir}/ukb_wes_ko.qc.nfe.samples"
 
-
-readonly ko_dir="data/knockouts/alt/pp90/combined"
 readonly out_dir="data/post_hoc/results"
-
-readonly samples=""
 
 mkdir -p ${out_dir}
 
 set_up_rpy
 
 count_ko_case_ctrl() {
-  local annotation="${1}"
-  local ko_file="${ko_dir}/ukb_eur_wes_200k_chrCHR_${annotation}_all.tsv.gz"
-  local out_prefix="${out_dir}/ukb_eur_wes_200k_case_ctrl_${annotation}"
+  local phenos="${1}"
+  local out_tag="${2}"
+  local annotation="${3}"
+  local out_prefix="${out_dir}/ukb_eur_wes_200k_case_ctrl_${annotation}_${out_tag}"
   Rscript ${rscript} \
     --phenotypes ${phenos} \
-    --ko_file ${ko_file} \
+    --phenos_path ${phenos_header} \
+    --annotation ${annotation} \
+    --samples ${samples} \
     --out_prefix ${out_prefix}
 }
 
-
-#count_ko_case_ctrl "pLoF"
+count_ko_case_ctrl "${phenos_tte}" "tte" "pLoF"
+#count_ko_case_ctrl "${phenos_boolean}" "bool" "pLoF"
 #count_ko_case_ctrl "damaging_missense"
 #count_ko_case_ctrl "pLoF_damaging_missense"
-count_ko_case_ctrl "other_missense"
-count_ko_case_ctrl "synonymous"
+#count_ko_case_ctrl "other_missense"
+#count_ko_case_ctrl "synonymous"
 
 
 

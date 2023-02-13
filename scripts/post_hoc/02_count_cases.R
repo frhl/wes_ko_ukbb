@@ -1,5 +1,6 @@
 #!/usr/bin/env Rscript
 
+source("scripts/post_hoc/utils.R")
 library(argparse)
 library(data.table)
 
@@ -19,26 +20,35 @@ names(ensg_to_hgnc) <- bridge$ensembl_gene_id
 main <- function(args){
 
   stopifnot(file.exists(args$phenotypes))
+  stopifnot(file.exists(args$phenos_path))
+  stopifnot(file.exists(args$samples))
  
   # read in phenotypes
   phenotypes <- fread(args$phenotypes)
-  binary_cols <- unlist(sapply(phenotypes, class)) == 'logical'
-  binary_names <- names(binary_cols)[binary_cols]
+  
+  # subset columns
   keep_cols <- c("eid","sex")
-  phenotypes <- phenotypes[,binary_cols | colnames(phenotypes) %in%  keep_cols, with = FALSE] 
- 
-  # read on all knockouts
-  ko <- do.call(rbind, lapply(1:22, function(chr){fread(gsub("CHR",chr,args$ko_file))}))
-  #ko <- ko[ko$pKO >= 0.5]
+  pheno_list <- fread(args$phenos_path, header=FALSE)$V1
+  phenotypes <- phenotypes[,colnames(phenotypes) %in% c(keep_cols, pheno_list),with=FALSE]
+  pheno_list <- pheno_list[pheno_list %in% colnames(phenotypes)]
+
+  # read samples to keep
+  samples_to_keep <- fread(args$samples, header = FALSE)$V1
+  phenotypes <- phenotypes[phenotypes$eid %in% samples_to_keep,]
+
+  # read all knockouts
+  ko <- read_ukb_wes_kos(args$annotation, chromosomes = 1:22)
   ko <- ko[,c('gene_id',"s","knockout")]
   ko$knockout <- labels[ko$knockout]
   ko <- merge(ko, phenotypes, by.x = "s", by.y = "eid", all.x = TRUE)
 
-  by_samples <- do.call(rbind, lapply(binary_names, function(p){
+  by_samples <- do.call(rbind, lapply(pheno_list, function(p){
     
     # count number of samples that are knockouts
     ko_tmp <- ko[,c('s','knockout',p), with = FALSE]
+    ko_tmp$p <- as.logical(ko_tmp[[p]])
     f <- as.formula(paste0("s~knockout"))
+    
     ko_tmp <- dcast(f, data = ko_tmp, fun.aggregate = sum, value.var = p)
     ko_tmp[is.na(ko_tmp)] <- 0
     names <- colnames(ko_tmp)[-1]
@@ -95,9 +105,11 @@ main <- function(args){
 
 # add arguments
 parser <- ArgumentParser()
-parser$add_argument("--phenotypes", default=NULL, help = "chromosome")
-parser$add_argument("--ko_file", default=NULL, help = "chromosome")
+parser$add_argument("--phenotypes", default=NULL, help = "path to data.frame for phenotype status")
+parser$add_argument("--phenos_path", default=NULL, help = "(path to) phenotypes to actually run")
+parser$add_argument("--samples", default=NULL, help = "file (without header) containg samples to subset by")
 parser$add_argument("--out_prefix", default=NULL, help = "prefix for out file")
+parser$add_argument("--annotation", default="pLoF_damaging_missense", help = "what annotation to be extracted")
 args <- parser$parse_args()
 
 main(args)
