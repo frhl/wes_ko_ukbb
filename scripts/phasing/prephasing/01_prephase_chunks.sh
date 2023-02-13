@@ -18,7 +18,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 21
+#$ -t 6
 #$ -V
 
 set -o errexit
@@ -39,6 +39,10 @@ readonly spark_dir="data/tmp/spark"
 
 # how many samples should there be in each chunk 
 readonly samples_per_chunk=100
+# what matrix table should samples be taken from
+readonly input_samples_dir="data/prephased/wes_union_calls/chunks/intervals"
+readonly input_samples="${input_samples_dir}/"
+
 
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
@@ -50,7 +54,7 @@ readonly queue="short"
 readonly nslots=2
 
 # what file should be split up
-readonly input_dir="data/unphased/wes_union_calls/prefilter_no_maf_cutoff/200k"
+readonly input_dir="data/unphased/wes_union_calls/prefilter/200k"
 readonly input_path="${input_dir}/ukb_wes_union_calls_chr${chr}.vcf.gz" 
 readonly input_type="vcf"
 
