@@ -38,7 +38,7 @@ main <- function(args){
             d$marker_out <- NULL
             return(d)
         }))
-        out_prefix_pheno <- paste0(args$out_prefix,".permuted.pvalues.",trait,".txt.gz")
+        out_prefix_pheno <- paste0(args$out_prefix,".permuted.p.",trait,".txt.gz")
         fwrite(d, out_prefix_pheno, sep = '\t')
         
         # calculate empirical P-value 
@@ -50,7 +50,7 @@ main <- function(args){
             return(data.table(gene = gene, hgnc_symbol=hgnc, p.obs=get_emp_p(d), permutations=permutations))
         }))
         # write the resulting file
-        out_prefix_pheno <- paste0(args$out_prefix,".empirical.pvalues.",trait,".txt.gz")
+        out_prefix_pheno <- paste0(args$out_prefix,".empirical.p.",trait,".txt.gz")
         fwrite(d, out_prefix_pheno, sep = '\t')
     }    
 }
