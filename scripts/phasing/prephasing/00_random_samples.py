@@ -27,6 +27,7 @@ if __name__=='__main__':
     parser.add_argument('--input_path', default=None, help='')
     parser.add_argument('--input_type', default=None, help='')
     parser.add_argument('--out_prefix', default=None, help='')
+    parser.add_argument('--seed', default=None, help='')
     parser.add_argument('--random_samples_count', default=None, help='')
 
     args = parser.parse_args()
