@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 22
+#$ -t 1
 #$ -V
 
 set -o errexit
@@ -27,7 +27,7 @@ readonly covariates=$( cat ${covar_file} )
 
 readonly chr=$( get_chr ${SGE_TASK_ID} )
 readonly in_dir="data/simulation/knockouts"
-readonly in_prefix="${in_dir}/ukb_eur_100k_encoded_norm_knockouts_chr${chr}.mt"
+readonly in_prefix="${in_dir}/ukb_wes_union_calls_10k_encoded_norm_knockouts_chr${chr}.mt"
 readonly in_type="mt"
 
 readonly out_dir="data/simulation/phenotypes"
@@ -51,7 +51,7 @@ simulate_phenotypes() {
   local vars="${var_beta}_${var_theta}"
   local pis="${pi_beta}_${pi_theta}"
 
-  local out_prefix="${out_dir}/ukb_eur_h2_${h2}_var_${vars}_pi_${pis}_K${K}_seed${seed}_chr${chr}"
+  local out_prefix="${out_dir}/ukb_wes_union_calls_h2_${h2}_var_${vars}_pi_${pis}_K${K}_seed${seed}_chr${chr}"
   local out_phenotypes="${out_prefix}_phenos.tsv.gz"
   
   local sim_name="sim_c${SGE_TASK_ID}_h2_${h2}_var_${vars}_pi_${pis}"
@@ -95,7 +95,7 @@ simulate_phenotypes() {
 
 readonly queue="short.qc"
 readonly nslots="2"
-readonly tasks=1-5 #-2
+readonly tasks=1 #-2
 
 #simulate_phenotypes 0.00 0.00 0.00 0.01 0.01
 
@@ -109,12 +109,12 @@ readonly tasks=1-5 #-2
 
 # this works and results in nice phenotypes
 run_with_params 0.00 0.00 0.00 0.01 0.01 100
-run_with_params 0.001 0.10 99.0 0.20 0.20 101
-run_with_params 0.002 0.10 99.0 0.20 0.20 102
-run_with_params 0.005 0.10 99.0 0.20 0.20 103
-run_with_params 0.01 0.10 99.0 0.20 0.20 104
-run_with_params 0.02 0.10 99.0 0.20 0.20 105
-run_with_params 0.05 0.10 99.0 0.20 0.20 106
+#run_with_params 0.001 0.10 99.0 0.20 0.20 101
+#run_with_params 0.002 0.10 99.0 0.20 0.20 102
+#run_with_params 0.005 0.10 99.0 0.20 0.20 103
+#run_with_params 0.01 0.10 99.0 0.20 0.20 104
+#run_with_params 0.02 0.10 99.0 0.20 0.20 105
+#run_with_params 0.05 0.10 99.0 0.20 0.20 106
 
 #run_with_params 0.001 0.10 99.0 1.00 1.00 601
 #run_with_params 0.002 0.10 99.0 1.00 1.00 602

@@ -5,9 +5,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/encode_ko.log
 #SBATCH --error=logs/encode_ko.errors.log
-#SBATCH --partition=short
+#SBATCH --partition=epyc
 #SBATCH --cpus-per-task 3
-#SBATCH --array=20
+#SBATCH --array=22
 #
 #$ -N encode_ko
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -31,11 +31,12 @@ readonly chr=$( get_chr ${array_idx} )
 
 readonly n_samples="100k"
 readonly in_dir="data/simulation/mt"
-readonly in_file="${in_dir}/ukb_eur_${n_samples}_chr${chr}.mt"
+readonly in_file="${in_dir}/ukb_wes_union_calls_100k_chr${chr}.mt"
+
 readonly in_type="mt"
 
 readonly out_dir="data/simulation/knockouts"
-readonly out_prefix="${out_dir}/ukb_eur_${n_samples}_encoded_norm_knockouts_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_${n_samples}_encoded_chr${chr}"
 readonly out_type="vcf"
 
 # Allele frequency thresholds to filter on

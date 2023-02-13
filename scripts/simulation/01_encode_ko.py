@@ -38,7 +38,6 @@ def main(args):
     exclude = args.exclude
     use_loftee = args.use_loftee
     csqs_category = args.csqs_category
-    discard_prob_dosages = args.discard_prob_dosages
     
     seed=42
 
@@ -120,7 +119,6 @@ def main(args):
     prob = mt.annotate_entries(DS=mt.pKO * 2)
     prob = prob.annotate_entries(GT=ko.get_gt_from_floor_ds(prob.DS))
     prob = prob.select_entries(*[prob.DS, prob.GT, prob.pKO, prob.knockout, prob.G, prob.G_add_norm, prob.G_rec, prob.G_rec_norm_by_add, prob.G_rec_norm_by_rec])
-    #prob = prob.select_entries(prob.DS)
     prob = prob.add_row_index()
     prob = prob.annotate_rows(
         locus = ht[prob.row_idx].locus,
@@ -142,12 +140,6 @@ def main(args):
     # remove invariant sites
     prob = prob.annotate_rows(stdev = hl.agg.stats(prob.DS).stdev)
     prob = prob.filter_rows(prob.stdev > 0)
-
-    # discard effects owed to unphased singletons
-    if discard_prob_dosages:
-        new_DS = ko.discard_prob_dosages(prob.DS)
-        prob = prob.transmute_entries(DS = new_DS)
-        print("discarding singletons")
 
     # export genes with knockouts
     genes = prob.drop(prob.stats_add)
@@ -178,7 +170,6 @@ if __name__=='__main__':
     parser.add_argument('--maf_max', default=None, help='Select all variants with a maf less than the indicated value')
     parser.add_argument('--exclude', default=None, help='exclude variants by rsid and/or variant id')
     parser.add_argument('--use_loftee', default=False, action='store_true', help='use LOFTEE to distinghiush between high confidence PTVs')
-    parser.add_argument('--discard_prob_dosages', default=False, action='store_true', help='Discard any dosages < 2 by setting them to zero.')
     parser.add_argument('--csqs_category', default=None, action=SplitArgs, help='What categories should be subsetted to?')
     args = parser.parse_args()
 
