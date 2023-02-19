@@ -1,4 +1,0 @@
-/var/spool/slurmd/job11535800/slurm_script: line 12: utils/bash_utils.sh: No such file or directory
-/var/spool/slurmd/job11535800/slurm_script: line 13: utils/qsub_utils.sh: No such file or directory
-/var/spool/slurmd/job11535800/slurm_script: line 30: set_up_rpy: command not found
-Fatal error: cannot open file 'scripts/post_hoc/24_gene_geneset_counts.R': No such file or directory
