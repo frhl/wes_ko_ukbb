@@ -1,11 +1,20 @@
 
-library(MASS) # for glm.nb
 library(ggplot2)
 library(data.table)
 library(argparse)
 
 # holds all the functions to load knockouts
 source("scripts/post_hoc/utils.R")
+hgnc_to_ensembl <- get_mapping_hgnc_to_ensembl()
+
+# new nice labels and order for levels
+mapping <- c(
+    "Heterozygote" = "Heterozygote",
+    'Homozygote' = 'Homozygote',
+    "Compound heterozygote" = "Compound heterozygote",
+    "Compound heterozygote (cis)" = "Two-hit (Cis)",
+    "Knockout" = "Knockout"
+)
 
 # go over a geneset and count
 check_geneset <- function(dt, geneset, to_real_table = TRUE){
@@ -82,7 +91,7 @@ main <- function(args){
 
     # get gtex categories
     outfile <- paste0(args$out_prefix,".", annotation, ".txt.gz")
-    fwrite(final, outfile)
+    fwrite(final, outfile, sep = "\t")
 
 }
 

@@ -7,7 +7,6 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -V
 
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
@@ -21,7 +20,7 @@ mkdir -p ${out_dir}
 
 
 get_gene_table () {
-  local anotation=${1}
+  local annotation=${1}
   Rscript "${rscript}" \
     --annotation "${annotation}" \
     --out_prefix "${out_prefix}"
@@ -29,5 +28,8 @@ get_gene_table () {
 
 set_up_rpy
 get_gene_table "pLoF"
+get_gene_table "pLoF_damaging_missense"
+get_gene_table "damaging_missense"
+get_gene_table "synonymous"
 
 
