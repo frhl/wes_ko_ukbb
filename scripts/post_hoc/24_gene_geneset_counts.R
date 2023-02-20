@@ -90,7 +90,7 @@ main <- function(args){
     rownames(final) <- NULL
 
     # get gtex categories
-    outfile <- paste0(args$out_prefix,".", annotation, ".txt.gz")
+    outfile <- paste0(args$out_prefix,".", annotation, ".txt")
     fwrite(final, outfile, sep = "\t")
 
 }

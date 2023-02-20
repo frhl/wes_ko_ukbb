@@ -80,7 +80,7 @@ eval_wes_ko_geneset <- function(geneset, total_samples, exclude_ensgid = NULL){
     d_damaging_missense <- get_sample_ko_table(d, categories, geneset, total_samples, knockout_annotation)
     
     # synonymous
-    d <- read_ukb_wes_kos("synoymous")
+    d <- read_ukb_wes_kos("synonymous")
     if (!is.null(exclude_ensgid)) d <- d[!(d$gene_id %in% exclude_ensgid),]
     categories <- unique(d$knockout)
     d_synonymous <- get_sample_ko_table(d, categories, geneset, total_samples, knockout_annotation)
@@ -102,8 +102,9 @@ eval_wes_ko_geneset <- function(geneset, total_samples, exclude_ensgid = NULL){
     d_plof_damaging_missense <- d_plof_damaging_missense[match(d_plof$category, d_plof_damaging_missense$category),]
     d_damaging_missense <- d_damaging_missense[match(d_plof$category, d_damaging_missense$category),]
     d_synonymous <- d_synonymous[match(d_plof$category, d_synonymous$category),]
-    d_other_missense <- d_synonymous[match(d_plof$category, d_other_missense$category),]
-    
+    d_other_missense <- d_other_missense[match(d_plof$category, d_other_missense$category),]
+
+    # check that all categories are matching    
     stopifnot(d_plof_damaging_missense$category == d_plof$category)
     stopifnot(d_plof_damaging_missense$category == d_damaging_missense$category)
     stopifnot(d_plof_damaging_missense$category == d_synonymous$category)
@@ -135,7 +136,7 @@ main <- function(args){
 
     # protein coding genes in ensembl
     coding <- fread("/well/lindgren/flassen/ressources/genesets/genesets/data/biomart//protein_coding_genes.tsv") 
-    coding_esngid <- unique(coding$ensembl_gene_id)
+    coding_ensgid <- unique(coding$ensembl_gene_id)
 
     # total samples
     total_samples = 176587
@@ -145,12 +146,12 @@ main <- function(args){
 
     # evaluate omim
     dt_omim <- eval_wes_ko_geneset(omim_ensgid,  total_samples, common_kos_to_exclude)   
-    outfile <- paste0(args$out_prefix,".omim.txt.gz")
+    outfile <- paste0(args$out_prefix,".omim.txt")
     fwrite(dt_omim, outfile, sep = "\t")
 
     # evalauate ensembl protein coding
     dt_omim <- eval_wes_ko_geneset(coding_ensgid,  total_samples, common_kos_to_exclude)   
-    outfile <- paste0(args$out_prefix,".ensembl.protein_coding.txt.gz")
+    outfile <- paste0(args$out_prefix,".ensembl.protein_coding.txt")
     fwrite(dt_omim, outfile, sep = "\t")
 
 
