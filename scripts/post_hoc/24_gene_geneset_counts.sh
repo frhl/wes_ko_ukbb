@@ -5,7 +5,7 @@
 #$ -o logs/gene_geneset_counts.log
 #$ -e logs/gene_geneset_counts.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 1
+#$ -pe shmem 3
 #$ -q short.qc
 
 source utils/bash_utils.sh
