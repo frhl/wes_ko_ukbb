@@ -9,16 +9,16 @@
 #SBATCH --error=logs/merge_prephased.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 5
-#SBATCH --array=22
+#SBATCH --array=1
 #
 #$ -N merge_prephased
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/merge_prephased.log
 #$ -e logs/merge_prephased.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 8
+#$ -pe shmem 5
 #$ -q short.qc
-#$ -t 21
+#$ -t 1
 #$ -V
 
 set -o errexit
@@ -27,7 +27,6 @@ set -o nounset
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
 source utils/vcf_utils.sh
-
 
 # how many samples should there be in each chunk 
 readonly n_split=500
@@ -61,34 +60,42 @@ cat ${input_list} | sort | uniq  > ${tmp}
 readonly n=$( cat ${tmp} | wc -l)
 readonly n_rounded=$( echo $n | sed 's|.*|(&+500)/1000*1000|' | bc )
 
-set -x
-
 if [ ! -f "${out_vcf_gz}" ]; then
   module load BCFtools/1.12-GCC-10.3.0
+  #module load BCFtools/1.10.2-GCC-8.3.0
   # loop over chunks of n_split
-  for idx_start in $(seq 1 ${n_split} ${n_rounded}); do 
-    # create temporary mergelist
-    idx_end=$( echo "${idx_start}+${n_split}-1" | bc )
-    tmp_idx="${tmp}_partition${idx_start}to${idx_end}"
-    sed -n "${idx_start},${idx_end} p" ${tmp} > ${tmp_idx}
-    # create paths to partition files
-    out_idx_vcf="${in_prefix}_partition${idx_start}_${idx_end}.vcf"
-    out_idx_vcf_gz="${out_idx_vcf}.gz"
-    echo "Combining partition ${idx_start} to ${idx_end} in ${out_vcf}.."
-    echo "${out_idx_vcf_gz}" >> ${input_super_list}
-    # combine the files
-    if [ ! -f "${out_idx_vcf_gz}" ]; then
-      bcftools merge -l "${tmp_idx}" -Oz -o "${out_idx_vcf_gz}"
-    fi
-    # index files
-    echo "Indexing partition ${out_idx_vcf}.."
-    if [ ! -f "${out_idx_vcf_gz}.tbi" ]; then
-      make_tabix "${out_idx_vcf_gz}" "tbi"
-    fi
-    # remove merge indexes
-    rm ${tmp_idx}
-  done 
-  
+  echo "n_split=${n_split}"
+  echo "n_rounded=${n_rounded}"
+  # if there are more than 500 x 1000 samples them into chunks
+  if [ ${n_rounded} -ge ${n_split} ]; then
+    for idx_start in $(seq 1 ${n_split} ${n_rounded}); do 
+      echo "Starting loop at idx ${idx_start}."
+      # create temporary mergelist
+      idx_end=$( echo "${idx_start}+${n_split}-1" | bc )
+      tmp_idx="${tmp}_partition${idx_start}to${idx_end}"
+      sed -n "${idx_start},${idx_end} p" ${tmp} > ${tmp_idx}
+      # create paths to partition files
+      out_idx_vcf="${in_prefix}_partition${idx_start}_${idx_end}.vcf"
+      out_idx_vcf_gz="${out_idx_vcf}.gz"
+      echo "Combining partition ${idx_start} to ${idx_end} in ${out_vcf}.."
+      echo "${out_idx_vcf_gz}" >> ${input_super_list}
+      # combine the files
+      if [ ! -f "${out_idx_vcf_gz}" ]; then
+        bcftools merge -l "${tmp_idx}" -Oz -o "${out_idx_vcf_gz}"
+      fi
+      # index files
+      echo "Indexing partition ${out_idx_vcf}.."
+      if [ ! -f "${out_idx_vcf_gz}.tbi" ]; then
+        make_tabix "${out_idx_vcf_gz}" "tbi"
+      fi
+      # remove merge indexes
+      rm ${tmp_idx}
+    done 
+  # otherwise just merge the ones we have
+  else
+    mv ${input_list} ${input_super_list}
+  fi
+
   # create final VCF file
   echo "Partitions done! Merging into final file '${out_vcf_gz}'.."
   cat ${input_super_list} | sort | uniq  > ${tmp_super}
