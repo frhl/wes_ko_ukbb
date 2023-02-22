@@ -20,9 +20,10 @@ readonly in_dir="data/simulation/saige/step2/binary"
 readonly out_dir="data/simulation/combined"
 mkdir -p ${out_dir}
 
+# Simualate traits with no effect
 pattern_seed="seed10"
-pattern_var="var_0.10"
-out_prefix="${out_dir}/seed100_combined_sim"
+pattern_var="h2_0\\.00" 
+out_prefix="${out_dir}/seed100_combined_sim_null"
 
 module purge
 set_up_rpy
@@ -31,5 +32,32 @@ Rscript ${rscript} \
   --out_prefix "${out_prefix}" \
   --seed_regex "${pattern_seed}" \
   --var_regex "${pattern_var}"
+
+# simulate traits with additive effects
+pattern_seed="seed20"
+pattern_var="var_99_"
+out_prefix="${out_dir}/seed200_combined_sim_add"
+
+module purge
+set_up_rpy
+Rscript ${rscript} \
+  --input_dir "${in_dir}" \
+  --out_prefix "${out_prefix}" \
+  --seed_regex "${pattern_seed}" \
+  --var_regex "${pattern_var}"
+
+# simulate traits with recessive effects
+pattern_seed="seed10"
+pattern_var="var_0.10"
+out_prefix="${out_dir}/seed100_combined_sim_rec"
+
+module purge
+set_up_rpy
+Rscript ${rscript} \
+  --input_dir "${in_dir}" \
+  --out_prefix "${out_prefix}" \
+  --seed_regex "${pattern_seed}" \
+  --var_regex "${pattern_var}"
+
 
 

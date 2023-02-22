@@ -90,6 +90,8 @@ main <- function(args){
 
     print(args)
     stopifnot(dir.exists(args$input_dir))
+    stopifnot(!is.null(args$seed_regex))
+    stopifnot(!is.null(args$var_regex))
 
     # get files to be aggregated
     pattern <- args$seed_regex
