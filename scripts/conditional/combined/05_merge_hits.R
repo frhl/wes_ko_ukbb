@@ -1,7 +1,6 @@
-
+devtools::load_all("utils/modules/R/gwastools")
 library(argparse)
 library(data.table)
-
 
 main <- function(args){
 
@@ -16,15 +15,31 @@ main <- function(args){
         gene <- sig_genes$gene[idx]
         regex <- paste0(phenotype,".+",gene,"$")
         file_path <- list.files(args$target_dir, pattern = regex, full.names = TRUE)
-        prs <- grepl("locoprs", file_path)
+
+        # check if PRS is available and whether
+        # prs should actualyl be conditioned on
+        bool_prs <- grepl(pattern="locoprs", file_path)
+        bool_allow_prs <- grepl_cond_prs(phenotype) 
+        if (any(bool_prs)) {
+            print("subset")
+            print(file_path)
+            print(bool_prs)
+            if (bool_allow_prs) {
+                file_path <- file_path[bool_prs]
+            } else {
+                file_path <- file_path[!bool_prs]
+            }
+        }
+
         if (length(file_path) == 0){
             write(paste0("path '",file_path,"' (",gene,"/",phenotype,") could not be found. Skipping."), stderr())
         } else {
-            # open file and subset to the gene
+            print(file_path)
+            stopifnot(length(file_path)==1)
             d <- fread(file_path)
             d <- d[d$MarkerID %in% gene,]
             d$phenotype <- phenotype
-            d$prs <- prs
+            d$prs <- any(bool_prs)
             d$filepath <- file_path
             return(d)
         }

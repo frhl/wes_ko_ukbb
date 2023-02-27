@@ -10,7 +10,7 @@
 #SBATCH --error=logs/cond_collapsed.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=11-320
+#SBATCH --array=1-320
 #
 #$ -N cond_collapsed
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -199,7 +199,7 @@ submit_merge_job()
 
 # parameters
 readonly markers_rare_cond_min_mac=4
-readonly use_prs="1"
+readonly use_prs="0"
 readonly min_mac=4
 readonly tasks=1-22 # 1-22
 readonly project="lindgren.prj"
