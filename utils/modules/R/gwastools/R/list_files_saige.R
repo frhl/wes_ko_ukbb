@@ -1,68 +1,53 @@
 #' @title list files/results after saige analysis
 #' @param cond either "none", "common", "rare", "combined"
-#' @param prs should PRS be included, either "include", "exclude", "only" or "prefer" which resturns PRS when available.
+#' @param prs should PRS be included, either "all", "exclude", "only" or "prefer" which resturns PRS when available.
 #' @param regex regex for saige files to grab
 #' @return a vector of file paths to results
 
-list_files_saige <- function(
-        cond="none", prs="include", regex = "\\.txt\\.gz",
-        step2_dir = "/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/data/saige/output/binary/step2/min_mac4",
-        step2_common_dir = "/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/data/saige/output/binary/step2_common/min_mac4",
-        step2_rare_dir = "/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/data/saige/output/binary/step2_rare_cond/min_mac4",
-        step2_combined_dir = "/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/data/saige/output/binary/step2_rare_cond/min_mac4"
-    ){
+list_files_saige <- function(dir = "", prs = "all", regex = "\\.txt.\\.gz"){
 
-    # subset paths based on condions
-    if (cond %in% "none"){
-        files <- list.files(step2_dir, full.names = TRUE, pattern = regex)
-        if (length(files) == 0) stop(paste("No files found in", step2_dir))
-    } else if (cond %in% "common"){
-        files <- list.files(step2_common_dir, full.names = TRUE, pattern = regex)
-        if (length(files) == 0) stop(paste("No files found in", step2_common_dir))
-    } else if (cond %in% "rare"){
-        files <- list.files(step2_rare_dir, full.names = TRUE, pattern = regex)
-        if (length(files) == 0) stop(paste("No files found in", step2_rare_dir))
-    } else if (cond %in% "combined"){
-        files <- list.files(step2_combined_dir, full.names = TRUE, pattern = regex)
-        if (length(files) == 0) stop(paste("No files found in", step2_combined_dir))
-    } else {
-        stop(paste(cond, "is not a valid. Try 'none','common','rare' or 'combined'"))
-    }
+    # get phenotypes we are running
+    pheno_w_prs <- get_phenos_tested(prs="with")
+    pheno_wo_prs <- get_phenos_tested(prs="without")
+    phenos <- c(pheno_w_prs, pheno_wo_prs)
     
-    # perform final subset by PRS
-    files <- sort(files)
-    is_prs <- grepl("locoprs.txt.gz", files)
-    if (prs %in% "include"){
-        return(files)
-    } else if (prs %in% "exclude"){
-        # exclude any PRS files
-        return(files[!is_prs])
-    } else if (prs %in% "only") {
-        # only include PRS
-        return(files[is_prs])
-    } else if (prs %in% "prefer") {
-        # if two files exists, one with PRS and without
-        # this option will preferentially select PRS
-        directory <- unique(dirname(files))
-        stopifnot(length(directory) == 1)
-        file_df <- data.frame(bname=basename(files))
-        file_df$sans_ext <- gsub(".txt.gz", "", file_df$bname)
-        file_df$sans_locoprs <- gsub("_locoprs", "", file_df$sans_ext)
-        # count how many occours twice
-        counts <- data.frame(table(file_df$sans_locoprs))
-        colnames(counts) <- c("sans_locoprs", "n")
-        file_df <- merge(file_df, counts)
-        # subset to files with locoprs if there are matches
-        file_df_n1 <- file_df[file_df$n == 1,]
-        file_df_n2 <- file_df[file_df$n >= 2,]
-        file_df_n2 <- file_df[grepl("_locoprs", file_df$bname), ]
-        file_df <- rbind(file_df_n1, file_df_n2)
-        files <- file.path(directory, file_df$bname)
-        return(files)
-    } else {
+    # get files that we have created
+    files <- sort(list.files(get_saige_dir(dir), full.names = TRUE, pattern = regex))
+    files_w_prs <- files[grepl("locoprs.txt.gz", files)]
+    files_wo_prs <- files[!grepl("locoprs.txt.gz", files)]
+    
+    # find name interesection between tested phenos and created files
+    files_tested <- unique(unlist(lapply(phenos, function(p) extract_path_by_phenotype(p, files))))
+    files_tested_only_prs <- unique(unlist(lapply(pheno_w_prs, function(p) extract_path_by_phenotype(p, files_w_prs))))
+    files_tested_only_wo_prs <- unique(unlist(lapply(pheno_wo_prs, function(p) extract_path_by_phenotype(p, files_wo_prs))))
+                         
+    # list all files with PRS
+    if (prs %in% "all") {
+        warning("Listing all files including files with PRS that does not pass cutoffs!")
+        return(files_tested)
+    }
+    else if (prs %in% "exclude") {
+        return(files_tested_only_wo_prs)
+    }
+    else if (prs %in% "only") {
+        return(files_tested_only_prs)
+    }
+    else if (prs %in% "prefer") {
+        return(c(files_tested_only_prs, files_tested_only_wo_prs))
+    }
+    else {
         stop(paste(prs, "is not valid. Must be either 'include','exclude','prefer' or 'only'."))
     }
-
 }
+
+# helper to find subsets of file paths and phenotypes that have
+# been included in the downstream analysis
+extract_path_by_phenotype <- function(phenotype, paths) {
+    stopifnot(length(paths) > 1)
+    regex <- paste0("ukb_eur_wes_200k_", phenotype, "_pLoF_damaging_missense")
+    paths <- paths[grepl(pattern = regex, paths)]
+    return(paths)
+}
+                                      
 
 
