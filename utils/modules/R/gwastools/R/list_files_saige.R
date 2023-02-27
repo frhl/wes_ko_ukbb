@@ -4,7 +4,11 @@
 #' @param regex regex for saige files to grab
 #' @return a vector of file paths to results
 
-list_files_saige <- function(dir = "", prs = "all", regex = "\\.txt.\\.gz"){
+list_files_saige <- function(cond = NULL, prs = "all", regex = "\\.txt\\.gz"){
+
+    # deal with old version
+    if (cond == "none") cond <- ""
+    if (is.null(cond)) cond <- ""
 
     # get phenotypes we are running
     pheno_w_prs <- get_phenos_tested(prs="with")
@@ -12,7 +16,8 @@ list_files_saige <- function(dir = "", prs = "all", regex = "\\.txt.\\.gz"){
     phenos <- c(pheno_w_prs, pheno_wo_prs)
     
     # get files that we have created
-    files <- sort(list.files(get_saige_dir(dir), full.names = TRUE, pattern = regex))
+    files <- sort(list.files(get_saige_dir(cond), full.names = TRUE, pattern = regex))
+    stopifnot(length(files)>0)
     files_w_prs <- files[grepl("locoprs.txt.gz", files)]
     files_wo_prs <- files[!grepl("locoprs.txt.gz", files)]
     
