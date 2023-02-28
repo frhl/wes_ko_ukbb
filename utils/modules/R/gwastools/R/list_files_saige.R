@@ -4,55 +4,50 @@
 #' @param regex regex for saige files to grab
 #' @return a vector of file paths to results
 
-list_files_saige <- function(cond = NULL, prs = "all", regex = "\\.txt\\.gz"){
+list_files_saige <- function(cond = NULL, prs = "include", regex = "\\.txt\\.gz"){
 
     # deal with old version
     if (cond == "none") cond <- ""
     if (is.null(cond)) cond <- ""
 
     # get phenotypes we are running
-    pheno_w_prs <- get_phenos_tested(prs="with")
-    pheno_wo_prs <- get_phenos_tested(prs="without")
-    phenos <- c(pheno_w_prs, pheno_wo_prs)
-    
+    trait_allow_prs <- get_phenos_tested(prs="with", use_bonf_corrected = TRUE)
+    trait_disallow_prs <- get_phenos_tested(prs="without")
+    all_traits <- c(trait_allow_prs, trait_disallow_prs)
+
     # get files that we have created
-    files <- sort(list.files(get_saige_dir(cond), full.names = TRUE, pattern = regex))
-    stopifnot(length(files)>0)
-    files_w_prs <- files[grepl("locoprs.txt.gz", files)]
-    files_wo_prs <- files[!grepl("locoprs.txt.gz", files)]
-    
-    # find name interesection between tested phenos and created files
-    files_tested <- unique(unlist(lapply(phenos, function(p) extract_path_by_phenotype(p, files))))
-    files_tested_only_prs <- unique(unlist(lapply(pheno_w_prs, function(p) extract_path_by_phenotype(p, files_w_prs))))
-    files_tested_only_wo_prs <- unique(unlist(lapply(pheno_wo_prs, function(p) extract_path_by_phenotype(p, files_wo_prs))))
-                         
+    files <- sort(list.files(get_saige_dir(cond), full.names = TRUE, pattern = ".txt.gz"))
+    files_pheno <- gsub_phenotype_from_path(files)
+    files_prs <- grepl("locoprs.txt.gz", files)
+    allow_prs <- files_pheno %in% trait_allow_prs
+
+    # combine into data.frame
+    df <- data.frame(
+      phenotype = files_pheno,
+      prs_available = files_prs,
+      prs_allowed = allow_prs,
+      path = files
+    )
+
+    # subset phenotype
+    df <- df[df$phenotype %in% all_traits,]
+
     # list all files with PRS
-    if (prs %in% "all") {
-        warning("Listing all files including files with PRS that does not pass cutoffs!")
-        return(files_tested)
-    }
-    else if (prs %in% "exclude") {
-        return(files_tested_only_wo_prs)
-    }
-    else if (prs %in% "only") {
-        return(files_tested_only_prs)
-    }
-    else if (prs %in% "prefer") {
-        return(c(files_tested_only_prs, files_tested_only_wo_prs))
-    }
-    else {
+    if (prs %in% "include") {
+        df <- df[(df$prs_allowed) | (!df$prs_available),]
+    } else if (prs %in% "exclude") {
+        df <- df[!df$prs_available,]
+    } else if (prs %in% "only") {
+        df <- df[(df$prs_available) & (df$prs_allowed),]
+    } else if (prs %in% "prefer") {
+        df1 <- df[(df$prs_available) & (df$prs_allowed),]
+        df2 <- df[(!df$prs_available) & (!df$prs_allowed),]
+        df <- rbind(df1, df2)
+    } else {
         stop(paste(prs, "is not valid. Must be either 'include','exclude','prefer' or 'only'."))
     }
-}
+    return(df$path)
 
-# helper to find subsets of file paths and phenotypes that have
-# been included in the downstream analysis
-extract_path_by_phenotype <- function(phenotype, paths) {
-    stopifnot(length(paths) > 1)
-    regex <- paste0("ukb_eur_wes_200k_", phenotype, "_pLoF_damaging_missense")
-    paths <- paths[grepl(pattern = regex, paths)]
-    return(paths)
 }
-                                      
 
 
