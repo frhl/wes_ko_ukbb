@@ -9,7 +9,7 @@
 #SBATCH --error=logs/merge_prephased.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 5
-#SBATCH --array=1
+#SBATCH --array=1-22
 #
 #$ -N merge_prephased
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -60,7 +60,7 @@ cat ${input_list} | sort | uniq  > ${tmp}
 readonly n=$( cat ${tmp} | wc -l)
 readonly n_rounded=$( echo $n | sed 's|.*|(&+500)/1000*1000|' | bc )
 
-rm "${out_vcf_gz}"
+
 
 if [ ! -f "${out_vcf_gz}" ]; then
   module load BCFtools/1.12-GCC-10.3.0
