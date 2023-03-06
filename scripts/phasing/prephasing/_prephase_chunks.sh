@@ -94,6 +94,7 @@ submit_prephasing_sample_job() {
 
 }
 
+
 submit_prephasing_job_slurm() {
   echo "Submitting jobs with SLURM"
   readonly prephasing_jid=$( sbatch \
@@ -149,7 +150,6 @@ submit_merge_job_slurm() {
     --chdir="$(pwd)" \
     --partition="${slurm_queue}" \
     --cpus-per-task="${slurm_nslots}" \
-    --dependency="afterok:${prephasing_jid}" \
     --parsable \
     --constraint=skl-compat \
     ${merge_script} \
@@ -158,6 +158,7 @@ submit_merge_job_slurm() {
     ${out_merge_file} \
     ${out_merge_type} 
   )
+  #--dependency="afterok:${prephasing_jid}" \
 }
 
 submit_merge_job_sge() {
@@ -181,8 +182,8 @@ submit_merge_job_sge() {
     ${out_merge_type} 
 }
 
-
 # check if phasing and merging has already been completed
+force_rm_bad_vcf "${out_merge_file}.vcf.gz" 
 if [ ! -f "${out_merge_file}.vcf.gz" ]; then
   
   # split main MatrixTable into 
@@ -205,8 +206,8 @@ if [ ! -f "${out_merge_file}.vcf.gz" ]; then
   # only submit jobs if the right files exists
   if [ -f "${splitted_input}.tbi" ]; then
     # submit workers for each sample
-    submit_prephasing_sample_job ${cluster}
-    submit_merge_job_sge
+    #submit_prephasing_sample_job ${cluster}
+    submit_merge_job_slurm
   else
     >&2 echo "Error: Prephasing job was not submitted because VCF/VCF.tbi files do not exists."
   fi

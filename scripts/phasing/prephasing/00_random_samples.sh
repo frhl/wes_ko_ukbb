@@ -38,9 +38,9 @@ readonly input_path="${input_dir}/ukb_wes_union_calls_chr21.vcf.gz"
 readonly input_type="vcf"
 
 readonly out_dir="data/prephased/wes_union_calls/intervals"
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_random_samples_10k_seed1995_chr21"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_random_samples_1k_seed1995_chr21"
 
-readonly random_samples_count=10000
+readonly random_samples_count=1000
 readonly seed=1995
 
 mkdir -p ${out_dir}

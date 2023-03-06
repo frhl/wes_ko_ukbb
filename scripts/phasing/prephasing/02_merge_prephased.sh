@@ -60,6 +60,8 @@ cat ${input_list} | sort | uniq  > ${tmp}
 readonly n=$( cat ${tmp} | wc -l)
 readonly n_rounded=$( echo $n | sed 's|.*|(&+500)/1000*1000|' | bc )
 
+rm "${out_vcf_gz}"
+
 if [ ! -f "${out_vcf_gz}" ]; then
   module load BCFtools/1.12-GCC-10.3.0
   #module load BCFtools/1.10.2-GCC-8.3.0
@@ -113,7 +115,6 @@ if [ ! -f "${out_vcf_gz}" ]; then
     rm "${out_idx_vcf_gz}"
     rm "${out_idx_vcf_gz}.tbi"
   done
-
 fi
 
 
