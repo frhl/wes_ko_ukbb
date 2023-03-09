@@ -39,11 +39,16 @@ main <- function(args){
     stopifnot(sum(is.na(gwas$final_beta_auto))<1000)
   }
 
+  # cutoff prs if z-score estimate is not good enough
+  if (!is.null(args$ldsc_n_eff_cutoff)){
+    ldsc_n_eff_cutoff <- as.numeric(args$ldsc_n_eff_cutoff)
+    if (n_eff < ldsc_n_eff_cutoff) stop("phenotype does not pass N_eff cutoff")
+  }
 
-    # cutoff prs if z-score estimate is not good enough
+  # cutoff prs if z-score estimate is not good enough
   if (!is.null(args$ldsc_pvalue_cutoff)){
     pvalue_cutoff <- as.numeric(args$ldsc_pvalue_cutoff)
-    if (pvalue > pvalue_cutoff) stop("phenotype does not pass threshold")
+    if (pvalue > pvalue_cutoff) stop("phenotype does not pass zstat cutoff")
   }
 
   # Estimate h2 chromosome-wide
@@ -253,6 +258,7 @@ parser$add_argument("--method", default=NULL, required = TRUE, help = "either 'i
 parser$add_argument("--pred", default=NULL, required = TRUE, help = "Path to plink (bed) for PGS prediction")
 parser$add_argument("--ldsc", default=NULL, required = TRUE, help = ".rds object containing QCed GWAS and ldsc heritability estimates")
 parser$add_argument("--ldsc_pvalue_cutoff", default=NULL, help = "cancel the run if the ldsc heritability p-value is not below the given treshold.")
+parser$add_argument("--ldsc_n_eff_cutoff", default=NULL, help = "cancel the run if the ldsc N_eff is not below the given treshold.")
 parser$add_argument("--standardized_gt", default=1, required = FALSE, help = "Should genotypes be standardized?")
 parser$add_argument("--vec_p_init_n", default=50, required = FALSE, help = "number of intial estimates to sample form (should be at least 5)")
 parser$add_argument("--tmp_bfile", default=NULL, required = TRUE, help = "File path to temporary backing files")

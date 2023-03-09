@@ -25,14 +25,14 @@ readonly phenotypes="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
 readonly out_dir="data/prs/validation"
 readonly out_prefix="${out_dir}/ldsc_summary"
 
-
-
 mkdir -p ${out_dir}
 
 set_up_rpy
 Rscript "${rscript}" \
     --in_dir "${ldsc_dir}" \
     --phenotypes "${phenotypes}" \
-    --out_prefix "${out_prefix}"
+    --out_prefix "${out_prefix}" \
+    --ldsc_n_eff_cutoff 20000 \
+    --ldsc_p_cutoff 0.05
 
 

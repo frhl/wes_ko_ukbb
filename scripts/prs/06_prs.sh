@@ -7,8 +7,8 @@
 #SBATCH --error=logs/prs.errors.log
 #SBATCH --open-mode=append
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 1
-#SBATCH --array=1-40
+#SBATCH --cpus-per-task 2
+#SBATCH --array=1-320
 # --begin=now+6hour
 #
 #$ -N prs
@@ -43,6 +43,7 @@ readonly mrg_dir="data/prs/scores_full"
 # do not run files that have h2 estimates
 # above the given p-value cutoff (nominal).
 readonly ldsc_pvalue_cutoff="0.05"
+readonly ldsc_n_eff_cutoff=20000
 
 readonly cluster=$( get_current_cluster )
 readonly index=$( get_array_task_id )
@@ -127,6 +128,7 @@ fit_pgs()
       "${method}" \
       "${impute}" \
       "${ldsc_pvalue_cutoff}" \
+      "${ldsc_n_eff_cutoff}" \
       "${out_prefix}" )
   elif [ "${cluster}" = "sge" ]; then
     qsub -N "${prs_jname}" \
@@ -145,6 +147,7 @@ fit_pgs()
       "${method}" \
       "${impute}" \
       "${ldsc_pvalue_cutoff}" \
+      "${ldsc_n_eff_cutoff}" \
       "${out_prefix}"
   else
     >&2 echo "${cluster} is not valid!"

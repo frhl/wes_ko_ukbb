@@ -34,27 +34,27 @@ main <- function(args){
   outfile1 <- paste0(args$out_prefix, ".txt.gz")
   fwrite(d, outfile1, sep = "\t") 
 
-  # bonferroni correction
-  n_phenos <- length(final_phenotypes)
-  p_cutoff <- 0.05 / n_phenos
-
   # keep these phenotypes
-  phenos_with_nom_sig_prs <- d$phenotype[(d$coef == "h2") & (d$pvalue < 0.05)]
-  phenos_with_bonf_sig_prs <- d$phenotype[(d$coef == "h2") & (d$pvalue < p_cutoff)]
+  p_cutoff <- as.numeric(args$ldsc_p_cutoff)
+  ldsc_n_eff_cutoff <- as.numeric(args$ldsc_n_eff_cutoff)
+  phenos_with_nom_sig_prs <- d$phenotype[(d$coef == "h2") & (d$pvalue < p_cutoff)]
+  phenos_to_keep <- d$phenotype[(d$coef == "h2") & (d$pvalue < p_cutoff) & (d$n_eff >= ldsc_n_eff_cutoff)]
 
   # write bonf and nom sig prs phenos 
   outfile0 <- paste0(args$out_prefix, "_tested_phenos.txt")
   fwrite(data.frame(d$phenotype), outfile0, sep = '\t', col.names = FALSE)
   outfile1 <- paste0(args$out_prefix, "_nom_sig_phenos.txt")
   fwrite(data.frame(phenos_with_nom_sig_prs), outfile1, sep = '\t', col.names = FALSE)
-  outfile2 <- paste0(args$out_prefix, "_bonf_sig_phenos.txt")
-  fwrite(data.frame(phenos_with_bonf_sig_prs), outfile2, sep = '\t', col.names = FALSE)
+  outfile2 <- paste0(args$out_prefix, "_keep_phenos.txt")
+  fwrite(data.frame(phenos_to_keep), outfile2, sep = '\t', col.names = FALSE)
 
  }
 
 # add arguments
 parser <- ArgumentParser()
 parser$add_argument("--in_dir", default=NULL, required = TRUE, help = "either 'binary' or 'cts'")
+parser$add_argument("--ldsc_n_eff_cutoff", default=20000, required = TRUE, help = "What is the effective sample size cutoff")
+parser$add_argument("--ldsc_p_cutoff", default=0.05, required = TRUE, help = "P-value cutoff")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 parser$add_argument("--phenotypes", default=NULL, required = TRUE, help = "What phenotypes are being considered?")
 args <- parser$parse_args()

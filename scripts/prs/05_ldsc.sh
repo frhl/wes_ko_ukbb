@@ -7,7 +7,7 @@
 #SBATCH --output=logs/ldsc.log
 #SBATCH --error=logs/ldsc.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 1
+#SBATCH --cpus-per-task 2
 #SBATCH --array=1-320
 #
 #
@@ -31,7 +31,7 @@ readonly rscript="scripts/prs/05_ldsc.R"
 
 readonly gwas_dir="data/prs/sumstat"
 readonly bed_dir="data/prs/hapmap/ld/unrel_kin_eur_10k"
-readonly out_dir="data/prs/ldsc"
+readonly out_dir="data/prs/ldsc_test"
 readonly pheno_dir="data/phenotypes"
 
 readonly ld_bed="${bed_dir}/short_merged_ukb_hapmap_rand_10k_eur.bed"
@@ -47,7 +47,6 @@ readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
 readonly file_binary="${pheno_dir}/dec22_phenotypes_binary_500k.tsv.gz"
 readonly pheno_list_binary="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
 readonly phenotype_binary=$( sed "${index}q;d" ${pheno_list_binary} )
-
 
 mkdir -p ${out_dir}
 

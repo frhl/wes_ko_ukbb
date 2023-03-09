@@ -13,7 +13,8 @@ readonly ld_dir=${4?Error: Missing arg2 (ld_matrix)}
 readonly method=${5?Error: Missing arg2 (method)}
 readonly impute=${6?Error: Missing arg2 (impute)}
 readonly ldsc_pvalue_cutoff=${7?Error: Missing arg2 (impute)}
-readonly prefix=${8?Error: Missing arg8 (prefix)}
+readonly ldsc_n_eff_cutoff=${8?Error: Missing arg2 (impute)}
+readonly prefix=${9?Error: Missing arg8 (prefix)}
 
 readonly cluster=$( get_current_cluster )
 readonly index=$( get_array_task_id )
@@ -40,6 +41,7 @@ if [ ! -f "${out_prefix_new}.txt.gz" ]; then
       --impute "${impute}" \
       --method "${method}" \
       --ldsc_pvalue_cutoff "${ldsc_pvalue_cutoff}" \
+      --ldsc_n_eff_cutoff "${ldsc_n_eff_cutoff}" \
       --tmp_bfile "${tmp_bfile}" \
       --out_prefix "${out_prefix_new}" \
       --path_betas ${path_betas}
