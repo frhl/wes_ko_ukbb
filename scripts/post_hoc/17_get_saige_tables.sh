@@ -20,11 +20,18 @@ readonly rscript="scripts/post_hoc/17_get_saige_tables.R"
 readonly header_dir="data/phenotypes"
 readonly header_file="${header_dir}/dec22_phenotypes_binary_200k_header.tsv"
 
-# bonferroni p-value < 0.05 / ( 313 * 1895 ) # when N_ko>=2 (min_mac=4)
-# bonferroni p-value < 0.05 / (313 * 1143) # when N_ko>=2 (min_mac=8)
-readonly p_cutoff="1.3975888796648e-07"
+# calc bonferroni cutoff
+readonly genes_tested=958
+readonly phenos_tested=311
+readonly p_cutoff="$(python -c "print(0.05/(${genes_tested}*${phenos_tested}))")"
+
+# define cutoffs
 readonly N_ko_case_cutoff="0"
-readonly N_ko_cutoff="4"
+readonly N_ko_cutoff="5"
+
+# path to PRS heritability estimates
+readonly ldsc_h2_dir="data/prs/validation"
+readonly ldsc_h2="${ldsc_h2_dir}/ldsc_summary.txt.gz"
 
 readonly out_dir="data/post_hoc/results"
 mkdir -p ${out_dir}
@@ -37,6 +44,7 @@ get_table() {
   Rscript "${rscript}" \
     --path_header ${header_file} \
     --p_cutoff ${p} \
+    --path_ldsc_h2 ${ldsc_h2} \
     --N_ko_case_cutoff ${N_ko_case_cutoff} \
     --N_ko_cutoff ${N_ko_cutoff} \
     --cond ${cond} \
@@ -45,13 +53,15 @@ get_table() {
 }
 
 set_up_rpy
-#get_table "176k_saige_sig_merge_excluding_prs" "none" "exclude" "${p_cutoff}"
-#get_table "176k_saige_sig_merge_only_prs" "none" "only" "${p_cutoff}"
-#get_table "176k_saige_sig_merge_prefer_prs" "none" "prefer" "${p_cutoff}"
+# Subsetting by P-value
+get_table "176k_saige_sig_prs_excl" "none" "exclude" "${p_cutoff}"
+get_table "176k_saige_sig_prs_only" "none" "only" "${p_cutoff}"
+get_table "176k_saige_sig_prs_pref" "none" "prefer" "${p_cutoff}"
 
-get_table "test_176k_saige_merge_excluding_prs" "none" "exclude" "1"
-get_table "test_176k_saige_merge_only_prs" "none" "only" "1"
-get_table "test_176k_saige_merge_prefer_prs" "none" "prefer" "1"
+# no subsetting by P-value
+get_table "176k_saige_all_prs_excl" "none" "exclude" "1"
+get_table "176k_saige_all_prs_only" "none" "only" "1"
+get_table "176k_saige_all_prs_pref" "none" "prefer" "1"
 
 
 

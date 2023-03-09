@@ -39,9 +39,11 @@ readonly chr=$( get_chr ${task_id} )
 
 readonly in_dir="data/mt/prefilter/pp90"
 readonly out_dir="data/mt/dosages_urv/pp90_test"
+
 # in parameters
 readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.mt"
 readonly in_type="mt"
+
 # prefix for indiviual genes and final merged file
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_max_ds"
 readonly out_type="vcf"

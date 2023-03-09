@@ -7,7 +7,7 @@
 #SBATCH --error=logs/agreement.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#
+#SBATCH --array=20-22
 #
 #$ -N agreement
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -16,21 +16,25 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
+#$ -t 22
 #$ -V
 
 source utils/bash_utils.sh
 
+readonly array_idx=$( get_array_task_id )
+readonly chr=$( get_chr ${array_idx} )
+
 readonly rscript="scripts/phasing/prephasing/07_agreement.R"
 readonly bashscript="scripts/phasing/prephasing/_agreement.sh"
-readonly input_dir="data/prephased/wes_union_calls/phase_conf"
-readonly input_path="${input_dir}/ukb_shapeit5_whatshap_chr20.PP.PS.txt.gz" # note: chr21 does not have MAC
+readonly input_dir="data/prephased/wes_union_calls/full_phase_conf"
+readonly input_path="${input_dir}/ukb_shapeit5_whatshap_chr${chr}.PP.PS.txt.gz" # note: chr21 does not have MAC
 
-readonly out_dir="data/prephased/wes_union_calls/test"
-readonly out_prefix="${out_dir}/161222_phasing_agreement_n20000"
+readonly out_dir="data/prephased/wes_union_calls/full_agreement"
+readonly out_prefix="${out_dir}/ukb_shapeit5_whatshap_chr${chr}_phasing_agreement_1k"
 
 readonly wes_variants="/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list"
 
-readonly n_samples=20000
+readonly n_samples=1000
 
 mkdir -p ${out_dir}
 

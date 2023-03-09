@@ -69,7 +69,8 @@ submit_intervals()
   local in_file_std="${step2_dir}/${in_prefix}_${phenotype}_${annotation}.txt.gz"
   #local out_prefix_loco="${out_dir}/${in_prefix}_${phenotype}_${annotation}_locoprs"
   local out_prefix_std="${out_dir}/${in_prefix}_${phenotype}_${annotation}"
-  if [ "${use_prs}" -eq "1" ] & [ -f "${in_file_loco}" ]; then
+  local sig_prs="$(pheno_allow_cond_prs ${phenotype})"
+  if [ "${use_prs}" -eq "1" ] & [ -f "${in_file_loco}" ] & [ "${sig_prs}" -eq "1" ]; then
     echo "Note: Using PRS results from ${phenotype}"
     local in_file=${in_file_loco}
   else

@@ -9,8 +9,7 @@
 #SBATCH --error=logs/spa_null.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-300
-#SBATCH --begin=now+7hour
+#SBATCH --array=86
 #
 #$ -N spa_null
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -32,7 +31,7 @@ source utils/hail_utils.sh
 readonly curwd=$(pwd)
 readonly spa_null_script="scripts/_spa_null.sh"
 readonly rscript="scripts/_spa_null.R"
-readonly rscript_ldsc="scripts/_check_prs_p.R"
+readonly rscript_ldsc="scripts/_check_prs_ok.R"
 
 readonly plink_dir="data/saige/grm/input"
 readonly grm_dir="data/saige/grm/input/dnanexus"
@@ -95,7 +94,7 @@ set_up_prs() {
     if [[ -f "${prs}" ]]; then
       echo "Note: Checking LDSC h2 estimates at ${ldsc}."
       if [ -f "${ldsc}" ]; then
-        local h2_pass_qc=$(Rscript ${rscript_ldsc} --ldsc ${ldsc})
+        local h2_pass_qc=$(Rscript ${rscript_ldsc} --phenotype ${phenotype})
         echo "Note: PRS for ${phenotype} pass QC: ${h2_pass_qc}"
         if [ "${h2_pass_qc}" -eq "1" ]; then
           if [ ! -f "${out_pheno_prs}" ]; then

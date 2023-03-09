@@ -7,7 +7,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q test.qc
-#$ -t 2-5
+#$ -t 1-50
 #$ -tc 5
 #$ -V
 
@@ -114,6 +114,32 @@ run_with_params 0.005 0.10 99.0 0.20 0.20 103
 run_with_params 0.01 0.10 99.0 0.20 0.20 104
 run_with_params 0.02 0.10 99.0 0.20 0.20 105
 run_with_params 0.05 0.10 99.0 0.20 0.20 106
+
+# simualte additive effects
+run_with_params 0.001 99 0.10 0.20 0.20 201
+run_with_params 0.002 99 0.10 0.20 0.20 202
+run_with_params 0.005 99 0.10 0.20 0.20 203
+run_with_params 0.01 99 0.10 0.20 0.20 204
+run_with_params 0.02 99 0.10 0.20 0.20 205
+run_with_params 0.05 99 0.10 0.20 0.20 206
+
+# this works and results in nice phenotypes
+#run_with_params 0.00 0.00 0.00 0.01 0.01 100
+#run_with_params 0.001 0.10 99.0 0.20 0.20 101
+#run_with_params 0.002 0.10 99.0 0.20 0.20 102
+#run_with_params 0.005 0.10 99.0 0.20 0.20 103
+#run_with_params 0.01 0.10 99.0 0.20 0.20 104
+#run_with_params 0.02 0.10 99.0 0.20 0.20 105
+#run_with_params 0.05 0.10 99.0 0.20 0.20 106
+
+
+run_with_params 0.001 99.0 0.10 0.20 0.20 101
+run_with_params 0.002 99.0 0.10 0.20 0.20 102
+run_with_params 0.005 99.0 0.10 0.20 0.20 103
+run_with_params 0.01 99.0 0.10 0.20 0.20 104
+run_with_params 0.02 99.0 0.10 0.20 0.20 105
+run_with_params 0.05 99.0 0.10 0.20 0.20 106
+
 
 #run_with_params 0.001 0.10 99.0 1.00 1.00 601
 #run_with_params 0.002 0.10 99.0 1.00 1.00 602

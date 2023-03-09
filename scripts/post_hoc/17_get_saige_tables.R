@@ -84,7 +84,7 @@ main <- function(args){
     # get files
     files <- gwastools::list_files_saige(cond = args$cond, prs = args$prs)
     print(head(files))
-    
+   
     # read files and format
     d <- get_formatted_df(files)
     d <- d[d$phenotype %in% header,]
@@ -108,15 +108,10 @@ main <- function(args){
 
     # get tier A in the top
     d <- d[order(d$p.value),]
-    #d1 <- d[d$N_ko_case == 1,]
-    #d2 <- d[d$N_ko_case >= 2,]
-    #d <- rbind(d2, d1)
 
     # clean up
     d$hgnc_symbol[d$hgnc_symbol==""] <- NA
     d$hgnc_symbol[d$hgnc_symbol==" "] <- NA
-    
-    # put
     outfile <- paste0(args$out_prefix, ".txt.gz")
     write(paste0("writing ", outfile), stdout())
     fwrite(d, outfile, sep = "\t", na = "n/a")
@@ -126,6 +121,7 @@ main <- function(args){
 # add arguments
 parser <- ArgumentParser()
 parser$add_argument("--path_header", default=NULL, required = TRUE, help = "")
+parser$add_argument("--path_ldsc_h2", default=NULL, required = TRUE, help = "")
 parser$add_argument("--p_cutoff", default=NULL, required = TRUE, help = "")
 parser$add_argument("--N_ko_case_cutoff", default=NULL, required = TRUE, help = "")
 parser$add_argument("--N_ko_cutoff", default=NULL, required = TRUE, help = "")

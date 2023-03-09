@@ -73,7 +73,7 @@ main <- function(args){
     dt$PP[is.na(dt$PP)] <- 1
 
     # eval gt agreement
-    gt_agreement <- eval_gt_agreement_by_bin(dt, mac_bin, pp_cutoff)
+    gt_agreement <- phasingtools::eval_gt_agreement_by_bin(dt, mac_bin, pp_cutoff)
     print(head(gt_agreement))
     
     # return genotype agreement

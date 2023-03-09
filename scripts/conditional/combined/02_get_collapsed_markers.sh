@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 #
-# @description Append pseudo variants with actual variants for downstream conditional analysis.
-#
 #SBATCH --account=lindgren.prj
 #SBATCH --job-name=get_collapsed_markers
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

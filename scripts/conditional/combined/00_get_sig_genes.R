@@ -7,6 +7,9 @@ main <- function(args){
 
     args$p_cutoff <- as.numeric(args$p_cutoff)
     files <- gwastools::list_files_saige(args$cond_step, prs=args$prs)
+    phenos <- gwastools::gsub_phenotype_from_path(files)
+    files <- files[phenos %in% gwastools::get_phenos_tested()]
+
     d <- rbindlist(lapply(files, function(f){
         trait <- basename(f)
         trait <- stringr::str_extract(trait, "200k_.+pLoF_damaging_missense")

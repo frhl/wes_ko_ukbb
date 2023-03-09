@@ -78,7 +78,7 @@ touch ${status_phenos}
 set_arr_phenos() {
   trait=${1}
   if [ ! -z ${pheno_dir} ]; then
-    local pheno_bin="data/permute/overview/phenotypes_with_5cis_5chets_2chetcases_header.txt"
+    local pheno_bin="data/permute/overview/phenotypes_with_5cis_5chets_0chetcases_header.txt"
     local pheno_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
     readarray -t arr_bin < ${pheno_bin}
     readarray -t arr_cts < ${pheno_cts}
@@ -426,7 +426,7 @@ iteration=$((${iteration} + 1))
 wait_on_jids=""
 set_arr_phenos "binary"
 #arr_phenos=( "spiro_visual_impairment_and_blindness" "PSOR_combined" "spiro_diabetic_ophthalmic_complications" "spiro_bronchiectasis" )
-
+#echo "${arr_phenos[*]}"
 
 
 if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then

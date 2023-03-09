@@ -25,6 +25,7 @@ readonly curwd="$(pwd)"
 readonly vcf_dir="data/conditional/common/combined"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
+readonly rscript="scripts/_check_prs_ok.R"
 
 readonly spa_script="scripts/conditional/common/_spa_cond_common.sh"
 readonly merge_script="scripts/_spa_merge.sh"
@@ -80,13 +81,14 @@ submit_spa_with_csqs()
       if [ "${use_prs}" -eq "1" ]; then
         local in_gmat_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.rda"
         local in_var_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.varianceRatio.txt"
-         if [ -f "${in_gmat_prs/CHR/21}" ] & [ -f "${in_var_prs/CHR/21}" ]; then
+        local prs_ok=$(Rscript ${rscript} --phenotype ${phenotype})
+        if [ -f "${in_gmat_prs/CHR/21}" ] & [ -f "${in_var_prs/CHR/21}" ] & [ "${prs_ok}" -eq "1" ]; then
            local in_gmat=${in_gmat_prs}
            local in_var=${in_var_prs}
            local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${phenotype}_${annotation}_locoprs"
            local out_mrg="${step2_dir}/${in_prefix}_${phenotype}_${annotation}_locoprs.txt.gz"
          else
-           >&2 echo "Saige NULL (PRS) ${in_gmat_prs}/${in_var_prs} does not exist. Using without PRS."
+           >&2 echo "Using without PRS."
          fi
        fi
 
@@ -168,7 +170,7 @@ submit_merge_job()
 
 
 # parameters
-readonly use_prs="1"
+readonly use_prs="0"
 readonly min_mac=4
 readonly tasks=1-22
 readonly queue="short"
