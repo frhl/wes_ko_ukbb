@@ -11,11 +11,18 @@ main <- function(args){
     out_prefix = args$out_prefix
     path_phenotypes = args$path_phenotypes
     path_header = args$path_header
+    convert_tte_to_bool = args$convert_tte_to_bool
 
     # iterate over phenotypes
     df_phenotype <- fread(path_phenotypes)
     phenotypes <- readLines(path_header)
-    
+
+    # convert numerics to bools for time-to-event phenotypes
+    if (convert_tte_to_bool){
+        cols <- which(colnames(df_phenotype) %in% phenotypes)
+        df_phenotype[cols] <- lapply(df_phenotype[cols], function(x) !is.na(suppressWarnings(as.numeric(x))))        
+    }
+
     # read knockouts
     d <- read_ukb_wes_kos(annotation = annotation, chromosomes = chrom)
     d$is_cis <- d$knockout %in% "Compound heterozygote (cis)"
@@ -23,6 +30,7 @@ main <- function(args){
     d$is_hom <- d$knockout %in% "Homozygote"
     d <- d[(d$is_cis) | (d$is_chet) | (d$is_hom), ]
 
+    # read over cases that are knockouts
     out <- do.call(rbind, lapply(phenotypes, function(pheno){   
         case_eid <- df_phenotype$eid[as.logical(df_phenotype[[pheno]])]
         d_cases <- d[d$s %in% case_eid,]
@@ -46,6 +54,7 @@ main <- function(args){
 parser <- ArgumentParser()
 parser$add_argument("--chrom", default=NULL, required = TRUE, help = "")
 parser$add_argument("--annotation", default=NULL, required = TRUE, help = "")
+parser$add_argument("--convert_tte_to_bool", default=FALSE, action="store_true", help = "")
 parser$add_argument("--path_phenotypes", default=NULL, required = TRUE, help = "")
 parser$add_argument("--path_header", default=NULL, required = TRUE, help = "")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")

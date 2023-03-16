@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 #
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=co_occurence_by_phenotype
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/co_occurence_by_phenotype.log
+#SBATCH --error=logs/co_occurence_by_phenotype.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 1
+#SBATCH --array=1-22
+#
 #$ -N co_occurence_by_phenotype
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #$ -o logs/co_occurence_by_phenotype.log
@@ -7,7 +16,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 1-22
+#$ -t 22
 #$ -V
 
 source utils/bash_utils.sh
@@ -18,18 +27,17 @@ readonly chr=$( get_chr ${task_id} )
 
 readonly rscript="scripts/post_hoc/23_co_occurence_by_phenotype.R"
 
-readonly path_header="data/phenotypes/dec22_phenotypes_binary_200k_header.tsv"
-readonly path_phenotypes="data/phenotypes/dec22_phenotypes_binary_200k.tsv.gz"
-
-readonly time_to_event_dir="/well/lindgren-ukbb/projects/ukbb-11867/samvida/general_resources"
-readonly time_to_event_samvida="${time_to_event_dir}/eid_time_to_event_matrix.txt"
-readonly time_to_event_duncan="${time_to_event_dir}/eid_time_to_event_matrix_duncan_phenotypes.txt"
-
-#readonly out_dir="data/knockouts/alt/pp90/co_occurence_time_to_event"
-#readonly out_prefix="${out_dir}/co_occurence_samvida_tte_by_phenotype_chr${chr}"
-readonly out_dir="data/knockouts/alt/pp90/co_occurence3"
-readonly out_prefix="${out_dir}/co_occurence_by_phenotype_chr${chr}"
+# annotation for knockouts to be extractaed
 readonly annotation="pLoF_damaging_missense"
+# phenotype files to use (either tte or standard)
+readonly in_dir="data/phenotypes"
+readonly path_header="${in_dir}/dec22_phenotypes_binary_200k_header.tsv"
+readonly path_phenotypes="${in_dir}/dec22_phenotypes_binary_200k.tsv.gz"
+readonly path_tte_phenotypes="${in_dir}/tte_matrix_176k.txt.gz"
+
+readonly out_dir="data/knockouts/alt/pp90/co_occurence3"
+#readonly out_prefix="${out_dir}/co_occurence_by_phenotype_chr${chr}"
+readonly out_prefix="${out_dir}/co_occurence_tte_by_phenotype_chr${chr}_${annotation}"
 
 mkdir -p ${out_dir}
 
@@ -37,8 +45,9 @@ set_up_rpy
 Rscript "${rscript}" \
   --chrom ${chr} \
   --annotation ${annotation} \
-  --path_phenotypes ${path_phenotypes} \
+  --path_phenotypes ${path_tte_phenotypes} \
   --path_header ${path_header} \
-  --out_prefix ${out_prefix}
+  --out_prefix ${out_prefix} \
+  --convert_tte_to_bool
 
 

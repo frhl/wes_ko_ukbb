@@ -30,6 +30,7 @@ main <- function(args){
     dt$is_chet <- dt$knockout %in% "Compound heterozygote"
     dt$is_cis <- dt$knockout %in% "Compound heterozygote (cis)"
     dt$is_hom <- dt$knockout %in% "Homozygote"
+    dt$is_het <- dt$knockout %in% "Heterozygote"
     dt$is_ko <- dt$is_hom | dt$is_chet
     dt$knockout <- NULL
 
@@ -50,6 +51,7 @@ main <- function(args){
     dt2$is_chet <- dt2$knockout %in% "Compound heterozygote"
     dt2$is_cis <- dt2$knockout %in% "Compound heterozygote (cis)"
     dt2$is_hom <- dt2$knockout %in% "Homozygote"
+    dt2$is_het <- dt2$knockout %in% "Heterozygote"
     dt2$is_ko <- dt2$is_hom | dt2$is_chet
     dt2$knockout <- NULL
 
@@ -58,16 +60,16 @@ main <- function(args){
     counts2 <- counts2[rev(order(counts2$N))]
     counts2$excluded <- counts2$N > 100000
     gene_id_exclude2 <- counts2$V2[counts2$N > 100000]
-    dt2 <- dt2[!(dt2$gene_id %in% gene_id_exclude2),]
-    outfile <- paste0(args$out_prefix, ".excl.other.count.txt.gz")
-    fwrite(counts2, outfile, sep = "\t")
+    #dt2 <- dt2[!(dt2$gene_id %in% gene_id_exclude2),]
+    #outfile <- paste0(args$out_prefix, ".excl.other.count.txt.gz")
+    #fwrite(counts2, outfile, sep = "\t")
 
     # write file containing all annotations 
     dt <- rbind(dt, dt2)
     colnames(dt)[colnames(dt) == "gene_id"] <- "ensembl_gene_id"
     colnames(dt)[colnames(dt) == "transcript_id"] <- "ensembl_transcript_id"
-    outfile <- paste0(args$out_prefix, ".txt.gz")
-    fwrite(dt, outfile, sep = "\t")
+    #outfile <- paste0(args$out_prefix, ".txt.gz")
+    #fwrite(dt, outfile, sep = "\t")
 
     # aggregate counts
     cols_aggr <- c("ensembl_gene_id", "ensembl_transcript_id", "annotation")
