@@ -49,6 +49,44 @@ def csqs_case_builder(worst_csq_expr: hl.StringExpression, use_loftee: bool = Tr
     return case.or_missing()
 
 
+def csqs_case_builder_brava(worst_csq_expr: hl.StringExpression, 
+                           cadd_cutoff = 28.1, revel_cutoff = 0.773, spliceai_cutoff = 0.20):
+    r'''Annotate consequence categories for downstream analysis
+    
+    :param worst_csq_by_gene_canonical_expr: A struct that should contain "most_severe_consequence"
+    :param cadd_cutoff: CADD-based (phred) cutoff for which to assign a variant as "damaging_missense"
+    :param revel_cutoff" REVEL-based cutoff for which to assign a variant as "damaging_missense"
+    :param spliceai_cutoff" SpliceAI-based cutoff for which to assign a variant as "damaging_missense"
+    '''
+    case = hl.case(missing_false=True)
+    
+    # High confidence pLOF: LOFTEE HC
+    case = (case
+            .when(worst_csq_expr.lof == 'HC', 'pLoF')
+            )
+    
+    # Damaging missense/protein-altering: missense / start-loss / stop-loss with 
+    # REVEL ≥ 0.773 AND/OR CADD ≥ 28.1 + any variant with SpliceAI ≥ 0.2 + LOFTEE LC
+    case = (case
+            .when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence) &
+                      (worst_csq_expr.cadd_phred >= cadd_cutoff) | (worst_csq_expr.revel_score >= revel_cutoff), "damaging_missense")
+            .when(worst_csq_expr.SpliceAI_DS_max >= spliceai_cutoff, "SpliceAI_damaging_missense")
+            .when(worst_csq_expr.lof == 'LC', 'damaging_missense')
+           )
+    
+    # Other missense/protein-altering: missense / start-loss / stop-loss not categorised in (2) + in frame indels
+    # Synonymous: synonymous variants with SpliceAI < 0.2
+    case = (case.when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence) &
+                      (~hl.is_defined(worst_csq_expr.cadd_phred) | ~hl.is_defined(worst_csq_expr.revel_score)), "other_missense")
+                .when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence), "other_missense")
+                .when(hl.set(OTHER_CSQS).contains(worst_csq_expr.most_severe_consequence), "non_coding")
+                .when(hl.set(SYNONYMOUS_CSQS).contains(worst_csq_expr.most_severe_consequence) &
+                      (worst_csq_expr.SpliceAI_DS_max < 0.20), "synonymous")
+            )
+    return case.or_missing()
+
+
+
 def set_to_phased_call(gt: hl.call):
     """ Set an unphased genotype call to phased genotype 
     
@@ -224,7 +262,7 @@ def sum_gts_entries(mt: hl.MatrixTable):
 
    
 
-def calc_prob_ko(hom_expr, phased_expr, unphased_expr, only_homs=False):
+def calc_prob_ko(hom_expr, phased_expr, unphased_expr, only_homs=False, only_chets=False):
     """Calculate probability of knockout based on phased 
        and unphased alleles (requires sum_gts_entries)
     
@@ -232,6 +270,7 @@ def calc_prob_ko(hom_expr, phased_expr, unphased_expr, only_homs=False):
     :param phased_expr: struct with integers a1 and a2
     :param unphased_expr: struct with integers a1 and a2
     :param only_homs: only count homozygotes as knockouts.
+    :param only_homs: only count compound heterozygotes as knockouts.
     """
     
     n = unphased_expr.n
@@ -239,6 +278,13 @@ def calc_prob_ko(hom_expr, phased_expr, unphased_expr, only_homs=False):
     if only_homs:
         return (hl.case()
                .when(hom_expr > 0, 1) # homozygote
+               .default(0)
+               )
+    elif only_chets:
+         return (hl.case()
+               .when(
+                   (phased_expr.a1 > 0) & # compound het
+                   (phased_expr.a2 > 0), 1)
                .default(0)
                )
     else:
