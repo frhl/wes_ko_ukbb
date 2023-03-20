@@ -64,6 +64,10 @@ def main(args):
             genes = ko.aggr_phase_count_by_expr(mt, gene_expr)
             expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased, only_homs=True)
             expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko)
+        elif aggr_method in "only_chets":
+            genes = ko.aggr_phase_count_by_expr(mt, gene_expr)
+            expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased, only_chets=True)
+            expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko)
         elif aggr_method in "collect":
             genes = ko.collect_phase_count_by_expr(mt, gene_expr)
             genes = ko.sum_gts_entries(genes)

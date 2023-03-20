@@ -19,12 +19,12 @@ main <- function(args){
 
     # In this matrix, columns 2:308 are the Spiros disease codes
     # Columns need to be renamed to UNIX names from the dictionary
-    pheno_matrix <- read.table("/well/lindgren-ukbb/projects/ukbb-11867/samvida/general_resources/eid_phenotype_matrix.txt", 
-                                   sep = "\t", quote = "",
-                                   header = T, stringsAsFactors = F)
-    rownames(pheno_matrix) <- pheno_matrix$eid
-    pheno_matrix <- pheno_matrix[, -1]
-    colnames(pheno_matrix) <- dictionary$unix_code
+    #pheno_matrix <- read.table("/well/lindgren-ukbb/projects/ukbb-11867/samvida/general_resources/eid_phenotype_matrix.txt", 
+    #                               sep = "\t", quote = "",
+    #                               header = T, stringsAsFactors = F)
+    #rownames(pheno_matrix) <- pheno_matrix$eid
+    #pheno_matrix <- pheno_matrix[, -1]
+    #colnames(pheno_matrix) <- dictionary$unix_code
 
     # subset tte_matrix
     samples_to_keep <- fread(args$samples, header = FALSE)$V1
@@ -54,6 +54,11 @@ main <- function(args){
     # change palmer columns
     cnames_to_change_palmer <- colnames(tte_matrix)[colnames(tte_matrix) %in% palmer_from]
     colnames(tte_matrix)[match(cnames_to_change_palmer, colnames(tte_matrix))] <- palmer_map[cnames_to_change_palmer]
+
+    # force all to numeric (need to be a data.frame!)
+    tte_matrix <- data.frame(tte_matrix)
+    cols <- which(colnames(tte_matrix) %in% header)
+    tte_matrix[cols] <- lapply(tte_matrix[cols], function(x) suppressWarnings(as.numeric(x)))
 
     write(paste("writing to", args$out_path), stdout())
     fwrite(tte_matrix, args$out_path)
