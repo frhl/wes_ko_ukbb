@@ -9,8 +9,8 @@
 #SBATCH --error=logs/export_imputed.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 6
-#SBATCH --array=10-22
-#SBATCH --dependency="afternotok:10047864"
+#SBATCH --array=1-22
+# --dependency="afternotok:10047864"
 #
 #$ -N export_imputed
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

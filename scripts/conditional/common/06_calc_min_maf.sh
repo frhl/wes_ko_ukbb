@@ -9,8 +9,8 @@
 #SBATCH --error=logs/calc_min_maf.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-5
-#
+#SBATCH --array=1-320
+#SBATCH --dependency=afterok:12374257
 #
 #$ -N calc_min_mafs
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

@@ -9,8 +9,8 @@
 #SBATCH --error=logs/make_intervals.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=11-320
-#
+#SBATCH --array=1-320
+#SBATCH --dependency=afterok:12367588
 #
 #$ -N make_intervals
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

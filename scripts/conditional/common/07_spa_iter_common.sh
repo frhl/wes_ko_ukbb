@@ -12,8 +12,8 @@
 #SBATCH --error=logs/spa_iter_common.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=6-320
-#
+#SBATCH --array=1-320
+#SBATCH --dependency=afterok:12374266
 #
 #$ -N spa_iter_common
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

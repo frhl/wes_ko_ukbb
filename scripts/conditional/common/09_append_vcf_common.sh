@@ -9,7 +9,7 @@
 #SBATCH --error=logs/append_vcf_common.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 3
-#SBATCH --array=1-19
+#SBATCH --array=1-22
 #SBATCH --requeue
 #
 #$ -N append_vcf_common

@@ -9,8 +9,8 @@
 #SBATCH --error=logs/filter_genotypes.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-4
-#
+#SBATCH --array=1-320
+#SBATCH --dependency=afterok:12373851
 #
 #$ -N filter_genotypess
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
