@@ -9,6 +9,15 @@
 #$ -q short.qc
 #$ -V
 
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=get_saige_tables
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/get_saige_tables.log
+#SBATCH --error=logs/get_saige_tables.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 1
+#SBATCH --requeue
+
 set -o errexit
 set -o nounset
 
@@ -54,14 +63,14 @@ get_table() {
 
 set_up_rpy
 # Subsetting by P-value
-get_table "176k_saige_sig_prs_excl" "none" "exclude" "${p_cutoff}"
-get_table "176k_saige_sig_prs_only" "none" "only" "${p_cutoff}"
-get_table "176k_saige_sig_prs_pref" "none" "prefer" "${p_cutoff}"
+get_table "176k_sig_saige_sig_prs_excl" "none" "exclude" "${p_cutoff}"
+get_table "176k_sig_saige_sig_prs_only" "none" "only" "${p_cutoff}"
+get_table "176k_sig_saige_sig_prs_pref" "none" "prefer" "${p_cutoff}"
 
 # no subsetting by P-value
-get_table "176k_saige_all_prs_excl" "none" "exclude" "1"
-get_table "176k_saige_all_prs_only" "none" "only" "1"
-get_table "176k_saige_all_prs_pref" "none" "prefer" "1"
+get_table "176k_sig_saige_all_prs_excl" "none" "exclude" "1"
+get_table "176k_sig_saige_all_prs_only" "none" "only" "1"
+get_table "176k_sig_saige_all_prs_pref" "none" "prefer" "1"
 
 
 

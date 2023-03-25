@@ -9,6 +9,15 @@
 #$ -q short.qc
 #$ -V
 
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=get_saige_tables_cond
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/get_saige_tables_cond.log
+#SBATCH --error=logs/get_saige_tables_cond.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 1
+#SBATCH --requeue
+
 set -o errexit
 set -o nounset
 
@@ -35,7 +44,7 @@ readonly N_ko_case_cutoff="2"
 readonly N_ko_cutoff="5"
 
 readonly out_dir="data/post_hoc/results"
-readonly out_prefix="${out_dir}/176k_saige_cond_sig_pref_prs_combined"
+readonly out_prefix="${out_dir}/176k_sig_saige_cond_sig_pref_prs_combined"
 
 mkdir -p ${out_dir}
 
