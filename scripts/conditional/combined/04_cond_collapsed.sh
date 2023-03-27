@@ -10,7 +10,9 @@
 #SBATCH --error=logs/cond_collapsed.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-320
+#SBATCH --array=11-320
+#SBATCH --open-mode=append
+# --begin=23:00
 #
 #$ -N cond_collapsed
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -51,11 +53,13 @@ readonly in_prefix="ukb_eur_wes_200k"
 
 # list of genes that passes significance cutoffs
 readonly sig_genes_dir="data/conditional/combined/sig_genes"
-readonly sig_genes="${sig_genes_dir}/sig_genes_after_prs_176k.txt.gz"
+readonly sig_genes="${sig_genes_dir}/sig_genes_after_sig_prs_176k.txt.gz"
 
 # list of collapsed rare variants to condition on
 readonly cond_rare_dir="data/mt/dosages_urv/pp90"
 readonly cond_rare_file="${cond_rare_dir}/ukb_eur_wes_200k_chrCHR_mac_gt10.txt.gz"
+
+# add check to ensure all cond rare files have been generated
 
 # list of rare pseudo variants to condition on
 readonly cond_collapsed_dir="data/mt/dosages_urv/pp90"
@@ -103,6 +107,7 @@ submit_spa_with_csqs()
     local out_mrg="${step2_dir}/${in_prefix}_${phenotype}_${annotation}.txt.gz"
 
    if [ "${use_prs}" -eq "1" ]; then
+      set_up_rpy
       local in_gmat_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.rda"
       local in_var_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.varianceRatio.txt"
       local prs_ok=$(Rscript ${rscript} --phenotype ${phenotype})
@@ -111,6 +116,7 @@ submit_spa_with_csqs()
         local in_var=${in_var_prs}
         local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${phenotype}_${annotation}_locoprs"
         local out_mrg="${step2_dir}/${in_prefix}_${phenotype}_${annotation}_locoprs.txt.gz"
+        >&2 echo "PRS enabled"
       else
         >&2 echo "Using without PRS."
       fi
@@ -202,7 +208,7 @@ submit_merge_job()
 
 # parameters
 readonly markers_rare_cond_min_mac=4
-readonly use_prs="0"
+readonly use_prs="1"
 readonly min_mac=4
 readonly tasks=1-22 # 1-22
 readonly project="lindgren.prj"

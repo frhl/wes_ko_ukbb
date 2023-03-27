@@ -77,8 +77,8 @@ submit_spa_with_csqs()
       local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
       local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${phenotype}_${annotation}"
       local out_mrg="${step2_dir}/${in_prefix}_${phenotype}_${annotation}.txt.gz"
-
       if [ "${use_prs}" -eq "1" ]; then
+        set_up_rpy
         local in_gmat_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.rda"
         local in_var_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.varianceRatio.txt"
         local prs_ok=$(Rscript ${rscript} --phenotype ${phenotype})
@@ -170,7 +170,7 @@ submit_merge_job()
 
 
 # parameters
-readonly use_prs="0"
+readonly use_prs="1"
 readonly min_mac=4
 readonly tasks=1-22
 readonly queue="short"

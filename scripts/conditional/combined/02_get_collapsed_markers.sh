@@ -8,7 +8,7 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 #SBATCH --array=1-22
-#SBATCH --dependency="aftercorr:10270053"
+# --dependency="aftercorr:10270053"
 
 #$ -N get_collapsed_markers
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

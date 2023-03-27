@@ -10,7 +10,7 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 #SBATCH --array=1-320
-#SBATCH --dependency=afterok:12374257
+#SBATCH --begin=now+1hour
 #
 #$ -N calc_min_mafs
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

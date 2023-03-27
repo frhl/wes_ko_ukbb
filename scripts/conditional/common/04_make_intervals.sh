@@ -10,7 +10,7 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 #SBATCH --array=1-320
-#SBATCH --dependency=afterok:12367588
+# --dependency=afterok:12367588
 #
 #$ -N make_intervals
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -75,7 +75,7 @@ submit_intervals()
       readonly slurm_jname="_make_intervals_${1}"
       readonly slurm_lname="logs/_make_intervals"
       readonly slurm_project="lindgren.prj"
-      readonly slurm_queue="epyc"
+      readonly slurm_queue="short"
       readonly sge_queue="short.qc"
       readonly slurm_shmem="1"
       if [ "${cluster}" = "slurm" ]; then

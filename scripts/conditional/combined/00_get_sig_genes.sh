@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 #
+# Iterate over files in data/saige/output/binary/step2 and combine
+# combine significant markers into a single file
+#
 #SBATCH --account=lindgren.prj
 #SBATCH --job-name=get_sig_genes
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

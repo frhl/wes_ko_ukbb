@@ -8,7 +8,7 @@
 #SBATCH --output=logs/get_regular_markers.log
 #SBATCH --error=logs/get_regular_markers.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 2
+#SBATCH --cpus-per-task 5
 #SBATCH --array=1
 
 #$ -N get_regular_markers
@@ -21,7 +21,7 @@
 #$ -t 1
 #$ -V
 
-#: note chr1 requires 5 slots (memory)
+#: note chr1 requires 5 slots!!
 
 set -o errexit
 set -o nounset

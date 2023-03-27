@@ -12,8 +12,8 @@
 #SBATCH --error=logs/spa_iter_common.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-320
-#SBATCH --dependency=afterok:12374266
+#SBATCH --array=11-320
+#--dependency=afterok:12374266
 #
 #$ -N spa_iter_common
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -34,6 +34,7 @@ source utils/bash_utils.sh
 
 readonly curwd=$(pwd)
 readonly bash_script="scripts/conditional/common/_spa_iter_common.sh"
+readonly rscript="scripts/_check_prs_ok.R"
 
 readonly cluster=$( get_current_cluster)
 readonly task_id=$( get_array_task_id )
@@ -84,17 +85,10 @@ submit_cond_spa()
   local out_prefix="${out_dir}/${in_prefix}_${phenotype}_${annotation}_cond"
   local step1_dir="data/saige/output/${trait}/step1"
   local step2_dir="data/saige/output/${trait}/step2/minmac${min_mac}"
-  
-  #if [ "${force_prs}" -eq "1" ]; then
-  #  local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.rda"
-  #  local in_var="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.varianceRatio.txt"
-  #  local out_prefix="${out_prefix}_locoprs"
-  #else
-  #  local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
-  #  local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
-  #fi
- 
-  if [ "${use_prs}" -eq "1" ]; then
+  local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
+  local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
+  local prs_ok=$(Rscript ${rscript} --phenotype ${phenotype})
+  if [ "${use_prs}" -eq "1" ] & [ "${prs_ok}" -eq "1" ]; then
      local in_gmat_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.rda"
      local in_var_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.varianceRatio.txt"
      if [ -f "${in_gmat_prs/CHR/21}" ] & [ -f "${in_var_prs/CHR/21}" ]; then

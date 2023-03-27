@@ -10,7 +10,7 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 #SBATCH --array=1-320
-#SBATCH --dependency=afterok:12373851
+# --dependency=afterok:12412742
 #
 #$ -N filter_genotypess
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
