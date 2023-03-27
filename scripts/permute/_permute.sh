@@ -428,7 +428,7 @@ do_extra_loop=0
 iteration=$((${iteration} + 1))
 wait_on_jids=""
 set_arr_phenos "binary"
-arr_phenos=( "spiro_visual_impairment_and_blindness" "spiro_bronchiectasis" )
+#arr_phenos=( "spiro_visual_impairment_and_blindness" "spiro_bronchiectasis" )
 #echo "${arr_phenos[*]}"
 
 if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then

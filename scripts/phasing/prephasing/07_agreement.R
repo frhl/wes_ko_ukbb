@@ -5,26 +5,6 @@ library(argparse)
 library(data.table)
 library(Hmisc)
 
-bin_conf <- function(counts){
-    counts_ci <- do.call(rbind, lapply(1:nrow(counts), function(i) Hmisc::binconf(counts$match[i], counts$total[i])))
-    colnames(counts_ci) <- tolower(colnames(counts_ci))
-    counts <- cbind(counts, counts_ci)                                   
-    return(counts)
-}
-
-eval_phase <- function(full, labels){
-    sums <- aggregate(match ~ bin, data = full, FUN = sum)
-    lens <- aggregate(match ~ bin, data = full, FUN = length)
-    colnames(lens)[2] <- "total"
-    mrg <- merge(sums, lens)
-    mrg <- mrg[match(labels, mrg$bin), ]
-    mrg <- mrg[!is.na(mrg$bin),]
-    mrg$errors <- mrg$total - mrg$match
-    mrg <- bin_conf(mrg)
-    return(mrg)
-}
-                                       
-
 main <- function(args){
 
     # get WES sites
@@ -47,7 +27,7 @@ main <- function(args){
     d$MAC <- as.numeric(d$MAC)
 
     # bins
-    bins <- c(0,1,5,10,20,50,100,200,500,1000,2000,5000,10000, Inf)
+    bins <- c(0,1,5,10,20,50,100,200,500,1000,2000)
     
     # keep phased sets with at least one rare variant
     bool_keep <- (!is.na(d$PP) & d$MAC < (bins[length(bins)-1]+1))

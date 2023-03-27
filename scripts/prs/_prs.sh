@@ -44,8 +44,8 @@ if [ ! -f "${out_prefix_new}.txt.gz" ]; then
       --ldsc_n_eff_cutoff "${ldsc_n_eff_cutoff}" \
       --tmp_bfile "${tmp_bfile}" \
       --out_prefix "${out_prefix_new}" \
-      --path_betas ${path_betas}
- #     --calc_betas 
+      --path_betas ${path_betas} \
+      --calc_betas
   # always remove temporary bk files as these
   # tend to become extremely large (In the magnitude of terrabytes)  
   rm ${tmp_bk} ${tmp_rds}

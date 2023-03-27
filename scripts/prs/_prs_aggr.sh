@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-#
-#
-#
 
 source utils/bash_utils.sh
 

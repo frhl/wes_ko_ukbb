@@ -7,6 +7,9 @@ main <- function(args){
   print(args)
   stopifnot(dir.exists(args$in_dir))
   stopifnot(dir.exists(args$out_dir))
+  
+  print(paste("Looking for chromosomes in", args$in_dir))
+
   files <- list.files(args$in_dir, pattern = paste0(args$phenotype,"_chr[0-9]+_new.txt.gz"), full.names = TRUE)
   #files <- list.files(args$in_dir, pattern = paste0(args$phenotype,"_chr[0-9]+.txt.gz"), full.names = TRUE)
   n <- length(files)

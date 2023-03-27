@@ -33,7 +33,7 @@ readonly header_file="${header_dir}/dec22_phenotypes_binary_200k_header.tsv"
 # some of the columns when conditioniong on markers, 
 # thus we need to map them manually
 readonly ref_dir="data/post_hoc/results"
-readonly ref_file="${ref_dir}/176k_saige_sig_prs_pref.txt.gz"
+readonly ref_file="${ref_dir}/176k_sig_saige_sig_prs_pref.txt.gz"
 
 # get merged hits that unprocessed
 readonly merged_dir="data/conditional/combined/saige"

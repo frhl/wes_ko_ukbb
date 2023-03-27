@@ -7,7 +7,7 @@
 #SBATCH --error=logs/agreement.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=20-22
+#SBATCH --array=20
 #
 #$ -N agreement
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -20,6 +20,7 @@
 #$ -V
 
 source utils/bash_utils.sh
+source utils/qsub_utils.sh
 
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
@@ -83,8 +84,8 @@ qsub_by_mac_bin "101-200"
 qsub_by_mac_bin "201-500"
 qsub_by_mac_bin "501-1000"
 qsub_by_mac_bin "1001-2000"
-qsub_by_mac_bin "2001-5000"
-qsub_by_mac_bin "5001-10000"
+#qsub_by_mac_bin "2001-5000"
+#qsub_by_mac_bin "5001-10000"
 
 
 

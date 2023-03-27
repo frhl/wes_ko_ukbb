@@ -26,6 +26,7 @@ main <- function(args){
   ldsc <- readRDS(args$ldsc)
   h2 <- ldsc$coefficients$estimate[2]
   pvalue <- ldsc$coefficients$pvalue[2]
+  n_eff <- min(unique(ldsc$gwas$n_eff))
 
   # if we just want to use betas that have 
   # been pre-calculated for prediction
@@ -163,7 +164,8 @@ main <- function(args){
      # try the following combination of paramters in case of instability
      grid_params <- list(
         list(iter=100, burn_in=100, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.40, length.out=vec_p_ranges), seed=1),
-        list(iter=200, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.40, length.out=vec_p_ranges), seed=2)
+        list(iter=200, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.40, length.out=vec_p_ranges), seed=2),
+        list(iter=100, burn_in=50, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.30, length.out=vec_p_ranges), seed=3)
      )
      
      step <- 0

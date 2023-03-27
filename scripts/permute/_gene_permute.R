@@ -204,7 +204,7 @@ format_real_variant_long_to_wide <- function(dt, position_last = 20000){
 
 main <- function(args){
 
-     print(args)
+     #print(args)
 
     autosomes <- paste0("chr",1:22)
     stopifnot(file.exists(args$input_path))
@@ -235,8 +235,6 @@ main <- function(args){
     # replicate knockout
     n <- as.numeric(args$permutations)
     vcf_samples <- readLines(args$input_path)
-    print("here")
-    print(head(vcf_samples))
     reps <- replicate(n, shuffle_knockouts3(vcf_samples, kos))
     rownames(reps) <- vcf_samples
     reps <- data.table(t(reps))

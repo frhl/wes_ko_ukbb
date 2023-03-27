@@ -9,7 +9,7 @@
 #SBATCH --error=logs/spa_null.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=86
+#SBATCH --array=1-310
 #
 #$ -N spa_null
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -18,7 +18,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 51-300
+#$ -t 1-305
 #$ -V
 
 set -o errexit
@@ -37,7 +37,7 @@ readonly plink_dir="data/saige/grm/input"
 readonly grm_dir="data/saige/grm/input/dnanexus"
 readonly covar_dir="data/phenotypes"
 readonly pheno_dir="data/phenotypes"
-readonly prs_dir="data/prs/scores_full"
+readonly prs_dir="data/prs/scores"
 readonly ldsc_dir="data/prs/ldsc"
 
 readonly grm_mtx="${grm_dir}/ukb_eur_200k_grm_fitted_relatednessCutoff_0.05_2000_randomMarkersUsed.sparseGRM.mtx"
@@ -189,7 +189,7 @@ submit_spa_null() {
 }
 
 # Parameters
-readonly use_prs=1
+readonly use_prs=0
 readonly nslots=3
 readonly queue="short"
 readonly sge_queue="short.qc"

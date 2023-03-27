@@ -9,7 +9,7 @@
 #SBATCH --error=logs/permute.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=22
+#SBATCH --array=1-22
 
 set -o errexit
 set -o nounset
@@ -24,7 +24,7 @@ readonly chr="${SLURM_ARRAY_TASK_ID}"
 
 # setup directories
 readonly in_dir="data/permute/overview"
-readonly out_dir="data/permute/permutations_shuffle3/chr${chr}/GENE"
+readonly out_dir="data/permute/permutations_shuffle/chr${chr}/GENE"
 readonly pheno_dir="data/phenotypes"
 readonly cond_dir="data/conditional/common/markers"
 readonly grm_dir="data/saige/grm/input/dnanexus"
@@ -46,9 +46,9 @@ readonly cond_genotypes="${cond_dir}/common_conditional.tsv.gz"
 readonly min_mac=4
 readonly n_replicates=1000
 readonly n_start_shuffle=1000 #1000
-readonly n_cutoff_shuffle=100000 #100000 #10000000
+readonly n_cutoff_shuffle=1000000 #100000 #10000000
 readonly n_slots_saige=1
-readonly n_slots_permute=1
+readonly n_slots_permute=2
 readonly queue_saige="short"
 readonly queue_permute="short"
 readonly queue_merge="short"

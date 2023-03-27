@@ -8,7 +8,7 @@
 #SBATCH --open-mode=append
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=1-320
+#SBATCH --array=3-10
 # --begin=now+6hour
 #
 #$ -N prs
@@ -18,7 +18,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 1-30
+#$ -t 301
 #$ -V
 
 set -o errexit
@@ -32,13 +32,14 @@ readonly rscript="scripts/prs/06_prs.R"
 readonly rscript_ldsc="scripts/prs/_check_ldsc.R"
 readonly clean_script="scripts/prs/_prs_clean.sh"
 readonly aggr_script="scripts/prs/_prs_aggr.sh"
+readonly rscript_check_prs="scripts/_check_prs_ok.R"
 
 readonly ldsc_dir="data/prs/ldsc"
 readonly pred_dir="data/prs/hapmap/ukb_500k_hm3/validation"
 readonly ld_dir="data/prs/hapmap/ld/matrix_unrel_kin"
 readonly pheno_dir="data/phenotypes"
 readonly out_dir="data/prs/scores/auto"
-readonly mrg_dir="data/prs/scores_full"
+readonly mrg_dir="data/prs/scores"
 
 # do not run files that have h2 estimates
 # above the given p-value cutoff (nominal).
@@ -81,8 +82,8 @@ submit_ldpred2()
     if [ ! -f "${merged}" ]; then
       # check that p-value passes thresholds
       set_up_rpy
-      local pass_qc=$( Rscript ${rscript_ldsc} --ldsc ${ldsc} --ldsc_pvalue_cutoff ${ldsc_pvalue_cutoff} )
-      if [ "${pass_qc}" = "1" ]; then
+      local prs_ok=$(Rscript ${rscript_check_prs} --phenotype ${phenotype})
+      if [ "${prs_ok}" = "1" ]; then
         fit_pgs
         aggr_pgs
         clean_pgs

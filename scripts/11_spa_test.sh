@@ -8,7 +8,8 @@
 #SBATCH --error=logs/spa_test.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-10
+#SBATCH --array=11-320
+# --begin=23:00
 
 set -o errexit
 set -o nounset
@@ -17,8 +18,9 @@ module purge
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
-readonly vcf_dir="data/knockouts/alt/pp90/combined"
+#readonly vcf_dir="data/knockouts/alt/pp90/combined"
 #readonly vcf_dir="data/knockouts/alt/pp90/only_homs"
+readonly vcf_dir="data/knockouts/alt/pp90/only_chets"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
 readonly rscript="scripts/_check_prs_ok.R"
@@ -62,7 +64,9 @@ submit_spa_with_csqs()
   if [ ! -z ${phenotype} ]; then
 
     local step1_dir="data/saige/output/${trait}/step1"
-    local step2_dir="data/saige/output/${trait}/step2/min_mac${min_mac}"
+    #local step2_dir="data/saige/output/${trait}/step2/min_mac${min_mac}"
+    local step2_dir="data/saige/output/${trait}/step2_only_chets/min_mac${min_mac}"
+    #local step2_dir="data/saige/output/${trait}/step2_only_homs/min_mac${min_mac}"
     local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${annotation}.vcf.bgz"
     mkdir -p ${step2_dir}
 
