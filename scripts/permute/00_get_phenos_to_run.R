@@ -10,7 +10,7 @@ main <- function(args){
     d <- fread(args$path_sig_hits)
     d$phenotype <- gsub("chr[0-9]+\\_","",d$phenotype)
     d <- d[d$p.value < (0.05 / (311 * 1143)),]
-    d <- d[d$N_ko >= 8, ] # this is allele count and not KO (>4 KOs)
+    d <- d[d$N_ko >= 10, ] # this is allele count and not KO (>4 KOs)
     d <- d[d$N_ko_case >= 2]
     d$ensembl_gene_id <- d$MarkerID
 
@@ -58,6 +58,7 @@ main <- function(args){
 parser <- ArgumentParser()
 parser$add_argument("--path_sig_hits", default=NULL, required = TRUE, help = "")
 parser$add_argument("--min_chet", default=NULL, required = TRUE, help = "")
+parser$add_argument("--min_chet_case", default=0, required = FALSE, help = "")
 parser$add_argument("--min_cis", default=NULL, required = TRUE, help = "")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()

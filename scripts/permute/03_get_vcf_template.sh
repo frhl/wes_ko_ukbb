@@ -23,7 +23,10 @@ readonly out_file="${out_dir}/sample_order.txt"
 # get sample order that is used to create
 mkdir -p ${out_dir}
 
-echo "$( bcftools query -l ${in_vcf} )"
+
+# NOTE: there is an error in SLURM/BCFTOOLS causing this
+# to fail when submitted as a job. You might need to do it manuall (Mar-2023)
+echo "$( bcftools query -l ${in_vcf} )" > ${out_file}
 
 
 

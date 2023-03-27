@@ -23,7 +23,7 @@ readonly min_chet=5
 readonly min_cis=5
 
 readonly sig_hits_dir="data/post_hoc/results"
-readonly sig_hits="${sig_hits_dir}/176k_saige_cond_sig_subset_prefer_prs.txt.gz"
+readonly sig_hits="${sig_hits_dir}/176k_sig_saige_cond_sig_pref_prs_combined.txt.gz"
 
 readonly out_dir="data/permute/overview"
 readonly out_prefix="${out_dir}/phenotypes_with_${min_cis}cis_${min_chet}chets"

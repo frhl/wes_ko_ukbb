@@ -11,6 +11,7 @@ readonly bash_script="scripts/permute/_gene_permute.sh"
 readonly spa_script="scripts/permute/_gene_spa.sh"
 readonly merge_script="scripts/permute/_merge_permuted_spa.sh"
 readonly calc_script="scripts/permute/_calc_p.sh"
+readonly rscript_check_prs="scripts/_check_prs_ok.R"
 
 readonly curwd=$(pwd)
 readonly project="lindgren.prj"
@@ -78,7 +79,7 @@ touch ${status_phenos}
 set_arr_phenos() {
   trait=${1}
   if [ ! -z ${pheno_dir} ]; then
-    local pheno_bin="data/permute/overview/phenotypes_with_5cis_5chets_0chetcases_header.txt"
+    local pheno_bin="data/permute/overview/phenotypes_with_5cis_5chets_header.txt"
     local pheno_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
     readarray -t arr_bin < ${pheno_bin}
     readarray -t arr_cts < ${pheno_cts}
@@ -107,14 +108,16 @@ set_arr_saige() {
     local in_gmat="${step1_dir}/${in_prefix}_${phenotype}.rda"
     local in_var="${step1_dir}/${in_prefix}_${phenotype}.varianceRatio.txt"
     if [ "${use_prs}" -eq "1" ]; then
+      set_up_rpy # required for PRS
       local in_gmat_prs="${step1_dir}/${in_prefix}_${phenotype}_chr${chr}.rda"
       local in_var_prs="${step1_dir}/${in_prefix}_${phenotype}_chr${chr}.varianceRatio.txt"
-      if [ -f "${in_gmat_prs/CHR/21}" ] & [ -f "${in_var_prs/CHR/21}" ]; then
+      local prs_ok=$(Rscript ${rscript_check_prs} --phenotype ${phenotype})
+      if [ -f "${in_gmat_prs/CHR/21}" ] & [ -f "${in_var_prs/CHR/21}" ] & [ "${prs_ok}" -eq "1" ]; then
         echo "Note: PRS files were found (${phenotype}). Using PRS NULL models as SAIGE input."
         local in_gmat=${in_gmat_prs}
         local in_var=${in_var_prs}
       else
-        >&2 echo "Saige NULL (PRS) ${in_gmat_prs}/${in_var_prs} does not exist. Using without PRS."
+        >&2 echo "Using without PRS."
       fi
     fi
     read -a arr_saige <<< "${step1_dir} ${step2_dir} ${in_gmat} ${in_var}"
@@ -425,9 +428,8 @@ do_extra_loop=0
 iteration=$((${iteration} + 1))
 wait_on_jids=""
 set_arr_phenos "binary"
-#arr_phenos=( "spiro_visual_impairment_and_blindness" "PSOR_combined" "spiro_diabetic_ophthalmic_complications" "spiro_bronchiectasis" )
+arr_phenos=( "spiro_visual_impairment_and_blindness" "spiro_bronchiectasis" )
 #echo "${arr_phenos[*]}"
-
 
 if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then
   readonly is_all_done=$( check_if_all_done ${status_phenos} ${tested_phenos} )

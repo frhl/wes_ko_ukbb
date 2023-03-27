@@ -9,7 +9,7 @@
 #SBATCH --error=logs/permute.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1
+#SBATCH --array=22
 
 set -o errexit
 set -o nounset
@@ -24,7 +24,7 @@ readonly chr="${SLURM_ARRAY_TASK_ID}"
 
 # setup directories
 readonly in_dir="data/permute/overview"
-readonly out_dir="data/permute/permutations/chr${chr}/GENE"
+readonly out_dir="data/permute/permutations_shuffle3/chr${chr}/GENE"
 readonly pheno_dir="data/phenotypes"
 readonly cond_dir="data/conditional/common/markers"
 readonly grm_dir="data/saige/grm/input/dnanexus"
@@ -65,7 +65,7 @@ readonly genes_path="${overview_dir}/genes_to_run_5cis_5chets.tsv.gz"
 
 # count how many genes to submit for the given chromosome
 readonly n_genes="$( zcat ${genes_path} | grep -w "chr${chr}" | wc -l)"
-readonly slurm_tasks="1-${n_genes}"
+readonly slurm_tasks="1" #-${n_genes}"
 readonly slurm_jname="_chr${chr}_permute"
 readonly slurm_lname="logs/_permute"
 readonly slurm_project="lindgren.prj"
