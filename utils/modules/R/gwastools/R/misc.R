@@ -12,10 +12,24 @@ get_phenos_header_path <- function(){
 #' phenotypes passing bonferroni correction should be returned
 #' @return path to file containg PRS that have been run
 get_phenos_prs_path <- function(use_bonf_corrected = TRUE){
-    dir <- "/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/data/prs/validation/"
-    if (use_bonf_corrected) path <- file.path(dir,"data/prs/validation/ldsc_summary_keep_phenos.txt")
+    dir <- "/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/data/prs/validation"
+    if (use_bonf_corrected){
+        path <- file.path(dir,"ldsc_summary_keep_phenos.txt")
+    } else {
+        path <- file.path(dir,"ldsc_summary_nom_sig_phenos.txt")
+    }
     stopifnot(file.exists(path))
     return(path)
+}
+
+#' @title get vector of phenos to run with PRS
+#' @param use_bonf_corrected boolean indicating whether only
+#' phenotypes passing bonferroni correction should be returned
+#' @return vector of phenotypes
+get_phenos_prs <- function(use_bonf_corrected=TRUE){
+    path <- get_phenos_prs_path(use_bonf_corrected)
+    d <- fread(path, header = FALSE)
+    return(d$V1)
 }
 
 
