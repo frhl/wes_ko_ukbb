@@ -8,7 +8,7 @@
 #SBATCH --open-mode=append
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=151-310
+#SBATCH --array=3-10
 # --begin=now+6hour
 #
 #$ -N prs

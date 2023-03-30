@@ -47,7 +47,12 @@ main <- function(args){
   stopifnot(all(gwas$marker %in% snp$map$marker))
   stopifnot(all(snp$map$marker %in% gwas$marker)) 
   stopifnot(sum(gwas$marker == snp$map$marker) / nrow(gwas) == 1)
-  
+ 
+  # write SNP order
+  marker_order <- gwas[,c("chr","pos","a0","a1","marker")]
+  marker_path <- paste0(args$out_prefix,'.txt.gz')
+  fwrite(marker_order, marker_path, sep="\t")
+
   ldpred_with_params <- function(num_iter, burn_in, h2_init, vec_p_init, seed=NULL) { 
      if (!is.null(seed)) set.seed(seed)
      multi_auto <- snp_ldpred2_auto(
@@ -70,7 +75,7 @@ main <- function(args){
  
   # try the following combination of paramters in case of instability
   grid_params <- list(
-     list(iter=1000, burn_in=500, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.40, length.out=vec_p_ranges), seed=1),
+     list(iter=500, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.50, length.out=vec_p_ranges), seed=1),
      list(iter=500, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.20, length.out=vec_p_ranges), seed=2)
    )
  
@@ -94,7 +99,7 @@ main <- function(args){
   # ensure that no missing values are present,
   msg <- paste0("Error: Stopping since all chains are NA: ", args$out_prefix)
   if (length(converged) == 0) stop(msg)
-  write(paste0("Success! ",length(converged)," chain(s) passed for", args$out_prefix), stderr())
+  write(paste0("Success +10 chain(s) passed for", args$out_prefix), stderr())
 
   # Chain QC
   (range <- sapply(multi_auto, function(auto) diff(range(auto$corr_est))))
@@ -102,7 +107,7 @@ main <- function(args){
   keep[is.na(keep)] <- FALSE
   stopifnot(sum(keep) > 0)
 
-  # save weightss
+  # save weights
   multi_auto_path <- paste0(args$out_prefix,'.rda')
   saveRDS(multi_auto, multi_auto_path, compress = 'xz')
   toc()
@@ -115,7 +120,7 @@ parser$add_argument("--method", default=NULL, required = TRUE, help = "either 'i
 parser$add_argument("--ldsc", default=NULL, required = TRUE, help = ".rds object containing QCed GWAS and ldsc heritability estimates")
 parser$add_argument("--ldsc_pvalue_cutoff", default=NULL, help = "cancel the run if the ldsc heritability p-value is not below the given treshold.")
 parser$add_argument("--ldsc_n_eff_cutoff", default=NULL, help = "cancel the run if the ldsc N_eff is not below the given treshold.")
-parser$add_argument("--vec_p_init_n", default=100, required = FALSE, help = "number of intial estimates to sample form (should be at least 5)")
+parser$add_argument("--vec_p_init_n", default=35, required = FALSE, help = "number of intial estimates to sample form (should be at least 5)")
 parser$add_argument("--ld_dir", default=NULL, required = TRUE, help = "Path to directory with pre-calcualted SNP correlations and LD (.rds files)")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()
