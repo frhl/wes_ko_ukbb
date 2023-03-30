@@ -163,9 +163,10 @@ main <- function(args){
      
      # try the following combination of paramters in case of instability
      grid_params <- list(
-        list(iter=100, burn_in=100, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.40, length.out=vec_p_ranges), seed=1),
-        list(iter=200, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.40, length.out=vec_p_ranges), seed=2),
-        list(iter=100, burn_in=50, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.30, length.out=vec_p_ranges), seed=3)
+        list(iter=500, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.70, length.out=vec_p_ranges), seed=1),
+        list(iter=500, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.50, length.out=vec_p_ranges), seed=2),
+        list(iter=500, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.20, length.out=vec_p_ranges), seed=3),
+        list(iter=500, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.10, length.out=vec_p_ranges), seed=4)
      )
      
      step <- 0
