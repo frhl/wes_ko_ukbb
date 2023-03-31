@@ -13,42 +13,54 @@ main <- function(args){
   stopifnot(dir.exists(args$ld_dir))
   stopifnot(args$chrom %in% paste0("chr",1:22))
   stopifnot(dir.exists(dirname(args$out_prefix)))
-  stopifnot(dir.exists(dirname(args$path_betas)))
+  stopifnot(file.exists(args$path_betas))
+  stopifnot(file.exists(args$path_betas_map))
 
   tic(paste0("LDPred2 ", basename(args$out_prefix)))
   # setup parallel environment
   NCORES <- max(1, nb_cores())
   bigparallelr::assert_cores(NCORES)
 
+  # load betas and do chain QC
+  multi_auto <- readRDS(args$path_betas)
+  (range <- sapply(multi_auto, function(auto) diff(range(auto$corr_est))))
+  (keep <- (range > (0.95 * quantile(range, 0.95, na.rm=TRUE))))
+  keep[is.na(keep)] <- FALSE
+  stopifnot(sum(keep) > 0)
+
+  # obtain weights
+  betas <- fread(args$path_betas_map)
+  final_beta_auto <- rowMeans(sapply(multi_auto[keep], function(auto) auto$beta_est)) 
+  betas$beta <- final_beta_auto
+
   # laod ldsc and qced GWAS
   ldsc <- readRDS(args$ldsc)
-  h2 <- ldsc$coefficients$estimate[2]
-  pvalue <- ldsc$coefficients$pvalue[2]
-  n_eff <- min(unique(ldsc$gwas$n_eff))
   gwas <- ldsc$gwas
+  stopifnot(!is.null(gwas)) 
 
   # check estimates and ensure that
   # the trait is actually heritable 
   #stopifnot(pvalue < 1e-5)
-  stopifnot(!is.null(gwas)) 
 
   # load prediction file (note, that this needs to be done before loading
   # LD-matrix, so that it can be subsetted accordinly).
   pred <- load_bigsnp_from_bed(args$pred)
   gwas <- gwas[gwas$rsid %in% pred$map$rsid,]
 
-  # need to keep track of matching SNPs.
+  # check that pred file hsa enough markers
   n_pred_in_gwas <- sum(pred$map$rsid %in% gwas$rsid)
   total <- nrow(pred$map)
   pct <- paste0("(",round((n_pred_in_gwas/total)*100, 2),"%)")
   msg <- paste("Only",n_pred_in_gwas,"of",total,"SNPs", pct,"GWAS and prediction SNVs:", args$out_prefix)
   if (n_pred_in_gwas < 1000) stop(msg)
       
-  # get SNP correlations and LD
+  # orient GWAS according to LD-matrix
   snp <- get_single_ld_matrix(gwas, chr = args$chrom, ld_dir = args$ld_dir)
- 
-  # match GWAS with snp-correlation map
   gwas <- gwas[na.omit(match(snp$map$marker, gwas$marker)), ]
+  
+
+
+
 
   # check that LD-matrix markers and gwas markers have overlap
   # Check that ordering of markers are actually matching
@@ -142,6 +154,7 @@ parser$add_argument("--ld_dir", default=NULL, required = TRUE, help = "Path to d
 parser$add_argument("--impute", default=NULL, required = TRUE, help = "Should missing genotypes be imputed? (See https://privefl.github.io/bigsnpr/reference/snp_fastImputeSimple.html)")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 parser$add_argument("--path_betas", default=NULL, required = TRUE, help = "What is the path to the betas that should be used?")
+parser$add_argument("--path_betas_map", default=NULL, required = TRUE, help = "What is the path to the betas that should be used?")
 args <- parser$parse_args()
 
 main(args)
