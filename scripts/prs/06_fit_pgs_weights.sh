@@ -38,7 +38,7 @@ readonly pheno_dir="data/phenotypes"
 readonly out_dir="data/prs/weights/auto"
 
 readonly ldsc_pvalue_cutoff="0.05"
-readonly ldsc_n_eff_cutoff=5000 # 20000
+readonly ldsc_n_eff_cutoff=2000 # 20000
 readonly ldpred_method="auto"
 
 readonly cluster=$( get_current_cluster )
@@ -60,18 +60,13 @@ submit_ldpred() {
   local out_prefix="${out_dir}/weights_${phenotype}"
   if [ ! -z ${phenotype} ]; then
      if [ ! -f "${out_prefix}.txt.gz" ]; then
-        local prs_ok=$(Rscript ${rscript_check_prs} --phenotype ${phenotype})
-        if [ "${prs_ok}" = "1" ]; then
-          Rscript "${rscript}" \
-            --ldsc "${ldsc}" \
-            --ld_dir "${ld_dir}" \
-            --method "${method}" \
-            --ldsc_pvalue_cutoff "${ldsc_pvalue_cutoff}" \
-            --ldsc_n_eff_cutoff "${ldsc_n_eff_cutoff}" \
-            --out_prefix "${out_prefix}"
-        else
-          >&2 echo "${phenotype} does not pass ldsc cutoffs.."
-        fi
+        Rscript "${rscript}" \
+          --ldsc "${ldsc}" \
+          --ld_dir "${ld_dir}" \
+          --method "${method}" \
+          --ldsc_pvalue_cutoff "${ldsc_pvalue_cutoff}" \
+          --ldsc_n_eff_cutoff "${ldsc_n_eff_cutoff}" \
+          --out_prefix "${out_prefix}"
      else
         >&2 echo "${out_prefix}.txt.gz already exists. Skipping.."
      fi
