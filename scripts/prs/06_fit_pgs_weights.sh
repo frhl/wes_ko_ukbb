@@ -10,7 +10,7 @@
 #SBATCH --open-mode=append
 #SBATCH --partition=epyc
 #SBATCH --cpus-per-task 2
-#SBATCH --array=100-310
+#SBATCH --array=10-20
 # --begin=now+6hour
 #
 #$ -N fit_pgs_weights
@@ -18,9 +18,9 @@
 #$ -o logs/fit_pgs_weights.log
 #$ -e logs/fit_pgs_weights.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 1
+#$ -pe shmem 2
 #$ -q short.qc
-#$ -t 301
+#$ -t 10-20
 #$ -V
 
 set -o errexit
@@ -29,7 +29,6 @@ set -o nounset
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
-readonly bash_script="scripts/prs/_prs.sh"
 readonly rscript="scripts/prs/06_fit_pgs_weights.R"
 readonly rscript_check_prs="scripts/_check_prs_ok.R"
 
@@ -60,7 +59,7 @@ submit_ldpred() {
   local ldsc="${ldsc_dir}/ldsc_${phenotype}.rds"
   local out_prefix="${out_dir}/weights_${phenotype}"
   if [ ! -z ${phenotype} ]; then
-     if [ ! -f "${out_prefix}.rda" ]; then
+     if [ ! -f "${out_prefix}.txt.gz" ]; then
         local prs_ok=$(Rscript ${rscript_check_prs} --phenotype ${phenotype})
         if [ "${prs_ok}" = "1" ]; then
           Rscript "${rscript}" \

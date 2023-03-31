@@ -10,67 +10,43 @@ main <- function(args){
 
   stopifnot(file.exists(args$pred))
   stopifnot(!file.exists(args$tmp_bfile))
-  stopifnot(dir.exists(args$ld_dir))
   stopifnot(args$chrom %in% paste0("chr",1:22))
   stopifnot(dir.exists(dirname(args$out_prefix)))
-  stopifnot(file.exists(args$path_betas))
-  stopifnot(file.exists(args$path_betas_map))
+  stopifnot(file.exists(args$path_weights))
 
   tic(paste0("LDPred2 ", basename(args$out_prefix)))
   # setup parallel environment
   NCORES <- max(1, nb_cores())
   bigparallelr::assert_cores(NCORES)
 
-  # load betas and do chain QC
-  multi_auto <- readRDS(args$path_betas)
-  (range <- sapply(multi_auto, function(auto) diff(range(auto$corr_est))))
-  (keep <- (range > (0.95 * quantile(range, 0.95, na.rm=TRUE))))
-  keep[is.na(keep)] <- FALSE
-  stopifnot(sum(keep) > 0)
-
-  # obtain weights
-  betas <- fread(args$path_betas_map)
-  final_beta_auto <- rowMeans(sapply(multi_auto[keep], function(auto) auto$beta_est)) 
-  betas$beta <- final_beta_auto
-
   # laod ldsc and qced GWAS
-  ldsc <- readRDS(args$ldsc)
-  gwas <- ldsc$gwas
-  stopifnot(!is.null(gwas)) 
+  #ldsc <- readRDS(args$ldsc)
+  #gwas <- ldsc$gwas
+  #stopifnot(!is.null(gwas)) 
 
-  # check estimates and ensure that
-  # the trait is actually heritable 
-  #stopifnot(pvalue < 1e-5)
+  # get weights
+  weights <- fread(args$path_weights)
 
   # load prediction file (note, that this needs to be done before loading
   # LD-matrix, so that it can be subsetted accordinly).
   pred <- load_bigsnp_from_bed(args$pred)
-  gwas <- gwas[gwas$rsid %in% pred$map$rsid,]
+  #gwas <- gwas[gwas$rsid %in% pred$map$rsid,]
+  weights <- weights[weights$marker %in% pred$map$rsid, ]
 
   # check that pred file hsa enough markers
-  n_pred_in_gwas <- sum(pred$map$rsid %in% gwas$rsid)
+  n_pred_in_weights <- sum(pred$map$rsid %in% weights$marker)
   total <- nrow(pred$map)
-  pct <- paste0("(",round((n_pred_in_gwas/total)*100, 2),"%)")
-  msg <- paste("Only",n_pred_in_gwas,"of",total,"SNPs", pct,"GWAS and prediction SNVs:", args$out_prefix)
-  if (n_pred_in_gwas < 1000) stop(msg)
+  pct <- paste0("(",round((n_pred_in_weights/total)*100, 2),"%)")
+  msg <- paste("Only",n_pred_in_weights,"of",total,"SNPs", pct,"GWAS and prediction SNVs:", args$out_prefix)
+  if (n_pred_in_weights < 1000) stop(msg)
       
   # orient GWAS according to LD-matrix
-  snp <- get_single_ld_matrix(gwas, chr = args$chrom, ld_dir = args$ld_dir)
-  gwas <- gwas[na.omit(match(snp$map$marker, gwas$marker)), ]
-  
-
-
-
-
-  # check that LD-matrix markers and gwas markers have overlap
-  # Check that ordering of markers are actually matching
-  stopifnot(all(gwas$marker %in% snp$map$marker))
-  stopifnot(all(snp$map$marker %in% gwas$marker)) 
-  stopifnot(sum(gwas$marker == snp$map$marker) / nrow(gwas) == 1)
+  #snp <- get_single_ld_matrix(gwas, chr = args$chrom, ld_dir = args$ld_dir)
+  #gwas <- gwas[na.omit(match(snp$map$marker, gwas$marker)), ]
   
   # load data to be used for prediction 
   bfile <- tempfile(tmpdir = dirname(args$out_prefix))
-  pred <- match_bigsnp_with_gwas(obj=pred, gwas=gwas, bfile=args$tmp_bfile)
+  pred <- match_bigsnp_with_gwas(obj=pred, gwas=weights, bfile=args$tmp_bfile)
   genotypes <- pred$genotypes  
   indicies <- pred$gwas_indicies
 
@@ -79,7 +55,7 @@ main <- function(args){
   stopifnot(!is.null(indicies))
     
   # check that things are mathced
-  stopifnot(pred$map$rsid == gwas$rsid)
+  stopifnot(pred$map$rsid == weights$marker)
 
   # dimensions  
   cols <- genotypes$`.->ncol` # variants
@@ -111,15 +87,10 @@ main <- function(args){
      stopifnot(sum(is.na(sds))==0)
   }
 
-  # save chains
-  multi_auto <- readRDS(path_betas)
-  final_beta_auto <- rowMeans(sapply(multi_auto[keep], function(auto) auto$beta_est))
-  final_beta_auto <- gwas$final_beta_auto
-
   # perform prediction
   final_pred <- big_prodVec(
      genotypes, 
-     final_beta_auto,
+     weights$beta,
      center = means,
      scale = sds,
      ncores = NCORES)
@@ -139,7 +110,6 @@ main <- function(args){
 
   write(paste0(args$pred, ".. done! Writing to ", args$out_prefix, ".txt.gz"), stdout())
   fwrite(PGS, file = paste0(args$out_prefix,".txt.gz"), sep = '\t')
-  fwrite(model, file = paste0(args$out_prefix,".model"), sep = '\t')
   toc()
   
 }
@@ -150,11 +120,10 @@ parser$add_argument("--chrom", default=NULL, required = TRUE, help = "chromosome
 parser$add_argument("--pred", default=NULL, required = TRUE, help = "Path to plink (bed) for PGS prediction")
 parser$add_argument("--standardized_gt", default=1, required = FALSE, help = "Should genotypes be standardized?")
 parser$add_argument("--tmp_bfile", default=NULL, required = TRUE, help = "File path to temporary backing files")
-parser$add_argument("--ld_dir", default=NULL, required = TRUE, help = "Path to directory with pre-calcualted SNP correlations and LD (.rds files)")
+#parser$add_argument("--ld_dir", default=NULL, required = TRUE, help = "Path to directory with pre-calcualted SNP correlations and LD (.rds files)")
 parser$add_argument("--impute", default=NULL, required = TRUE, help = "Should missing genotypes be imputed? (See https://privefl.github.io/bigsnpr/reference/snp_fastImputeSimple.html)")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
-parser$add_argument("--path_betas", default=NULL, required = TRUE, help = "What is the path to the betas that should be used?")
-parser$add_argument("--path_betas_map", default=NULL, required = TRUE, help = "What is the path to the betas that should be used?")
+parser$add_argument("--path_weights", default=NULL, required = TRUE, help = "What is the path to the betas that should be used?")
 args <- parser$parse_args()
 
 main(args)

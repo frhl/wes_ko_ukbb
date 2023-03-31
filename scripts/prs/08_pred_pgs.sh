@@ -1,24 +1,24 @@
 #!/usr/bin/env bash
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=prs
+#SBATCH --job-name=pred_pgs
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/prs.log
-#SBATCH --error=logs/prs.errors.log
+#SBATCH --output=logs/pred_pgs.log
+#SBATCH --error=logs/pred_pgs.errors.log
 #SBATCH --open-mode=append
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=151-310
+#SBATCH --array=3-10
 # --begin=now+6hour
 #
-#$ -N prs
+#$ -N pred_pgs
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/prs.log
-#$ -e logs/prs.errors.log
+#$ -o logs/pred_pgs.log
+#$ -e logs/pred_pgs.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
-#$ -t 301
+#$ -t 10-15
 #$ -V
 
 set -o errexit
@@ -27,31 +27,21 @@ set -o nounset
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
-readonly bash_script="scripts/prs/_prs.sh"
-readonly rscript="scripts/prs/06_prs.R"
-readonly rscript_ldsc="scripts/prs/_check_ldsc.R"
+readonly bash_script="scripts/prs/_pred_pgs.sh"
+readonly rscript="scripts/prs/08_pred_pgs.R"
 readonly clean_script="scripts/prs/_prs_clean.sh"
 readonly aggr_script="scripts/prs/_prs_aggr.sh"
-readonly rscript_check_prs="scripts/_check_prs_ok.R"
 
-readonly ldsc_dir="data/prs/ldsc"
 readonly pred_dir="data/prs/hapmap/ukb_500k_hm3/validation"
 readonly ld_dir="data/prs/hapmap/ld/matrix_unrel_kin"
+readonly ldsc_dir="data/prs/ldsc"
 readonly pheno_dir="data/phenotypes"
-readonly out_dir="data/prs/scores/auto"
-readonly mrg_dir="data/prs/scores"
-
-# do not run files that have h2 estimates
-# above the given p-value cutoff (nominal).
-readonly ldsc_pvalue_cutoff="0.05"
-readonly ldsc_n_eff_cutoff=20000
+readonly beta_dir="data/prs/weights"
+readonly out_dir="data/prs/scores_new/by_chrom"
+readonly mrg_dir="data/prs/scores_new"
 
 readonly cluster=$( get_current_cluster )
 readonly index=$( get_array_task_id )
-
-readonly file_cts="${pheno_dir}/curated_covar_phenotypes_cts.tsv.gz"
-readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
-readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
 
 readonly file_binary="${pheno_dir}/dec22_phenotypes_binary_500k.tsv.gz"
 readonly pheno_list_binary="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
@@ -63,15 +53,15 @@ readonly impute="mean2"
 mkdir -p ${out_dir}
 mkdir -p ${mrg_dir}
 
-submit_ldpred2()
+predict_prs()
 { 
-  local method=${1}
-  local nslots=${2}
-  local phenotype=${3}
+  local nslots=${1}
+  local phenotype=${2}
   local pred="${pred_dir}/ukb_hapmap_500k_eur_chrCHR.bed"
   local ldsc="${ldsc_dir}/ldsc_${phenotype}.rds"
-  local out_prefix="${out_dir}/prs_${method}_${phenotype}_chrCHR"
-  local merged="${mrg_dir}/${phenotype}_pgs.txt.gz"
+  local betas="${beta_dir}/weights.qc.${phenotype}.txt.gz"
+  local out_prefix="${out_dir}/pgs.${phenotype}.chrCHR"
+  local merged="${mrg_dir}/pgs.${phenotype}.combined.txt.gz"
 
   local qsub_fit="_prs_${phenotype}"
   local qsub_aggr="_aggr_${phenotype}"
@@ -79,30 +69,24 @@ submit_ldpred2()
 
   # submit phenotype
   if [ ! -z ${phenotype} ]; then
-    if [ ! -f "${merged}" ]; then
-      # check that p-value passes thresholds
-      set_up_rpy
-      local prs_ok=$(Rscript ${rscript_check_prs} --phenotype ${phenotype})
-      if [ "${prs_ok}" = "1" ]; then
-        fit_pgs
-        aggr_pgs
-        clean_pgs
+    if [ -f "${betas}" ]; then
+      if [ ! -f "${merged}" ]; then
+          set_up_rpy
+          fit_pgs
+          aggr_pgs
+          clean_pgs
       else
-        >&2 echo "${phenotype} does not pass LDSC QC."
+        >&2 echo "${merged} already exists. Skipping.."
       fi
-    else
-      >&2 echo "${merged} already exists. Skipping.."
     fi
-    # remove disk backing files
   fi
-
 }
 
 
 fit_pgs()
 {
   readonly prs_jname="${qsub_fit}"
-  readonly prs_lname="_prs"
+  readonly prs_lname="_pred_pgs"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
   local sge_queue="short.qc"
@@ -126,10 +110,8 @@ fit_pgs()
       "${pred}" \
       "${ldsc}" \
       "${ld_dir}" \
-      "${method}" \
+      "${betas}" \
       "${impute}" \
-      "${ldsc_pvalue_cutoff}" \
-      "${ldsc_n_eff_cutoff}" \
       "${out_prefix}" )
   elif [ "${cluster}" = "sge" ]; then
     qsub -N "${prs_jname}" \
@@ -145,10 +127,8 @@ fit_pgs()
       "${pred}" \
       "${ldsc}" \
       "${ld_dir}" \
-      "${method}" \
+      "${betas}" \
       "${impute}" \
-      "${ldsc_pvalue_cutoff}" \
-      "${ldsc_n_eff_cutoff}" \
       "${out_prefix}"
   else
     >&2 echo "${cluster} is not valid!"
@@ -249,9 +229,7 @@ clean_pgs()
 # parameters
 readonly queue="short"
 readonly project="lindgren.prj"
-readonly tasks=1-22
+readonly tasks=21
 
-submit_ldpred2 "auto" "2" "${phenotype_binary}"
-#submit_ldpred2 "auto" "6" "${phenotype_cts}_int"
-#submit_ldpred2 "auto" "6" "${phenotype_cts}"
+predict_prs "2" "${phenotype_binary}"
 

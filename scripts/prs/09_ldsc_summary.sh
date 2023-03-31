@@ -16,7 +16,7 @@ set -o nounset
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
-readonly rscript="scripts/prs/07_ldsc_summary.R"
+readonly rscript="scripts/prs/09_ldsc_summary.R"
 
 readonly ldsc_dir="data/prs/ldsc"
 readonly pheno_dir="data/phenotypes"
