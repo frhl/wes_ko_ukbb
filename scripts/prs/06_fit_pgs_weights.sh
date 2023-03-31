@@ -10,7 +10,7 @@
 #SBATCH --open-mode=append
 #SBATCH --partition=epyc
 #SBATCH --cpus-per-task 2
-#SBATCH --array=10-20
+#SBATCH --array=1-10
 # --begin=now+6hour
 #
 #$ -N fit_pgs_weights
@@ -20,7 +20,7 @@
 #$ -P lindgren.prjc
 #$ -pe shmem 2
 #$ -q short.qc
-#$ -t 10-20
+#$ -t 1-320
 #$ -V
 
 set -o errexit
@@ -38,7 +38,7 @@ readonly pheno_dir="data/phenotypes"
 readonly out_dir="data/prs/weights/auto"
 
 readonly ldsc_pvalue_cutoff="0.05"
-readonly ldsc_n_eff_cutoff=10000 # 20000
+readonly ldsc_n_eff_cutoff=5000 # 20000
 readonly ldpred_method="auto"
 
 readonly cluster=$( get_current_cluster )
@@ -73,7 +73,7 @@ submit_ldpred() {
           >&2 echo "${phenotype} does not pass ldsc cutoffs.."
         fi
      else
-        >&2 echo "${merged} already exists. Skipping.."
+        >&2 echo "${out_prefix}.txt.gz already exists. Skipping.."
      fi
   fi
 }

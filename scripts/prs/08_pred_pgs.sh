@@ -63,7 +63,7 @@ predict_prs()
   local out_prefix="${out_dir}/pgs.${phenotype}.chrCHR"
   local merged="${mrg_dir}/pgs.${phenotype}.combined.txt.gz"
 
-  local qsub_fit="_prs_${phenotype}"
+  local qsub_fit="_pgs_${phenotype}"
   local qsub_aggr="_aggr_${phenotype}"
   local qsub_clean="_clean_${phenotype}"
 
@@ -229,7 +229,7 @@ clean_pgs()
 # parameters
 readonly queue="short"
 readonly project="lindgren.prj"
-readonly tasks=21
+readonly tasks=1-22
 
 predict_prs "2" "${phenotype_binary}"
 
