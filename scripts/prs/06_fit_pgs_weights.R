@@ -76,7 +76,8 @@ main <- function(args){
   # try the following combination of paramters in case of instability
   grid_params <- list(
      list(iter=500, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.50, length.out=vec_p_ranges), seed=1),
-     list(iter=500, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.20, length.out=vec_p_ranges), seed=2)
+     list(iter=500, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.20, length.out=vec_p_ranges), seed=2),
+     list(iter=250, burn_in=100, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.20, length.out=vec_p_ranges), seed=2),
    )
  
   step <- 0
@@ -120,7 +121,7 @@ parser$add_argument("--method", default=NULL, required = TRUE, help = "either 'i
 parser$add_argument("--ldsc", default=NULL, required = TRUE, help = ".rds object containing QCed GWAS and ldsc heritability estimates")
 parser$add_argument("--ldsc_pvalue_cutoff", default=NULL, help = "cancel the run if the ldsc heritability p-value is not below the given treshold.")
 parser$add_argument("--ldsc_n_eff_cutoff", default=NULL, help = "cancel the run if the ldsc N_eff is not below the given treshold.")
-parser$add_argument("--vec_p_init_n", default=35, required = FALSE, help = "number of intial estimates to sample form (should be at least 5)")
+parser$add_argument("--vec_p_init_n", default=40, required = FALSE, help = "number of intial estimates to sample form (should be at least 5)")
 parser$add_argument("--ld_dir", default=NULL, required = TRUE, help = "Path to directory with pre-calcualted SNP correlations and LD (.rds files)")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()

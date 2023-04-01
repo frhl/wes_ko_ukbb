@@ -60,7 +60,7 @@ extract_weights() {
             --path_betas_map "${path_betas_map}" \
             --out_prefix "${out_prefix}"
      else
-        >&2 echo "${merged} already exists. Skipping.."
+        >&2 echo "${out_prefix}.txt.gz already exists. Skipping.."
      fi
   fi
 }
