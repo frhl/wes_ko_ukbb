@@ -8,9 +8,9 @@
 #SBATCH --output=logs/extract_weights.log
 #SBATCH --error=logs/extract_weights.errors.log
 #SBATCH --open-mode=append
-#SBATCH --partition=epyc
-#SBATCH --cpus-per-task 2
-#SBATCH --array=10-20
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 1
+#SBATCH --array=1-320
 # --begin=now+6hour
 #
 #$ -N extract_weights

@@ -8,8 +8,8 @@
 #SBATCH --open-mode=append
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=3-10
-# --begin=now+6hour
+#SBATCH --array=1-310
+#SBATCH --begin=now+1hour
 #
 #$ -N pred_pgs
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -17,8 +17,8 @@
 #$ -e logs/pred_pgs.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
-#$ -q short.qc
-#$ -t 1-310
+#$ -q short.qe
+#$ -t 1-100
 #$ -V
 
 set -o errexit

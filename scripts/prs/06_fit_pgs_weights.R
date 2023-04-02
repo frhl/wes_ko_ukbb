@@ -77,7 +77,7 @@ main <- function(args){
   grid_params <- list(
      list(iter=500, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.50, length.out=vec_p_ranges), seed=1),
      list(iter=500, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.20, length.out=vec_p_ranges), seed=2),
-     list(iter=250, burn_in=100, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.20, length.out=vec_p_ranges), seed=2),
+     list(iter=250, burn_in=100, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.20, length.out=vec_p_ranges), seed=2)
    )
  
   step <- 0

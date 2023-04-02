@@ -5,9 +5,10 @@ library(argparse)
 
 main <- function(args){
    phenotype <- args$phenotype
-   all_phenotypes <- gwastools::get_phenos_tested()
+   use_bonf_corrected <- !(args$include_nominal_significant)
+   all_phenotypes <- get_phenos_tested()
    stopifnot(phenotype %in% all_phenotypes)
-   prs_phenotype <- fread(gwastools::get_phenos_prs_path(), header=FALSE)$V1
+   prs_phenotype <- get_phenos_prs(use_bonf_corrected)
    out <- ifelse(phenotype %in% prs_phenotype, 1 , 0)
    write(out, stdout())
 }
@@ -15,6 +16,7 @@ main <- function(args){
 # add arguments
 parser <- ArgumentParser()
 parser$add_argument("--phenotype", default=NULL, help = "?")
+parser$add_argument("--include_nominal_significant", default=FALSE, action="store_true", help = "?")
 args <- parser$parse_args()
 
 main(args)
