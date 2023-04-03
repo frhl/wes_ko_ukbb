@@ -7,7 +7,7 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/spa_null.log
 #SBATCH --error=logs/spa_null.errors.log
-#SBATCH --partition=short
+#SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
 #SBATCH --array=1-320
 #
@@ -123,64 +123,70 @@ submit_spa_null() {
   mkdir -p ${out_dir}
   tasks=${index}
   set_up_prs
+  local out_bname=$( basename ${out} )
+  local chr_done=$( ls -l ${out_dir} | grep ${out_bname} | grep chr | grep rda | wc -l )
   if [[ "${prs_ok}" -eq "0"  && "${use_prs}" -eq "1" ]]; then
     >&2 echo "Error: PRS could not be started for '${phenotype}'"
   else
     if [ ! -z ${phenotype} ]; then
       if [ ! -f "${out_prefix}.rda" ]; then
-        local slurm_tasks="${tasks}"
-        local slurm_jname="_null_${phenotype}"
-        local slurm_lname="logs/_spa_null"
-        local slurm_project="${project}"
-        local slurm_queue="${queue}"
-        local slurm_nslots="${nslots}"
-        if [ ${cluster} == "slurm" ]; then
-          readonly spa_null_jid=$( sbatch \
-            --account="${slurm_project}" \
-            --job-name="${slurm_jname}" \
-            --output="${slurm_lname}.log" \
-            --error="${slurm_lname}.errors.log" \
-            --chdir="$(pwd)" \
-            --partition="${slurm_queue}" \
-            --cpus-per-task="${slurm_nslots}" \
-            --array=${slurm_tasks} \
-            --parsable \
-            "${spa_null_script}" \
-            "${plink_file}" \
-            "${pheno_file}" \
-            "${phenotype}" \
-            "${covariates}" \
-            "${trait_type}" \
-            "${grm_mtx}" \
-            "${grm_sam}" \
-            "${inv_normalize}" \
-            "${use_prs}" \
-            "${out}" )
-        elif [ "${cluster}" == "sge" ]; then
-          qsub -N "${slurm_jname}" \
-            -q ${sge_queue} \
-            -pe shmem ${slurm_nslots} \
-            -P lindgren.prjc \
-            -o "${slurm_lname}.log" \
-            -e "${slurm_lname}.errors.log" \
-            -t "${slurm_tasks}" \
-            -wd $(pwd) \
-            "${spa_null_script}" \
-            "${plink_file}" \
-            "${pheno_file}" \
-            "${phenotype}" \
-            "${covariates}" \
-            "${trait_type}" \
-            "${grm_mtx}" \
-            "${grm_sam}" \
-            "${inv_normalize}" \
-            "${use_prs}" \
-            "${out}"
-        else 
-           >&2 echo "${cluster} is not a valid cluster. Exiting!"
+        if [ "${chr_done}" -lt "22" ]; then
+          local slurm_tasks="${tasks}"
+          local slurm_jname="_null_${phenotype}"
+          local slurm_lname="logs/_spa_null"
+          local slurm_project="${project}"
+          local slurm_queue="${queue}"
+          local slurm_nslots="${nslots}"
+          if [ ${cluster} == "slurm" ]; then
+            readonly spa_null_jid=$( sbatch \
+              --account="${slurm_project}" \
+              --job-name="${slurm_jname}" \
+              --output="${slurm_lname}.log" \
+              --error="${slurm_lname}.errors.log" \
+              --chdir="$(pwd)" \
+              --partition="${slurm_queue}" \
+              --cpus-per-task="${slurm_nslots}" \
+              --array=${slurm_tasks} \
+              --parsable \
+              "${spa_null_script}" \
+              "${plink_file}" \
+              "${pheno_file}" \
+              "${phenotype}" \
+              "${covariates}" \
+              "${trait_type}" \
+              "${grm_mtx}" \
+              "${grm_sam}" \
+              "${inv_normalize}" \
+              "${use_prs}" \
+              "${out}" )
+          elif [ "${cluster}" == "sge" ]; then
+            qsub -N "${slurm_jname}" \
+              -q ${sge_queue} \
+              -pe shmem ${slurm_nslots} \
+              -P lindgren.prjc \
+              -o "${slurm_lname}.log" \
+              -e "${slurm_lname}.errors.log" \
+              -t "${slurm_tasks}" \
+              -wd $(pwd) \
+              "${spa_null_script}" \
+              "${plink_file}" \
+              "${pheno_file}" \
+              "${phenotype}" \
+              "${covariates}" \
+              "${trait_type}" \
+              "${grm_mtx}" \
+              "${grm_sam}" \
+              "${inv_normalize}" \
+              "${use_prs}" \
+              "${out}"
+          else 
+             >&2 echo "${cluster} is not a valid cluster. Exiting!"
+          fi
+        else
+          >&2 echo "${out} (PRS) already exist. Skipping.." 
         fi
       else
-        >&2 echo "${out_prefix} already exists. Skipping.."
+        >&2 echo "${out} already exists. Skipping.."
       fi
     else
       >&2 echo "No phenotype at index ${index}. Exiting.." 
