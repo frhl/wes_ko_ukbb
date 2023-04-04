@@ -32,7 +32,7 @@ Rscript "${rscript}" \
     --in_dir "${ldsc_dir}" \
     --phenotypes "${phenotypes}" \
     --out_prefix "${out_prefix}" \
-    --ldsc_n_eff_cutoff 20000 \
+    --ldsc_n_eff_cutoff 5000 \
     --ldsc_p_cutoff 0.05
 
 

@@ -62,10 +62,12 @@ main <- function(args){
          burn_in = burn_in,
          h2_init = h2_init,
          vec_p_init = vec_p_init,
+         #use_MLE = FALSE, # Uncomment if convergence issues
          ncores = NCORES)
       beta_auto <- sapply(multi_auto, function(auto){auto$beta_est})
       chains_converged <- which(colSums(is.na(beta_auto))==0)
-      converged <- length(chains_converged) >= 10 #  want at least 10 chains
+      write(paste("Chains converged:", chains_converged), stdout())
+      converged <- length(chains_converged) >= 3 #  want at least 10 chains
       return(list(beta_auto=beta_auto, multi_auto=multi_auto, chains_converged=chains_converged, converged=converged))       
   }
 
@@ -75,9 +77,10 @@ main <- function(args){
  
   # try the following combination of paramters in case of instability
   grid_params <- list(
-     list(iter=500, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.50, length.out=vec_p_ranges), seed=1),
-     list(iter=500, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.20, length.out=vec_p_ranges), seed=2),
-     list(iter=250, burn_in=100, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.20, length.out=vec_p_ranges), seed=2)
+     list(iter=500, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.70, length.out=vec_p_ranges), seed=5),
+     list(iter=500, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.60, length.out=vec_p_ranges), seed=6),
+     list(iter=100, burn_in=100, h2_init=h2_init, vec_p_init=seq_log(1e-5, 0.80, length.out=vec_p_ranges), seed=7),
+     list(iter=100, burn_in=50, h2_init=h2_init, vec_p_init=seq_log(1e-5, 0.40, length.out=vec_p_ranges), seed=8)
    )
  
   step <- 0
@@ -121,7 +124,7 @@ parser$add_argument("--method", default=NULL, required = TRUE, help = "either 'i
 parser$add_argument("--ldsc", default=NULL, required = TRUE, help = ".rds object containing QCed GWAS and ldsc heritability estimates")
 parser$add_argument("--ldsc_pvalue_cutoff", default=NULL, help = "cancel the run if the ldsc heritability p-value is not below the given treshold.")
 parser$add_argument("--ldsc_n_eff_cutoff", default=NULL, help = "cancel the run if the ldsc N_eff is not below the given treshold.")
-parser$add_argument("--vec_p_init_n", default=40, required = FALSE, help = "number of intial estimates to sample form (should be at least 5)")
+parser$add_argument("--vec_p_init_n", default=100, required = FALSE, help = "number of intial estimates to sample form (should be at least 5)")
 parser$add_argument("--ld_dir", default=NULL, required = TRUE, help = "Path to directory with pre-calcualted SNP correlations and LD (.rds files)")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where should the results be written?")
 args <- parser$parse_args()

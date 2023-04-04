@@ -7,9 +7,9 @@
 #SBATCH --error=logs/pred_pgs.errors.log
 #SBATCH --open-mode=append
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 2
-#SBATCH --array=1-310
-#SBATCH --begin=now+1hour
+#SBATCH --cpus-per-task 1
+#SBATCH --array=1-320
+#--begin=now+1hour
 #
 #$ -N pred_pgs
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -61,7 +61,7 @@ predict_prs()
   local ldsc="${ldsc_dir}/ldsc_${phenotype}.rds"
   local betas="${beta_dir}/weights.qc.${phenotype}.txt.gz"
   local out_prefix="${out_dir}/pgs.${phenotype}.chrCHR"
-  local merged="${mrg_dir}/pgs.${phenotype}.combined.txt.gz"
+  local merged="${mrg_dir}/${phenotype}_pgs_chrom.txt.gz"
 
   local qsub_fit="_pgs_${phenotype}"
   local qsub_aggr="_aggr_${phenotype}"
@@ -74,7 +74,7 @@ predict_prs()
           set_up_rpy
           fit_pgs
           aggr_pgs
-          clean_pgs
+          #clean_pgs
       else
         >&2 echo "${merged} already exists. Skipping.."
       fi
@@ -150,8 +150,8 @@ aggr_pgs()
     readonly aggr_pgs_jid=$( sbatch \
       --account="${slurm_project}" \
       --job-name="${aggr_jname}" \
-      --output="logs/${aggr_jname}.log" \
-      --error="logs/${aggr_jname}.errors.log" \
+      --output="logs/${aggr_lname}.log" \
+      --error="logs/${aggr_lname}.errors.log" \
       --chdir="$(pwd)" \
       --partition="${slurm_queue}" \
       --cpus-per-task="${slurm_nslots}" \
@@ -206,7 +206,7 @@ clean_pgs()
       --parsable \
       "${clean_script}" \
       "${pred}" \
-      "${out_prefix}_new" )
+      "${out_prefix}" )
   elif [ "${cluster}" = "sge" ]; then
     qsub -N "${qsub_clean}" \
       -t ${tasks} \
@@ -219,7 +219,7 @@ clean_pgs()
       -hold_jid_ad "${qsub_fit}" \
       "${clean_script}" \
       "${pred}" \
-      "${out_prefix}_new" 
+      "${out_prefix}" 
   else
     >&2 echo "${cluster} is not valid"
   fi

@@ -41,6 +41,3 @@ else
   echo "Note: ${out_prefix_chr} already exists. Skipping.."
 fi
 
-#    --ldsc "${ldsc}" \
-#      --ld_dir "${ld_dir}" \
-   

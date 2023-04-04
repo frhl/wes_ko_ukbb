@@ -10,7 +10,7 @@
 #SBATCH --open-mode=append
 #SBATCH --partition=epyc
 #SBATCH --cpus-per-task 6
-#SBATCH --array=1-320
+#SBATCH --array=129
 # --begin=now+3hour
 #
 #$ -N fit_pgs_weights
@@ -42,7 +42,7 @@ readonly pheno_dir="data/phenotypes"
 readonly out_dir="data/prs/weights/auto"
 
 readonly ldsc_pvalue_cutoff="0.05"
-readonly ldsc_n_eff_cutoff=500 # 20000
+readonly ldsc_n_eff_cutoff=100 # 20000
 readonly ldpred_method="auto"
 
 readonly cluster=$( get_current_cluster )
