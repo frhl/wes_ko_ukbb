@@ -9,9 +9,13 @@ library(dplyr)
 main <- function(args){
 
     sites <- args$sites
+    samples <- args$samples
     input_path <- args$input_path
     out_prefix <- args$out_prefix
+    
     exome_vars <- fread(sites)
+    qc_samples <- readLines(samples)
+
     dt_summary <- list()
     for (chr in seq(20,22))
     {
@@ -19,6 +23,7 @@ main <- function(args){
         cat(paste('chromosome', chr, "-", fpath))
         dt <- fread(fpath, key=c("locus", "alleles"))
         dt <- merge(dt, exome_vars)
+        dt <- dt[dt$s %in% qc_samples,]
 
         rb_sizes <- dt %>% group_by(s, PS_rb) %>% summarise(count=n())
         pairs <- data.table(rb_sizes %>% filter(count == 2))
@@ -84,6 +89,7 @@ main <- function(args){
 parser <- ArgumentParser()
 parser$add_argument("--input_path", default=NULL, required = TRUE, help = "path to file with PS_rb, GT_rb and GT sites.")
 parser$add_argument("--sites", default=NULL, required = TRUE, help = "path to quality controlled variant sites")
+parser$add_argument("--samples", default=NULL, required = TRUE, help = "path to samples to subset to")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "out prefix for files.")
 args <- parser$parse_args()
 
