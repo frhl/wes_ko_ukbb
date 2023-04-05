@@ -10,6 +10,7 @@ main <- function(args){
 
     sites <- args$sites
     input_path <- args$input_path
+    out_prefix <- args$out_prefix
     exome_vars <- fread(sites)
     dt_summary <- list()
     for (chr in seq(20,22))
@@ -76,7 +77,7 @@ main <- function(args){
     # combine by PP and MAC bins
     dt_summary_pp <- rbindlist(dt_summary_list)
     outfile <- paste0(out_prefix,".pp.txt.gz")
-    fwrite(dt_summary, outfile, sep = '\t')
+    fwrite(dt_summary_pp, outfile, sep = '\t')
 }
 
 # add arguments
