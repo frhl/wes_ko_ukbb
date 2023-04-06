@@ -112,21 +112,25 @@ main <- function(args){
     stopifnot(all(colnames(dt) %in% new_order))
     dt <- dt[,new_order, with=FALSE]
 
-    # create subsets and export
-    only_plofs <- grepl("pLoF", dt$consequence_category) & !grepl("damaging_missense", dt$consequence_category)
-    only_missense <- !grepl("pLoF", dt$consequence_category) & grepl("damaging_missense", dt$consequence_category)
-   
     # export all 
-    outfile <- paste0(out_prefix,".pLoF_damaging_missense.txt.gz")
+    outfile <- paste0(out_prefix,".txt.gz")
     fwrite(dt, outfile)
 
-    # export plofs
-    outfile <- paste0(out_prefix,".pLoF.txt.gz")
-    fwrite(dt[only_plofs,], outfile)
+    # create subsets and export
+    #only_plofs <- grepl("pLoF", dt$consequence_category) & !grepl("damaging_missense", dt$consequence_category)
+    #only_missense <- !grepl("pLoF", dt$consequence_category) & grepl("damaging_missense", dt$consequence_category)
+   
+    # export all 
+    #outfile <- paste0(out_prefix,".pLoF_damaging_missense.txt.gz")
+    #fwrite(dt, outfile)
 
     # export plofs
-    outfile <- paste0(out_prefix,".damaging_missense.txt.gz")
-    fwrite(dt[only_missense,], outfile)
+    #outfile <- paste0(out_prefix,".pLoF.txt.gz")
+    #fwrite(dt[only_plofs,], outfile)
+
+    # export plofs
+    #outfile <- paste0(out_prefix,".damaging_missense.txt.gz")
+    #fwrite(dt[only_missense,], outfile)
 
 }
 
