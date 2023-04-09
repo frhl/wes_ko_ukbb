@@ -10,7 +10,8 @@ library(data.table)
 main <- function(args){
  
     stopifnot(file.exists(args$input_path))
-
+    stopifnot(args$what %in% c("p", "t"))
+        
     # read input
     d <- fread(args$input_path)
 
@@ -34,9 +35,15 @@ main <- function(args){
     true_t <- unique(true_t)
     stopifnot(length(true_p) == 1)
     stopifnot(length(true_t) == 1)
-    if (is.na(true_p)) stop(paste("true P is NA for", args$input_path))
+    if (is.na(true_p)) stop(paste("true P/t-statistic is NA for", args$input_path))
     
-    write(true_p, stdout())
+    if (args$what == "p" {
+        write(true_p, stdout())
+    } else if (args$what == "t"){
+        write(true_t, stdout())
+    } else {
+        stop("arg 'what' should be either 'p' (p-value) or 't' (t-statistic)")
+    }
 
 }
 
@@ -47,6 +54,6 @@ main <- function(args){
 
 my_args <- commandArgs(trailingOnly=TRUE)
 #write(paste("args:", my_args), stderr())
-args <- list(input_path=my_args[1])
+args <- list(input_path=my_args[1], what=my_args[2])
 main(args)
 

@@ -76,10 +76,17 @@ main <- function(args){
     n_same_p <- length(idx_same_p)
     idx_string <- paste0(idx_same_p, collapse = ",")
 
-    # calculate empirical P-value (note, need to ensure tail)
-    count_p_ge_true <- sum(true_p >= pvalue)/length(pvalue) 
+    if (args$alternative == "two.sided"){
+        count_p_ge_true <- sum(true_p >= pvalue)/length(pvalue) 
+    } else if (args$alternative == "greater"){
+        count_p_ge_true <- sum(true_t >= tstat)/length(tstat) 
+    } else {
+        stop("arg 'alternative' must be either 'two.sided' or 'greater'")
+    }
+    
     empirical_p <- count_p_ge_true
     write(empirical_p, stdout())
+
 
 }
 
@@ -87,9 +94,7 @@ main <- function(args){
 parser <- ArgumentParser()
 parser$add_argument("--input_path", default=NULL, help = "path to saige (merge) file of markers")
 parser$add_argument("--out_prefix", default=NULL, help = "prefix for output")
-#parser$add_argument("--true_tstat", default=NULL, help = "the true t-statistic from non-permuted analysis")
-#parser$add_argument("--true_p", default=NULL, help = "the true p-value from non-permuted analysis")
-#parser$add_argument("--true_AC", default=NULL, help = "the true allele count from non-permuted analysis")
+parser$add_argument("--alternative", default="two.sided", help = "Character string specifying the alternative hypothesis, must be one of 'two.sided' (default) or 'greater'.")
 parser$add_argument("--marker_id", default=NULL, help = "the true marker name")
 parser$add_argument("--exclude_real_markers", default=FALSE, action="store_true", help = "Exclude real conditioning markers (from conditioning analysis)")
 args <- parser$parse_args()

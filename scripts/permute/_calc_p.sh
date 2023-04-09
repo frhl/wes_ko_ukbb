@@ -50,7 +50,7 @@ if [ "${total_phenos}" -ne "${tested_phenos}" ]; then
     set_up_rpy
     if [ "$(zcat ${saige_merged} | wc -l)" -gt "1" ]; then
       # strange error with argparse below so needed to use commandArgs instead.
-      readonly true_p=$( Rscript ${r_get_true_p} "${saige_merged}" )
+      readonly true_p=$( Rscript ${r_get_true_p} "${saige_merged}" "p" )
       if [[ "${true_p}" != "NA" ]]; then
         readonly last_p=$(get_last_permuted_p)
         readonly permuted_p=$(Rscript ${r_get_spa_p} --input_path "${saige_merged}" --select_min_p ${top_p} )
