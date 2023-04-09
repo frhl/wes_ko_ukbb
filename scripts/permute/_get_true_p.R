@@ -1,10 +1,10 @@
 #!/usr/bin/env Rscript
 
-python_bin <- findpython::find_python_cmd()
-write(paste("Python path:", python_bin), stderr())
-options('python_cmd'='/well/lindgren/users/mmq446/conda/skylake/envs/rpy/bin/python')
+#python_bin <- findpython::find_python_cmd()
+#write(paste("Python path:", python_bin), stderr())
+#options('python_cmd'='/well/lindgren/users/mmq446/conda/skylake/envs/rpy/bin/python')
 
-library(argparse)
+#library(argparse)
 library(data.table)
 
 main <- function(args){
@@ -41,9 +41,12 @@ main <- function(args){
 }
 
 # add arguments
-parser <- ArgumentParser()
-parser$add_argument("--input_path", default=NULL, help = "Merged SAIGE file with 'actual' (true) marker included.")
-args <- parser$parse_args()
+#parser <- ArgumentParser()
+#parser$add_argument("--input_path", default=NULL, help = "Merged SAIGE file with 'actual' (true) marker included.")
+#args <- parser$parse_args()
 
+my_args <- commandArgs(trailingOnly=TRUE)
+#write(paste("args:", my_args), stderr())
+args <- list(input_path=my_args[1])
 main(args)
 

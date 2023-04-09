@@ -237,6 +237,7 @@ submit_saige() {
         --partition="${slurm_queue}" \
         --cpus-per-task="${slurm_nslots}" \
         --array=${slurm_tasks} \
+        --constraint="skl-compat" \
         --open-mode="append" \
         --parsable \
         "${spa_script}" \
@@ -309,6 +310,7 @@ submit_calc_p() {
     --chdir="${curwd}" \
     --partition="${slurm_queue}" \
     --cpus-per-task="${slurm_nslots}" \
+    --constraint="skl-compat" \
     --open-mode="append" \
     --parsable \
     "${calc_script}" \

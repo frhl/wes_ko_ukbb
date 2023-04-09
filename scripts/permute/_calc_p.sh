@@ -49,7 +49,7 @@ if [ "${total_phenos}" -ne "${tested_phenos}" ]; then
   if [ -f "${saige_merged}" ]; then
     set_up_rpy
     if [ "$(zcat ${saige_merged} | wc -l)" -gt "1" ]; then
-      readonly true_p=$( Rscript ${r_get_true_p} --input_path "${saige_merged}" )
+      readonly true_p=$( Rscript ${r_get_true_p} "${saige_merged}" )
       if [[ "${true_p}" != "NA" ]]; then
         readonly last_p=$(get_last_permuted_p)
         readonly permuted_p=$(Rscript ${r_get_spa_p} --input_path "${saige_merged}" --select_min_p ${top_p} )
