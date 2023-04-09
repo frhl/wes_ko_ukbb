@@ -25,31 +25,33 @@ readonly input_path=${4?Error: Missing arg2}
 readonly out_prefix_prelim=${5?Error: Missing arg3}
 readonly pheno_dir=${6?Error: Missing arg4}
 readonly genes_path=${7?Error: Missing arg5} 
-readonly min_mac=${8?Error: Missing arg7 (Minimum number of knockouts)}
-readonly replicates=${9?Error: Missing arg8 (Shuffles per permute submission)}
-readonly n_shuffle=${10?Error: Missing arg9 (How many shuffles of of phase should be done) }
-readonly n_cutoff_shuffle=${11?Error: Missing arg10 (maximum allowed number of shuffles)}
-readonly n_slots_saige=${12?Error: Missing arg11 (compute slots flor saige script)}
-readonly n_slots_permute=${13?Error: Missing arg12 (compute slots for permute script)}
-readonly queue_saige=${14?Error: Missing arg13 (What queue should be used for SAIGE gwas)}
-readonly queue_permute=${15?Error: Missing arg14 (What queue should be used for permute script)}
-readonly queue_merge=${16?Error: Missing arg15 (What queue should be used for merge script)}
-readonly queue_master=${17?Error: Missing arg16 (What queue should be user for master script)}
-readonly annotation=${18?Error: Missing arg17 (Consequence annotation)}
-readonly static_assoc=${19?Error: Missing arg18 (Prefix for association file)}
-readonly use_prs=${20?Error: Missing arg19 (Should PRS be used)}
-readonly cond_markers=${21?Error: Missing arg20 (List of markers to condition on)}
-readonly use_cond_common=${22?Error: Missing arg20 (List of markers to condition on)}
-readonly cond_genotypes=${23?Error: Missing arg21 (Genotypes/dosages for conditioning markers)}
-iteration=${24?Error: Missing arg22 (What is the current iteration)}
-permutation_supply=${25?Error: Missing arg23 (How many permutations have been accomplished so far)}
-top_p=${26?Error: Missing arg24 (What index of the lowest P-value should be used to determien covergence (10 or 100)}
+readonly genes_phenos_path=${8?Error: Missing arg5} 
+readonly min_mac=${9?Error: Missing arg7 (Minimum number of knockouts)}
+readonly replicates=${10?Error: Missing arg8 (Shuffles per permute submission)}
+readonly n_shuffle=${11?Error: Missing arg9 (How many shuffles of of phase should be done) }
+readonly n_cutoff_shuffle=${12?Error: Missing arg10 (maximum allowed number of shuffles)}
+readonly n_slots_saige=${13?Error: Missing arg11 (compute slots flor saige script)}
+readonly n_slots_permute=${14?Error: Missing arg12 (compute slots for permute script)}
+readonly queue_saige=${15?Error: Missing arg13 (What queue should be used for SAIGE gwas)}
+readonly queue_permute=${16?Error: Missing arg14 (What queue should be used for permute script)}
+readonly queue_merge=${17?Error: Missing arg15 (What queue should be used for merge script)}
+readonly queue_master=${18?Error: Missing arg16 (What queue should be user for master script)}
+readonly annotation=${19?Error: Missing arg17 (Consequence annotation)}
+readonly static_assoc=${20?Error: Missing arg18 (Prefix for association file)}
+readonly use_prs=${21?Error: Missing arg19 (Should PRS be used)}
+readonly cond_markers=${22?Error: Missing arg20 (List of markers to condition on)}
+readonly use_cond_common=${23?Error: Missing arg20 (List of markers to condition on)}
+readonly cond_genotypes=${24?Error: Missing arg21 (Genotypes/dosages for conditioning markers)}
+iteration=${25?Error: Missing arg22 (What is the current iteration)}
+permutation_supply=${26?Error: Missing arg23 (How many permutations have been accomplished so far)}
+top_p=${27?Error: Missing arg24 (What index of the lowest P-value should be used to determien covergence (10 or 100)}
 
 # set final paths depending on gene
 readonly gene="$(zcat ${genes_path} | grep -w "chr${chr}" | cut -f1 | sed ${index}'q;d' )"
 readonly out_prefix=$(echo ${out_prefix_prelim} | sed -e "s/GENE/${gene}/g")
 readonly write_dir="$( dirname ${out_prefix})"
 readonly tested_phenos="${out_prefix}.phenos"
+readonly pheno_bin_gene="${out_prefix}.totest.phenos"
 readonly status_phenos="${out_prefix}.permuted"
 readonly file_cutoff="${out_prefix}.cutoff"
 
@@ -76,15 +78,15 @@ mkdir -p ${write_dir}
 touch ${tested_phenos}
 touch ${status_phenos}
 
+# comment out this line if you only want to run the relevantn gene-trait combinations
+zcat "${genes_phenos_path}" | tail -n +2 | grep -w "${gene}" | cut -f1 > "${pheno_bin_gene}"
+#zcat "${genes_phenos_path}" | tail -n +2 | cut -f1 > "${pheno_bin_gene}"
+
 set_arr_phenos() {
   trait=${1}
   if [ ! -z ${pheno_dir} ]; then
-    local pheno_bin="data/permute/overview/phenotypes_with_5cis_5chets_header.txt"
-    #local pheno_bin="data/permute/overview/phenotypes_with_5cis_5chets.txt.gz"
     local pheno_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
-    #local pheno_bin_gene="${out_prefix}.phenos.subset" 
-    #zcat ${pheno_bin} | grep -w ${gene} > | cut -f1 > ${pheno_bin_gene}
-    readarray -t arr_bin < ${pheno_bin}
+    readarray -t arr_bin < ${pheno_bin_gene}
     readarray -t arr_cts < ${pheno_cts}
     if [[ "${trait}" == "both" ]]; then
       arr_phenos=("${arr_bin[@]}" "${arr_cts[@]}")
@@ -357,6 +359,7 @@ resubmit_loop() {
     "${out_prefix}" \
     "${pheno_dir}" \
     "${genes_path}" \
+    "${genes_phenos_path}" \
     "${min_mac}" \
     "${replicates}" \
     "${new_n_shuffle}" \
@@ -434,7 +437,7 @@ iteration=$((${iteration} + 1))
 wait_on_jids=""
 set_arr_phenos "binary"
 #arr_phenos=( "spiro_visual_impairment_and_blindness" "spiro_bronchiectasis" )
-arr_phenos=( "spiro_visual_impairment_and_blindness" "spiro_dermatitis" "spiro_asthma" )
+#arr_phenos=( "spiro_visual_impairment_and_blindness" "spiro_dermatitis" "spiro_asthma" )
 #echo "${arr_phenos[*]}"
 
 if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then

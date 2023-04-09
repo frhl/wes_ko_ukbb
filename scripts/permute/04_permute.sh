@@ -9,7 +9,7 @@
 #SBATCH --error=logs/permute.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=22
+#SBATCH --array=1-21
 
 set -o errexit
 set -o nounset
@@ -44,9 +44,9 @@ readonly cond_genotypes="${cond_dir}/common_conditional.tsv.gz"
 
 # parameters for master script
 readonly min_mac=4
-readonly n_replicates=100 # 1000
-readonly n_start_shuffle=100 #1000
-readonly n_cutoff_shuffle=10000 #100000 #10000000
+readonly n_replicates=1000 # 1000
+readonly n_start_shuffle=1000 #1000
+readonly n_cutoff_shuffle=1000000 #10000000
 readonly n_slots_saige=1
 readonly n_slots_permute=2
 readonly queue_saige="short"
@@ -61,7 +61,8 @@ readonly use_cond_common=1
 
 # get path to true P-value and t-stats
 readonly overview_dir="data/permute/overview"
-readonly genes_path="${overview_dir}/genes_to_run_10cis_5chets.tsv.gz"
+readonly genes_path="${overview_dir}/genes_to_run_5cis_5chets.tsv.gz"
+readonly genes_phenos_path="${overview_dir}/phenotypes_with_5cis_5chets.txt.gz"
 
 # count how many genes to submit for the given chromosome
 readonly n_genes="$( zcat ${genes_path} | grep -w "chr${chr}" | wc -l)"
@@ -90,6 +91,7 @@ sbatch \
   "${out_prefix}" \
   "${pheno_dir}" \
   "${genes_path}" \
+  "${genes_phenos_path}" \
   "${min_mac}" \
   "${n_replicates}" \
   "${n_start_shuffle}" \
