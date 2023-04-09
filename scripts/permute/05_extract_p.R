@@ -39,7 +39,7 @@ main <- function(args){
     stopifnot(dir.exists(permute_dir))
     stopifnot(file.exists(path_trait_genes))
     trait_gene_combos <- fread(path_trait_genes)
-    phenotypes <- unique(trait_gene_combos$trait)
+    phenotypes <- unique(trait_gene_combos$phenotype)
     stopifnot(length(phenotypes)>1)
     for (trait in phenotypes){
         pattern <- paste0(trait,".pvalues")
