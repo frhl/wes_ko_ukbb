@@ -12,7 +12,7 @@
 #SBATCH --error=logs/spa_iter_common.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=11-320
+#SBATCH --array=1-320
 #--dependency=afterok:12374266
 #
 #$ -N spa_iter_common
@@ -79,6 +79,7 @@ submit_cts_analysis()
 
 submit_cond_spa()
 {
+  set_up_rpy
   local annotation=${1?Error: Missing arg1 (consequence)}
   local phenotype=${2?Error: Missing arg2 (phenotype)}
   local trait=${3?Error: Missing arg3 (trait)}

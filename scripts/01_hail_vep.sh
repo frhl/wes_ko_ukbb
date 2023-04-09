@@ -9,8 +9,8 @@
 #SBATCH --output=logs/hail_vep.log
 #SBATCH --error=logs/hail_vep.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 2
-#SBATCH --array=21
+#SBATCH --cpus-per-task 1
+#SBATCH --array=1-19
 #SBATCH --requeue
 
 source utils/qsub_utils.sh
@@ -20,7 +20,7 @@ source utils/hail_utils.sh
 readonly in_dir="data/unphased/wes/post-qc"
 readonly spark_dir="data/tmp/spark"
 readonly vep_dir="data/vep/full"
-readonly out_dir="data/vep/hail/slurm_test"
+readonly out_dir="data/vep/hail_hgvs/"
 
 # hail script
 readonly hail_script="scripts/01_hail_vep.py"

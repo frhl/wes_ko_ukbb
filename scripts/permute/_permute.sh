@@ -80,7 +80,10 @@ set_arr_phenos() {
   trait=${1}
   if [ ! -z ${pheno_dir} ]; then
     local pheno_bin="data/permute/overview/phenotypes_with_5cis_5chets_header.txt"
+    #local pheno_bin="data/permute/overview/phenotypes_with_5cis_5chets.txt.gz"
     local pheno_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
+    #local pheno_bin_gene="${out_prefix}.phenos.subset" 
+    #zcat ${pheno_bin} | grep -w ${gene} > | cut -f1 > ${pheno_bin_gene}
     readarray -t arr_bin < ${pheno_bin}
     readarray -t arr_cts < ${pheno_cts}
     if [[ "${trait}" == "both" ]]; then
@@ -429,6 +432,7 @@ iteration=$((${iteration} + 1))
 wait_on_jids=""
 set_arr_phenos "binary"
 #arr_phenos=( "spiro_visual_impairment_and_blindness" "spiro_bronchiectasis" )
+arr_phenos=( "spiro_visual_impairment_and_blindness" "spiro_dermatitis" "spiro_asthma" )
 #echo "${arr_phenos[*]}"
 
 if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then

@@ -10,6 +10,8 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 #SBATCH --array=1-320
+#SBATCH --begin=now+2hour
+#SBATCH --dependency=afterok:13640293
 
 set -o errexit
 set -o nounset

@@ -6,6 +6,15 @@ library(data.table)
 library(Hmisc)
 library(dplyr)
 
+# a function to get binomial CIs
+bin_conf <- function(counts, col){
+    counts_ci <- do.call(rbind, lapply(1:nrow(counts), function(i) Hmisc::binconf(counts[[col]][i], counts$count[i])))
+    colnames(counts_ci) <- tolower(colnames(counts_ci))
+    counts <- cbind(counts, counts_ci)
+    return(counts)
+}
+
+
 main <- function(args){
 
     sites <- args$sites
@@ -74,15 +83,21 @@ main <- function(args){
         dt_summary_list[[as.character(min_pp)]] <- dt_summary %>% filter(min_PP > min_pp) %>% 
             group_by(MAC_bin, MAC_group) %>% summarise(
                 min_PP = min_pp,
-                mean=1-mean(as.numeric(match)),
+                #mean=1-mean(as.numeric(match)),
+                matches=sum(as.numeric(match)),
                 count=n()
             )
     }
 
     # combine by PP and MAC bins
     dt_summary_pp <- rbindlist(dt_summary_list)
+    dt_summary_pp$errors <- dt_summary_pp$count - dt_summary$matches
+    dt_summary_pp <- bin_conf(dt_summary_pp, col = "matches")
+    
+    # write final file
     outfile <- paste0(out_prefix,".pp.txt.gz")
     fwrite(dt_summary_pp, outfile, sep = '\t')
+
 }
 
 # add arguments

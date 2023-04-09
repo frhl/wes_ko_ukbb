@@ -8,7 +8,7 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/get_phenos_to_run.log
 #SBATCH --error=logs/get_phenos_to_run.errors.log
-#SBATCH --partition=epyc
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 
 set -o errexit
@@ -20,7 +20,7 @@ source utils/qsub_utils.sh
 readonly rscript="scripts/permute/00_get_phenos_to_run.R"
 
 readonly min_chet=5
-readonly min_cis=5
+readonly min_cis=10
 
 readonly sig_hits_dir="data/post_hoc/results"
 readonly sig_hits="${sig_hits_dir}/176k_sig_saige_cond_sig_pref_prs_combined.txt.gz"

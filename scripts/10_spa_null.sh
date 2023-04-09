@@ -10,6 +10,7 @@
 #SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
 #SBATCH --array=1-320
+# --begin=now+3hour
 #
 #$ -N spa_null
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -125,6 +126,7 @@ submit_spa_null() {
   set_up_prs
   local out_bname=$( basename ${out} )
   local chr_done=$( ls -l ${out_dir} | grep ${out_bname} | grep chr | grep rda | wc -l )
+  #local single_done=$( ls -l ${out_dir} | grep -w "${out_bname}.rda" | wc -l)
   if [[ "${prs_ok}" -eq "0"  && "${use_prs}" -eq "1" ]]; then
     >&2 echo "Error: PRS could not be started for '${phenotype}'"
   else

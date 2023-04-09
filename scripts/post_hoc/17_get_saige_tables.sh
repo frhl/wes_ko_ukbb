@@ -35,7 +35,7 @@ readonly phenos_tested=311
 readonly p_cutoff="$(python -c "print(0.05/(${genes_tested}*${phenos_tested}))")"
 
 # define cutoffs
-readonly N_ko_case_cutoff="0"
+readonly N_ko_case_cutoff="2"
 readonly N_ko_cutoff="5"
 
 # path to PRS heritability estimates

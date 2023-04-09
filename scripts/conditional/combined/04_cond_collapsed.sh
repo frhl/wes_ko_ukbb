@@ -10,7 +10,7 @@
 #SBATCH --error=logs/cond_collapsed.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=11-320
+#SBATCH --array=1-320
 #SBATCH --open-mode=append
 # --begin=23:00
 #

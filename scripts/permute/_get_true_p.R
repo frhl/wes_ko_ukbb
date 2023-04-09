@@ -1,5 +1,9 @@
 #!/usr/bin/env Rscript
 
+python_bin <- findpython::find_python_cmd()
+write(paste("Python path:", python_bin), stderr())
+options('python_cmd'='/well/lindgren/users/mmq446/conda/skylake/envs/rpy/bin/python')
+
 library(argparse)
 library(data.table)
 

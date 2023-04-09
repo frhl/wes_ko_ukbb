@@ -8,7 +8,7 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/get_sig_genes.log
 #SBATCH --error=logs/get_sig_genes.errors.log
-#SBATCH --partition=epyc
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 
 #$ -N get_sig_genes
