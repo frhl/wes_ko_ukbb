@@ -24,7 +24,7 @@ readonly chr="${SLURM_ARRAY_TASK_ID}"
 
 # setup directories
 readonly in_dir="data/permute/overview"
-readonly out_dir="data/permute/permutations_shuffle5/chr${chr}/GENE"
+readonly out_dir="data/permute/permutations_shuffle/chr${chr}/GENE"
 readonly pheno_dir="data/phenotypes"
 readonly cond_dir="data/conditional/common/markers"
 readonly grm_dir="data/saige/grm/input/dnanexus"
@@ -55,7 +55,7 @@ readonly queue_merge="short"
 readonly queue_master="short"
 readonly iteration=0
 readonly permutation_supply=0
-readonly initial_top_p=3 # 10
+readonly initial_top_p=100 # 10
 readonly use_prs=1
 readonly use_cond_common=1
 
@@ -72,47 +72,51 @@ readonly slurm_lname="logs/_permute"
 readonly slurm_project="lindgren.prj"
 readonly slurm_queue="${queue_master}"
 readonly slurm_nslots="1"
-set -x
-sbatch \
-  --account="${slurm_project}" \
-  --job-name="${slurm_jname}" \
-  --output="${slurm_lname}.log" \
-  --error="${slurm_lname}.errors.log" \
-  --chdir="${curwd}" \
-  --partition="${slurm_queue}" \
-  --cpus-per-task="${slurm_nslots}" \
-  --array=${slurm_tasks} \
-  --parsable \
-  "${bash_script}" \
-  "${chr}" \
-  "${grm_mtx}" \
-  "${grm_sam}" \
-  "${input_path}" \
-  "${out_prefix}" \
-  "${pheno_dir}" \
-  "${genes_path}" \
-  "${genes_phenos_path}" \
-  "${min_mac}" \
-  "${n_replicates}" \
-  "${n_start_shuffle}" \
-  "${n_cutoff_shuffle}" \
-  "${n_slots_saige}" \
-  "${n_slots_permute}" \
-  "${queue_saige}" \
-  "${queue_permute}" \
-  "${queue_merge}" \
-  "${queue_master}" \
-  "${annotation}" \
-  "${assoc_format}" \
-  "${use_prs}" \
-  "${cond_markers}" \
-  "${use_cond_common}" \
-  "${cond_genotypes}" \
-  "${iteration}" \
-  "${permutation_supply}" \
-  "${initial_top_p}"
-set +x
 
+if [ "${n_genes}" -gt "0" ]; then
+  set -x
+  sbatch \
+    --account="${slurm_project}" \
+    --job-name="${slurm_jname}" \
+    --output="${slurm_lname}.log" \
+    --error="${slurm_lname}.errors.log" \
+    --chdir="${curwd}" \
+    --partition="${slurm_queue}" \
+    --cpus-per-task="${slurm_nslots}" \
+    --array=${slurm_tasks} \
+    --parsable \
+    "${bash_script}" \
+    "${chr}" \
+    "${grm_mtx}" \
+    "${grm_sam}" \
+    "${input_path}" \
+    "${out_prefix}" \
+    "${pheno_dir}" \
+    "${genes_path}" \
+    "${genes_phenos_path}" \
+    "${min_mac}" \
+    "${n_replicates}" \
+    "${n_start_shuffle}" \
+    "${n_cutoff_shuffle}" \
+    "${n_slots_saige}" \
+    "${n_slots_permute}" \
+    "${queue_saige}" \
+    "${queue_permute}" \
+    "${queue_merge}" \
+    "${queue_master}" \
+    "${annotation}" \
+    "${assoc_format}" \
+    "${use_prs}" \
+    "${cond_markers}" \
+    "${use_cond_common}" \
+    "${cond_genotypes}" \
+    "${iteration}" \
+    "${permutation_supply}" \
+    "${initial_top_p}"
+  set +x
+else
+  >&2 echo "No genes to run for chr${chr}. Exiting.."
+fi
 
 
 

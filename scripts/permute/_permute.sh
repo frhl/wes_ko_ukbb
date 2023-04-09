@@ -73,14 +73,19 @@ if [ ! -f "${input_path}" ]; then
   raise_error "${input_path} does not exist."
 fi
 
-# create files and dirs
-mkdir -p ${write_dir}
-touch ${tested_phenos}
-touch ${status_phenos}
+# check that phenotypes should actually be run for the given gene.
+readonly n_phenos=$(zcat ${genes_phenos_path} | tail -n +2 | grep -w "${gene}" | wc -l)
+if [ "${n_phenos}" -gt "0" ]; then
+  # create files and dirs
+  mkdir -p ${write_dir}
+  touch ${tested_phenos}
+  touch ${status_phenos}
+fi
 
-# comment out this line if you only want to run the relevantn gene-trait combinations
+# comment out this line if you only want to run the relevant gene-trait combinations
 zcat "${genes_phenos_path}" | tail -n +2 | grep -w "${gene}" | cut -f1 > "${pheno_bin_gene}"
 #zcat "${genes_phenos_path}" | tail -n +2 | cut -f1 > "${pheno_bin_gene}"
+
 
 set_arr_phenos() {
   trait=${1}
