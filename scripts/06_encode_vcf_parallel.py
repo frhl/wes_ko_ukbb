@@ -75,7 +75,7 @@ def main(args):
         # calculate probability of being knocked out based on phased counts
         genes = genes.annotate_entries(pKO=expr_pko, knockout=expr_ko)
         if checkpoint or aggr_method in "collect":
-            genes = genes.checkpoint(out_prefix + "_checkpoint.mt", overwrite=True)
+            genes = genes.checkpoint(out_prefix, overwrite=True)
             n_genes = genes.count()[0]
             sys.stderr.write(f"Aggregated variants to {n_genes} gene(s).")
     

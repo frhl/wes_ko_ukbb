@@ -54,9 +54,14 @@ set_up_rpy
 #get_table "176k_sig_saige_sig_prs_pref_wo_case_cutoff" "none" "prefer" "${p_cutoff}"
 
 # no subsetting by P-value
-get_table "176k_sig_saige_all_prs_excl_wo_case_cutoff" "none" "exclude" "1"
-get_table "176k_sig_saige_all_prs_only_wo_case_cutoff" "none" "only" "1"
-get_table "176k_sig_saige_all_prs_pref_wo_case_cutoff" "none" "prefer" "1"
+#get_table "176k_sig_saige_all_prs_excl_wo_case_cutoff" "none" "exclude" "1"
+#get_table "176k_sig_saige_all_prs_only_wo_case_cutoff" "none" "only" "1"
+#get_table "176k_sig_saige_all_prs_pref_wo_case_cutoff" "none" "prefer" "1"
+
+get_table "176k_sig_saige_all_prs_excl_wo_case_cutoff_chet_only" "chet_only" "exclude" "1"
+get_table "176k_sig_saige_all_prs_only_wo_case_cutoff_chet_only" "chet_only" "only" "1"
+get_table "176k_sig_saige_all_prs_pref_wo_case_cutoff_chet_only" "chet_only" "prefer" "1"
+
 
 
 

@@ -1,16 +1,7 @@
 #!/usr/bin/env bash
 #
-# requires merged hits from scripts/conditional/combined/05_merge..
-# 
-#$ -N spa_cond_combine
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/spa_cond_combine.log
-#$ -e logs/spa_cond_combine.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qc
-#$ -V
-
+# Get a nice table of the final hits after conditioning on common and rare variants (and PRS)
+#
 #SBATCH --account=lindgren.prj
 #SBATCH --job-name=spa_cond_combine
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -51,9 +42,20 @@ readonly N_ko_case_cutoff="2"
 readonly N_ko_cutoff="5"
 
 readonly out_dir="data/post_hoc/results"
-readonly out_prefix="${out_dir}/176k_sig_saige_cond_sig_pref_prs_combined"
 mkdir -p ${out_dir}
 
+# write all hits interrogated regardless of final P
+out_prefix="${out_dir}/176k_sig_saige_cond_all_pref_prs_combined"
+set_up_rpy
+Rscript "${rscript}" \
+  --ref_file "${ref_file}" \
+  --merged_hits "${merged_hits}" \
+  --N_ko_case_cutoff ${N_ko_case_cutoff} \
+  --N_ko_cutoff ${N_ko_cutoff} \
+  --out_prefix "${out_prefix}"
+
+# only write hits with sig final P
+out_prefix="${out_dir}/176k_sig_saige_cond_sig_pref_prs_combined"
 set_up_rpy
 Rscript "${rscript}" \
   --ref_file "${ref_file}" \

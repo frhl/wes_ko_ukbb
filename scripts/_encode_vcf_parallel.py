@@ -36,7 +36,6 @@ def main(args):
 
     if not os.path.isfile(checkpoint_file):
         mt = io.import_table(input_path, input_type, calc_info=False)
-        
         # create list for subsetting
         if subset_gene:
             subset_gene = list(set(subset_gene))
@@ -46,7 +45,6 @@ def main(args):
             csqs_expr = hl.literal(set(csqs_category)).contains(mt.consequence_category)
             gene_expr = hl.literal(subset_gene).contains(gene_id_expr)
             mt = mt.filter_rows((csqs_expr & gene_expr))
-
         # checkpoint and write
         mt = mt.repartition(32)
         mt = mt.checkpoint(out_prefix + "_checkpoint.mt", overwrite = True)

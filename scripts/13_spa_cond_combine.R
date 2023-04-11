@@ -76,7 +76,7 @@ main <- function(args){
 
     N_ko_cutoff <- as.numeric(args$N_ko_cutoff)
     N_ko_case_cutoff <- as.numeric(args$N_ko_case_cutoff)
-    p_cutoff <- as.numeric(args$p_cutoff)
+    p_cutoff <- args$p_cutoff
 
     # ensure we are using saige with PRS when possible
     ref <- fread(args$ref_file)
@@ -103,10 +103,10 @@ main <- function(args){
     # perform subsets
     d <- d[d$N_ko >= N_ko_cutoff,]
     d <- d[d$N_ko_case >= N_ko_case_cutoff,]
-    d <- d[order(d$p.value), ]
 
     # p-value cutoff
     if (!is.null(p_cutoff)){
+        p_cutoff <- as.numeric(p_cutoff)
         d <- d[(d$p.value < p_cutoff),]
     }
 
@@ -120,8 +120,6 @@ main <- function(args){
     
     # subset and order
     d <- d[,..cols]
-
-    # get tier A in the top
     d <- d[order(d$p.value),]
     d$hgnc_symbol[d$hgnc_symbol==""] <- NA
     d$hgnc_symbol[d$hgnc_symbol==" "] <- NA
