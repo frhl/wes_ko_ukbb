@@ -9,9 +9,9 @@ main <- function(args){
 
     d <- fread(args$path_sig_hits)
     d$phenotype <- gsub("chr[0-9]+\\_","",d$phenotype)
-    d <- d[d$p.value < (0.05 / (311 * 1143)),]
-    d <- d[d$N_ko >= 10, ] # this is allele count and not KO (>4 KOs)
-    d <- d[d$N_ko_case >= 2]
+    #d <- d[d$p.value < (0.05 / (311 * 1143)),]
+    #d <- d[d$N_ko >= 10, ] # this is allele count and not KO (>4 KOs)
+    #d <- d[d$N_ko_case >= 0]
     d$ensembl_gene_id <- d$MarkerID
 
     # get knockouts

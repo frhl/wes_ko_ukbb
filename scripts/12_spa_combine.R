@@ -121,7 +121,6 @@ main <- function(args){
 # add arguments
 parser <- ArgumentParser()
 parser$add_argument("--path_header", default=NULL, required = TRUE, help = "")
-parser$add_argument("--path_ldsc_h2", default=NULL, required = TRUE, help = "")
 parser$add_argument("--p_cutoff", default=NULL, required = TRUE, help = "")
 parser$add_argument("--N_ko_case_cutoff", default=NULL, required = TRUE, help = "")
 parser$add_argument("--N_ko_cutoff", default=NULL, required = TRUE, help = "")

@@ -21,7 +21,7 @@ readonly in_dir="data/permute/overview"
 # overview of significant gene-phenotypes that have been evaluated
 readonly path_trait_genes="${in_dir}/phenotypes_with_5cis_5chets.txt.gz"
 # directory to be searched recursively permuted P-values
-readonly permute_dir="data/permute/permutations_shuffle5"
+readonly permute_dir="data/permute/permutations_shuffle"
 
 readonly out_dir="data/permute/combined"
 readonly out_prefix="${out_dir}/analysis"

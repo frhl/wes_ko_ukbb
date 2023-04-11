@@ -62,7 +62,7 @@ main <- function(args){
             gene <- stringr::str_extract(basename(f), pattern = "ENSG[0-9]+")
             hgnc <- ensembl_to_hgnc[gene]
             permutations <- sum(d$is_permuted)
-            return(data.table(gene = gene, hgnc_symbol=hgnc, p.obs=get_one_sided_emp_p(d, "greater"), permutations=permutations))
+            return(data.table(gene = gene, hgnc_symbol=hgnc, p.obs=get_one_sided_emp_p(d, "greater"), permutations=permutations, phenotype=trait))
         }))
         # write the resulting file
         out_prefix_emp_p <- paste0(args$out_prefix,".empirical.p.",trait,".txt.gz")

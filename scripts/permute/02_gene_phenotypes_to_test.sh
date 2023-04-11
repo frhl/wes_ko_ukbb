@@ -20,12 +20,12 @@ readonly phenotypes="data/phenotypes/dec22_phenotypes_binary_200k.tsv.gz"
 
 readonly in_dir="data/permute/overview"
 readonly phenotypes_by_count="${in_dir}/phenotypes_with_5cis_5chets.txt.gz"
-readonly genes_by_count="${in_dir}/genes_to_run_10cis_5chets.tsv.gz"
+readonly genes_by_count="${in_dir}/genes_to_run_5cis_5chets.tsv.gz"
 
 readonly min_chets=0
 
 readonly out_dir="data/permute/overview"
-readonly out_prefix="${out_dir}/phenotypes_with_10cis_5chets_${min_chets}chetcases"
+readonly out_prefix="${out_dir}/phenotypes_with_5cis_5chets_${min_chets}chetcases"
 
 mkdir -p ${out_dir}
 

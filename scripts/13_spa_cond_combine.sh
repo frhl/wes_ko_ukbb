@@ -1,19 +1,21 @@
 #!/usr/bin/env bash
 #
-#$ -N get_saige_tables_cond
+# requires merged hits from scripts/conditional/combined/05_merge..
+# 
+#$ -N spa_cond_combine
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/get_saige_tables_cond.log
-#$ -e logs/get_saige_tables_cond.errors.log
+#$ -o logs/spa_cond_combine.log
+#$ -e logs/spa_cond_combine.errors.log
 #$ -P lindgren.prjc
 #$ -pe shmem 1
 #$ -q short.qc
 #$ -V
 
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=get_saige_tables_cond
+#SBATCH --job-name=spa_cond_combine
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/get_saige_tables_cond.log
-#SBATCH --error=logs/get_saige_tables_cond.errors.log
+#SBATCH --output=logs/spa_cond_combine.log
+#SBATCH --error=logs/spa_cond_combine.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 #SBATCH --requeue
@@ -23,7 +25,7 @@ set -o nounset
 
 source utils/bash_utils.sh
 
-readonly rscript="scripts/post_hoc/18_get_saige_tables_cond.R"
+readonly rscript="scripts/13_spa_cond_combine.R"
 
 # phenotypes we are including
 readonly header_dir="data/phenotypes"
@@ -39,13 +41,17 @@ readonly ref_file="${ref_dir}/176k_sig_saige_sig_prs_pref.txt.gz"
 readonly merged_dir="data/conditional/combined/saige"
 readonly merged_hits="${merged_dir}/176k_merged_hits_post_cond.txt.gz"
 
+# calc bonferroni cutoff
+readonly genes_tested=958
+readonly phenos_tested=311
+readonly p_cutoff="$(python -c "print(0.05/(${genes_tested}*${phenos_tested}))")"
+
 # paramters for sutff to include
 readonly N_ko_case_cutoff="2"
 readonly N_ko_cutoff="5"
 
 readonly out_dir="data/post_hoc/results"
 readonly out_prefix="${out_dir}/176k_sig_saige_cond_sig_pref_prs_combined"
-
 mkdir -p ${out_dir}
 
 set_up_rpy
@@ -54,5 +60,6 @@ Rscript "${rscript}" \
   --merged_hits "${merged_hits}" \
   --N_ko_case_cutoff ${N_ko_case_cutoff} \
   --N_ko_cutoff ${N_ko_cutoff} \
-  --out_prefix "${out_prefix}"
+  --out_prefix "${out_prefix}" \
+  --p_cutoff ${p_cutoff} \
 

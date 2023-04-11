@@ -76,6 +76,7 @@ main <- function(args){
 
     N_ko_cutoff <- as.numeric(args$N_ko_cutoff)
     N_ko_case_cutoff <- as.numeric(args$N_ko_case_cutoff)
+    p_cutoff <- as.numeric(args$p_cutoff)
 
     # ensure we are using saige with PRS when possible
     ref <- fread(args$ref_file)
@@ -104,6 +105,11 @@ main <- function(args){
     d <- d[d$N_ko_case >= N_ko_case_cutoff,]
     d <- d[order(d$p.value), ]
 
+    # p-value cutoff
+    if (!is.null(p_cutoff)){
+        d <- d[(d$p.value < p_cutoff),]
+    }
+
     # columsn to keep
     cols <- c(
         'phenotype','CHR','MarkerID','hgnc_symbol',
@@ -131,6 +137,7 @@ parser$add_argument("--ref_file", default=NULL, required = TRUE, help = "")
 parser$add_argument("--merged_hits", default=NULL, required = TRUE, help = "")
 parser$add_argument("--N_ko_case_cutoff", default=NULL, required = TRUE, help = "")
 parser$add_argument("--N_ko_cutoff", default=NULL, required = TRUE, help = "")
+parser$add_argument("--p_cutoff", default=NULL, required = FALSE, help = "")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "")
 args <- parser$parse_args()
 

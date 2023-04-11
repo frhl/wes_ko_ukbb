@@ -7,7 +7,7 @@
 #SBATCH --error=logs/recode_knockouts.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-22
+#SBATCH --array=1
 #SBATCH --requeue
 
 set -o errexit
@@ -43,8 +43,8 @@ submit_recode_job()
   local jname="_c${chr}_recode"
   local lname="logs/_recode_knockouts"
   local project="lindgren.prj"
-  local queue="short"
-  local nslots="2"
+  local queue="long"
+  local nslots="3"
   sbatch \
     --account="${project}" \
     --job-name="${jname}" \
