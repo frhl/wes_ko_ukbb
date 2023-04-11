@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# encoding VCF for interval of genes as opposed
+# to an entire chromosome, which avoids Hail out of memory errors
+
 set -o errexit
 set -o nounset
 
