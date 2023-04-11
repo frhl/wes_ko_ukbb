@@ -9,7 +9,7 @@ get_ldsc_path <- function(){
 
 #' @title get ldsc heritability estimate
 #' @param traits a vector of traits
-#' @param get either "h2", "p" or "std_error"
+#' @param get either "h2", "p", "std_error" or "n_eff"
 #' @return estimate for each phenotype
 get_ldsc_param <- function(traits, get = "h2"){
     d <- fread(get_ldsc_path())
@@ -22,6 +22,9 @@ get_ldsc_param <- function(traits, get = "h2"){
         names(mapping) <- d$phenotype
     } else if (get == "std_error"){
         mapping <- d$std_error
+        names(mapping) <- d$phenotype
+    } else if (get == "n_eff"){
+        mapping <- d$n_eff
         names(mapping) <- d$phenotype
     }
     return(mapping[traits])
