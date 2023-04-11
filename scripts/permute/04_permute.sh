@@ -9,7 +9,7 @@
 #SBATCH --error=logs/permute.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-21
+#SBATCH --array=1-22
 
 set -o errexit
 set -o nounset
