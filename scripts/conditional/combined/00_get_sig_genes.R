@@ -7,6 +7,7 @@ main <- function(args){
 
     args$p_cutoff <- as.numeric(args$p_cutoff)
     files <- gwastools::list_files_saige(args$cond_step, prs=args$prs)
+    print(files)
     phenos <- gwastools::gsub_phenotype_from_path(files)
     files <- files[phenos %in% gwastools::get_phenos_tested()]
 
