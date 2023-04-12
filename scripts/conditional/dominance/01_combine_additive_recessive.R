@@ -59,6 +59,7 @@ main <- function(args){
     # append position
     max_pos_rec <- max(rec$metadata$POS)
     add$metadata$POS <- add$metadata$POS + max_pos_rec
+    add$metadata$ID <- paste0("add",tolower(add$metadata$ID))
 
     metadata <- rbind(rec$metadata, add$metadata)
     genotypes <- rbind(rec$genotypes, add$genotypes)

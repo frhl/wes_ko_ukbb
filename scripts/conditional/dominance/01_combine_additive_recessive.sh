@@ -9,7 +9,7 @@
 #SBATCH --error=logs/combine_additive_recessive.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 4
-#SBATCH --array=1-21
+#SBATCH --array=1-22
 
 set -o errexit
 set -o nounset
