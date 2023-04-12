@@ -9,7 +9,7 @@
 #SBATCH --error=logs/cond_additive_recessive.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=20
+#SBATCH --array=1-22
 #SBATCH --open-mode=append
 
 set -o errexit
@@ -187,7 +187,7 @@ submit_merge_job()
 # parameters
 readonly use_prs="1"
 readonly min_mac=4
-readonly tasks=22 # 1-22
+readonly tasks=1-22 # 1-22
 readonly project="lindgren.prj"
 
 # cts traits
