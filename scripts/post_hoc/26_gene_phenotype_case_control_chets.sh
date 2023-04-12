@@ -5,7 +5,7 @@
 #$ -o logs/gene_phenotype_case_control_chets.log
 #$ -e logs/gene_phenotype_case_control_chets.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 2
+#$ -pe shmem 4
 #$ -q short.qc
 #$ -V
 

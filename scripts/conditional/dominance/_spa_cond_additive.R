@@ -14,10 +14,12 @@ main <- function(args){
     stopifnot(nrow(d_gene)>0)
 
     # gene needs to be the correct encoding
-    gene <- tolower(paste0("add",d_gene))
+    print(head(d_gene))
+    print(gene)
+
 
     # subset to pseudo marker
-    d_gene <- d_gene[d_gene$ensembl_gene_id %in% gene,]
+    d_gene <- d_gene[grepl(d_gene$ensembl_gene_id, pattern=tolower(gene)),]
     stopifnot(nrow(d_gene) > 0)
     markers <- d_gene$pseudo_marker
     fwrite(data.table(x=markers), outfile, row.names=FALSE, col.names=FALSE)

@@ -7,7 +7,7 @@
 #SBATCH --error=logs/recode_knockouts.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1
+#SBATCH --array=1-22
 #SBATCH --requeue
 
 set -o errexit
@@ -27,11 +27,8 @@ readonly chr=$( get_chr ${array_idx} )
 readonly vep_dir="data/mt/prefilter/final_90_loftee"
 readonly vep_path="${vep_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.csqs.txt.gz"
 
-readonly in_dir="data/knockouts/alt/pp90/combined"
-readonly out_dir="data/knockouts/alt/pp90/recoded_test"
-
-#readonly input_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense_all.tsv.gz"
-#readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}.pp90.recoded"
+readonly in_dir="data/knockouts/alt/pp90/encode_vcf_parallel"
+readonly out_dir="data/knockouts/alt/pp90/recoded"
 
 mkdir -p ${out_dir}
 
@@ -66,13 +63,13 @@ the_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_all.tsv.gz"
 the_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}.pp90.recoded.pLoF"
 submit_recode_job ${the_path} ${the_prefix}
 
-the_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_damaging_missense_all.tsv.gz"
-the_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}.pp90.recoded.damaging_missense"
-submit_recode_job ${the_path} ${the_prefix}
+#the_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_damaging_missense_all.tsv.gz"
+#the_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}.pp90.recoded.damaging_missense"
+#submit_recode_job ${the_path} ${the_prefix}
 
-the_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense_all.tsv.gz"
-the_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}.pp90.recoded.pLoF_damaging_missense"
-submit_recode_job ${the_path} ${the_prefix}
+#the_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense_all.tsv.gz"
+#the_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}.pp90.recoded.pLoF_damaging_missense"
+#submit_recode_job ${the_path} ${the_prefix}
 
 
 

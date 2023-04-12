@@ -10,7 +10,7 @@
 #SBATCH --error=logs/encode_vcf_parallel.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=3-19
+#SBATCH --array=1-22
 
 set -o errexit
 set -o nounset
@@ -31,7 +31,7 @@ readonly chr=$( get_chr ${task_id} )
 
 readonly in_dir="data/mt/prefilter/pp90"
 readonly merge_dir="data/knockouts/alt/pp90/encode_vcf_parallel"
-readonly out_dir="data/knockouts/alt/pp90/encode_vcf_parallel/chr${chr}"
+readonly out_dir="data/knockouts/alt/pp90/encode_vcf_parallel/damaging_missense/chr${chr}"
 
 readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.mt"
 readonly in_type="mt"
@@ -136,8 +136,8 @@ submit_knockout_job()
 
 
 #submit_knockout_job "pLoF,damaging_missense" "2"
-#submit_knockout_job "damaging_missense" "2"
-submit_knockout_job "pLoF" "4"
+submit_knockout_job "damaging_missense" "4"
+#submit_knockout_job "pLoF" "4"
 #submit_knockout_job "synonymous" "1"
 #submit_knockout_job "other_missense" "4"
 
