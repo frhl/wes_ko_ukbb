@@ -8,7 +8,7 @@
 #SBATCH --output=logs/combine_additive_recessive.log
 #SBATCH --error=logs/combine_additive_recessive.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 2
+#SBATCH --cpus-per-task 4
 #SBATCH --array=21
 
 set -o errexit
@@ -16,10 +16,10 @@ set -o nounset
 
 source utils/vcf_utils.sh
 source utils/qsub_utils.sh
-source utils/hail_utils.sh
+source utils/bash_utils.sh
 
 readonly spark_dir="data/tmp/spark"
-readonly hail_script="scripts/conditional/dominance/01_combine_additive_recessive.py"
+readonly hail_script="scripts/conditional/dominance/01_combine_additive_recessive.R"
 
 readonly array_idx=$( get_array_task_id )
 readonly chr="$( get_chr ${array_idx} )"
@@ -46,24 +46,19 @@ readonly out="${out_prefix}.vcf.bgz"
 mkdir -p ${out_dir}
 
 if [ ! -f "${out_prefix}.vcf.bgz" ]; then
-  set_up_hail
-  set_up_pythonpath_legacy
-  python3 "${hail_script}" \
+  set_up_rpy
+  Rscript "${hail_script}" \
      --chrom ${chr} \
      --additive_path ${additive_path} \
-     --additive_type ${additive_type} \
      --recessive_path ${recessive_path} \
-     --recessive_type ${recessive_type} \
-     --out_prefix ${out_prefix} \
-     --out_type ${out_type}
+     --out_prefix ${out_prefix}
+   
 fi
 
-# index the resulting file.
-if [ ! -f "${out_prefix}.vcf.csi" ] & [ "${out_type}" == "vcf" ]; then
-  module purge
-  module load BCFtools/1.12-GCC-10.3.0
-  make_tabix "${out_prefix}.vcf.bgz" "csi"
-fi
+module purge
+module load BCFtools/1.12-GCC-10.3.0
+bgzip "${out_prefix}.vcf" 
+make_tabix "${out_prefix}.vcf.bgz" "csi"
 
 
 
