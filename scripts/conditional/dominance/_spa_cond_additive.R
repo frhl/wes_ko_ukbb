@@ -7,15 +7,16 @@ library(data.table)
 main <- function(args){
 
     phenotype <- args$phenotype
-    min_mac <- as.numeric(args$min_mac)
     gene <- args$gene_id
     outfile <- args$outfile
     d_gene <- fread(args$path_markers)
+    stopifnot(ncol(d_gene)>1)
+    stopifnot(nrow(d_gene)>0)
 
     # subset to pseudo marker
     d_gene <- d_gene[d_gene$ensembl_gene_id %in% gene,]
     stopifnot(nrow(d_gene) > 0)
-    markers <- d_gene$psuedo_marker
+    markers <- d_gene$pseudo_marker
     fwrite(data.table(x=markers), outfile, row.names=FALSE, col.names=FALSE)
 
 }

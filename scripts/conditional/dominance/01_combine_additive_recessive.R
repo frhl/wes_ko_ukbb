@@ -44,12 +44,24 @@ main <- function(args){
     add$genotypes <- genotypes_to_integer(add$genotypes)
     rec$genotypes <- genotypes_to_integer(rec$genotypes)
 
+    # subset to markers in reces
+    keep_id <- rec$metadata$ID
+    idx <- add$metadata$ID %in% keep_id
+    add$genotypes <- add$genotypes[idx,]
+    add$metadata <- add$metadata[idx,]
+
+    # check format
+    stopifnot(nrow(add$metadata) > 0)
+    stopifnot(nrow(add$genotypes) == nrow(add$metadata))
+    stopifnot(nrow(rec$metadata) > 0)
+    stopifnot(nrow(rec$genotypes) == nrow(rec$metadata))
+
+    # append position
     max_pos_rec <- max(rec$metadata$POS)
     add$metadata$POS <- add$metadata$POS + max_pos_rec
 
-    # combine all metadata
     metadata <- rbind(rec$metadata, add$metadata)
-    genotypes <- rbind(rec$genotypes, rec$genotypes)
+    genotypes <- rbind(rec$genotypes, add$genotypes)
     metadata_and_genotypes <- cbind(metadata, genotypes)
 
     # write list of additive variants
@@ -59,15 +71,18 @@ main <- function(args){
                           add$metadata$ALT,
                           sep= ":"
                           )
-
+    dt <- data.table(
+        ensembl_gene_id=add$metadata$ID,
+        pseudo_marker=add_variants
+    )
     out_table <- paste0(args$out_prefix, ".additive.txt")
-    fwrite(data.table(x=add_variants), out_table, col.names=FALSE)
+    fwrite(dt, out_table, sep="\t")
 
     # write header and append information
     vcf_out = make_vcf_dosage_header(args$chrom)
     outfile = paste0(args$out_prefix, ".vcf")
     writeLines(text = vcf_out, outfile)
-    fwrite(genotypes, outfile, append = TRUE, quote = FALSE, sep = '\t', col.names = TRUE)
+    fwrite(metadata_and_genotypes, outfile, append = TRUE, quote = FALSE, sep = '\t', col.names = TRUE)
 
 
 }

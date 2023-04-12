@@ -9,7 +9,7 @@
 #SBATCH --error=logs/cond_additive_recessive.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-320
+#SBATCH --array=20
 #SBATCH --open-mode=append
 
 set -o errexit
@@ -25,7 +25,7 @@ readonly index=$( get_array_task_id )
 readonly rscript="scripts/_check_prs_ok.R"
 
 readonly curwd=$(pwd)
-readonly vcf_dir="data/conditional/dominance"
+readonly vcf_dir="data/conditional/dominance/combine_encodings"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
 
@@ -43,8 +43,8 @@ readonly sig_genes_dir="data/conditional/combined/sig_genes"
 readonly sig_genes="${sig_genes_dir}/sig_genes_after_sig_prs_176k.txt.gz"
 
 # list of additive markers to condition on
-readonly cond_additive_dir="data/conditional/dominance/combine_encoding"
-readonly cond_additive_file="${cond_additive_dir}/TBD"
+readonly cond_additive_dir="data/conditional/dominance/combine_encodings"
+readonly cond_additive_file="${cond_additive_dir}/ukb_eur_wes_200k_chrCHR_pLoF_damaging_missense.additive.txt"
 
 # list of common markers to condition on
 readonly cond_common_dir="data/conditional/common/combined"
@@ -78,7 +78,7 @@ submit_spa_with_csqs()
 
     local step1_dir="data/saige/output/${trait}/step1"
     local step2_dir="data/saige/output/${trait}/step2_dominance/min_mac${min_mac}"
-    local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${annotation}.vcf.bgz"
+    local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${annotation}.vcf.gz"
     mkdir -p ${step2_dir}
 
     local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
@@ -187,7 +187,7 @@ submit_merge_job()
 # parameters
 readonly use_prs="1"
 readonly min_mac=4
-readonly tasks=1-22 # 1-22
+readonly tasks=22 # 1-22
 readonly project="lindgren.prj"
 
 # cts traits

@@ -9,7 +9,7 @@ source utils/qsub_utils.sh
 
 readonly cluster=$( get_current_cluster )
 
-readonly bash_script="scripts/conditional/combined/_cond_additive_recessive_gene.sh"
+readonly bash_script="scripts/conditional/dominance/_cond_additive_recessive_gene.sh"
 
 readonly phenotype=${1?Error: Missing arg1 (phenotype)}
 readonly in_vcf=${2?Error: Missing arg2 (in_vcf)}

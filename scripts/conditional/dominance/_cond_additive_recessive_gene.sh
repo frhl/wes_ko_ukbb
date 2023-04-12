@@ -10,6 +10,7 @@ source utils/qsub_utils.sh
 readonly step2_SPAtests="utils/saige/step2_SPAtests_cond.R"
 readonly rscript_additive="scripts/conditional/dominance/_spa_cond_additive.R"
 readonly rscript_common="scripts/conditional/common/_spa_cond_common.R"
+readonly rscript_merge="scripts/conditional/combined/_brute_force_cond.R"
 
 readonly phenotype=${1?Error: Missing arg1 (phenotype)}
 readonly vcf=${2?Error: Missing arg2 (in_vcf)}
@@ -34,6 +35,7 @@ readonly out="${out_prefix}"
 echo "Starting testing on chr${chr} for ${gene_id}."
 
 set_up_rpy
+set -x
 
 # create a subset of common (non-coding) makers to be used in analysis
 readonly out_common_markers_file="${out_prefix/CHR/${chr}}.common.markers"
@@ -56,8 +58,9 @@ Rscript "${rscript_additive}" \
 # merge the two subsets
 readonly out_markers_file="${out_prefix/CHR/${chr}}.final.markers"
 Rscript ${rscript_merge} \
-  --file_rare_markers ${out_rare_markers_file} \
+  --file_common_markers ${out_common_markers_file} \
   --file_collapsed_markers ${out_additive_markers_file} \
+  --file_rare_markers "n/a" \
   --outfile ${out_markers_file}
 
 spa_test() {

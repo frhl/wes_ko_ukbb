@@ -9,7 +9,7 @@
 #SBATCH --error=logs/combine_additive_recessive.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 4
-#SBATCH --array=21
+#SBATCH --array=1-21
 
 set -o errexit
 set -o nounset
@@ -45,20 +45,20 @@ readonly out="${out_prefix}.vcf.bgz"
 
 mkdir -p ${out_dir}
 
-if [ ! -f "${out_prefix}.vcf.bgz" ]; then
+if [ ! -f "${out_prefix}.vcf.gz" ]; then
   set_up_rpy
   Rscript "${hail_script}" \
      --chrom ${chr} \
      --additive_path ${additive_path} \
      --recessive_path ${recessive_path} \
      --out_prefix ${out_prefix}
-   
 fi
 
-module purge
-module load BCFtools/1.12-GCC-10.3.0
-bgzip "${out_prefix}.vcf" 
-make_tabix "${out_prefix}.vcf.bgz" "csi"
-
+if [ ! -f "${out_prefix}.vcf.gz.csi" ]; then
+  module purge
+  module load BCFtools/1.12-GCC-10.3.0
+  bgzip "${out_prefix}.vcf" 
+  make_tabix "${out_prefix}.vcf.gz" "csi"
+fi
 
 
