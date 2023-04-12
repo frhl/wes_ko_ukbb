@@ -58,9 +58,17 @@ set_up_rpy
 #get_table "176k_sig_saige_all_prs_only_wo_case_cutoff" "none" "only" "1"
 #get_table "176k_sig_saige_all_prs_pref_wo_case_cutoff" "none" "prefer" "1"
 
-get_table "176k_sig_saige_all_prs_excl_wo_case_cutoff_chet_only" "chet_only" "exclude" "1"
-get_table "176k_sig_saige_all_prs_only_wo_case_cutoff_chet_only" "chet_only" "only" "1"
-get_table "176k_sig_saige_all_prs_pref_wo_case_cutoff_chet_only" "chet_only" "prefer" "1"
+#get_table "176k_sig_saige_all_prs_excl_wo_case_cutoff_chet_only" "chet_only" "exclude" "1"
+#get_table "176k_sig_saige_all_prs_only_wo_case_cutoff_chet_only" "chet_only" "only" "1"
+#get_table "176k_sig_saige_all_prs_pref_wo_case_cutoff_chet_only" "chet_only" "prefer" "1"
+
+#get_table "176k_sig_saige_all_prs_excl_wo_case_cutoff_hom_only" "hom_only" "exclude" "1"
+#get_table "176k_sig_saige_all_prs_only_wo_case_cutoff_hom_only" "hom_only" "only" "1"
+#get_table "176k_sig_saige_all_prs_pref_wo_case_cutoff_hom_only" "hom_only" "prefer" "1"
+
+get_table "176k_sig_saige_all_prs_excl_wo_case_cutoff_add_encoding" "add_encoding" "exclude" "1"
+get_table "176k_sig_saige_all_prs_only_wo_case_cutoff_add_encoding" "add_encoding" "only" "1"
+get_table "176k_sig_saige_all_prs_pref_wo_case_cutoff_add_encoding" "add_encoding" "prefer" "1"
 
 
 

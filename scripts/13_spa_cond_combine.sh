@@ -32,6 +32,10 @@ readonly ref_file="${ref_dir}/176k_sig_saige_sig_prs_pref.txt.gz"
 readonly merged_dir="data/conditional/combined/saige"
 readonly merged_hits="${merged_dir}/176k_merged_hits_post_cond.txt.gz"
 
+# get merged dominance cond hits that are unprocessed
+readonly merged_dominance_dir="data/conditional/dominance/saige"
+readonly merged_dominance_hits="${merged_dominance_dir}/176k_merged_hits_post_cond_dominance.txt.gz"
+
 # calc bonferroni cutoff
 readonly genes_tested=958
 readonly phenos_tested=311
@@ -45,23 +49,33 @@ readonly out_dir="data/post_hoc/results"
 mkdir -p ${out_dir}
 
 # write all hits interrogated regardless of final P
-out_prefix="${out_dir}/176k_sig_saige_cond_all_pref_prs_combined"
+#out_prefix="${out_dir}/176k_sig_saige_cond_all_pref_prs_combined"
+#set_up_rpy
+#Rscript "${rscript}" \
+#  --ref_file "${ref_file}" \
+#  --merged_hits "${merged_hits}" \
+#  --N_ko_case_cutoff ${N_ko_case_cutoff} \
+#  --N_ko_cutoff ${N_ko_cutoff} \
+#  --out_prefix "${out_prefix}"
+
+# only write hits with sig final P
+#out_prefix="${out_dir}/176k_sig_saige_cond_sig_pref_prs_combined"
+#set_up_rpy
+#Rscript "${rscript}" \
+#  --ref_file "${ref_file}" \
+#  --merged_hits "${merged_hits}" \
+#  --N_ko_case_cutoff ${N_ko_case_cutoff} \
+#  --N_ko_cutoff ${N_ko_cutoff} \
+#  --out_prefix "${out_prefix}" \
+#  --p_cutoff ${p_cutoff} \
+
+# write all dominance hits
+out_prefix="${out_dir}/176k_sig_saige_dominance_cond_sig_pref_prs_combined"
 set_up_rpy
 Rscript "${rscript}" \
   --ref_file "${ref_file}" \
-  --merged_hits "${merged_hits}" \
+  --merged_hits "${merged_dominance_hits}" \
   --N_ko_case_cutoff ${N_ko_case_cutoff} \
   --N_ko_cutoff ${N_ko_cutoff} \
   --out_prefix "${out_prefix}"
-
-# only write hits with sig final P
-out_prefix="${out_dir}/176k_sig_saige_cond_sig_pref_prs_combined"
-set_up_rpy
-Rscript "${rscript}" \
-  --ref_file "${ref_file}" \
-  --merged_hits "${merged_hits}" \
-  --N_ko_case_cutoff ${N_ko_case_cutoff} \
-  --N_ko_cutoff ${N_ko_cutoff} \
-  --out_prefix "${out_prefix}" \
-  --p_cutoff ${p_cutoff} \
 

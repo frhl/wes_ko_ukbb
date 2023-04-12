@@ -40,7 +40,8 @@ def main(args):
         if subset_gene:
             subset_gene = list(set(subset_gene))
             subset_gene = list(filter(None, subset_gene))
-            assert len(set(subset_gene)) >= 1 
+            assert len(set(subset_gene)) >= 1
+            print(subset_gene)
             gene_id_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
             csqs_expr = hl.literal(set(csqs_category)).contains(mt.consequence_category)
             gene_expr = hl.literal(subset_gene).contains(gene_id_expr)

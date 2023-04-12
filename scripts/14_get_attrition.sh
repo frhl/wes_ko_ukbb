@@ -14,17 +14,26 @@ set -o nounset
 
 source utils/bash_utils.sh
 
-readonly rscript="scripts/13_get_attrition.R"
+readonly rscript="scripts/14_get_attrition.R"
 
-readonly header_dir="data/phenotypes"
-readonly header_file="${header_dir}/dec22_phenotypes_binary_200k_header.tsv"
+readonly dir="data/post_hoc/results"
+readonly excl_prs="${dir}/176k_sig_saige_all_prs_excl.txt.gz"
+readonly prefer_prs="${dir}/176k_sig_saige_all_prs_pref.txt.gz"
+readonly cond_full="${dir}/176k_sig_saige_cond_all_pref_prs_combined.txt.gz"
+
+readonly chet_only="${dir}/176k_sig_saige_all_prs_excl_wo_case_cutoff_chet_only.txt.gz"
+readonly hom_only="${dir}/176k_sig_saige_all_prs_excl_wo_case_cutoff_hom_only.txt.gz"
+
+readonly out_dir="data/post_hoc/results"
+readonly out_prefix="${out_dir}/attrition"
 
 set_up_rpy
 Rscript "${rscript}" \
-  --ref_file "${ref_file}" \
-  --merged_hits "${merged_hits}" \
-  --N_ko_case_cutoff ${N_ko_case_cutoff} \
-  --N_ko_cutoff ${N_ko_cutoff} \
+  --excl_prs "${excl_prs}" \
+  --prefer_prs "${prefer_prs}" \
+  --cond_full "${cond_full}" \
+  --chet_only "${chet_only}" \
+  --hom_only "${hom_only}" \
   --out_prefix "${out_prefix}"
 
 

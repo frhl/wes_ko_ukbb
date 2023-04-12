@@ -32,6 +32,7 @@ main <- function(args){
 
     # read over cases that are knockouts
     out <- do.call(rbind, lapply(phenotypes, function(pheno){   
+        # deal with cases
         case_eid <- df_phenotype$eid[as.logical(df_phenotype[[pheno]])]
         d_cases <- d[d$s %in% case_eid,]
         cases_unpacked <- NULL
@@ -39,14 +40,25 @@ main <- function(args){
             cases_packed <- gwastools::cooccur_pack_lib(d_cases)
             cases_unpacked <- gwastools::cooccur_unpack_lib(cases_packed)
             cases_unpacked$phenotype <- pheno
+            cases_unpacked$type <- "cases"
         }
-        return(cases_unpacked)
+        # deal with controls and cases (i.e. full knockout count)
+        control_eid <- df_phenotype$eid[!as.logical(df_phenotype[[pheno]])]
+        case_control_eid <- c(case_eid, control_eid)
+        d_cases_controls <- d[d$s %in% case_control_eid,]
+        cases_controls_unpacked <- NULL
+        if (nrow(d_cases_controls) > 0){
+            cases_controls_packed <- gwastools::cooccur_pack_lib(d_cases_controls)
+            cases_controls_unpacked <- gwastools::cooccur_unpack_lib(cases_controls_packed)
+            cases_controls_unpacked$phenotype <- pheno
+            cases_controls_unpacked$type <- "all"
+        }
+        combined <- rbind(cases_unpacked, cases_controls_unpacked)
+        return(combined)
    }))
    outfile <- paste0(out_prefix,".txt.gz")
    write(paste("writing", outfile), stderr()) 
    fwrite(out, outfile, sep = "\t")
-     
-
 }
 
 

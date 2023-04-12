@@ -106,9 +106,6 @@ main <- function(args){
     # subset and order
     d <- d[,..cols]
 
-    # get tier A in the top
-    d <- d[order(d$p.value),]
-
     # clean up
     d$hgnc_symbol[d$hgnc_symbol==""] <- NA
     d$hgnc_symbol[d$hgnc_symbol==" "] <- NA

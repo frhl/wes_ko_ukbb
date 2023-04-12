@@ -13,6 +13,7 @@ source utils/vcf_utils.sh
 readonly hail_script="scripts/_encode_vcf_parallel.py"
 readonly spark_dir="data/tmp/spark"
 
+set -x
 readonly input_path=${1?Error: Missing arg1 (input_path)}
 readonly input_type=${2?Error: Missing arg2 (input_type)}
 readonly in_category=${3?Error: Missing arg3 (variant category)}
@@ -24,7 +25,7 @@ readonly chr=${7?Error: Missing arg6 (chr)}
 
 readonly chunk_id=$( get_array_task_id )
 readonly out_prefix_chunk="${out_prefix}.${chunk_id}of${total_chunks}"
-readonly out_prefix_checkpoint="${out_prefix_chunk}.mt/"
+readonly out_prefix_checkpoint="${out_prefix_chunk}_checkpoint.mt/"
 
 readonly idx_start="$(( ((${chunk_id}-1) * ${genes_per_chunk})+1 ))"
 readonly idx_end="$(( ${chunk_id} * ${genes_per_chunk}))"

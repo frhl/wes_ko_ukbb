@@ -9,7 +9,7 @@
 #SBATCH --error=logs/spa_null.errors.log
 #SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-320
+#SBATCH --array=152
 # --begin=now+3hour
 #
 #$ -N spa_null

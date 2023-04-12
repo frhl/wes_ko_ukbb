@@ -8,9 +8,8 @@
 #SBATCH --output=logs/encode_vcf.log
 #SBATCH --error=logs/encode_vcf.errors.log
 #SBATCH --partition=short
-#SBATCH --constraint="skl-compat"
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1,21
+#SBATCH --array=1-22
 
 set -o errexit
 set -o nounset
@@ -28,7 +27,7 @@ readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
 readonly in_dir="data/mt/prefilter/pp90"
-readonly out_dir="data/knockouts/alt/pp90/test_loftee"
+readonly out_dir="data/knockouts/alt/pp90/test_collect_plof"
 readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chrCHR.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.mt"
 readonly in_type="mt"
 
@@ -88,11 +87,11 @@ submit_encode_job()
 # Note: Heterozygotes/Cis are not aggregated with "fast"
 
 
-#submit_encode_job "pLoF,damaging_missense" "3" "only_homs"
+#submit_encode_job "pLoF,damaging_missense" "2" "only_chets"
 
 
 
-submit_encode_job "pLoF" "6" "collect"
+submit_encode_job "pLoF" "14" "collect"
 
 #submit_encode_job "damaging_missense" "2" "fast"
 #submit_encode_job "pLoF,damaging_missense" "2" "fast_012"
