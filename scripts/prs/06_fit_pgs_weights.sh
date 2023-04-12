@@ -8,9 +8,9 @@
 #SBATCH --output=logs/fit_pgs_weights.log
 #SBATCH --error=logs/fit_pgs_weights.errors.log
 #SBATCH --open-mode=append
-#SBATCH --partition=epyc
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 6
-#SBATCH --array=129
+#SBATCH --array=152
 # --begin=now+3hour
 #
 #$ -N fit_pgs_weights

@@ -8,7 +8,7 @@
 #SBATCH --open-mode=append
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-320
+#SBATCH --array=152
 #--begin=now+1hour
 #
 #$ -N pred_pgs
