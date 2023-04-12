@@ -13,6 +13,9 @@ main <- function(args){
     stopifnot(ncol(d_gene)>1)
     stopifnot(nrow(d_gene)>0)
 
+    # gene needs to be the correct encoding
+    gene <- tolower(paste0("add",d_gene))
+
     # subset to pseudo marker
     d_gene <- d_gene[d_gene$ensembl_gene_id %in% gene,]
     stopifnot(nrow(d_gene) > 0)
