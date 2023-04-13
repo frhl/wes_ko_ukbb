@@ -99,6 +99,35 @@ main <- function(args){
     write(paste0("writing ", outfile), stdout())
     fwrite(mrg, outfile, sep = "\t")
 
+    # extend with co_table
+    a <- mrg
+    d <- fread(args$co_table)
+    colnames(d)[1] <- "MarkerID"
+    d$gene_trait <- paste0(d$phenotype,":",d$MarkerID)
+    d <- d[d$gene_trait %in% a$gene_trait,]
+
+    # Manually populate missing values for saige traits that could not be run
+    # beacuse of min_mac thresholding (for example chet_only, hom_only)
+    for (i in 1:nrow(a)){
+        na_row <- (is.na(a$N_ko_case.chetonly[i]) & is.na(a$N_ko_case.homonly[i]))
+        if (na_row){
+            pheno <- a$phenotype[i]
+            gene <- a$MarkerID[i]
+            row_gene_trait <- a$gene_trait[i]
+            ndf <- d[d$gene_trait %in% row_gene_trait,]
+            # replace values
+            a$N_ko_case.chetonly[i] <- ndf$N_ko_case.chetonly
+            a$N_ko_case.homonly[i] <- ndf$N_ko_case.homonly
+            a$N_ko.chetonly[i] <- ndf$N_ko.chetonly
+            a$N_ko.homonly[i] <- ndf$N_ko.homonly
+        }
+    }
+
+    # overwrite extended file
+    outfile <- paste0(args$out_prefix, ".extended.txt.gz")
+    write(paste0("Rewriting ", outfile, " with NAs replaced."), stdout())
+    fwrite(a, outfile, sep = "\t")
+
 
 }
 
@@ -109,6 +138,7 @@ parser$add_argument("--prefer_prs", default=NULL, required = TRUE, help = "")
 parser$add_argument("--cond_full", default=NULL, required = TRUE, help = "")
 parser$add_argument("--chet_only", default=NULL, required = TRUE, help = "")
 parser$add_argument("--hom_only", default=NULL, required = TRUE, help = "")
+parser$add_argument("--co_table", default=NULL, required = FALSE, help = "")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "")
 args <- parser$parse_args()
 

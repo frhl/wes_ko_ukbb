@@ -24,6 +24,9 @@ readonly cond_full="${dir}/176k_sig_saige_cond_all_pref_prs_combined.txt.gz"
 readonly chet_only="${dir}/176k_sig_saige_all_prs_excl_wo_case_cutoff_chet_only.txt.gz"
 readonly hom_only="${dir}/176k_sig_saige_all_prs_excl_wo_case_cutoff_hom_only.txt.gz"
 
+readonly co_table_dir="data/knockouts/alt/pp90//co_occurence3"
+readonly co_table="${co_table_dir}/co_occurence_collapsed_pLoF_damaging_missense.wide.txt.gz"
+
 readonly out_dir="data/post_hoc/results"
 readonly out_prefix="${out_dir}/attrition"
 
@@ -34,6 +37,7 @@ Rscript "${rscript}" \
   --cond_full "${cond_full}" \
   --chet_only "${chet_only}" \
   --hom_only "${hom_only}" \
+  --co_table "${co_table}" \
   --out_prefix "${out_prefix}"
 
 
