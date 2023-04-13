@@ -21,6 +21,9 @@ readonly excl_prs="${dir}/176k_sig_saige_all_prs_excl.txt.gz"
 readonly prefer_prs="${dir}/176k_sig_saige_all_prs_pref.txt.gz"
 readonly cond_full="${dir}/176k_sig_saige_cond_all_pref_prs_combined.txt.gz"
 
+readonly additive="${dir}/176k_sig_saige_all_prs_pref_wo_case_cutoff_add_encoding.txt.gz"
+readonly cond_additive="${dir}/176k_sig_saige_dominance_cond_sig_pref_prs_combined.txt.gz"
+
 readonly chet_only="${dir}/176k_sig_saige_all_prs_excl_wo_case_cutoff_chet_only.txt.gz"
 readonly hom_only="${dir}/176k_sig_saige_all_prs_excl_wo_case_cutoff_hom_only.txt.gz"
 
@@ -35,6 +38,8 @@ Rscript "${rscript}" \
   --excl_prs "${excl_prs}" \
   --prefer_prs "${prefer_prs}" \
   --cond_full "${cond_full}" \
+  --additive "${additive}" \
+  --cond_additive "${cond_additive}" \
   --chet_only "${chet_only}" \
   --hom_only "${hom_only}" \
   --co_table "${co_table}" \

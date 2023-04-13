@@ -37,6 +37,11 @@ get_table() {
   local cond=${2}
   local prs=${3}
   local p=${4}
+  if [ "${cond}" == "add_encoding" ]; then
+    local gt_encoding="012"
+  else 
+    local gt_encoding="001"
+  fi
   Rscript "${rscript}" \
     --path_header ${header_file} \
     --p_cutoff ${p} \
@@ -44,6 +49,7 @@ get_table() {
     --N_ko_cutoff ${N_ko_cutoff} \
     --cond ${cond} \
     --prs ${prs} \
+    --gt_encoding "${gt_encoding}" \
     --out_prefix "${out_prefix}"
 }
 

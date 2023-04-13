@@ -14,7 +14,26 @@ ensembl_to_contig <- bridge$chromosome_name
 names(ensembl_to_contig) <- bridge$ensembl_gene_id
 
 
-process_saige_df <- function(d, f){
+# columsn to keep
+cols_rec_encoding <- c(
+    'phenotype','CHR','MarkerID','hgnc_symbol',
+    'MissingRate','BETA','SE','Tstat',
+    'var','p.value','p.value.NA','N_case',
+    'N_ctrl','N_ko_case','N_ko_ctrl','N_ko',
+    'KF_ko','KF_case','KF_ctrl','prs')
+
+cols_add_encoding <- c(
+    'phenotype','CHR','MarkerID','hgnc_symbol',
+    'MissingRate','BETA','SE','Tstat',
+    'var','p.value','p.value.NA','N_case',
+    'N_case_hom', 'N_ctrl_hom',
+    'AF_Allele2','AC_Allele2',
+    'AF_case', 'AF_ctrl', 'N_case', 'N_ctrl', 
+    'N_case_hom', 'N_case_het', 'N_ctrl_hom', 'N_ctrl_het',
+    'prs')
+
+
+process_saige_df <- function(d, f, gt_encoding = "001"){
     # deal with conditional P-values
     if ("p.value_c" %in% colnames(d)) {
         d$p.value <- d$p.value_c
@@ -45,23 +64,29 @@ process_saige_df <- function(d, f){
     d$hgnc_symbol <- ensembl_to_hgnc[d$ensembl_gene_id]
     d$contig <- ensembl_to_contig[d$ensembl_gene_id]
     d$pos <- ensembl_to_pos[d$ensembl_gene_id]
-    d$N_ko_case <- d$N_case_hom #unlist(ifelse("N_ko_case" %in% colnames(d), list(d$N_case_hom), NA))
-    d$N_ko_ctrl <- d$N_ctrl_hom #unlist(ifelse("N_ko_ctrl" %in% colnames(d), list(d$N_ctrl_hom), NA))
-    d$N_ko <- d$AC_Allele2/2
-    d$KF_ko <- d$AF_Allele2
-    d$KF_case <- d$AF_case
-    d$KF_ctrl <- d$AF_ctrl
+    # knockout encoding
+    if (gt_encoding == "001"){
+        d$N_ko_case <- d$N_case_hom #unlist(ifelse("N_ko_case" %in% colnames(d), list(d$N_case_hom), NA))
+        d$N_ko_ctrl <- d$N_ctrl_hom #unlist(ifelse("N_ko_ctrl" %in% colnames(d), list(d$N_ctrl_hom), NA))
+        d$N_ko <- d$AC_Allele2/2
+        d$KF_ko <- d$AF_Allele2
+        d$KF_case <- d$AF_case
+        d$KF_ctrl <- d$AF_ctrl
+        d <- d[,..cols_rec_encoding]
+    } else if (gt_encoding == "012"){
+        d <- d[,..cols_add_encoding]
+    }
     return(d)
 }
 
 
-get_formatted_df <- function(files){
+get_formatted_df <- function(files, gt_encoding){
     d <- do.call(rbind, lapply(files, function(f){
         stopifnot(file.exists(f))
         d <- fread(f)
         if (is.numeric(d$p.value)){
             if (nrow(d) > 0){
-                return(process_saige_df(d, f))
+                return(process_saige_df(d, f, gt_encoding))
             } else {
                 return(NULL)
             }
@@ -79,32 +104,28 @@ main <- function(args){
     N_ko_case_cutoff <- as.numeric(args$N_ko_case_cutoff)
     p_cutoff <- as.numeric(args$p_cutoff)
     path_header <- args$path_header
+    gt_encoding <- args$gt_encoding
     header <- fread(path_header, header=FALSE)$V1
 
     # get files
     files <- gwastools::list_files_saige(cond = args$cond, prs = args$prs)
-    print(head(files))
    
     # read files and format
-    d <- get_formatted_df(files)
+    d <- get_formatted_df(files, gt_encoding)
     d <- d[d$phenotype %in% header,]
-  
+ 
     # perform subsets
-    d <- d[d$N_ko >= N_ko_cutoff,]
-    d <- d[d$N_ko_case >= N_ko_case_cutoff,]
+    if (gt_encoding == "001") { 
+        d <- d[d$N_ko >= N_ko_cutoff,]
+        d <- d[d$N_ko_case >= N_ko_case_cutoff,]
+    } else if (gt_encoding == "012") {
+        d <- d[d$AC_allele2 >= (N_ko_cutoff*2),]
+        d <- d[d$N_case_hom >= N_ko_case_cutoff,]
+    }
+
+    # re-order and subset
     d <- d[d$p.value < p_cutoff,]
     d <- d[order(d$p.value), ]
-
-    # columsn to keep
-    cols <- c(
-        'phenotype','CHR','MarkerID','hgnc_symbol',
-        'MissingRate','BETA','SE','Tstat',
-        'var','p.value','p.value.NA','N_case',
-        'N_ctrl','N_ko_case','N_ko_ctrl','N_ko',
-        'KF_ko','KF_case','KF_ctrl','prs')
-    
-    # subset and order
-    d <- d[,..cols]
 
     # clean up
     d$hgnc_symbol[d$hgnc_symbol==""] <- NA
@@ -123,6 +144,7 @@ parser$add_argument("--N_ko_case_cutoff", default=NULL, required = TRUE, help = 
 parser$add_argument("--N_ko_cutoff", default=NULL, required = TRUE, help = "")
 parser$add_argument("--cond", default="none", required = TRUE, help = "")
 parser$add_argument("--prs", default=NULL, required = TRUE, help = "")
+parser$add_argument("--gt_encoding", default="001", required = TRUE, help = "A character string to indicate genotype encoding, either recessive '001' or additive '012'.")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "")
 args <- parser$parse_args()
 
