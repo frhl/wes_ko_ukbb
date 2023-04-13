@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
-#$ -N gene_phenotype_case_control_chets
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/gene_phenotype_case_control_chets.log
-#$ -e logs/gene_phenotype_case_control_chets.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 4
-#$ -q short.qc
-#$ -V
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=gene_phenotype_case_control_chets
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/gene_phenotype_case_control_chets.log
+#SBATCH --error=logs/gene_phenotype_case_control_chets.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 1
+
 
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
@@ -21,7 +21,7 @@ readonly co_occurence_dir="data/knockouts/alt/pp90/co_occurence3"
 readonly co_occurence_file="${co_occurence_dir}/co_occurence_by_phenotype_chrCHR.txt.gz"
 
 
-readonly out_dir="data/knockouts/alt/pp90/co_occurencec3"
+readonly out_dir="data/knockouts/alt/pp90/co_occurence3"
 readonly out_prefix="${out_dir}/co_occurence_collapsed_pLoF_damaging_missense"
 
 mkdir -p ${out_dir}

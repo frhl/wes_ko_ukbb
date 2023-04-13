@@ -35,7 +35,31 @@ main <- function(args){
 
     outfile <- paste0(out_prefix,".txt.gz")
     fwrite(mrg, outfile, sep = "\t")
- 
+
+    # convert to wide
+    d <- mrg
+    setkeyv(d, c("g","phenotype"))
+
+    # count up cases
+    d1 <- d[d$type == "cases",]
+    d1 <- d1[,c("g","phenotype","chet","hom", "cis")]
+    colnames(d1)[colnames(d1) == "chet"] <- "N_ko_case.chetonly"
+    colnames(d1)[colnames(d1) == "hom"] <- "N_ko_case.homonly"
+    colnames(d1)[colnames(d1) == "cis"] <- "N_cis_case"
+
+    # count up cases and controls
+    d2 <- d[d$type == "all",]
+    d2 <- d2[,c("g","phenotype","chet","hom", "cis")]
+    colnames(d2)[colnames(d2) == "chet"] <- "N_ko.chetonly"
+    colnames(d2)[colnames(d2) == "hom"] <- "N_ko.homonly"
+    colnames(d2)[colnames(d2) == "cis"] <- "N_cis"
+
+    # merge all
+    mrg <- merge(d1, d2)
+    outfile <- paste0(out_prefix,".wide.txt.gz")
+    fwrite(mrg, outfile, sep = "\t")
+
+
 }
 
 
