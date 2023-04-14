@@ -35,7 +35,7 @@ readonly path_header="${in_dir}/dec22_phenotypes_binary_200k_header.tsv"
 readonly path_phenotypes="${in_dir}/dec22_phenotypes_binary_200k.tsv.gz"
 readonly path_tte_phenotypes="${in_dir}/tte_matrix_176k.txt.gz"
 
-readonly out_dir="data/knockouts/alt/pp90/co_occurence3"
+readonly out_dir="data/knockouts/alt/pp90/co_occurence4"
 readonly out_prefix="${out_dir}/co_occurence_by_phenotype_chr${chr}"
 #readonly out_prefix="${out_dir}/co_occurence_tte_by_phenotype_chr${chr}_${annotation}"
 

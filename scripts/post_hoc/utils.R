@@ -22,7 +22,8 @@ other_csqs = c("mature_miRNA_variant", "5_prime_UTR_variant",
 
 # get path to full file of ukb wes knockouts
 ukb_wes_ko_path <- function(annotation = "pLoF_damaging_missense", chr = "21"){
-    thedir <- paste0("/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/data/knockouts/alt/pp90/recoded")
+    rawdir <- paste0("/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/data/knockouts/alt/pp90/recoded")
+    thedir <- file.path(rawdir, annotation)
     thefile <- paste0("ukb_eur_wes_200k_chr",chr,".pp90.recoded.",annotation,".txt.gz")
     path <- file.path(thedir, thefile)
     if (!file.exists(path)) stop(paste(path, "does not exist!"))
@@ -32,7 +33,7 @@ ukb_wes_ko_path <- function(annotation = "pLoF_damaging_missense", chr = "21"){
 # get path to full file of ukb wes knockouts
 ukb_wes_syn_path <- function(annotation = "synonymous", chr = "21"){
     #thedir <- paste0("data/knockouts/alt/pp90/recoded_tmp")
-    thedir <- paste0("/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/data/knockouts/alt/pp90/recoded_other_by_merge")
+    thedir <- paste0("/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/data/knockouts/alt/pp90/recoded/recoded_other_by_merge")
     thefile <- paste0("ukb_eur_wes_200k_chr",chr,".pp90.recoded.",annotation,".txt.gz")
     path <- file.path(thedir, thefile)
     if (!file.exists(path)) stop(paste(path, "does not exist!"))

@@ -5,54 +5,54 @@ library(data.table)
 library(stringr)
 
 # create mapping to used by map_by_variant
-create_mapping <- function(dt, what, id="id"){
-    stopifnot(what %in% colnames(dt))
-    stopifnot(id %in% colnames(dt))
-    mapping <- dt[[what]]
-    names(mapping) <- dt[[id]]
-    return(mapping)
-}
+#create_mapping <- function(dt, what, id="id"){
+#    stopifnot(what %in% colnames(dt))
+#    stopifnot(id %in% colnames(dt))
+#    mapping <- dt[[what]]
+#    names(mapping) <- dt[[id]]
+#    return(mapping)
+#}
 
 # create ID based on variant id and gene id
-create_id <- function(dt){
-    stopifnot("gene_id" %in% colnames(dt))
-    stopifnot("varid" %in% colnames(dt))
-    n <- nrow(dt)
-    ids <- unlist(lapply(1:n, function(idx){
-        variant <- dt$varid[idx]
-        gene <- dt$gene_id[idx]
-        at_least_two <- stringr::str_detect(variant, ";")
-         if (at_least_two){
-            id <- unlist(strsplit(variant, ";"))
-            id <- paste(gene, id, sep = ":")
-            return(paste0(id, collapse = ";"))
-        } else {
-            id <- paste(gene, variant, sep = ":")
-            return(id)
-        }
-    }))
-    return(ids)
-}
+#create_id <- function(dt){
+#    stopifnot("gene_id" %in% colnames(dt))
+#    stopifnot("varid" %in% colnames(dt))
+#    n <- nrow(dt)
+#    ids <- unlist(lapply(1:n, function(idx){
+#        variant <- dt$varid[idx]
+#        gene <- dt$gene_id[idx]
+#        at_least_two <- stringr::str_detect(variant, ";")
+#         if (at_least_two){
+#            id <- unlist(strsplit(variant, ";"))
+#            id <- paste(gene, id, sep = ":")
+#            return(paste0(id, collapse = ";"))
+#        } else {
+#            id <- paste(gene, variant, sep = ":")
+#            return(id)
+#        }
+#    }))
+#    return(ids)
+#}
 
 # map by variant
-map_by_variant <- function(ids, mapping, allow_dups=TRUE, message=""){
-    stopifnot(any(names(mapping) %in% ids))
-    if (nchar(message)>0) write(message,stdout())
-    mapped <- unlist(lapply(ids, function(v){
-        at_least_two <- stringr::str_detect(v, ";")
-        if (at_least_two){
-            vs <- unlist(strsplit(v, ";"))
-            vs <- as.character(mapping[vs])
-            vs <- na.omit(vs)
-            if (!allow_dups) vs <- unique(vs)
-            if (length(vs)==0) return(NA)
-            return(paste0(vs, collapse = ";"))
-        } else {
-            return(paste0(mapping[v], collapse = ";"))
-        }
-    }))
-    return(mapped)
-}
+#map_by_variant <- function(ids, mapping, allow_dups=TRUE, message=""){
+#    stopifnot(any(names(mapping) %in% ids))
+#    if (nchar(message)>0) write(message,stdout())
+#    mapped <- unlist(lapply(ids, function(v){
+#        at_least_two <- stringr::str_detect(v, ";")
+#        if (at_least_two){
+#            vs <- unlist(strsplit(v, ";"))
+#            vs <- as.character(mapping[vs])
+#            vs <- na.omit(vs)
+#            if (!allow_dups) vs <- unique(vs)
+#            if (length(vs)==0) return(NA)
+#            return(paste0(vs, collapse = ";"))
+#        } else {
+#            return(paste0(mapping[v], collapse = ";"))
+#        }
+#    }))
+#    return(mapped)
+#}
 
 
 

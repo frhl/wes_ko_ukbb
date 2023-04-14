@@ -111,7 +111,7 @@ main <- function(args){
     # write main table
     outfile <- paste0(args$out_prefix, ".txt.gz")
     write(paste0("writing ", outfile), stdout())
-    fwrite(mrg, outfile, sep = "\t")
+    fwrite(mrg, outfile, sep = "\t", na="NA")
 
     # append hom / chet only information
     stopifnot(file.exists(f5))
@@ -136,7 +136,7 @@ main <- function(args){
 
     outfile <- paste0(args$out_prefix, ".extended.txt.gz")
     write(paste0("writing ", outfile), stdout())
-    fwrite(mrg, outfile, sep = "\t")
+    fwrite(mrg, outfile, sep = "\t", na="NA")
 
     # extend with co_table
     a <- mrg
@@ -165,7 +165,7 @@ main <- function(args){
     # overwrite extended file
     outfile <- paste0(args$out_prefix, ".extended.txt.gz")
     write(paste0("Rewriting ", outfile, " with NAs replaced."), stdout())
-    fwrite(a, outfile, sep = "\t")
+    fwrite(a, outfile, sep = "\t", na="NA")
 
     #
 

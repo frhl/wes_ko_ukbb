@@ -26,9 +26,8 @@ cols_add_encoding <- c(
     'phenotype','CHR','MarkerID','hgnc_symbol',
     'MissingRate','BETA','SE','Tstat',
     'var','p.value','p.value.NA','N_case',
-    'N_case_hom', 'N_ctrl_hom',
     'AF_Allele2','AC_Allele2',
-    'AF_case', 'AF_ctrl', 'N_case', 'N_ctrl', 
+    'AF_case', 'AF_ctrl', 'N_ctrl', 
     'N_case_hom', 'N_case_het', 'N_ctrl_hom', 'N_ctrl_het',
     'prs')
 
@@ -109,7 +108,9 @@ main <- function(args){
 
     # get files
     files <- gwastools::list_files_saige(cond = args$cond, prs = args$prs)
-   
+    files_found <- length(files_found)
+    if (files_found < 2) stop(paste("Only",files_found,"files were found!"))
+
     # read files and format
     d <- get_formatted_df(files, gt_encoding)
     d <- d[d$phenotype %in% header,]
@@ -119,7 +120,7 @@ main <- function(args){
         d <- d[d$N_ko >= N_ko_cutoff,]
         d <- d[d$N_ko_case >= N_ko_case_cutoff,]
     } else if (gt_encoding == "012") {
-        d <- d[d$AC_allele2 >= (N_ko_cutoff*2),]
+        d <- d[d$AC_Allele2 >= (N_ko_cutoff*2),]
         d <- d[d$N_case_hom >= N_ko_case_cutoff,]
     }
 

@@ -28,7 +28,8 @@ main <- function(args){
     d$is_cis <- d$knockout %in% "Compound heterozygote (cis)"
     d$is_chet <- d$knockout %in% "Compound heterozygote"
     d$is_hom <- d$knockout %in% "Homozygote"
-    d <- d[(d$is_cis) | (d$is_chet) | (d$is_hom), ]
+    d$is_het <- d$knockout %in% "Heterozygote"
+    d <- d[(d$is_cis) | (d$is_chet) | (d$is_hom) | (d$is_het), ]
 
     # read over cases that are knockouts
     out <- do.call(rbind, lapply(phenotypes, function(pheno){   

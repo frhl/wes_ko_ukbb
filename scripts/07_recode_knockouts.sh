@@ -7,7 +7,7 @@
 #SBATCH --error=logs/recode_knockouts.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-22
+#SBATCH --array=1
 #SBATCH --requeue
 
 set -o errexit
@@ -17,18 +17,19 @@ source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
 readonly bash_script="scripts/_recode_knockouts.sh"
-readonly rscript="scripts/07_recode_knockouts.R"
+readonly rscript="scripts/07_recode_knockouts_gpt.R"
 readonly curwd=$(pwd)
 
 readonly cluster=$( get_current_cluster )
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
-readonly vep_dir="data/mt/prefilter/final_90_loftee"
+readonly vep_dir="data/mt/prefilter/pp90"
 readonly vep_path="${vep_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.csqs.txt.gz"
 
 readonly in_dir="data/knockouts/alt/pp90/encode_vcf_parallel"
-readonly out_dir="data/knockouts/alt/pp90/recoded"
+#readonly out_dir="data/knockouts/alt/pp90/recoded/damaging_missense"
+readonly out_dir="data/knockouts/alt/pp90/recoded/test_pLoF"
 
 mkdir -p ${out_dir}
 
@@ -41,7 +42,7 @@ submit_recode_job()
   local lname="logs/_recode_knockouts"
   local project="lindgren.prj"
   local queue="long"
-  local nslots="3"
+  local nslots="5"
   sbatch \
     --account="${project}" \
     --job-name="${jname}" \
