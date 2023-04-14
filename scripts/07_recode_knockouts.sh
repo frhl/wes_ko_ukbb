@@ -5,9 +5,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/recode_knockouts.log
 #SBATCH --error=logs/recode_knockouts.errors.log
-#SBATCH --partition=short
+#SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1
+#SBATCH --array=21
 #SBATCH --requeue
 
 set -o errexit
@@ -17,7 +17,8 @@ source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
 readonly bash_script="scripts/_recode_knockouts.sh"
-readonly rscript="scripts/07_recode_knockouts_gpt.R"
+readonly merge_script="scripts/_recode_knockouts_merge.sh"
+readonly rscript="scripts/_recode_knockouts.R"
 readonly curwd=$(pwd)
 
 readonly cluster=$( get_current_cluster )
@@ -29,10 +30,11 @@ readonly vep_path="${vep_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_cs
 
 readonly in_dir="data/knockouts/alt/pp90/encode_vcf_parallel"
 #readonly out_dir="data/knockouts/alt/pp90/recoded/damaging_missense"
-readonly out_dir="data/knockouts/alt/pp90/recoded/test_pLoF"
+readonly out_dir="data/knockouts/alt/pp90/recoded/test_test_test"
 
 mkdir -p ${out_dir}
 
+readonly chunk_size=5000
 
 submit_recode_job()
 {
@@ -41,8 +43,43 @@ submit_recode_job()
   local jname="_c${chr}_recode"
   local lname="logs/_recode_knockouts"
   local project="lindgren.prj"
-  local queue="long"
-  local nslots="5"
+  local queue="epyc"
+  local nslots="1"
+  # get number of arrays to send
+  local num_lines=$( zcat ${input_path} | wc -l )
+  local num_chunks=$(( (${num_lines} + ${chunk_size} - 1) / ${chunk_size} ))
+  local array_chunks="1-${num_chunks}" 
+  local slurm_jid=$(sbatch \
+    --account="${project}" \
+    --job-name="${jname}" \
+    --output="${lname}.log" \
+    --error="${lname}.errors.log" \
+    --chdir="${curwd}" \
+    --partition="${queue}" \
+    --cpus-per-task="${nslots}" \
+    --array=${array_chunks} \
+    --parsable \
+    "${bash_script}" \
+    "${rscript}" \
+    "${input_path}" \
+    "${vep_path}" \
+    "${chunk_size}" \
+    "${num_chunks}" \
+    "${out_prefix}")
+  # submit merge of chunks
+  local outfile="${out_prefix}.txt.gz" 
+  submit_merge_job ${out_prefix} ${outfile} ${slurm_jid}
+}
+
+submit_merge_job()
+{
+  echo "Submitting merge job."
+  local regex_prefix="${1}"
+  local outfile="${2}"
+  local dependency="${3}"
+  local jname="_c${chr}_recode_knockout_merge"
+  local lname="logs/_recode_knockout_merge"
+  local nslots="1"
   sbatch \
     --account="${project}" \
     --job-name="${jname}" \
@@ -51,13 +88,13 @@ submit_recode_job()
     --chdir="${curwd}" \
     --partition="${queue}" \
     --cpus-per-task="${nslots}" \
-    --array=${array_idx} \
-    "${bash_script}" \
-    "${rscript}" \
-    "${input_path}" \
-    "${vep_path}" \
-    "${out_prefix}"
+    --dependency="${dependency}" \
+    "${merge_script}" \
+    "${regex_prefix}" \
+    "${num_chunks}" \
+    "${outfile}"
 }
+
 
 
 the_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_all.tsv.gz"

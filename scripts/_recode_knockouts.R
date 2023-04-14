@@ -5,54 +5,54 @@ library(data.table)
 library(stringr)
 
 # create mapping to used by map_by_variant
-#create_mapping <- function(dt, what, id="id"){
-#    stopifnot(what %in% colnames(dt))
-#    stopifnot(id %in% colnames(dt))
-#    mapping <- dt[[what]]
-#    names(mapping) <- dt[[id]]
-#    return(mapping)
-#}
+create_mapping <- function(dt, what, id="id"){
+    stopifnot(what %in% colnames(dt))
+    stopifnot(id %in% colnames(dt))
+    mapping <- dt[[what]]
+    names(mapping) <- dt[[id]]
+    return(mapping)
+}
 
 # create ID based on variant id and gene id
-#create_id <- function(dt){
-#    stopifnot("gene_id" %in% colnames(dt))
-#    stopifnot("varid" %in% colnames(dt))
-#    n <- nrow(dt)
-#    ids <- unlist(lapply(1:n, function(idx){
-#        variant <- dt$varid[idx]
-#        gene <- dt$gene_id[idx]
-#        at_least_two <- stringr::str_detect(variant, ";")
-#         if (at_least_two){
-#            id <- unlist(strsplit(variant, ";"))
-#            id <- paste(gene, id, sep = ":")
-#            return(paste0(id, collapse = ";"))
-#        } else {
-#            id <- paste(gene, variant, sep = ":")
-#            return(id)
-#        }
-#    }))
-#    return(ids)
-#}
+create_id <- function(dt){
+    stopifnot("gene_id" %in% colnames(dt))
+    stopifnot("varid" %in% colnames(dt))
+    n <- nrow(dt)
+    ids <- unlist(lapply(1:n, function(idx){
+        variant <- dt$varid[idx]
+        gene <- dt$gene_id[idx]
+        at_least_two <- stringr::str_detect(variant, ";")
+         if (at_least_two){
+            id <- unlist(strsplit(variant, ";"))
+            id <- paste(gene, id, sep = ":")
+            return(paste0(id, collapse = ";"))
+        } else {
+            id <- paste(gene, variant, sep = ":")
+            return(id)
+        }
+    }))
+    return(ids)
+}
 
 # map by variant
-#map_by_variant <- function(ids, mapping, allow_dups=TRUE, message=""){
-#    stopifnot(any(names(mapping) %in% ids))
-#    if (nchar(message)>0) write(message,stdout())
-#    mapped <- unlist(lapply(ids, function(v){
-#        at_least_two <- stringr::str_detect(v, ";")
-#        if (at_least_two){
-#            vs <- unlist(strsplit(v, ";"))
-#            vs <- as.character(mapping[vs])
-#            vs <- na.omit(vs)
-#            if (!allow_dups) vs <- unique(vs)
-#            if (length(vs)==0) return(NA)
-#            return(paste0(vs, collapse = ";"))
-#        } else {
-#            return(paste0(mapping[v], collapse = ";"))
-#        }
-#    }))
-#    return(mapped)
-#}
+map_by_variant <- function(ids, mapping, allow_dups=TRUE, message=""){
+    stopifnot(any(names(mapping) %in% ids))
+    if (nchar(message)>0) write(message,stdout())
+    mapped <- unlist(lapply(ids, function(v){
+        at_least_two <- stringr::str_detect(v, ";")
+        if (at_least_two){
+            vs <- unlist(strsplit(v, ";"))
+            vs <- as.character(mapping[vs])
+            vs <- na.omit(vs)
+            if (!allow_dups) vs <- unique(vs)
+            if (length(vs)==0) return(NA)
+            return(paste0(vs, collapse = ";"))
+        } else {
+            return(paste0(mapping[v], collapse = ";"))
+        }
+    }))
+    return(mapped)
+}
 
 
 
@@ -61,7 +61,9 @@ main <- function(args){
     input_path <- args$input_path
     vep_path <- args$vep_path
     out_prefix <- args$out_prefix
-    
+    idx_start <- args$idx_start
+    idx_end <- args$idx_end
+
     dt <- fread(input_path)
     annotation <- fread(vep_path)
 
@@ -91,6 +93,13 @@ main <- function(args){
     map_ac <- create_mapping(annotation, "info.AC")
     map_an <- create_mapping(annotation, "info.AN")
 
+    # subset if need be
+    if ((!is.null(idx_start) & (!is.null(idx_end)))){
+        idx_start <- as.numeric(idx_start)
+        idx_end <- min(as.numeric(idx_end), nrow(dt))
+        dt <- dt[idx_start:idx_end,]
+    }
+
     # map items from 
     dt$consequence_category <- map_by_variant(dt$id, map_csqs, message="csqs_category")
     dt$most_severe_consequence <- map_by_variant(dt$id, map_function_csqs, message="most_severe_csqs")
@@ -116,22 +125,6 @@ main <- function(args){
     outfile <- paste0(out_prefix,".txt.gz")
     fwrite(dt, outfile)
 
-    # create subsets and export
-    #only_plofs <- grepl("pLoF", dt$consequence_category) & !grepl("damaging_missense", dt$consequence_category)
-    #only_missense <- !grepl("pLoF", dt$consequence_category) & grepl("damaging_missense", dt$consequence_category)
-   
-    # export all 
-    #outfile <- paste0(out_prefix,".pLoF_damaging_missense.txt.gz")
-    #fwrite(dt, outfile)
-
-    # export plofs
-    #outfile <- paste0(out_prefix,".pLoF.txt.gz")
-    #fwrite(dt[only_plofs,], outfile)
-
-    # export plofs
-    #outfile <- paste0(out_prefix,".damaging_missense.txt.gz")
-    #fwrite(dt[only_missense,], outfile)
-
 }
 
 # add arguments
@@ -139,6 +132,8 @@ parser <- ArgumentParser()
 parser$add_argument("--input_path", default=NULL, help = "?")
 parser$add_argument("--vep_path", default=NULL, help = "?")
 parser$add_argument("--out_prefix", default=NULL, help = "?")
+parser$add_argument("--idx_start", default=NULL, help = "?")
+parser$add_argument("--idx_end", default=NULL, help = "?")
 args <- parser$parse_args()
 
 main(args)
