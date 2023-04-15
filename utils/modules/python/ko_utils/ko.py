@@ -70,7 +70,7 @@ def csqs_case_builder_brava(worst_csq_expr: hl.StringExpression,
     case = (case
             .when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence) &
                       (worst_csq_expr.cadd_phred >= cadd_cutoff) | (worst_csq_expr.revel_score >= revel_cutoff), "damaging_missense")
-            .when(worst_csq_expr.SpliceAI_DS_max >= spliceai_cutoff, "SpliceAI_damaging_missense")
+            .when(worst_csq_expr.SpliceAI_DS_max >= spliceai_cutoff, "damaging_missense") # spliceAI
             .when(worst_csq_expr.lof == 'LC', 'damaging_missense')
            )
     
@@ -283,6 +283,7 @@ def calc_prob_ko(hom_expr, phased_expr, unphased_expr, only_homs=False, only_che
     elif only_chets:
          return (hl.case()
                .when(
+                   (hom_expr == 0 ) &
                    (phased_expr.a1 > 0) & # compound het
                    (phased_expr.a2 > 0), 1)
                .default(0)
@@ -303,6 +304,29 @@ def calc_prob_ko(hom_expr, phased_expr, unphased_expr, only_homs=False, only_che
                     (n > 1), 1 - 2 * (1 / 2) ** n)
                .default(0)
                 )
+
+        
+def calc_frac_haplotypes(hom_expr, phased_expr, unphased_expr):
+    """Calculate the fraction of affected haplotypes 
+    :param hom_expr: integer for homozygous count 
+    :param phased_expr: struct with integers a1 and a2
+    :param unphased_expr: struct with integers a1 and a2
+    """
+    
+    return (hl.case()
+           .when(hom_expr > 0, 1) # homozygote
+           .when(
+               (phased_expr.a1 > 0) & # compound het
+               (phased_expr.a2 > 0), 1)
+           .when(
+               (phased_expr.a1 > 0) & # het
+                (phased_expr.a2 == 0), 0.5)
+           .when(
+               (phased_expr.a1 == 0) & # het
+                (phased_expr.a2 > 0), 0.5)
+           .default(0)
+           )
+
 
 
 def calc_prob_ko_by_count(ko_expr, phased_expr, unphased_expr):
