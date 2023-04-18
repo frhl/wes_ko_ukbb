@@ -57,7 +57,7 @@ cooccur_pack_lib <- function(d){
         # add variant key to library
         if (! variant_key %in% names(lib[[gene_key]])){
             lib[[gene_key]][[variant_key]] <- list(
-                cis = 0, chet = 0, hom = 0
+                cis = 0, chet = 0, hom = 0, het = 0
             )
         }
 
@@ -68,6 +68,8 @@ cooccur_pack_lib <- function(d){
             lib[[gene_key]][[variant_key]]$chet <- lib[[gene_key]][[variant_key]]$chet + 1
         } else if (row$is_hom) {
             lib[[gene_key]][[variant_key]]$hom <- lib[[gene_key]][[variant_key]]$hom + 1
+        } else if (row$is_het) {
+            lib[[gene_key]][[variant_key]]$het <- lib[[gene_key]][[variant_key]]$het + 1
         }
     }  
     return(lib)

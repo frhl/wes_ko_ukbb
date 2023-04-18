@@ -21,6 +21,9 @@ get_saige_dir <- function(directory = "") {
     else if (directory == "hom_only") {
         out_dir <- "/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/data/saige/output/binary/step2_only_homs/min_mac4"
     }
+    else if (directory == "add_encoding") {
+        out_dir <- "/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/data/saige/output/binary/step2_encoding_012/min_mac4"
+    }
     else {
         stop(paste(directory, "is not valid saige directory subset"))
     }

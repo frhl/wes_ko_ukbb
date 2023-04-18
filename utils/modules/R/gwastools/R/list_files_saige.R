@@ -16,7 +16,8 @@ list_files_saige <- function(cond = NULL, prs = "include", regex = "\\.txt\\.gz"
     all_traits <- c(trait_allow_prs, trait_disallow_prs)
 
     # get files that we have created
-    files <- sort(list.files(get_saige_dir(cond), full.names = TRUE, pattern = ".txt.gz"))
+    thedir <- get_saige_dir(cond)
+    files <- sort(list.files(thedir, full.names = TRUE, pattern = ".txt.gz"))
     files_pheno <- gsub_phenotype_from_path(files)
     files_prs <- grepl("locoprs.txt.gz", files)
     allow_prs <- files_pheno %in% trait_allow_prs
@@ -39,6 +40,7 @@ list_files_saige <- function(cond = NULL, prs = "include", regex = "\\.txt\\.gz"
         df <- df[!df$prs_available,]
     } else if (prs %in% "only") {
         df <- df[(df$prs_available) & (df$prs_allowed),]
+        if (sum(df$prs_available) == 0) stop(paste("'only' PRS specified but there are no 'locoprs' files in", thedir)) 
     } else if (prs %in% "prefer") {
         df1 <- df[(df$prs_available) & (df$prs_allowed),]
         df2 <- df[(!df$prs_available) & (!df$prs_allowed),]

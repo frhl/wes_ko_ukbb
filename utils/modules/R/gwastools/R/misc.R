@@ -52,7 +52,7 @@ gsub_phenotype_from_path <- function(paths){
 get_phenos_tested <- function(prs=NULL, use_bonf_corrected=TRUE){
     phenos <- readLines(get_phenos_header_path())
     if (!is.null(prs)){
-        phenos_w_prs <- readLines(get_phenos_prs_path(use_bonf_corrected))[-1]
+        phenos_w_prs <- readLines(get_phenos_prs_path(use_bonf_corrected))
         if (prs == "with"){
             phenos <- phenos_w_prs
         } else if (prs == "without"){
