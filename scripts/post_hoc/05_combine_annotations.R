@@ -16,12 +16,11 @@ main <- function(args){
     damaging_missense$annotation <- "damaging_missense"
     pLoF_damaging_missense$annotation <- "pLoF_damaging_missense"
     other_missense$annotation <- "other_missense"
-    synonymous$annotation <- "other_missense"
+    synonymous$annotation <- "synonymous"
     
     # keep only relevant columns
     cols_to_keep <- c("gene_id","s","knockout","annotation", "pKO", "chromosome", "transcript_id")
-    dt <- setDT(rbind(pLoF, damaging_missense, pLoF_damaging_missense))
-    dt <- dt[!(dt$knockout %in% "Heterozygote"), ]
+    dt <- setDT(rbind(pLoF, damaging_missense, pLoF_damaging_missense, other_missense, synonymous))
     dt <- dt[,colnames(dt) %in% cols_to_keep, with = FALSE]
 
     # format
@@ -33,14 +32,27 @@ main <- function(args){
     dt$knockout <- NULL
 
     # no exclusion
-    outfile <- paste0(args$out_prefix,"all.txt.gz")
+    outfile <- paste0(args$out_prefix,".all.txt.gz")
     write(paste("writing", outfile), stderr())
-    fwrite(dt_out, outfile)
+    fwrite(dt, outfile)
+
+    # get counts instead by category
+    cols_aggr <- c("gene_id", "transcript_id", "annotation")
+    aggr_cis <- aggregate(is_cis ~ gene_id + transcript_id + annotation, data = dt, FUN=sum)
+    aggr_chet <- aggregate(is_chet ~ gene_id + transcript_id + annotation, data = dt, FUN=sum)
+    aggr_hom <- aggregate(is_hom ~ gene_id + transcript_id + annotation, data = dt, FUN=sum)
+    aggr_het <- aggregate(is_het ~ gene_id + transcript_id + annotation, data = dt, FUN=sum)
+    aggr_mrg <- merge(aggr_chet, aggr_hom, by = cols_aggr, all = TRUE)
+    aggr_mrg <- merge(aggr_mrg, aggr_cis, by = cols_aggr, all = TRUE)
+    aggr_mrg <- merge(aggr_mrg, aggr_het, by = cols_aggr, all = TRUE)
+ 
+    # no exclusion
+    outfile <- paste0(args$out_prefix,".counts.txt.gz")
+    write(paste("writing", outfile), stderr())
+    fwrite(aggr_mrg, outfile)
 
     # exclude hets
-    annotations_minimal <- c("pLoF", "pLoF_damaging_missense", "damaging_missense")
     dt <- dt[!dt$is_het, ]
-    dt <- dt[dt$annotation %in% annotations_minimal, ]
 
     # exclude common knockoiuts
     counts <- data.table(table(dt$is_ko, dt$gene_id))
@@ -52,9 +64,9 @@ main <- function(args){
     print(message)
 
     # writ efile
-    outfile <- paste0(args$out_prefix,"nohets.nocommonkos.txt.gz")
+    outfile <- paste0(args$out_prefix,".nohets.nocommonkos.txt.gz")
     write(paste("writing", outfile), stderr())
-    fwrite(dt_out, outfile)
+    fwrite(dt, outfile)
 
 }
 

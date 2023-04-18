@@ -6,7 +6,7 @@
 #SBATCH --output=logs/combine_annotations.log
 #SBATCH --error=logs/combine_annotations.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 4
+#SBATCH --cpus-per-task 10
 #SBATCH --requeue
 
 source utils/bash_utils.sh
@@ -15,7 +15,7 @@ source utils/qsub_utils.sh
 readonly rscript="scripts/post_hoc/05_combine_annotations.R"
 
 readonly out_dir="data/knockouts/tables"
-readonly out_prefix="${out_dir}/combined_annotations_by_sample"
+readonly out_prefix="${out_dir}/combined_annotations_by_sample.new"
 
 mkdir -p ${out_dir}
 
