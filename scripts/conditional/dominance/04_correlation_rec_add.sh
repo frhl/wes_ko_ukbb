@@ -8,7 +8,7 @@
 #SBATCH --output=logs/correlation_rec_add.log
 #SBATCH --error=logs/correlation_rec_add.errors.log
 #SBATCH --partition=epyc
-#SBATCH --cpus-per-task 1
+#SBATCH --cpus-per-task 3
 #SBATCH --array=1-22
 
 set -o errexit
@@ -27,12 +27,14 @@ readonly input_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense
 
 readonly out_dir="data/conditional/dominance/combine_encodings/"
 readonly out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense.correlation"
+readonly out_file="${out_prefix}.txt"
 
-set_up_rpy
-Rscript "${rscript}" \
-   --chrom ${chr} \
-   --input_path ${input_path} \
-   --out_prefix ${out_prefix}
-
+#if [ ! -f "${out_file}" ]; then
+  set_up_rpy
+  Rscript "${rscript}" \
+     --chrom ${chr} \
+     --input_path ${input_path} \
+     --out_prefix ${out_prefix}
+#fi
 
 
