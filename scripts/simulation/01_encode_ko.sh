@@ -8,16 +8,6 @@
 #SBATCH --partition=epyc
 #SBATCH --cpus-per-task 3
 #SBATCH --array=22
-#
-#$ -N encode_ko
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/encode_ko.log
-#$ -e logs/encode_ko.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 3
-#$ -q short.qa
-#$ -t 1,22
-#$ -V
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh

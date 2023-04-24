@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 #
-#$ -N fit_simulated_null
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/fit_simulated_null.log
-#$ -e logs/fit_simulated_null.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q test.qc
-#$ -t 22
-#$ -V
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=fit_simulated_null
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/fit_simulated_null.log
+#SBATCH --error=logs/fit_simulated_null.errors.log
+#SBATCH --partition=epyc
+#SBATCH --cpus-per-task 1
+#SBATCH --array=22
 
 set -o errexit
 set -o nounset
@@ -16,11 +15,13 @@ set -o nounset
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
 
-readonly chr="${SGE_TASK_ID}"
+readonly array_idx=$( get_array_task_id )
+readonly chr=$(get_chr ${array_idx} )
+
 readonly plink_dir="data/saige/grm/input"
 readonly grm_dir="data/saige/grm/input/dnanexus"
 readonly covar_dir="data/phenotypes"
-readonly pheno_dir="data/simulation/phenotypes"
+readonly pheno_dir="data/simulation/phenotypes_new"
 readonly out_dir="data/simulation/saige/step1/binary"
 
 readonly grm_mtx="${grm_dir}/ukb_eur_200k_grm_fitted_relatednessCutoff_0.05_2000_randomMarkersUsed.sparseGRM.mtx"
@@ -38,25 +39,19 @@ mkdir -p ${out_dir}
 
 # wrapper for running main script
 run_with_params() {
-    simulate_phenotypes ${1} ${2} ${3} ${4} ${5} ${6}
+    simulate_phenotypes ${1} ${2} ${3} ${4} ${5}
 }
 
 # main script
 simulate_phenotypes() {
 
-  local K=0.1
-  local h2=${1}
-  local var_beta=${2}
-  local var_theta=${3}
-  local pi_beta=${4}
-  local pi_theta=${5}
-  local seed=${6}
+  local K=${1}
+  local h2=${2}
+  local b=${3}
+  local pi=${4}
+  local seed=${5}
 
-  local vars="${var_beta}_${var_theta}"
-  local pis="${pi_beta}_${pi_theta}"
-
-  local prefix="ukb_wes_union_calls_h2_${h2}_var_${vars}_pi_${pis}_K${K}_seed${seed}_chr${chr}"
-  #local prefix="ukb_eur_h2_${h2s}_pi_${pis}_K${K}_seed${seed}_chr${chr}"
+  local prefix="ukb_wes_union_calls_h2_${h2}_b_${b}_pi_${pi}_K${K}_seed${seed}_chr${chr}"
   local pheno_file="${pheno_dir}/${prefix}_phenos.tsv.gz"
 
   #local trait_type="quantitative"
@@ -71,85 +66,41 @@ simulate_phenotypes() {
 
 fit_null() {
    local out_prefix="${out_dir}/${prefix}_${phenotype}"
-   set -x
-   qsub -N "_sim_fit_null${SGE_TASK_ID}" \
-     -q "short.qe" \
-     -pe shmem 2 \
-     -t ${tasks} \
-     ${bash_script} \
-     ${rscript} \
-     ${plink_file} \
-     ${pheno_file} \
-     ${phenotype} \
-     ${covariates} \
-     ${trait_type} \
-     ${inv_normalize} \
-     ${out_prefix} \
-     ${grm_mtx} \
-     ${grm_sam} \
-     ${chr}
-   set +x
+   local jname="_fit_simulated_null"
+   local lname="logs/_fit_simulated_null"
+   local sim_job=$( sbatch \
+          --account="${project}" \
+          --job-name="${jname}" \
+          --output="${lname}.log" \
+          --error="${lname}.errors.log" \
+          --chdir="$(pwd)" \
+          --partition="${queue}" \
+          --cpus-per-task="${nslots}" \
+          --array="${tasks}" \
+          --parsable \
+           ${bash_script} \
+           ${rscript} \
+           ${plink_file} \
+           ${pheno_file} \
+           ${phenotype} \
+           ${covariates} \
+           ${trait_type} \
+           ${inv_normalize} \
+           ${out_prefix} \
+           ${grm_mtx} \
+           ${grm_sam} \
+           ${chr} )
  }
 
-readonly tasks="1-50"
+readonly project="lindgren.prj"
+readonly queue="epyc"
+readonly nslots="1"
+readonly tasks="1-2"
 
+#run_with_params 0.2 0.00 0.5 0.20 101
+#run_with_params 0.2 0.01 0.5 0.20 101
+run_with_params 0.2 0.05 0.5 0.20 101
+run_with_params 0.2 0.05 10.0 0.20 101
+run_with_params 0.2 0.05 0.0 0.20 101
 
-# this works and results in nice phenotypes
-#run_with_params 0.00 0.00 0.00 0.01 0.01 100
-#run_with_params 0.001 0.10 99.0 0.20 0.20 101
-#run_with_params 0.002 0.10 99.0 0.20 0.20 102
-#run_with_params 0.005 0.10 99.0 0.20 0.20 103
-#run_with_params 0.01 0.10 99.0 0.20 0.20 104
-#run_with_params 0.02 0.10 99.0 0.20 0.20 105
-#run_with_params 0.05 0.10 99.0 0.20 0.20 106
-
-# this works and results in nice phenotypes
-run_with_params 0.00 0.00 0.00 0.01 0.01 100
-run_with_params 0.001 0.10 99.0 0.20 0.20 101
-run_with_params 0.002 0.10 99.0 0.20 0.20 102
-run_with_params 0.005 0.10 99.0 0.20 0.20 103
-run_with_params 0.01 0.10 99.0 0.20 0.20 104
-run_with_params 0.02 0.10 99.0 0.20 0.20 105
-run_with_params 0.05 0.10 99.0 0.20 0.20 106
-
-# simualte additive effects
-run_with_params 0.001 99 0.10 0.20 0.20 201
-run_with_params 0.002 99 0.10 0.20 0.20 202
-run_with_params 0.005 99 0.10 0.20 0.20 203
-run_with_params 0.01 99 0.10 0.20 0.20 204
-run_with_params 0.02 99 0.10 0.20 0.20 205
-run_with_params 0.05 99 0.10 0.20 0.20 206
-
-
-#run_with_params 0.001 0.10 99.0 1.00 1.00 601
-#run_with_params 0.002 0.10 99.0 1.00 1.00 602
-#run_with_params 0.005 0.10 99.0 1.00 1.00 603
-#run_with_params 0.01 0.10 99.0 1.00 1.00 604
-#run_with_params 0.02 0.10 99.0 1.00 1.00 605
-#run_with_params 0.05 0.10 99.0 1.00 1.00 606
-
-
-#run_with_params 0.001 10.0 0.10 0.20 0.20 601
-#run_with_params 0.001 0.10 0.10 0.20 0.20 601
-#run_with_params 0.001 0.10 1.00 0.20 0.20 602
-#run_with_params 0.001 0.10 10.0 0.20 0.20 603
-#run_with_params 0.001 0.10 99.0 0.20 0.20 604
-
-#run_with_params 0.005 10.0 0.10 0.20 0.20 501
-#run_with_params 0.005 0.10 0.10 0.20 0.20 501
-#run_with_params 0.005 0.10 1.00 0.20 0.20 502
-#run_with_params 0.005 0.10 10.0 0.20 0.20 503
-#run_with_params 0.005 0.10 99.0 0.20 0.20 504
-
-#run_with_params 0.01 10.0 0.10 0.20 0.20 501
-#run_with_params 0.01 0.10 0.10 0.20 0.20 501
-#run_with_params 0.01 0.10 1.00 0.20 0.20 502
-#run_with_params 0.01 0.10 10.0 0.20 0.20 503
-#run_with_params 0.01 0.10 99.0 0.20 0.20 504
-
-#run_with_params 0.10 10.0 0.10 0.20 0.20 501
-#run_with_params 0.10 0.10 0.10 0.20 0.20 501
-#run_with_params 0.10 0.10 1.00 0.20 0.20 502
-#run_with_params 0.10 0.10 10.0 0.20 0.20 503
-#run_with_params 0.10 0.10 99.0 0.20 0.20 504
 
