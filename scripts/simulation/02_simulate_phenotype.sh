@@ -80,7 +80,6 @@ simulate_phenotypes() {
         --chdir="$(pwd)" \
         --partition="${queue}" \
         --cpus-per-task="${nslots}" \
-        --array=${tasks} \
         --parsable \
         --dependency=afterok:${sim_job} \
         "${merge_script}" \
@@ -99,12 +98,16 @@ simulate_phenotypes() {
 readonly project="lindgren.prj"
 readonly queue="epyc"
 readonly nslots="1"
-readonly tasks=1-2 #-2
+readonly tasks=1-10 #-2
 
 # K, h2, b, pi, seed
 run_with_params 0.2 0.00 0.5 0.20 101 
 run_with_params 0.2 0.01 0.5 0.20 101 
+run_with_params 0.2 0.02 0.5 0.20 101 
 run_with_params 0.2 0.05 0.5 0.20 101 
-run_with_params 0.2 0.05 10.0 0.20 101 
-run_with_params 0.2 0.05 0.0 0.20 101 
+
+run_with_params 0.2 0.01 0.0 0.20 101 
+run_with_params 0.2 0.01 0.5 0.20 101 
+run_with_params 0.2 0.01 1.0 0.20 101 
+run_with_params 0.2 0.01 10.0 0.20 101 
 
