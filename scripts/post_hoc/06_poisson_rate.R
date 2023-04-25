@@ -1,7 +1,8 @@
 
 library(data.table)
 library(argparse)
-source("scripts/post_hoc/utils.R")
+library(ggplot2)
+library(MASS)
 
 main <- function(args){
   
@@ -66,9 +67,8 @@ main <- function(args){
     # get essential non-essential genes
     files <- list.files(args$dir_genesets, full.names = TRUE)
     files <- files[!grepl(files, pattern="essential_non_essential_combined")]
-    lst <- lapply(files, function(x){fread(x)$gene_id})
-    names(lst) <- tools::file_path_sans_ext(basename(files))
-    gene_lst <- lst
+    gene_lst <- lapply(files, function(x){fread(x)$gene_id})
+    names(gene_lst) <- tools::file_path_sans_ext(basename(files))
         
     essential_names <- c(
       "essential_in_mice_georgi2013",
@@ -96,6 +96,7 @@ main <- function(args){
       return(unlist(strsplit(model, split = "\\+"))[-1])
     }
 
+    lst <- list()
     for (m in models){
       lst[[m]] <- list()
       model <- paste0(m,"~x+bp")
@@ -147,6 +148,11 @@ main <- function(args){
     combined <- combined[combined$geneset %in% c(essential_names, non_essential_names),]
     combined$model <- factor(combined$model, levels = models)
 
+    # writ efile
+    outfile <- paste0(args$out_prefix,".txt")
+    write(paste("writing", outfile), stderr())
+    fwrite(combined, outfile, sep = "\t")
+
     # setup colors
     categories <- c('pLoF','pLoF_damaging_missense','damaging_missense','other_missense','synonymous', 'combined')
     my_colors <- c("#B13F64","#DD686D","#F09D7C", "#F4D400", "#7CA98A", "grey30")
@@ -155,10 +161,6 @@ main <- function(args){
     color_scale <- scale_color_manual(name = "annotation", values = my_colors)
     combined$annotation <- factor(combined$annotation, levels = categories)
 
-    # writ efile
-    outfile <- paste0(args$out_prefix,".txt")
-    write(paste("writing", outfile), stderr())
-    fwrite(combined, outfile, sep = "\t")
 
 }
 

@@ -21,6 +21,9 @@ main <- function(args){
     if (convert_tte_to_bool){
         cols <- which(colnames(df_phenotype) %in% phenotypes)
         df_phenotype[cols] <- lapply(df_phenotype[cols], function(x) !is.na(suppressWarnings(as.numeric(x))))        
+        # TTE controls are NAs
+        df_phenotype[!is.na(df_phenotype)] <- TRUE
+        df_phenotype[is.na(df_phenotype)] <- FALSE 
     }
 
     # read knockouts
@@ -34,7 +37,9 @@ main <- function(args){
     # read over cases that are knockouts
     out <- do.call(rbind, lapply(phenotypes, function(pheno){   
         # deal with cases
+        print(pheno)
         case_eid <- df_phenotype$eid[as.logical(df_phenotype[[pheno]])]
+        print(paste("cases:", length(case_eid)))
         d_cases <- d[d$s %in% case_eid,]
         cases_unpacked <- NULL
         if (nrow(d_cases) > 0) {
@@ -44,7 +49,8 @@ main <- function(args){
             cases_unpacked$type <- "cases"
         }
         # deal with controls and cases (i.e. full knockout count)
-        control_eid <- df_phenotype$eid[!as.logical(df_phenotype[[pheno]])]
+        control_eid <- df_phenotype$eid[!is.na(df_phenotype[[pheno]])]
+        print(paste("controls:", length(control_eid)))
         case_control_eid <- c(case_eid, control_eid)
         d_cases_controls <- d[d$s %in% case_control_eid,]
         cases_controls_unpacked <- NULL
@@ -54,6 +60,7 @@ main <- function(args){
             cases_controls_unpacked$phenotype <- pheno
             cases_controls_unpacked$type <- "all"
         }
+
         combined <- rbind(cases_unpacked, cases_controls_unpacked)
         return(combined)
    }))
