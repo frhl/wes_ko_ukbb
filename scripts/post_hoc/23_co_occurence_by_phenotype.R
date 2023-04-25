@@ -19,11 +19,13 @@ main <- function(args){
 
     # convert numerics to bools for time-to-event phenotypes
     if (convert_tte_to_bool){
+        eids <- df_phenotype$eid
         cols <- which(colnames(df_phenotype) %in% phenotypes)
         df_phenotype[cols] <- lapply(df_phenotype[cols], function(x) !is.na(suppressWarnings(as.numeric(x))))        
         # TTE controls are NAs
         df_phenotype[!is.na(df_phenotype)] <- TRUE
         df_phenotype[is.na(df_phenotype)] <- FALSE 
+        df_phenotype$eid <- eids
     }
 
     # read knockouts
