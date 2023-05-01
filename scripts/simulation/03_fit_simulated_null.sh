@@ -93,14 +93,16 @@ fit_null() {
  }
 
 readonly project="lindgren.prj"
-readonly queue="epyc"
+readonly queue="short"
 readonly nslots="1"
-readonly tasks="1-2"
+readonly tasks="1-30"
 
-#run_with_params 0.2 0.00 0.5 0.20 101
-#run_with_params 0.2 0.01 0.5 0.20 101
-run_with_params 0.2 0.05 0.5 0.20 101
-run_with_params 0.2 0.05 10.0 0.20 101
-run_with_params 0.2 0.05 0.0 0.20 101
+#run_with_params 0.2 0.00 0.5 0.25 101
+#run_with_params 0.2 0.01 0.5 0.25 101
+#run_with_params 0.2 0.02 0.5 0.25 101
+#run_with_params 0.2 0.05 0.5 0.25 101
 
-
+run_with_params 0.2 0.05 0.0 0.25 201
+run_with_params 0.2 0.05 0.5 0.25 201
+run_with_params 0.2 0.05 1.0 0.25 201
+run_with_params 0.2 0.05 10.0 0.25 201

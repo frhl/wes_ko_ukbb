@@ -27,18 +27,23 @@ readonly seed_jid=$(( ${array_idx} * ${seed}))
 
 mkdir -p ${spark_dir}
 
-SECONDS=0
-set_up_hail
-set_up_pythonpath_legacy
-python3 "${hail_script}" \
-   --in_prefix "${in_prefix}"\
-   --in_type "${in_type}" \
-   --h2 ${h2} \
-   --b ${pi} \
-   --pi ${pi} \
-   --K ${K} \
-   --seed ${seed_jid} \
-   --out_prefix "${out_prefix_jid}" \
-   && print_update "Finished simulating phenotypes for ${in_prefix}" ${SECONDS} \
-   || raise_error "Simulating phenotypes for ${in_prefix} failed"
+
+if [ ! -f "${out_prefix_jid}_cols.tsv.gz" ]; then
+  SECONDS=0
+  set_up_hail
+  set_up_pythonpath_legacy
+  python3 "${hail_script}" \
+     --in_prefix "${in_prefix}"\
+     --in_type "${in_type}" \
+     --h2 ${h2} \
+     --b ${pi} \
+     --pi ${pi} \
+     --K ${K} \
+     --seed ${seed_jid} \
+     --out_prefix "${out_prefix_jid}" \
+     && print_update "Finished simulating phenotypes for ${in_prefix}" ${SECONDS} \
+     || raise_error "Simulating phenotypes for ${in_prefix} failed"
+else
+  >&2 echo "${out_prefix_jid} already exists!"
+fi
 

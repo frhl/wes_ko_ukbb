@@ -8,7 +8,7 @@
 #SBATCH --error=logs/fit_simulated_alt.errors.log
 #SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-2
+#SBATCH --array=1-10
 
 set -o errexit
 set -o nounset
@@ -88,6 +88,7 @@ submit_spa_job() {
     --chdir="$(pwd)" \
     --partition="${queue}" \
     --cpus-per-task="${nslots}" \
+    --array="${chr}" \
     --parsable \
     "${spa_script}" \
     "${phenotype}" \
@@ -102,15 +103,18 @@ submit_spa_job() {
     "${conditioning_markers}")
 }
 
-readonly min_mac=10
+readonly min_mac=4
 readonly project="lindgren.prj"
 readonly queue="short"
 readonly nslots=1
 
-#run_with_params 0.2 0.00 0.5 0.20 101
+run_with_params 0.2 0.00 0.5 0.20 101
 run_with_params 0.2 0.01 0.5 0.20 101
-#run_with_params 0.2 0.05 0.5 0.20 101
-#run_with_params 0.2 0.05 10.0 0.20 101
-#run_with_params 0.2 0.05 0.0 0.20 101
+run_with_params 0.2 0.02 0.5 0.20 101
+run_with_params 0.2 0.05 0.5 0.20 101
 
+run_with_params 0.2 0.01 0.0 0.20 101
+run_with_params 0.2 0.01 0.5 0.20 101
+run_with_params 0.2 0.01 1.0 0.20 101
+run_with_params 0.2 0.01 10.0 0.20 101
 

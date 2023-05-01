@@ -97,7 +97,7 @@ simulate_phenotypes() {
 
 readonly project="lindgren.prj"
 readonly queue="epyc"
-readonly nslots="1"
+readonly nslots="2"
 readonly tasks=1-10 #-2
 
 # K, h2, b, pi, seed
