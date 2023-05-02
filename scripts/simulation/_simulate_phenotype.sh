@@ -36,7 +36,7 @@ if [ ! -f "${out_prefix_jid}_cols.tsv.gz" ]; then
      --in_prefix "${in_prefix}"\
      --in_type "${in_type}" \
      --h2 ${h2} \
-     --b ${pi} \
+     --b ${b} \
      --pi ${pi} \
      --K ${K} \
      --seed ${seed_jid} \

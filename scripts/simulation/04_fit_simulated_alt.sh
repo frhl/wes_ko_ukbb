@@ -6,9 +6,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/fit_simulated_alt.log
 #SBATCH --error=logs/fit_simulated_alt.errors.log
-#SBATCH --partition=epyc
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-10
+#SBATCH --array=1-30
 
 set -o errexit
 set -o nounset
@@ -108,13 +108,15 @@ readonly project="lindgren.prj"
 readonly queue="short"
 readonly nslots=1
 
-run_with_params 0.2 0.00 0.5 0.20 101
-run_with_params 0.2 0.01 0.5 0.20 101
-run_with_params 0.2 0.02 0.5 0.20 101
-run_with_params 0.2 0.05 0.5 0.20 101
+run_with_params 0.2 0.00 0.5 0.25 101
+run_with_params 0.2 0.01 0.5 0.25 101
+run_with_params 0.2 0.02 0.5 0.25 101
+run_with_params 0.2 0.05 0.5 0.25 101
 
-run_with_params 0.2 0.01 0.0 0.20 101
-run_with_params 0.2 0.01 0.5 0.20 101
-run_with_params 0.2 0.01 1.0 0.20 101
-run_with_params 0.2 0.01 10.0 0.20 101
+run_with_params 0.2 0.05 0.0 0.25 201
+run_with_params 0.2 0.05 0.5 0.25 201
+run_with_params 0.2 0.05 1.0 0.25 201
+run_with_params 0.2 0.05 10.0 0.25 201
+
+
 

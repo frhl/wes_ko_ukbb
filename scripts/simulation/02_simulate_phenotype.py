@@ -19,6 +19,7 @@ def make_effect(mt, h2, b, pi = None):
     pi_temp = 1 if pi == None else pi
     mean = b/(M*pi) 
     variance = h2/(M*pi)
+    print("h2=" + str(h2) + " b=" + str(b) + " mean=" + str(mean) + "variance=" + str(variance))
     return(hl.rand_bool(pi_temp)*hl.rand_norm(mean, hl.sqrt(variance)))
 
 def try_param_h2(x):
@@ -37,9 +38,9 @@ def main(args):
     in_type = args.in_type
     out_prefix = args.out_prefix
     seed = args.seed
-    h2 = try_param_h2(args.h2)
-    b = try_param_h2(args.b)
-    pi = try_param_h2(args.pi)
+    h2 = float(args.h2) #try_param_h2(args.h2)
+    b = float(args.b) #try_param_h2(args.b)
+    pi = float(args.pi)
     K = float(args.K)
 
     # import table

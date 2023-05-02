@@ -59,6 +59,7 @@ simulate_phenotypes() {
         --partition="${queue}" \
         --cpus-per-task="${nslots}" \
         --array=${tasks} \
+        --open-mode="append" \
         --parsable \
         "${bash_script}" \
         "${in_prefix}" \
@@ -80,6 +81,7 @@ simulate_phenotypes() {
         --chdir="$(pwd)" \
         --partition="${queue}" \
         --cpus-per-task="${nslots}" \
+        --open-mode="append" \
         --parsable \
         --dependency=afterok:${sim_job} \
         "${merge_script}" \
@@ -96,18 +98,50 @@ simulate_phenotypes() {
 
 
 readonly project="lindgren.prj"
-readonly queue="epyc"
+readonly queue="short"
 readonly nslots="2"
-readonly tasks=1-10 #-2
+readonly tasks=1-10
 
 # K, h2, b, pi, seed
-run_with_params 0.2 0.00 0.5 0.20 101 
-run_with_params 0.2 0.01 0.5 0.20 101 
-run_with_params 0.2 0.02 0.5 0.20 101 
-run_with_params 0.2 0.05 0.5 0.20 101 
+#run_with_params 0.2 0.00 0.5 0.20 101 
+#run_with_params 0.2 0.01 0.5 0.20 101 
+#run_with_params 0.2 0.02 0.5 0.20 101 
+#run_with_params 0.2 0.05 0.5 0.20 101 
 
-run_with_params 0.2 0.01 0.0 0.20 101 
-run_with_params 0.2 0.01 0.5 0.20 101 
-run_with_params 0.2 0.01 1.0 0.20 101 
-run_with_params 0.2 0.01 10.0 0.20 101 
+#run_with_params 0.2 0.01 0.0 0.20 101 
+#run_with_params 0.2 0.01 0.5 0.20 101 
+#run_with_params 0.2 0.01 1.0 0.20 101 
+#run_with_params 0.2 0.01 10.0 0.20 101 
+
+run_with_params 0.2 0.05 0.0 0.25 301
+run_with_params 0.2 0.05 0.5 0.25 301
+run_with_params 0.2 0.05 1.0 0.25 301
+run_with_params 0.2 0.05 10.0 0.25 301
+
+run_with_params 0.2 0.01 0.0 0.25 301
+run_with_params 0.2 0.02 0.0 0.25 301
+run_with_params 0.2 0.05 0.0 0.25 301
+run_with_params 0.2 0.10 0.0 0.25 301
+
+run_with_params 0.2 0.01 0.5 0.25 301
+run_with_params 0.2 0.02 0.5 0.25 301
+run_with_params 0.2 0.05 0.5 0.25 301
+run_with_params 0.2 0.10 0.5 0.25 301
+
+run_with_params 0.2 0.01 1.0 0.25 301
+run_with_params 0.2 0.02 1.0 0.25 301
+run_with_params 0.2 0.05 1.0 0.25 301
+run_with_params 0.2 0.10 1.0 0.25 301
+
+run_with_params 0.2 0.01 10.0 0.25 301
+run_with_params 0.2 0.02 10.0 0.25 301
+run_with_params 0.2 0.05 10.0 0.25 301
+run_with_params 0.2 0.10 10.0 0.25 301
+
+
+
+
+
+
+
 
