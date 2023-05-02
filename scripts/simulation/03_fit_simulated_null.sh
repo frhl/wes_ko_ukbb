@@ -95,14 +95,35 @@ fit_null() {
 readonly project="lindgren.prj"
 readonly queue="short"
 readonly nslots="3"
-readonly tasks="1-30"
+readonly tasks="1-10"
 
-run_with_params 0.2 0.00 0.5 0.25 101
-run_with_params 0.2 0.01 0.5 0.25 101
-run_with_params 0.2 0.02 0.5 0.25 101
-run_with_params 0.2 0.05 0.5 0.25 101
+run_with_params 0.2 0.00 0.0 0.25 401
+run_with_params 0.2 0.01 0.0 0.25 401
+run_with_params 0.2 0.02 0.0 0.25 401
+run_with_params 0.2 0.05 0.0 0.25 401
+run_with_params 0.2 0.10 0.0 0.25 401
 
-run_with_params 0.2 0.05 0.0 0.25 201
-run_with_params 0.2 0.05 0.5 0.25 201
-run_with_params 0.2 0.05 1.0 0.25 201
-run_with_params 0.2 0.05 10.0 0.25 201
+run_with_params 0.2 0.00 0.5 0.25 401
+run_with_params 0.2 0.01 0.5 0.25 401
+run_with_params 0.2 0.02 0.5 0.25 401
+run_with_params 0.2 0.05 0.5 0.25 401
+run_with_params 0.2 0.10 0.5 0.25 401
+
+run_with_params 0.2 0.00 1.0 0.25 401
+run_with_params 0.2 0.01 1.0 0.25 401
+run_with_params 0.2 0.02 1.0 0.25 401
+run_with_params 0.2 0.05 1.0 0.25 401
+run_with_params 0.2 0.10 1.0 0.25 401
+
+run_with_params 0.2 0.00 2.5 0.25 401
+run_with_params 0.2 0.01 2.5 0.25 401
+run_with_params 0.2 0.02 2.5 0.25 401
+run_with_params 0.2 0.05 2.5 0.25 401
+run_with_params 0.2 0.10 2.5 0.25 401
+
+run_with_params 0.2 0.00 10.0 0.25 401
+run_with_params 0.2 0.01 10.0 0.25 401
+run_with_params 0.2 0.02 10.0 0.25 401
+run_with_params 0.2 0.05 10.0 0.25 401
+run_with_params 0.2 0.10 10.0 0.25 401
+
