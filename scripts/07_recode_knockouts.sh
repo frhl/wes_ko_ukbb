@@ -7,7 +7,7 @@
 #SBATCH --error=logs/recode_knockouts.errors.log
 #SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
-#SBATCH --array=21
+#SBATCH --array=20-22
 #SBATCH --requeue
 
 set -o errexit
@@ -30,7 +30,8 @@ readonly vep_path="${vep_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_cs
 
 readonly in_dir="data/knockouts/alt/pp90/encode_vcf_parallel"
 #readonly out_dir="data/knockouts/alt/pp90/recoded/damaging_missense"
-readonly out_dir="data/knockouts/alt/pp90/recoded/test_test_test"
+readonly out_dir="data/knockouts/alt/pp90/recoded/pLoF_damaging_missense"
+#readonly out_dir="data/knockouts/alt/pp90/recoded/test_test_test"
 
 mkdir -p ${out_dir}
 
@@ -43,7 +44,7 @@ submit_recode_job()
   local jname="_c${chr}_recode"
   local lname="logs/_recode_knockouts"
   local project="lindgren.prj"
-  local queue="epyc"
+  local queue="short"
   local nslots="1"
   # get number of arrays to send
   local num_lines=$( zcat ${input_path} | wc -l )
@@ -79,7 +80,7 @@ submit_merge_job()
   local dependency="${3}"
   local jname="_c${chr}_recode_knockout_merge"
   local lname="logs/_recode_knockout_merge"
-  local nslots="1"
+  local nslots="2"
   sbatch \
     --account="${project}" \
     --job-name="${jname}" \
@@ -97,12 +98,16 @@ submit_merge_job()
 
 
 
-the_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_all.tsv.gz"
-the_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}.pp90.recoded.pLoF"
-submit_recode_job ${the_path} ${the_prefix}
+#the_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_all.tsv.gz"
+#the_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}.pp90.recoded.pLoF"
+#submit_recode_job ${the_path} ${the_prefix}
 
 #the_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_damaging_missense_all.tsv.gz"
 #the_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}.pp90.recoded.damaging_missense"
+#submit_recode_job ${the_path} ${the_prefix}
+
+#the_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense_all.tsv.gz"
+#the_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}.pp90.recoded.pLoF_damaging_missense"
 #submit_recode_job ${the_path} ${the_prefix}
 
 #the_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense_all.tsv.gz"

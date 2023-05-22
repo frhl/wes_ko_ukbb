@@ -35,6 +35,7 @@ cols_add_encoding <- c(
 process_saige_df <- function(d, f, gt_encoding = "001"){
     # deal with conditional P-values
     if ("p.value_c" %in% colnames(d)) {
+        write(paste("Detected conditional P.value (p.value_c) for ",f), stderr())
         d$p.value <- d$p.value_c
         d$p.value.NA <- d$p.value.NA_c
         d$BETA <- d$BETA_c
@@ -108,7 +109,7 @@ main <- function(args){
 
     # get files
     files <- gwastools::list_files_saige(cond = args$cond, prs = args$prs)
-    files_found <- length(files_found)
+    files_found <- length(files)
     if (files_found < 2) stop(paste("Only",files_found,"files were found!"))
 
     # read files and format

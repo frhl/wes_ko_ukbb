@@ -36,8 +36,12 @@ readonly merged_hits="${merged_dir}/176k_merged_hits_post_cond.txt.gz"
 readonly merged_dominance_dir="data/conditional/dominance/saige"
 readonly merged_dominance_hits="${merged_dominance_dir}/176k_merged_hits_post_cond_dominance.txt.gz"
 
+# get merged dominance cond hits that are unprocessed
+readonly merged_common_dir="data/conditional/common/saige"
+readonly merged_common_hits="${merged_common_dir}/176k_merged_hits_post_common_cond.txt.gz"
+
 # calc bonferroni cutoff
-readonly genes_tested=958
+readonly genes_tested=952
 readonly phenos_tested=311
 readonly p_cutoff="$(python -c "print(0.05/(${genes_tested}*${phenos_tested}))")"
 
@@ -69,7 +73,16 @@ mkdir -p ${out_dir}
 #  --out_prefix "${out_prefix}" \
 #  --p_cutoff ${p_cutoff} \
 
-# write all dominance hits
+# write all common hits
+out_prefix="${out_dir}/176k_sig_saige_common_cond_sig_pref_prs_combined"
+set_up_rpy
+Rscript "${rscript}" \
+  --ref_file "${ref_file}" \
+  --merged_hits "${merged_common_hits}" \
+  --N_ko_case_cutoff ${N_ko_case_cutoff} \
+  --N_ko_cutoff ${N_ko_cutoff} \
+  --out_prefix "${out_prefix}"
+
 out_prefix="${out_dir}/176k_sig_saige_dominance_cond_sig_pref_prs_combined"
 set_up_rpy
 Rscript "${rscript}" \
@@ -78,4 +91,5 @@ Rscript "${rscript}" \
   --N_ko_case_cutoff ${N_ko_case_cutoff} \
   --N_ko_cutoff ${N_ko_cutoff} \
   --out_prefix "${out_prefix}"
+
 

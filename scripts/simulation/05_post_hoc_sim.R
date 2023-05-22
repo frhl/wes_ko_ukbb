@@ -124,6 +124,39 @@ main <- function(args){
     out <- paste0(args$out_prefix, ".txt.gz")
     fwrite(final_df, out, sep = "\t")
 
+    # also run ROC
+    h2s <- unique(final_df$h2)
+    bs <- unique(final_df$b)
+    lst <- list()
+    for (cur_h2 in h2s){
+        for (cur_b in bs){
+            cur_df <- final_df[(final_df$h2 == cur_h2) & (final_df$b == cur_b)]
+            plims <- c(min(cur_df$pvalue), max(cur_df$pvalue))
+            pseq <- seq_log(from=plims[1], to=plims[2], length.out=5000)
+            dt <- rbindlist(lapply(pseq, function(p){
+                cur_df_by_p <- cur_df[,]
+                total <- nrow(cur_df)
+                bool_true_positive <- ((cur_df_by_p$theta != 0) & (cur_df$pvalue <= p))
+                bool_true_negative <- ((cur_df_by_p$theta == 0) & (cur_df$pvalue > p))
+                bool_false_positive <- ((cur_df_by_p$theta == 0) & (cur_df$pvalue <= p))
+                bool_false_negative <- ((cur_df_by_p$theta != 0) & (cur_df$pvalue > p))
+                sensitivity <- sum(bool_true_positive) / (sum(bool_true_positive)+sum(bool_false_negative))
+                specificity <- sum(bool_true_negative)/ (sum(bool_true_negative)+sum(bool_false_positive))
+                return(data.table(p, sensitivity, specificity))
+            }))
+            dt$b <- cur_b
+            dt$h2 <- cur_h2
+            outname <- paste0("h2=", cur_h2,", b=",cur_b)
+            dt$id <- outname
+            lst[[outname]] <- dt
+        }
+    }
+    # combine ROC data
+    roc_data <- rbindlist(lst)
+    roc_data$h2_label <- paste0("h2=",roc_data$h2)
+    out_roc <- paste0(args$out_prefix, ".roc.txt.gz")
+    fwrite(roc_data, out_roc, sep = "\t")
+
 }
 
 # add arguments

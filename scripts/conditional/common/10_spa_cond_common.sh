@@ -71,7 +71,7 @@ submit_spa_with_csqs()
     if [ "$(cat ${markers} | cut -f6 | uniq | grep -w ${phenotype} | wc -l )" -gt "0" ]; then
 
       local step1_dir="data/saige/output/${trait}/step1"
-      local step2_dir="data/saige/output/${trait}/step2_common/min_mac${min_mac}"
+      local step2_dir="data/saige/output/${trait}/step2_common_new/min_mac${min_mac}"
       local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${annotation}_w_common.vcf.bgz"
       mkdir -p ${step2_dir}
 

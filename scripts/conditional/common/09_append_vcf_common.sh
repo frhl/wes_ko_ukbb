@@ -10,8 +10,6 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 3
 #SBATCH --array=1-22
-#SBATCH --requeue
-#SBATCH --dependency=afterok:13640177
 #
 #$ -N append_vcf_common
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

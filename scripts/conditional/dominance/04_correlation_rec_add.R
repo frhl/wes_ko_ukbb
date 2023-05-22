@@ -60,18 +60,24 @@ main <- function(args){
         additive_mate <- gsub("ENSG","addensg", recessive_mate)
         idx_recessive <- which(dom$metadata$ID == recessive_mate)
         idx_additive <- which(dom$metadata$ID == additive_mate)
+        #write(additive_mate, stderr())
+        #write(recessive_mate, stderr())
         ds_recessive <- dom$genotypes[idx_recessive,]
         ds_additive <- dom$genotypes[idx_additive,]
         # ensure that there is always an additive mate
-        if (length(idx_additive) == 0) stop(paste("Missing an additive mate for", recessive_mate))
-        # check that recessive is truly a subset of additive
+        if (length(idx_recessive) == 0) stop(paste("Missing the recessive mate", recessive_mate))
+        if (length(idx_additive) == 0) stop(paste("Missing the additive mate for", recessive_mate))
+        stopifnot(length(ds_recessive) == length(ds_additive))
+        # check that recessive is truly a subset of additive and calulcate correlation
         ds_additive_wo_hets <- ds_additive
         ds_additive_wo_hets[ds_additive_wo_hets==1] <- 0
-        if (!all(ds_additive_wo_hets == ds_recessive)) stop("Recessive encoding is not a subset of additve encoding!")
-        # calculate correlation
-        stopifnot(length(ds_recessive) == length(ds_additive))
         correlation <- cor(ds_recessive, ds_additive)
-        out <- data.frame(recessive_mate, additive_mate, correlation, chrom)    
+        warn_nomatch <- as.integer(!all(ds_additive_wo_hets == ds_recessive))
+        if (warn_nomatch) {
+            warning(paste("Recessive encoding is not a subset of additve encoding:", args$chrom, recessive_mate))
+            correlation <- NA               
+        } 
+        out <- data.frame(recessive_mate, additive_mate, correlation, chrom, warn_nomatch)    
     }))
     
     # counts
@@ -82,7 +88,7 @@ main <- function(args){
     # write file
     out_file <- paste0(args$out_prefix, ".txt")
     write(paste("writing", out_file), stdout())
-    fwrite(final_by_chrom, out_file, sep="\t")
+    fwrite(final_by_chrom, out_file, sep="\t",na="NA")
 
 
 }

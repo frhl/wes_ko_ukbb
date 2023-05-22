@@ -4,6 +4,9 @@ devtools::load_all("utils/modules/R/gwastools")
 library(data.table)
 library(argparse)
 
+
+phenos_with_prs <- get_phenos_prs()
+
 # map from ENSEMBL to HGNC
 bridge <- fread("/well/lindgren/flassen/ressources/genesets/genesets/data/biomart/220524_hgnc_ensg_enst_chr_pos.txt.gz")
 ensembl_to_contig <- bridge$chromosome_name
@@ -19,7 +22,7 @@ sig_gene_trait <- function(x, sig_T){
 
 main <- function(args){
 
-    n_tested_genes <- 958
+    n_tested_genes <- 952
     n_tested_phenos <- 311
     significance_T <- 0.05 / (n_tested_genes * n_tested_phenos)
 
@@ -28,24 +31,28 @@ main <- function(args){
     f2 <- args$cond_full
     f3 <- args$additive
     f4 <- args$cond_additive
-    f5 <- args$chet_only
-    f6 <- args$hom_only
+    f5 <- args$common
+    f6 <- args$chet_only
+    f7 <- args$hom_only
     
     stopifnot(file.exists(f0))
     stopifnot(file.exists(f1))
     stopifnot(file.exists(f2))
     stopifnot(file.exists(f3))
     stopifnot(file.exists(f4))
+    stopifnot(file.exists(f5))
 
     d0 <- fread(f0)
     d1 <- fread(f1)
     d2 <- fread(f2)
     d3 <- fread(f3)
     d4 <- fread(f4)
+    d5 <- fread(f5)
     
     # cond hits need phenotype column to be cleaned
     d2$phenotype <- gsub("chr[0-9]+\\_","",d2$phenotype)
     d4$phenotype <- gsub("chr[0-9]+\\_","",d4$phenotype)
+    d5$phenotype <- gsub("chr[0-9]+\\_","",d5$phenotype)
 
     stats <- d0[,c("phenotype","MarkerID","hgnc_symbol","CHR",'N_case', 'N_ctrl', 'N_ko_case', 'N_ko_ctrl', 'N_ko')]
 
@@ -54,6 +61,7 @@ main <- function(args){
     d2$gene_trait <- paste0(d2$phenotype,":",d2$MarkerID)
     d3$gene_trait <- paste0(d3$phenotype,":",d3$MarkerID)
     d4$gene_trait <- paste0(d4$phenotype,":",d4$MarkerID)
+    d5$gene_trait <- paste0(d5$phenotype,":",d5$MarkerID)
 
     sig_gene_traits <- unique(c(
         sig_gene_trait(d0, significance_T), 
@@ -67,6 +75,7 @@ main <- function(args){
     setkeyv(d2, keys)
     setkeyv(d3, keys)
     setkeyv(d4, keys)
+    setkeyv(d5, keys)
     setkeyv(stats, keys) 
         
     cols_to_keep <- c("phenotype","MarkerID","hgnc_symbol","CHR","BETA","SE","p.value")
@@ -102,8 +111,16 @@ main <- function(args){
     colnames(d4)[colnames(d4) == "p.value"] <- "p.value.additivecond"
     colnames(d4)[colnames(d4) == "BETA"] <- "BETA.additivecond"
     colnames(d4)[colnames(d4) == "SE"] <- "SE.additiveccond"
+   
+    # aappend cond additive analysis hits
+    d5 <- d5[d5$gene_trait %in% sig_gene_traits,] 
+    d5 <- d5[,..cols_to_keep]
+    colnames(d5)[colnames(d5) == "p.value"] <- "p.value.commoncond"
+    colnames(d5)[colnames(d5) == "BETA"] <- "BETA.commoncond"
+    colnames(d5)[colnames(d5) == "SE"] <- "SE.commoncond"
     
     # merge additive hits onto main table
+    mrg <- merge(mrg, d5, by = keys, all.x=TRUE)
     mrg <- merge(mrg, d3, by = keys, all.x=TRUE)
     mrg <- merge(mrg, d4, by = keys, all.x=TRUE)
     mrg <- mrg[order(mrg$p.value.nocond),]
@@ -114,21 +131,21 @@ main <- function(args){
     fwrite(mrg, outfile, sep = "\t", na="NA")
 
     # append hom / chet only information
-    stopifnot(file.exists(f5))
     stopifnot(file.exists(f6))
+    stopifnot(file.exists(f7))
  
     # get hom only analysis
-    d5 <- fread(f5)
-    d6 <- fread(f6) 
+    d6 <- fread(f6)
+    d7 <- fread(f7) 
     
     # get counts for hom chets
-    stat_chet <- d5[,c("phenotype","MarkerID","hgnc_symbol", "CHR", 'N_ko_case', 'N_ko')]
-    stat_hom <- d6[,c("phenotype","MarkerID","hgnc_symbol", "CHR", 'N_ko_case', 'N_ko')]
+    stat_chet <- d6[,c("phenotype","MarkerID","hgnc_symbol", "CHR", 'N_ko_case', 'N_ko')]
+    stat_hom <- d7[,c("phenotype","MarkerID","hgnc_symbol", "CHR", 'N_ko_case', 'N_ko')]
 
     setkeyv(stat_hom, keys)
     setkeyv(stat_chet, keys)
 
-    mrg_chet_hom <- merge(d5[,..cols_to_keep], d6[,..cols_to_keep], by = keys, suffixes=c(".chetonly",".homonly"))
+    mrg_chet_hom <- merge(d6[,..cols_to_keep], d7[,..cols_to_keep], by = keys, suffixes=c(".chetonly",".homonly"))
     mrg_chet_hom_stat <- merge(stat_chet, stat_hom, by = keys, suffixes=c(".chetonly",".homonly"))
 
     mrg <- merge(mrg_chet_hom_stat, mrg, by=keys, all.y=TRUE)
@@ -178,6 +195,7 @@ parser$add_argument("--excl_prs", default=NULL, required = TRUE, help = "Path to
 parser$add_argument("--prefer_prs", default=NULL, required = TRUE, help = "Path to file with PRS conditioning when available")
 parser$add_argument("--cond_full", default=NULL, required = TRUE, help = "Path to fully conditioned hits (prs, common, rare)")
 parser$add_argument("--additive", default=NULL, required = FALSE, help = "Path to file with additive encoding)")
+parser$add_argument("--common", default=NULL, required = FALSE, help = "Path to file with common encoding)")
 parser$add_argument("--cond_additive", default=NULL, required = FALSE, help = "Path to file to recessive analysis conditioned on additive encoding")
 parser$add_argument("--chet_only", default=NULL, required = FALSE, help = "Path to chet-only analysis")
 parser$add_argument("--hom_only", default=NULL, required = FALSE, help = "Path to hom-only analysis")

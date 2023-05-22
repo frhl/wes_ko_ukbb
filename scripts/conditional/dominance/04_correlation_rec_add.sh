@@ -11,6 +11,8 @@
 #SBATCH --cpus-per-task 3
 #SBATCH --array=1-22
 
+# note: chrom1 requires more than 12 epyc cpus?
+
 set -o errexit
 set -o nounset
 

@@ -62,6 +62,8 @@ def main(args):
             expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko)
         if aggr_method in "fast_012":
             genes = ko.aggr_phase_count_by_expr(mt, gene_expr)
+            # note that we are here calculating the fraction of affected haplotypes
+            # which evenetualyl result in an additive encoding 
             expr_pko = ko.calc_frac_haplotypes(genes.hom_alt_n, genes.phased, genes.unphased)
             expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko)
         elif aggr_method in "only_homs":

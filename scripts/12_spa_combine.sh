@@ -21,7 +21,7 @@ readonly header_dir="data/phenotypes"
 readonly header_file="${header_dir}/dec22_phenotypes_binary_200k_header.tsv"
 
 # calc bonferroni cutoff
-readonly genes_tested=958
+readonly genes_tested=952
 readonly phenos_tested=311
 readonly p_cutoff="$(python -c "print(0.05/(${genes_tested}*${phenos_tested}))")"
 
@@ -54,27 +54,32 @@ get_table() {
 }
 
 set_up_rpy
+
 # Subsetting by P-value
-get_table "176k_sig_saige_sig_prs_excl_wo_case_cutoff" "none" "exclude" "${p_cutoff}"
-get_table "176k_sig_saige_sig_prs_only_wo_case_cutoff" "none" "only" "${p_cutoff}"
-get_table "176k_sig_saige_sig_prs_pref_wo_case_cutoff" "none" "prefer" "${p_cutoff}"
+#get_table "176k_sig_saige_sig_prs_excl_wo_case_cutoff" "none" "exclude" "${p_cutoff}"
+#get_table "176k_sig_saige_sig_prs_only_wo_case_cutoff" "none" "only" "${p_cutoff}"
+#get_table "176k_sig_saige_sig_prs_pref_wo_case_cutoff" "none" "prefer" "${p_cutoff}"
 
 # no subsetting by P-value
-get_table "176k_sig_saige_all_prs_excl_wo_case_cutoff" "none" "exclude" "1"
-get_table "176k_sig_saige_all_prs_only_wo_case_cutoff" "none" "only" "1"
-get_table "176k_sig_saige_all_prs_pref_wo_case_cutoff" "none" "prefer" "1"
+#get_table "176k_sig_saige_all_prs_excl_wo_case_cutoff" "none" "exclude" "1"
+#get_table "176k_sig_saige_all_prs_only_wo_case_cutoff" "none" "only" "1"
+#get_table "176k_sig_saige_all_prs_pref_wo_case_cutoff" "none" "prefer" "1"
 
-get_table "176k_sig_saige_all_prs_excl_wo_case_cutoff_chet_only" "chet_only" "exclude" "1"
-#get_table "176k_sig_saige_all_prs_only_wo_case_cutoff_chet_only" "chet_only" "only" "1"
-get_table "176k_sig_saige_all_prs_pref_wo_case_cutoff_chet_only" "chet_only" "prefer" "1"
 
-get_table "176k_sig_saige_all_prs_excl_wo_case_cutoff_hom_only" "hom_only" "exclude" "1"
-#get_table "176k_sig_saige_all_prs_only_wo_case_cutoff_hom_only" "hom_only" "only" "1"
-get_table "176k_sig_saige_all_prs_pref_wo_case_cutoff_hom_only" "hom_only" "prefer" "1"
+get_table "176k_sig_saige_all_prs_pref_wo_case_cutoff_common" "common" "prefer" "1"
 
-get_table "176k_sig_saige_all_prs_excl_wo_case_cutoff_add_encoding" "add_encoding" "exclude" "1"
-get_table "176k_sig_saige_all_prs_only_wo_case_cutoff_add_encoding" "add_encoding" "only" "1"
-get_table "176k_sig_saige_all_prs_pref_wo_case_cutoff_add_encoding" "add_encoding" "prefer" "1"
+# chet only
+#get_table "176k_sig_saige_all_prs_excl_wo_case_cutoff_chet_only" "chet_only" "exclude" "1"
+#get_table "176k_sig_saige_all_prs_pref_wo_case_cutoff_chet_only" "chet_only" "prefer" "1"
+
+# hom only
+#get_table "176k_sig_saige_all_prs_excl_wo_case_cutoff_hom_only" "hom_only" "exclude" "1"
+#get_table "176k_sig_saige_all_prs_pref_wo_case_cutoff_hom_only" "hom_only" "prefer" "1"
+
+# additive encoding
+#get_table "176k_sig_saige_all_prs_excl_wo_case_cutoff_add_encoding" "add_encoding" "exclude" "1"
+#get_table "176k_sig_saige_all_prs_only_wo_case_cutoff_add_encoding" "add_encoding" "only" "1"
+#get_table "176k_sig_saige_all_prs_pref_wo_case_cutoff_add_encoding" "add_encoding" "prefer" "1"
 
 
 

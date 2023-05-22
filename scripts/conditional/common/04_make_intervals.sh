@@ -9,7 +9,7 @@
 #SBATCH --error=logs/make_intervals.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-320
+#SBATCH --array=1-22
 # --dependency=afterok:12367588
 #
 #$ -N make_intervals
@@ -88,6 +88,7 @@ submit_intervals()
           --partition="${slurm_queue}" \
           --cpus-per-task="${slurm_shmem}" \
           --array=${task_id} \
+          --open-mode="append" \
           "${bash_script}" \
           "${genes}" \
           "${padding}" \
