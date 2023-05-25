@@ -25,17 +25,18 @@ readonly path_unrelated="data/post_hoc/unrelated/ukb_wes_ko_samples.txt.gz"
 
 # parameters
 # note that "_" charactters are subbed to " "
-readonly ko_definition="Homozygote,Compound_heterozygote"
 readonly kos_cutoff=5
+readonly ko_definition="Homozygote,Compound_heterozygote"
+readonly variant_annotation="pLoF_damaging_missense"
 
 mkdir -p ${out_dir}
 
-# create shuffled VCF
 set_up_rpy
 Rscript ${rscript} \
   --out_prefix ${out_prefix} \
   --path_unrelated ${path_unrelated} \
   --path_phenotypes ${path_phenotypes} \
   --ko_definition ${ko_definition} \
+  --variant_annotation ${variant_annotation} \
   --kos_cutoff ${kos_cutoff}
 

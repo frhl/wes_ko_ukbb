@@ -33,7 +33,8 @@ main <- function(args){
     kos_cutoff <- args$kos_cutoff
     out_prefix <- args$out_prefix
     ko_definition <- args$ko_definition
-    
+    variant_annotation <- args$variant_annotation
+
     # phenotypes we are using
     phenotypes <- gwastools::get_phenos_tested()
     
@@ -43,7 +44,7 @@ main <- function(args){
     stopifnot(all(ko_definition %in% c("Homozygote", "Compound heterozygote")))
 
     # get phenotypes and variants
-    pLoF_damaging_missense <- read_ukb_wes_kos("pLoF_damaging_missense")
+    pLoF_damaging_missense <- read_ukb_wes_kos(variant_annotation)
     pheno_df <- fread(path_phenotypes)
 
     final <- list()
@@ -120,6 +121,7 @@ main <- function(args){
 parser <- ArgumentParser()
 parser$add_argument("--ko_definition", default=NULL, help = "what constitutes a 'knockout'")
 parser$add_argument("--kos_cutoff", default=NULL, help = "How many occurences in the population before we test?")
+parser$add_argument("--variant_annotation", default=NULL, help = "either 'pLoF' or 'pLoF_damaging_missense'")
 parser$add_argument("--path_unrelated", default=NULL, help = "path to a file containing unrelated samples")
 parser$add_argument("--path_phenotypes", default=NULL, help = "path to a file containing binary phenotypes")
 parser$add_argument("--out_prefix", default=NULL, help = "prefix for out file")
