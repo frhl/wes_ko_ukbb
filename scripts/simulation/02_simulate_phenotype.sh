@@ -100,38 +100,48 @@ simulate_phenotypes() {
 readonly project="lindgren.prj"
 readonly queue="short"
 readonly nslots="2"
-readonly tasks=1-10
+readonly tasks=1-20
 
 # K, h2, b, pi, seed
-run_with_params 0.2 0.00 0.0 0.25 401
-run_with_params 0.2 0.01 0.0 0.25 401
-run_with_params 0.2 0.02 0.0 0.25 401
-run_with_params 0.2 0.05 0.0 0.25 401
-run_with_params 0.2 0.10 0.0 0.25 401
+#run_with_params 0.001 0.00 0.0 0.25 701
+#run_with_params 0.003 0.00 0.0 0.25 702
+#run_with_params 0.005 0.00 0.0 0.25 703
+#run_with_params 0.008 0.00 0.0 0.25 704
+#run_with_params 0.010 0.00 0.0 0.25 705
+#run_with_params 0.020 0.00 0.0 0.25 706
+#run_with_params 0.030 0.00 0.0 0.25 707
+#run_with_params 0.050 0.00 0.0 0.25 708
+#run_with_params 0.100 0.00 0.0 0.25 709
 
-run_with_params 0.2 0.00 0.5 0.25 401
-run_with_params 0.2 0.01 0.5 0.25 401
-run_with_params 0.2 0.02 0.5 0.25 401
-run_with_params 0.2 0.05 0.5 0.25 401
-run_with_params 0.2 0.10 0.5 0.25 401
+#run_with_params 0.005 0.00 0.0 0.25 401
+#run_with_params 0.005 0.01 0.0 0.25 401
+#run_with_params 0.005 0.02 0.0 0.25 401
+#run_with_params 0.005 0.05 0.0 0.25 401
+#run_with_params 0.005 0.10 0.0 0.25 401
 
-run_with_params 0.2 0.00 1.0 0.25 401
-run_with_params 0.2 0.01 1.0 0.25 401
-run_with_params 0.2 0.02 1.0 0.25 401
-run_with_params 0.2 0.05 1.0 0.25 401
-run_with_params 0.2 0.10 1.0 0.25 401
+run_with_params 0.001 0.00 0.5 0.25 401
+run_with_params 0.001 0.01 0.5 0.25 401
+run_with_params 0.001 0.02 0.5 0.25 401
+run_with_params 0.001 0.05 0.5 0.25 401
+run_with_params 0.001 0.10 0.5 0.25 401
 
-run_with_params 0.2 0.00 2.5 0.25 401
-run_with_params 0.2 0.01 2.5 0.25 401
-run_with_params 0.2 0.02 2.5 0.25 401
-run_with_params 0.2 0.05 2.5 0.25 401
-run_with_params 0.2 0.10 2.5 0.25 401
+run_with_params 0.001 0.00 1.0 0.25 401
+run_with_params 0.001 0.01 1.0 0.25 401
+run_with_params 0.001 0.02 1.0 0.25 401
+run_with_params 0.001 0.05 1.0 0.25 401
+run_with_params 0.001 0.10 1.0 0.25 401
 
-run_with_params 0.2 0.00 10.0 0.25 401
-run_with_params 0.2 0.01 10.0 0.25 401
-run_with_params 0.2 0.02 10.0 0.25 401
-run_with_params 0.2 0.05 10.0 0.25 401
-run_with_params 0.2 0.10 10.0 0.25 401
+run_with_params 0.001 0.00 2.5 0.25 401
+run_with_params 0.001 0.01 2.5 0.25 401
+run_with_params 0.001 0.02 2.5 0.25 401
+run_with_params 0.001 0.05 2.5 0.25 401
+run_with_params 0.001 0.10 2.5 0.25 401
+
+run_with_params 0.001 0.00 10.0 0.25 401
+run_with_params 0.001 0.01 10.0 0.25 401
+run_with_params 0.001 0.02 10.0 0.25 401
+run_with_params 0.001 0.05 10.0 0.25 401
+run_with_params 0.001 0.10 10.0 0.25 401
 
 
 

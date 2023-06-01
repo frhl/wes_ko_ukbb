@@ -45,10 +45,11 @@ get_sim_df_path <- function(f, dir="data/simulation/phenotypes_new",
 }
 
 # get expected/observed P-values
-get_qq_df <- function(f, ribbon_p = 0.95){
+get_qq_df <- function(f, ribbon_p = 0.95, AC_Allele2_cutoff=NULL){
     stopifnot(file.exists(f))
     params <- get_sim_params(f)
     d <- fread(f)
+    if (!is.null(AC_Allele2_cutoff)) d <- d[d$AC_Allele2 >= AC_Allele2_cutoff,]
     if (nrow(d) > 0){
         d <- d[order(d$p.value),]
         d$p.value.expt <- get_expected_p(d$p.value, na.rm = TRUE)
@@ -84,7 +85,9 @@ main <- function(args){
     print(args)
     stopifnot(dir.exists(args$input_dir))
     stopifnot(!is.null(args$pattern))
-    
+    AC_Allele2_cutoff <- as.numeric(args$ac_allele2_cutoff)
+    stopifnot(AC_Allele2_cutoff >= 0)
+
     # get files to run
     files <- list.files(args$input_dir, pattern=args$input_pattern)
     files <- files[!grepl("index", files)]
@@ -97,7 +100,7 @@ main <- function(args){
         write(f, stderr())
         # get saige file and simulated pheno file
         qq_df <- get_qq_df(f)
-        sim_path <- get_sim_df_path(f)
+        sim_path <- get_sim_df_path(f, 0.95, AC_Allele2_cutoff)
         sim_cmd <- paste("zcat", sim_path, "| grep -v NA")
         sim_df <- suppressMessages(fread(sim_cmd))
         colnames(sim_df)[colnames(sim_df) == "rsid"] <- "ensembl_gene_id"
@@ -162,6 +165,7 @@ main <- function(args){
 # add arguments
 parser <- ArgumentParser()
 parser$add_argument("--input_dir", default=NULL, help = "?")
+parser$add_argument("--ac_allele2_cutoff", default=0, help = "?")
 parser$add_argument("--input_pattern", default=NULL, help = "?")
 parser$add_argument("--out_prefix", default=NULL, help = "?")
 args <- parser$parse_args()

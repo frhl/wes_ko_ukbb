@@ -30,7 +30,7 @@ main <- function(args){
 
     path_phenotypes <- args$path_phenotypes
     path_unrelated <- args$path_unrelated
-    kos_cutoff <- args$kos_cutoff
+    kos_cutoff <- as.numeric(args$kos_cutoff)
     out_prefix <- args$out_prefix
     ko_definition <- args$ko_definition
     variant_annotation <- args$variant_annotation
@@ -46,33 +46,33 @@ main <- function(args){
     # get phenotypes and variants
     pLoF_damaging_missense <- read_ukb_wes_kos(variant_annotation)
     pheno_df <- fread(path_phenotypes)
+    print(pLoF_damaging_missense)
 
     final <- list()
 
-    for (phenotype in phenotypes[1:20]){
-    
+    for (phenotype in phenotypes){
+
+        #phenotype <- "CC_combined"
         # get case / controls
         trait <- get_trait(phenotype, pheno_df)
         write(phenotype, stderr())
-        print(phenotype)
 
         # get knockouts for unrelated samples
         unrelated <- fread(path_unrelated)
         mut <- pLoF_damaging_missense[pLoF_damaging_missense$s %in% unrelated$s,]
         mut <- mut[mut$s %in% c(trait$cases, trait$controls)]
         mut$ko <- mut$knockout %in% ko_definition
-        
+
         # what genes can be tested (for phenotypes that are defined)
         genes_to_test <- data.table(table(mut$ko, mut$gene_id))
         genes_to_test <- genes_to_test[genes_to_test$V1 == TRUE, c(2,3)]
         colnames(genes_to_test) <- c('gene_id','kos')
         genes_to_test <- genes_to_test[genes_to_test$kos >= kos_cutoff, ]
-
         # subset to genes that are testable and stratify by cases and controls
         mut <- mut[mut$gene_id %in% genes_to_test$gene_id,]
         mut_cases <- mut[mut$s %in% trait$cases,]
         mut_controls <- mut[mut$s %in% trait$controls]
-        
+
         n_cases_ko <- sum(mut_cases$ko)
         n_controls_ko <- sum(mut_controls$ko)
         if (n_cases_ko > 0) {
@@ -88,7 +88,6 @@ main <- function(args){
             tbl_control <- dcast(V2~V1, data=tbl_control, value.var="N")
             colnames(tbl_control) <- c("gene_id", "control_not_ko", "control_and_ko")
             fisher <- merge(tbl_case, tbl_control)
-            print(head(tbl_control))
 
             # run fisher's exact test
             exact_by_trait <- rbindlist(lapply(1:nrow(fisher), function(row_idx){
@@ -107,9 +106,9 @@ main <- function(args){
                 row$pop.controls <- length(trait$controls)
                 return(row)
             }))
-            
+
             # order by P-value
-            exact_by_trait <- merge(genes_to_test, exact_by_trait, by ="gene_id", all.y=TRUE)
+            exact_by_trait <- merge(genes_to_test, exact_by_trait, by ="gene_id")
             exact_by_trait <- exact_by_trait[order(exact_by_trait$p.value)]
             exact_by_trait <- cbind(phenotype, exact_by_trait)
             final[[phenotype]] <- setDT(exact_by_trait)

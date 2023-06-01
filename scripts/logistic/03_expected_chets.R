@@ -59,6 +59,7 @@ main <- function(args){
         for (kos_cutoff in kos_cutoffs) {
             
             # mutations 
+            mut <- pLoF_damaging_missense 
             mut <- mut[mut$s %in% c(trait$cases, trait$controls)]
             mut$ko <- mut$knockout %in% c("Compound heterozygote")
 
@@ -72,31 +73,36 @@ main <- function(args){
             mut <- mut[mut$gene_id %in% genes_to_test$gene_id,]
             mut_cases <- mut[mut$s %in% trait$cases,]
             mut_controls <- mut[mut$s %in% trait$controls]
-
-            # get cases that are carriers and non-carriers
-            tbl_case <- data.table(table(mut_cases$ko, mut_cases$gene_id))
-            tbl_case <- dcast(V2~V1, data=tbl_case, value.var="N")
-            colnames(tbl_case) <- c("gene_id", "case_not_ko", "case_and_ko")
-
-            # get controls that are carriers and non-carriers
-            tbl_control <- data.table(table(mut_controls$ko, mut_controls$gene_id))
-            tbl_control <- dcast(V2~V1, data=tbl_control, value.var="N")
-            colnames(tbl_control) <- c("gene_id", "control_not_ko", "control_and_ko")
-            fisher <- merge(tbl_case, tbl_control)
-            fisher$case_or_control_and_ko <- fisher$case_and_ko + fisher$control_and_ko
-
-            # get expected number
-            fisher$n_cases <- length(trait$cases)
-            fisher$n_controls <- length(trait$controls)
-            fisher$p_cases <- (fisher$n_cases/(fisher$n_cases+fisher$n_controls)) 
-            fisher$expected <- fisher$case_or_control_and_ko * fisher$p_cases
-            fisher$kos_cutoff <- kos_cutoff
             
-            # append some stats
-            fisher <- merge(genes_to_test, fisher, by="gene_id")
-            fisher <- cbind(phenotype, fisher)
-            final[[phenotype]][[as.character(kos_cutoff)]] <- fisher
+            n_cases_ko <- sum(mut_cases$ko)
+            n_controls_ko <- sum(mut_controls$ko)
+            if (n_cases_ko > 0) {
+
+                # get cases that are carriers and non-carriers
+                tbl_case <- data.table(table(mut_cases$ko, mut_cases$gene_id))
+                tbl_case <- dcast(V2~V1, data=tbl_case, value.var="N")
+                colnames(tbl_case) <- c("gene_id", "case_not_ko", "case_and_ko")
+
+                # get controls that are carriers and non-carriers
+                tbl_control <- data.table(table(mut_controls$ko, mut_controls$gene_id))
+                tbl_control <- dcast(V2~V1, data=tbl_control, value.var="N")
+                colnames(tbl_control) <- c("gene_id", "control_not_ko", "control_and_ko")
+                fisher <- merge(tbl_case, tbl_control)
+                fisher$case_or_control_and_ko <- fisher$case_and_ko + fisher$control_and_ko
+
+                # get expected number
+                fisher$n_cases <- length(trait$cases)
+                fisher$n_controls <- length(trait$controls)
+                fisher$p_cases <- (fisher$n_cases/(fisher$n_cases+fisher$n_controls)) 
+                fisher$expected <- fisher$case_or_control_and_ko * fisher$p_cases
+                fisher$kos_cutoff <- kos_cutoff
+                
+                # append some stats
+                fisher <- merge(genes_to_test, fisher, by="gene_id")
+                fisher <- cbind(phenotype, fisher)
+                final[[phenotype]][[as.character(kos_cutoff)]] <- fisher
             
+            } 
         }
         
     }

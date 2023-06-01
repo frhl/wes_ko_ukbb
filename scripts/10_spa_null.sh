@@ -7,9 +7,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/spa_null.log
 #SBATCH --error=logs/spa_null.errors.log
-#SBATCH --partition=epyc
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=152
+#SBATCH --array=1-100
 # --begin=now+3hour
 #
 #$ -N spa_null
@@ -44,7 +44,8 @@ readonly ldsc_dir="data/prs/ldsc"
 readonly grm_mtx="${grm_dir}/ukb_eur_200k_grm_fitted_relatednessCutoff_0.05_2000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
 readonly plink_file="${grm_dir}/ukb_eur_200k_grm_grch38_rv_merged"
-readonly covar_file="${covar_dir}/covars1.csv"
+readonly covar_file="${covar_dir}/covars3.csv"
+#readonly covar_file="${covar_dir}/covars1.csv" # <--- change
 readonly covariates=$( cat ${covar_file} )
 
 readonly out_prefix="ukb_wes_200k"
@@ -56,7 +57,7 @@ readonly index=$( get_array_task_id )
 fit_binary_traits() {
   local trait_type="binary"
   local inv_normalize="FALSE"
-  local out_dir="data/saige/output/binary/step1"
+  local out_dir="data/saige/output/binary_covars3/step1"
   local pheno_list="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
   local phenotype=$( sed "${index}q;d" ${pheno_list} )
   local out="${out_dir}/${out_prefix}_${phenotype}"

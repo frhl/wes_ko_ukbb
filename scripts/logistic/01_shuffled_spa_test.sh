@@ -161,7 +161,7 @@ submit_merge_job()
 
 # parameters
 readonly conditioning_markers=""
-readonly use_prs="0"
+readonly use_prs="1"
 readonly min_mac=4
 readonly project="lindgren.prj"
 readonly tasks=1-22
