@@ -10,6 +10,8 @@
         "--offline",
         "--cache", 
         "--dir_cache", "/well/lindgren/flassen/software/VEP/vep95/GRCh38",
+        "--fasta", "/well/lindgren/flassen/software/VEP/vep95/fasta/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz",
+        "--hgvs",
         "--assembly", "GRCh38",
         "--dir_plugins", "/well/lindgren/flassen/software/VEP/plugins_grch38/",
         "--plugin", "dbNSFP,/well/lindgren/flassen/software/VEP/dbNSFP/GRCh38/dbNSFP4.1a_grch38.gz,REVEL_score,CADD_phred",
