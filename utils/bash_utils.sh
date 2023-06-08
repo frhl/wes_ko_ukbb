@@ -65,6 +65,15 @@ stopifnot_file_exists() {
   fi
 }
 
+force_rm_bad_vcf() {
+  local _vcf=${1}
+  if [ -f ${_vcf} ]; then
+    if [ ! -s ${_vcf} ]  || [ $( get_eof_error ${_vcf} ) -gt 0 ]; then
+      echo "Removing bad VCF: '${_vcf}' (EOF error or empty file)"
+      rm -f "${_vcf}" "${_vcf}.tbi"
+    fi
+ fi
+}
 
 #vcf_check() {
 #  if [ ! -f $1 ]; then # check that VCF exists
@@ -167,7 +176,8 @@ wait_for_path() {
 
 set_up_RSAIGE() {
   module load Anaconda3/2020.07 
-  local version="${1:-1.1.6.1}"
+  #local version="${1:-1.1.6.1}"
+  local version="${1:-.1.1.9}"
   local envs=$( conda env list | grep $version )
   local env_dir=$(echo $envs | cut -d" " -f2 )
   local env_saige="saige-v${version}"
@@ -255,5 +265,38 @@ set_up_tensorflow() {
 #  module load samtools/1.8-gcc5.4.0 # required for LOFTEE 
 #  export PERL5LIB=$PERL5LIB:/well/lindgren/flassen/software/VEP/plugins_grch38/
 #}
+
+
+# path to bonferonni corrected phenotypes
+get_prs_path() {
+  echo "/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/data/prs/validation/ldsc_summary_bonf_sig_phenos.txt"
+}
+
+# get path to currently used phenotype headers and phenotypes
+get_pheno_header_path() {
+ echo "/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/data/phenotypes/dec22_phenotypes_binary_200k_header.tsv"
+}
+
+get_pheno_header_path_200k() {
+  echo "/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/data/phenotypes/dec22_phenotypes_binary_200k.tsv.gz"
+}
+
+# check if we allow conditioning om prs
+pheno_allow_cond_prs() {
+  local phenotype="${1}"
+  echo "$( cat $(get_prs_path) | grep -w "${phenotype}" | wc -l)"
+}
+
+# check if phenotype
+validate_phenotype() {
+  local phenotype="${1}"
+  local ok="$( cat $(get_pheno_header_path) | grep -w "${phenotype}" | wc -l)"
+  if [ "${ok}" -eq "0" ]; then
+    raise_error "${phenotype} not pheno path!"
+  fi
+}
+
+
+
 
 
