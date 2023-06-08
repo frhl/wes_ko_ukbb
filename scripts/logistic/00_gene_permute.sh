@@ -21,7 +21,7 @@ source utils/hail_utils.sh
 readonly rscript="scripts/logistic/00_gene_permute.R"
 
 readonly chr=$( get_array_task_id )
-readonly seed=3
+readonly seed=10
 
 readonly input_dir="data/knockouts/alt/pp90/combined"
 readonly input_path="${input_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense.vcf.bgz"

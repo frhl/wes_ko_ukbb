@@ -9,7 +9,7 @@
 #SBATCH --error=logs/spa_null.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-100
+#SBATCH --array=1-310
 # --begin=now+3hour
 #
 #$ -N spa_null
@@ -44,8 +44,7 @@ readonly ldsc_dir="data/prs/ldsc"
 readonly grm_mtx="${grm_dir}/ukb_eur_200k_grm_fitted_relatednessCutoff_0.05_2000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
 readonly plink_file="${grm_dir}/ukb_eur_200k_grm_grch38_rv_merged"
-readonly covar_file="${covar_dir}/covars3.csv"
-#readonly covar_file="${covar_dir}/covars1.csv" # <--- change
+readonly covar_file="${covar_dir}/covars1.csv" 
 readonly covariates=$( cat ${covar_file} )
 
 readonly out_prefix="ukb_wes_200k"
@@ -57,7 +56,7 @@ readonly index=$( get_array_task_id )
 fit_binary_traits() {
   local trait_type="binary"
   local inv_normalize="FALSE"
-  local out_dir="data/saige/output/binary_covars3/step1"
+  local out_dir="data/saige/output/binary/step1_with_logs"
   local pheno_list="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
   local phenotype=$( sed "${index}q;d" ${pheno_list} )
   local out="${out_dir}/${out_prefix}_${phenotype}"
@@ -136,7 +135,8 @@ submit_spa_null() {
         if [ "${chr_done}" -lt "22" ]; then
           local slurm_tasks="${tasks}"
           local slurm_jname="_null_${phenotype}"
-          local slurm_lname="logs/_spa_null"
+          #local slurm_lname="logs/_spa_null"
+          local slurm_lname="${out_dir}/${phenotype}"
           local slurm_project="${project}"
           local slurm_queue="${queue}"
           local slurm_nslots="${nslots}"
@@ -151,6 +151,7 @@ submit_spa_null() {
               --cpus-per-task="${slurm_nslots}" \
               --array=${slurm_tasks} \
               --parsable \
+              --open-mode="append"\
               "${spa_null_script}" \
               "${plink_file}" \
               "${pheno_file}" \
@@ -198,7 +199,7 @@ submit_spa_null() {
 }
 
 # Parameters
-readonly use_prs=1
+readonly use_prs=0
 readonly nslots=3
 readonly queue="short"
 readonly sge_queue="short.qc"

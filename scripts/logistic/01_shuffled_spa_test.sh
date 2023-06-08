@@ -8,7 +8,7 @@
 #SBATCH --error=logs/shuffled_spa_test.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-320
+#SBATCH --array=41-311
 
 
 set -o errexit
@@ -63,7 +63,7 @@ submit_spa_with_csqs()
   if [ ! -z ${phenotype} ]; then
 
     local step1_dir="data/saige/output/${trait}/step1"
-    local step2_dir="data/saige//output/${trait}/shuffled/step2/min_mac${min_mac}"
+    local step2_dir="data/saige//output/${trait}/shuffled_new/step2/seed${seed}/min_mac${min_mac}"
     local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${annotation}.vcf.gz"
     mkdir -p ${step2_dir}
 
@@ -88,6 +88,7 @@ submit_spa_with_csqs()
     fi
 
     if [ ! -f "${out_mrg}" ]; then
+      local slurm_spa_log_path="${step2_dir}/spa_${phenotype}_${annotation}"
       local slurm_spa_name="spa_${phenotype}_${annotation}"
       local slurm_merge_name="_mrg_${phenotype}_${annotation}"
       jid=$(submit_spa_job)
@@ -105,7 +106,7 @@ submit_spa_job() {
   mkdir -p ${step2_dir}
   local slurm_tasks="${tasks}"
   local slurm_jname="${slurm_spa_name}"
-  local slurm_lname="logs/_shuffled_spa_test"
+  local slurm_lname="${slurm_spa_log_path}"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
   local slurm_nslots="${nslots}"
@@ -118,6 +119,7 @@ submit_spa_job() {
     --partition="${slurm_queue}" \
     --cpus-per-task="${slurm_nslots}" \
     --array=${slurm_tasks} \
+    --open-mode="append" \
     --parsable \
     "${spa_script}" \
     "${phenotype}" \

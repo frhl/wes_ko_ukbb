@@ -7,7 +7,7 @@
 #SBATCH --error=logs/encode_ko.errors.log
 #SBATCH --partition=epyc
 #SBATCH --cpus-per-task 3
-#SBATCH --array=22
+#SBATCH --array=1-21
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
