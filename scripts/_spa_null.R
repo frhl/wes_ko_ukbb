@@ -12,7 +12,6 @@ main <- function(args){
   stopifnot(args$covariates != "")
   stopifnot(args$phenotype != "")
 
-  
   # load PRS and phenotypes
   prs <- fread(args$prsfile)
   colnames(prs)[1] <- 'eid'
@@ -36,6 +35,8 @@ main <- function(args){
   d <- fread(args$phenofile)
   covars <- unlist(strsplit(args$covariates, split = ","))
   
+  print("covars:")
+  print(covars) 
   # check that they are present in file
   stopifnot(all(covars %in% colnames(d)))
   stopifnot(args$phenotype %in% colnames(d))

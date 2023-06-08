@@ -17,10 +17,14 @@ module purge
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
-#readonly vcf_dir="data/knockouts/alt/pp90/combined"
-readonly vcf_dir="data/knockouts/alt/pp90/only_homs"
+readonly vcf_dir="data/knockouts/alt/pp90/combined"
+#readonly vcf_dir="data/knockouts/alt/pp90/test_new_vcf"
+#readonly vcf_dir="data/knockouts/alt/pp90/only_homs"
+#readonly vcf_dir="data/knockouts/alt/pp90/only_chets"
+#readonly vcf_dir="data/knockouts/alt/pp90/encoding_012"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
+readonly rscript="scripts/_check_prs_ok.R"
 
 readonly plink_dir="data/saige/grm/input"
 readonly grm_dir="data/saige/grm/input/dnanexus"
@@ -61,7 +65,11 @@ submit_spa_with_csqs()
   if [ ! -z ${phenotype} ]; then
 
     local step1_dir="data/saige/output/${trait}/step1"
-    local step2_dir="data/saige/output/${trait}/step2_only_homs/min_mac${min_mac}"
+    local step2_dir="data/saige/output/${trait}/step2/min_mac${min_mac}"
+    #local step2_dir="data/saige/output/${trait}/step2_only_chets/min_mac${min_mac}"
+    #local step2_dir="data/saige/output/${trait}/step2_only_homs/min_mac${min_mac}"
+    #local step2_dir="data/saige/output/${trait}/step2_encoding_012/min_mac${min_mac}"
+    #local step2_dir="data/saige/output/${trait}/step2_test_new_vcf/min_mac${min_mac}"
     local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${annotation}.vcf.bgz"
     mkdir -p ${step2_dir}
 
@@ -71,22 +79,23 @@ submit_spa_with_csqs()
     local out_mrg="${step2_dir}/${in_prefix}_${phenotype}_${annotation}.txt.gz"
 
     if [ "${use_prs}" -eq "1" ]; then
+      set_up_rpy
       local in_gmat_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.rda"
       local in_var_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.varianceRatio.txt"
-      if [ -f "${in_gmat_prs/CHR/21}" ] & [ -f "${in_var_prs/CHR/21}" ]; then
+      local prs_ok=$(Rscript ${rscript} --phenotype ${phenotype} --include_nominal_significant )
+      if [ -f "${in_gmat_prs/CHR/21}" ] & [ -f "${in_var_prs/CHR/21}" ] & [ "${prs_ok}" -eq "1" ]; then
         local in_gmat=${in_gmat_prs}
         local in_var=${in_var_prs}
         local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${phenotype}_${annotation}_locoprs"
         local out_mrg="${step2_dir}/${in_prefix}_${phenotype}_${annotation}_locoprs.txt.gz"
       else
-        >&2 echo "Saige NULL (PRS) ${in_gmat_prs}/${in_var_prs} does not exist. Using without PRS."
+        >&2 echo "Using without PRS."
       fi 
     fi
 
     if [ ! -f "${out_mrg}" ]; then
       local slurm_spa_name="spa_${phenotype}_${annotation}"
       local slurm_merge_name="_mrg_${phenotype}_${annotation}"
-      set -x
       jid=$(submit_spa_job)
       submit_merge_job ${jid}
     else

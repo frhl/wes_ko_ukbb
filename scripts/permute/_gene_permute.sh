@@ -54,6 +54,7 @@ if [ "${total_phenos}" -ne "${tested_phenos}" ]; then
         --remove_invariant_markers \
         ${enable_cond_pipeline:+--enable_cond_pipeline} \
         --out_prefix ${out_prefix_id} \
+        --include_original_knockout \
         --vcf_id ${gene} \
         --seed ${sge_seed} \
         && print_update "Finished permuting phase for chr${chr}-${gene} using seed ${sge_seed}" ${SECONDS} \
@@ -72,4 +73,7 @@ if [ "${total_phenos}" -ne "${tested_phenos}" ]; then
 else
   >&2 echo "Skipping: All phenotypes have been adequately permuted."
 fi
+
+
+
 

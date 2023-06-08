@@ -2,7 +2,8 @@
 
 library(argparse)
 library(data.table)
-
+# for read_ukb_wes_kos(annotation = "pLoF_damaging_missense", chrom = 1)
+source("scripts/post_hoc/utils.R")
 
 # hash dosage as a string. This function simply concatenates all the dosgae counts
 # into a long string, and subsequently applies a hash to this string. 
@@ -13,52 +14,88 @@ hash_dosage <- function(DS_matrix, algo = "xxhash32"){
     return(the_hash)
 }
 
-# get probability of knockout given number of heterozygotes
-naive_knockout_p <- function(hets){
-    if (hets > 1){
-        return(1 - (2*((1/2)^hets)))
-    } else {
-        return(0)
-    }
+# shuffle knockouts while preserving allele counts.
+shuffle_knockouts2 <- function(samples, kos){
+
+    stopifnot("knockout" %in% colnames(kos))
+    stopifnot("s" %in% colnames(kos))
+    stopifnot(length(samples) > 100)
+
+    # get ids from the various grous
+    eid_cis <- kos$s[kos$knockout == "Compound heterozygote (cis)"]
+    eid_chet <- kos$s[kos$knockout == "Compound heterozygote"]
+    eid_both <- c(eid_cis, eid_chet)
+    eid_homs <- kos$s[kos$knockout == "Homozygote"]
+    
+    # to preserve the allele count we randomly assign chets between cis & chets
+    n_samples <- length(samples)
+    v <- rep(0, n_samples)
+
+    # assign homs as these never change
+    v[which(samples %in% eid_homs)] <- 1
+
+    # randomly assign chets to two-hit variants
+    n_chets <- length(eid_chet)
+    eid_sampled <- sample(eid_both, size = n_chets, replace = FALSE)
+    eid_not_sampled <- eid_both[!eid_both %in% eid_sampled]
+
+    # assing these to be our new knockouts
+    v[which(samples %in% eid_sampled)] <- 1
+
+    # these are our new cis
+    v[which(samples %in% eid_not_sampled)] <- 0
+    return(v)
 }
 
-# fast way to calculate probability of being KO
-calc_knockout_p_fast <- function(d){
-   
-     # hom ref are always zero
-    d$P <- 0
-    # hom alt are always one
-    d$P[d$hom_alt_n > 1] <- 1
-    # depends on count for phased hets
-    index <- which((d$het_n > 1) & (d$hom_alt_n == 0))
-    for (idx in index){
-        hets <- d$het_n[idx]
-        d$P[idx] <- naive_knockout_p(hets)
-    }
+shuffle_knockouts3 <- function(samples, kos){
+
+    stopifnot("knockout" %in% colnames(kos))
+    stopifnot("s" %in% colnames(kos))
+    stopifnot(length(samples) > 100)
+
+    # get ids from the various grous
+    eid_cis <- kos$s[kos$knockout == "Compound heterozygote (cis)"]
+    eid_chet <- kos$s[kos$knockout == "Compound heterozygote"]
+    eid_both <- c(eid_cis, eid_chet)
+    eid_homs <- kos$s[kos$knockout == "Homozygote"]
     
-    return(d$P)
-    
+    # to preserve the allele count we randomly assign chets between cis & chets
+    n_samples <- length(samples)
+    v <- rep(0, n_samples)
+
+    # assign homs as these never change
+    v[which(samples %in% eid_homs)] <- 1
+
+    # setup probability of drawing 
+    n_chet <- length(eid_chet)
+    n_cis <- length(eid_cis)
+    n_both <- length(eid_both)
+    prob <- n_chet / (n_both)
+
+    # draw fron binomial distribution
+    draws <- rbinom(n_both, 1, prob)
+    v[which(samples %in% eid_both)] <- draws
+
+    return(v)
 }
 
-# simple method to shuffle knockouts
-shuffle_knockouts <- function(d){
-    
 
-    # NOTE: we now use "het" instead of "phased_het"
-    # header of d
-    # gene_id   s   unphased_het    phased_het  hom_alt_n   het pTKO
-    # <chr> <int>   <int>   <int>   <int>   <int>   <dbl>
-    # ENSG00000027644   1000028 0   0   0   0   0
-    # ENSG00000027644   1000034 0   0   0   0   0
-    # ENSG00000027644   1000087 0   0   0   0   0
-    stopifnot('het_n' %in% colnames(d))
-    stopifnot('hom_alt_n' %in% colnames(d)) 
-    
-    n <- nrow(d)
-    p <- calc_knockout_p_fast(d)
-    B <- rbinom(n = n, size = 1, prob = p)
 
-    return(B)
+# create original knockout as specified by the "kos" data.table
+create_original_ko <- function(samples, kos){
+    
+     # get ids from the various grous
+    eid_chet <- kos$s[kos$knockout == "Compound heterozygote"]
+    eid_homs <- kos$s[kos$knockout == "Homozygote"]
+    
+    # to preserve the allele count we randomly assign chets between cis & chets
+    n_samples <- length(samples)
+    v <- rep(0, n_samples)
+
+    # assign homs as these never change
+    v[which(samples %in% eid_homs)] <- 1
+    v[which(samples %in% eid_chet)] <- 1
+    return(v)
 }
 
 # make header of VCF file
@@ -75,8 +112,8 @@ make_vcf_dosage_header <- function(chrom){
 
 # aggregate information from dosage matrix to create INFO rows
 calc_info <- function(DS_matrix){
-    stopifnot(ncol(DS_matrix) > 1)
-    stopifnot(nrow(DS_matrix) > 1)
+    stopifnot(ncol(DS_matrix) > 0)
+    stopifnot(nrow(DS_matrix) > 0)
     # create INFO row by comining strings column wise
     d_info <- data.table(
         allele_count = rowSums(DS_matrix, na.rm = TRUE),
@@ -167,7 +204,7 @@ format_real_variant_long_to_wide <- function(dt, position_last = 20000){
 
 main <- function(args){
 
-    # print(args)
+     #print(args)
 
     autosomes <- paste0("chr",1:22)
     stopifnot(file.exists(args$input_path))
@@ -188,19 +225,22 @@ main <- function(args){
     seed <- as.numeric(args$seed)
     set.seed(seed)
 
+    # read knockouts
+    ko_chrom <- gsub("chr","",args$chrom)
+    kos <- read_ukb_wes_kos(annotation = "pLoF_damaging_missense", chrom = ko_chrom)
+    kos <- kos[!kos$knockout %in% "Heterozygote",]
+    kos <- kos[kos$gene_id %in% args$vcf_id,]
+    stopifnot(nrow(kos) > 0)
+
     # replicate knockout
     n <- as.numeric(args$permutations)
-    d <- fread(args$input_path)
-    stopifnot(nrow(d) > 0)
-    reps <- replicate(n, shuffle_knockouts(d))
-    rownames(reps) <- d$s
+    vcf_samples <- readLines(args$input_path)
+    reps <- replicate(n, shuffle_knockouts3(vcf_samples, kos))
+    rownames(reps) <- vcf_samples
     reps <- data.table(t(reps))
 
     # convert to dosage
     dosage <- reps * 2
-
-    # only keep non-probabilistic knockouts
-    if (args$only_non_prob_ko) dosage[dosage < 2] <- 0
 
 
     # load real conditioning variants, i.e. the actual
@@ -222,7 +262,7 @@ main <- function(args){
         write(paste("Note:",n_real_markers, "real marker(s) found. These will be included as unshuffled in permuted VCF."),stdout())
 
         # ensure that samples are overlapping
-        sample_overlap <- unique(intersect(cond_dt$s, d$s))
+        sample_overlap <- unique(intersect(cond_dt$s, vcf_samples))
 
         # subset dosage matrix (with permuted phased)
         rows <- make_vcf_dosage_rows(args$chrom, 1:n, args$vcf_id)
@@ -258,13 +298,6 @@ main <- function(args){
         n_real_miss <- sum(is.na(apply(cond_dosage, 1, sd)))
         write(paste0("Note: ", n_real_miss, " of ", n_real_count, " real markers have one or more missing dosages."), stdout())
 
-        # debugging - are SNPs monoprhic and thus
-        # the resulting matrix not invertible?
-        #cond_dosage_sd <- apply(cond_dosage, 1, sd)
-        #cond_dosage_af <- apply(cond_dosage, 1, mean)
-        #cond_rows$sd <- cond_dosage_sd
-        #cond_rows$af <- cond_dosage_af
-
     }  else {
 
         rows <- make_vcf_dosage_rows(args$chrom, 1:n, args$vcf_id)
@@ -273,14 +306,12 @@ main <- function(args){
         final$INFO <- calc_info(dosage)
         sds <- unlist(apply(dosage, 1, sd))
     }
-
-
-
+    
     # Sometimes markers with zero AC are crated,
     # let's remove them before entering SAIGE.
     if (any(is.na(sds))) stop("Some standard devations are NA! Something went wrong with shuffle")
     if (args$remove_invariant_markers){
-        bool_invariant <- sds == 0
+        bool_invariant <- (sds == 0)
         n_invariant <- sum(bool_invariant)
         print(n_invariant)
         if (n_invariant > 0){
@@ -289,6 +320,19 @@ main <- function(args){
         }
     }
 
+    # Include original marker?
+    if (args$include_original_knockout) {
+        orig <- create_original_ko(vcf_samples, kos)
+        orig_dosage <- t(orig * 2)
+        orig_rows <- make_vcf_dosage_rows(args$chrom, n+1, "actual")
+        orig_rows_dosage <- cbind(orig_rows, orig_dosage)
+        orig_rows_dosage$INFO <- calc_info(orig_dosage)
+        colnames(orig_rows_dosage) <- colnames(final)
+        final <- rbind(final, orig_rows_dosage)
+        final <- final[order(as.numeric(final$POS)),]
+    }
+
+    
     # (1) write header of VCF
     vcf_out = make_vcf_dosage_header(args$chrom)
     outfile = paste0(args$out_prefix, ".vcf")
@@ -302,14 +346,14 @@ main <- function(args){
 # add arguments
 parser <- ArgumentParser()
 parser$add_argument("--chrom", default=NULL, help = "chromosome")
-parser$add_argument("--input_path", default=NULL, help = "path to the input")
+parser$add_argument("--input_path", default=NULL, help = "path a file containing sample ordering to be used")
 parser$add_argument("--input_path_cond_genotypes", default=NULL, help = "path to the file of dosages/genotypes")
 parser$add_argument("--permutations", default=NULL, help = "number of times the gene should be permuted")
-parser$add_argument("--only_non_prob_ko", action="store_true", default=FALSE, help = "Only keep knockouts of phased heterozygotes.")
 parser$add_argument("--remove_invariant_markers", action="store_true", default=FALSE, help = "Remove markers with AC == 0.")
 parser$add_argument("--enable_cond_pipeline", action="store_true", default=FALSE, help = "Allow the use of conditional markers")
+parser$add_argument("--include_original_knockout", action="store_true", default=FALSE, help = "Include the original knockout")
 parser$add_argument("--seed", default=NULL, help = "seed for randomizer")
-parser$add_argument("--vcf_id", default="GENE", help = "Substitute for rsid")
+parser$add_argument("--vcf_id", default="GENE", help = "Substitute for rsid (this is just the gene id string)")
 parser$add_argument("--out_prefix", default=NULL, help = "prefix for out file")
 args <- parser$parse_args()
 

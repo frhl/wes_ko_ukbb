@@ -1,14 +1,4 @@
 #!/usr/bin/env bash
-#
-#$ -N _merge_phenotype
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_merge_phenotype.log
-#$ -e logs/_merge_phenotype.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qc@@short.hge
-#$ -t 1
-#$ -V
 
 set -o errexit
 set -o nounset
@@ -25,7 +15,6 @@ readonly out_file=${4?Error: Missing arg3 ()}
 
 SECONDS=0
 set_up_rpy
-set -x
 Rscript "${rscript}" \
    --input_path "${in_prefix}" \
    --real_phenotype_path "${pheno_file}" \
@@ -33,5 +22,4 @@ Rscript "${rscript}" \
    --output_path "${out_file}" \
    && print_update "Finished simulating phenotypes for ${in_prefix}" ${SECONDS} \
    || raise_error "Simulating phenotypes for ${in_prefix} failed"
-set +x
 

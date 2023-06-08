@@ -54,7 +54,7 @@ readonly pheno_list_binary="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv
 readonly phenotype_binary=$( sed "${index}q;d" ${pheno_list_binary} )
 
 # the job will fail if less than X cases
-readonly min_cases=100
+readonly min_cases=3000
 
 submit_gwas_job()
 {

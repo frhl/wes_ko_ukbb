@@ -24,6 +24,7 @@ set -o nounset
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
+readonly rscript="scripts/00_samples.R"
 readonly hail_script="scripts/00_samples.py"
 readonly spark_dir="data/tmp/spark"
 
@@ -38,6 +39,7 @@ readonly sample_list_phased="${out_dir}/sample_list_phased.txt"
 readonly sample_list_calls="${out_dir}/sample_list_calls.txt"
 readonly sample_list_final="${out_dir}/ukb_wes_ko.imputed.qc.samples"
 readonly sample_list_final_unrel="${out_dir}/ukb_wes_ko.imputed.qc.unrelated.samples"
+readonly sample_list_phased_nfe="${out_dir}/ukb_wes_ko.qc.nfe.samples"
 
 mkdir -p ${out_dir}
 mkdir -p ${spark_dir}
@@ -61,6 +63,7 @@ python3 "${hail_script}" \
 # export imputed samples
 python3 "${hail_script}" \
    --output_path "${sample_list_imputed}" \
+   --remove_withdrawn \
    --export_imputed_samples
 
 # export final list of samples (all)
@@ -68,6 +71,7 @@ python3 "${hail_script}" \
    --output_path "${sample_list_final}" \
    --extract1 ${sample_list_qc} \
    --extract2 ${sample_list_phased} \
+   --remove_withdrawn \
    --export_imputed_samples
 
 # export final list of samples (unrelated)
@@ -76,9 +80,17 @@ python3 "${hail_script}" \
    --extract1 ${sample_list_qc} \
    --extract2 ${sample_list_phased} \
    --get_unrelated \
+   --remove_withdrawn \
    --export_imputed_samples
 
-
+# export samples that are NFE and phased (i.e. those
+# we end up using for KO analysis)
+module purge
+set_up_rpy
+Rscript ${rscript} \
+  --input_path1 ${sample_list_phased} \
+  --input_path2 ${sample_list_qc} \
+  --outfile ${sample_list_phased_nfe}
 
 
 

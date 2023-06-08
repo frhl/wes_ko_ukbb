@@ -8,7 +8,7 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/get_phenos_to_run.log
 #SBATCH --error=logs/get_phenos_to_run.errors.log
-#SBATCH --partition=epyc
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 
 set -o errexit
@@ -19,18 +19,21 @@ source utils/qsub_utils.sh
 
 readonly rscript="scripts/permute/00_get_phenos_to_run.R"
 
-readonly sig_hits_dir="data/post_hoc/results"
-readonly sig_hits="${sig_hits_dir}/176k_saige_cond_sig_subset_prefer_prs.txt.gz"
+readonly min_chet=5
+readonly min_cis=5
 
-readonly out_dir="data/permute/overview/min_mac4"
-readonly out_prefix="${out_dir}/phenotypes_with_5cis_5chets"
+readonly sig_hits_dir="data/post_hoc/results"
+readonly sig_hits="${sig_hits_dir}/176k_sig_saige_cond_sig_pref_prs_combined.txt.gz"
+
+readonly out_dir="data/permute/overview"
+readonly out_prefix="${out_dir}/phenotypes_with_${min_cis}cis_${min_chet}chets"
 
 mkdir -p ${out_dir}
 
 set_up_rpy
 Rscript ${rscript} \
-  --min_chet 5 \
-  --min_cis 5 \
+  --min_chet ${min_chet} \
+  --min_cis ${min_cis} \
   --path_sig_hits ${sig_hits} \
   --out_prefix ${out_prefix}
 

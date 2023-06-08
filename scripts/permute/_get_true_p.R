@@ -1,69 +1,59 @@
 #!/usr/bin/env Rscript
 
-library(argparse)
+#python_bin <- findpython::find_python_cmd()
+#write(paste("Python path:", python_bin), stderr())
+#options('python_cmd'='/well/lindgren/users/mmq446/conda/skylake/envs/rpy/bin/python')
+
+#library(argparse)
 library(data.table)
 
 main <- function(args){
  
-    # input
-    true_p_path <- args$true_p_path
-    gene <- args$gene
-    phenotype <- args$phenotype
-    annotation <- args$annotation
-    use_prs <- args$use_prs
-    target <- args$target
+    stopifnot(file.exists(args$input_path))
+    stopifnot(args$what %in% c("p", "t"))
+        
+    # read input
+    d <- fread(args$input_path)
 
-    stopifnot(file.exists(true_p_path))
-    d <- fread(true_p_path)
- 
-    # subset by phenotype and annotation
-    bool_phenotype <- d$phenotype %in% phenotype
-    bool_gene <- d$MarkerID %in% gene
-    bool_annotation <- d$annotation %in% annotation
+    # We include the "real" marker in the VCF to extract
+    # the reference/true P-value and T-statistic
+    true_p_marker_name <- "actual"
+    stopifnot(true_p_marker_name %in% d$MarkerID)
+    d_actual <- d[d$MarkerID == true_p_marker_name,]
 
-    # first check
-    if (!any(bool_phenotype)) write(paste0("No P-values for phenotype: ", phenotype), stderr())
-    if (!any(bool_phenotype)) write(paste0("No P-values for gene: ", gene), stderr())
-    if (!any(bool_phenotype)) write(paste0("No P-values for Annotation: ", annotation), stderr())
-    
-    # subset by PRS
-    d1 <- d[(bool_phenotype & bool_annotation & bool_gene),]
-    bool_prs <- (!is.na(d1$prs))
-    if ((use_prs == "1") & sum(bool_prs) > 0){
-        d1 <- d1[bool_prs,]
-        #write(paste0("PRS found for ", phenotype), stderr())
-    } 
-
-    # check that we have at least one row.
-    if (nrow(d1) > 1) write("Ambigious input specifications! Too many markers found.", stderr())
-    if (nrow(d1) == 0) write(paste("No markers found for combination:", phenotype, gene, annotation), stderr())
-
-    # onlt return non-NA value if fields are formatted correctly
-    if (nrow(d1) == 1) {
-      if (target == "p"){
-          write(d1$pvalue, stdout())
-      } else if (target == "t"){
-          write(d1$tstat, stdout())
-      } else if (target == "AC"){
-          write(d1$AC, stdout())
-      } else {
-          stop(paste(target, "is not a valid parameter to return!"))
-      } 
+    if ("p.value_c" %in% colnames(d_actual)){
+      true_p <- as.numeric(d_actual$p.value_c)
+      true_t <- as.numeric(d_actual$Tstat_c)
     } else {
-        write("NA", stdout())
+      true_p <- as.numeric(d_actual$p.value)
+      true_t <- as.numeric(d_actual$Tstat)
+    }
+
+    # there is one true marker per VCF, we ensure
+    # they are all the same and take the unique
+    true_p <- unique(true_p)
+    true_t <- unique(true_t)
+    stopifnot(length(true_p) == 1)
+    stopifnot(length(true_t) == 1)
+    if (is.na(true_p)) stop(paste("true P/t-statistic is NA for", args$input_path))
+    
+    if (args$what == "p"){
+        write(true_p, stdout())
+    } else if (args$what == "t"){
+        write(true_t, stdout())
+    } else {
+        stop("arg 'what' should be either 'p' (p-value) or 't' (t-statistic)")
     }
 
 }
 
 # add arguments
-parser <- ArgumentParser()
-parser$add_argument("--true_p_path", default=NULL, help = "A value")
-parser$add_argument("--gene", default=NULL, help = "A value")
-parser$add_argument("--phenotype", default=NULL, help = "A value")
-parser$add_argument("--annotation", default=NULL, help = "B value")
-parser$add_argument("--target", default=NULL, help = "B value")
-parser$add_argument("--use_prs", default="0",  help = "operator")
-args <- parser$parse_args()
+#parser <- ArgumentParser()
+#parser$add_argument("--input_path", default=NULL, help = "Merged SAIGE file with 'actual' (true) marker included.")
+#args <- parser$parse_args()
 
+my_args <- commandArgs(trailingOnly=TRUE)
+#write(paste("args:", my_args), stderr())
+args <- list(input_path=my_args[1], what=my_args[2])
 main(args)
 

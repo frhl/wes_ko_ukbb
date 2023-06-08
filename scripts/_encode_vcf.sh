@@ -27,9 +27,7 @@ readonly out_prefix_chr=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
 evaluate_knockouts() {
   echo "Evaluating ${out_prefix_chr}.vcf.bgz.."
   SECONDS=0
-  set_up_hail
-  set_up_pythonpath_legacy
-  python3 "${hail_script}" \
+ python3 "${hail_script}" \
       --chrom ${chr} \
       --input_path ${input_path_chr} \
       --input_type ${input_type} \
@@ -46,9 +44,21 @@ evaluate_knockouts() {
   rm -rf "${out_prefix_chr}_precheckpoint.mt"
 }
 
-
+ 
 #if [ ! -f "${out_prefix_chr}.vcf.bgz" ]; then
+
+set -x
+set_up_hail
+set_up_pythonpath_legacy
+
+if python -c "import hail" &> /dev/null; then
+    echo 'all good'
+else
+    echo 'uh oh'
+fi
+
 evaluate_knockouts
+
 #else
 #  >&2 echo "${out_prefix_chr}.vcf.bgz already exists. Skipping!"
 #fi

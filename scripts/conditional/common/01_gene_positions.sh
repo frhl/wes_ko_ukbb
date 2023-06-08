@@ -30,6 +30,7 @@ source utils/bash_utils.sh
 readonly task_id=$( get_array_task_id )
 
 readonly rscript="scripts/conditional/common/01_gene_positions.R"
+readonly rscript_prs="scripts/_check_prs_ok.R"
 
 readonly min_mac=4
 
@@ -43,7 +44,7 @@ mkdir -p ${out_dir}
 submit_binary_intervals()
 {
   local annotation="${1?Error: Missing arg1 (annotation)}"
-  local pheno_list="${pheno_dir}/spiros_brava_phenotypes_binary_200k_header.tsv"
+  local pheno_list="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
   local phenotype=$( sed "${task_id}q;d" ${pheno_list} )
   submit_intervals "${annotation}" "${phenotype}" "binary"
 }
@@ -69,7 +70,8 @@ submit_intervals()
   local in_file_std="${step2_dir}/${in_prefix}_${phenotype}_${annotation}.txt.gz"
   #local out_prefix_loco="${out_dir}/${in_prefix}_${phenotype}_${annotation}_locoprs"
   local out_prefix_std="${out_dir}/${in_prefix}_${phenotype}_${annotation}"
-  if [ "${use_prs}" -eq "1" ] & [ -f "${in_file_loco}" ]; then
+  local prs_ok=$(Rscript ${rscript_prs} --phenotype ${phenotype})
+  if [ "${use_prs}" -eq "1" ] & [ -f "${in_file_loco}" ] & [ "${prs_ok}" -eq "1" ]; then
     echo "Note: Using PRS results from ${phenotype}"
     local in_file=${in_file_loco}
   else

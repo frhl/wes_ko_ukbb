@@ -5,19 +5,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/encode_ko.log
 #SBATCH --error=logs/encode_ko.errors.log
-#SBATCH --partition=short
+#SBATCH --partition=epyc
 #SBATCH --cpus-per-task 3
-#SBATCH --array=20
-#
-#$ -N encode_ko
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/encode_ko.log
-#$ -e logs/encode_ko.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 3
-#$ -q short.qa
-#$ -t 22
-#$ -V
+#SBATCH --array=1-21
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
@@ -29,14 +19,16 @@ readonly spark_dir="data/tmp/spark_dir"
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
-readonly n_samples="100k"
+readonly n_samples="10k"
 readonly in_dir="data/simulation/mt"
-readonly in_file="${in_dir}/ukb_eur_${n_samples}_chr${chr}.mt"
+readonly in_file="${in_dir}/ukb_wes_union_calls_${n_samples}_chr${chr}.mt"
+
 readonly in_type="mt"
 
 readonly out_dir="data/simulation/knockouts"
-readonly out_prefix="${out_dir}/ukb_eur_${n_samples}_encoded_norm_knockouts_chr${chr}"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_${n_samples}_encoded_chr${chr}"
 readonly out_type="vcf"
+readonly out="${out_prefix}.vcf.bgz"
 
 # Allele frequency thresholds to filter on
 readonly maf_min="0"
@@ -51,20 +43,21 @@ readonly in_category="pLoF,damaging_missense"
 mkdir -p ${spark_dir}
 mkdir -p ${out_dir}
 
-# Sample WES
 set_up_hail
 set_up_pythonpath_legacy
 python3 "${hail_script}" \
-      --chrom ${chr} \
-      --in_prefix ${in_file} \
-      --in_type ${in_type} \
-      --csqs_category ${in_category} \
-      --use_loftee \
-      --maf_max ${maf_max} \
-      --maf_min ${maf_min} \
-      --out_prefix ${out_prefix} \
-      --out_type ${out_type} 
+  --chrom ${chr} \
+  --in_prefix ${in_file} \
+  --in_type ${in_type} \
+  --csqs_category ${in_category} \
+  --use_loftee \
+  --maf_max ${maf_max} \
+  --maf_min ${maf_min} \
+  --out_prefix ${out_prefix} \
+  --out_type ${out_type} 
 
-
+#>&2 echo "${out}"
+#module load BCFtools/1.12-GCC-10.3.0
+#bcftools index --csi ${out}
 
 

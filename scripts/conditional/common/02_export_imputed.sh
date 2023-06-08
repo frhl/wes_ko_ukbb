@@ -7,10 +7,10 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/export_imputed.log
 #SBATCH --error=logs/export_imputed.errors.log
-#SBATCH --partition=epyc
-#SBATCH --cpus-per-task 8
-#SBATCH --array=2
-#SBATCH --dependency="afternotok:10047864"
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 6
+#SBATCH --array=1-22
+# --dependency="afternotok:10047864"
 #
 #$ -N export_imputed
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

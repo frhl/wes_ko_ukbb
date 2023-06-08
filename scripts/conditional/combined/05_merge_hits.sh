@@ -7,6 +7,8 @@
 #SBATCH --error=logs/merge_hits.errors.log
 #SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
+#SBATCH --dependency=afterok:13691922
+# --begin=now+1hour
 
 #$ -N merge_hits
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -28,7 +30,7 @@ readonly rscript="scripts/conditional/combined/05_merge_hits.R"
 readonly header_dir="data/phenotypes"
 readonly header="${header_dir}/dec22_phenotypes_binary_200k_header.tsv"
 readonly sig_genes_dir="data/conditional/combined/sig_genes/"
-readonly sig_genes="${sig_genes_dir}/sig_genes_after_prs_165k.txt.gz"
+readonly sig_genes="${sig_genes_dir}/sig_genes_after_sig_prs_176k.txt.gz"
 readonly in_dir="data/saige/output/binary/step2_collapsed_urv/min_mac4"
 readonly out_dir="data/conditional/combined/saige"
 readonly out_prefix="${out_dir}/176k_merged_hits_post_cond"

@@ -1,66 +1,60 @@
 #!/usr/bin/env bash
 #
-#$ -N fit_simulated_alt
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/fit_simulated_alt.log
-#$ -e logs/fit_simulated_alt.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q test.qc
-#$ -t 1-5
-#$ -tc 5
-#$ -V
+#
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=fit_simulated_alt
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/fit_simulated_alt.log
+#SBATCH --error=logs/fit_simulated_alt.errors.log
+#SBATCH --partition=short
+#SBATCH --cpus-per-task 1
+#SBATCH --array=1-50
 
 set -o errexit
 set -o nounset
 
 source utils/bash_utils.sh
+source utils/qsub_utils.sh
 
-readonly vcf_dir="data/knockouts/alt"
+# array idx indicate phenotype idx
+readonly array_idx=$( get_array_task_id )
+readonly chr=22
+
+readonly vcf_dir="data/simulation/knockouts"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
 
 readonly spa_script="scripts/_spa_test.sh"
-readonly merge_script="scripts/_spa_merge.sh"
-readonly vcf_prefix="ukb_eur_wes_200k_chrCHR_maf0to5e-2"
+#readonly merge_script="scripts/_spa_merge.sh"
+readonly vcf_prefix="ukb_wes_union_calls_100k_encoded_chr${chr}"
 
 readonly grm_dir="data/saige/grm/input/dnanexus"
 readonly grm_mtx="${grm_dir}/ukb_eur_200k_grm_fitted_relatednessCutoff_0.05_2000_randomMarkersUsed.sparseGRM.mtx"
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
 
 readonly conditioning_markers=""
-readonly min_mac=2
-readonly chr=22
-readonly tasks=${chr}
-readonly queue="short.qe"
-readonly nslots=1
 
 # wrapper for running main script
 run_with_params() {
-    submit_spa ${1} ${2} ${3} ${4} ${5} ${6}
+    submit_spa ${1} ${2} ${3} ${4} ${5}
 }
 
 # main script
 submit_spa()
 {
-  local K=0.1
-  local h2=${1}
-  local var_beta=${2}
-  local var_theta=${3}
-  local pi_beta=${4}
-  local pi_theta=${5}
-  local seed=${6}
-
-  local vars="${var_beta}_${var_theta}"
-  local pis="${pi_beta}_${pi_theta}"
+  local K=${1}
+  local h2=${2}
+  local b=${3}
+  local pi=${4}
+  local seed=${5}
 
 
   # change "case" to "y" for quant
-  local prefix="ukb_eur_h2_${h2}_var_${vars}_pi_${pis}_K${K}_seed${seed}_chr${chr}"
-  local saige_prefix="${prefix}_case_${SGE_TASK_ID}"
-  
-  #local phenotype="y_${SGE_TASK_ID}"
-  local phenotype="case_${SGE_TASK_ID}"
+  local prefix="ukb_wes_union_calls_h2_${h2}_b_${b}_pi_${pi}_K${K}_seed${seed}_chr${chr}"
+  local saige_prefix="${prefix}_case_${array_idx}"
+
+  #local phenotype="y_${array_idx}"
+  local phenotype="case_${array_idx}"
   submit_spa_with_csqs "${phenotype}" "${saige_prefix}" "binary"
 }
 
@@ -74,24 +68,28 @@ submit_spa_with_csqs()
   local step2_dir="data/simulation/saige/step2/${trait}"
   local in_gmat="${step1_dir}/${saige_prefix}.rda"
   local in_var="${step1_dir}/${saige_prefix}.varianceRatio.txt"
-  local out_prefix="${step2_dir}/${saige_prefix}_${annotation}"
-  local in_vcf="${vcf_dir}/${vcf_prefix}_${annotation}.vcf.bgz"
+  local out_prefix="${step2_dir}/${saige_prefix}"
+  local in_vcf="${vcf_dir}/${vcf_prefix}.vcf.bgz"
   submit_spa_job
-
 }
 
 
 submit_spa_job() {
   >&2 echo "Submitting SPA Job"
   mkdir -p ${step2_dir}
+  local jname="_fit_simulated_alt"
+  local lname="logs/_fit_simulated_alt"
   set -x
-  qsub -N "spa_${phenotype}_${annotation}" \
-    -o "logs/_fit_simulated_alt.log" \
-    -e "logs/_fit_simulated_alt.errors.log" \
-    -wd $(pwd) \
-    -t ${tasks} \
-    -q "${queue}" \
-    -pe shmem ${nslots} \
+  local sim_job=$( sbatch \
+    --account="${project}" \
+    --job-name="${jname}" \
+    --output="${lname}.log" \
+    --error="${lname}.errors.log" \
+    --chdir="$(pwd)" \
+    --partition="${queue}" \
+    --cpus-per-task="${nslots}" \
+    --array="${chr}" \
+    --parsable \
     "${spa_script}" \
     "${phenotype}" \
     "${in_vcf}" \
@@ -102,50 +100,94 @@ submit_spa_job() {
     "${grm_sam}" \
     "${min_mac}" \
     "${out_prefix}.txt" \
-    "${conditioning_markers}"
-  set +x
+    "${conditioning_markers}")
 }
 
-readonly annotation="pLoF_damaging_missense"
+readonly min_mac=4
+readonly project="lindgren.prj"
+readonly queue="short"
+readonly nslots=1
 
-# this works and results in nice phenotypes
-#run_with_params 0.00 0.00 0.00 0.01 0.01 600
-#run_with_params 0.001 0.10 99.0 0.20 0.20 601
-#run_with_params 0.002 0.10 99.0 0.20 0.20 602
-#run_with_params 0.005 0.10 99.0 0.20 0.20 603
-#run_with_params 0.01 0.10 99.0 0.20 0.20 604
-#run_with_params 0.02 0.10 99.0 0.20 0.20 605
-#run_with_params 0.05 0.10 99.0 0.20 0.20 606
+run_with_params 0.001 0.00 0.5 0.25 401
+run_with_params 0.001 0.01 0.5 0.25 401
+run_with_params 0.001 0.02 0.5 0.25 401
+run_with_params 0.001 0.05 0.5 0.25 401
+run_with_params 0.001 0.10 0.5 0.25 401
 
-#run_with_params 0.001 0.10 99.0 1.00 1.00 601
-#run_with_params 0.002 0.10 99.0 1.00 1.00 602
-#run_with_params 0.005 0.10 99.0 1.00 1.00 603
-#run_with_params 0.01 0.10 99.0 1.00 1.00 604
-#run_with_params 0.02 0.10 99.0 1.00 1.00 605
-#run_with_params 0.05 0.10 99.0 1.00 1.00 606
+run_with_params 0.001 0.00 1.0 0.25 401
+run_with_params 0.001 0.01 1.0 0.25 401
+run_with_params 0.001 0.02 1.0 0.25 401
+run_with_params 0.001 0.05 1.0 0.25 401
+run_with_params 0.001 0.10 1.0 0.25 401
+
+run_with_params 0.001 0.00 2.5 0.25 401
+run_with_params 0.001 0.01 2.5 0.25 401
+run_with_params 0.001 0.02 2.5 0.25 401
+run_with_params 0.001 0.05 2.5 0.25 401
+run_with_params 0.001 0.10 2.5 0.25 401
+
+run_with_params 0.001 0.00 10.0 0.25 401
+run_with_params 0.001 0.01 10.0 0.25 401
+run_with_params 0.001 0.02 10.0 0.25 401
+run_with_params 0.001 0.05 10.0 0.25 401
+run_with_params 0.001 0.10 10.0 0.25 401
 
 
-run_with_params 0.001 10.0 0.10 0.20 0.20 601
-run_with_params 0.001 0.10 0.10 0.20 0.20 601
-run_with_params 0.001 0.10 1.00 0.20 0.20 602
-run_with_params 0.001 0.10 10.0 0.20 0.20 603
-run_with_params 0.001 0.10 99.0 0.20 0.20 604
+run_with_params 0.001 0.00 0.0 0.25 701
+run_with_params 0.003 0.00 0.0 0.25 702
+run_with_params 0.005 0.00 0.0 0.25 703
+run_with_params 0.008 0.00 0.0 0.25 704
+run_with_params 0.010 0.00 0.0 0.25 705
+run_with_params 0.020 0.00 0.0 0.25 706
+run_with_params 0.030 0.00 0.0 0.25 707
+run_with_params 0.050 0.00 0.0 0.25 708
+run_with_params 0.100 0.00 0.0 0.25 709
 
-#run_with_params 0.005 10.0 0.10 0.20 0.20 501
-#run_with_params 0.005 0.10 0.10 0.20 0.20 501
-#run_with_params 0.005 0.10 1.00 0.20 0.20 502
-#run_with_params 0.005 0.10 10.0 0.20 0.20 503
-#run_with_params 0.005 0.10 99.0 0.20 0.20 504
+run_with_params 0.001 0.00 0.0 0.25 601
+run_with_params 0.003 0.00 0.0 0.25 602
+run_with_params 0.005 0.00 0.0 0.25 603
+run_with_params 0.008 0.00 0.0 0.25 604
+run_with_params 0.010 0.00 0.0 0.25 605
+run_with_params 0.020 0.00 0.0 0.25 606
+run_with_params 0.030 0.00 0.0 0.25 607
+run_with_params 0.050 0.00 0.0 0.25 608
+run_with_params 0.100 0.00 0.0 0.25 609
 
-#run_with_params 0.01 10.0 0.10 0.20 0.20 501
-#run_with_params 0.01 0.10 0.10 0.20 0.20 501
-#run_with_params 0.01 0.10 1.00 0.20 0.20 502
-#run_with_params 0.01 0.10 10.0 0.20 0.20 503
-#run_with_params 0.01 0.10 99.0 0.20 0.20 504
 
-#run_with_params 0.10 10.0 0.10 0.20 0.20 501
-#run_with_params 0.10 0.10 0.10 0.20 0.20 501
-#run_with_params 0.10 0.10 1.00 0.20 0.20 502
-#run_with_params 0.10 0.10 10.0 0.20 0.20 503
-#run_with_params 0.10 0.10 99.0 0.20 0.20 504
+#run_with_params 0.001 0.00 0.0 0.25 501
+#run_with_params 0.005 0.00 0.0 0.25 502
+#run_with_params 0.010 0.00 0.0 0.25 503
+#run_with_params 0.020 0.00 0.0 0.25 504
+#run_with_params 0.030 0.00 0.0 0.25 505
+#run_with_params 0.050 0.00 0.0 0.25 506
 
+
+#run_with_params 0.005 0.00 0.0 0.25 401
+#run_with_params 0.005 0.01 0.0 0.25 401
+#run_with_params 0.005 0.02 0.0 0.25 401
+#run_with_params 0.005 0.05 0.0 0.25 401
+#run_with_params 0.005 0.10 0.0 0.25 401
+
+#run_with_params 0.005 0.00 0.5 0.25 401
+#run_with_params 0.005 0.01 0.5 0.25 401
+#run_with_params 0.005 0.02 0.5 0.25 401
+#run_with_params 0.005 0.05 0.5 0.25 401
+#run_with_params 0.005 0.10 0.5 0.25 401
+
+#run_with_params 0.005 0.00 1.0 0.25 401
+#run_with_params 0.005 0.01 1.0 0.25 401
+#run_with_params 0.005 0.02 1.0 0.25 401
+#run_with_params 0.005 0.05 1.0 0.25 401
+#run_with_params 0.005 0.10 1.0 0.25 401
+
+#run_with_params 0.005 0.00 2.5 0.25 401
+#run_with_params 0.005 0.01 2.5 0.25 401
+#run_with_params 0.005 0.02 2.5 0.25 401
+#run_with_params 0.005 0.05 2.5 0.25 401
+#run_with_params 0.005 0.10 2.5 0.25 401
+
+#run_with_params 0.005 0.00 10.0 0.25 401
+#run_with_params 0.005 0.01 10.0 0.25 401
+#run_with_params 0.005 0.02 10.0 0.25 401
+#run_with_params 0.005 0.05 10.0 0.25 401
+#run_with_params 0.005 0.10 10.0 0.25 401

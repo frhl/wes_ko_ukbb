@@ -6,7 +6,7 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/export_ps_pp.log
 #SBATCH --error=logs/export_ps_pp.errors.log
-#SBATCH --partition=short
+#SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
 #SBATCH --array=20-22
 #
@@ -37,7 +37,7 @@ readonly in_dir="data/prephased/wes_union_calls/phase_conf"
 readonly in_path="${in_dir}/ukb_shapeit5_whatshap_chr${chr}.mt"
 readonly in_type="mt"
 
-readonly out_dir="data/prephased/wes_union_calls/phase_conf"
+readonly out_dir="data/prephased/wes_union_calls/phase_conf_with_mac"
 readonly out_prefix="${out_dir}/ukb_shapeit5_whatshap_chr${chr}"
 
 mkdir -p ${out_dir}

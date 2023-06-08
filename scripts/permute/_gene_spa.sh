@@ -55,8 +55,9 @@ if [ ! -f ${out_gene_task} ]; then
   echo "gmat_bytes=${gmat_bytes} at ${in_gmat}"
   if [ ${gmat_bytes} != 0 ] && [ ${var_bytes} != 0 ]; then 
     SECONDS=0
+    module purge
+    #set -x
     set_up_RSAIGE
-    set -x
     Rscript "${step2_SPAtests}"  \
        --vcfFile=${vcf} \
        --vcfFileIndex=${csi} \
@@ -71,9 +72,9 @@ if [ ! -f ${out_gene_task} ]; then
        --SAIGEOutputFile=${out_gene_task} \
        --condition_file=${out_markers} \
        --LOCO=FALSE
-    set +x
+    #set +x
     rm -f "${out_gene_task}.index"
-    gzip ${out_gene_task}
+    gzip -f ${out_gene_task}
   else
     touch ${out_file_failure}
   fi

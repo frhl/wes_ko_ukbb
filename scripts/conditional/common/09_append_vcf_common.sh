@@ -9,8 +9,7 @@
 #SBATCH --error=logs/append_vcf_common.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 3
-#SBATCH --array=1-19
-#SBATCH --requeue
+#SBATCH --array=1-22
 #
 #$ -N append_vcf_common
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

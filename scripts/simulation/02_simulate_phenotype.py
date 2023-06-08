@@ -13,28 +13,14 @@ from ukb_utils import variants
 import scipy.stats as stats
 
 
-def rescale_variances_hail(X, mt, target_variance):
-    """ Rescale variance X in of field in mt by some target variance
-    """
-    stats = mt.aggregate_cols(hl.agg.stats(X))
-    return(rescale_variances(X, stats.stdev ** 2, target_variance))
-    
-def rescale_variances(X, X_variance, Y_variance):
-    """ Variance rescaling equation
-    """
-    X_sd = X_variance ** (1/2)
-    Y_sd = Y_variance ** (1/2)
-    K = Y_sd / X_sd
-    Y = K*X
-    return(Y)
-
-def make_effect(mt, h2, pi = None):
+def make_effect(mt, h2, b, pi = None):
     """ Make effect sizes for either infintesimal or spike and slab model. """
     M = mt.count()[0]
     pi_temp = 1 if pi == None else pi
-    return(hl.rand_bool(pi_temp)*hl.rand_norm(0, hl.sqrt(h2/(M*pi_temp))))
-
-
+    mean = b/(M*pi) 
+    variance = h2/(M*pi)
+    print("h2=" + str(h2) + " b=" + str(b) + " mean=" + str(mean) + "variance=" + str(variance))
+    return(hl.rand_bool(pi_temp)*hl.rand_norm(mean, hl.sqrt(variance)))
 
 def try_param_h2(x):
     return float(x) if x not in [None, "NA","None"] else None
@@ -52,11 +38,9 @@ def main(args):
     in_type = args.in_type
     out_prefix = args.out_prefix
     seed = args.seed
-    h2 = try_param_h2(args.h2)
-    var_beta = try_param_h2(args.var_beta)
-    var_theta = try_param_h2(args.var_theta)
-    pi_beta = try_param_pi(args.pi_beta)
-    pi_theta = try_param_pi(args.pi_theta)
+    h2 = float(args.h2) #try_param_h2(args.h2)
+    b = float(args.b) #try_param_h2(args.b)
+    pi = float(args.pi)
     K = float(args.K)
 
     # import table
@@ -65,49 +49,21 @@ def main(args):
     hl.set_global_seed(int(seed))
     mt = io.import_table(in_prefix, in_type)
     
-    print("h2:", str(h2))
-    print("var_beta:", str(var_beta))
-    print("var_theta:", str(var_theta))
-    
     # setup effects
-    if h2 > 0 and (var_beta + var_theta) > 0:
-        
-        # setup standard additive effects
-        mt = mt.annotate_rows(beta = make_effect(mt, h2=var_beta, pi=pi_beta))
-
-        # keep track of sign for additive effects
-        mt = mt.annotate_rows(
-            beta_sign = hl.case().when(hl.sign(mt.beta) == 0, 1).default(hl.sign(mt.beta))
-        )
-
-        # setup recessive effects
-        mt = mt.annotate_rows(
-                theta_nosign = hl.abs(make_effect(mt, h2=var_theta, pi=pi_theta))
-        )
-        
-        # keep theta sign consistent with beta sign
-        mt = mt.annotate_rows(
-            theta = mt.theta_nosign * mt.beta_sign
-        )
-
+    if h2 > 0:
         # both G_add_norm and G_rec_norm are on the same scale, however G_rec_norm
         # has been normalized AFTER excluding DS < 2, i.e. only recessive effects will be allowed.
-        mt = mt.annotate_cols(y_no_noise_add=hl.agg.sum(mt.beta * mt.G_add_norm)) # beta
-        mt = mt.annotate_cols(y_no_noise_rec=hl.agg.sum(mt.theta * mt.G_rec_norm)) # theta
-        mt = mt.annotate_cols(y_no_noise=mt.y_no_noise_add+mt.y_no_noise_rec)
-
-        # re-scale effects genetic effects accordingly 
-        mt = mt.annotate_cols(y_no_noise_rescaled = rescale_variances_hail(mt.y_no_noise, mt, h2))
+        mt = mt.annotate_rows(theta=make_effect(mt, h2=h2, b=b, pi=pi))
+        mt = mt.annotate_cols(y_no_noise=hl.agg.sum(mt.theta * mt.G_rec_norm_by_add))
     else:
-        mt = mt.annotate_cols(y_no_noise_rescaled = 0)
+        mt = mt.annotate_cols(y_no_noise = 0)
         mt = mt.annotate_rows(
-                beta = 0,
-                theta = 0
+                theta = 0,
        )
 
     # add up all effects
     mt = mt.annotate_cols(y_noise = hl.rand_norm(0, hl.sqrt(1-h2)))
-    mt = mt.annotate_cols(y = mt.y_noise + mt.y_no_noise_rescaled)
+    mt = mt.annotate_cols(y = mt.y_noise + mt.y_no_noise)
 
     # binarize phenotype
     if K is not None:
@@ -116,7 +72,7 @@ def main(args):
         mt = mt.annotate_cols(case=mt.y > threshold)
 
     # export effect sizes
-    ht = mt.select_rows(*['rsid','beta','theta']).select_entries(*['pKO','knockout'])
+    ht = mt.select_rows(*['rsid','theta']).select_entries(*['pKO','knockout'])
     ht.entries().flatten().export(out_prefix + "_entries.tsv.gz")
 
     # export simulated phenotypes
@@ -127,11 +83,9 @@ if __name__=='__main__':
 
     parser = argparse.ArgumentParser()
     #parser.add_argument('--chrom', default=None, help='chromosome')
-    parser.add_argument('--h2', default=0, help='Heritability for coding region')
-    parser.add_argument('--var_beta', default=0, help='Heritability for coding region')
-    parser.add_argument('--var_theta', default=0, help='Heritability for knockouts')
-    parser.add_argument('--pi_beta', default=0, help='Probability of variant being causal in coding region')
-    parser.add_argument('--pi_theta', default=0, help='Probability of variant being causal in non-coding region')
+    parser.add_argument('--h2', default=0, help='Heritability for trait')
+    parser.add_argument('--b', default=0, help='Average effect for a variant')
+    parser.add_argument('--pi', default=0, help='Probability of variant being causal')
     parser.add_argument('--K', default=0, help='Prevalence of phenotype: cases / (cases + controls)')
     parser.add_argument('--seed', default=None, help='seed for random simulations')
     parser.add_argument('--in_prefix', default=None, help='Path prefix for input dataset')

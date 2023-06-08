@@ -10,6 +10,8 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 #SBATCH --array=1-320
+# --begin=now+2hour
+# --dependency=afterok:13640293
 
 set -o errexit
 set -o nounset
@@ -25,6 +27,7 @@ readonly curwd="$(pwd)"
 readonly vcf_dir="data/conditional/common/combined"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
+readonly rscript="scripts/_check_prs_ok.R"
 
 readonly spa_script="scripts/conditional/common/_spa_cond_common.sh"
 readonly merge_script="scripts/_spa_merge.sh"
@@ -68,7 +71,7 @@ submit_spa_with_csqs()
     if [ "$(cat ${markers} | cut -f6 | uniq | grep -w ${phenotype} | wc -l )" -gt "0" ]; then
 
       local step1_dir="data/saige/output/${trait}/step1"
-      local step2_dir="data/saige/output/${trait}/step2_common/min_mac${min_mac}"
+      local step2_dir="data/saige/output/${trait}/step2_common_new/min_mac${min_mac}"
       local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${annotation}_w_common.vcf.bgz"
       mkdir -p ${step2_dir}
 
@@ -76,17 +79,18 @@ submit_spa_with_csqs()
       local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
       local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${phenotype}_${annotation}"
       local out_mrg="${step2_dir}/${in_prefix}_${phenotype}_${annotation}.txt.gz"
-
       if [ "${use_prs}" -eq "1" ]; then
+        set_up_rpy
         local in_gmat_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.rda"
         local in_var_prs="${step1_dir}/ukb_wes_200k_${phenotype}_chrCHR.varianceRatio.txt"
-         if [ -f "${in_gmat_prs/CHR/21}" ] & [ -f "${in_var_prs/CHR/21}" ]; then
+        local prs_ok=$(Rscript ${rscript} --phenotype ${phenotype})
+        if [ -f "${in_gmat_prs/CHR/21}" ] & [ -f "${in_var_prs/CHR/21}" ] & [ "${prs_ok}" -eq "1" ]; then
            local in_gmat=${in_gmat_prs}
            local in_var=${in_var_prs}
            local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${phenotype}_${annotation}_locoprs"
            local out_mrg="${step2_dir}/${in_prefix}_${phenotype}_${annotation}_locoprs.txt.gz"
          else
-           >&2 echo "Saige NULL (PRS) ${in_gmat_prs}/${in_var_prs} does not exist. Using without PRS."
+           >&2 echo "Using without PRS."
          fi
        fi
 

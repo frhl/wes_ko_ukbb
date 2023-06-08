@@ -35,7 +35,7 @@ rm_bad_vcf() {
   if [ -f ${_vcf} ]; then
     if [ ! -s ${_vcf} ]  || [ $( get_eof_error ${_vcf} ) -gt 0 ]; then
       echo "Removing bad VCF: '${_vcf}' (EOF error or empty file)"
-      rm "${_vcf}" "${_vcf}.tbi"
+      rm -f "${_vcf}" "${_vcf}.tbi"
     fi 
  fi
 }

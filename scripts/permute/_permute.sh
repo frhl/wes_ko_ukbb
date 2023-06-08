@@ -11,6 +11,7 @@ readonly bash_script="scripts/permute/_gene_permute.sh"
 readonly spa_script="scripts/permute/_gene_spa.sh"
 readonly merge_script="scripts/permute/_merge_permuted_spa.sh"
 readonly calc_script="scripts/permute/_calc_p.sh"
+readonly rscript_check_prs="scripts/_check_prs_ok.R"
 
 readonly curwd=$(pwd)
 readonly project="lindgren.prj"
@@ -20,11 +21,11 @@ readonly index=${SLURM_ARRAY_TASK_ID}
 readonly chr=${1?Error: Missing arg1}
 readonly grm_mtx=${2?Error: Missing arg6 (grm_mtx)}
 readonly grm_sam=${3?Error: Missing arg7 (grm_sam)}
-readonly input_path_prelim=${4?Error: Missing arg2}
+readonly input_path=${4?Error: Missing arg2}
 readonly out_prefix_prelim=${5?Error: Missing arg3}
 readonly pheno_dir=${6?Error: Missing arg4}
 readonly genes_path=${7?Error: Missing arg5} 
-readonly true_p_path=${8?Error: Missing arg6 (Path to true non-permuted P-values)}
+readonly genes_phenos_path=${8?Error: Missing arg5} 
 readonly min_mac=${9?Error: Missing arg7 (Minimum number of knockouts)}
 readonly replicates=${10?Error: Missing arg8 (Shuffles per permute submission)}
 readonly n_shuffle=${11?Error: Missing arg9 (How many shuffles of of phase should be done) }
@@ -47,10 +48,10 @@ top_p=${27?Error: Missing arg24 (What index of the lowest P-value should be used
 
 # set final paths depending on gene
 readonly gene="$(zcat ${genes_path} | grep -w "chr${chr}" | cut -f1 | sed ${index}'q;d' )"
-readonly input_path=$(echo ${input_path_prelim} | sed -e "s/GENE/${gene}/g")
 readonly out_prefix=$(echo ${out_prefix_prelim} | sed -e "s/GENE/${gene}/g")
 readonly write_dir="$( dirname ${out_prefix})"
 readonly tested_phenos="${out_prefix}.phenos"
+readonly pheno_bin_gene="${out_prefix}.totest.phenos"
 readonly status_phenos="${out_prefix}.permuted"
 readonly file_cutoff="${out_prefix}.cutoff"
 
@@ -61,36 +62,45 @@ readonly name_merge="_mrg_${gene}"
 readonly name_calc="_p_${gene}"
 readonly name_main="_i${iteration}_${gene}"
 
-
 # get logs
 readonly log="${write_dir}/${gene}.log"
 readonly log_saige="${write_dir}/saige.log"
 readonly log_errors="${write_dir}/${gene}.errors.log"
 readonly log_saige_errors="${write_dir}/saige.errors.log"
 
-# check if permute gene even exists:
+# check that path to sample order exists
 if [ ! -f "${input_path}" ]; then
   raise_error "${input_path} does not exist."
-elif [ $( zcat ${input_path} | wc -l ) -le 1 ]; then
-  raise_error "${input_path} only contains a header!"
 fi
 
-# create files and dirs
-mkdir -p ${write_dir}
-touch ${tested_phenos}
-touch ${status_phenos}
+# check that phenotypes should actually be run for the given gene.
+readonly n_phenos=$(zcat ${genes_phenos_path} | tail -n +2 | grep -w "${gene}" | wc -l)
+if [ "${n_phenos}" -gt "0" ]; then
+  # create files and dirs
+  mkdir -p ${write_dir}
+  touch ${tested_phenos}
+  touch ${status_phenos}
+fi
+
+# comment out this line if you only want to run the relevant gene-trait combinations
+zcat "${genes_phenos_path}" | tail -n +2 | grep -w "${gene}" | cut -f1 > "${pheno_bin_gene}"
+#zcat "${genes_phenos_path}" | tail -n +2 | cut -f1 > "${pheno_bin_gene}"
+
 
 set_arr_phenos() {
   trait=${1}
   if [ ! -z ${pheno_dir} ]; then
-    local pheno_bin="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
     local pheno_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
-    readarray -t arr_bin < ${pheno_bin}
+    readarray -t arr_bin < ${pheno_bin_gene}
     readarray -t arr_cts < ${pheno_cts}
     if [[ "${trait}" == "both" ]]; then
       arr_phenos=("${arr_bin[@]}" "${arr_cts[@]}")
+    elif [[ "${trait}" == "binary" ]]; then
+      arr_phenos=("${arr_bin[@]}")
     elif [[ "${trait}" == "cts" ]]; then
       arr_phenos=("${arr_cts[@]}")
+    else 
+      >&2 echo "trait has not been defined properly."
     fi
   else
     raise_error "global variable 'pheno_dir' has not been defined"
@@ -108,14 +118,16 @@ set_arr_saige() {
     local in_gmat="${step1_dir}/${in_prefix}_${phenotype}.rda"
     local in_var="${step1_dir}/${in_prefix}_${phenotype}.varianceRatio.txt"
     if [ "${use_prs}" -eq "1" ]; then
+      set_up_rpy # required for PRS
       local in_gmat_prs="${step1_dir}/${in_prefix}_${phenotype}_chr${chr}.rda"
       local in_var_prs="${step1_dir}/${in_prefix}_${phenotype}_chr${chr}.varianceRatio.txt"
-      if [ -f "${in_gmat_prs/CHR/21}" ] & [ -f "${in_var_prs/CHR/21}" ]; then
+      local prs_ok=$(Rscript ${rscript_check_prs} --phenotype ${phenotype})
+      if [ -f "${in_gmat_prs/CHR/21}" ] & [ -f "${in_var_prs/CHR/21}" ] & [ "${prs_ok}" -eq "1" ]; then
         echo "Note: PRS files were found (${phenotype}). Using PRS NULL models as SAIGE input."
         local in_gmat=${in_gmat_prs}
         local in_var=${in_var_prs}
       else
-        >&2 echo "Saige NULL (PRS) ${in_gmat_prs}/${in_var_prs} does not exist. Using without PRS."
+        >&2 echo "Using without PRS."
       fi
     fi
     read -a arr_saige <<< "${step1_dir} ${step2_dir} ${in_gmat} ${in_var}"
@@ -232,6 +244,7 @@ submit_saige() {
         --partition="${slurm_queue}" \
         --cpus-per-task="${slurm_nslots}" \
         --array=${slurm_tasks} \
+        --constraint="skl-compat" \
         --open-mode="append" \
         --parsable \
         "${spa_script}" \
@@ -304,6 +317,7 @@ submit_calc_p() {
     --chdir="${curwd}" \
     --partition="${slurm_queue}" \
     --cpus-per-task="${slurm_nslots}" \
+    --constraint="skl-compat" \
     --open-mode="append" \
     --parsable \
     "${calc_script}" \
@@ -315,7 +329,6 @@ submit_calc_p() {
     "${prs_available}" \
     "${path_merged}.gz" \
     "${top_p}" \
-    "${true_p_path}" \
     "${n_shuffle}" \
     "${iteration}" \
     "${out_prefix}")
@@ -351,7 +364,7 @@ resubmit_loop() {
     "${out_prefix}" \
     "${pheno_dir}" \
     "${genes_path}" \
-    "${true_p_path}" \
+    "${genes_phenos_path}" \
     "${min_mac}" \
     "${replicates}" \
     "${new_n_shuffle}" \
@@ -428,11 +441,9 @@ do_extra_loop=0
 iteration=$((${iteration} + 1))
 wait_on_jids=""
 set_arr_phenos "binary"
-#arr_phenos=( "Alanine_aminotransferase_residual" "Calcium_residual" "WHR_adj_BMI" "BMI" "Apolipoprotein_B_residual")
-#arr_phenos=( "Alanine_aminotransferase_residual" )
-#arr_phenos=( "spiro_visual_impairment_and_blindness" "spiro_epilepsy" )
-arr_phenos=( "spiro_visual_impairment_and_blindness" )
-#arr_phenos=( "Alanine_aminotransferase_residual" "BMI" )
+#arr_phenos=( "spiro_visual_impairment_and_blindness" "spiro_bronchiectasis" )
+#arr_phenos=( "spiro_visual_impairment_and_blindness" "spiro_dermatitis" "spiro_asthma" )
+#echo "${arr_phenos[*]}"
 
 if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then
   readonly is_all_done=$( check_if_all_done ${status_phenos} ${tested_phenos} )
@@ -465,6 +476,7 @@ if [ ${n_shuffle} -le ${n_cutoff_shuffle} ]; then
             do_extra_loop=1
             last_jid=$(submit_calc_p)
             wait_on_jids=$( echo "${last_jid}:${wait_on_jids}" | sed 's/:$//g' )
+            echo "Waiting on the following jobs before re-initating loop: ${wait_on_jids}"
           fi
        fi
       fi

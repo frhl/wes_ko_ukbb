@@ -94,15 +94,17 @@ main <- function(args){
   h2_est <- ldsc[["h2"]]
   h2_se <- ldsc[["h2_se"]]
   int_se <- ldsc[["int_se"]]
- 
+
+  # measures the proportion of the inflation in the mean chi^2 that 
+  # the LD Score regression intercept ascribes to causes other than 
+  # polygenic heritability
+  ratio <-  (int_est-1)/(mean(chi2, na.rm=TRUE)-1)
+
   # calculate P-values for linear fit
   h2_z <- h2_est / h2_se
   int_z <- int_est / int_se
   h2_pval <- 2 * pnorm(abs(h2_z), lower.tail = FALSE)
   int_pval <- 2 * pnorm(abs(int_z), lower.tail = FALSE)
-  h2_log_pval <- pnorm(abs(h2_z), lower.tail = FALSE, log.p = TRUE)
-  int_log_pval <- pnorm(abs(int_z), lower.tail = FALSE, log.p = TRUE)
-
 
   # organize in table
   coefficients <- data.frame(
@@ -110,11 +112,11 @@ main <- function(args){
     std_error = c(int_se, h2_se),
     zstat = c(int_z, h2_z),
     pvalue = c(int_pval, h2_pval),
-    log_pvalue = c(int_pval, h2_pval)
+    ratio = ratio
   )
 
   # rename table
-  colnames(coefficients) <- c("estimate", "std_error", "zstat", "pvalue", "log_pvalue")
+  colnames(coefficients) <- c("estimate", "std_error", "zstat", "pvalue", "ratio")
   rownames(coefficients) <- c("intercept", "h2")
 
   # what SNPS are used

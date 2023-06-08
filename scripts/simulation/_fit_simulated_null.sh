@@ -1,14 +1,4 @@
 #!/usr/bin/env bash
-#
-#$ -N _fit_simulated_null
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/_fit_simulated_null.log
-#$ -e logs/_fit_simulated_null.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qc@@short.hge
-#$ -t 1
-#$ -V
 
 set -o errexit
 set -o nounset
@@ -27,12 +17,14 @@ readonly in_prefix=${8?Error: Missing arg3 ()}
 readonly grm_mtx=${9?Error: Missing arg3 ()}
 readonly grm_sam=${10?Error: Missing arg3 ()}
 
-readonly phenotype="${in_phenotype}_${SGE_TASK_ID}"
-readonly out_prefix="${in_prefix}_${SGE_TASK_ID}"
+readonly array_idx=$( get_array_task_id )
+readonly phenotype="${in_phenotype}_${array_idx}"
+readonly out_prefix="${in_prefix}_${array_idx}"
 
 if [ ! -f "${out_prefix}.rda" ]; then
  SECONDS=0
  set_up_RSAIGE
+ set -x
  Rscript "${rscript}" \
    --plinkFile="${plink_file}" \
    --phenoFile="${pheno_file}" \

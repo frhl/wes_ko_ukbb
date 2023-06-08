@@ -4,82 +4,99 @@ devtools::load_all('utils/modules/R/phasingtools')
 library(argparse)
 library(data.table)
 library(Hmisc)
+library(dplyr)
 
-bin_conf <- function(counts){
-    counts_ci <- do.call(rbind, lapply(1:nrow(counts), function(i) Hmisc::binconf(counts$match[i], counts$total[i])))
+# a function to get binomial CIs
+bin_conf <- function(counts, col){
+    counts_ci <- do.call(rbind, lapply(1:nrow(counts), function(i) Hmisc::binconf(counts[[col]][i], counts$count[i])))
     colnames(counts_ci) <- tolower(colnames(counts_ci))
-    counts <- cbind(counts, counts_ci)                                   
+    counts <- cbind(counts, counts_ci)
     return(counts)
 }
 
-eval_phase <- function(full, labels){
-    sums <- aggregate(match ~ bin, data = full, FUN = sum)
-    lens <- aggregate(match ~ bin, data = full, FUN = length)
-    colnames(lens)[2] <- "total"
-    mrg <- merge(sums, lens)
-    mrg <- mrg[match(labels, mrg$bin), ]
-    mrg <- mrg[!is.na(mrg$bin),]
-    mrg$errors <- mrg$total - mrg$match
-    mrg <- bin_conf(mrg)
-    return(mrg)
-}
-                                       
 
 main <- function(args){
 
-    # get WES sites
-    n_samples <- as.numeric(args$n_samples)
-    pp_cutoff <- as.numeric(args$pp_cutoff)
-    seed <- as.numeric(args$seed)
     sites <- args$sites
-    mac_bin <- args$mac_bin
-    input_path <- args$input_path    
+    samples <- args$samples
+    input_path <- args$input_path
     out_prefix <- args$out_prefix
-    stopifnot(file.exists(sites))
-    variants <- fread(sites)
-
-    # get phased fil
-    d <- fread(args$input_path)
-    stopifnot("MAC" %in% colnames(d))
-    stopifnot("PP" %in% colnames(d))
-    keep <- d$locus %in% variants$locus
-    d <- d[keep,] 
-    d$MAC <- as.numeric(d$MAC)
-
-    # bins
-    bins <- c(0,1,5,10,20,50,100,200,500,1000,2000,5000,10000, Inf)
     
-    # keep phased sets with at least one rare variant
-    bool_keep <- (!is.na(d$PP) & d$MAC < (bins[length(bins)-1]+1))
-    ps_to_keep <- unique(d$PS_rb[bool_keep])
-    dt <- d[d$PS_rb %in% ps_to_keep,]
-    stopifnot(nrow(dt) > 0)
+    exome_vars <- fread(sites)
+    qc_samples <- readLines(samples)
 
-    # use same bins as in S5 paper
-    labels <- unlist(lapply(2:length(bins), function(i){paste0(bins[i-1]+1,"-",bins[i])}))
-    labels[labels == '1-1'] <- "singleton"
-    dt$bin <- cut(dt$MAC, breaks = bins, labels = labels)
-   
-    # ensure that selected mac_bin is available.
-    stopifnot(mac_bin %in% labels)
-    labels_to_run <- mac_bin
+    dt_summary <- list()
+    for (chr in seq(20,22))
+    {
+        fpath <- gsub("CHR", chr, input_path) 
+        cat(paste('chromosome', chr, "-", fpath))
+        dt <- fread(fpath, key=c("locus", "alleles"))
+        dt <- merge(dt, exome_vars)
+        dt <- dt[dt$s %in% qc_samples,]
 
-    # sample 1000 random
-    set.seed(seed)
-    my_samples <- sample(unique(dt$s), n_samples, replace = FALSE)
-    dt <- dt[dt$s %in% my_samples,]
+        rb_sizes <- dt %>% group_by(s, PS_rb) %>% summarise(count=n())
+        pairs <- data.table(rb_sizes %>% filter(count == 2))
+        others <- data.table(rb_sizes %>% filter(count > 2))
 
-    # NA's are due to well phased genotypes
-    dt$PP[is.na(dt$PP)] <- 1
+        setkeyv(dt, c("s", "PS_rb"))
+        setkeyv(pairs, c("s", "PS_rb"))
+        setkeyv(others, c("s", "PS_rb"))
 
-    # eval gt agreement
-    gt_agreement <- eval_gt_agreement_by_bin(dt, mac_bin, pp_cutoff)
-    print(head(gt_agreement))
+        dt_pairs <- merge(dt, pairs)
+        dt_others <- merge(dt, others)
+
+        # Agreement of dt_pairs
+        dt_pairs$PP[is.na(dt_pairs$PP)] <- 1
+        dt_summary[[paste0('chr', chr)]] <- dt_pairs %>% group_by(s, PS_rb) %>% 
+            summarise(
+            match = (sum(GT == GT_rb) != 1),
+            min_MAC = min(MAC),
+            max_MAC = max(MAC),
+            min_PP = min(PP),
+            max_PP = max(PP)
+            )
+    }
+
+    dt_summary <- rbindlist(dt_summary) 
+    outfile <- paste0(out_prefix,".raw.txt.gz")
+    fwrite(dt_summary, outfile, sep = '\t')
+
+    # combinme
+    setDT(dt_summary)[, MAC_bin := as.integer(cut(min_MAC, breaks = c(1, 2, 6, 11, 21, 51, 101, 201, 501, 1000, 2000, 5000, 10000, (max(dt_summary$min_MAC)+1)), right=FALSE))][,
+             MAC_group := c(
+             'Singleton',
+             '2-5',
+             '6-10',
+             '11-20',
+             '21-50',
+             '51-100',
+             '101-200',
+             '201-500',
+             '501-1000',
+             '1k-2k',
+             '2k-5k',
+             '5k-10k',
+             '10k+')[MAC_bin]]
+
+    dt_summary_list <- list()
+    for (min_pp in c(0.5, 0.6, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 0.99)) {
+        dt_summary_list[[as.character(min_pp)]] <- dt_summary %>% filter(min_PP > min_pp) %>% 
+            group_by(MAC_bin, MAC_group) %>% summarise(
+                min_PP = min_pp,
+                #mean=1-mean(as.numeric(match)),
+                matches=sum(as.numeric(match)),
+                count=n()
+            )
+    }
+
+    # combine by PP and MAC bins
+    dt_summary_pp <- rbindlist(dt_summary_list)
+    dt_summary_pp$errors <- dt_summary_pp$count - dt_summary$matches
+    dt_summary_pp <- bin_conf(dt_summary_pp, col = "matches")
     
-    # return genotype agreement
-    the_bin <- gsub("-", "_", mac_bin)
-    outfile <- paste0(out_prefix,".",the_bin,".txt.gz")
-    fwrite(gt_agreement, outfile, sep = '\t')
+    # write final file
+    outfile <- paste0(out_prefix,".pp.txt.gz")
+    fwrite(dt_summary_pp, outfile, sep = '\t')
 
 }
 
@@ -87,11 +104,8 @@ main <- function(args){
 parser <- ArgumentParser()
 parser$add_argument("--input_path", default=NULL, required = TRUE, help = "path to file with PS_rb, GT_rb and GT sites.")
 parser$add_argument("--sites", default=NULL, required = TRUE, help = "path to quality controlled variant sites")
+parser$add_argument("--samples", default=NULL, required = TRUE, help = "path to samples to subset to")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "out prefix for files.")
-parser$add_argument("--n_samples", default=10, required = TRUE, help = "how many samples should be sampled?")
-parser$add_argument("--seed", default=52, required = TRUE, help = "seed for selecting random samples")
-parser$add_argument("--pp_cutoff", default=NULL, required = TRUE, help = "What phasing confidence threshold should be cut of?")
-parser$add_argument("--mac_bin", default=NULL, required = TRUE, help = "Should a particular mac_bin be evaluated? Faster than running all.")
 args <- parser$parse_args()
 
 main(args)
