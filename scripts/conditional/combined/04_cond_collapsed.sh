@@ -10,20 +10,9 @@
 #SBATCH --error=logs/cond_collapsed.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-320
+#SBATCH --array=1
 #SBATCH --open-mode=append
-# --begin=23:00
-#
-#$ -N cond_collapsed
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/cond_collapsed.log
-#$ -e logs/cond_collapsed.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q test.qc
-#$ -t 1-10
-#$ -V
-# -hold_jid 80056213
+#SBATCH --dependency="afterok:20534910"
 
 set -o errexit
 set -o nounset

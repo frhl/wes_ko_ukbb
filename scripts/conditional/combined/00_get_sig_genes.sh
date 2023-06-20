@@ -11,15 +11,6 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 
-#$ -N get_sig_genes
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/get_sig_genes.log
-#$ -e logs/get_sig_genes.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qa
-#$ -V
-
 set -o errexit
 set -o nounset
 
@@ -29,7 +20,7 @@ source utils/bash_utils.sh
 readonly rscript="scripts/conditional/combined/00_get_sig_genes.R"
 
 readonly cond_step="none" 
-readonly p_cutoff="5e-7"
+readonly p_cutoff="5.2e-5" # nominal sig
 readonly prs="prefer"
 
 readonly out_dir="data/conditional/combined/sig_genes"
