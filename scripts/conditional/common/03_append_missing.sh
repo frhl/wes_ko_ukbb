@@ -7,19 +7,8 @@
 #SBATCH --error=logs/append_missing.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=1-22
-#
-#
-#$ -N append_missing
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/append_missing.log
-#$ -e logs/append_missing.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 8
-#$ -q short.qc
-#$ -t 1-9
-#$ -V
-
+#SBATCH --array=1
+#SBATCH --dependency="afterok:19368637"
 
 set -o errexit
 set -o nounset
@@ -43,7 +32,7 @@ readonly ko_dir="data/knockouts/alt/pp90/combined"
 readonly ko_path="${ko_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense.mt"
 readonly ko_type="mt"
 
-readonly imp_dir="data/unphased/imputed/common_new"
+readonly imp_dir="data/unphased/imputed/common"
 readonly imp_path="${imp_dir}/ukb_imp_200k_common_chr${chr}.mt"
 
 readonly calls_dir="data/unphased/calls/liftover"

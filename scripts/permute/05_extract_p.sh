@@ -19,7 +19,7 @@ readonly rscript="scripts/permute/05_extract_p.R"
 readonly in_dir="data/permute/overview"
 
 # overview of significant gene-phenotypes that have been evaluated
-readonly path_trait_genes="${in_dir}/phenotypes_with_5cis_5chets.txt.gz"
+readonly path_trait_genes="${in_dir}/phenotypes_with_2cis_2chets.txt.gz"
 # directory to be searched recursively permuted P-values
 readonly permute_dir="data/permute/permutations_shuffle"
 

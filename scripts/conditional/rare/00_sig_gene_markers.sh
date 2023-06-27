@@ -10,7 +10,7 @@
 #SBATCH --error=logs/sig_gene_markers.errors.log
 #SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-300
+#SBATCH --array=1-320
 #SBATCH --requeue
 
 
@@ -37,6 +37,13 @@ readonly vep_dir="data/mt/vep/worst_csq_by_gene_canonical"
 readonly pheno_dir="data/phenotypes"
 readonly in_prefix="ukb_eur_wes_200k"
 readonly vep_path="${vep_dir}/ukb_eur_wes_union_calls_200k_chrCHR.tsv.gz" # CHR to be gsubbed in Rscript
+
+
+# nominal significance P-cutoff
+readonly genes_tested=952
+readonly phenos_tested=311
+readonly p_cutoff="$(python -c "print(0.05/(${genes_tested}))")"
+
 
 readonly index=${SLURM_ARRAY_TASK_ID}
 
@@ -90,7 +97,8 @@ submit_sig_genes()
         --vep_path_with_CHR "${vep_path}" \
         --in_spa_file "${in_file}" \
         --out_prefix "${out_prefix}" \
-        --phenotype "${phenotype}"
+        --phenotype "${phenotype}" \
+        --p_cutoff "${p_cutoff}"
     else 
       >&2 echo "${vep_path} (path) does not contain any files!."
     fi

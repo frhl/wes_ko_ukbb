@@ -14,17 +14,26 @@ names(ensembl_to_contig) <- bridge$ensembl_gene_id
 
 sig_gene_trait <- function(x, sig_T){
     x <- x[x$p.value <= sig_T,]
-    x <- x[x$N_ko_case >= 2]
     x <- x[x$N_ko >= 5]
     x <- x$gene_trait
     return(x)
 }
 
+# icd codes for phenotypes
+icd <- fread("data/phenotypes/phenotype_icd_chapter.txt")
+icd <- icd[order(icd$ICD_chapter),]
+na_chapter <- "None of the above"
+icd[is.na(icd$ICD_chapter_desc_short)]$ICD_chapter_desc_short <- na_chapter 
+chapters <- unique(icd$ICD_chapter_desc_short)
+
+
 main <- function(args){
 
+    print(args)
     n_tested_genes <- 952
     n_tested_phenos <- 311
-    significance_T <- 0.05 / (n_tested_genes * n_tested_phenos)
+    #significance_T <- 0.05 / (n_tested_genes * n_tested_phenos)
+    significance_T <- 0.05 / (n_tested_genes) # nominal P
 
     f0 <- args$excl_prs
     f1 <- args$prefer_prs
@@ -48,7 +57,14 @@ main <- function(args){
     d3 <- fread(f3)
     d4 <- fread(f4)
     d5 <- fread(f5)
-    
+
+    stopifnot(nrow(d0) > 0)
+    stopifnot(nrow(d1) > 0)
+    stopifnot(nrow(d2) > 0)
+    stopifnot(nrow(d3) > 0)
+    stopifnot(nrow(d4) > 0)
+    stopifnot(nrow(d5) > 0)
+
     # cond hits need phenotype column to be cleaned
     d2$phenotype <- gsub("chr[0-9]+\\_","",d2$phenotype)
     d4$phenotype <- gsub("chr[0-9]+\\_","",d4$phenotype)
@@ -123,7 +139,10 @@ main <- function(args){
     mrg <- merge(mrg, d5, by = keys, all.x=TRUE)
     mrg <- merge(mrg, d3, by = keys, all.x=TRUE)
     mrg <- merge(mrg, d4, by = keys, all.x=TRUE)
-    mrg <- mrg[order(mrg$p.value.nocond),]
+    
+    # order by full cond
+    #mrg <- mrg[order(mrg$p.value.nocond),]
+    mrg <- mrg[order(mrg$p.value.fullcond),]
 
     # write main table
     outfile <- paste0(args$out_prefix, ".txt.gz")
@@ -138,6 +157,9 @@ main <- function(args){
     d6 <- fread(f6)
     d7 <- fread(f7) 
     
+    stopifnot(nrow(d6) > 0)
+    stopifnot(nrow(d7) > 0)
+    
     # get counts for hom chets
     stat_chet <- d6[,c("phenotype","MarkerID","hgnc_symbol", "CHR", 'N_ko_case', 'N_ko')]
     stat_hom <- d7[,c("phenotype","MarkerID","hgnc_symbol", "CHR", 'N_ko_case', 'N_ko')]
@@ -151,6 +173,12 @@ main <- function(args){
     mrg <- merge(mrg_chet_hom_stat, mrg, by=keys, all.y=TRUE)
     mrg <- merge(mrg, mrg_chet_hom, all.x=TRUE)
 
+    # combine data with ICD mapping
+    mrg <- merge(icd, mrg, by.x = "unix_code", by.y = "phenotype", all.y=TRUE)
+    mrg$ICD_chapter_desc[is.na(mrg$ICD_chapter_desc)] <- na_chapter
+    mrg$ICD_chapter_desc_short[is.na(mrg$ICD_chapter_desc_short)] <- na_chapter
+
+    mrg <- mrg[order(mrg$p.value.fullcond),]
     outfile <- paste0(args$out_prefix, ".extended.txt.gz")
     write(paste0("writing ", outfile), stdout())
     fwrite(mrg, outfile, sep = "\t", na="NA")
@@ -180,6 +208,7 @@ main <- function(args){
     }
 
     # overwrite extended file
+    a <- a[order(a$p.value.fullcond),]
     outfile <- paste0(args$out_prefix, ".extended.txt.gz")
     write(paste0("Rewriting ", outfile, " with NAs replaced."), stdout())
     fwrite(a, outfile, sep = "\t", na="NA")

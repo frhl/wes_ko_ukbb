@@ -13,6 +13,12 @@ names(ensembl_to_pos) <- bridge$ensembl_gene_id
 ensembl_to_contig <- bridge$chromosome_name
 names(ensembl_to_contig) <- bridge$ensembl_gene_id
 
+# icd codes for phenotypes
+icd <- fread("data/phenotypes/phenotype_icd_chapter.txt")
+icd <- icd[order(icd$ICD_chapter),]
+na_chapter <- "None of the above"
+icd[is.na(icd$ICD_chapter_desc_short)]$ICD_chapter_desc_short <- na_chapter
+chapters <- unique(icd$ICD_chapter_desc_short)
 
 # columsn to keep
 cols_rec_encoding <- c(
@@ -123,6 +129,13 @@ main <- function(args){
     } else if (gt_encoding == "012") {
         d <- d[d$AC_Allele2 >= (N_ko_cutoff*2),]
         d <- d[d$N_case_hom >= N_ko_case_cutoff,]
+    }
+
+    # add ICD code
+    if (FALSE) {
+        d <- merge(icd, d, by.x = "unix_code", by.y = "phenotype", all.y=TRUE)
+        d$ICD_chapter_desc[is.na(d$ICD_chapter_desc)] <- na_chapter
+        d$ICD_chapter_desc_short[is.na(d$ICD_chapter_desc_short)] <- na_chapter
     }
 
     # re-order and subset

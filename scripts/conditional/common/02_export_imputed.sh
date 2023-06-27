@@ -8,19 +8,8 @@
 #SBATCH --output=logs/export_imputed.log
 #SBATCH --error=logs/export_imputed.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 6
-#SBATCH --array=1-22
-# --dependency="afternotok:10047864"
-#
-#$ -N export_imputed
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/export_imputed.log
-#$ -e logs/export_imputed.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 8
-#$ -q short.qc
-#$ -t 1-9
-#$ -V
+#SBATCH --cpus-per-task 8
+#SBATCH --array=1
 
 
 set -o errexit

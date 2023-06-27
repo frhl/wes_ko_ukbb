@@ -19,12 +19,17 @@ source utils/bash_utils.sh
 
 readonly rscript="scripts/conditional/combined/00_get_sig_genes.R"
 
+
+readonly genes_tested=952
+readonly phenos_tested=311
+readonly bonf_p_cutoff="$(python -c "print(0.05/(${genes_tested}*${phenos_tested}))")"
+readonly nom_p_cutoff="$(python -c "print(0.05/(${genes_tested}))")"
+
 readonly cond_step="none" 
-readonly p_cutoff="5.2e-5" # nominal sig
 readonly prs="prefer"
 
 readonly out_dir="data/conditional/combined/sig_genes"
-readonly out_prefix="${out_dir}/test_sig_genes_after_sig_prs_176k"
+readonly out_prefix="${out_dir}/sig_genes_after_sig_prs_176k"
 
 mkdir -p ${out_dir}
 
@@ -32,7 +37,7 @@ set_up_rpy
 Rscript ${rscript} \
   --cond_step ${cond_step} \
   --prs ${prs} \
-  --p_cutoff ${p_cutoff} \
+  --p_cutoff ${nom_p_cutoff} \
   --out_prefix ${out_prefix}
 
 

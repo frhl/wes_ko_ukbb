@@ -10,17 +10,6 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 3
 #SBATCH --array=1-22
-#
-#
-#$ -N collapse_variants
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/collapse_variants.log
-#$ -e logs/collapse_variants.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 3
-#$ -q short.qc
-#$ -t 1,19
-#$ -V
 
 set -o errexit
 set -o nounset

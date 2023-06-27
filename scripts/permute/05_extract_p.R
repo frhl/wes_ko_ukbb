@@ -81,6 +81,7 @@ main <- function(args){
             return(d)
         }))
         out_prefix_cent_t <- paste0(args$out_prefix,".centered.t.",trait,".txt.gz")
+        write(paste("writing", out_prefix_cent_t), stdout())
         fwrite(d, out_prefix_cent_t, sep = '\t')
     }    
 }

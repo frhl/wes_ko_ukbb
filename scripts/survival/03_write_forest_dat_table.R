@@ -30,6 +30,7 @@ main <- function(args){
     in_dir_uncond <- args$in_dir_uncond
     out_prefix <- args$out_prefix
     n_tests <- as.numeric(args$n_tests)
+    export <- args$export
     stopifnot(n_tests>0)
 
     stopifnot(dir.exists(in_dir_cond))
@@ -41,6 +42,7 @@ main <- function(args){
     uncond <- rbindlist(lapply(uncond_files, function(f) read.table(f, sep = "\t", header = T, stringsAsFactors = F, quote = "", comment.char = "$")))
     cond <- rbindlist(lapply(cond_files, function(f) read.table(f, sep = "\t", header = T, stringsAsFactors = F, quote = "", comment.char = "$")))
 
+    # extract files based on PRS conditioning
     uncond <- uncond %>% 
         mutate(test_combo = paste0(gene, ":", diagnosis),
              analysis_type = "unconditioned")
@@ -60,7 +62,6 @@ main <- function(args){
       pivot_wider(values_from = c(estimate, std.error, p.value),
                   names_from = analysis_type)
 
-
     # Set multiple-testing thresholds 
     PTHRESH <-  0.05 / n_tests  
 
@@ -72,18 +73,19 @@ main <- function(args){
     dat$min_p <- pmin(dat$p.value_unconditioned, dat$p.value_conditioned)
     dat$FDR <- p.adjust.n(dat$p.value_conditioned, n=n_tests, method="fdr")
     dat$FDR[dat$term != "knockout"] <- NA
-    #print(unique(dat$test_combo[(dat$test_combo %in% keep_combos_gwas) | ((dat$term == "knockout") & (dat$min_p <= PTHRESH))]))
-    # get things that are significant in GWAS but not TTE
-    #print(unique(dat$test_combo[((dat$term == "knockout") & (dat$min_p > PTHRESH))]))
 
-    combos_plot <- dat$test_combo[
-        which(
-            (dat$term == "knockout") & 
-            ((dat$min_p <= PTHRESH) | (dat$FDR < 0.05))
-            #(dat$test_combo %in% keep_combos_gwas)
-        )]
-
-    #combos_plot <- dat$test_combo[which(dat$term == "knockout" & (dat$min_p <= PTHRESH | dat$test_combo %in% keep_combos_gwas))]
+    # export significant things or everything
+    if (is.null(export)) {
+        combos_plot <- dat$test_combo[
+            which(
+                (dat$term == "knockout") & 
+                ((dat$min_p <= PTHRESH) | (dat$FDR < 0.05))
+            )]
+    } else if (export %in% "everything") {
+        combos_plot <- dat$test_combo[which((dat$term == "knockout") )]
+    } else {
+        stop(paste(export, "is not a valid parameter"))
+    }
 
     # order test-combos by estimate size for knockouts
     for_ordering <- dat %>% 
@@ -111,22 +113,19 @@ main <- function(args){
     forest_dat$hgnc_symbol <- mapping[forest_dat$gene]
     forest_dat <- forest_dat %>%
       filter(test_combo %in% combos_plot & term %in% c("wt","knockout","chet_cis")) %>%
-      #filter(!(test_combo %in% combos_to_exclude)) %>%
       mutate(lci = estimate - 1.96*std.error,
              uci = estimate + 1.96*std.error,
              analysis_type = factor(analysis_type, levels = c("conditioned", "unconditioned")),
              plabel = paste0("P = ", gsub("e", "E", signif(p.value, digits = 3))),
              print_combo = factor(paste0(hgnc_symbol, ":", diagnosis), 
                                   levels = rev(unique(for_ordering$print_combo))))
-    # only display conditional P-value
-    #forest_dat$plabel[forest_dat$analysis_type == "unconditioned"] <- NA
 
-    #### for writing extended data tables
+    # for writing extended data tables
     outtable <- forest_dat
     outtable$vs <- "het"
     outtable <- outtable[,c("gene","hgnc_symbol", "term","vs", "diagnosis", "estimate","std.error", "p.value", "lci", "uci", "FDR", "analysis_type")]
     
-    outfile1 <- paste0(out_prefix, ".all.txt.gz")
+    outfile1 <- paste0(out_prefix, ".txt.gz")
     write(paste("writing", outfile1), stdout())
     fwrite(outtable, outfile1, sep="\t")
     outfile2 <- paste0(out_prefix, ".ko.txt.gz")
@@ -143,6 +142,7 @@ parser$add_argument("--in_dir_cond", default=NULL, required = TRUE, help = "")
 parser$add_argument("--in_dir_uncond", default=NULL, required = TRUE, help = "")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "")
 parser$add_argument("--n_tests", default=NULL, required = TRUE, help = "")
+parser$add_argument("--export", default=NULL, required = FALSE, help = "either NULL or 'everything'")
 args <- parser$parse_args()
 
 main(args)

@@ -25,17 +25,28 @@ readonly in_dir_cond="${in_dir}/unconditioned"
 readonly in_dir_uncond="${in_dir}/unconditioned"
 
 readonly out_dir="data/survival/tables"
-readonly out_prefix="${out_dir}/230609_forest_table"
+readonly out_prefix_sig="${out_dir}/230609_forest_table"
+readonly out_prefix_all="${out_dir}/230609_forest_table_all"
 mkdir -p ${out_dir}
 
 readonly n_tests=266560 # (952 * 280)
 
 set_up_rpy
+# export significant hits
 Rscript ${rscript} \
   --in_dir_cond ${in_dir_cond} \
   --in_dir_uncond ${in_dir_uncond} \
-  --out_prefix ${out_prefix} \
+  --out_prefix ${out_prefix_sig} \
   --n_tests ${n_tests}
+
+
+# export everything
+Rscript ${rscript} \
+  --in_dir_cond ${in_dir_cond} \
+  --in_dir_uncond ${in_dir_uncond} \
+  --out_prefix ${out_prefix_all} \
+  --n_tests ${n_tests} \
+  --export "everything"
 
 
 
