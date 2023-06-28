@@ -39,8 +39,15 @@ main <- function(args){
     cond_files <- list.files(recursive = TRUE, full.names=TRUE, in_dir_cond)
     uncond_files <- list.files(recursive = TRUE, full.names=TRUE, in_dir_uncond)
 
-    uncond <- rbindlist(lapply(uncond_files, function(f) read.table(f, sep = "\t", header = T, stringsAsFactors = F, quote = "", comment.char = "$")))
+    print(in_dir_cond)
+    print(in_dir_uncond)
+
+    print(head(cond_files))
+    print(head(uncond_files))
+
+
     cond <- rbindlist(lapply(cond_files, function(f) read.table(f, sep = "\t", header = T, stringsAsFactors = F, quote = "", comment.char = "$")))
+    uncond <- rbindlist(lapply(uncond_files, function(f) read.table(f, sep = "\t", header = T, stringsAsFactors = F, quote = "", comment.char = "$")))
 
     # extract files based on PRS conditioning
     uncond <- uncond %>% 
@@ -59,8 +66,10 @@ main <- function(args){
     # Combine results
     dat <- bind_rows(uncond, cond)
     dat <- dat %>% 
-      pivot_wider(values_from = c(estimate, std.error, p.value),
+      pivot_wider(values_from = c(estimate, std.error, p.value, FDR),
                   names_from = analysis_type)
+
+    print(head(as.data.frame(dat[dat$diagnosis == "cataract",])))
 
     # Set multiple-testing thresholds 
     PTHRESH <-  0.05 / n_tests  

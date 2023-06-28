@@ -21,12 +21,12 @@ readonly chr=$( get_chr ${task_id} )
 readonly rscript="scripts/survival/03_write_forest_dat_table.R"
 
 readonly in_dir="/well/lindgren-ukbb/projects/ukbb-11867/samvida/for_fred_ko_project/2304_analyses/results/ref_group_het"
-readonly in_dir_cond="${in_dir}/unconditioned"
+readonly in_dir_cond="${in_dir}/prs_conditioned"
 readonly in_dir_uncond="${in_dir}/unconditioned"
 
 readonly out_dir="data/survival/tables"
-readonly out_prefix_sig="${out_dir}/230609_forest_table"
-readonly out_prefix_all="${out_dir}/230609_forest_table_all"
+readonly out_prefix_sig="${out_dir}/230628_forest_table"
+readonly out_prefix_all="${out_dir}/230628_forest_table_all"
 mkdir -p ${out_dir}
 
 readonly n_tests=266560 # (952 * 280)
