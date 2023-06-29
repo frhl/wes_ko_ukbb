@@ -10,17 +10,6 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 #SBATCH --array=1-320
-# --begin=now+1hour
-#
-#$ -N calc_min_mafs
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/calc_min_maf.log
-#$ -e logs/calc_min_maf.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q test.qc
-#$ -t 6-320
-#$ -V
 
 
 set -o errexit

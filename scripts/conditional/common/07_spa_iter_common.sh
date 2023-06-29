@@ -13,17 +13,6 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 #SBATCH --array=1-320
-#--dependency=afterok:12374266
-#
-#$ -N spa_iter_common
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/spa_iter_common.log
-#$ -e logs/spa_iter_common.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qc
-#$ -t 1-320
-#$ -V
 
 
 set -o errexit
@@ -42,13 +31,13 @@ readonly task_id=$( get_array_task_id )
 # parameters
 readonly min_maf=0.01
 readonly min_mac=4
-readonly max_iter=50
+readonly max_iter=25
 readonly P_cutoff="5e-6"
 
 # directories and paths
 readonly pheno_dir="data/phenotypes"
 readonly interval_dir="data/conditional/common/intervals/min_mac${min_mac}"
-readonly out_dir="data/conditional/common/spa_iter"
+readonly out_dir="data/conditional/common/spa_iter_new"
 
 readonly grm_dir="data/saige/grm/input/dnanexus"
 readonly grm_mtx="${grm_dir}/ukb_eur_200k_grm_fitted_relatednessCutoff_0.05_2000_randomMarkersUsed.sparseGRM.mtx"

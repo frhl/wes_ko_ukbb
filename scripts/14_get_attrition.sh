@@ -17,17 +17,16 @@ source utils/bash_utils.sh
 readonly rscript="scripts/14_get_attrition.R"
 
 readonly dir="data/post_hoc/results"
-readonly excl_prs="${dir}/176k_sig_saige_all_prs_excl.txt.gz"
-readonly prefer_prs="${dir}/176k_sig_saige_all_prs_pref.txt.gz"
+readonly excl_prs="${dir}/176k_sig_saige_all_prs_excl_N5.txt.gz"
+readonly prefer_prs="${dir}/176k_sig_saige_all_prs_pref_N5.txt.gz"
 readonly cond_full="${dir}/176k_sig_saige_cond_all_pref_prs_combined.txt.gz"
 readonly common_table="${dir}/176k_sig_saige_common_cond_sig_pref_prs_combined.txt.gz"
 
-readonly additive="${dir}/176k_sig_saige_all_prs_pref_wo_case_cutoff_add_encoding.txt.gz"
+readonly additive="${dir}/176k_sig_saige_all_prs_pref_N5_add_encoding.txt.gz"
 readonly cond_additive="${dir}/176k_sig_saige_dominance_cond_sig_pref_prs_combined.txt.gz"
 
-readonly chet_only="${dir}/176k_sig_saige_all_prs_excl_wo_case_cutoff_chet_only.txt.gz"
-readonly hom_only="${dir}/176k_sig_saige_all_prs_excl_wo_case_cutoff_hom_only.txt.gz"
-
+readonly chet_only="${dir}/176k_sig_saige_all_prs_pref_N5_chet_only.txt.gz"
+readonly hom_only="${dir}/176k_sig_saige_all_prs_pref_N5_hom_only.txt.gz"
 
 readonly co_table_dir="data/knockouts/alt/pp90//co_occurence3"
 readonly co_table="${co_table_dir}/co_occurence_collapsed_pLoF_damaging_missense.wide.txt.gz"

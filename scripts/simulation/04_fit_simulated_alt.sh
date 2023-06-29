@@ -153,41 +153,39 @@ run_with_params 0.030 0.00 0.0 0.25 607
 run_with_params 0.050 0.00 0.0 0.25 608
 run_with_params 0.100 0.00 0.0 0.25 609
 
+run_with_params 0.001 0.00 0.0 0.25 501
+run_with_params 0.005 0.00 0.0 0.25 502
+run_with_params 0.010 0.00 0.0 0.25 503
+run_with_params 0.020 0.00 0.0 0.25 504
+run_with_params 0.030 0.00 0.0 0.25 505
+run_with_params 0.050 0.00 0.0 0.25 506
 
-#run_with_params 0.001 0.00 0.0 0.25 501
-#run_with_params 0.005 0.00 0.0 0.25 502
-#run_with_params 0.010 0.00 0.0 0.25 503
-#run_with_params 0.020 0.00 0.0 0.25 504
-#run_with_params 0.030 0.00 0.0 0.25 505
-#run_with_params 0.050 0.00 0.0 0.25 506
+run_with_params 0.005 0.00 0.0 0.25 401
+run_with_params 0.005 0.01 0.0 0.25 401
+run_with_params 0.005 0.02 0.0 0.25 401
+run_with_params 0.005 0.05 0.0 0.25 401
+run_with_params 0.005 0.10 0.0 0.25 401
 
+run_with_params 0.005 0.00 0.5 0.25 401
+run_with_params 0.005 0.01 0.5 0.25 401
+run_with_params 0.005 0.02 0.5 0.25 401
+run_with_params 0.005 0.05 0.5 0.25 401
+run_with_params 0.005 0.10 0.5 0.25 401
 
-#run_with_params 0.005 0.00 0.0 0.25 401
-#run_with_params 0.005 0.01 0.0 0.25 401
-#run_with_params 0.005 0.02 0.0 0.25 401
-#run_with_params 0.005 0.05 0.0 0.25 401
-#run_with_params 0.005 0.10 0.0 0.25 401
+run_with_params 0.005 0.00 1.0 0.25 401
+run_with_params 0.005 0.01 1.0 0.25 401
+run_with_params 0.005 0.02 1.0 0.25 401
+run_with_params 0.005 0.05 1.0 0.25 401
+run_with_params 0.005 0.10 1.0 0.25 401
 
-#run_with_params 0.005 0.00 0.5 0.25 401
-#run_with_params 0.005 0.01 0.5 0.25 401
-#run_with_params 0.005 0.02 0.5 0.25 401
-#run_with_params 0.005 0.05 0.5 0.25 401
-#run_with_params 0.005 0.10 0.5 0.25 401
+run_with_params 0.005 0.00 2.5 0.25 401
+run_with_params 0.005 0.01 2.5 0.25 401
+run_with_params 0.005 0.02 2.5 0.25 401
+run_with_params 0.005 0.05 2.5 0.25 401
+run_with_params 0.005 0.10 2.5 0.25 401
 
-#run_with_params 0.005 0.00 1.0 0.25 401
-#run_with_params 0.005 0.01 1.0 0.25 401
-#run_with_params 0.005 0.02 1.0 0.25 401
-#run_with_params 0.005 0.05 1.0 0.25 401
-#run_with_params 0.005 0.10 1.0 0.25 401
-
-#run_with_params 0.005 0.00 2.5 0.25 401
-#run_with_params 0.005 0.01 2.5 0.25 401
-#run_with_params 0.005 0.02 2.5 0.25 401
-#run_with_params 0.005 0.05 2.5 0.25 401
-#run_with_params 0.005 0.10 2.5 0.25 401
-
-#run_with_params 0.005 0.00 10.0 0.25 401
-#run_with_params 0.005 0.01 10.0 0.25 401
-#run_with_params 0.005 0.02 10.0 0.25 401
-#run_with_params 0.005 0.05 10.0 0.25 401
-#run_with_params 0.005 0.10 10.0 0.25 401
+run_with_params 0.005 0.00 10.0 0.25 401
+run_with_params 0.005 0.01 10.0 0.25 401
+run_with_params 0.005 0.02 10.0 0.25 401
+run_with_params 0.005 0.05 10.0 0.25 401
+run_with_params 0.005 0.10 10.0 0.25 401

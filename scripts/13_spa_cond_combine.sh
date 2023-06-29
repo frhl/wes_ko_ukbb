@@ -26,7 +26,8 @@ readonly header_file="${header_dir}/dec22_phenotypes_binary_200k_header.tsv"
 # some of the columns when conditioniong on markers, 
 # thus we need to map them manually
 readonly ref_dir="data/post_hoc/results"
-readonly ref_file="${ref_dir}/176k_sig_saige_sig_prs_pref.txt.gz"
+#readonly ref_file="${ref_dir}/176k_sig_saige_sig_prs_pref_N5.txt.gz"
+readonly ref_file="${ref_dir}/176k_sig_saige_sig_prs_excl_N5.txt.gz"
 
 # get merged hits that unprocessed
 readonly merged_dir="data/conditional/combined/saige"
@@ -43,35 +44,36 @@ readonly merged_common_hits="${merged_common_dir}/176k_merged_hits_post_common_c
 # calc bonferroni cutoff
 readonly genes_tested=952
 readonly phenos_tested=311
-readonly p_cutoff="$(python -c "print(0.05/(${genes_tested}*${phenos_tested}))")"
+readonly bonf_p_cutoff="$(python -c "print(0.05/(${genes_tested}*${phenos_tested}))")"
+readonly nom_p_cutoff="$(python -c "print(0.05/(${genes_tested}))")"
 
 # paramters for sutff to include
-readonly N_ko_case_cutoff="2"
+readonly N_ko_case_cutoff="0"
 readonly N_ko_cutoff="5"
 
 readonly out_dir="data/post_hoc/results"
 mkdir -p ${out_dir}
 
 # write all hits interrogated regardless of final P
-#out_prefix="${out_dir}/176k_sig_saige_cond_all_pref_prs_combined"
-#set_up_rpy
-#Rscript "${rscript}" \
-#  --ref_file "${ref_file}" \
-#  --merged_hits "${merged_hits}" \
-#  --N_ko_case_cutoff ${N_ko_case_cutoff} \
-#  --N_ko_cutoff ${N_ko_cutoff} \
-#  --out_prefix "${out_prefix}"
+out_prefix="${out_dir}/176k_sig_saige_cond_all_pref_prs_combined"
+set_up_rpy
+Rscript "${rscript}" \
+  --ref_file "${ref_file}" \
+  --merged_hits "${merged_hits}" \
+  --N_ko_case_cutoff ${N_ko_case_cutoff} \
+  --N_ko_cutoff ${N_ko_cutoff} \
+  --out_prefix "${out_prefix}"
 
 # only write hits with sig final P
-#out_prefix="${out_dir}/176k_sig_saige_cond_sig_pref_prs_combined"
-#set_up_rpy
-#Rscript "${rscript}" \
-#  --ref_file "${ref_file}" \
-#  --merged_hits "${merged_hits}" \
-#  --N_ko_case_cutoff ${N_ko_case_cutoff} \
-#  --N_ko_cutoff ${N_ko_cutoff} \
-#  --out_prefix "${out_prefix}" \
-#  --p_cutoff ${p_cutoff} \
+out_prefix="${out_dir}/176k_sig_saige_cond_sig_pref_prs_combined"
+set_up_rpy
+Rscript "${rscript}" \
+  --ref_file "${ref_file}" \
+  --merged_hits "${merged_hits}" \
+  --N_ko_case_cutoff ${N_ko_case_cutoff} \
+  --N_ko_cutoff ${N_ko_cutoff} \
+  --out_prefix "${out_prefix}" \
+  --p_cutoff "${nom_p_cutoff}" \
 
 # write all common hits
 out_prefix="${out_dir}/176k_sig_saige_common_cond_sig_pref_prs_combined"

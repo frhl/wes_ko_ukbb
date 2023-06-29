@@ -61,8 +61,8 @@ readonly use_cond_common=1
 
 # get path to true P-value and t-stats
 readonly overview_dir="data/permute/overview"
-readonly genes_path="${overview_dir}/genes_to_run_5cis_5chets.tsv.gz"
-readonly genes_phenos_path="${overview_dir}/phenotypes_with_5cis_5chets.txt.gz"
+readonly genes_path="${overview_dir}/genes_to_run_2cis_2chets.tsv.gz"
+readonly genes_phenos_path="${overview_dir}/phenotypes_with_2cis_2chets.txt.gz"
 
 # count how many genes to submit for the given chromosome
 readonly n_genes="$( zcat ${genes_path} | grep -w "chr${chr}" | wc -l)"

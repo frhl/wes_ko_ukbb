@@ -19,13 +19,14 @@ source utils/qsub_utils.sh
 
 readonly rscript="scripts/permute/00_get_phenos_to_run.R"
 
-readonly min_chet=5
-readonly min_cis=5
+readonly min_chet=2
+readonly min_cis=2
 
-readonly sig_hits_dir="data/post_hoc/results"
-readonly sig_hits="${sig_hits_dir}/176k_sig_saige_cond_sig_pref_prs_combined.txt.gz"
+readonly sig_hits_dir="data/post_hoc/results/N_ko10"
+readonly sig_hits="${sig_hits_dir}/176k_sig_saige_sig_prs_pref_N10.txt.gz"
 
-readonly out_dir="data/permute/overview"
+
+readonly out_dir="data/permute/overview/N_ko10"
 readonly out_prefix="${out_dir}/phenotypes_with_${min_cis}cis_${min_chet}chets"
 
 mkdir -p ${out_dir}

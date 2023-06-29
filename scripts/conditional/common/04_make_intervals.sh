@@ -9,19 +9,8 @@
 #SBATCH --error=logs/make_intervals.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-22
-# --dependency=afterok:12367588
+#SBATCH --array=1-320
 #
-#$ -N make_intervals
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/make_intervals.log
-#$ -e logs/make_intervals.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q test.qc
-#$ -t 11-320
-#$ -V
-
 
 set -o errexit
 set -o nounset

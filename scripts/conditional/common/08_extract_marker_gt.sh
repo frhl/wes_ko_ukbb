@@ -8,6 +8,7 @@
 #SBATCH --error=logs/extract_marker_gt.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 5
+#SBATCH --dependency="afterok:19593418,19593296"
 
 set -o errexit
 set -o nounset
@@ -24,7 +25,7 @@ readonly out_prefix="${out_dir}/common_conditional"
 readonly out_checkpoint="${out_prefix}_checkpoint.mt"
 readonly out_type="vcf"
 
-readonly markers_dir="data/conditional/common/spa_iter"
+readonly markers_dir="data/conditional/common/spa_iter_new"
 readonly markers=$(cat ${markers_dir}/*.markers | cut -f2 | sort -u | tr "\n" ",")
 readonly chroms=$(cat ${markers_dir}/*.markers | sed '/^[[:space:]]*$/d' | cut -d":" -f1)
 

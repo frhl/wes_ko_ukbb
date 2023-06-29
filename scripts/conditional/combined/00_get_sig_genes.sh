@@ -11,15 +11,6 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 
-#$ -N get_sig_genes
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/get_sig_genes.log
-#$ -e logs/get_sig_genes.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qa
-#$ -V
-
 set -o errexit
 set -o nounset
 
@@ -28,12 +19,17 @@ source utils/bash_utils.sh
 
 readonly rscript="scripts/conditional/combined/00_get_sig_genes.R"
 
+
+readonly genes_tested=952
+readonly phenos_tested=311
+readonly bonf_p_cutoff="$(python -c "print(0.05/(${genes_tested}*${phenos_tested}))")"
+readonly nom_p_cutoff="$(python -c "print(0.05/(${genes_tested}))")"
+
 readonly cond_step="none" 
-readonly p_cutoff="5e-7"
 readonly prs="prefer"
 
 readonly out_dir="data/conditional/combined/sig_genes"
-readonly out_prefix="${out_dir}/test_sig_genes_after_sig_prs_176k"
+readonly out_prefix="${out_dir}/sig_genes_after_sig_prs_176k"
 
 mkdir -p ${out_dir}
 
@@ -41,7 +37,7 @@ set_up_rpy
 Rscript ${rscript} \
   --cond_step ${cond_step} \
   --prs ${prs} \
-  --p_cutoff ${p_cutoff} \
+  --p_cutoff ${nom_p_cutoff} \
   --out_prefix ${out_prefix}
 
 

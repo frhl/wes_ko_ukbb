@@ -7,7 +7,7 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/gene_positions.log
 #SBATCH --error=logs/gene_positions.errors.log
-#SBATCH --partition=epyc
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 #SBATCH --array=1-320
 
@@ -38,6 +38,11 @@ readonly genes="data/genes/220310_ensgid_grch38_pos.tsv.gz"
 readonly out_dir="data/conditional/common/gene_positions/min_mac${min_mac}"
 readonly pheno_dir="data/phenotypes"
 readonly in_prefix="ukb_eur_wes_200k"
+
+readonly genes_tested=952
+readonly bonf_p_cutoff="$(python -c "print(0.05/(${genes_tested}*${phenos_tested}))")"
+readonly nom_p_cutoff="$(python -c "print(0.05/(${genes_tested}))")"
+echo "Using cutoff 'P < ${nom_p_cutoff}'."
 
 mkdir -p ${out_dir}
 
@@ -86,7 +91,8 @@ submit_intervals()
       --coordinates "${genes}" \
       --flanking_bp 0 \
       --out_prefix "${out_prefix}" \
-      --phenotype "${phenotype}"
+      --phenotype "${phenotype}" \
+      --p_cutoff "${nom_p_cutoff}"
   else
     >&2 echo "${in_file} does not exist. Skipping!"
   fi
