@@ -10,17 +10,6 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
 #SBATCH --array=1-22
-#SBATCH --dependency="afterok:10047864"
-#
-#$ -N prefilter_variants
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/prefilter_variants.log
-#$ -e logs/prefilter_variants.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 2
-#$ -q short.qa
-#$ -t 1-22
-#$ -V
 
 set -o errexit
 set -o nounset
