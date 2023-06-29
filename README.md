@@ -1,6 +1,7 @@
-# Compound Heterozygous Effects in UKBB
 
-** dizzy_mizz_lizzy **
+# Exome-wide evidence of compound heterozygous effects across common phenotypes in the UK Biobank
+
+
 
 
 
