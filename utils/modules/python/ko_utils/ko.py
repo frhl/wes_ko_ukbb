@@ -22,8 +22,8 @@ def csqs_case_builder(worst_csq_expr: hl.StringExpression, use_loftee: bool = Tr
     r'''Annotate consequence categories for downstream analysis
     
     :param worst_csq_by_gene_canonical_expr: A struct that should contain "most_severe_consequence"
-    :param use_loftee: if True will annotate PTVs as either high confidence (ptv) or low confidence (ptv_LC)
-    :param loftee_lc_annotation: low confidence
+    :param use_loftee: if True will annotate PTVs as either high confidence (pLoF) or low confidence (LC/damaging_missense)
+    :param loftee_lc_annotation: low confidence PTV annotation (default is "damaging_missense")
     '''
     case = hl.case(missing_false=True)
     if use_loftee:
@@ -81,7 +81,7 @@ def csqs_case_builder_brava(worst_csq_expr: hl.StringExpression,
                 .when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence), "other_missense")
                 .when(hl.set(OTHER_CSQS).contains(worst_csq_expr.most_severe_consequence), "non_coding")
                 .when(hl.set(SYNONYMOUS_CSQS).contains(worst_csq_expr.most_severe_consequence) &
-                      (worst_csq_expr.SpliceAI_DS_max < 0.20), "synonymous")
+                      ((worst_csq_expr.SpliceAI_DS_max < 0.20) | (~hl.is_defined(worst.csq_expr.SpliceAI_DS_max))), "synonymous")
             )
     return case.or_missing()
 
