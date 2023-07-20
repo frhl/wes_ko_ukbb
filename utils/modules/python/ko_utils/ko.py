@@ -81,7 +81,7 @@ def csqs_case_builder_brava(worst_csq_expr: hl.StringExpression,
                 .when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence), "other_missense")
                 .when(hl.set(OTHER_CSQS).contains(worst_csq_expr.most_severe_consequence), "non_coding")
                 .when(hl.set(SYNONYMOUS_CSQS).contains(worst_csq_expr.most_severe_consequence) &
-                      ((worst_csq_expr.SpliceAI_DS_max < 0.20) | (~hl.is_defined(worst.csq_expr.SpliceAI_DS_max))), "synonymous")
+                      ((worst_csq_expr.SpliceAI_DS_max < 0.20) | (~hl.is_defined(worst_csq_expr.SpliceAI_DS_max))), "synonymous")
             )
     return case.or_missing()
 
