@@ -6,7 +6,8 @@ PLOF_CSQS = ["transcript_ablation", "splice_acceptor_variant",
              "splice_donor_variant", "stop_gained", "frameshift_variant"]
 
 MISSENSE_CSQS = ["stop_lost", "start_lost", "transcript_amplification",
-                 "inframe_insertion", "inframe_deletion", "missense_variant"]
+                 "inframe_insertion", "inframe_deletion", "missense_variant",
+                 "protein_altering_variant"]
 
 SYNONYMOUS_CSQS = ["stop_retained_variant", "synonymous_variant"]
 
@@ -69,7 +70,7 @@ def csqs_case_builder_brava(worst_csq_expr: hl.StringExpression,
     # REVEL ≥ 0.773 AND/OR CADD ≥ 28.1 + any variant with SpliceAI ≥ 0.2 + LOFTEE LC
     case = (case
             .when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence) &
-                      (worst_csq_expr.cadd_phred >= cadd_cutoff) | (worst_csq_expr.revel_score >= revel_cutoff), "damaging_missense")
+                      ((worst_csq_expr.cadd_phred >= cadd_cutoff) | (worst_csq_expr.revel_score >= revel_cutoff)), "damaging_missense")
             .when(worst_csq_expr.SpliceAI_DS_max >= spliceai_cutoff, "damaging_missense") # spliceAI
             .when(worst_csq_expr.lof == 'LC', 'damaging_missense')
            )
