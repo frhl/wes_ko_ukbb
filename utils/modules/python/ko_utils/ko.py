@@ -64,25 +64,16 @@ def csqs_case_builder_brava(worst_csq_expr: hl.StringExpression,
     # High confidence pLOF: LOFTEE HC
     case = (case
             .when(worst_csq_expr.lof == 'HC', 'pLoF')
-            )
-    
-    # Damaging missense/protein-altering: missense / start-loss / stop-loss with 
-    # REVEL ≥ 0.773 AND/OR CADD ≥ 28.1 + any variant with SpliceAI ≥ 0.2 + LOFTEE LC
-    case = (case
             .when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence) &
                       ((worst_csq_expr.cadd_phred >= cadd_cutoff) | (worst_csq_expr.revel_score >= revel_cutoff)), "damaging_missense")
             .when(worst_csq_expr.SpliceAI_DS_max >= spliceai_cutoff, "damaging_missense") # spliceAI
             .when(worst_csq_expr.lof == 'LC', 'damaging_missense')
-           )
-    
-    # Other missense/protein-altering: missense / start-loss / stop-loss not categorised in (2) + in frame indels
-    # Synonymous: synonymous variants with SpliceAI < 0.2
-    case = (case.when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence) &
+            .when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence) &
                       (~hl.is_defined(worst_csq_expr.cadd_phred) | ~hl.is_defined(worst_csq_expr.revel_score)), "other_missense")
-                .when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence), "other_missense")
-                .when(hl.set(OTHER_CSQS).contains(worst_csq_expr.most_severe_consequence), "non_coding")
-                .when(hl.set(SYNONYMOUS_CSQS).contains(worst_csq_expr.most_severe_consequence) &
-                      ((worst_csq_expr.SpliceAI_DS_max < 0.20) | (~hl.is_defined(worst_csq_expr.SpliceAI_DS_max))), "synonymous")
+            .when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence), "other_missense")
+            .when(hl.set(OTHER_CSQS).contains(worst_csq_expr.most_severe_consequence), "non_coding")
+            .when(hl.set(SYNONYMOUS_CSQS).contains(worst_csq_expr.most_severe_consequence) &
+                      ((worst_csq_expr.SpliceAI_DS_max < spliceai_cutoff) | (~hl.is_defined(worst_csq_expr.SpliceAI_DS_max))), "synonymous")
             )
     return case.or_missing()
 
