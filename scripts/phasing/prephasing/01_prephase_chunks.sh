@@ -9,7 +9,7 @@
 #SBATCH --error=logs/prephase_chunks.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-22
+#SBATCH --array=21
 #
 #$ -N prephase_chunks
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -40,8 +40,8 @@ readonly spark_dir="data/tmp/spark"
 # how many samples should there be in each chunk 
 readonly samples_per_chunk=100
 # what matrix table should samples be drawn from
-readonly input_samples_dir="data/prephased/wes_union_calls/chunks/intervals"
-readonly input_samples_path="${input_samples_dir}/ukb_wes_union_calls_random_samples_1k_seed1995_chr21.mt"
+readonly input_samples_dir="data/prephased/wes_union_calls/intervals"
+readonly input_samples_path="${input_samples_dir}/ukb_wes_union_calls_random_samples_50k_seed1995_chr21.mt/"
 readonly input_samples_type="mt"
 
 readonly task_id=$( get_array_task_id )
@@ -59,7 +59,7 @@ readonly input_path="${input_dir}/ukb_wes_union_calls_chr${chr}.vcf.gz"
 readonly input_type="vcf"
 
 # Output paths
-readonly out_dir="data/prephased/wes_union_calls/chunks"
+readonly out_dir="data/prephased/wes_union_calls/chunks/50k"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
 readonly out_prefix_w_job_config="${out_prefix}_spc${samples_per_chunk}_${queue}/chr${chr}_chunk"
 readonly out_merge_w_job_config="${out_prefix}_spc${samples_per_chunk}_${queue}.mergelist"

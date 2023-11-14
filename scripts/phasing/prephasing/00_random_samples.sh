@@ -8,7 +8,8 @@
 #SBATCH --output=logs/random_samples.log
 #SBATCH --error=logs/random_samples.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 1
+#SBATCH --cpus-per-task 3
+#SBATCH --array=22
 #
 #$ -N random_samples
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -22,11 +23,13 @@
 set -o errexit
 set -o nounset
 
-
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 source utils/vcf_utils.sh
+
+readonly task_id=$( get_array_task_id )
+readonly chr=$( get_chr ${task_id} )
 
 readonly curwd=$(pwd)
 readonly cluster=$( get_current_cluster)
@@ -38,9 +41,9 @@ readonly input_path="${input_dir}/ukb_wes_union_calls_chr21.vcf.gz"
 readonly input_type="vcf"
 
 readonly out_dir="data/prephased/wes_union_calls/intervals"
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_random_samples_1k_seed1995_chr21"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_random_samples_50k_seed1995_chr${chr}"
 
-readonly random_samples_count=1000
+readonly random_samples_count=50000
 readonly seed=1995
 
 mkdir -p ${out_dir}
@@ -54,9 +57,7 @@ python3 ${hail_script} \
   --input_path ${input_path} \
   --input_type ${input_type} \
   --out_prefix ${out_prefix} \
-  --seed ${seed} \
-  && print_update "Finished creating subset of random samples" ${SECONDS} \
-  || raise_error "Writing random samples failed"
+  --seed ${seed}
 
 
 
