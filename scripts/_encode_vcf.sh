@@ -37,6 +37,7 @@ evaluate_knockouts() {
       ${aggr_method:+--aggr_method "${aggr_method}"} \
       --out_prefix ${out_prefix_chr} \
       --out_type ${out_type} \
+      --exclude_singletons \
       --checkpoint \
       && print_update "Finished evaluation knockouts for chr${chr}" ${SECONDS} \
       || raise_error "Evaluating knockouts for chr${chr} failed"
