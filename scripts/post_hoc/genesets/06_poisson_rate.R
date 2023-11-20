@@ -89,6 +89,14 @@ main <- function(args){
     #loeuf <- fread("~/Projects/09_genesets/genesets/data/gnomad/karczewski2020/supplementary_dataset_11_full_constraint_metrics.tsv")
     loeuf <- fread(args$file_pli)
     gene_lst[["pLI>=0.9"]] <- unique(as.character(na.omit(loeuf$gene_id[loeuf$pLI >= 0.9])))
+
+    
+    # GTEx
+
+    # OMim
+
+
+
     models <- c("is_chet" , "is_hom", "is_ko", "is_het","is_cis")
     annotations <- unique(aggr_mrg$annotation)
 
