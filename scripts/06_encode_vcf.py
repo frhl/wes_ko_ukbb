@@ -37,6 +37,8 @@ def main(args):
     repartition = args.repartition
     export_all_gts = args.export_all_gts
     csqs_category = args.csqs_category
+    exclude_singletons = args.exclude_singletons
+    only_singletons = args.only_singletons
 
     # import phased/unphased data
     hail_init.hail_bmrc_init(log='logs/hail/knockout.log', default_reference='GRCh38', min_block_size=128)
@@ -50,8 +52,23 @@ def main(args):
             mt = mt.repartition(int(repartition))
         # subset to current csqs category
         mt = mt.filter_rows(hl.literal(set(csqs_category)).contains(mt.consequence_category))
+        # export VCF to compare with RAP
+        hl.export_vcf(mt, out_prefix + ".vcf.gz") 
         n_csqs = mt.count()[0]
         sys.stderr.write(f"Filtering to {n_csqs} variants that are {csqs_category}.")
+        # exclude singletons if
+        if exclude_singletons and only_singletons:
+            raise TypeError("'exclude_singletons' and 'only_singletons' can't be provided at the same time!")
+        if exclude_singletons:
+            mt = io.recalc_info(mt)
+            mt = mt.filter_rows(mt.info.AC>1) 
+            n_singletons = n_csqs - mt.count()[0]
+            sys.stderr.write(f"{n_singletons} singletons were excluded!.")
+        if only_singletons:
+            mt = io.recalc_info(mt)
+            mt = mt.filter_rows(mt.info.AC==1) 
+            n_singletons = n_csqs - mt.count()[0]
+            sys.stderr.write(f"{n_singletons} non-singletons were excluded!.")
         # perform an aggregation based on "collect", which requires a lot
         # of memory but allows the variant ID to be returned as well alongside
         # with information of cis/trans-CHs and heterozygotes.
@@ -165,6 +182,8 @@ if __name__=='__main__':
     parser.add_argument('--checkpoint', default=False, action='store_true', help='Checkpoint gene-aggregation matrix to avoid Spark Memory overflow errors') 
     parser.add_argument('--aggr_method', default="collect", help='How should the CH matrix be generated?')
     # filtering options
+    parser.add_argument('--exclude_singletons', default=False, action='store_true', help='Excludes all MAC=1 variants')
+    parser.add_argument('--only_singletons', default=False, action='store_true', help='Excludes MAC!=1 variants')
     parser.add_argument('--export_all_gts', default=False, action='store_true', help='Exports a table of all csqs')
     parser.add_argument('--discard_prob_dosages', default=False, action='store_true', help='Discard any dosages < 2 by setting them to zero.')
     parser.add_argument('--csqs_category', default=None, action=SplitArgs, help='What categories should be subsetted to?')
