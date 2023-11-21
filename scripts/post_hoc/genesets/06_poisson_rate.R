@@ -90,12 +90,46 @@ main <- function(args){
     loeuf <- fread(args$file_pli)
     gene_lst[["pLI>=0.9"]] <- unique(as.character(na.omit(loeuf$gene_id[loeuf$pLI >= 0.9])))
 
+    # omim gene list
+    if (!is.null(args$file_omim)){
+        #omim <- fread("/well/lindgren/flassen/ressources/genesets/genesets/data/omim/230329_morbidmap_by_gene_with_inheritance.txt")
+        omim <- fread(args$file_omim)
+        omim <- omim[grepl(omim$ensgid, pattern="ENSG"),]
+        omim_autosomal_recessive <- unique(omim$ensgid[omim$AR])
+        omim_autosomal_dominant <- unique(omim$ensgid[omim$AD])
+        gene_lst[["omim_AR"]] <- omim_autosomal_recessive
+        gene_lst[["omim_AD"]] <- omim_autosomal_dominant
+    } 
     
-    # GTEx
+    # GTEx files
+    if (!is.null(args$file_gtex)){
+        
+        # load gtex and get top 10% specific
+        #d <- fread("/well/lindgren/flassen/ressources/genesets/genesets/data/gtex/GTEx.tstat.tsv")
+        d <- fread(args$file_gtex)
+        d <- cbind(gene_id = d$ENSGID, data.table(apply(d[,-1], 2, function(x) x > quantile(x, probs = 0.90))))
+        colnames(d) <- paste0("gtex_",tolower(gsub("\\_$","",gsub("\\_+","\\_",gsub("(\\()|(\\)|(\\-))","_",colnames(d))))))
 
-    # OMim
+        # add to gene_lst 
+        tissues <- colnames(d)[-1]
+        for (tissue in tissues[1]){
+            bool_tissue <- d[[tissue]]
+            genes_specific_to_tissue <- d$gtex_gene_id[bool_tissue]
+            gene_lst[[tissue]] <- genes_specific_to_tissue
+        }
+    }
 
-
+    # cancer gene set
+    if (!is.null(args$file_cancer)){
+        d <- fread(args$file_cancer)
+        #d <- fread("/well/lindgren/flassen/ressources/genesets/genesets/data/gsea/cancer/gavish_3ca_genes.txt")
+        d <- d[(!is.na(d$ensgid)) & (d$ensgid != "")]
+        genesets <- unique(d$pathway)
+        for (geneset in genesets[1]){
+            genes <- d$ensgid[d$pathway == geneset]
+            gene_lst[[geneset]] <- genes
+        }
+    }
 
     models <- c("is_chet" , "is_hom", "is_ko", "is_het","is_cis")
     annotations <- unique(aggr_mrg$annotation)
@@ -178,6 +212,9 @@ parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "Where
 parser$add_argument("--in_count", default=NULL, required = TRUE, help = "")
 parser$add_argument("--file_mutation_rates", default=NULL, required = TRUE, help = "")
 parser$add_argument("--file_pli", default=NULL, required = TRUE, help = "")
+parser$add_argument("--file_omim", default=NULL, required = FALSE, help = "")
+parser$add_argument("--file_cancer", default=NULL, required = FALSE, help = "")
+parser$add_argument("--file_gtex", default=NULL, required = FALSE, help = "")
 parser$add_argument("--dir_genesets", default=NULL, required = TRUE, help = "")
 args <- parser$parse_args()
 
