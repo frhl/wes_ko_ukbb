@@ -19,7 +19,6 @@ source utils/hail_utils.sh
 # directories
 readonly in_dir="data/unphased/wes/post-qc"
 readonly spark_dir="data/tmp/spark"
-readonly vep_dir="data/vep/full"
 readonly out_dir="data/vep/hail_hgvs/"
 
 # hail script
@@ -28,7 +27,6 @@ readonly hail_script="scripts/01_hail_vep.py"
 # input paths
 readonly chr=$( get_chr ${SLURM_ARRAY_TASK_ID} ) 
 readonly in="${in_dir}/ukb_wes_200k_filtered_chr${chr}.mt"
-readonly vep="${vep_dir}/ukb_wes_200k_full_vep_chr${chr}.vcf"
 
 # output path
 readonly out_prefix="${out_dir}/ukb_wes_200k_chr${chr}"
@@ -41,7 +39,6 @@ if [ ! -f "${out_prefix}.ht" ]; then
        --chrom "${chr}" \
        --input_path "${in}" \
        --input_type "mt" \
-       --vep_path "${vep}" \
        --out_prefix "${out_prefix}"
 else
    raise_error "Hail VEP annotation for chr${chr} already exists. Skipping"

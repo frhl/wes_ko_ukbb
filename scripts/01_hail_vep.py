@@ -16,7 +16,6 @@ def main(args):
     chrom = args.chrom
     input_path = args.input_path
     input_type = args.input_type
-    vep_path = args.vep_path
     out_prefix = args.out_prefix
 
     # setup flags
@@ -30,10 +29,7 @@ def main(args):
 
     # write out VEP hail table
     ht.write(out_prefix + "_vep.ht", overwrite=True)
-
-    # write a table with variants and consequences which
-    # we can access in other coding languages
-    #ht.
+    ht.export(ou_prefix + "_vep.txt.gz")
 
 
 
@@ -42,7 +38,6 @@ if __name__=='__main__':
     # initial params
     parser.add_argument('--input_path', default=None, help='Path to input')
     parser.add_argument('--input_type', default=None, help='Input type, either "mt", "vcf" or "plink"')
-    parser.add_argument('--vep_path', default=None, help='Path to dbNSFP annotations')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
     parser.add_argument('--chrom', default=None, help='Chromosome to be used')
 
