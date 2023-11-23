@@ -8,8 +8,9 @@
 #SBATCH --output=logs/trim_chunks.log
 #SBATCH --error=logs/trim_chunks.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 6
+#SBATCH --cpus-per-task 3
 #SBATCH --array=21
+#SBATCH --constraint="hge"
 #
 #
 #$ -N trim_chunks
@@ -37,12 +38,12 @@ readonly chr=$( get_chr ${array_idx} )
 
 
 # For eagle2
-readonly main_dir="data/phased/wes_union_calls/200k/eagle2/chunks"
-readonly in_dir="${main_dir}/ukb_wes_union_calls_eagle2_200k_chr${chr}-20xlong"
-readonly in_prefix_regex="eagle2_prs100000_pro25000_mprs150000" 
-readonly out_dir="data/phased/wes_union_calls/200k/eagle2/trimmed"
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_eagle2_200k_chr${chr}_trim"
-readonly out="${out_prefix}.vcf.bgz"
+#readonly main_dir="data/phased/wes_union_calls/200k/eagle2/chunks"
+#readonly in_dir="${main_dir}/ukb_wes_union_calls_eagle2_200k_chr${chr}-20xlong"
+#readonly in_prefix_regex="eagle2_prs100000_pro25000_mprs150000" 
+#readonly out_dir="data/phased/wes_union_calls/200k/eagle2/trimmed"
+#readonly out_prefix="${out_dir}/ukb_wes_union_calls_eagle2_200k_chr${chr}_trim"
+#readonly out="${out_prefix}.vcf.bgz"
 
 # For SHAPEIT4
 #readonly main_dir="data/phased/wes_union_calls/200k/shapeit4/chunks"
@@ -53,12 +54,12 @@ readonly out="${out_prefix}.vcf.bgz"
 #readonly out="${out_prefix}.vcf.bgz"
 
 # For SHAPEIT5
-#readonly main_dir="data/phased/wes_union_calls/200k/shapeit5/phase_rare/newrun"
-#readonly in_dir="${main_dir}/ukb_wes_union_calls_shapeit5_200k_chr${chr}-20xshort"
-#readonly in_prefix_regex="shapeit5_prs100000_pro25000_mprs150000" # need this for regex
-#readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/trimmed"
-#readonly out_prefix="${out_dir}/ukb_wes_union_calls_shapeit5_200k_chr${chr}_trim"
-#readonly out="${out_prefix}.vcf.bgz"
+readonly main_dir="data/phased/wes_union_calls/200k/shapeit5/phase_rare_test"
+readonly in_dir="${main_dir}/ukb_wes_union_calls_shapeit5_200k_chr${chr}-16xlong"
+readonly in_prefix_regex="shapeit5_prs100000_pro25000_mprs150000" # need this for regex
+readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/trimmed_test"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_shapeit5_200k_chr${chr}_trim"
+readonly out="${out_prefix}.vcf.bgz"
 
 #readonly main_dir="data/phased/wes_scaffold_calls/200k_from_500k/chunks/shapeit5"
 #readonly in_dir="${main_dir}/ukb_wes_union_calls_shapeit5_200k_from_500k_chr${chr}-16xshort"
@@ -71,8 +72,11 @@ readonly out="${out_prefix}.vcf.bgz"
 mkdir -p ${out_dir}
 
 if [ ! -f ${out} ]; then
+  echo $PATH
   set_up_hail
+  echo $PATH
   set_up_pythonpath_legacy
+  echo $PATH
   SECONDS=0
   set -x
   python3 ${hail_script} \
