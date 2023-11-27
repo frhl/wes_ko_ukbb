@@ -7,7 +7,7 @@
 #SBATCH --error=logs/vep.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=22
+#SBATCH --array=1-21
 
 set -o errexit
 set -o nounset
@@ -25,7 +25,7 @@ readonly in="${in_dir}/ukb_wes_200k_filtered_chr${chr}.mt"
 
 readonly json_path="utils/configs/vep105_revel_float.json"
 
-readonly out_dir="data/vep/vep105/veo)out"
+readonly out_dir="data/vep/vep105/vep_out"
 readonly out_prefix="${out_dir}/UKB.chr${chr}.exome_array.variants_only.vep"
 readonly hail_script="scripts/variant_annotation/vep105/01_vep.py"
 

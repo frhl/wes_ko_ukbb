@@ -28,7 +28,7 @@ def main(args):
             ht.position), reference_genome='GRCh38'), alleles=[ht.allele1, ht.allele2])
     elif "mt" in input_path:
         mt = hl.read_matrix_table(input_path)
-        mt = mt.rows()
+        ht = mt.rows()
     elif "vcf" in input_path:
         mt = hl.import_vcf(input_path, reference_genome='GRCh38', force_bgz=True)
         ht = mt.rows().select()

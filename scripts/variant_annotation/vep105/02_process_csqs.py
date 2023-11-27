@@ -46,7 +46,7 @@ def main(args):
     ht = convert_revel_scores_to_unique_float(ht, 'revel_score_float') # we use modification to dbNSFP to extract this
     ht = process_consequences(ht)
     ht.write(out_prefix + ".ht", overwrite=True)
-    #ht.export(out_prefix + ".txt.gz")
+    ht.export(out_prefix + ".txt.gz")
 
 
 if __name__ == '__main__':

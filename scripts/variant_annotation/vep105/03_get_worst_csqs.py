@@ -25,25 +25,7 @@ def main(args):
     # key variant (snp, coding sequence id)
     ht = ht.explode(ht.vep.worst_csq_by_gene_canonical)
     ht = ht.annotate(transcript_id=ht.vep.worst_csq_by_gene_canonical.transcript_id)
-    #ht = ht.annotate(ccds=ht.vep.worst_csq_by_gene_canonical.ccds.split("\\.")[0])
-    #ht = ht.key_by(ht.locus, ht.alleles, ht.ccds) 
     ht = ht.key_by(ht.locus, ht.alleles, ht.transcript_id) 
-
-    # get alpha missense and key variant by snp and ccds
-    #alpha = hl.read_table(alpha_missense_path)
-    #alpha = alpha.key_by(alpha.locus, alpha.alleles, alpha.ccds)
-    #alpha = alpha.semi_join(ht)
-
-    #ht = ht.annotate(alpha_info=alpha[ht.key])
-    # annotate consequence
-    #ht = ht.transmute(
-    #    vep = ht.vep.annotate(
-    #        worst_csq_by_gene_canonical = ht.vep.worst_csq_by_gene_canonical.annotate(
-    #            am_pathogenicity = hl.float(ht.alpha_info.am_pathogenicity),
-    #            am_class = ht.alpha_info.am_class
-    #        )
-    #    )
-    #)
 
     # get spliceAI annotation, note that we if we don't key by
     # mane select, then we get downstream gene variants annotated as splice variantss
@@ -71,15 +53,6 @@ def main(args):
     ht = ht.key_by(ht.locus, ht.alleles)
     ht = ht.drop(ht.transcript_id)
 
-    #if case_builder in "alpha_missense":
-    #    ht = ht.annotate(
-    #        brava_csqs=ko.csqs_case_builder_alpha_missense_v2(
-    #                worst_csq_expr=ht.vep.worst_csq_by_gene_canonical,
-    #                spliceai_cutoff = spliceai_score,
-    #                revel_cutoff = revel_score,
-    #                am_cutoff = am_score
-    #        )
-    #    )
     if case_builder in "brava":
         print(f"Using {case_builder} builder with cadd>{cadd_score}\trevel>{revel_score}\tspliceAI>{spliceai_score}")
         ht = ht.annotate(
@@ -114,8 +87,6 @@ def main(args):
             cadd_phred=ht.vep.worst_csq_by_gene_canonical.cadd_phred,
             spliceai_max_ds=ht.vep.worst_csq_by_gene_canonical.SpliceAI_DS_max,
             loftee_lof=ht.vep.worst_csq_by_gene_canonical.lof
-            #am_class=ht.vep.worst_csq_by_gene_canonical.am_class,
-            #am_pathogenicity=ht.vep.worst_csq_by_gene_canonical.am_pathogenicity
     )
 
     # filter to protein coding
@@ -145,9 +116,8 @@ if __name__=='__main__':
     parser.add_argument('--alpha_missense_path', default=None, help='Path to spliceai VCF')
     parser.add_argument('--spliceai_path', default=None, help='Path to spliceai VCF')
     parser.add_argument('--spliceai_score', type=float, default=0.50, help='SpliceAI delta score')
-    parser.add_argument('--revel_score', type=float, default=0.773, help='Revel score cutoff')
-    parser.add_argument('--cadd_score', type=float, default=28.1, help='CADD score cutoff')
-    #parser.add_argument('--am_score', type=float, default=0.564, help='AlphaMissense score cutoff')
+    parser.add_argument('--revel_score', type=float, default=0.6, help='Revel score cutoff')
+    parser.add_argument('--cadd_score', type=float, default=20, help='CADD score cutoff')
     parser.add_argument('--out_prefix', default=None, help='Path prefix for output dataset')
 
     args = parser.parse_args()

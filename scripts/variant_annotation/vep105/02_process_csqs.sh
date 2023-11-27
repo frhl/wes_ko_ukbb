@@ -2,12 +2,13 @@
 
 #SBATCH --account=lindgren.prj
 #SBATCH --job-name=process_csqs
-#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb_nexus
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/process_csqs.log
 #SBATCH --error=logs/process_csqs.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-23
+#SBATCH --array=1-22
+#SBATCH --dependency="afterok:38165954"
 
 set -o errexit
 set -o nounset
@@ -20,12 +21,12 @@ readonly spark_dir="data/tmp/spark"
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
-readonly in_dir="data/vep/vep_out"
+readonly in_dir="data/vep/vep105/vep_out"
 readonly in="${in_dir}/UKB.chr${chr}.exome_array.variants_only.vep.ht"
 
-readonly out_dir="data/vep/process_csqs"
+readonly out_dir="data/vep/vep105/process_csqs"
 readonly out_prefix="${out_dir}/UKB.chr${chr}.exome_array.variants_only.vep.csqs"
-readonly hail_script="scripts/variant_annotation/02_process_csqs.py"
+readonly hail_script="scripts/variant_annotation/vep105/02_process_csqs.py"
 
 mkdir -p ${out_dir}
 mkdir -p ${spark_dir}
