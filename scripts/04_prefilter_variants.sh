@@ -9,7 +9,7 @@
 #SBATCH --error=logs/prefilter_variants.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=1-22
+#SBATCH --array=1-21
 
 set -o errexit
 set -o nounset
@@ -20,6 +20,7 @@ source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark_dir"
 readonly hail_script="scripts/04_prefilter_variants.py"
+readonly hail_script_to_vcf="scripts/_mt_to_vcf.py"
 
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
@@ -42,11 +43,21 @@ readonly partitions=64
 
 mkdir -p ${out_dir}
 
-#if [ ! -f "${out_prefix}.mt/_SUCCESS" ]; then
+
+# temp
+set_up_hail
+set_up_pythonpath_legacy
+python3 "${hail_script_to_vcf}" \
+   --input_path "${out_prefix}.mt" \
+   --input_type "mt" \
+   --out_prefix ${out_prefix} \
+   --out_type "vcf" \
+
+if [ ! -f "${out_prefix}.mt/_SUCCESS" ]; then
   #rm -rf "${out_prefix}.mt/"
+  echo "exiting.."
+  exit 1 
   SECONDS=0
-  set_up_hail
-  set_up_pythonpath_legacy
   python3 "${hail_script}" \
      --input_path ${input_prefix}\
      --input_type ${input_type} \
@@ -57,11 +68,18 @@ mkdir -p ${out_dir}
      --maf_max ${maf_max} \
      --exclude ${exclude} \
      --partitions ${partitions} \
+     --export_csqs\
      && print_update "Finished annotating MatrixTables chr${chr}" ${SECONDS} \
      || raise_error "Annotating MatrixTables for chr${chr} failed"
-#else
-#  >&2 echo "${out_prefix}.mt already exists! Skipping"
-#fi
+else
+  >&2 echo "${out_prefix}.mt already exists! Skipping"
+fi
+
+
+ 
+
+
+
 
 
 

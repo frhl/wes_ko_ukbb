@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #
 # @description: amalgamate variants by phase to infer knockouts by genes.
+# @note: check parallel/ for exporting other_missense and synonymous
 #
 #SBATCH --account=lindgren.prj
 #SBATCH --job-name=encode_vcf

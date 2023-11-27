@@ -22,6 +22,7 @@ def main(args):
     exclude = args.exclude
     pp_cutoff = args.pp_cutoff
     partitions = args.partitions
+    export_csqs = args.export_csqs
 
     # import phased/unphased data
     hail_init.hail_bmrc_init('logs/hail/knockout.log', 'GRCh38')
@@ -58,16 +59,21 @@ def main(args):
                 use_loftee=True))
 
     # repartition data
-    if partitions:
+    if partitions and out_type in "mt":
         mt = mt.repartition(int(partitions))
 
     # export result
     io.export_table(mt, out_prefix, out_type)
-    
+   
+    # we also need the VCF
+    if out_type not in "vcf":
+        io.export_table(mt, out_prefix, "vcf")
+
     # export info
-    ht = mt.rows()
-    ht = ht.select(*[ht.varid, ht.info, ht.consequence_category, ht.consequence.vep[csqs_expr]])
-    ht.flatten().export(out_prefix + ".csqs.txt.gz")
+    if export_csqs:
+        ht = mt.rows()
+        ht = ht.select(*[ht.varid, ht.info, ht.consequence_category, ht.consequence.vep[csqs_expr]])
+        ht.flatten().export(out_prefix + ".csqs.txt.gz")
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
@@ -81,6 +87,7 @@ if __name__=='__main__':
     parser.add_argument('--exclude', default=None, help='exclude variants by rsid and/or variant id')
     parser.add_argument('--pp_cutoff', default=None, help='exclude variants by rsid and/or variant id')
     parser.add_argument('--partitions', default=None, help='Should the data be repartitioned')
+    parser.add_argument('--export_csqs', action='store_true', default=False, help='Export a column of variant IDs and consequence categories')
 
     args = parser.parse_args()
 

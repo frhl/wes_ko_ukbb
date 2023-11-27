@@ -112,7 +112,7 @@ main <- function(args){
 
         # add to gene_lst 
         tissues <- colnames(d)[-1]
-        for (tissue in tissues[1]){
+        for (tissue in tissues){
             bool_tissue <- d[[tissue]]
             genes_specific_to_tissue <- d$gtex_gene_id[bool_tissue]
             gene_lst[[tissue]] <- genes_specific_to_tissue
@@ -131,7 +131,8 @@ main <- function(args){
         }
     }
 
-    models <- c("is_chet" , "is_hom", "is_ko", "is_het","is_cis")
+    #models <- c("is_chet" , "is_hom", "is_ko", "is_het","is_cis")
+    models <- c("is_chet" , "is_hom", "is_ko", "is_het")
     annotations <- unique(aggr_mrg$annotation)
 
     get_covars <- function(model){
@@ -181,16 +182,15 @@ main <- function(args){
       }
     }
 
-
     # combine all of the data.frames
     combined <- do.call(rbind, lapply(lapply(lst, function(l) lapply(l, rbindlist)), rbindlist))
     combined <- combined[combined$keep, ]
     combined$geneset <- factor(combined$geneset, levels=rev(unique(combined$geneset)))
-    combined$geneset_cat <- ifelse(combined$geneset %in% essential_names, "Essential", "Non-essential")
-    combined <- combined[combined$geneset %in% c(essential_names, non_essential_names),]
+    #combined$geneset_cat <- ifelse(combined$geneset %in% essential_names, "Essential", "Non-essential")
+    #combined <- combined[combined$geneset %in% c(essential_names, non_essential_names),]
     combined$model <- factor(combined$model, levels = models)
 
-    # writ efile
+    # write efile
     outfile <- paste0(args$out_prefix,".txt")
     write(paste("writing", outfile), stderr())
     fwrite(combined, outfile, sep = "\t")

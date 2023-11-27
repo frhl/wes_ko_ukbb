@@ -44,8 +44,9 @@ readonly out_dir="data/mt/vep/worst_csq_by_gene_canonical"
 readonly out_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
 readonly out_saige="${out_prefix}.saige"
 
-readonly out_pp_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.pp90"
-readonly pp_cutoff="0.90"
+readonly out_pp_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}"
+#readonly out_pp_prefix="${out_dir}/ukb_eur_wes_union_calls_200k_chr${chr}.pp90"
+#readonly pp_cutoff="0.90"
 
 mkdir -p ${out_dir}
 

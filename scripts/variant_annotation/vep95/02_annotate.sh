@@ -9,17 +9,7 @@
 #SBATCH --error=logs/annotate.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=1-22
-#
-#$ -N annotate
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/annotate.log
-#$ -e logs/annotate.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 3
-#$ -q short.qc
-#$ -t 6-22
-#$ -V
+#SBATCH --array=1-21
 
 # Note: long.qc@@long.hga with 4 slots required to run full pipeline
 # -q long.qc@@long.hga
@@ -44,8 +34,24 @@ readonly input_type="vcf"
 
 readonly out_dir="data/mt/annotated/new"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
-readonly out_type="mt"
-readonly out="${out_prefix}.mt"
+
+readonly out_type="vcf"
+readonly out="${out_prefix}.vcf.gz"
+
+
+# temp
+set_up_hail
+set_up_pythonpath_legacy
+readonly hail_script_to_vcf="scripts/_mt_to_vcf.py"
+python3 "${hail_script_to_vcf}" \
+   --input_path "${out_prefix}.mt" \
+   --input_type "mt" \
+   --out_prefix ${out_prefix} \
+   --out_type "vcf" \
+
+
+#readonly out_type="mt"
+#readonly out="${out_prefix}.mt"
 
 readonly annotation_table="data/vep/hail/ukb_wes_200k_chr${chr}_vep.ht"
 
@@ -65,9 +71,11 @@ if [ ! -f ${out} ]; then
      --final_sample_list ${final_sample_list} \
      --final_variant_list ${final_variant_list}\
      --out_prefix ${out_prefix} \
-     --out_type "${out_type}" \
-     --dbsnp_path "155" \
+     --out_type "${out_type}" 
      --annotate_snp_id
 fi
+
+
+
 
 

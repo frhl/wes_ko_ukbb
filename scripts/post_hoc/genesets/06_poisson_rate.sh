@@ -6,7 +6,7 @@
 #SBATCH --output=logs/poisson_rate.log
 #SBATCH --error=logs/poisson_rate.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 1
+#SBATCH --cpus-per-task 2
 #SBATCH --requeue
 
 source utils/bash_utils.sh
@@ -26,10 +26,10 @@ readonly essential_dir="${geneset_dir}/shapeit"
 readonly pli="${geneset_dir}/gnomad/karczewski2020/supplementary_dataset_11_full_constraint_metrics.tsv"
 
 # get additional (non-mandatory) genesets
-readonly omim="${geneset_dir}/data/omim/230329_morbidmap_by_gene_with_inheritance.txt"
-readonly gtex="${geneset_dir}/data/gtex/GTEx.tstat.tsv"
-readonly cancer1="${geneset_dir}/data/gsea/cancer/gavish_3ca_genes.txt"
-readonly cancer2="${geneset_dir}/data/gsea/cancer/gsea_cgn_genes.txt"
+readonly omim="${geneset_dir}/omim/230329_morbidmap_by_gene_with_inheritance.txt"
+readonly gtex="${geneset_dir}/gtex/GTEx.tstat.tsv"
+readonly cancer1="${geneset_dir}/gsea/cancer/gavish_3ca_genes.txt"
+readonly cancer2="${geneset_dir}/gsea/cancer/gsea_cgn_genes.txt"
 
 mkdir -p ${out_dir}
 
