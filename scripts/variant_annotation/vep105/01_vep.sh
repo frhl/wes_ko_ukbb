@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=hail_vep
+#SBATCH --job-name=vep105
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/vep.log
 #SBATCH --error=logs/vep.errors.log
