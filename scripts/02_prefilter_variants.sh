@@ -19,8 +19,7 @@ source utils/qsub_utils.sh
 source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark_dir"
-readonly hail_script="scripts/04_prefilter_variants.py"
-readonly hail_script_to_vcf="scripts/_mt_to_vcf.py"
+readonly hail_script="scripts/02_prefilter_variants.py"
 
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
@@ -42,16 +41,6 @@ readonly pp_cutoff=0.90
 readonly partitions=64
 
 mkdir -p ${out_dir}
-
-
-# temp
-set_up_hail
-set_up_pythonpath_legacy
-python3 "${hail_script_to_vcf}" \
-   --input_path "${out_prefix}.mt" \
-   --input_type "mt" \
-   --out_prefix ${out_prefix} \
-   --out_type "vcf" \
 
 if [ ! -f "${out_prefix}.mt/_SUCCESS" ]; then
   #rm -rf "${out_prefix}.mt/"

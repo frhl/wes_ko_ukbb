@@ -3,10 +3,10 @@
 # @description Annotate main MatrixTables with VEP results
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=freqx_variants
+#SBATCH --job-name=plink_freqx_variants
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/freqx_variants.log
-#SBATCH --error=logs/freqx_variants.errors.log
+#SBATCH --output=logs/plink_freqx_variants.log
+#SBATCH --error=logs/plink_freqx_variants.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
 #SBATCH --dependency="afterok:38165677"
