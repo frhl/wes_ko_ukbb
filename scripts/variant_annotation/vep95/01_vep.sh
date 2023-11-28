@@ -26,7 +26,7 @@ readonly in="${in_dir}/ukb_wes_200k_filtered_chr${chr}.mt"
 readonly json_path="utils/configs/vep_final.json"
 
 readonly out_dir="data/vep/vep95/vep_out"
-readonly out_prefix="${out_dir}/UKB.chr${chr}.exome_array.variants_only.vep"
+readonly out_prefix="${out_dir}/UKB.chr${chr}.exome_array.variants_only.vep95"
 readonly hail_script="scripts/variant_annotation/vep95/01_vep.py"
 
 mkdir -p ${out_dir}

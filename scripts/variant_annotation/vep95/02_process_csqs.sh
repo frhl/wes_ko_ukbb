@@ -7,8 +7,8 @@
 #SBATCH --error=logs/process_csqs.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-22
-#SBATCH --dependency="afterok:38165954"
+#SBATCH --array=1-21
+#SBATCH --dependency="afterok:38317309"
 
 set -o errexit
 set -o nounset
@@ -22,10 +22,10 @@ readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
 readonly in_dir="data/vep/vep95/vep_out"
-readonly in="${in_dir}/UKB.chr${chr}.exome_array.variants_only.vep.ht"
+readonly in="${in_dir}/UKB.chr${chr}.exome_array.variants_only.vep95.ht"
 
 readonly out_dir="data/vep/vep95/process_csqs"
-readonly out_prefix="${out_dir}/UKB.chr${chr}.exome_array.variants_only.vep.csqs"
+readonly out_prefix="${out_dir}/UKB.chr${chr}.exome_array.variants_only.vep95.csqs"
 readonly hail_script="scripts/variant_annotation/vep95/02_process_csqs.py"
 
 mkdir -p ${out_dir}

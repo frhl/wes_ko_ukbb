@@ -22,10 +22,10 @@ readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
 readonly in_dir="data/vep/vep105/vep_out"
-readonly in="${in_dir}/UKB.chr${chr}.exome_array.variants_only.vep.ht"
+readonly in="${in_dir}/UKB.chr${chr}.exome_array.variants_only.vep105.ht"
 
 readonly out_dir="data/vep/vep105/process_csqs"
-readonly out_prefix="${out_dir}/UKB.chr${chr}.exome_array.variants_only.vep.csqs"
+readonly out_prefix="${out_dir}/UKB.chr${chr}.exome_array.variants_only.vep105.csqs"
 readonly hail_script="scripts/variant_annotation/vep105/02_process_csqs.py"
 
 mkdir -p ${out_dir}
