@@ -15,7 +15,7 @@ readonly in_var=${5?Error: Missing arg5 (in_var)}
 readonly grm_mtx=${6?Error: Missing arg6 (grm_mtx)}
 readonly grm_sam=${7?Error: Missing arg7 (grm_sam)}
 readonly min_mac=${8?Error: Missing arg8 (min_mac)} 
-readonly group_file=${9?Error: Missing arg9 (group_file)} 
+readonly in_group_file=${9?Error: Missing arg9 (group_file)} 
 readonly annotation_in_group_test=${10?Error: Missing arg10 (annotation_in_group_test)} 
 readonly max_maf_in_group_test=${11?Error: Missing arg11 (max_maf_in_group_test)} 
 readonly out_prefix=${12?Error: Missing arg12 (path prefix for saige output)}
@@ -31,6 +31,7 @@ readonly var=$(echo ${in_var} | sed -e "s/CHR/${chr}/g")
 readonly var_bytes=$( file_size ${var} )
 readonly gmat_bytes=$( file_size ${gmat} )
 
+readonly group_file=$(echo ${in_group_file} | sed -e "s/CHR/${chr}/g")
 readonly vcf=$(echo ${in_vcf} | sed -e "s/CHR/${chr}/g")
 readonly csi=$(echo ${in_csi} | sed -e "s/CHR/${chr}/g")
 readonly out=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
@@ -45,17 +46,18 @@ spa_test_group() {
   Rscript "${step2_SPAtests}"	\
      --vcfFile=${vcf} \
      --vcfFileIndex=${csi} \
-     --vcfField="DS" \
+     --vcfField="GT" \
      --sparseGRMFile=${grm_mtx} \
      --sparseGRMSampleIDFile=${grm_sam}  \
      --chrom="chr${chr}" \
-     --minMAF=0.0000001 \
-     --minMAC=${min_mac} \
+     --minMAF=0 \
+     --minMAC=1 \
      --GMMATmodelFile=${gmat} \
      --varianceRatioFile=${var} \
      --SAIGEOutputFile=${out} \
      --is_output_moreDetails=TRUE \
      --groupFile ${group_file} \
+     --maxMAF_in_groupTest=0.5\
      --annotation_in_groupTest ${annotation_in_group_test} \
      --LOCO=FALSE \
      && print_update "Finished saddle-point approximation. Writing to ${out}" ${SECONDS} \
