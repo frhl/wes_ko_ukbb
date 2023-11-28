@@ -8,7 +8,7 @@
 #SBATCH --error=logs/spa_test_group.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=22
+#SBATCH --array=1
 
 set -o errexit
 set -o nounset
@@ -158,7 +158,7 @@ submit_merge_job()
 readonly use_prs="1"
 readonly min_mac=4
 readonly project="lindgren.prj"
-readonly tasks=22
+readonly tasks=21
 readonly queue="short"
 readonly nslots=2
 readonly max_maf_in_group_test="0.05"
