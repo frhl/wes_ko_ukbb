@@ -49,14 +49,15 @@ def main(args):
         mt = mt.filter_entries((expr_pp_cutoff) | (expr_keep))
 
     # explode by rows
-    csqs_expr = "worst_csq_by_gene_canonical"
-    mt = mt.explode_rows(mt.consequence.vep[csqs_expr])
-    mt = mt.annotate_rows(
-        gene_id=mt.consequence.vep[csqs_expr].gene_id,
-        transcript_id=mt.consequence.vep[csqs_expr].transcript_id,
-        consequence_category=ko.csqs_case_builder(
-                worst_csq_expr=mt.consequence.vep[csqs_expr],
-                use_loftee=True))
+    if out_type in "mt":
+        csqs_expr = "worst_csq_by_gene_canonical"
+        mt = mt.explode_rows(mt.consequence.vep[csqs_expr])
+        mt = mt.annotate_rows(
+            gene_id=mt.consequence.vep[csqs_expr].gene_id,
+            transcript_id=mt.consequence.vep[csqs_expr].transcript_id,
+            consequence_category=ko.csqs_case_builder(
+                    worst_csq_expr=mt.consequence.vep[csqs_expr],
+                    use_loftee=True))
 
     # repartition data
     if partitions and out_type in "mt":
@@ -64,7 +65,7 @@ def main(args):
 
     # export result
     io.export_table(mt, out_prefix, out_type)
-   
+    
     # we also need the VCF
     if out_type not in "vcf":
         io.export_table(mt, out_prefix, "vcf")

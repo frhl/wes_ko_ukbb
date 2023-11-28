@@ -9,7 +9,7 @@
 #SBATCH --error=logs/prefilter_variants.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-21
+#SBATCH --array=22
 
 set -o errexit
 set -o nounset
@@ -31,7 +31,7 @@ readonly input_type="mt"
 
 readonly out_dir="data/mt/prefilter/pp90"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005"
-readonly out_type="mt"
+readonly out_type="vcf"
 
 # remove these common plofs (90% pop)
 readonly exclude="data/genes/220310_common_plofs_to_exclude.txt"
@@ -60,7 +60,7 @@ if [ ! -f "${out_prefix}.mt/_SUCCESS" ]; then
      && print_update "Finished annotating MatrixTables chr${chr}" ${SECONDS} \
      || raise_error "Annotating MatrixTables for chr${chr} failed"
   # ensure that VCF is indexed
-  make_tabix "${out_prefix}.vcf.bgz" "csi"
+  # make_tabix "${out_prefix}.vcf.bgz" "csi"
 else
   >&2 echo "${out_prefix}.mt already exists! Skipping"
 fi

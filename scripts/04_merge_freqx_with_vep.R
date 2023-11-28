@@ -108,7 +108,8 @@ main <- function(args)
     #       --out_file test
     vep_spliceAI_path <- args$vep_spliceAI_processed
     dt_brava_annot <- fread(vep_spliceAI_path)
-    
+    stopifnot(nrow(dt_brava_annot)>0)
+
     # rename to brava convention
     colnames(dt_brava_annot)[colnames(dt_brava_annot) == "varid"] <- "SNP_ID"
     colnames(dt_brava_annot)[colnames(dt_brava_annot) == "brava_csqs"] <- "annotation"
@@ -122,11 +123,18 @@ main <- function(args)
         "synonymous",
         "non_coding")
 
+    # drop NAs 
+    dt_brava_annot <- dt_brava_annot[!is.na(dt_brava_annot$annotation),]
+
 
     if (!all(dt_brava_annot$annotation %in% expt_annototations)){
         print(expt_annototations)
-        print(table(dt_brava_annot$annotation))
-      
+        print(paste("NAs:", sum(is.na(dt_brava_annot$annotation))))
+        print(paste("pLoF:",sum(dt_brava_annot$annotation=="pLoF", na.rm=TRUE)))
+        print(paste("damaging_missense:",sum(dt_brava_annot$annotation=="damaging_missense", na.rm=TRUE)))
+        print(paste("other_missense:",sum(dt_brava_annot$annotation=="other_missense", na.rm=TRUE)))
+        print(paste("synymous:",sum(dt_brava_annot$annotation=="synonymous", na.rm=TRUE)))
+        print(paste("non_coding:",sum(dt_brava_annot$annotation=="non_coding", na.rm=TRUE)))
         stop("An annotation is present in the file which is not in the following:
             - pLoF
             - damaging_missense
@@ -134,7 +142,7 @@ main <- function(args)
             - synonymous
             - non_coding")
     }
-    if (all(is.na(dt_brava_annot$max_DS)) & (args$force_without_spliceAI)) {
+    if (all(is.na(dt_brava_annot$max_DS)) & (!args$force_without_spliceAI)) {
         stop("splice AI information has not been incorporated.
             All entries of the max_DS column are empty. 
             Check variant ID merging between spliceAI and VEP information. 
@@ -143,17 +151,18 @@ main <- function(args)
     }
     dt_brava_annot[, SNP_ID := gsub("chr", "", SNP_ID)]
     dt_AC <- fread(AC_path)
+    stopifnot(nrow(dt_AC)>0)
 
     dt_AC[, SNP_ID := gsub("chr", "", SNP)]
     setkey(dt_AC, "SNP_ID")
 
     # Check to ensure that all SNP_IDs are off the form CHR:POS:REF:ALT
-    AC_correct_format <- all(
-        grepl("[1-9,X]+:[0-9]+:[A,C,G,T]+:[A,C,G,T]+", dt_AC$SNP_ID))
-    brava_annot_correct_format <- all(
-        grepl("[1-9,X]+:[0-9]+:[A,C,G,T]+:[A,C,G,T]+", dt_brava_annot$SNP_ID)
-        )
-    if (!AC_correct_format | !brava_annot_correct_format) {
+    AC_correct_format <- grepl("[1-9,X]+:[0-9]+:[A,C,G,T]+:[A,C,G,T]+", dt_AC$SNP_ID)
+    brava_annot_correct_format <- grepl("[1-9,X]+:[0-9]+:[A,C,G,T]+:[A,C,G,T]+", dt_brava_annot$SNP_ID)
+
+    if (!all(AC_correct_format) | !all(brava_annot_correct_format)) {
+        print(head(dt_AC[!AC_correct_format,]))
+        print(head(dt_brava_annot[!brava_annot_correct_format,]))
         stop(paste("One or both SNP/SNP_ID columns in", AC_path,
             "and", vep_spliceAI_path, "is not formatted to CHR:POS:REF:ALT"))
     }

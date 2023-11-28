@@ -14,12 +14,10 @@ def main(args):
     out_type = args.out_type
 
     hail_init.hail_bmrc_init('logs/hail/knockout.log', 'GRCh38')
-    mt = io.import_table(input_path, input_type, calc_info = True) 
-    
-    
-    
-    
-    
+    mt = io.import_table(input_path, input_type, calc_info = False) 
+    print(mt.describe())
+    mt = mt.transmute_rows(ID=mt.varid)
+    print(mt.describe())
     io.export_table(mt, out_prefix, out_type)
 
 if __name__=='__main__':

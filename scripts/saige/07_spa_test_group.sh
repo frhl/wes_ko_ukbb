@@ -85,7 +85,7 @@ submit_spa_with_csqs()
       local slurm_spa_name="spa_${phenotype}_${annotation_label}"
       local slurm_merge_name="_mrg_${phenotype}_${annotation_label}"
       jid=$(submit_spa_job)
-      #submit_merge_job ${jid} ## need to modify merge
+      submit_merge_job ${jid} ## need to modify merge
     else
       >&2 echo "Phenotype ${phenotype} with annotation ${annotation} already exists! Skipping.." 
     fi
@@ -159,13 +159,15 @@ submit_merge_job()
 readonly use_prs="1"
 readonly min_mac=4
 readonly project="lindgren.prj"
-readonly tasks=21
+readonly tasks="1-22"
 readonly queue="short"
 readonly nslots=2
 readonly max_maf_in_group_test="0.05"
 
-# cts traits
-submit_spa_binary_with_csqs "pLoF,damaging_missense"
+# pLoF_damaging_missense (combinesi pLoF and damaging_missense into a single category)  
+# pLoF,damaging_missense (runs pLoF and damaging_missense seperately)
+
+submit_spa_binary_with_csqs "pLoF_damaging_missense"
 
 
 

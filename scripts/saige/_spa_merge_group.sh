@@ -5,7 +5,7 @@ set -o nounset
 
 source utils/bash_utils.sh
 
-readonly rmerge="scripts/saige/_spa_merge.R"
+readonly rmerge="scripts/saige/_spa_merge_group.R"
 
 readonly prefix=${1?Error: Missing arg1 (prefix)}
 readonly out=${2?Error: Missing arg2 (file out full name)}

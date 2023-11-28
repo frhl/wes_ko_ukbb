@@ -6,8 +6,8 @@
 #SBATCH --output=logs/get_worst_csqs.log
 #SBATCH --error=logs/get_worst_csqs.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 1
-#SBATCH --array=1-22
+#SBATCH --cpus-per-task 2
+#SBATCH --array=1
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh

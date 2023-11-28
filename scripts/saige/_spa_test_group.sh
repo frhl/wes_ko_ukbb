@@ -62,7 +62,8 @@ spa_test_group() {
      --LOCO=FALSE \
      && print_update "Finished saddle-point approximation. Writing to ${out}" ${SECONDS} \
      || raise_error "Saddle-point approximation for chr${chr} failed"
-     # --maxMAF_in_groupTest=${max_maf_in_group_test} \
+     # --maxMAF_in_groupTest=${max_maf_in_group_test} 
+     rm -f ${out}*.bin
   else
     raise_error "${var} or ${gmat} does not contain any bytes!"
   fi
