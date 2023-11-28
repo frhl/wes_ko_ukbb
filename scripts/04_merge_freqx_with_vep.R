@@ -31,10 +31,10 @@ main <- function(args)
     most_deleterious <- function(annotation) {
         case_when(
           "pLoF" %in% annotation ~ "pLoF",
-          "damaging_missense_or_protein_altering" %in% 
-          annotation ~ "damaging_missense_or_protein_altering",
-          "other_missense_or_protein_altering" %in% 
-          annotation ~ "other_missense_or_protein_altering",
+          "damaging_missense" %in% 
+          annotation ~ "damaging_missense",
+          "other_missense" %in% 
+          annotation ~ "other_missense",
           "synonymous" %in% annotation ~ "synonymous",
           "non_coding" %in% annotation ~ "non_coding",
           .default = NA
@@ -107,18 +107,30 @@ main <- function(args)
     #       --spliceai ukb_wes_450k.qced.v6.sites_only.21.all.vcf 
     #       --out_file test
     vep_spliceAI_path <- args$vep_spliceAI_processed
+    dt_brava_annot <- fread(vep_spliceAI_path)
     
-    dt_brava_annot <- fread(vep_spliceAI_path, key=c("SNP_ID"))
-    if (!all(dt_brava_annot$annotation %in% c(
+    # rename to brava convention
+    colnames(dt_brava_annot)[colnames(dt_brava_annot) == "varid"] <- "SNP_ID"
+    colnames(dt_brava_annot)[colnames(dt_brava_annot) == "brava_csqs"] <- "annotation"
+    
+    # set keys
+    setkeyv(dt_brava_annot, c("SNP_ID"))
+    expt_annototations <- c(
         "pLoF",
-        "damaging_missense_or_protein_altering",
-        "other_missense_or_protein_altering",
+        "damaging_missense",
+        "other_missense",
         "synonymous",
-        "non_coding"))) {
+        "non_coding")
+
+
+    if (!all(dt_brava_annot$annotation %in% expt_annototations)){
+        print(expt_annototations)
+        print(table(dt_brava_annot$annotation))
+      
         stop("An annotation is present in the file which is not in the following:
             - pLoF
-            - damaging_missense_or_protein_altering
-            - other_missense_or_protein_altering
+            - damaging_missense
+            - other_missense
             - synonymous
             - non_coding")
     }
