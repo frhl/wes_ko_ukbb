@@ -8,7 +8,7 @@
 #SBATCH --output=logs/prefilter_variants.log
 #SBATCH --error=logs/prefilter_variants.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 2
+#SBATCH --cpus-per-task 1
 #SBATCH --array=1-21
 
 set -o errexit
@@ -17,6 +17,7 @@ set -o nounset
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
+source utils/vcf_utils.sh
 
 readonly spark_dir="data/tmp/spark_dir"
 readonly hail_script="scripts/02_prefilter_variants.py"
@@ -44,8 +45,6 @@ mkdir -p ${out_dir}
 
 if [ ! -f "${out_prefix}.mt/_SUCCESS" ]; then
   #rm -rf "${out_prefix}.mt/"
-  echo "exiting.."
-  exit 1 
   SECONDS=0
   python3 "${hail_script}" \
      --input_path ${input_prefix}\
@@ -60,6 +59,8 @@ if [ ! -f "${out_prefix}.mt/_SUCCESS" ]; then
      --export_csqs\
      && print_update "Finished annotating MatrixTables chr${chr}" ${SECONDS} \
      || raise_error "Annotating MatrixTables for chr${chr} failed"
+  # ensure that VCF is indexed
+  make_tabix "${out_prefix}.vcf.bgz" "csi"
 else
   >&2 echo "${out_prefix}.mt already exists! Skipping"
 fi
