@@ -19,11 +19,11 @@ source utils/qsub_utils.sh
 source utils/bash_utils.sh
 source utils/hail_utils.sh
 
-readonly prune_script="scripts/_prune_plink.sh"
-readonly rv_script="scripts/_create_plink_rv.sh"
-readonly mrg_script="scripts/_merge_plink.sh"
-readonly fit_script="scripts/_fit_grm.sh"
-readonly liftover_script="scripts/_liftover_plink.sh"
+readonly prune_script="scripts/saige/_prune_plink.sh"
+readonly rv_script="scripts/saige/_create_plink_rv.sh"
+readonly mrg_script="scripts/saige/_merge_plink.sh"
+readonly fit_script="scripts/saige/_fit_grm.sh"
+readonly liftover_script="scripts/saige/_liftover_plink.sh"
 
 readonly spark_dir="data/tmp/spark"
 readonly out_dir="data/saige/grm/input/dnanexus"

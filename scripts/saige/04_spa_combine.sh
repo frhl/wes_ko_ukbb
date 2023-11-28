@@ -14,7 +14,7 @@ set -o nounset
 
 source utils/bash_utils.sh
 
-readonly rscript="scripts/12_spa_combine.R"
+readonly rscript="scripts/saige/04_spa_combine.R"
 
 # phenotypes we are including
 readonly header_dir="data/phenotypes"

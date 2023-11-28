@@ -10,17 +10,6 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 #SBATCH --array=1-310
-# --begin=now+3hour
-#
-#$ -N spa_null
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/spa_null.log
-#$ -e logs/spa_null.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qc
-#$ -t 1-310
-#$ -V
 
 set -o errexit
 set -o nounset
@@ -30,9 +19,9 @@ source utils/qsub_utils.sh
 source utils/hail_utils.sh
 
 readonly curwd=$(pwd)
-readonly spa_null_script="scripts/_spa_null.sh"
-readonly rscript="scripts/_spa_null.R"
-readonly rscript_ldsc="scripts/_check_prs_ok.R"
+readonly spa_null_script="scripts/saige/_spa_null.sh"
+readonly rscript="scripts/saige/_spa_null.R"
+readonly rscript_ldsc="scripts/saige/_check_prs_ok.R"
 
 readonly plink_dir="data/saige/grm/input"
 readonly grm_dir="data/saige/grm/input/dnanexus"

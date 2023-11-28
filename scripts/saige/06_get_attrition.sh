@@ -14,7 +14,7 @@ set -o nounset
 
 source utils/bash_utils.sh
 
-readonly rscript="scripts/14_get_attrition.R"
+readonly rscript="scripts/saige/14_get_attrition.R"
 
 readonly dir="data/post_hoc/results"
 readonly excl_prs="${dir}/176k_sig_saige_all_prs_excl_N5.txt.gz"

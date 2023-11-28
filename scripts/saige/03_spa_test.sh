@@ -24,7 +24,6 @@ source utils/qsub_utils.sh
 readonly vcf_dir="data/knockouts/alt/pp90/encoding_012"
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
-readonly rscript="scripts/_check_prs_ok.R"
 
 readonly plink_dir="data/saige/grm/input"
 readonly grm_dir="data/saige/grm/input/dnanexus"
@@ -33,8 +32,9 @@ readonly grm_mtx="${grm_dir}/ukb_eur_200k_grm_fitted_relatednessCutoff_0.05_2000
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
 readonly plink_file="${grm_dir}/ukb_eur_200k_grm_grch38_rv_merged"
 
-readonly spa_script="scripts/_spa_test.sh"
-readonly merge_script="scripts/_spa_merge.sh"
+readonly rscript="scripts/saige/_check_prs_ok.R"
+readonly spa_script="scripts/saige/_spa_test.sh"
+readonly merge_script="scripts/saige/_spa_merge.sh"
 readonly in_prefix="ukb_eur_wes_200k"
 
 readonly cluster=$( get_current_cluster)
