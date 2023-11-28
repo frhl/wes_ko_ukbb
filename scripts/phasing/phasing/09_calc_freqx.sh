@@ -11,6 +11,7 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 #SBATCH --array=1-22
+#SBATCH --dependency="afterok:38720368"
 
 set -o errexit
 set -o nounset
@@ -22,7 +23,7 @@ source utils/qsub_utils.sh
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
-readonly phased_dir="data/phased/wes_union_calls/200k/shapeit5/ligated"
+readonly phased_dir="data/phased/wes_union_calls/200k/shapeit5/clean_ligated"
 readonly phased_path="${phased_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.bgz"
 readonly out_dir="data/phased/wes_union_calls/200k/shapeit5/plink"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
@@ -32,7 +33,8 @@ mkdir -p ${out_dir}
 module load PLINK/1.9b_6.21-x86_64
 
 plink --vcf ${phased_path} --freqx --out ${out_prefix}
-
+rm ${out_prefix}.log
+rm ${out_prefix}.nosex
 
 
 

@@ -9,7 +9,7 @@
 #SBATCH --error=logs/clean_ligated.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=22
+#SBATCH --array=1-21
 
 set -o errexit
 set -o nounset
