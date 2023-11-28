@@ -54,7 +54,7 @@ if [ ! -f ${out} ]; then
      --final_sample_list ${final_sample_list} \
      --final_variant_list ${final_variant_list}\
      --out_prefix ${out_prefix} \
-     --out_type "${out_type}" 
+     --out_type "${out_type}" \
      --annotate_snp_id
 fi
 
