@@ -3,16 +3,15 @@
 # @description Annotate main MatrixTables with VEP results
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=annotate
+#SBATCH --job-name=annotate_variants
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/annotate.log
-#SBATCH --error=logs/annotate.errors.log
+#SBATCH --output=logs/annotate_variants.log
+#SBATCH --error=logs/annotate_variants.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
 #SBATCH --array=1-21
 
 # Note: long.qc@@long.hga with 4 slots required to run full pipeline
-# -q long.qc@@long.hga
 
 set -o errexit
 set -o nounset
@@ -23,7 +22,7 @@ source utils/qsub_utils.sh
 source utils/hail_utils.sh
 
 readonly spark_dir="data/tmp/spark_dir"
-readonly hail_script="scripts/02_annotate.py"
+readonly hail_script="scripts/01_annotate_variants.py"
 
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
@@ -38,23 +37,7 @@ readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
 readonly out_type="vcf"
 readonly out="${out_prefix}.vcf.gz"
 
-
-# temp
-set_up_hail
-set_up_pythonpath_legacy
-readonly hail_script_to_vcf="scripts/_mt_to_vcf.py"
-python3 "${hail_script_to_vcf}" \
-   --input_path "${out_prefix}.mt" \
-   --input_type "mt" \
-   --out_prefix ${out_prefix} \
-   --out_type "vcf" \
-
-
-#readonly out_type="mt"
-#readonly out="${out_prefix}.mt"
-
 readonly annotation_table="data/vep/hail/ukb_wes_200k_chr${chr}_vep.ht"
-
 readonly final_sample_list='data/phenotypes/samples/ukb_wes_ko.imputed.qc.samples'
 readonly final_variant_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list'
 
