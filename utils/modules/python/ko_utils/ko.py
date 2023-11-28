@@ -11,7 +11,7 @@ MISSENSE_CSQS = ["stop_lost", "start_lost", "transcript_amplification",
 
 SYNONYMOUS_CSQS = ["stop_retained_variant", "synonymous_variant"]
 
-OTHER_CSQS = ["mature_miRNA_variant", "5_prime_UTR_variant",
+OTHER_CSQS = ["mature_miRNA_variant", "5_prime_UTR_variant", "splice_region_variant",
               "3_prime_UTR_variant", "non_coding_transcript_exon_variant", "intron_variant",
               "NMD_transcript_variant", "non_coding_transcript_variant", "upstream_gene_variant",
               "downstream_gene_variant", "TFBS_ablation", "TFBS_amplification", "TF_binding_site_variant",
@@ -76,6 +76,81 @@ def csqs_case_builder_brava(worst_csq_expr: hl.StringExpression,
                       ((worst_csq_expr.SpliceAI_DS_max < spliceai_cutoff) | (~hl.is_defined(worst_csq_expr.SpliceAI_DS_max))), "synonymous")
             )
     return case.or_missing()
+
+def csqs_case_builder_alpha_missense(worst_csq_expr: hl.StringExpression, spliceai_cutoff = 0.20):
+    r'''Annotate consequence categories for downstream analysis
+    
+    :param worst_csq_by_gene_canonical_expr: A struct that should contain "most_severe_consequence"
+    :param spliceai_cutoff" SpliceAI-based cutoff for which to assign a variant as "damaging_missense"
+    '''
+    case = hl.case(missing_false=True)
+    
+    # High confidence pLOF: LOFTEE HC
+    case = (case
+            .when(worst_csq_expr.lof == 'HC', 'pLoF')
+            .when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence) &
+                      (worst_csq_expr.am_class == "likely_pathogenic"), "damaging_missense")
+            .when(worst_csq_expr.SpliceAI_DS_max >= spliceai_cutoff, "damaging_missense") # spliceAI
+            .when(worst_csq_expr.lof == 'LC', 'damaging_missense')
+            .when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence) &
+                      (~hl.is_defined(worst_csq_expr.am_class)), "other_missense")
+            .when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence), "other_missense")
+            .when(hl.set(OTHER_CSQS).contains(worst_csq_expr.most_severe_consequence), "non_coding")
+            .when(hl.set(SYNONYMOUS_CSQS).contains(worst_csq_expr.most_severe_consequence) &
+                      ((worst_csq_expr.SpliceAI_DS_max < spliceai_cutoff) | (~hl.is_defined(worst_csq_expr.SpliceAI_DS_max))), "synonymous")
+            )
+    return case.or_missing()
+
+
+def csqs_case_builder_alpha_missense_v2(worst_csq_expr: hl.StringExpression, 
+        am_cutoff=0.564, revel_cutoff = 0.773, spliceai_cutoff = 0.50, loftee_lc_annotation="damaging_missense"):
+    r'''Annotate consequence categories for downstream analysis
+    
+    :param am_cutoff" AlphaMissense-based cutoff for which to assign a variant as "damaging_missense". 
+                      Default is 0.564 which results in 90% precision.
+    :param revel_cutoff" REVEL-based cutoff for which to assign a variant as "damaging_missense"
+    :param worst_csq_by_gene_canonical_expr: A struct that should contain "most_severe_consequence"
+    :param spliceai_cutoff" SpliceAI-based cutoff for which to assign a variant as "damaging_missense"
+    '''
+    case = hl.case(missing_false=True)
+
+    print("cutoff:")
+    print(am_cutoff)
+
+    # High confidence pLOF: LOFTEE HC
+    case = (case
+            .when(worst_csq_expr.lof == 'HC', 'pLoF')
+            .when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence) & # alpha Missense for 
+                      (worst_csq_expr.am_pathogenicity >= am_cutoff), "damaging_missense")
+            .when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence) & # indels can be assigned with REVEL
+                      (~hl.is_defined(worst_csq_expr.am_pathogenicity)) & (worst_csq_expr.revel_score >= revel_cutoff), "damaging_missense")
+            .when(worst_csq_expr.SpliceAI_DS_max >= spliceai_cutoff, "damaging_missense") # spliceAI deals with splice sites
+            .when(worst_csq_expr.lof == loftee_lc_annotation, 'damaging_missense')
+            .when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence) &
+                      (~hl.is_defined(worst_csq_expr.am_class)), "other_missense")
+            .when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence), "other_missense")
+            .when(hl.set(OTHER_CSQS).contains(worst_csq_expr.most_severe_consequence), "non_coding")
+            .when(hl.set(SYNONYMOUS_CSQS).contains(worst_csq_expr.most_severe_consequence) &
+                      ((worst_csq_expr.SpliceAI_DS_max < spliceai_cutoff) | (~hl.is_defined(worst_csq_expr.SpliceAI_DS_max))), "synonymous")
+            )
+    return case.or_missing()
+
+def encode_prob_csqs_builder(worst_csq_expr: hl.StringExpression):
+    r'''Annotate probabilistic csqs for downstream analysis
+    '''
+    case = hl.case(missing_false=True)
+
+    case = (case
+            .when(worst_csq_expr.lof == 'HC', 1)
+            .when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence) & # alpha Missense for 
+                      (hl.is_defined(worst_csq_expr.am_pathogenicity)) & (~hl.is_defined(worst_csq_expr.revel_score)), worst_csq_expr.am_pathogenicity)
+            .when(hl.set(MISSENSE_CSQS).contains(worst_csq_expr.most_severe_consequence) & # indels can be assigned with REVEL
+                      (~hl.is_defined(worst_csq_expr.am_pathogenicity)) & (hl.is_defined(worst_csq_expr.revel_score)), worst_csq_expr.revel_score)
+            .when(~hl.is_defined(worst_csq_expr.SpliceAI_DS_max), worst_csq_expr.SpliceAI_DS_max) # spliceAI deals with splice sites
+            .when(worst_csq_expr.lof == loftee_lc_annotation, 0.50)
+            )
+    return case.default(0)
+
 
 
 
