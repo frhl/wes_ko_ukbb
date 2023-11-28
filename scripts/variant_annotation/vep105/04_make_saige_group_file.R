@@ -13,6 +13,12 @@ main <- function(args) {
     # Read data from input file
     data <- fread(args$input_path)
 
+    # any duplicated?
+    n_in <- nrow(data)
+    data <- data[!duplicated(data),]
+    n_diff <- n_in - nrow(data)
+    if (n_diff>0){warning(paste(n_diff,"duplicate records removed!"))}
+
     # Select and rename relevant columns
     selected_data <- data[, .(gene_id, varid, brava_csqs)]
     setnames(selected_data, c('gene', 'variant', 'annotation'))
