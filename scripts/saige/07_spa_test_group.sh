@@ -8,7 +8,7 @@
 #SBATCH --error=logs/spa_test_group.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1
+#SBATCH --array=1,5
 
 set -o errexit
 set -o nounset
@@ -27,7 +27,7 @@ readonly grm_mtx="${grm_dir}/ukb_eur_200k_grm_fitted_relatednessCutoff_0.05_2000
 readonly grm_sam="${grm_mtx}.sampleIDs.txt"
 readonly plink_file="${grm_dir}/ukb_eur_200k_grm_grch38_rv_merged"
 
-readonly vep_version="105"
+readonly vep_version="95"
 readonly saige_group_file_dir="data/vep/vep${vep_version}/saige_group"
 readonly saige_group_file="${saige_group_file_dir}/UKB.chrCHR.exome_array.variants_only.vep${vep_version}.csqs.worst_csq_by_gene_canonical.original.saige.txt.gz"
 
@@ -64,7 +64,7 @@ submit_spa_with_csqs()
     local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
     local in_var="${step1_dir}/ukb_wes_200k_${phenotype}.varianceRatio.txt"
     local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${phenotype}_pLoF_damaging_missense.vep${vep_version}"
-    local out_mrg="${step2_dir}/${in_prefix}_${phenotype}_${annotation_label}.txt.gz"
+    local out_mrg="${step2_dir}/${in_prefix}_${phenotype}_${annotation_label}.vep${vep_version}.txt.gz"
 
     if [ "${use_prs}" -eq "1" ]; then
       set_up_rpy
@@ -74,8 +74,8 @@ submit_spa_with_csqs()
       if [ -f "${in_gmat_prs/CHR/21}" ] & [ -f "${in_var_prs/CHR/21}" ] & [ "${prs_ok}" -eq "1" ]; then
         local in_gmat=${in_gmat_prs}
         local in_var=${in_var_prs}
-        local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${phenotype}_${annotation_label}_locoprs"
-        local out_mrg="${step2_dir}/${in_prefix}_${phenotype}_${annotation_label}_locoprs.txt.gz"
+        local out_prefix="${step2_dir}/${in_prefix}_chrCHR_${phenotype}_${annotation_label}_locoprs.vep${vep_version}"
+        local out_mrg="${step2_dir}/${in_prefix}_${phenotype}_${annotation_label}_locoprs.vep${vep_version}.txt.gz"
       else
         >&2 echo "Using without PRS."
       fi 
@@ -161,7 +161,7 @@ readonly min_mac=4
 readonly project="lindgren.prj"
 readonly tasks="1-22"
 readonly queue="short"
-readonly nslots=2
+readonly nslots=1
 readonly max_maf_in_group_test="0.05"
 
 # pLoF_damaging_missense (combinesi pLoF and damaging_missense into a single category)  
