@@ -7,8 +7,7 @@
 #SBATCH --error=logs/process_csqs.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-22
-#SBATCH --dependency="afterok:38317309"
+#SBATCH --array=1
 
 set -o errexit
 set -o nounset

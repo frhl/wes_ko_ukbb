@@ -8,6 +8,7 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
 #SBATCH --array=1
+#SBATCH --dependency="afterok:38762019"
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
