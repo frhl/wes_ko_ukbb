@@ -13,8 +13,6 @@ def main(args):
     hail_init.hail_bmrc_init('logs/hail/knockout.log', 'GRCh38')
     mt = io.import_table(args.input_path, args.input_type, calc_info=False)
 
-    print(mt.describe())
-
     # Apply filters based on the provided arguments
     if args.sex != 'both':
         mt = samples.filter_to_sex(mt, args.sex)
@@ -61,6 +59,11 @@ def main(args):
 
     # re-calculate info and export the processed data
     mt = io.recalc_info(mt)
+    
+    # remove invariant sites
+    mt = mt.filter_rows(mt.info.AC > 0)
+   
+    # export output
     io.export_table(mt, args.out_prefix, args.out_type)
 
 if __name__ == '__main__':

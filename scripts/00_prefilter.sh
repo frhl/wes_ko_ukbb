@@ -9,7 +9,7 @@
 #SBATCH --error=logs/prefilter.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=1
+#SBATCH --array=1-22
 
 set -o errexit
 set -o nounset
@@ -33,8 +33,8 @@ readonly in_dir="data/phased/wes_union_calls/200k/shapeit5/clean_ligated"
 readonly input_prefix="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.bgz"
 readonly input_type="vcf"
 
-readonly out_dir="data/mt/prefilter_phased"
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}_pp90_maf05.vcf.bgz"
+readonly out_dir="data/mt/prefilter_phased/v2"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}_pp90_maf05"
 readonly out_type="vcf"
 
 # Get paths for final variants and samples
@@ -45,7 +45,6 @@ readonly final_variant_list="/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_q
 readonly exclude="data/genes/220310_common_plofs_to_exclude.txt"
 
 # Define MAF and PP cutoff thresholds
-readonly maf_min=0.00
 readonly maf_max=0.05
 readonly pp_cutoff=0.90
 
@@ -66,7 +65,6 @@ if [ ! -f "${out_prefix}.mt/_SUCCESS" ]; then
      --out_prefix "${out_prefix}" \
      --out_type "${out_type}" \
      --pp_cutoff "${pp_cutoff}" \
-     --maf_min "${maf_min}" \
      --maf_max "${maf_max}" \
      --exclude "${exclude}" \
      --final_sample_list "${final_sample_list}" \
