@@ -8,17 +8,7 @@
 #SBATCH --error=logs/combine_ps_pp.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 3
-#SBATCH --array=1-22
-#
-#$ -N combine_ps_pp
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/combine_ps_pp.log
-#$ -e logs/combine_ps_pp.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 2
-#$ -q short.qc
-#$ -t 20-22
-#$ -V
+#SBATCH --array=1-20,22
 
 set -o errexit
 set -o nounset
@@ -33,18 +23,32 @@ readonly spark_dir="data/tmp/spark"
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
-readonly ref_dir="data/prephased/wes_union_calls"
-readonly ref_path="${ref_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.gz"
+# Now with 50k samples
+readonly ref_dir="/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/readbacked/data/phased/subset/50k"
+readonly ref_path="${ref_dir}/UKB.wes.200k.chr${chr}.50k.b1of4.vcf.gz"
 readonly ref_type="vcf"
+
+# original readbacked phasing
+#readonly ref_dir="data/prephased/wes_union_calls"
+#readonly ref_path="${ref_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.gz"
+#readonly ref_type="vcf"
 
 readonly phased_dir="data/phased/wes_union_calls/200k/shapeit5/ligated"
 readonly phased_path="${phased_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.bgz"
 readonly phased_type="vcf"
 
-readonly out_dir="data/prephased/wes_union_calls/full_phase_conf"
+# new combined out dir
+readonly out_dir="data/prephased/wes_union_calls/revision/50k"
 readonly out_prefix="${out_dir}/ukb_shapeit5_whatshap_chr${chr}"
 readonly out_type="mt"
 readonly out="${out_prefix}.mt"
+
+
+# original combined dir
+#readonly out_dir="data/prephased/wes_union_calls/full_phase_conf"
+#readonly out_prefix="${out_dir}/ukb_shapeit5_whatshap_chr${chr}"
+#readonly out_type="mt"
+#readonly out="${out_prefix}.mt"
 
 mkdir -p ${out_dir}
 

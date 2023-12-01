@@ -19,8 +19,8 @@ source utils/vcf_utils.sh
 
 readonly rscript="scripts/phasing/prephasing/00_revision_subset_samples.R"
 
-readonly input_dir="/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/readbacked/data/phased/100k/readbacked"
-readonly input_path="${input_dir}/ukb.wes.readbacked.200k.chr21.100k.vcf.gz"
+readonly input_dir="/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/readbacked/data/phased/subset/50k"
+readonly input_path="${input_dir}/UKB.wes.200k.chr21.50k.b1of4.vcf.gz"
 
 readonly qced_samples_dir="/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb_nexus/data/samples"
 readonly qced_samples="${qced_samples_dir}/UKB.chr21.samples.eur.txt"
@@ -39,6 +39,7 @@ mkdir -p ${out_dir}
 # get overlapping samples
 module load BCFtools
 readonly vcf_samples="${out_prefix}.samples_in_vcf"
+
 bcftools query -l ${input_path} > ${vcf_samples}
 
 echo "wc -l vcf_samples"

@@ -6,19 +6,10 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/export_ps_pp.log
 #SBATCH --error=logs/export_ps_pp.errors.log
-#SBATCH --partition=epyc
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=20-22
-#
-#$ -N export_ps_pp
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/export_ps_pp.log
-#$ -e logs/export_ps_pp.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 2
-#$ -q short.qc
-#$ -t 20,22
-#$ -V
+#SBATCH --array=1-20,22
+#SBATCH --begin=now+6hour
 
 set -o errexit
 set -o nounset
@@ -33,20 +24,34 @@ readonly spark_dir="data/tmp/spark"
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
-readonly in_dir="data/prephased/wes_union_calls/phase_conf"
+readonly in_dir="data/prephased/wes_union_calls/revision/50k"
 readonly in_path="${in_dir}/ukb_shapeit5_whatshap_chr${chr}.mt"
 readonly in_type="mt"
 
-readonly out_dir="data/prephased/wes_union_calls/phase_conf_with_mac"
-readonly out_prefix="${out_dir}/ukb_shapeit5_whatshap_chr${chr}"
+readonly out_dir="data/prephased/wes_union_calls/10k"
+readonly out_prefix="${out_dir}/ukb_shapeit5_whatshap_chr${chr}.10k"
+
+# read-backed phasing file with the samples that have been processed
+readonly ref_dir="/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/readbacked/data/phased/subset/50k"
+readonly ref_path="${ref_dir}/UKB.wes.200k.chr${chr}.50k.b1of4.vcf.gz"
+readonly ref_type="vcf"
 
 mkdir -p ${out_dir}
+
+# samples to subset from that has read-backed phasing
+readonly sample_file="${out_prefix}.samples"
+module load BCFtools
+bcftools query -l ${ref_path} | head -n 10500 > ${sample_file}
+
 
 module purge
 set_up_hail
 set_up_pythonpath_legacy
 python3 ${hail_script} \
+  --sample_file ${sample_file} \
   --phased_path ${in_path} \
   --phased_type ${in_type} \
   --out_prefix ${out_prefix}
+
+rm ${sample_file}
 
