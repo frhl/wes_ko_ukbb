@@ -9,7 +9,7 @@
 #SBATCH --error=logs/export_vcf.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=22
+#SBATCH --array=1-21
 
 set -o errexit
 set -o nounset
@@ -26,22 +26,26 @@ readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
 readonly in_dir="data/mt/prefilter/pp90"
-readonly input_path="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.mt"
-readonly input_type="mt"
+readonly input_path="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.vcf.bgz"
+readonly input_type="vcf.bgz"
 
 readonly out_dir="data/mt/prefilter/pp90"
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.clean"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.from_mt"
 readonly out_type="vcf"
 
 mkdir -p ${out_dir}
 
-set_up_hail
-set_up_pythonpath_legacy
-python3 "${hail_script}" \
-   --input_path ${input_path}\
-   --input_type ${input_type} \
-   --out_prefix ${out_prefix} \
-   --out_type ${out_type} \
+module load BCFtools
+bcftools view -c 1 -c 1:nonmajor ${input_path} | bcftools annotate --set-id '%CHROM\:%POS\:%REF\:%ALT' -Oz -o ${out_prefix}.vcf.gz
+
+# deprecated in favour of BCFtools to annotate variants
+#set_up_hail
+#set_up_pythonpath_legacy
+#python3 "${hail_script}" \
+#   --input_path ${input_path}\
+#   --input_type ${input_type} \
+#   --out_prefix ${out_prefix} \
+#   --out_type ${out_type} \
 
 
  
