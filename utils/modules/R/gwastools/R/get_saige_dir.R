@@ -24,6 +24,12 @@ get_saige_dir <- function(directory = "") {
     else if (directory == "add_encoding") {
         out_dir <- "/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/data/saige/output/binary/step2_encoding_012/min_mac4"
     }
+    else if (directory == "only_singletons") {
+        out_dir <- "/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/data/saige/output/binary/step2_only_singletons/min_mac4"
+    }
+    else if (directory == "exclude_singletons") {
+        out_dir <- "/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/data/saige/output/binary/step2_exclude_singletons/min_mac4"
+    }
     else {
         stop(paste(directory, "is not valid saige directory subset"))
     }
