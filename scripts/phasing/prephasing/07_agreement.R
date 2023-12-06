@@ -26,10 +26,13 @@ main <- function(args){
     qc_samples <- readLines(samples)
 
     dt_summary <- list()
-    for (chr in seq(20,22))
+    for (chr in seq(1,22))
     {
         fpath <- gsub("CHR", chr, input_path) 
         cat(paste('chromosome', chr, "-", fpath))
+        stopifnot(file.exists(fpath))
+        chrom <- paste0("chr", chr)
+
         dt <- fread(fpath, key=c("locus", "alleles"))
         dt <- merge(dt, exome_vars)
         dt <- dt[dt$s %in% qc_samples,]
@@ -47,13 +50,14 @@ main <- function(args){
 
         # Agreement of dt_pairs
         dt_pairs$PP[is.na(dt_pairs$PP)] <- 1
-        dt_summary[[paste0('chr', chr)]] <- dt_pairs %>% group_by(s, PS_rb) %>% 
+        dt_summary[[chrom]] <- dt_pairs %>% group_by(s, PS_rb) %>% 
             summarise(
             match = (sum(GT == GT_rb) != 1),
             min_MAC = min(MAC),
             max_MAC = max(MAC),
             min_PP = min(PP),
-            max_PP = max(PP)
+            max_PP = max(PP),
+            chrom = chrom
             )
     }
 
