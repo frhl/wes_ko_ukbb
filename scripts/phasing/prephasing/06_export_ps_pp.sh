@@ -8,8 +8,7 @@
 #SBATCH --error=logs/export_ps_pp.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-20,22
-#SBATCH --begin=now+6hour
+#SBATCH --array=21
 
 set -o errexit
 set -o nounset
@@ -28,7 +27,7 @@ readonly in_dir="data/prephased/wes_union_calls/revision/50k"
 readonly in_path="${in_dir}/ukb_shapeit5_whatshap_chr${chr}.mt"
 readonly in_type="mt"
 
-readonly out_dir="data/prephased/wes_union_calls/10k"
+readonly out_dir="data/prephased/wes_union_calls/10k/test_mac"
 readonly out_prefix="${out_dir}/ukb_shapeit5_whatshap_chr${chr}.10k"
 
 # read-backed phasing file with the samples that have been processed
