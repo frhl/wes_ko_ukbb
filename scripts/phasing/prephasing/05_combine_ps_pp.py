@@ -18,30 +18,42 @@ def main(args):
     # set up
     hail_init.hail_bmrc_init_local('logs/hail/merge_chunks.log', 'GRCh38')
     hl._set_flags(no_whole_stage_codegen='1') # from zulip
+    # original 200k phased data
     mt1 = hl.import_vcf(
         phased_path,
         force_bgz=True,
         skip_invalid_loci=True,
         array_elements_required=False,
         find_replace=(':-nan', ':NaN'))
+    
+    # readback phased data
     mt2 = hl.import_vcf(
         ref_path,
         force_bgz=True,
         skip_invalid_loci=True,
         array_elements_required=False,
         find_replace=('nan', 'NaN'))
+    
+    # we only care about read-backed entries in 
+    # which we have a phased set (i.e. phased genotypes)
     mt2 = mt2.filter_entries(hl.is_defined(mt2.PS))
+    
+    # transfer the read-backed phased entries to
+    # the original phased data
     mt1 = mt1.annotate_entries(
         GT_rb = mt2[mt1.row_key, mt1.col_key].GT,
         PS_rb = mt2[mt1.row_key, mt1.col_key].PS
-    )    
+    )   
 
+    # we also keep the allele count from the read-backed
+    # phased data. Just in case, we want to filter downstream
     mt1.transmute_rows(
         info = mt1.info.annotate(
             AC_rb = mt2.rows()[mt1.row_key].info.AC,
             AN_rb = mt2.rows()[mt1.row_key].info.AN
         )
     )
+
     io.export_table(mt1, out_prefix, out_type)
 
 

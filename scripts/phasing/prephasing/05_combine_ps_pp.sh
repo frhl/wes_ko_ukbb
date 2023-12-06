@@ -8,7 +8,7 @@
 #SBATCH --error=logs/combine_ps_pp.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 3
-#SBATCH --array=1-20,22
+#SBATCH --array=1-22
 
 set -o errexit
 set -o nounset
@@ -33,16 +33,15 @@ readonly ref_type="vcf"
 #readonly ref_path="${ref_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.gz"
 #readonly ref_type="vcf"
 
-readonly phased_dir="data/phased/wes_union_calls/200k/shapeit5/ligated"
+readonly phased_dir="data/phased/wes_union_calls/200k/shapeit5/clean_ligated" # consider using ligated_clean
 readonly phased_path="${phased_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.bgz"
 readonly phased_type="vcf"
 
 # new combined out dir
-readonly out_dir="data/prephased/wes_union_calls/revision/50k"
+readonly out_dir="data/prephased/wes_union_calls/revision"
 readonly out_prefix="${out_dir}/ukb_shapeit5_whatshap_chr${chr}"
 readonly out_type="mt"
 readonly out="${out_prefix}.mt"
-
 
 # original combined dir
 #readonly out_dir="data/prephased/wes_union_calls/full_phase_conf"
@@ -51,7 +50,6 @@ readonly out="${out_prefix}.mt"
 #readonly out="${out_prefix}.mt"
 
 mkdir -p ${out_dir}
-
 
 
 # combine parents and children in same vcf
