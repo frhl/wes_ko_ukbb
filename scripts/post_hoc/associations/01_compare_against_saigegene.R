@@ -136,3 +136,46 @@ write(paste("writing to", outfile), stdout())
 fwrite(final, outfile, sep="\t", na="NA")
 
 
+
+######### plotting #########
+
+cols_to_keep <- c("trait","hgnc_symbol", "Pvalue_KO",
+                  "Burden.PP_ge_50", "SKATO.PP_ge_50",
+                  "Burden.PP_ge_90", "SKATO.PP_ge_90")
+
+d <- final[,..cols_to_keep]
+melted_d <- melt(d, id.vars = c("trait", "hgnc_symbol", "Pvalue_KO"))
+melted_d$pp_set <- factor(ifelse(grepl(melted_d$variable, pattern="50"), "PP>=50", "PP>=0.90"))
+melted_d$model <- factor(ifelse(grepl(melted_d$variable, pattern="Burden"), "Burden", "SKATO"))
+
+options(repr.plot.width=12, repr.plot.height=10)
+p <- ggplot(melted_d, aes(x=-log10(value),y=-log10(Pvalue_KO), label=hgnc_symbol)) +
+    geom_point(size=2) +
+    geom_text_repel(color="black", max.overlaps = 70, point.padding = 0.15, box.padding = 1) +
+    geom_abline(linetype="dashed") +
+    scale_x_continuous(breaks=scales::pretty_breaks(n=5)) +
+    scale_y_continuous(breaks=scales::pretty_breaks(n=5)) +
+    xlab(expression(paste(-log[10],'(Haplotype Encoding P-value)' ))) +
+    ylab(expression(paste(-log[10],'(SAIGE-GENE+ P-value)' ))) +
+    labs(color="(Knockout*2) count cutoff") +
+    theme_bw() +
+    theme(
+        axis.text=element_text(size=15),
+        axis.title=element_text(size=15,face="bold"),
+        axis.title.x = element_text(margin=ggplot2::margin(t=16)),
+        axis.title.y = element_text(margin=ggplot2::margin(r=16)),
+        plot.title = element_text(hjust=0.5),
+        plot.subtitle = element_text(hjust=0.5),
+        legend.text=element_text(size=15),
+        legend.position="top"
+    ) +
+    facet_grid(model~pp_set)
+p
+
+outfile <- file.path("/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/derived/plots/231208_saigegene_vs_additive.pdf")
+ggsave(outfile, width=12, height=10)
+
+
+
+
+
