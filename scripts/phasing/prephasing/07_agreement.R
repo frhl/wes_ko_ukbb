@@ -34,6 +34,12 @@ main <- function(args){
         chrom <- paste0("chr", chr)
 
         dt <- fread(fpath, key=c("locus", "alleles"))
+        
+        # deal with AC looking like this [156]
+        dt$AC <- as.numeric(gsub("(\\[)|(\\])", "", dt$AC))
+        dt$MAC <- dt$AC #min(dt$AC, (200000*2)-dt$AC)
+
+        
         dt <- merge(dt, exome_vars)
         dt <- dt[dt$s %in% qc_samples,]
 

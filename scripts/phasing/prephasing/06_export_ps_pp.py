@@ -33,8 +33,8 @@ def main(args):
 
     # grab the allele counts from the WES200k
     mt = mt.annotate_rows(AC=mt.info.AC[0])
-    mt = mt.annotate_rows(AN=mt.info.AN[0])
-    mt = mt.annotate_rows(AF=mt.info.AF[0])
+    mt = mt.annotate_rows(AN=mt.info.AN)
+    mt = mt.annotate_rows(AF=mt.info.AF)
     mt = mt.annotate_rows(MAC=hl.min(mt.AC, mt.AN-mt.AC))
    
     # we now filter to defined phased sets in the data
@@ -45,7 +45,7 @@ def main(args):
     mt = mt.transmute_rows(rsid=variants.get_variant_expr(mt.locus, mt.alleles))
    
     # keep wes200k AC/AN and also the AC for the read-backed phased data
-    mt = mt.select_rows(*[mt.rsid, mt.AC, mt.AN, mt.MAC, mt.AC_rb])
+    mt = mt.select_rows(*[mt.rsid, mt.AC, mt.AN, mt.MAC])
 
     ht = mt.entries()
     ht.export(out_prefix + ".PP.PS.txt.gz")

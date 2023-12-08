@@ -8,7 +8,8 @@
 #SBATCH --error=logs/export_ps_pp.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=21
+#SBATCH --array=1-20,22
+#SBATCH --dependency="afterok:39377737_1"
 
 set -o errexit
 set -o nounset
@@ -23,20 +24,19 @@ readonly spark_dir="data/tmp/spark"
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
-readonly in_dir="data/prephased/wes_union_calls/revision/50k"
+readonly in_dir="data/prephased/wes_union_calls/revision"
 readonly in_path="${in_dir}/ukb_shapeit5_whatshap_chr${chr}.mt"
 readonly in_type="mt"
 
-readonly out_dir="data/prephased/wes_union_calls/10k/test_mac"
+readonly out_dir="data/prephased/wes_union_calls/10k"
 readonly out_prefix="${out_dir}/ukb_shapeit5_whatshap_chr${chr}.10k"
+
+mkdir -p ${out_dir}
 
 # read-backed phasing file with the samples that have been processed
 readonly ref_dir="/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/readbacked/data/phased/subset/50k"
 readonly ref_path="${ref_dir}/UKB.wes.200k.chr${chr}.50k.b1of4.vcf.gz"
 readonly ref_type="vcf"
-
-mkdir -p ${out_dir}
-
 # samples to subset from that has read-backed phasing
 readonly sample_file="${out_prefix}.samples"
 module load BCFtools
