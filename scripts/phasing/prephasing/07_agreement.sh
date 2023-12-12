@@ -37,14 +37,19 @@ readonly samples_dir="/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/K
 mkdir -p ${out_dir}
 set_up_rpy
 
-for anc in "afr" "eas" "sas" "eur"; do
+for anc in "afr" "eas" "eur"; do
   samples="${samples_dir}/UKB.chr21.samples.${anc}.txt"
   out_prefix_anc="${out_prefix}.${anc}"
-  Rscript ${rscript} \
-    --input_path "${input_path}" \
-    --sites "${wes_variants}" \
-    --samples "${samples}" \
-    --out_prefix "${out_prefix_anc}"
+  out="${out_prefix_anc}.pp.txt.gz"
+  if [[ ! -f ${out} ]]; then
+    Rscript ${rscript} \
+      --input_path "${input_path}" \
+      --sites "${wes_variants}" \
+      --samples "${samples}" \
+      --out_prefix "${out_prefix_anc}"
+  else
+    >&2 echo "Skipping ${out}"
+  fi
 done
 
 
