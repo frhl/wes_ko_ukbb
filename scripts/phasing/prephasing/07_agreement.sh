@@ -19,8 +19,8 @@ readonly rscript="scripts/phasing/prephasing/07_agreement.R"
 readonly input_dir="data/prephased/wes_union_calls/50k" # 10k samples all autosomes
 readonly input_path="${input_dir}/ukb_shapeit5_whatshap_chrCHR.50k.PP.PS.txt.gz"
 
-readonly out_dir="data/prephased/wes_union_calls/10k"
-readonly out_prefix="${out_dir}/ukb_shapeit5_whatshap.15k.PP.PS.agreement"
+readonly out_dir="data/prephased/wes_union_calls/50k"
+readonly out_prefix="${out_dir}/ukb_shapeit5_whatshap.50k.PP.PS.agreement"
 
 #readonly input_dir="data/prephased/wes_union_calls/full_phase_conf" # all chromosomes 1000 samples
 #readonly input_path="${input_dir}/ukb_shapeit5_whatshap_chrCHR.PP.PS.txt.gz"
@@ -37,8 +37,8 @@ readonly samples_dir="/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/K
 mkdir -p ${out_dir}
 set_up_rpy
 
-for anc in "eur" "afr" "eas" "sas"; do
-  samples="${samples_dir}.${anc}.txt"
+for anc in "afr" "eas" "sas" "eur"; do
+  samples="${samples_dir}/UKB.chr21.samples.${anc}.txt"
   out_prefix_anc="${out_prefix}.${anc}"
   Rscript ${rscript} \
     --input_path "${input_path}" \
