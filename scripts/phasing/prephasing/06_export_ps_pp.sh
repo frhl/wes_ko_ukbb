@@ -8,8 +8,7 @@
 #SBATCH --error=logs/export_ps_pp.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-20,22
-#SBATCH --dependency="afterok:39377737_1"
+#SBATCH --array=1-22
 
 set -o errexit
 set -o nounset
@@ -28,8 +27,8 @@ readonly in_dir="data/prephased/wes_union_calls/revision"
 readonly in_path="${in_dir}/ukb_shapeit5_whatshap_chr${chr}.mt"
 readonly in_type="mt"
 
-readonly out_dir="data/prephased/wes_union_calls/10k"
-readonly out_prefix="${out_dir}/ukb_shapeit5_whatshap_chr${chr}.10k"
+readonly out_dir="data/prephased/wes_union_calls/50k"
+readonly out_prefix="${out_dir}/ukb_shapeit5_whatshap_chr${chr}.50k"
 
 mkdir -p ${out_dir}
 
@@ -37,10 +36,12 @@ mkdir -p ${out_dir}
 readonly ref_dir="/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/readbacked/data/phased/subset/50k"
 readonly ref_path="${ref_dir}/UKB.wes.200k.chr${chr}.50k.b1of4.vcf.gz"
 readonly ref_type="vcf"
+
 # samples to subset from that has read-backed phasing
 readonly sample_file="${out_prefix}.samples"
 module load BCFtools
-bcftools query -l ${ref_path} | head -n 10500 > ${sample_file}
+#bcftools query -l ${ref_path} | head -n 100000 > ${sample_file}
+bcftools query -l ${ref_path} > ${sample_file}
 
 
 module purge
