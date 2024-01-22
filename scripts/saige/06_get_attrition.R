@@ -43,6 +43,8 @@ main <- function(args){
     f5 <- args$common
     f6 <- args$chet_only
     f7 <- args$hom_only
+    f8 <- args$only_singletons
+    f9 <- args$exclude_singletons
     
     stopifnot(file.exists(f0))
     stopifnot(file.exists(f1))
@@ -228,6 +230,8 @@ parser$add_argument("--common", default=NULL, required = FALSE, help = "Path to 
 parser$add_argument("--cond_additive", default=NULL, required = FALSE, help = "Path to file to recessive analysis conditioned on additive encoding")
 parser$add_argument("--chet_only", default=NULL, required = FALSE, help = "Path to chet-only analysis")
 parser$add_argument("--hom_only", default=NULL, required = FALSE, help = "Path to hom-only analysis")
+parser$add_argument("--only_singletons", default=NULL, required = FALSE, help = "Path to hom-only analysis")
+parser$add_argument("--exclude_singletons", default=NULL, required = FALSE, help = "Path to hom-only analysis")
 parser$add_argument("--co_table", default=NULL, required = FALSE, help = "Path to collapsed co-occurence table to populate NAs from chet/hom only")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "")
 args <- parser$parse_args()

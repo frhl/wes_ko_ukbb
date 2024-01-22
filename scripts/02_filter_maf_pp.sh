@@ -3,13 +3,15 @@
 # @description Annotate main MatrixTables with VEP results
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=prefilter_variants
+#SBATCH --job-name=filter_maf_pp
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/prefilter_variants.log
-#SBATCH --error=logs/prefilter_variants.errors.log
+#SBATCH --output=logs/filter_maf_pp.log
+#SBATCH --error=logs/filter_maf_pp.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 #SBATCH --array=1-22
+
+# this script used to be called 02_prefilter_variants.*
 
 set -o errexit
 set -o nounset
@@ -20,7 +22,7 @@ source utils/hail_utils.sh
 source utils/vcf_utils.sh
 
 readonly spark_dir="data/tmp/spark_dir"
-readonly hail_script="scripts/02_prefilter_variants.py"
+readonly hail_script="scripts/02_filter_maf_pp.py"
 
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )

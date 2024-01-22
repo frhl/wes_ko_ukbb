@@ -64,31 +64,46 @@ get_table() {
 set_up_rpy
 
 # additive encoding
-get_table "176k_sig_saige_all_prs_excl_N${N_ko_cutoff}_add_encoding" "add_encoding" "exclude" "1"
-get_table "176k_sig_saige_all_prs_only_N${N_ko_cutoff}_add_encoding" "add_encoding" "only" "1"
-get_table "176k_sig_saige_all_prs_pref_N${N_ko_cutoff}_add_encoding" "add_encoding" "prefer" "1"
+#get_table "176k_sig_saige_all_prs_excl_N${N_ko_cutoff}_add_encoding" "add_encoding" "exclude" "1"
+#get_table "176k_sig_saige_all_prs_only_N${N_ko_cutoff}_add_encoding" "add_encoding" "only" "1"
+#get_table "176k_sig_saige_all_prs_pref_N${N_ko_cutoff}_add_encoding" "add_encoding" "prefer" "1"
 
-get_table "176k_sig_saige_sig_prs_excl_N${N_ko_cutoff}_add_encoding" "add_encoding" "exclude" "${add_nom_p_cutoff}"
-get_table "176k_sig_saige_sig_prs_only_N${N_ko_cutoff}_add_encoding" "add_encoding" "only" "${add_nom_p_cutoff}"
-get_table "176k_sig_saige_sig_prs_pref_N${N_ko_cutoff}_add_encoding" "add_encoding" "prefer" "${add_nom_p_cutoff}"
+#get_table "176k_sig_saige_sig_prs_excl_N${N_ko_cutoff}_add_encoding" "add_encoding" "exclude" "${add_nom_p_cutoff}"
+#get_table "176k_sig_saige_sig_prs_only_N${N_ko_cutoff}_add_encoding" "add_encoding" "only" "${add_nom_p_cutoff}"
+#get_table "176k_sig_saige_sig_prs_pref_N${N_ko_cutoff}_add_encoding" "add_encoding" "prefer" "${add_nom_p_cutoff}"
 
 # Subsetting by P-value
-get_table "176k_sig_saige_sig_prs_excl_N${N_ko_cutoff}" "none" "exclude" "${nom_p_cutoff}"
-get_table "176k_sig_saige_sig_prs_only_N${N_ko_cutoff}" "none" "only" "${nom_p_cutoff}"
-get_table "176k_sig_saige_sig_prs_pref_N${N_ko_cutoff}" "none" "prefer" "${nom_p_cutoff}"
+#get_table "176k_sig_saige_sig_prs_excl_N${N_ko_cutoff}" "none" "exclude" "${nom_p_cutoff}"
+#get_table "176k_sig_saige_sig_prs_only_N${N_ko_cutoff}" "none" "only" "${nom_p_cutoff}"
+#get_table "176k_sig_saige_sig_prs_pref_N${N_ko_cutoff}" "none" "prefer" "${nom_p_cutoff}"
 
 # no subsetting by P-value
-get_table "176k_sig_saige_all_prs_excl_N${N_ko_cutoff}" "none" "exclude" "1"
-get_table "176k_sig_saige_all_prs_only_N${N_ko_cutoff}" "none" "only" "1"
-get_table "176k_sig_saige_all_prs_pref_N${N_ko_cutoff}" "none" "prefer" "1"
+#get_table "176k_sig_saige_all_prs_excl_N${N_ko_cutoff}" "none" "exclude" "1"
+#get_table "176k_sig_saige_all_prs_only_N${N_ko_cutoff}" "none" "only" "1"
+#get_table "176k_sig_saige_all_prs_pref_N${N_ko_cutoff}" "none" "prefer" "1"
 
 # chet only
-get_table "176k_sig_saige_all_prs_excl_N${N_ko_cutoff}_chet_only" "chet_only" "exclude" "1"
-get_table "176k_sig_saige_all_prs_pref_N${N_ko_cutoff}_chet_only" "chet_only" "prefer" "1"
+#get_table "176k_sig_saige_all_prs_excl_N${N_ko_cutoff}_chet_only" "chet_only" "exclude" "1"
+#get_table "176k_sig_saige_all_prs_pref_N${N_ko_cutoff}_chet_only" "chet_only" "prefer" "1"
 
 # hom only
-get_table "176k_sig_saige_all_prs_excl_N${N_ko_cutoff}_hom_only" "hom_only" "exclude" "1"
-get_table "176k_sig_saige_all_prs_pref_N${N_ko_cutoff}_hom_only" "hom_only" "prefer" "1"
+#get_table "176k_sig_saige_all_prs_excl_N${N_ko_cutoff}_hom_only" "hom_only" "exclude" "1"
+#get_table "176k_sig_saige_all_prs_pref_N${N_ko_cutoff}_hom_only" "hom_only" "prefer" "1"
+
+# add encoding no pp cutoff
+get_table "176k_sig_saige_all_prs_excl_N${N_ko_cutoff}_add_encoding_no_pp_cutoff" "add_encoding_no_pp_cutoff" "exclude" "1"
+get_table "176k_sig_saige_all_prs_pref_N${N_ko_cutoff}_add_encoding_no_pp_cutoff" "add_encoding_no_pp_cutoff" "prefer" "1"
+
+# no singletons
+get_table "176k_sig_saige_all_prs_excl_N${N_ko_cutoff}_exclude_singletons" "exclude_singletons" "exclude" "1"
+get_table "176k_sig_saige_all_prs_pref_N${N_ko_cutoff}_exclude_singletons" "exclude_singletons" "prefer" "1"
+
+# only singletons (not enough psuedo variants)
+#get_table "176k_sig_saige_all_prs_excl_N${N_ko_cutoff}_only_singletons" "only_singletons" "exclude" "1"
+#get_table "176k_sig_saige_all_prs_pref_N${N_ko_cutoff}_only_singletons" "only_singletons" "prefer" "1"
+
+
+
 
 
 

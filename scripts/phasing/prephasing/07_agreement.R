@@ -21,7 +21,8 @@ main <- function(args){
     samples <- args$samples
     input_path <- args$input_path
     out_prefix <- args$out_prefix
-    
+    summary_type <- args$summary_type   
+ 
     exome_vars <- fread(sites)
     qc_samples <- readLines(samples)
 
@@ -72,6 +73,7 @@ main <- function(args){
     fwrite(dt_summary, outfile, sep = '\t')
 
     # combinme
+    if (summary_type=="shapeit"){
     setDT(dt_summary)[, MAC_bin := as.integer(cut(min_MAC, breaks = c(1, 2, 6, 11, 21, 51, 101, 201, 501, 1000, 2000, 5000, 10000, (max(dt_summary$min_MAC)+1)), right=FALSE))][,
              MAC_group := c(
              'Singleton',
@@ -87,6 +89,31 @@ main <- function(args){
              '2k-5k',
              '5k-10k',
              '10k+')[MAC_bin]]
+    } else if (summary_type=="long") {
+        setDT(dt_summary)[, MAC_bin := as.integer(cut(min_MAC, breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 16, 21, 51, 101, 201, 501, 1000, 2000, 5000, 10000, (max(dt_summary$min_MAC)+1)), right=FALSE))][,
+             MAC_group := c(
+             'Singleton',
+             '2',
+             '3',
+             '4',
+             '5',
+             '6',
+             '7',
+             '8',
+             '9',
+             '10',
+             '11-15',
+             '16-20',
+             '21-50',
+             '51-100',
+             '101-200',
+             '201-500',
+             '501-1000',
+             '1k-2k',
+             '2k-5k',
+             '5k-10k',
+             '10k+')[MAC_bin]]   
+    }
 
     dt_summary_list <- list()
     for (min_pp in c(0.5, 0.6, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 0.99)) {
@@ -116,6 +143,7 @@ parser$add_argument("--input_path", default=NULL, required = TRUE, help = "path 
 parser$add_argument("--sites", default=NULL, required = TRUE, help = "path to quality controlled variant sites")
 parser$add_argument("--samples", default=NULL, required = TRUE, help = "path to samples to subset to")
 parser$add_argument("--out_prefix", default=NULL, required = TRUE, help = "out prefix for files.")
+parser$add_argument("--summary_type", default="shapeit", required = FALSE, help = "out prefix for files.")
 args <- parser$parse_args()
 
 main(args)

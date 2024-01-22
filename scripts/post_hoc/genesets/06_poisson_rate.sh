@@ -39,6 +39,7 @@ Rscript "${rscript}" \
    --in_count "${in_file}" \
    --file_mutation_rates "${mutation_rates}" \
    --dir_genesets "${essential_dir}" \
+   --file_omim ${omim} \
    --file_pli ${pli} \
    --file_gtex ${gtex} \
    --file_cancer ${cancer1}

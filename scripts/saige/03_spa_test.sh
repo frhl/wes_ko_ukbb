@@ -8,7 +8,7 @@
 #SBATCH --error=logs/spa_test.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-320
+#SBATCH --array=1-311
 
 set -o errexit
 set -o nounset
@@ -21,7 +21,11 @@ source utils/qsub_utils.sh
 #readonly vcf_dir="data/knockouts/alt/pp90/test_new_vcf"
 #readonly vcf_dir="data/knockouts/alt/pp90/only_homs"
 #readonly vcf_dir="data/knockouts/alt/pp90/only_chets"
-readonly vcf_dir="data/knockouts/alt/pp90/encoding_012"
+#readonly vcf_dir="data/knockouts/alt/pp90/encoding_012"
+#readonly vcf_dir="data/mt/prefilter/no_pp_cutoff/encoded" # additive encoding with no PP cutoff
+#readonly vcf_dir="data/knockouts/alt/pp90/only_singletons"
+readonly vcf_dir="data/knockouts/alt/pp90/exclude_singletons"
+
 readonly pheno_dir="data/phenotypes"
 readonly spark_dir="data/tmp/spark"
 
@@ -68,9 +72,14 @@ submit_spa_with_csqs()
     #local step2_dir="data/saige/output/${trait}/step2/min_mac${min_mac}"
     #local step2_dir="data/saige/output/${trait}/step2_only_chets/min_mac${min_mac}"
     #local step2_dir="data/saige/output/${trait}/step2_only_homs/min_mac${min_mac}"
-    local step2_dir="data/saige/output/${trait}/step2_encoding_012/min_mac${min_mac}"
+    #local step2_dir="data/saige/output/${trait}/step2_encoding_012/min_mac${min_mac}"
+    #local step2_dir="data/saige/output/${trait}/step2_encoding_012_no_pp_cutoff/min_mac${min_mac}"
+    local step2_dir="data/saige/output/${trait}/step2_exclude_singletons/min_mac${min_mac}"
+    #local step2_dir="data/saige/output/${trait}/step2_only_singletons/min_mac${min_mac}"
     #local step2_dir="data/saige/output/${trait}/step2_test_new_vcf/min_mac${min_mac}"
+    
     local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${annotation}.vcf.bgz"
+    local in_vcf="${vcf_dir}/ukb_wes_union_calls_200k_chrCHR.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.${annotation}.vcf.gz"
     mkdir -p ${step2_dir}
 
     local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
@@ -167,7 +176,7 @@ submit_merge_job()
 
 # parameters
 readonly conditioning_markers=""
-readonly use_prs="0"
+readonly use_prs="1"
 readonly min_mac=4
 readonly project="lindgren.prj"
 readonly tasks=1-22

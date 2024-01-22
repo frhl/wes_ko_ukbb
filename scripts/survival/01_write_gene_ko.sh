@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
-#
-#$ -N write_gene_ko
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/write_gene_ko.log
-#$ -e logs/write_gene_ko.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qc
-#$ -t 1-19
-#$ -tc 1
-#$ -V
+
+#SBATCH --account=lindgren.prj
+#SBATCH --job-name=write_gene_ko
+#SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
+#SBATCH --output=logs/write_gene_ko.log
+#SBATCH --error=logs/write_gene_ko.errors.log
+#SBATCH --partition=epyc
+#SBATCH --cpus-per-task=1
+#SBATCH --array=22
+
 
 set -o errexit
 set -o nounset
@@ -33,8 +32,8 @@ extract_genes_by_annotation() {
   local annotation=${1}
   local in_dir="data/knockouts/alt/pp90/combined"
   local in_file="${in_dir}/ukb_eur_wes_200k_chr${chr}_${annotation}_all.tsv.gz"
-  local out_dir="data/survival/knockouts/${annotation}/chr${chr}"
-  local out_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}_${annotation}"
+  local out_dir="data/survival/knockouts/${annotation}/wo_chrom_prefix"
+  local out_prefix="${out_dir}/ukb_eur_wes_200k_${annotation}"
   local sample_file="${out_prefix}.samples.txt"
   if [ -f "${in_file}" ]; then
     mkdir -p ${out_dir}

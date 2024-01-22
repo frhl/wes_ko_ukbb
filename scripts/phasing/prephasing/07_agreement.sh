@@ -5,8 +5,8 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/agreement.log
 #SBATCH --error=logs/agreement.errors.log
-#SBATCH --partition=short
-#SBATCH --cpus-per-task 5
+#SBATCH --partition=epyc
+#SBATCH --cpus-per-task 2
 
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
@@ -20,7 +20,7 @@ readonly input_dir="data/prephased/wes_union_calls/50k" # 10k samples all autoso
 readonly input_path="${input_dir}/ukb_shapeit5_whatshap_chrCHR.50k.PP.PS.txt.gz"
 
 readonly out_dir="data/prephased/wes_union_calls/50k"
-readonly out_prefix="${out_dir}/ukb_shapeit5_whatshap.50k.PP.PS.agreement"
+readonly out_prefix="${out_dir}/ukb_shapeit5_whatshap.50k.PP.PS.agreement.long"
 
 #readonly input_dir="data/prephased/wes_union_calls/full_phase_conf" # all chromosomes 1000 samples
 #readonly input_path="${input_dir}/ukb_shapeit5_whatshap_chrCHR.PP.PS.txt.gz"
@@ -37,7 +37,7 @@ readonly samples_dir="/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/K
 mkdir -p ${out_dir}
 set_up_rpy
 
-for anc in "afr" "eas" "eur"; do
+for anc in "eur"; do
   samples="${samples_dir}/UKB.chr21.samples.${anc}.txt"
   out_prefix_anc="${out_prefix}.${anc}"
   out="${out_prefix_anc}.pp.txt.gz"
@@ -46,7 +46,8 @@ for anc in "afr" "eas" "eur"; do
       --input_path "${input_path}" \
       --sites "${wes_variants}" \
       --samples "${samples}" \
-      --out_prefix "${out_prefix_anc}"
+      --out_prefix "${out_prefix_anc}" \
+      --summary_type "long"
   else
     >&2 echo "Skipping ${out}"
   fi

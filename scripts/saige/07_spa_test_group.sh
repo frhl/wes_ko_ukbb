@@ -8,7 +8,8 @@
 #SBATCH --error=logs/spa_test_group.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1,5
+#SBATCH --array=1-22
+#SBATCh --dependency="afterok:39656974"
 
 set -o errexit
 set -o nounset
@@ -17,7 +18,8 @@ module purge
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
-readonly vcf_dir="data/mt/prefilter/pp90"
+#readonly vcf_dir="data/mt/prefilter/pp90" # with standard PP cutoff
+readonly vcf_dir="data/mt/prefilter/no_pp_cutoff/old" # without PP cutoff
 readonly pheno_dir="data/phenotypes"
 
 readonly plink_dir="data/saige/grm/input"
@@ -43,7 +45,8 @@ readonly curwd=$(pwd)
 submit_spa_binary_with_csqs()
 {
   local annotation="${1?Error: Missing arg1 (annotation)}"
-  local pheno_list="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
+  #local pheno_list="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
+  local pheno_list="${pheno_dir}/dec22_phenotypes_binary_200k_header_additive_to_try.txt"
   local phenotype=$( sed "${index}q;d" ${pheno_list} )
   submit_spa_with_csqs "${annotation}" "${phenotype}" "binary"
 }
@@ -57,7 +60,8 @@ submit_spa_with_csqs()
   if [ ! -z ${phenotype} ]; then
 
     local step1_dir="data/saige/output/${trait}/step1"
-    local step2_dir="data/saige/output/${trait}/step2_saige_group/min_mac${min_mac}"
+    #local step2_dir="data/saige/output/${trait}/step2_saige_group/min_mac${min_mac}"
+    local step2_dir="data/saige/output/${trait}/step2_saige_group_no_pp/min_mac${min_mac}"
     local in_vcf="${vcf_dir}/ukb_wes_union_calls_200k_chrCHR.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.vcf.bgz"
     mkdir -p ${step2_dir}
 
@@ -156,12 +160,12 @@ submit_merge_job()
 }
 
 # parameters
-readonly use_prs="1"
+readonly use_prs="0"
 readonly min_mac=4
 readonly project="lindgren.prj"
 readonly tasks="1-22"
 readonly queue="short"
-readonly nslots=1
+readonly nslots=2
 readonly max_maf_in_group_test="0.05"
 
 # pLoF_damaging_missense (combinesi pLoF and damaging_missense into a single category)  
