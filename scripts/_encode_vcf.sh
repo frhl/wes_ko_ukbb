@@ -27,7 +27,7 @@ readonly out_prefix_chr=$(echo ${out_prefix} | sed -e "s/CHR/${chr}/g")
 evaluate_knockouts() {
   echo "Evaluating ${out_prefix_chr}.vcf.bgz.."
   SECONDS=0
- python3 "${hail_script}" \
+  set -x && python3 "${hail_script}" \
       --chrom ${chr} \
       --input_path ${input_path_chr} \
       --input_type ${input_type} \
@@ -37,25 +37,19 @@ evaluate_knockouts() {
       ${aggr_method:+--aggr_method "${aggr_method}"} \
       --out_prefix ${out_prefix_chr} \
       --out_type ${out_type} \
-      --exclude_singletons \
-      --checkpoint \
-      && print_update "Finished evaluation knockouts for chr${chr}" ${SECONDS} \
-      || raise_error "Evaluating knockouts for chr${chr} failed"
+      --only_singletons \
+      --checkpoint
   rm -rf "${out_prefix_chr}_checkpoint.mt"
   rm -rf "${out_prefix_chr}_precheckpoint.mt"
 }
 
- 
-#if [ ! -f "${out_prefix_chr}.vcf.bgz" ]; then
-
-set -x
 set_up_hail
 set_up_pythonpath_legacy
-
 if python -c "import hail" &> /dev/null; then
-    echo 'all good'
+    echo 'Hail can be successfull started.'
 else
-    echo 'uh oh'
+    >&2 echo 'Error: Hail could not be started.. check conda env?'
+    exit 1
 fi
 
 evaluate_knockouts

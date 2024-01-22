@@ -113,6 +113,7 @@ main <- function(args)
     # rename to brava convention
     colnames(dt_brava_annot)[colnames(dt_brava_annot) == "varid"] <- "SNP_ID"
     colnames(dt_brava_annot)[colnames(dt_brava_annot) == "brava_csqs"] <- "annotation"
+    colnames(dt_brava_annot)[colnames(dt_brava_annot) == "csqs"] <- "CSQ"
     
     # set keys
     setkeyv(dt_brava_annot, c("SNP_ID"))

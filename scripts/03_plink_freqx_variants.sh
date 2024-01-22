@@ -10,6 +10,8 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
 #SBATCH --array=1-22
+#SBATCH --dependency="afterok:38969407_1"
+#SBATCH --begin=now+1hour
 
 set -o errexit
 set -o nounset
@@ -21,7 +23,7 @@ readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
 readonly in_dir="data/mt/prefilter/pp90"
-readonly in_vcf="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.from_mt.vcf.bgz"
+readonly in_vcf="${in_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.from_mt.vcf.gz"
 
 readonly out_dir="data/mt/prefilter/pp90"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.from_mt"

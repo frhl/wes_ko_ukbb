@@ -1,13 +1,14 @@
 #!/usr/bin/env Rscript
 
+library(ggplot2)
 library(argparse)
 library(data.table)
 
 main <- function(args){
 
-    autosomes <- paste0(1:22)[20:21]
+    autosomes <- paste0(1:22)
     lst <- list()
-    singleton_lst <- lst()
+    singleton_lst <- list()
     for (chr in autosomes){
         path_vep <- gsub("CHR", chr, args$vep_file)
         path_alt <- gsub("CHR", chr, args$in_file)
@@ -18,9 +19,6 @@ main <- function(args){
         alt <- fread(path_alt, header=FALSE, sep=" ")
         colnames(alt) <- c("SAMPLE", "ID", "GT", "PP", "AC", "AN", "AF")
         vep <- fread(path_vep)
-
-        print(head(alt))
-        print(head(vep))
 
         # map signletons to csqs
         csqs_map <- vep$brava_csqs
@@ -45,7 +43,7 @@ main <- function(args){
         final$non_coding <- as.numeric(final$non_coding)
 
         # save to list
-        final$chrom <- chr
+        final$chrom <- paste("chr",chr)
         lst[[chr]] <- final
     }
 
@@ -71,13 +69,46 @@ main <- function(args){
     fwrite(singletons_combined, out, sep="\t") 
 
 
+    # plot functional cateogyr
+    data <- data.frame(combine)    
+    category_sums <- colSums(data[, -which(names(data) == "chrom")])
+    total <- sum(category_sums)
+    fractions <- category_sums / total
+
+    # Ordering fractions from smallest to largest
+    ordered_fractions <- sort(fractions)
+
+    # Prepare data for ggplot
+    plot_data <- data.frame(category = names(ordered_fractions), fraction = ordered_fractions)
+
+    # Define colors
+    reds <- c("#B13F64", "#DD686D", "#F09D7C")
+    greens <- c("#669850", "#7CA98A")
+    plot_data$color <- NA
+    plot_data$color[plot_data$category == "pLoF"] <- reds[1]
+    plot_data$color[plot_data$category == "damaging_missense"] <- reds[2]
+    plot_data$color[plot_data$category == "other_missense"] <- reds[3]
+    plot_data$color[plot_data$category == "synonymous"] <- greens[2]
+    plot_data$color[plot_data$category == "non_coding"] <- greens[1]
+
+    # Create the plot
+    p <- ggplot(plot_data, aes(x = reorder(category, fraction), y = fraction, fill = color)) +
+      geom_bar(stat = "identity") +
+      geom_text(aes(label = scales::percent(fraction)), vjust = -0.5) +
+      scale_fill_identity() +
+      labs(title = "Fraction of Each Category", x = "Category", y = "Fraction") +
+      theme_minimal()
+
+    out <- paste0(args$out_prefix, ".pdf")
+    ggsave(out, width=10, height=7)
+
 }
 
 # add arguments
 parser <- ArgumentParser()
 parser$add_argument("--vep_file", default=NULL, help = "")
 parser$add_argument("--in_file", default=NULL, help = "")
-parser$add_argument("--out", default=NULL, help = "")
+parser$add_argument("--out_prefix", default=NULL, help = "")
 args <- parser$parse_args()
 
 main(args)

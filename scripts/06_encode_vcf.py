@@ -39,78 +39,64 @@ def main(args):
     csqs_category = args.csqs_category
     exclude_singletons = args.exclude_singletons
     only_singletons = args.only_singletons
+    print(args)
 
     # import phased/unphased data
     hail_init.hail_bmrc_init(log='logs/hail/knockout.log', default_reference='GRCh38', min_block_size=128)
-    
     hl._set_flags(no_whole_stage_codegen='1')
-    gene_checkpoint = out_prefix + "_checkpoint.mt"
-    if not os.path.isfile(gene_checkpoint + "/_SUCCESS"): 
-        sys.stderr.write("No checkpoint found. Reading raw genotypes..")
-        mt = io.import_table(input_path, input_type, calc_info = False)
-        if repartition:
-            mt = mt.repartition(int(repartition))
-        # subset to current csqs category
-        mt = mt.filter_rows(hl.literal(set(csqs_category)).contains(mt.consequence_category))
-        # export VCF to compare with RAP
-        hl.export_vcf(mt, out_prefix + ".vcf.gz") 
-        n_csqs = mt.count()[0]
-        sys.stderr.write(f"Filtering to {n_csqs} variants that are {csqs_category}.")
-        # exclude singletons if
-        if exclude_singletons and only_singletons:
-            raise TypeError("'exclude_singletons' and 'only_singletons' can't be provided at the same time!")
-        if exclude_singletons:
-            mt = io.recalc_info(mt)
-            mt = mt.filter_rows(mt.info.AC>1) 
-            n_singletons = n_csqs - mt.count()[0]
-            sys.stderr.write(f"{n_singletons} singletons were excluded!.")
-        if only_singletons:
-            mt = io.recalc_info(mt)
-            mt = mt.filter_rows(mt.info.AC==1) 
-            n_singletons = n_csqs - mt.count()[0]
-            sys.stderr.write(f"{n_singletons} non-singletons were excluded!.")
-        # perform an aggregation based on "collect", which requires a lot
-        # of memory but allows the variant ID to be returned as well alongside
-        # with information of cis/trans-CHs and heterozygotes.
-        gene_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
-        if aggr_method in "fast":
-            genes = ko.aggr_phase_count_by_expr(mt, gene_expr)
-            expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased, only_homs=False)
-            expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko)
-        if aggr_method in "fast_012":
-            genes = ko.aggr_phase_count_by_expr(mt, gene_expr)
-            # note that we are here calculating the fraction of affected haplotypes
-            # which evenetualyl result in an additive encoding 
-            expr_pko = ko.calc_frac_haplotypes(genes.hom_alt_n, genes.phased, genes.unphased)
-            expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko)
-        elif aggr_method in "only_homs":
-            genes = ko.aggr_phase_count_by_expr(mt, gene_expr)
-            expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased, only_homs=True)
-            expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko)
-        elif aggr_method in "only_chets":
-            genes = ko.aggr_phase_count_by_expr(mt, gene_expr)
-            expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased, only_chets=True)
-            expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko)
-        elif aggr_method in "collect":
-            genes = ko.collect_phase_count_by_expr(mt, gene_expr)
-            genes = ko.sum_gts_entries(genes)
-            expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased)
-            expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko, genes.phased)
-        else:
-            raise TypeError(str(aggr_method) + " is not allowed!")
-
-        # calculate probability of being knocked out based on phased counts
-        genes = genes.annotate_entries(pKO=expr_pko, knockout=expr_ko)
-        if checkpoint or aggr_method in "collect":
-            genes = genes.checkpoint(out_prefix + "_checkpoint.mt", overwrite=True)
-            n_genes = genes.count()[0]
-            sys.stderr.write(f"Aggregated variants to {n_genes} gene(s).")
     
-    # if checkpoitn has already been created
+    sys.stderr.write("No checkpoint found. Reading raw genotypes..")
+    mt = io.import_table(input_path, input_type, calc_info = False)
+    
+    # subset to current csqs category
+    mt = mt.filter_rows(hl.literal(set(csqs_category)).contains(mt.consequence_category))
+    n_csqs = mt.count()[0]
+    sys.stderr.write(f"Filtering to {n_csqs} variants that are {csqs_category}.")
+    
+    # exclude singletons if
+    if exclude_singletons and only_singletons:
+        raise TypeError("'exclude_singletons' and 'only_singletons' can't be provided at the same time!")
+    if exclude_singletons:
+        mt = io.recalc_info(mt)
+        mt = mt.filter_rows(mt.info.AC>1) 
+        n_singletons = n_csqs - mt.count()[0]
+        print(f"{n_singletons} singletons were excluded!.")
+    if only_singletons:
+        mt = io.recalc_info(mt)
+        mt = mt.filter_rows(mt.info.AC==1) 
+        n_singletons = n_csqs - mt.count()[0]
+        print(f"{n_singletons} non-singletons were excluded!.")
+    # exprot result
+    hl.export_vcf(mt, out_prefix + ".vcf.gz") 
+    gene_expr = mt.consequence.vep.worst_csq_by_gene_canonical.gene_id
+    
+    if aggr_method in "fast":
+        genes = ko.aggr_phase_count_by_expr(mt, gene_expr)
+        genes.checkpoint(out_prefix+"_checkpoint1.mt")
+        expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased, only_homs=False)
+        expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko)
+    elif aggr_method in "fast_012":
+         genes = ko.aggr_phase_count_by_expr(mt, gene_expr)
+         expr_pko = ko.calc_frac_haplotypes(genes.hom_alt_n, genes.phased, genes.unphased)
+         expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko)
+    elif aggr_method in "only_homs":
+         genes = ko.aggr_phase_count_by_expr(mt, gene_expr)
+         expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased, only_homs=True)
+         expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko)
+    elif aggr_method in "only_chets":
+         genes = ko.aggr_phase_count_by_expr(mt, gene_expr)
+         expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased, only_chets=True)
+         expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko)
+    elif aggr_method in "collect":
+         genes = ko.collect_phase_count_by_expr(mt, gene_expr)
+         genes = ko.sum_gts_entries(genes)
+         expr_pko = ko.calc_prob_ko(genes.hom_alt_n, genes.phased, genes.unphased)
+         expr_ko = ko.annotate_knockout(genes.hom_alt_n, expr_pko, genes.phased)
     else:
-        genes = io.import_table(gene_checkpoint, "mt", calc_info = False) 
-        n_genes = genes.count()[0]
-        sys.stderr.write(f"Aggregated variants to {n_genes} gene(s) using checkpoint.")
+         raise TypeError(str(aggr_method) + " is not allowed!")
+    
+    # get genen matrix
+    genes = genes.annotate_entries(pKO=expr_pko, knockout=expr_ko)
 
     # setup sites and alleles
     rows = genes.count()[0]
@@ -180,7 +166,7 @@ if __name__=='__main__':
     parser.add_argument('--repartition', default=None, help='Hail repartition files')
     parser.add_argument('--only_vcf', default=False, action='store_true', help='Only return VCF (less memory required when running)')
     parser.add_argument('--checkpoint', default=False, action='store_true', help='Checkpoint gene-aggregation matrix to avoid Spark Memory overflow errors') 
-    parser.add_argument('--aggr_method', default="collect", help='How should the CH matrix be generated?')
+    parser.add_argument('--aggr_method', default=None, required=True, help='How should the CH matrix be generated?')
     # filtering options
     parser.add_argument('--exclude_singletons', default=False, action='store_true', help='Excludes all MAC=1 variants')
     parser.add_argument('--only_singletons', default=False, action='store_true', help='Excludes MAC!=1 variants')

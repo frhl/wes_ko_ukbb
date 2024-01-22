@@ -8,6 +8,7 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
 
+
 set -o errexit
 set -o nounset
 
@@ -25,6 +26,8 @@ readonly in_file="${in_dir}/ukb_wes_union_calls_200k_chrCHR.loftee.worst_csq_by_
 
 readonly out_dir="data/mt/singleton_category_count"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.from_mt.alt_alleles.singleton_category"
+
+mkdir -p ${out_dir}
 
 set_up_rpy
 Rscript ${rscript} \

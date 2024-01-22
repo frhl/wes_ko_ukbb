@@ -9,7 +9,7 @@
 #SBATCH --output=logs/encode_vcf.log
 #SBATCH --error=logs/encode_vcf.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 3
+#SBATCH --cpus-per-task 1
 #SBATCH --array=1-22
 
 set -o errexit
@@ -28,8 +28,8 @@ readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
 readonly in_dir="data/mt/prefilter/pp90"
-readonly out_dir="data/knockouts/alt/pp90/no_singletons"
-#readonly out_dir="data/knockouts/alt/pp90/test_new_vcf_test"
+#readonly out_dir="data/knockouts/alt/pp90/exclude_singletons"
+readonly out_dir="data/knockouts/alt/pp90/only_singletons"
 readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chrCHR.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.mt"
 readonly in_type="mt"
 
@@ -62,6 +62,7 @@ submit_encode_job()
   local sge_queue="short.qc"
   local slurm_nslots="${nslots}"
   if [ "${cluster}" = "slurm" ]; then
+    set -x
     sbatch \
       --account="${slurm_project}" \
       --job-name="${slurm_jname}" \
@@ -91,9 +92,8 @@ submit_encode_job()
 
 #submit_encode_job "pLoF,damaging_missense" "2" "only_chets"
 
-
-#submit_encode_job "damaging_missense" "2" "fast"
-submit_encode_job "pLoF,damaging_missense" "2" "fast_012"
+submit_encode_job "pLoF,damaging_missense" "2" "fast"
+#submit_encode_job "pLoF,damaging_missense" "2" "fast_012"
 
 #submit_encode_job "pLoF" "14" "collect"
 
