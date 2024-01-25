@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=simulate_ch_events
+#SBATCH --job-name=combine_ch_events
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/simulate_ch_events.log
-#SBATCH --error=logs/simulate_ch_events.errors.log
+#SBATCH --output=logs/combine_ch_events.log
+#SBATCH --error=logs/combine_ch_events.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 
