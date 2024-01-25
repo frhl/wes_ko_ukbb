@@ -5,9 +5,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/write_gene_ko.log
 #SBATCH --error=logs/write_gene_ko.errors.log
-#SBATCH --partition=epyc
+#SBATCH --partition=short
 #SBATCH --cpus-per-task=1
-#SBATCH --array=22
+#SBATCH --array=1-21
 
 
 set -o errexit
