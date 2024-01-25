@@ -42,8 +42,12 @@ main <- function(args){
         return(dt_AC) 
     }))
 
+    genes <- unique(d_plof$gene_id[d_plof$knockout %in% c("Homozygote", "Compound heterozygote")])
+    print(length(genes))
+
     # iterate
-    seeds <- 55:65
+    seeds <- as.numeric(args$seed) 
+    n_samples <- as.numeric(args$n_samples)
     combined <- do.call(rbind, lapply(seeds, function(seed_id){
         
         write(paste0("Simulation with seed=",seed_id), stderr())
@@ -55,7 +59,7 @@ main <- function(args){
             
             MAF <- plof_af$MAF[plof_af$gene_id %in% gene_id] 
             rbinom_tmp <- function(MAF) {
-              rbinom(200000, 1, MAF)
+              rbinom(n_samples, 1, MAF)
             }
 
             X_1 <- sapply(MAF, rbinom_tmp)
@@ -71,32 +75,34 @@ main <- function(args){
         return(sim)
     }))
 
-    outfile <- paste0(args$out_prefix, ".raw.txt.gz")
+    outfile <- paste0(args$out_prefix, ".txt.gz")
     fwrite(combined, outfile, sep="\t", quote=FALSE)
 
     # aggregate homozygotes and compound hets
-    aggr_homs <- setDT(aggregate(homs~gene_id, FUN=mean, data=combined))
-    aggr_chets <- setDT(aggregate(chets~gene_id, FUN=mean, data=combined))
-    setkeyv(aggr_homs, "gene_id")
-    setkeyv(aggr_chets, "gene_id")
+    #aggr_homs <- setDT(aggregate(homs~gene_id, FUN=mean, data=combined))
+    #aggr_chets <- setDT(aggregate(chets~gene_id, FUN=mean, data=combined))
+    #setkeyv(aggr_homs, "gene_id")
+    #setkeyv(aggr_chets, "gene_id")
 
     # combine and summarize
-    sim_counts <- merge(aggr_homs, aggr_chets)
-    sim_counts$homs_per_chet <- sim_counts$homs / sim_counts$chets
-    sim_counts <- sim_counts[(sim_counts$homs>0) | (sim_counts$chets>0),]
-    sim_counts <- sim_counts[order(sim_counts$homs_per_chet),]
-    setkeyv(sim_counts, "gene_id")
+    #sim_counts <- merge(aggr_homs, aggr_chets)
+    #sim_counts$homs_per_chet <- sim_counts$homs / sim_counts$chets
+    #sim_counts <- sim_counts[(sim_counts$homs>0) | (sim_counts$chets>0),]
+    #sim_counts <- sim_counts[order(sim_counts$homs_per_chet),]
+    #setkeyv(sim_counts, "gene_id")
 
     # combine with observed counts
-    mrg <- merge(sim_counts, obs_counts)
-    outfile <- paste0(args$out_prefix, ".txt.gz")
-    fwrite(mrg, outfile, sep="\n", quote=FALSE)
+    #mrg <- merge(sim_counts, obs_counts)
+    #outfile <- paste0(args$out_prefix, ".txt.gz")
+    #fwrite(mrg, outfile, sep="\n", quote=FALSE)
 
 }
 
 # add arguments
 parser <- ArgumentParser()
+parser$add_argument("--n_samples", default=200000, help = "?")
 parser$add_argument("--out_prefix", default=NULL, help = "?")
+parser$add_argument("--seed", default=NULL, help = "?")
 args <- parser$parse_args()
 
 main(args)
