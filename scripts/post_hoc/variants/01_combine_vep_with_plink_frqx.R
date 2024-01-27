@@ -83,7 +83,10 @@ main <- function(args){
     })
 
     d <- rbindlist(lst_after)
+    d$locus <- NULL
+    d$alleles <- NULL
     outfile <- paste0(out_prefix, ".txt.gz")
+    write(paste("writing to", outfile), stdout())
     fwrite(d, outfile, sep="\t", quote=FALSE)
 
 }
