@@ -8,8 +8,8 @@
 #SBATCH --open-mode=append
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=152
-#--begin=now+1hour
+#SBATCH --array=1-100
+#SBATCH# --begin=now+8hour
 #
 #$ -N pred_pgs
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

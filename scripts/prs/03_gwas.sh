@@ -7,7 +7,7 @@
 #SBATCH --error=logs/gwas.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-320
+#SBATCH --array=1-2
 #
 #$ -N gwas
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -169,7 +169,7 @@ submit_merge_job()
 }
 
 
-readonly tasks="1-22"
+readonly tasks="22"
 submit_gwas_job "data/prs/sumstat/binary" "${phenotype_binary}" "${file_binary}"
 #submit_gwas_job "data/prs/sumstat/test/cts" "${phenotype_cts}_int" "${file_cts}"
 #submit_gwas_job "data/prs/sumstat/test/cts" "${phenotype_cts}" "${file_cts}"

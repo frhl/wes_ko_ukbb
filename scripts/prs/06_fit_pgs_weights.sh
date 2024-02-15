@@ -10,7 +10,7 @@
 #SBATCH --open-mode=append
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 6
-#SBATCH --array=152
+#SBATCH --array=11-100
 # --begin=now+3hour
 #
 #$ -N fit_pgs_weights

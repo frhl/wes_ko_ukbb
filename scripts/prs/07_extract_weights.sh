@@ -10,8 +10,7 @@
 #SBATCH --open-mode=append
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-320
-# --begin=now+6hour
+#SBATCH --array=1-100
 #
 #$ -N extract_weights
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb

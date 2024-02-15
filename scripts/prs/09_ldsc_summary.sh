@@ -9,6 +9,7 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 #SBATCH --requeue
+#SBATCH --begin=now+10hour
 
 set -o errexit
 set -o nounset
