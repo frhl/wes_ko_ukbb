@@ -29,9 +29,11 @@ main <- function(args){
     if ("p.value_c" %in% colnames(d_actual)){ 
       true_p <- as.numeric(d_actual$p.value_c)
       true_t <- as.numeric(d_actual$Tstat_c)
+      true_v <- as.numeric(d_actual$var_c)
     } else {
       true_p <- as.numeric(d_actual$p.value)
       true_t <- as.numeric(d_actual$Tstat)
+      true_v <- as.numeric(d_actual$var)
     }
 
     # if a merged VCF with two actual/real
@@ -39,8 +41,10 @@ main <- function(args){
     # we need to take the unique
     true_p <- unique(true_p)
     true_t <- unique(true_t)
+    true_v <- unique(true_v)
     stopifnot(length(true_p) == 1)
     stopifnot(length(true_t) == 1)
+    stopifnot(length(true_v) == 1)
 
     # exclude real markers (non-permuted stuff)
     stopifnot("MarkerID" %in% colnames(d))
@@ -59,14 +63,16 @@ main <- function(args){
     if ("p.value_c" %in% colnames(d)){ 
       pvalue <- as.numeric(d$p.value_c)
       tstat <- as.numeric(d$Tstat_c)
+      var <- as.numeric(d$var_c)
     } else {
       pvalue <- as.numeric(d$p.value)
       tstat <- as.numeric(d$Tstat)
+      var <- as.numeric(d$var)
     }
 
     # data.frame of true P-values and permuted P-values
-    dt_true <- data.table(Tstat=true_t, p=true_p,  out_marker=out_marker, is_permuted=0)
-    dt_perm <- data.table(Tstat=tstat, p=pvalue,  out_marker=out_marker, is_permuted=1)
+    dt_true <- data.table(Tstat=true_t, p=true_p, var=true_v,  out_marker=out_marker, is_permuted=0)
+    dt_perm <- data.table(Tstat=tstat, p=pvalue,  var=var, out_marker=out_marker, is_permuted=1)
     dt <- rbind(dt_true, dt_perm)
     outfile <- paste0(args$out_prefix, ".txt.gz")
     fwrite(dt, outfile, sep = "\t")
