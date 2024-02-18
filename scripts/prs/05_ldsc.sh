@@ -8,18 +8,7 @@
 #SBATCH --error=logs/ldsc.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=1-320
-#
-#
-#$ -N ldsc
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/ldsc.log
-#$ -e logs/ldsc.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qc
-#$ -t 1-320
-#$ -V
+#SBATCH --array=2-50
 
 set -o errexit
 set -o nounset
@@ -40,7 +29,7 @@ readonly ld_dir="data/prs/hapmap/ld/matrix_unrel_kin"
 readonly cluster=$( get_current_cluster )
 readonly index=$( get_array_task_id )
 
-readonly file_cts="${pheno_dir}/curated_covar_phenotypes_cts.tsv.gz"
+readonly file_cts="${pheno_dir}/curated_covar_phenotypes_cts_int_500k.txt.gz"
 readonly pheno_list_cts="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
 readonly phenotype_cts=$( sed "${index}q;d" ${pheno_list_cts} )
 
@@ -76,6 +65,6 @@ estimate_heritability(){
 }
 
 
-#estimate_heritability "${phenotype_cts}_int" "cts"
-estimate_heritability "${phenotype_binary}" "binary"
+estimate_heritability "${phenotype_cts}" "cts"
+#estimate_heritability "${phenotype_binary}" "binary"
 

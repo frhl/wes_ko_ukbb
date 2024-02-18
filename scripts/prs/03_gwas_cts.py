@@ -7,6 +7,7 @@ from ko_utils import io
 from ukb_utils import hail_init
 from ukb_utils import variants
 
+
 def main(args):
     # parser
     input_path = args.input_path
@@ -22,7 +23,7 @@ def main(args):
 
     if phenotypes:
         ht = hl.import_table(phenotypes,
-                             types={'eid': hl.tstr},
+                             types={'eid': hl.tstr, 'ukbb.centre' : hl.tstr},
                              missing=["", '""', "NA"],
                              impute=True,
                              force=True,
@@ -31,25 +32,56 @@ def main(args):
     else:
         raise ValueError("param 'phenotypes' is not set!")
 
+
+    # make one hot encoding for ukbb centre
+    categories = mt.aggregate_cols(hl.agg.collect_as_set(mt.pheno['ukbb.centre']))
+    categories = list(categories) 
+    categories = [category for category in categories if category is not None]
+
+    # Initialize a list to keep track of the new field names
+    new_covariate_names = []
+
+    print(mt.describe())
+    print("##")
+    print(mt.pheno.describe())
+    print("##")
+    print(categories)
+
+    # Annotate the MatrixTable with new fields for each category
+    for category in categories:
+        print(category)
+        # Generate a safe variable name for the category
+        encoded_var_name = f"ukbb.centre_{category}".replace(" ", "_")
+        # Annotate the MatrixTable with a new column for this category
+        mt = mt.annotate_cols(**{encoded_var_name: hl.if_else(mt.pheno['ukbb.centre'] == category, 1, 0)})
+        
+        # Keep track of this new variable name
+        new_covariate_names.append(encoded_var_name)
+
+
+    # Assuming 'split_covariates' contains the original list of covariate names including 'ukbb.centre'
     split_covariates = covariates.split(',')
-    if set(list(mt.pheno)) >= set(split_covariates):
-        covariates = [mt.pheno[x] for x in split_covariates]
-        covariates.insert(0, 1)  # Include intercept
-        if response in list(mt.pheno):
-            if min_maf_cutoff:
-                mt = mt.filter_rows(variants.get_maf_expr(mt) > float(min_maf_cutoff))
-            if mt.pheno[response].dtype == hl.dtype('float64'):
-                reg = hl.linear_regression_rows(
-                    y=mt.pheno[response],
-                    x=mt.GT.n_alt_alleles(),
-                    covariates=covariates
-                )
-            else:
-                raise TypeError("Response variable is not a float64!")
+    split_covariates = [cov for cov in split_covariates if cov != 'ukbb.centre']  # Remove 'ukbb.centre'
+    split_covariates += new_covariate_names  # Add the new one-hot encoded variable names
+
+    print(split_covariates)
+
+    covariates = [mt.pheno[x] for x in split_covariates if x in mt.pheno]
+    covariates += [mt[x] for x in split_covariates if x not in mt.pheno]  # Include one-hot encoded covariates
+    covariates.insert(0, 1)  # Include intercept
+    if response in list(mt.pheno):
+        if min_maf_cutoff:
+            mt = mt.filter_rows(variants.get_maf_expr(mt) > float(min_maf_cutoff))
+        if mt.pheno[response].dtype == hl.dtype('float64'):
+            reg = hl.linear_regression_rows(
+                y=mt.pheno[response],
+                x=mt.GT.n_alt_alleles(),
+                covariates=covariates
+            )
         else:
-            raise ValueError("Response variable is not in phenotype file")
+            raise TypeError("Response variable is not a float64!")
     else:
-        raise ValueError("Some or all covariates are not in phenotype file!")
+        raise ValueError("Response variable is not in phenotype file")
 
     # Get allele frequencies and annotate results
     reg = reg.annotate(
@@ -69,6 +101,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--chrom', default=None, help='chromosomes to be parsed.')    
     parser.add_argument('--input_path', default=None, help='Path to input.')
     parser.add_argument('--input_type', default=None, help='Input type (vcf/mt/plink).')
     parser.add_argument('--min_maf_cutoff', default=None, help='Filter by minimum minor allele frequency')

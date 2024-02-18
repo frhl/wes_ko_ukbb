@@ -25,6 +25,8 @@ set_up_hail_debug
 set_up_pythonpath_legacy
 export LD_PRELOAD="/well/lindgren/users/mmq446/conda/skylake/envs/hail-v0.2.105/lib/libopenblas.so"
 
+set -x
+
 if [ ! -f "${out_prefix_chr}.txt.gz" ]; then
   python3 "${hail_script}" \
      --chrom "${chr}" \

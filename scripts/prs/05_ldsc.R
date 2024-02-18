@@ -18,6 +18,7 @@ get_sd_y <- function(path_cts_phenotypes, phenotype){
 
 main <- function(args){
 
+  print(args)
   stopifnot(file.exists(args$gwas)) 
   stopifnot(file.exists(args$ld_bed))
   stopifnot(dir.exists(args$ld_dir))
