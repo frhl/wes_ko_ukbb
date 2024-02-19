@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
 #SBATCH --account=lindgren.prj
-#SBATCH --job-name=poisson_rate
+#SBATCH --job-name=glm_rate_ratio
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#SBATCH --output=logs/poisson_rate.log
-#SBATCH --error=logs/poisson_rate.errors.log
+#SBATCH --output=logs/glm_rate_ratio.log
+#SBATCH --error=logs/glm_rate_ratio.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
 #SBATCH --requeue
@@ -12,10 +12,10 @@
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
-readonly rscript="scripts/post_hoc/genesets/06_poisson_rate.R"
+readonly rscript="scripts/post_hoc/genesets/06_glm_rate_ratio.R"
 
 readonly out_dir="data/knockouts/tables"
-readonly out_prefix="${out_dir}/poisson_rate_essential_genesets_review"
+readonly out_prefix="${out_dir}/zinfb_rate_essential_genesets_review"
 
 readonly in_dir="data/knockouts/tables"
 readonly in_file="${in_dir}/combined_annotations_by_sample.new.counts.txt.gz"
@@ -39,8 +39,9 @@ Rscript "${rscript}" \
    --in_count "${in_file}" \
    --file_mutation_rates "${mutation_rates}" \
    --dir_genesets "${essential_dir}" \
-   --file_omim ${omim} \
    --file_pli ${pli} \
-   --file_gtex ${gtex} \
-   --file_cancer ${cancer1}
+   --glm_method "zinfb"
+ #  --file_omim ${omim} \
+ #  --file_gtex ${gtex} \
+ #  --file_cancer ${cancer1}
 

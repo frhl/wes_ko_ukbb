@@ -3,6 +3,48 @@ library(data.table)
 library(argparse)
 library(ggplot2)
 library(MASS)
+library(pscl)
+
+fit_glm_poisson <- function(model, dt_fit, gene_set, anno, m) {
+  fit <- glm(as.formula(model), data = dt_fit, family = poisson(link = "log"), control = glm.control(maxit = 200))
+  fit_coef <- data.frame(coef(summary(fit)))
+  colnames(fit_coef) <- c("est", "error", "z", "p")
+  conf <- suppressMessages(exp(cbind(coef(fit), confint(fit))))
+  
+  fit_coef$ci_lower <- conf[, 1]
+  fit_coef$ci_upper <- conf[, 2]
+  fit_coef$geneset <- gene_set
+  fit_coef$annotation <- anno
+  fit_coef$model <- m
+  
+  return(fit_coef)
+}
+
+fit_zinb <- function(model, dt_fit, gene_set, anno, m) {
+  zi_model <- zeroinfl(as.formula(paste(model, "| 1")), data = dt_fit, dist = "negbin")
+  model_summary <- summary(zi_model)
+  
+  coef_summary_count <- model_summary$coefficients$count
+  exp_conf_ints <- exp(confint(zi_model))
+  
+  exp_est = exp(coef_summary_count[, "Estimate"])
+  fit_coef <- data.frame(
+    est = coef_summary_count[, "Estimate"],
+    error = coef_summary_count[, "Std. Error"],
+    z = coef_summary_count[, "z value"],
+    p = coef_summary_count[, "Pr(>|z|)"],
+    exp_est = exp_est,
+    ci_lower = exp_conf_ints[, 1],
+    ci_upper = exp_conf_ints[, 2]
+  )
+  
+  fit_coef$geneset <- gene_set
+  fit_coef$annotation <- anno
+  fit_coef$model <- m
+  
+  return(fit_coef)
+}
+
 
 main <- function(args){
   
@@ -132,7 +174,8 @@ main <- function(args){
     }
 
     #models <- c("is_chet" , "is_hom", "is_ko", "is_het","is_cis")
-    models <- c("is_chet" , "is_hom", "is_ko", "is_het")
+    #models <- c("is_chet" , "is_hom", "is_ko", "is_het")
+    models <- c("is_cis")
     annotations <- unique(aggr_mrg$annotation)
 
     get_covars <- function(model){
@@ -148,36 +191,46 @@ main <- function(args){
         genes_in_geneset <- gene_lst[[gene_set]]
         print(gene_set)
         for (anno in annotations){
+          
           if (anno == "synonymous") model <- paste0(m,"~x+syn")
           if (anno == "other_missense") model <-  paste0(m,"~x+mis")
-          if (anno == "damaging_missense") model <-  paste0(m,"~x+mis+frameshift")
+          if (anno == "damaging_missense") model <-  paste0(m,"~x+mis")
           if (anno == "pLoF") model <-  paste0(m,"~x+frameshift+splice_site+non")
           if (anno == "pLoF_damaging_missense") model <-  paste0(m,"~x+mis+frameshift+splice_site+non")
-          
+
           lst[[m]][[gene_set]][[anno]] <- list()
-          print(anno)
-          print(model)
+          print(anno); print(model)
+          
           # setup fit
           dt_fit <- dt[dt$annotation %in% anno,]
           background_fit <- background[!background$gene_id %in% dt_fit$gene_id,]
           dt_fit <- rbind(dt_fit, background_fit)
+          
           # add background
           dt_fit$x <- FALSE
           dt_fit$x[dt_fit$gene_id %in% genes_in_geneset ] <- TRUE
-          # fit models
-          fit <- glm(as.formula(model), data = dt_fit, family=poisson(link="log"), control = glm.control(maxit = 200))
-          fit_coef <- data.frame(coef(summary(fit)))
-          colnames(fit_coef) <- c("est", "error", "z", "p")
-          conf <- suppressMessages(exp(cbind(coef(fit), confint(fit))))
-          # setup coeffecients
-          fit_coef$ci_est <- conf[,1]
-          fit_coef$ci_lower <- conf[,2]
-          fit_coef$ci_upper <- conf[,3]
-          fit_coef$keep <- as.logical(c(0, 1, rep(0, nrow(conf)-2)))
-          fit_coef$geneset <- gene_set
-          fit_coef$annotation <- anno
-          fit_coef$model <- m
+
+          # trasnforming covariates seem to solve convergence issue
+          # see https://stats.stackexchange.com/questions/76488/error-system-is-computationally-singular-when-running-a-glm         
+          dt_fit$syn <- dt_fit$syn * 100
+          dt_fit$mis <- dt_fit$mis * 100
+          dt_fit$frameshift <- dt_fit$frameshift * 100
+          dt_fit$splice_site <- dt_fit$splice_site * 100
+          dt_fit$non <- dt_fit$non * 100
+
+          # fit GLM
+          if (args$glm_method == "poisson") {
+                fit_coef <- fit_glm(model, dt_fit, gene_set, anno, m)
+          } else if (args$glm_method == "zinfb") {
+                fit_coef <- fit_zinb(model, dt_fit, gene_set, anno, m)
+          } else {
+                stop(paste(args$glm_method), "is not a valid method to use")
+          }
+
+          # only keep variable of interest
+          fit_coef$keep <- rownames(fit_coef) %in% "xTRUE"
           lst[[m]][[gene_set]][[anno]] <- fit_coef
+
         }
       }
     }
@@ -216,6 +269,7 @@ parser$add_argument("--file_omim", default=NULL, required = FALSE, help = "")
 parser$add_argument("--file_cancer", default=NULL, required = FALSE, help = "")
 parser$add_argument("--file_gtex", default=NULL, required = FALSE, help = "")
 parser$add_argument("--dir_genesets", default=NULL, required = TRUE, help = "")
+parser$add_argument("--glm_method", default="zinfb", required = TRUE, help = "either 'zinfb' or 'poisson'")
 args <- parser$parse_args()
 
 main(args)
