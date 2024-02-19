@@ -14,12 +14,14 @@ read_frqx_path <- function(frqx_path){
     # get allele frequencies
     dt_AC[, AC_A1 := 2*`C(HOM A1)` + `C(HET)`]
     dt_AC[, AC_A2 := 2*`C(HOM A2)` + `C(HET)`]
+    dt_AC[, AN := AC_A1 + AC_A2]
     dt_AC[, MAC := pmin(AC_A1, AC_A2)]
+    dt_AC[, MAF := MAC / AN]
     dt_AC$POS <- as.numeric(sub(".*:(\\d+):.*", "\\1", dt_AC$SNP))
     
     # need to recreate SNP ID as some might have I/D in name.
     dt_AC <- dt_AC[!duplicated(dt_AC),]
-    cols_to_keep <- c("CHR", "POS", "A1", "A2", "MAC")
+    cols_to_keep <- c("CHR", "POS", "A1", "A2", "MAC", "MAF", "AN")
     dt_AC <- dt_AC[,..cols_to_keep]
     setkeyv(dt_AC, cols_to_keep[1:4])
     return(dt_AC)

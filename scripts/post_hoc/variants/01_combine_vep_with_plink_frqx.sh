@@ -25,7 +25,7 @@ readonly vep_dir="data/vep/vep95/worst_csqs/"
 readonly vep_path="${vep_dir}/UKB.chrCHR.exome_array.variants_only.vep95.csqs.worst_csq_by_gene_canonical.original.txt.gz"
 
 readonly out_dir="data/vep/counts"
-readonly out_prefix="${out_dir}/UKB.exome_array.varaints.vep95.worst_csq_by_gene_canonical.original.counts"
+readonly out_prefix="${out_dir}/UKB.exome_array.variants.vep95.worst_csq_by_gene_canonical.original.counts"
 
 
 mkdir -p ${out_dir}
