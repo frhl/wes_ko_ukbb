@@ -5,10 +5,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/recode_knockouts.log
 #SBATCH --error=logs/recode_knockouts.errors.log
-#SBATCH --partition=epyc
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=20-22
-#SBATCH --requeue
+#SBATCH --array=1-22
 
 set -o errexit
 set -o nounset
@@ -25,17 +24,21 @@ readonly cluster=$( get_current_cluster )
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
+readonly ac_dir="data/vep/counts"
+readonly ac_path="${ac_dir}/UKB.exome_array.variants.vep95.worst_csq_by_gene_canonical.original.counts.txt.gz"
+
 readonly vep_dir="data/mt/prefilter/pp90"
 readonly vep_path="${vep_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.csqs.txt.gz"
 
 readonly in_dir="data/knockouts/alt/pp90/encode_vcf_parallel"
-#readonly out_dir="data/knockouts/alt/pp90/recoded/damaging_missense"
-readonly out_dir="data/knockouts/alt/pp90/recoded/pLoF_damaging_missense"
+readonly out_dir="data/knockouts/alt/pp90/recoded_vep_ac/damaging_missense"
+#readonly out_dir="data/knockouts/alt/pp90/recoded_vep_ac/pLoF"
+#readonly out_dir="data/knockouts/alt/pp90/recoded_vep_ac/pLoF_damaging_missense"
 #readonly out_dir="data/knockouts/alt/pp90/recoded/test_test_test"
 
 mkdir -p ${out_dir}
 
-readonly chunk_size=5000
+readonly chunk_size=10000
 
 submit_recode_job()
 {
@@ -64,8 +67,10 @@ submit_recode_job()
     "${rscript}" \
     "${input_path}" \
     "${vep_path}" \
+    "${ac_path}" \
     "${chunk_size}" \
     "${num_chunks}" \
+    "chr${chr}" \
     "${out_prefix}")
   # submit merge of chunks
   local outfile="${out_prefix}.txt.gz" 
@@ -102,9 +107,9 @@ submit_merge_job()
 #the_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}.pp90.recoded.pLoF"
 #submit_recode_job ${the_path} ${the_prefix}
 
-#the_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_damaging_missense_all.tsv.gz"
-#the_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}.pp90.recoded.damaging_missense"
-#submit_recode_job ${the_path} ${the_prefix}
+the_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_damaging_missense_all.tsv.gz"
+the_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}.pp90.recoded.damaging_missense"
+submit_recode_job ${the_path} ${the_prefix}
 
 #the_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense_all.tsv.gz"
 #the_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}.pp90.recoded.pLoF_damaging_missense"

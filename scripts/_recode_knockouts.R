@@ -36,6 +36,7 @@ create_id <- function(dt){
 
 # map by variant
 map_by_variant <- function(ids, mapping, allow_dups=TRUE, message=""){
+    #if (!any(names(mapping) %in% ids)) warning(paste("Not a perfect overlap between mapping and reference SNPIds -", message))
     stopifnot(any(names(mapping) %in% ids))
     if (nchar(message)>0) write(message,stdout())
     mapped <- unlist(lapply(ids, function(v){
@@ -58,14 +59,33 @@ map_by_variant <- function(ids, mapping, allow_dups=TRUE, message=""){
 
 main <- function(args){
 
+    print(args)
+
     input_path <- args$input_path
     vep_path <- args$vep_path
+    ac_path <- args$ac_path
     out_prefix <- args$out_prefix
     idx_start <- args$idx_start
     idx_end <- args$idx_end
+    chrom <- args$chrom
 
     dt <- fread(input_path)
     annotation <- fread(vep_path)
+    dt_AC <- fread(ac_path)
+
+    # get AC files and pre-process
+    dt_AC <- dt_AC[dt_AC$biotype == "protein_coding"]
+    
+    # first subset by chromosome since it's a huge file
+    dt_AC[ ,chromosome := paste0("chr",CHR)]
+    dt_AC <-dt_AC[dt_AC$chromosome %in% chrom, ] 
+    
+    # generate ID for mapping
+    dt_AC[ ,varid := paste0("chr",SNP_ID)]
+    cols_to_keep <- c("varid", "gene_id", "AN.before_pp", "MAC.before_pp", "MAF.before_pp")
+    dt_AC <- dt_AC[,..cols_to_keep]
+    colnames(dt_AC) <- c("varid", "gene_id", "AN", "AC", "MAF")
+    dt_AC$id <- paste0(dt_AC$gene_id,":", dt_AC$varid)
 
     # create ID fields for mapping
     colnames(annotation) <- gsub("worst_csq_by_gene_canonical\\.","",colnames(annotation))
@@ -79,19 +99,17 @@ main <- function(args){
     
     # create mapping to VEP annotations
     map_enstid <- create_mapping(annotation, "transcript_id")
-    map_exon <- create_mapping(annotation, "exon")
-    map_intron <- create_mapping(annotation, "intron")
+    #map_exon <- create_mapping(annotation, "exon")
+    #map_intron <- create_mapping(annotation, "intron")
     map_revel <- create_mapping(annotation, "revel_score")
     map_cadd <- create_mapping(annotation, "cadd_phred")
     map_function_csqs <- create_mapping(annotation, "most_severe_consequence")
     map_csqs <- create_mapping(annotation, "consequence_category")
-    map_codons <- create_mapping(annotation, "codons")
-    map_amino_acids <- create_mapping(annotation, "amino_acids")
 
     # cerarte mapping to INFO annotations
-    map_af <- create_mapping(annotation, "info.AF")
-    map_ac <- create_mapping(annotation, "info.AC")
-    map_an <- create_mapping(annotation, "info.AN")
+    map_af <- create_mapping(dt_AC, "MAF")
+    map_ac <- create_mapping(dt_AC, "AC")
+    map_an <- create_mapping(dt_AC, "AN")
 
     # subset if need be
     if ((!is.null(idx_start) & (!is.null(idx_end)))){
@@ -104,8 +122,8 @@ main <- function(args){
     dt$consequence_category <- map_by_variant(dt$id, map_csqs, message="csqs_category")
     dt$most_severe_consequence <- map_by_variant(dt$id, map_function_csqs, message="most_severe_csqs")
     dt$transcript_id <- map_by_variant(dt$id, map_enstid, allow_dups = FALSE, message="trancript")
-    dt$exon <- map_by_variant(dt$id, map_exon, message="exon")
-    dt$intron <- map_by_variant(dt$id, map_intron, message="intron")
+    #dt$exon <- map_by_variant(dt$id, map_exon, message="exon")
+    #dt$intron <- map_by_variant(dt$id, map_intron, message="intron")
     dt$revel_score <- map_by_variant(dt$id, map_revel, message="revel_score")
     dt$cadd_phred <- map_by_variant(dt$id, map_cadd, message="cadd_phred")
     dt$AF <- map_by_variant(dt$id, map_af, message = "af")
@@ -116,7 +134,7 @@ main <- function(args){
     # make columns nicer
     new_order <- c("s","gene_id","transcript_id","varid","gts","AC", "AF", "AN", "hom_alt_n", "phased.a1", "phased.a2",
                    "unphased.n", "pKO" ,"knockout","consequence_category", "most_severe_consequence",
-                   "revel_score", "cadd_phred",'exon','intron')
+                   "revel_score", "cadd_phred")
     stopifnot(all(new_order %in% colnames(dt)))
     stopifnot(all(colnames(dt) %in% new_order))
     dt <- dt[,new_order, with=FALSE]
@@ -131,9 +149,11 @@ main <- function(args){
 parser <- ArgumentParser()
 parser$add_argument("--input_path", default=NULL, help = "?")
 parser$add_argument("--vep_path", default=NULL, help = "?")
+parser$add_argument("--ac_path", default=NULL, help = "?")
 parser$add_argument("--out_prefix", default=NULL, help = "?")
 parser$add_argument("--idx_start", default=NULL, help = "?")
 parser$add_argument("--idx_end", default=NULL, help = "?")
+parser$add_argument("--chrom", default=NULL, help = "?")
 args <- parser$parse_args()
 
 main(args)
