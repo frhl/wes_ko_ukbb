@@ -9,8 +9,7 @@
 #SBATCH --error=logs/make_variant_tables.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-22
-#SBATCH --dependency="afterok:20032410"
+#SBATCH --array=1-21
 
 set -o errexit
 set -o nounset
@@ -29,7 +28,7 @@ readonly chr=$( get_chr ${task_id} )
 
 readonly pheno_dir="data/phenotypes"
 readonly in_dir="data/conditional/rare/combined/mt"
-readonly out_dir="data/conditional/rare/combined/chunks"
+readonly out_dir="data/conditional/rare/combined/chunks/2024"
 
 readonly in_vcf="${in_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense.vcf.bgz"
 readonly covar_path="${pheno_dir}/covars1.csv"

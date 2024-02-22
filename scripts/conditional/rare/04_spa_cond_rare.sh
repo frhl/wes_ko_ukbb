@@ -7,7 +7,7 @@
 #SBATCH --error=logs/spa_cond_rare.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-320
+#SBATCH --array=1-10
 
 set -o errexit
 set -o nounset
@@ -28,15 +28,16 @@ readonly grm_sam="${grm_mtx}.sampleIDs.txt"
 readonly plink_file="${grm_dir}/ukb_eur_200k_grm_grch38_rv_merged"
 
 readonly spa_script="scripts/conditional/rare/_spa_cond_rare.sh"
-readonly merge_script="scripts/_spa_merge.sh"
+readonly merge_script="scripts/saige/_spa_merge.sh"
 readonly in_prefix="ukb_eur_wes_200k"
 
 # directory to markers by genes that are significant in primary analysis
-readonly markers_by_gene_dir="data/conditional/rare/combined/genes/min_mac4"
+readonly markers_by_gene_dir="data/conditional/rare/combined/genes/2024/min_mac4"
 
 # directory to conditioning markers
 readonly cond_rare_dir="data/conditional/rare/combined/mt"
 readonly cond_rare_file="${cond_rare_dir}/ukb_eur_wes_200k_chrCHR_pLoF_damaging_missense_markers.txt.gz"
+
 # path to file with allele count by phenotype (need to avoid conditioning on monomorphic SNPs)
 readonly markers_ac="${cond_rare_dir}/ukb_eur_wes_200k_chrCHR_pLoF_damaging_missense_AC.txt.gz"
 readonly markers_hash="${cond_rare_dir}/ukb_eur_wes_200k_chrCHR_pLoF_damaging_missense_hash.txt.gz"
@@ -95,13 +96,14 @@ submit_spa_with_csqs()
 
     # setup paths to variants in genes by phenotype (We don't care about PRS here, since
     # this step is just for selecting variants within genes).
+    #updated_phenotype=$(echo ${phenotype} | sed -e s/"_primary_care"/""/)
     local markers_by_gene="${markers_by_gene_dir}/${in_prefix}_${phenotype}_${annotation}.txt.gz"
 
     if [ -f ${markers_by_gene} ]; then
       if [ ! -f "${out_mrg}" ]; then
         local slurm_spa_name="spa_${phenotype}_${annotation}"
         local slurm_merge_name="_mrg_${phenotype}_${annotation}"
-        submit_spa_job
+        #submit_spa_job
         submit_merge_job
       else
         >&2 echo "Phenotype ${phenotype} with annotation ${annotation} already exists! Skipping.." 

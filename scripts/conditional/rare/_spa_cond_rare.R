@@ -141,13 +141,13 @@ main <- function(args){
   chromosome <- args$chromosome
   phenotype <- args$phenotype
   min_mac <- as.numeric(args$min_mac)
-  
+
   d_gene <- fread(args$path_markers_by_gene)
   d_phenos <- fread(args$path_ac_by_phenotypes)
   d_hash <- fread(args$path_hash_by_phenotypes)
 
-  # filter to candidate variants in gene
-  d_gene_filter <- filter_to_candidates(d_gene, args$phenotype, args$chromosome)
+  # here we need original phenotype when 'primary_care' is used.
+  d_gene_filter <- filter_to_candidates(d_gene, phenotype, args$chromosome)
   markers_in_gene <- d_gene_filter$id
 
   # 
@@ -158,8 +158,8 @@ main <- function(args){
   d_hash <- d_hash[d_hash$id %in% markers_in_gene,]
   
   # annotate the data by various metrics
-  d_ac_filter <- annotate_by_allele_count(d_phenos, args$phenotype, min_mac = 4)
-  d_ld_filter <- annotate_by_perfect_ld(d_hash, args$phenotype)
+  d_ac_filter <- annotate_by_allele_count(d_phenos, phenotype, min_mac = 4)
+  d_ld_filter <- annotate_by_perfect_ld(d_hash, phenotype)
 
   # merge the two filters
   mrg <- merge(d_ac_filter, d_ld_filter, by = 'id')
@@ -207,7 +207,7 @@ main <- function(args){
     n_ac_singletons <- sum(d_ac_filter$ac == 1)
 
     msg <- paste0(
-      "# Phenotype: ", phenotype, "\n",
+      "# Phenotype: ",phenotype, "\n",
       "# Significant gene(s): ", n_genes, "\n",
       "# Maximum hail markers in gene(s): ", n_markers_start, "\n",
       "# Same marker in different gene(s): ", n_dup_mark, "\n",

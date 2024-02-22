@@ -20,7 +20,7 @@ readonly cluster=$( get_current_cluster)
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
-readonly in_dir="$(pwd)/data/conditional/rare/combined/chunks"
+readonly in_dir="$(pwd)/data/conditional/rare/combined/chunks/2024"
 readonly in_ac="${in_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense_AC.txt.gz"
 readonly in_hash="${in_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense_hash.txt.gz"
 
@@ -28,9 +28,13 @@ readonly out_dir="data/conditional/rare/combined/mt"
 readonly out_ac="${out_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense_AC.txt.gz"
 readonly out_hash="${out_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense_hash.txt.gz"
 
-ln -s ${in_ac} ${out_ac}
-ln -s ${in_hash} ${out_hash}
-
+if [[ -f "${in_ac}" ]]; then
+  echo "Symlinking ${in_ac} -> ${out_ac}"
+  ln -sf ${in_ac} ${out_ac}
+  ln -sf ${in_hash} ${out_hash}
+else
+  >&2 echo "${in_ac} does not exist. Skipping!"
+fi
 
 
 

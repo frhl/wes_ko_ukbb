@@ -31,7 +31,7 @@ readonly use_prs=0
 
 # I/O
 readonly genes="data/genes/220310_ensgid_grch38_pos.tsv.gz"
-readonly out_dir="data/conditional/rare/combined/genes/min_mac${min_mac}"
+readonly out_dir="data/conditional/rare/combined/genes/2024/min_mac${min_mac}"
 readonly vep_dir="data/mt/vep/worst_csq_by_gene_canonical"
 
 readonly pheno_dir="data/phenotypes"
