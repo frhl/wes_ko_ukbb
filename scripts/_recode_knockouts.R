@@ -82,10 +82,10 @@ main <- function(args){
     
     # generate ID for mapping
     dt_AC[ ,varid := paste0("chr",SNP_ID)]
-    cols_to_keep <- c("varid", "gene_id", "AN.before_pp", "MAC.before_pp", "MAF.before_pp")
+    cols_to_keep <- c("varid", "AN.before_pp", "MAC.before_pp", "MAF.before_pp")
     dt_AC <- dt_AC[,..cols_to_keep]
-    colnames(dt_AC) <- c("varid", "gene_id", "AN", "AC", "MAF")
-    dt_AC$id <- paste0(dt_AC$gene_id,":", dt_AC$varid)
+    colnames(dt_AC) <- c("varid", "AN", "AC", "MAF")
+    dt_AC$id <- dt_AC$varid
 
     # create ID fields for mapping
     colnames(annotation) <- gsub("worst_csq_by_gene_canonical\\.","",colnames(annotation))
@@ -97,16 +97,16 @@ main <- function(args){
     ok <- as.logical(sum(variants_in_dt %in% annotation$id)/length(variants_in_dt))
     stopifnot(ok)
     
-    # create mapping to VEP annotations
+    # create mapping to VEP annotations that are 
+    # gene and transcript specfic
     map_enstid <- create_mapping(annotation, "transcript_id")
-    #map_exon <- create_mapping(annotation, "exon")
-    #map_intron <- create_mapping(annotation, "intron")
     map_revel <- create_mapping(annotation, "revel_score")
     map_cadd <- create_mapping(annotation, "cadd_phred")
     map_function_csqs <- create_mapping(annotation, "most_severe_consequence")
     map_csqs <- create_mapping(annotation, "consequence_category")
 
-    # cerarte mapping to INFO annotations
+    # create mapping to INFO annotations, with
+    # the id column being just variant ID (see below)
     map_af <- create_mapping(dt_AC, "MAF")
     map_ac <- create_mapping(dt_AC, "AC")
     map_an <- create_mapping(dt_AC, "AN")
@@ -122,13 +122,14 @@ main <- function(args){
     dt$consequence_category <- map_by_variant(dt$id, map_csqs, message="csqs_category")
     dt$most_severe_consequence <- map_by_variant(dt$id, map_function_csqs, message="most_severe_csqs")
     dt$transcript_id <- map_by_variant(dt$id, map_enstid, allow_dups = FALSE, message="trancript")
-    #dt$exon <- map_by_variant(dt$id, map_exon, message="exon")
-    #dt$intron <- map_by_variant(dt$id, map_intron, message="intron")
     dt$revel_score <- map_by_variant(dt$id, map_revel, message="revel_score")
     dt$cadd_phred <- map_by_variant(dt$id, map_cadd, message="cadd_phred")
-    dt$AF <- map_by_variant(dt$id, map_af, message = "af")
-    dt$AC <- map_by_variant(dt$id, map_ac, message = "ac")
-    dt$AN <- map_by_variant(dt$id, map_an, message = "an")
+    
+    # note, that we do not care about functional csqs
+    # when we are mapping variant by allele frequncy
+    dt$AF <- map_by_variant(dt$varid, map_af, message = "af")
+    dt$AC <- map_by_variant(dt$varid, map_ac, message = "ac")
+    dt$AN <- map_by_variant(dt$varid, map_an, message = "an")
     dt$id <- NULL
 
     # make columns nicer
