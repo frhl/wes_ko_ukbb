@@ -45,12 +45,18 @@ main <- function(args){
         pattern <- paste0(trait,".pvalues")
         files <- list.files(permute_dir, pattern = pattern, recursive = TRUE, full.names = TRUE)
         # aggregate permuted and observed pvalues into a single file
+        print(files)
         d <- rbindlist(lapply(files, function(f){
             d <- fread(f)
+            stopifnot("Tstat" %in% colnames(d))
+            if (!("var" %in% colnames(d))) stop(paste("'var' not in colnames for", f))
+            stopifnot("p" %in% colnames(d))
+            stopifnot("out_marker" %in% colnames(d))
+            stopifnot("is_permuted" %in% colnames(d))
             gene <- stringr::str_extract(basename(f), pattern = "ENSG[0-9]+")
             d$hgnc_symbol <- ensembl_to_hgnc[gene]
-            d$ensembl_gene_id <- d$marker_out
-            d$marker_out <- NULL
+            d$ensembl_gene_id <- d$out_marker
+            d$out_marker <- NULL
             d$phenotype <- trait
             return(d)
         }))
@@ -74,6 +80,9 @@ main <- function(args){
             d$centered_tstat <- d$Tstat - mean(d$Tstat)
             d$centered_tstat_min <- min(d$centered_tstat)
             d$centered_tstat_max <- max(d$centered_tstat)
+            d$centered_normalised_tstat <- d$centered_tstat / d$var
+            d$centered_normalised_tstat_min <- min(d$centered_normalised_tstat)
+            d$centered_normalised_tstat_max <- max(d$centered_normalised_tstat)
             gene <- stringr::str_extract(basename(f), pattern = "ENSG[0-9]+")
             d$hgnc_symbol <- ensembl_to_hgnc[gene]
             d$ensembl_gene_id <- gene
