@@ -77,6 +77,29 @@ def csqs_case_builder_brava(worst_csq_expr: hl.StringExpression,
             )
     return case.or_missing()
 
+
+def csqs_case_builder_visscher(worst_csq_expr: hl.StringExpression):
+    """
+    Annotate consequence categories for downstream analysis
+
+    :param worst_csq_expr: An expression that should contain "most_severe_consequence"
+    """
+    # Define the sets for each consequence category
+    non_synonymous_csqs = PLOF_CSQS.union(MISSENSE_CSQS)
+    synonymous_csqs = hl.set(SYNONYMOUS_CSQS)
+    non_coding_csqs = hl.set(OTHER_CSQS)
+    
+    # Build the case statement
+    case = hl.case(missing_false=True)
+    
+    case = (case
+            .when(non_synonymous_csqs.contains(worst_csq_expr.most_severe_consequence), "non_synonymous")
+            .when(synonymous_csqs.contains(worst_csq_expr.most_severe_consequence), "synonymous")
+            .when(non_coding_csqs.contains(worst_csq_expr.most_severe_consequence), "non_coding")
+           )
+    
+    return case.or_missing()
+
 def csqs_case_builder_alpha_missense(worst_csq_expr: hl.StringExpression, spliceai_cutoff = 0.20):
     r'''Annotate consequence categories for downstream analysis
     
