@@ -23,7 +23,7 @@ readonly spark_dir="data/tmp/spark"
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
-# Now with 50k samples
+# These are the samples that are phased using read-backed phasing (Using whatshap)
 readonly ref_dir="/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/readbacked/data/phased/subset/50k"
 readonly ref_path="${ref_dir}/UKB.wes.200k.chr${chr}.50k.b1of4.vcf.gz"
 readonly ref_type="vcf"
@@ -33,6 +33,7 @@ readonly ref_type="vcf"
 #readonly ref_path="${ref_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.gz"
 #readonly ref_type="vcf"
 
+# these are the samples that are phased statistically (Using shapeit5)
 readonly phased_dir="data/phased/wes_union_calls/200k/shapeit5/clean_ligated" # consider using ligated_clean
 readonly phased_path="${phased_dir}/ukb_wes_union_calls_200k_chr${chr}.vcf.bgz"
 readonly phased_type="vcf"
@@ -51,8 +52,6 @@ readonly out="${out_prefix}.mt"
 
 mkdir -p ${out_dir}
 
-
-# combine parents and children in same vcf
 # note: we can't combine data using bcftools beacuse some variants
 # share the same position (but not same reference alleles)
 module purge

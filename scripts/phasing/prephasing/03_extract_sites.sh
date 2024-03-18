@@ -35,7 +35,6 @@ readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
 mkdir -p ${out_dir}
 
 
-# combine parents and children in same vcf
 # note: we can't combine data using bcftools beacuse some variants
 # share the same position (but not same reference alleles)
 module purge
