@@ -11,16 +11,6 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 5
 #SBATCH --array=20,22
-#
-#$ -N extract_prephase_sites
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/extract_prephase_sites.log
-#$ -e logs/extract_prephase_sites.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 2
-#$ -q short.qc
-#$ -t 20
-#$ -V
 
 set -o errexit
 set -o nounset

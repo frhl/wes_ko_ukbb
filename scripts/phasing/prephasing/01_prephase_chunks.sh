@@ -10,20 +10,9 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 #SBATCH --array=21
-#
-#$ -N prephase_chunks
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/prephase_chunks.log
-#$ -e logs/prephase_chunks.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qc
-#$ -t 17
-#$ -V
 
 set -o errexit
 set -o nounset
-
 
 source utils/qsub_utils.sh
 source utils/bash_utils.sh
@@ -37,9 +26,12 @@ readonly prephasing_script="scripts/phasing/prephasing/_prephase_chunks.sh"
 readonly merge_script="scripts/phasing/prephasing/_prephase_merge.sh"
 readonly spark_dir="data/tmp/spark"
 
-# how many samples should there be in each chunk 
+# In each "chunk", we run whatshap across the samples and combine them.
 readonly samples_per_chunk=100
-# what matrix table should samples be drawn from
+
+# what matrix table should samples be drawn from. The only thing that
+# this python-hail script is doing in creating a lists of samples in 
+# chunks of 100s (as whatever parameter 'samples_per_chunk')
 readonly input_samples_dir="data/prephased/wes_union_calls/intervals"
 readonly input_samples_path="${input_samples_dir}/ukb_wes_union_calls_random_samples_50k_seed1995_chr21.mt/"
 readonly input_samples_type="mt"
@@ -48,12 +40,12 @@ readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
 # Cluster params
-# note: errors after 50 min with 1000 samples/chunk with 4 slots
+# (note: errors after 50 min with 1000 samples/chunk with 4 slots)
 readonly project="lindgren.prj"
 readonly queue="short"
 readonly nslots=2
 
-# what file should be split up
+# we need to provide whatshap the unphased VCF that we want to read-back phase.
 readonly input_dir="data/unphased/wes_union_calls/prefilter/200k"
 readonly input_path="${input_dir}/ukb_wes_union_calls_chr${chr}.vcf.gz" 
 readonly input_type="vcf"
@@ -115,13 +107,7 @@ submit_prephasing_job() {
   readonly slurm_project="${project}"
   readonly slurm_queue="${queue}"
   readonly slurm_nslots="${nslots}"
-  if [ "${cluster}" == "slurm" ]; then
-    submit_prephasing_job_slurm
-  elif [ "${cluster}" == "sge" ]; then
-    submit_prephasing_job_sge
-  else
-    echo "${cluster} is not valid!"
-  fi
+  submit_prephasing_job_slurm
 
 }
 
@@ -150,30 +136,6 @@ submit_prephasing_job_slurm() {
     ${out_merge_w_job_config} \
     ${out_prefix_w_job_config} )
 }
-
-submit_prephasing_job_sge() {
-  echo "Submitting jobs with SGE"
-  qsub -N "${slurm_jname}" \
-    -o "${slurm_lname}.log" \
-    -e "${slurm_lname}.errors.log" \
-    -t ${slurm_tasks} \
-    -q "short.qc@@short.hge" \
-    -pe shmem ${slurm_nslots} \
-    -wd $(pwd) \
-    ${prephasing_script} \
-    ${chr} \
-    ${input_path} \
-    ${input_type} \
-    ${interval_path} \
-    ${max_interval_idx} \
-    ${samples_per_chunk} \
-    ${read_placeholder} \
-    ${out_merge_w_job_config} \
-    ${out_prefix_w_job_config}
-}
-
-
-
 
 submit_merge_job() {
   local max_interval_idx=$( get_max_interval_idx )

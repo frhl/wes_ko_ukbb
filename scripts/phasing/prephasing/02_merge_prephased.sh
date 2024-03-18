@@ -10,16 +10,6 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 5
 #SBATCH --array=1-22
-#
-#$ -N merge_prephased
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/merge_prephased.log
-#$ -e logs/merge_prephased.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 5
-#$ -q short.qc
-#$ -t 1
-#$ -V
 
 set -o errexit
 set -o nounset
@@ -37,20 +27,27 @@ readonly chr=$( get_chr ${task_id} )
 # parameters relating to file name
 readonly queue="short"
 readonly samples_per_chunk=100
+
 # save results in final directory
 readonly out_dir="data/prephased/wes_union_calls"
 readonly out_prefix="${out_dir}/ukb_wes_union_calls_200k_chr${chr}"
-# directories and out paths
+
+# in directories and out paths
 readonly in_dir="data/prephased/wes_union_calls/chunks"
 readonly in_prefix="${in_dir}/ukb_wes_union_calls_200k_chr${chr}"
 readonly input_list="${in_prefix}_spc${samples_per_chunk}_${queue}.mergelist"
 readonly input_super_list="${in_prefix}_spp${n_split}_${queue}.mergelist"
+
 # save temporary uniq files here
+
 readonly tmp="${input_list}.tmp"
 readonly tmp_super="${input_super_list}.tmp"
+
 # keep track of merged VCF
+
 readonly out_vcf="${out_prefix}.vcf"
 readonly out_vcf_gz="${out_vcf}.gz"
+
 # keep track of scaffold (final VCF)
 readonly final_vcf="${out_prefix}_scaffold"
 readonly out_type="vcf"
@@ -61,7 +58,9 @@ readonly n=$( cat ${tmp} | wc -l)
 readonly n_rounded=$( echo $n | sed 's|.*|(&+500)/1000*1000|' | bc )
 
 
-
+# this piece of code just iterates over various subsets of
+# read-backed phased genotypes for 100 samples at a time, and
+# combines into a larger VCF.
 if [ ! -f "${out_vcf_gz}" ]; then
   module load BCFtools/1.12-GCC-10.3.0
   #module load BCFtools/1.10.2-GCC-8.3.0
