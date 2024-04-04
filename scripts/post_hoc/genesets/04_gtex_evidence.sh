@@ -12,7 +12,7 @@
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
-readonly rscript="scripts/post_hoc/21_gtex_evidence.R"
+readonly rscript="scripts/post_hoc/04_gtex_evidence.R"
 readonly out_dir="derived/tables"
 readonly out_prefix="${out_dir}/gtex_top10"
 

@@ -7,17 +7,7 @@
 #SBATCH --error=logs/co_occurence_by_phenotype.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-22
-#
-#$ -N co_occurence_by_phenotype
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/co_occurence_by_phenotype.log
-#$ -e logs/co_occurence_by_phenotype.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qc
-#$ -t 22
-#$ -V
+#SBATCH --array=16
 
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
@@ -25,7 +15,7 @@ source utils/qsub_utils.sh
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
-readonly rscript="scripts/post_hoc/23_co_occurence_by_phenotype.R"
+readonly rscript="scripts/post_hoc/co_occurence/02_co_occurence_by_phenotype.R"
 
 # annotation for knockouts to be extractaed
 readonly annotation="pLoF_damaging_missense"
@@ -35,7 +25,7 @@ readonly path_header="${in_dir}/dec22_phenotypes_binary_200k_header.tsv"
 readonly path_phenotypes="${in_dir}/dec22_phenotypes_binary_200k.tsv.gz"
 readonly path_tte_phenotypes="${in_dir}/tte_matrix_176k.txt.gz"
 
-readonly out_dir="data/knockouts/alt/pp90/co_occurence5"
+readonly out_dir="data/knockouts/alt/pp90/co_occurence6"
 readonly out_prefix_tte="${out_dir}/co_occurence_by_tte_phenotype_chr${chr}"
 readonly out_prefix="${out_dir}/co_occurence_by_phenotype_chr${chr}"
 

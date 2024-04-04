@@ -21,8 +21,9 @@ other_csqs = c("mature_miRNA_variant", "5_prime_UTR_variant",
 
 
 # get path to full file of ukb wes knockouts
-ukb_wes_ko_path <- function(annotation = "pLoF_damaging_missense", chr = "21"){
+ukb_wes_ko_path <- function(annotation = "pLoF_damaging_missense", chr = "21", use_frqx=FALSE){
     rawdir <- paste0("/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/data/knockouts/alt/pp90/recoded")
+    if (use_frqx==TRUE) rawdir <- paste0("/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/data/knockouts/alt/pp90/recoded_vep_ac")
     thedir <- file.path(rawdir, annotation)
     thefile <- paste0("ukb_eur_wes_200k_chr",chr,".pp90.recoded.",annotation,".txt.gz")
     path <- file.path(thedir, thefile)
@@ -41,13 +42,14 @@ ukb_wes_syn_path <- function(annotation = "synonymous", chr = "21"){
 }
 
 # read full paths
-read_ukb_wes_kos <- function(annotation, chromosomes=1:22, allow_hets = TRUE){
+read_ukb_wes_kos <- function(annotation, chromosomes=1:22, allow_hets = TRUE, use_frqx=FALSE){
     d <- do.call(rbind, lapply(chromosomes, function(chr){
         if (annotation %in% c("pLoF", "damaging_missense", "pLoF_damaging_missense")){
-            path <- ukb_wes_ko_path(annotation, chr)
+            path <- ukb_wes_ko_path(annotation, chr, use_frqx)
             d <- fread(path)
             
         } else if (annotation %in% c("synonymous", "other_missense")){
+            if (use_frqx) warning(paste("frqx has not been run for", annotation))
             path <- ukb_wes_syn_path(annotation, chr)
             d <- fread(path)
         }

@@ -12,7 +12,7 @@
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
-readonly rscript="scripts/post_hoc/19_omim_gencc_tables.R"
+readonly rscript="scripts/post_hoc/03_omim_gencc_tables.R"
 
 readonly out_dir="data/knockouts/tables"
 readonly out_prefix="${out_dir}/230117_evidence"

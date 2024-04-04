@@ -11,7 +11,7 @@
 
 source utils/bash_utils.sh
 
-readonly rscript="scripts/post_hoc/16_aggr_cond_markers.R"
+readonly rscript="scripts/post_hoc/05_aggr_cond_markers.R"
 
 # folder containing ukb_eur_wes_200k_DM_T1D_pLoF_damaging_missense_cond_ENSG00000213676.markers for example
 readonly markers_common_dir="data/conditional/common/spa_iter"

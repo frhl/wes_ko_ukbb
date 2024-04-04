@@ -1,26 +1,27 @@
 #!/usr/bin/env bash
 #
-#$ -N sample_geneset_counts
+#$ -N aggr_anno
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/sample_geneset_counts.log
-#$ -e logs/sample_geneset_counts.errors.log
+#$ -o logs/aggr_anno.log
+#$ -e logs/aggr_anno.errors.log
 #$ -P lindgren.prjc
-#$ -pe shmem 5
+#$ -pe shmem 12
 #$ -q short.qc
+#$ -V
 
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
-readonly rscript="scripts/post_hoc/25_sample_geneset_counts.R"
+readonly rscript="scripts/post_hoc/04_aggr_anno.R"
 
 readonly out_dir="data/knockouts/tables"
-readonly out_prefix="${out_dir}/sample_geneset_counts"
+readonly out_prefix="${out_dir}/combined_annotations.all_syn"
 
 mkdir -p ${out_dir}
 
 set_up_rpy
 Rscript "${rscript}" \
-  --out_prefix "${out_prefix}"
+ --out_prefix "${out_prefix}" \
 
 
 

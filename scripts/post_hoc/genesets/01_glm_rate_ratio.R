@@ -47,7 +47,9 @@ fit_zinb <- function(model, dt_fit, gene_set, anno, m) {
 
 
 main <- function(args){
-  
+
+    print(args)
+
     # remove the three outliers
     #aggr_mrg <- fread("~/Downloads/combined_annotations_by_sample.new.counts.txt.gz")
     cols_aggr <- c("gene_id", "transcript_id", "annotation")
@@ -173,9 +175,12 @@ main <- function(args){
         }
     }
 
-    #models <- c("is_chet" , "is_hom", "is_ko", "is_het","is_cis")
     #models <- c("is_chet" , "is_hom", "is_ko", "is_het")
-    models <- c("is_cis")
+    #models <- c("is_cis")
+    valid_models <- c("is_chet" , "is_hom", "is_ko", "is_het","is_cis")
+    models <- unlist(strsplit(args$models_to_run, split=","))
+    stopifnot(all(models %in% valid_models))
+    
     annotations <- unique(aggr_mrg$annotation)
 
     get_covars <- function(model){
@@ -197,6 +202,9 @@ main <- function(args){
           if (anno == "damaging_missense") model <-  paste0(m,"~x+mis")
           if (anno == "pLoF") model <-  paste0(m,"~x+frameshift+splice_site+non")
           if (anno == "pLoF_damaging_missense") model <-  paste0(m,"~x+mis+frameshift+splice_site+non")
+          
+          #print("USING ALL MODEL!!!")
+          #model <- paste(m,"~x+all")
 
           lst[[m]][[gene_set]][[anno]] <- list()
           print(anno); print(model)
@@ -212,11 +220,12 @@ main <- function(args){
 
           # trasnforming covariates seem to solve convergence issue
           # see https://stats.stackexchange.com/questions/76488/error-system-is-computationally-singular-when-running-a-glm         
-          dt_fit$syn <- dt_fit$syn * 100
-          dt_fit$mis <- dt_fit$mis * 100
-          dt_fit$frameshift <- dt_fit$frameshift * 100
-          dt_fit$splice_site <- dt_fit$splice_site * 100
-          dt_fit$non <- dt_fit$non * 100
+          scaling <- 100
+          dt_fit$syn <- dt_fit$syn * scaling
+          dt_fit$mis <- dt_fit$mis * scaling
+          dt_fit$frameshift <- dt_fit$frameshift * scaling
+          dt_fit$splice_site <- dt_fit$splice_site * scaling
+          dt_fit$non <- dt_fit$non * scaling
 
           # fit GLM
           if (args$glm_method == "poisson") {
@@ -246,7 +255,7 @@ main <- function(args){
     # write efile
     outfile <- paste0(args$out_prefix,".txt")
     write(paste("writing", outfile), stderr())
-    fwrite(combined, outfile, sep = "\t")
+    fwrite(combined, outfile, sep = "\t", na="NA")
 
     # setup colors
     categories <- c('pLoF','pLoF_damaging_missense','damaging_missense','other_missense','synonymous', 'combined')
@@ -270,6 +279,7 @@ parser$add_argument("--file_cancer", default=NULL, required = FALSE, help = "")
 parser$add_argument("--file_gtex", default=NULL, required = FALSE, help = "")
 parser$add_argument("--dir_genesets", default=NULL, required = TRUE, help = "")
 parser$add_argument("--glm_method", default="zinfb", required = TRUE, help = "either 'zinfb' or 'poisson'")
+parser$add_argument("--models_to_run", default="is_chet", required = TRUE, help = "either 'is_hom', 'is_chet', 'is_het', 'is_cis' or 'is_ko'")
 args <- parser$parse_args()
 
 main(args)

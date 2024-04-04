@@ -12,7 +12,7 @@
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
-readonly rscript="scripts/post_hoc/13_create_icd_overview.R"
+readonly rscript="scripts/post_hoc/04_create_icd_overview.R"
 
 readonly in_dir="data/phenotypes"
 readonly in_file="${in_dir}/dec22_phenotypes_binary_200k_header.tsv"

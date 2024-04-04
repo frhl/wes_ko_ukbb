@@ -30,9 +30,9 @@ Rscript ${rscript} \
   --out_prefix "${out_prefix}.protein_coding" \
   --filter_biotype "protein_coding"
 
-Rscript ${rscript} \
-  --in_file ${in_file} \
-  --out_prefix "${out_prefix}"
+#Rscript ${rscript} \
+#  --in_file ${in_file} \
+ # --out_prefix "${out_prefix}"
 
 
 

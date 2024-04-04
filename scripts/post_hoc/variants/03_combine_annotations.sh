@@ -12,7 +12,7 @@
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
-readonly rscript="scripts/post_hoc/05_combine_annotations.R"
+readonly rscript="scripts/post_hoc/03_combine_annotations.R"
 
 readonly out_dir="data/knockouts/tables"
 readonly out_prefix="${out_dir}/combined_annotations_by_sample.new"

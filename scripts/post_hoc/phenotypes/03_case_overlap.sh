@@ -14,7 +14,7 @@ set -o nounset
 
 source utils/bash_utils.sh
 
-readonly rscript="scripts/post_hoc/07_case_overlap.R"
+readonly rscript="scripts/post_hoc/03_case_overlap.R"
 
 readonly pheno_dir="data/phenotypes"
 readonly phenos="${pheno_dir}/dec22_phenotypes_binary_200k.tsv.gz"

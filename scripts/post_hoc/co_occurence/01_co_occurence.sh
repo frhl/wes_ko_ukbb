@@ -16,7 +16,7 @@ source utils/qsub_utils.sh
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
-readonly rscript="scripts/post_hoc/22_co_occurence.R"
+readonly rscript="scripts/post_hoc/01_co_occurence.R"
 readonly out_dir="data/knockouts/alt/pp90/co_occurence3"
 
 readonly out_prefix="${out_dir}/co_occurence_chr${chr}_other_missense"

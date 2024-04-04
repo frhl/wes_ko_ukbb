@@ -5,17 +5,20 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/glm_rate_ratio.log
 #SBATCH --error=logs/glm_rate_ratio.errors.log
-#SBATCH --partition=short
+#SBATCH --partition=epyc
 #SBATCH --cpus-per-task 2
 #SBATCH --requeue
 
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
-readonly rscript="scripts/post_hoc/genesets/06_glm_rate_ratio.R"
+readonly rscript="scripts/post_hoc/genesets/01_glm_rate_ratio.R"
 
 readonly out_dir="data/knockouts/tables"
-readonly out_prefix="${out_dir}/zinfb_rate_essential_genesets_review"
+readonly out_prefix="${out_dir}/poisson_rate_essential_genesets_review"
+
+readonly glm_method="poisson" # method
+readonly models_to_run="is_ko,is_chet,is_hom,is_het,is_cis" # seperated by comma
 
 readonly in_dir="data/knockouts/tables"
 readonly in_file="${in_dir}/combined_annotations_by_sample.new.counts.txt.gz"
@@ -40,8 +43,9 @@ Rscript "${rscript}" \
    --file_mutation_rates "${mutation_rates}" \
    --dir_genesets "${essential_dir}" \
    --file_pli ${pli} \
-   --glm_method "zinfb"
- #  --file_omim ${omim} \
- #  --file_gtex ${gtex} \
- #  --file_cancer ${cancer1}
+   --glm_method "${glm_method}" \
+   --models_to_run "${models_to_run}" \
+   --file_omim ${omim} \
+   --file_gtex ${gtex} \
+   --file_cancer ${cancer1}
 

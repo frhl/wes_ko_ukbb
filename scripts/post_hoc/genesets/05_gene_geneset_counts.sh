@@ -11,7 +11,7 @@
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
-readonly rscript="scripts/post_hoc/24_gene_geneset_counts.R"
+readonly rscript="scripts/post_hoc/05_gene_geneset_counts.R"
 
 readonly out_dir="data/knockouts/tables"
 readonly out_prefix="${out_dir}/gene_geneset_counts"

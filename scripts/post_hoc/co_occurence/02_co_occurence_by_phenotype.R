@@ -17,6 +17,10 @@ main <- function(args){
     df_phenotype <- fread(path_phenotypes)
     phenotypes <- readLines(path_header)
 
+    # for testing, just take first 30
+    write("Warning! We are only doing first 10 phenos for testing. Edit code to change!", stderr())
+    phenotypes <- phenotypes[1:10]
+
     # convert numerics to bools for time-to-event phenotypes
     if (convert_tte_to_bool){
         eids <- df_phenotype$eid

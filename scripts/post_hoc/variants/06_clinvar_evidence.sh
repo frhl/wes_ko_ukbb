@@ -12,7 +12,7 @@
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
-readonly rscript="scripts/post_hoc/20_clinvar_evidence.R"
+readonly rscript="scripts/post_hoc/06_clinvar_evidence.R"
 readonly path_clinvar="data/knockouts/alt/pp90/clinvar_alleles/ukb_eur_wes_200k_clinvar_chrCHR.txt.gz"
 readonly path_info="data/mt/prefilter/final_90_loftee/ukb_wes_union_calls_200k_chrCHR.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.csqs.txt.gz"
 

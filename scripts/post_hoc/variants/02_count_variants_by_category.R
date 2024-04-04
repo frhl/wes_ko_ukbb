@@ -48,8 +48,8 @@ get_total_row <- function(combined, cat_text, pred_text){
         n_variants_before_pp=sum_n_variants_before_pp,
         n_singletons_before_pp=sum_n_singletons_before_pp,
         pct_singletons_before_pp=summed_pct_singletons_before_pp,
-        n_variants_after_pp=sum_n_singletons_after_pp,
-        n_singletons_after_pp=sum_n_variants_after_pp,
+        n_variants_after_pp=sum_n_variants_after_pp,
+        n_singletons_after_pp=sum_n_singletons_after_pp,
         pct_singletons_after_pp=summed_pct_singletons_after_pp,
         summary_row=TRUE
     )  
@@ -72,11 +72,13 @@ main <- function(args){
     # add a few important covariates
     dt[, super_category := sapply(CSQ, get_super_category)]
     dt$is_singleton_before_pp <- dt$MAC.before_pp == 1
-    dt$is_singleton_after_pp <- (dt$MAC.after_pp == 1) & (dt$is_singeton_before_pp)
+    dt$is_singleton_after_pp <- (dt$MAC.after_pp == 1) & (dt$is_singleton_before_pp)
 
-    # get major categories
-    all_csqs <- unique(dt$CSQ)
-    all_categories <- c("PTV", "Missense", "Synonymous", "Non_coding")#unique(dt$super_category)
+    # get major categories and subset. This removes a few (non_coding CSQs)
+    all_csqs <- as.character(unlist(super_categories))
+    all_categories <- names(super_categories)
+    dt <- dt[dt$super_category %in% all_categories,]
+    dt <- dt[dt$CSQ %in% all_csqs,]  
     all_predictions <- unique(dt$annotation)
 
     out <- rbindlist(lapply(all_categories, function(cat){
@@ -125,7 +127,7 @@ main <- function(args){
     }))
 
     out <- out[out$n_variants_before_pp>0,]
-    outfile <- paste0(out_prefix, ".txt.gz")
+    outfile <- paste0(out_prefix, ".txt")
     write(paste("writing to", outfile), stdout())
     fwrite(out, outfile, sep="\t", quote=FALSE)
 

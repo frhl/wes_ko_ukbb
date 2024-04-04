@@ -12,7 +12,7 @@
 source utils/bash_utils.sh
 source utils/qsub_utils.sh
 
-readonly rscript="scripts/post_hoc/15_ldsc_auc_icd.R"
+readonly rscript="scripts/post_hoc/06_ldsc_auc_icd.R"
 
 
 readonly summary_ldsc="data/prs/validation/ldsc_summary.txt.gz"

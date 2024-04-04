@@ -15,7 +15,7 @@ source utils/qsub_utils.sh
 readonly task_id=$( get_array_task_id )
 readonly chr=$( get_chr ${task_id} )
 
-readonly rscript="scripts/post_hoc/26_gene_phenotype_case_control_chets.R"
+readonly rscript="scripts/post_hoc/03_gene_phenotype_case_control_chets.R"
 
 readonly co_occurence_dir="data/knockouts/alt/pp90/co_occurence5"
 readonly co_occurence_file="${co_occurence_dir}/co_occurence_by_phenotype_chrCHR.txt.gz"
@@ -26,8 +26,7 @@ readonly out_prefix="${out_dir}/co_occurence_collapsed_pLoF_damaging_missense"
 
 mkdir -p ${out_dir}
 
-
-# remember to include chr1 in the R-script!
+## Note: remember to include chr1 in the R-script!
 set_up_rpy
 Rscript "${rscript}" \
   --co_occurence_file ${co_occurence_file} \
