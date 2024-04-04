@@ -8,17 +8,6 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 #SBATCH --array=1-22
-# --dependency="aftercorr:10270053"
-
-#$ -N get_collapsed_markers
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/get_collapsed_markers.log
-#$ -e logs/get_collapsed_markers.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qc
-#$ -t 22
-#$ -V
 
 set -o errexit
 set -o nounset

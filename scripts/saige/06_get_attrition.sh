@@ -14,9 +14,10 @@ set -o nounset
 
 source utils/bash_utils.sh
 
-readonly rscript="scripts/saige/14_get_attrition.R"
+readonly rscript="scripts/saige/06_get_attrition.R"
 
-readonly dir="data/post_hoc/results"
+#readonly dir="data/post_hoc/results"
+readonly dir="data/post_hoc/results/2024"
 readonly excl_prs="${dir}/176k_sig_saige_all_prs_excl_N5.txt.gz"
 readonly prefer_prs="${dir}/176k_sig_saige_all_prs_pref_N5.txt.gz"
 readonly cond_full="${dir}/176k_sig_saige_cond_all_pref_prs_combined.txt.gz"
@@ -31,7 +32,8 @@ readonly hom_only="${dir}/176k_sig_saige_all_prs_pref_N5_hom_only.txt.gz"
 readonly co_table_dir="data/knockouts/alt/pp90//co_occurence3"
 readonly co_table="${co_table_dir}/co_occurence_collapsed_pLoF_damaging_missense.wide.txt.gz"
 
-readonly out_dir="data/post_hoc/results"
+#readonly out_dir="data/post_hoc/results"
+readonly out_dir="data/post_hoc/results/2024"
 readonly out_prefix="${out_dir}/attrition"
 
 set_up_rpy

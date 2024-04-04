@@ -40,7 +40,8 @@ module load BCFtools
 readonly samples="${out_prefix}.samples"
 bcftools query -l ${samples_vcf} > ${samples}
 
-for anno in "pLoF_damaging_missense"; do
+#for anno in "pLoF_damaging_missense"; do
+for anno in "pLoF"; do
 
   # setup paths 
   out_prefix_anno="${out_prefix}.${anno}"

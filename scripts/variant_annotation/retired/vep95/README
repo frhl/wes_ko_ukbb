@@ -1,8 +1,0 @@
-These VEP scripts were retired because others were created that are easier to use and interpret.
-Note, that when this script was run 'splice_donor_variant' that are LC were assigned to 'pLoF' consequence. This
-will not affect results when pLoF+damaging missense are already run together. This issue is super rare and affects
-only a few variants on each chromsome (chr20 has 2, chr21 has 1.. etc).
-
-
-
-

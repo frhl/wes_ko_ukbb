@@ -11,10 +11,14 @@ ALL_GENES <- read.table("/well/lindgren-ukbb/projects/ukbb-11867/flassen/project
 submission_script <- "/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/scripts/survival/replicate_missing/submit_coxph_models.sh"
 
 # Types of files
-ftypes <- c("remove.wes200k.replication_full",
-            "remove.wes200k.replication",
-            "keep.wes200k.replication_full",
-            "keep.wes200k.replication")
+#ftypes <- c("remove.wes200k.replication_full",
+#            "remove.wes200k.replication",
+#            "keep.wes200k.replication_full",
+#            "keep.wes200k.replication")
+
+ftypes <- c("remove.wes200k",
+            "keep.wes200k")
+
 
 # Reference groups
 refgps <- c("het", "chet_cis")

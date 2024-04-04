@@ -7,8 +7,8 @@
 #SBATCH --output=logs/ldsc.log
 #SBATCH --error=logs/ldsc.errors.log
 #SBATCH --partition=short
-#SBATCH --cpus-per-task 2
-#SBATCH --array=2-50
+#SBATCH --cpus-per-task 4
+#SBATCH --array=1-50
 
 set -o errexit
 set -o nounset

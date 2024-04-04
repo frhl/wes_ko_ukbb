@@ -40,13 +40,7 @@ def main(args):
 
     # Initialize a list to keep track of the new field names
     new_covariate_names = []
-
-    print(mt.describe())
-    print("##")
-    print(mt.pheno.describe())
-    print("##")
-    print(categories)
-
+    
     # Annotate the MatrixTable with new fields for each category
     for category in categories:
         print(category)
@@ -63,8 +57,6 @@ def main(args):
     split_covariates = covariates.split(',')
     split_covariates = [cov for cov in split_covariates if cov != 'ukbb.centre']  # Remove 'ukbb.centre'
     split_covariates += new_covariate_names  # Add the new one-hot encoded variable names
-
-    print(split_covariates)
 
     covariates = [mt.pheno[x] for x in split_covariates if x in mt.pheno]
     covariates += [mt[x] for x in split_covariates if x not in mt.pheno]  # Include one-hot encoded covariates

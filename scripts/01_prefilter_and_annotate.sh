@@ -9,8 +9,7 @@
 #SBATCH --error=logs/prefilter_and_annotate.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
-#SBATCH --array=21
-#SBATCH --time=12:00:30
+#SBATCH --array=1-21
 
 # used to be called 01_annotate.sh 
 # Note: long.qc@@long.hga with 4 slots required to run full pipeline
@@ -18,8 +17,6 @@
 set -o errexit
 set -o nounset
 
-source utils/vcf_utils.sh
-source utils/bash_utils.sh
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
 
@@ -44,18 +41,6 @@ readonly final_sample_list='data/phenotypes/samples/ukb_wes_ko.imputed.qc.sample
 readonly final_variant_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/variants/08_final_qc.keep.variant_list'
 
 mkdir -p ${out_dir}
-
-readonly to_mt="scripts/_mt_to_vcf.py"
-set_up_hail
-set_up_pythonpath_legacy  
-python3 "${to_mt}" \
-   --input_path "${out_prefix}.mt" \
-   --input_type "mt" \
-   --out_prefix "${out_prefix}" \
-   --out_type "vcf"
-
-echo "EXITING!!!" && exit 1
-
 
 if [ ! -f ${out} ]; then
   SECONDS=0

@@ -9,7 +9,7 @@
 #SBATCH --error=logs/spa_null.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-310
+#SBATCH --array=2-100
 
 set -o errexit
 set -o nounset
@@ -45,7 +45,7 @@ readonly index=$( get_array_task_id )
 fit_binary_traits() {
   local trait_type="binary"
   local inv_normalize="FALSE"
-  local out_dir="data/saige/output/binary/step1_with_logs"
+  local out_dir="data/saige/output/binary/step1"
   local pheno_list="${pheno_dir}/dec22_phenotypes_binary_200k_header.tsv"
   local phenotype=$( sed "${index}q;d" ${pheno_list} )
   local out="${out_dir}/${out_prefix}_${phenotype}"
@@ -60,13 +60,13 @@ fit_binary_traits() {
 
 fit_cts_traits() {
   local trait_type="quantitative"
-  local inv_normalize="FALSE"
+  local inv_normalize="TRUE"
   local out_dir="data/saige/output/cts/step1"
   local pheno_list="${pheno_dir}/filtered_phenotypes_cts_manual.tsv"
   local phenotype_in=$( sed "${index}q;d" ${pheno_list} )
   local phenotype="${phenotype_in}"
   local out="${out_dir}/${out_prefix}_${phenotype}"
-  pheno_file="${pheno_dir}/filtered_covar_phenotypes_cts.tsv.gz"
+  pheno_file="${pheno_dir}/curated_covar_phenotypes_cts_int_200k_subset.txt.gz"
 
   local out_pheno_prs="${out_dir}/${phenotype}_prs.txt.gz"
   local prs="${prs_dir}/${phenotype}_pgs_chrom.txt.gz"
@@ -195,8 +195,8 @@ readonly sge_queue="short.qc"
 readonly project="lindgren.prj"
 
 # Fit null model for binary/cts traits
-#fit_cts_traits
-fit_binary_traits
+fit_cts_traits
+#fit_binary_traits
 
 
 

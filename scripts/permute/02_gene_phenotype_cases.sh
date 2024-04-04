@@ -19,7 +19,7 @@ readonly rscript="scripts/permute/02_gene_phenotype_cases.R"
 readonly phenotypes="data/phenotypes/dec22_phenotypes_binary_200k.tsv.gz"
 
 readonly in_dir="data/permute/overview"
-readonly phenotypes_by_count="${in_dir}/phenotypes_with_5cis_2chets.txt.gz"
+readonly phenotypes_by_count="${in_dir}/phenotypes_with_5cis_2chets.txt"
 readonly genes_by_count="${in_dir}/genes_to_run_5cis_2chets.tsv.gz"
 
 readonly min_chets=0

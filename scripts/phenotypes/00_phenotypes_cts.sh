@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/cts/env bash
 #
 #
 #SBATCH -A lindgren.prj
@@ -21,10 +21,10 @@ readonly in_dir="/well/lindgren/UKBIOBANK/dpalmer/ukb_wes_phenotypes"
 readonly covar_dir="data/phenotypes"
 readonly out_dir="data/phenotypes/test"
 
-readonly in_bin="${in_dir}/curated_phenotypes_cts.tsv"
-readonly tmp_bin="${out_dir}/cts_phenotypes.tsv.gz"
-readonly out_bin_500k="${out_dir}/cts_phenotypes_500k"
-readonly out_bin_200k="${out_dir}/cts_phenotypes_200k"
+readonly in_cts="${in_dir}/curated_phenotypes_cts.tsv"
+readonly tmp_cts="${out_dir}/cts_phenotypes.tsv.gz"
+readonly out_cts_500k="${out_dir}/cts_phenotypes_500k"
+readonly out_cts_200k="${out_dir}/cts_phenotypes_200k"
 
 readonly final_sample_list="/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list"
 
@@ -40,11 +40,11 @@ mkdir -p ${out_dir}
 # Pre-processing of phenotypes
 set_up_rpy
 Rscript ${r_script} \
-  --input_path ${in_bin} \
+  --input_path ${in_cts} \
   --covariates ${covariates} \
   --transform_method ${transform_method} \
   --transform ${phenotypes_cts} \
-  --out_path ${tmp_bin}
+  --out_path ${tmp_cts}
 
 # set up python
 set +eu
@@ -55,18 +55,18 @@ set -eu
 
 # Get 200k WES samples
 python3 "${hail_script}" \
-     --input_path "${tmp_bin}" \
+     --input_path "${tmp_cts}" \
      --extract_samples "${final_sample_list}" \
      --export_header \
-     --out_prefix "${out_bin_200k}"
-gzip "${out_bin_200k}.tsv"
+     --out_prefix "${out_cts_200k}"
+gzip "${out_cts_200k}.tsv"
 
 # get 500k IMP samples
 python3 "${hail_script}" \
-     --input_path "${tmp_bin}" \
+     --input_path "${tmp_cts}" \
      --export_header \
-     --out_prefix "${out_bin_500k}"
-gzip "${out_bin_500k}.tsv"
+     --out_prefix "${out_cts_500k}"
+gzip "${out_cts_500k}.tsv"
 
 
 

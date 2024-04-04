@@ -38,7 +38,8 @@ def main(args):
     exclude = args.exclude
     use_loftee = args.use_loftee
     csqs_category = args.csqs_category
-    
+    exclude_singletons = args.exclude_singletons
+
     seed=42
 
     # import table
@@ -51,6 +52,16 @@ def main(args):
     if maf_max:
         mt = mt.annotate_rows(MAF=variants.get_maf_expr(mt))
         mt = mt.filter_rows(mt.MAF <= float(maf_max))
+
+    if exclude_singletons:
+        rows_before = mt.count_rows()
+        mt = mt.annotate_rows(MAC=variants.get_mac_expr(mt))
+        mt = mt.filter_rows(mt.MAC>0)
+        rows_after = mt.count_rows()
+        print("singleton exclusion before/after")
+        print(rows_before)
+        print(rows_after)
+
 
     # annotate with variant consequence and collapse by gene
     mt = mt.explode_rows(mt.consequence.vep.worst_csq_by_gene_canonical)
@@ -170,6 +181,7 @@ if __name__=='__main__':
     parser.add_argument('--maf_max', default=None, help='Select all variants with a maf less than the indicated value')
     parser.add_argument('--exclude', default=None, help='exclude variants by rsid and/or variant id')
     parser.add_argument('--use_loftee', default=False, action='store_true', help='use LOFTEE to distinghiush between high confidence PTVs')
+    parser.add_argument('--exclude_singletons', default=False, action='store_true', help='Exclude singletons for analysis')
     parser.add_argument('--csqs_category', default=None, action=SplitArgs, help='What categories should be subsetted to?')
     args = parser.parse_args()
 

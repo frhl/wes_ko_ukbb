@@ -25,13 +25,14 @@ readonly header_file="${header_dir}/dec22_phenotypes_binary_200k_header.tsv"
 # for some reason there is a "bug" in saige, not giving us
 # some of the columns when conditioniong on markers, 
 # thus we need to map them manually
-readonly ref_dir="data/post_hoc/results"
+readonly ref_dir="data/post_hoc/results/2024"
+#readonly ref_dir="data/post_hoc/results"
 #readonly ref_file="${ref_dir}/176k_sig_saige_sig_prs_pref_N5.txt.gz"
-readonly ref_file="${ref_dir}/176k_sig_saige_sig_prs_excl_N5.txt.gz"
+readonly ref_file="${ref_dir}/176k_sig_saige_sig_prs_excl_N5.txt.gz" # ok
 
 # get merged hits that unprocessed
 readonly merged_dir="data/conditional/combined/saige"
-readonly merged_hits="${merged_dir}/176k_merged_hits_post_cond.txt.gz"
+readonly merged_hits="${merged_dir}/176k_merged_hits_post_cond.txt.gz" # nope
 
 # get merged dominance cond hits that are unprocessed
 readonly merged_dominance_dir="data/conditional/dominance/saige"
@@ -51,7 +52,7 @@ readonly nom_p_cutoff="$(python -c "print(0.05/(${genes_tested}))")"
 readonly N_ko_case_cutoff="0"
 readonly N_ko_cutoff="5"
 
-readonly out_dir="data/post_hoc/results"
+readonly out_dir="data/post_hoc/results/2024"
 mkdir -p ${out_dir}
 
 # write all hits interrogated regardless of final P

@@ -8,7 +8,7 @@
 #SBATCH --error=logs/spa_test.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-311
+#SBATCH --array=1-50
 
 set -o errexit
 set -o nounset
@@ -79,7 +79,7 @@ submit_spa_with_csqs()
     #local step2_dir="data/saige/output/${trait}/step2_test_new_vcf/min_mac${min_mac}"
     
     local in_vcf="${vcf_dir}/${in_prefix}_chrCHR_${annotation}.vcf.bgz"
-    local in_vcf="${vcf_dir}/ukb_wes_union_calls_200k_chrCHR.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.${annotation}.vcf.gz"
+    #local in_vcf="${vcf_dir}/ukb_wes_union_calls_200k_chrCHR.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.${annotation}.vcf.gz"
     mkdir -p ${step2_dir}
 
     local in_gmat="${step1_dir}/ukb_wes_200k_${phenotype}.rda"
@@ -185,8 +185,8 @@ readonly nslots=2
 
 
 # cts traits
-#submit_spa_cts_with_csqs "pLoF_damaging_missense"
-submit_spa_binary_with_csqs "pLoF_damaging_missense"
+submit_spa_cts_with_csqs "pLoF_damaging_missense"
+#submit_spa_binary_with_csqs "pLoF_damaging_missense"
 
 #sleep 10
 #submit_spa_cts_with_csqs "pLoF"

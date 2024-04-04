@@ -11,17 +11,6 @@
 #SBATCH --cpus-per-task 3
 #SBATCH --array=1-22
 
-#
-#$ -N append_vcf_common
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/append_vcf_common.log
-#$ -e logs/append_vcf_common.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 2
-#$ -q short.qc
-#$ -t 1-22
-#$ -V
-
 source utils/vcf_utils.sh
 source utils/bash_utils.sh
 source utils/hail_utils.sh
@@ -34,8 +23,8 @@ readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
 readonly ko_dir="data/knockouts/alt/pp90/combined"
-readonly common_dir="data/conditional/common/markers"
-readonly out_dir="data/conditional/common/combined"
+readonly common_dir="data/conditional/common/markers/2024"
+readonly out_dir="data/conditional/common/combined/2024"
 
 readonly ko_path_wo_ext="${ko_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense"
 readonly common_path_wo_ext="${common_dir}/common_conditional"

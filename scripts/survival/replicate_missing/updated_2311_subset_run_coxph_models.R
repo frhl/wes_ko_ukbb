@@ -25,9 +25,9 @@ print(args)
 
 # Read and wrangle data into correct formats ----
 
-input_prefix <- paste0("/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb_nexus/data/survival/samvida/2401/UKB.carrier_matrix.eur.unrel.af05.pp0.90.pLoF_damaging_missense.", args$fileType, 
+input_prefix <- paste0("/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb_nexus/data/survival/samvida/240226/UKB.carrier_matrix.qced.eur.unrel.af05.pp0.90.pLoF_damaging_missense.", args$fileType, 
                        ".b1of1.")
-out_prefix <- paste0("/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/data/survival/missing_replication/2401_analyses/results/ref_group_", 
+out_prefix <- paste0("/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb/data/survival/missing_replication/240226_analyses/results/ref_group_", 
                      args$refGroup, "/unconditioned/", args$fileType, "_chunk", args$chunk)
 
 dir.create(dirname(out_prefix), recursive = TRUE)

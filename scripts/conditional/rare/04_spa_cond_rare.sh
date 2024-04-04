@@ -5,9 +5,9 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/spa_cond_rare.log
 #SBATCH --error=logs/spa_cond_rare.errors.log
-#SBATCH --partition=short
+#SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-10
+#SBATCH --array=11-50
 
 set -o errexit
 set -o nounset
@@ -103,7 +103,7 @@ submit_spa_with_csqs()
       if [ ! -f "${out_mrg}" ]; then
         local slurm_spa_name="spa_${phenotype}_${annotation}"
         local slurm_merge_name="_mrg_${phenotype}_${annotation}"
-        #submit_spa_job
+        submit_spa_job
         submit_merge_job
       else
         >&2 echo "Phenotype ${phenotype} with annotation ${annotation} already exists! Skipping.." 
@@ -123,7 +123,7 @@ submit_spa_job() {
   local slurm_lname="${out_prefix}"
   local slurm_project="${project}"
   local slurm_queue="${queue}"
-  local sge_queue="short.qc"
+  local sge_queue="epyc.qc"
   local slurm_nslots="${nslots}"
   readonly spa_jid=$( sbatch \
     --account="${slurm_project}" \
@@ -183,7 +183,7 @@ readonly markers_cond_min_mac=4  #3
 readonly use_prs="0"
 readonly min_mac=4
 readonly tasks=1-22
-readonly queue="short"
+readonly queue="epyc"
 readonly project="lindgren.prj"
 readonly nslots=4
 

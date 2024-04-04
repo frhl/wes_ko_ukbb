@@ -5,7 +5,7 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/symlink_tables.log
 #SBATCH --error=logs/symlink_tables.errors.log
-#SBATCH --partition=short
+#SBATCH --partition=epyc
 #SBATCH --cpus-per-task 1
 #SBATCH --array=1-22
 

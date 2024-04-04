@@ -7,7 +7,7 @@
 #SBATCH --error=logs/recode_knockouts.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-22
+#SBATCH --array=22
 
 set -o errexit
 set -o nounset
@@ -31,9 +31,9 @@ readonly vep_dir="data/mt/prefilter/pp90"
 readonly vep_path="${vep_dir}/ukb_wes_union_calls_200k_chr${chr}.loftee.worst_csq_by_gene_canonical.pp90.maf0_005.csqs.txt.gz"
 
 readonly in_dir="data/knockouts/alt/pp90/encode_vcf_parallel"
-readonly out_dir="data/knockouts/alt/pp90/recoded_vep_ac/damaging_missense"
 #readonly out_dir="data/knockouts/alt/pp90/recoded_vep_ac/pLoF"
-#readonly out_dir="data/knockouts/alt/pp90/recoded_vep_ac/pLoF_damaging_missense"
+#readonly out_dir="data/knockouts/alt/pp90/recoded_vep_ac/damaging_missense"
+readonly out_dir="data/knockouts/alt/pp90/recoded_vep_ac/pLoF_damaging_missense"
 #readonly out_dir="data/knockouts/alt/pp90/recoded/test_test_test"
 
 mkdir -p ${out_dir}
@@ -107,13 +107,13 @@ submit_merge_job()
 #the_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}.pp90.recoded.pLoF"
 #submit_recode_job ${the_path} ${the_prefix}
 
-the_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_damaging_missense_all.tsv.gz"
-the_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}.pp90.recoded.damaging_missense"
-submit_recode_job ${the_path} ${the_prefix}
-
-#the_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense_all.tsv.gz"
-#the_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}.pp90.recoded.pLoF_damaging_missense"
+#the_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_damaging_missense_all.tsv.gz"
+#the_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}.pp90.recoded.damaging_missense"
 #submit_recode_job ${the_path} ${the_prefix}
+
+the_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense_all.tsv.gz"
+the_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}.pp90.recoded.pLoF_damaging_missense"
+submit_recode_job ${the_path} ${the_prefix}
 
 #the_path="${in_dir}/ukb_eur_wes_200k_chr${chr}_pLoF_damaging_missense_all.tsv.gz"
 #the_prefix="${out_dir}/ukb_eur_wes_200k_chr${chr}.pp90.recoded.pLoF_damaging_missense"

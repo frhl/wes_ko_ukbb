@@ -9,7 +9,7 @@
 #SBATCH --error=logs/make_intervals.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-320
+#SBATCH --array=1-340
 #
 
 set -o errexit
@@ -26,8 +26,8 @@ readonly bash_script="scripts/conditional/common/_make_intervals.sh"
 readonly padding=1000000 # 1 Megabase
 readonly min_mac=4
 
-readonly in_dir="data/conditional/common/gene_positions/min_mac${min_mac}"
-readonly out_dir="data/conditional/common/intervals/min_mac${min_mac}"
+readonly genes_dir="data/conditional/common/gene_positions/2024/min_mac${min_mac}"
+readonly out_dir="data/conditional/common/intervals/2024/min_mac${min_mac}"
 readonly pheno_dir="data/phenotypes"
 readonly in_prefix="ukb_eur_wes_200k"
 
@@ -57,7 +57,7 @@ submit_intervals()
   local phenotype=${2?Error: Missing arg2 (phenotype)}
   local trait=${3?Error: Missing arg3 (trait)}
   local pheno_file=${4?Error: Missing arg4 (pheno_file)}
-  local genes="${in_dir}/${in_prefix}_${phenotype}_${annotation}.tsv.gz"
+  local genes="${genes_dir}/${in_prefix}_${phenotype}_${annotation}.tsv.gz"
   local out_prefix="${out_dir}/${in_prefix}_${phenotype}_${annotation}"
   if [ ! -z "${phenotype}" ]; then
     if [ -f ${genes} ]; then

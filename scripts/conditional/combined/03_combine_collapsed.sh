@@ -10,18 +10,6 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 2
 #SBATCH --array=1-22
-# --dependency="aftercorr:10270075"
-#
-#$ -N combine_collapsed
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/combine_collapsed.log
-#$ -e logs/combine_collapsed.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 2
-#$ -q short.qc
-#$ -t 1-21
-#$ -V
-#$ -hold_jid_ad 80055415
 
 set -o errexit
 set -o nounset

@@ -8,6 +8,8 @@ main <- function(args){
     sig_genes <- fread(args$path_sig_genes)
     traits_to_test <- fread(args$path_header, header = FALSE)$V1
     sig_genes <- sig_genes[sig_genes$trait %in% traits_to_test,]
+    print(sig_genes)
+    print(traits_to_test)
 
     # combine list of significant genes 
     d <- rbindlist(lapply(1:nrow(sig_genes), function(idx){
@@ -29,6 +31,13 @@ main <- function(args){
             } else {
                 file_path <- file_path[!bool_prs]
             }
+        }
+
+        # make sure only one file is included when primary care data is used
+        if (grepl(pattern="combined_primary_care", phenotype)){
+            file_path <- file_path[grepl("primary_care", file_path)]
+        } else {
+            file_path <- file_path[!grepl("primary_care", file_path)]
         }
 
         if (length(file_path) == 0){

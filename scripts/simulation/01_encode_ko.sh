@@ -5,9 +5,10 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/encode_ko.log
 #SBATCH --error=logs/encode_ko.errors.log
-#SBATCH --partition=epyc
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 3
-#SBATCH --array=1-21
+#SBATCH --array=20-22
+#SBATCH --qos=960_cpu
 
 source utils/qsub_utils.sh
 source utils/hail_utils.sh
@@ -19,14 +20,14 @@ readonly spark_dir="data/tmp/spark_dir"
 readonly array_idx=$( get_array_task_id )
 readonly chr=$( get_chr ${array_idx} )
 
-readonly n_samples="10k"
+readonly n_samples="100k"
 readonly in_dir="data/simulation/mt"
 readonly in_file="${in_dir}/ukb_wes_union_calls_${n_samples}_chr${chr}.mt"
 
 readonly in_type="mt"
 
-readonly out_dir="data/simulation/knockouts"
-readonly out_prefix="${out_dir}/ukb_wes_union_calls_${n_samples}_encoded_chr${chr}"
+readonly out_dir="data/simulation/knockouts/excl_singletons"
+readonly out_prefix="${out_dir}/ukb_wes_union_calls_${n_samples}_no_singletons_encoded_chr${chr}"
 readonly out_type="vcf"
 readonly out="${out_prefix}.vcf.bgz"
 
@@ -54,7 +55,8 @@ python3 "${hail_script}" \
   --maf_max ${maf_max} \
   --maf_min ${maf_min} \
   --out_prefix ${out_prefix} \
-  --out_type ${out_type} 
+  --out_type ${out_type} \
+  --exclude_singletons 
 
 #>&2 echo "${out}"
 #module load BCFtools/1.12-GCC-10.3.0

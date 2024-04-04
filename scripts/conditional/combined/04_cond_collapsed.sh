@@ -10,7 +10,7 @@
 #SBATCH --error=logs/cond_collapsed.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=311
+#SBATCH --array=11-50
 #SBATCH --open-mode=append
 
 set -o errexit
@@ -41,7 +41,7 @@ readonly in_prefix="ukb_eur_wes_200k"
 
 # list of genes that passes significance cutoffs
 readonly sig_genes_dir="data/conditional/combined/sig_genes"
-readonly sig_genes="${sig_genes_dir}/sig_genes_176k.txt.gz"
+readonly sig_genes="${sig_genes_dir}/sig_genes_after_sig_prs_176k.txt.gz"
 
 # list of collapsed rare variants to condition on
 readonly cond_rare_dir="data/mt/dosages_urv/pp90"

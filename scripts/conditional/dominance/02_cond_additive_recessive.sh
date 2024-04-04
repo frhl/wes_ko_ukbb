@@ -9,7 +9,7 @@
 #SBATCH --error=logs/cond_additive_recessive.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-320
+#SBATCH --array=11-331
 #SBATCH --open-mode=append
 
 set -o errexit
@@ -22,7 +22,7 @@ source utils/qsub_utils.sh
 readonly cluster=$( get_current_cluster)
 readonly index=$( get_array_task_id )
 
-readonly rscript="scripts/_check_prs_ok.R"
+readonly rscript="scripts/saige/_check_prs_ok.R"
 
 readonly curwd=$(pwd)
 readonly vcf_dir="data/conditional/dominance/combine_encodings"
@@ -40,7 +40,7 @@ readonly in_prefix="ukb_eur_wes_200k"
 
 # list of genes that passes significance cutoffs
 readonly sig_genes_dir="data/conditional/combined/sig_genes"
-readonly sig_genes="${sig_genes_dir}/sig_genes_176k.txt.gz"
+readonly sig_genes="${sig_genes_dir}/sig_genes_after_sig_prs_176k.txt.gz"
 
 # list of additive markers to condition on
 readonly cond_additive_dir="data/conditional/dominance/combine_encodings"

@@ -11,7 +11,7 @@ readonly bash_script="scripts/permute/_gene_permute.sh"
 readonly spa_script="scripts/permute/_gene_spa.sh"
 readonly merge_script="scripts/permute/_merge_permuted_spa.sh"
 readonly calc_script="scripts/permute/_calc_p.sh"
-readonly rscript_check_prs="scripts/_check_prs_ok.R"
+readonly rscript_check_prs="scripts/saige/_check_prs_ok.R"
 
 readonly curwd=$(pwd)
 readonly project="lindgren.prj"

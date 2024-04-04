@@ -9,7 +9,7 @@
 #SBATCH --error=logs/filter_genotypes.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-320
+#SBATCH --array=1-340
 
 
 set -o errexit
@@ -29,8 +29,8 @@ readonly min_info=0.8
 readonly missing=0.10
 readonly min_mac=4
 
-readonly in_dir="data/conditional/common/intervals/min_mac${min_mac}"
-readonly out_dir="data/conditional/common/intervals/min_mac${min_mac}"
+readonly in_dir="data/conditional/common/intervals/2024/min_mac${min_mac}"
+readonly out_dir="data/conditional/common/intervals/2024/min_mac${min_mac}"
 readonly pheno_dir="data/phenotypes"
 readonly in_prefix="ukb_eur_wes_200k"
 

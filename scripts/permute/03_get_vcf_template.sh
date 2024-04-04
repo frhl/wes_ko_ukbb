@@ -7,7 +7,7 @@
 #SBATCH --chdir=/well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
 #SBATCH --output=logs/get_vcf_template.log
 #SBATCH --error=logs/get_vcf_template.errors.log
-#SBATCH --partition=epyc
+#SBATCH --partition=short
 #SBATCH --cpus-per-task 1
 
 source utils/vcf_utils.sh
@@ -26,6 +26,7 @@ mkdir -p ${out_dir}
 
 # NOTE: there is an error in SLURM/BCFTOOLS causing this
 # to fail when submitted as a job. You might need to do it manuall (Mar-2023)
+# update: i think this issue stems from using 'epyc' nodes
 echo "$( bcftools query -l ${in_vcf} )" > ${out_file}
 
 

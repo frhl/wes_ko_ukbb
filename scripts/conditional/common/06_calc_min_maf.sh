@@ -9,7 +9,7 @@
 #SBATCH --error=logs/calc_min_maf.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-320
+#SBATCH --array=1-350
 
 
 set -o errexit
@@ -25,8 +25,8 @@ readonly bash_script="scripts/conditional/common/_calc_min_maf.sh"
 readonly final_sample_list='/well/lindgren/UKBIOBANK/dpalmer/wes_200k/ukb_wes_qc/data/samples/09_final_qc.keep.sample_list'
 
 readonly min_mac=4
-readonly in_dir="data/conditional/common/intervals/min_mac${min_mac}"
-readonly out_dir="data/conditional/common/intervals/min_mac${min_mac}"
+readonly in_dir="data/conditional/common/intervals/2024/min_mac${min_mac}"
+readonly out_dir="data/conditional/common/intervals/2024/min_mac${min_mac}"
 readonly pheno_dir="data/phenotypes"
 readonly in_prefix="ukb_eur_wes_200k"
 

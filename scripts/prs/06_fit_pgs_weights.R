@@ -8,6 +8,7 @@ library(tictoc)
 
 main <- function(args){
 
+  print(args)
   stopifnot(file.exists(args$ldsc))
   stopifnot(dir.exists(args$ld_dir))
   stopifnot(dir.exists(dirname(args$out_prefix)))
@@ -51,6 +52,7 @@ main <- function(args){
   # write SNP order
   marker_order <- gwas[,c("chr","pos","a0","a1","marker")]
   marker_path <- paste0(args$out_prefix,'.txt.gz')
+  write(paste("Writing", marker_path), stderr())
   fwrite(marker_order, marker_path, sep="\t")
 
   ldpred_with_params <- function(num_iter, burn_in, h2_init, vec_p_init, seed=NULL) { 
@@ -62,13 +64,13 @@ main <- function(args){
          burn_in = burn_in,
          h2_init = h2_init,
          vec_p_init = vec_p_init,
-         #use_MLE = FALSE, # Uncomment if convergence issues
+         use_MLE = FALSE, # Uncomment if convergence issues
          ncores = NCORES)
       beta_auto <- sapply(multi_auto, function(auto){auto$beta_est})
       chains_converged <- which(colSums(is.na(beta_auto))==0)
       write(paste("Chains converged:", chains_converged), stdout())
-      converged <- length(chains_converged) >= 3 #  want at least 10 chains
-      return(list(beta_auto=beta_auto, multi_auto=multi_auto, chains_converged=chains_converged, converged=converged))       
+      did_converge <- length(chains_converged) >= 3 #  want at least 10 chains
+      return(list(beta_auto=beta_auto, multi_auto=multi_auto, chains_converged=chains_converged, converged=did_converge))       
   }
 
   # use proper vec p init
@@ -77,10 +79,11 @@ main <- function(args){
  
   # try the following combination of paramters in case of instability
   grid_params <- list(
-     list(iter=500, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.70, length.out=vec_p_ranges), seed=5),
-     list(iter=500, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.60, length.out=vec_p_ranges), seed=6),
-     list(iter=100, burn_in=100, h2_init=h2_init, vec_p_init=seq_log(1e-5, 0.80, length.out=vec_p_ranges), seed=7),
-     list(iter=100, burn_in=50, h2_init=h2_init, vec_p_init=seq_log(1e-5, 0.40, length.out=vec_p_ranges), seed=8)
+     #list(iter=500, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.70, length.out=vec_p_ranges), seed=5+1),
+     list(iter=500, burn_in=200, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.60, length.out=vec_p_ranges), seed=6+1)
+     #list(iter=100, burn_in=100, h2_init=h2_init, vec_p_init=seq_log(1e-5, 0.80, length.out=vec_p_ranges), seed=7+1),
+     #list(iter=100, burn_in=50, h2_init=h2_init, vec_p_init=seq_log(1e-5, 0.40, length.out=vec_p_ranges), seed=8+1),
+     #list(iter=200, burn_in=100, h2_init=h2_init, vec_p_init=seq_log(1e-4, 0.30, length.out=vec_p_ranges), seed=9+1)
    )
  
   step <- 0
@@ -94,10 +97,11 @@ main <- function(args){
          vec_p_init=par$vec_p_init,
          seed=par$seed
      )
-     converged <- ldpred_result$converged
+     converged <- as.logical(ldpred_result$converged)
      multi_auto <- ldpred_result$multi_auto
      beta_auto <- ldpred_result$beta_auto
-     if (converged) break 
+     write(paste("converge? =", converged), stderr())
+     if (converged == TRUE) break 
   }
     
   # ensure that no missing values are present,
@@ -109,10 +113,23 @@ main <- function(args){
   (range <- sapply(multi_auto, function(auto) diff(range(auto$corr_est))))
   (keep <- (range > (0.95 * quantile(range, 0.95, na.rm=TRUE))))
   keep[is.na(keep)] <- FALSE
-  stopifnot(sum(keep) > 0)
+  
+  print(head(range))
+  print(head(keep))
+  
+  if (sum(keep) == 0) {
+    write(paste("Error:"))
+    write(head(keep), stderr())
+    write(head(range), stderr())
+    stop(paste("No chains passed QC. Stopping", args$out_prefix, "!"))
+  }
+
+  print(head(multi_auto))
+  print(str(multi_auto))
 
   # save weights
   multi_auto_path <- paste0(args$out_prefix,'.rda')
+  write(paste("Writing", multi_auto_path), stderr())
   saveRDS(multi_auto, multi_auto_path, compress = 'xz')
   toc()
   

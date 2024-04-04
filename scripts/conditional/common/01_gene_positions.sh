@@ -9,7 +9,7 @@
 #SBATCH --error=logs/gene_positions.errors.log
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 1
-#SBATCH --array=1-320
+#SBATCH --array=1-340
 
 #$ -N gene_positions
 #$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
@@ -35,10 +35,11 @@ readonly rscript_prs="scripts/_check_prs_ok.R"
 readonly min_mac=4
 
 readonly genes="data/genes/220310_ensgid_grch38_pos.tsv.gz"
-readonly out_dir="data/conditional/common/gene_positions/min_mac${min_mac}"
+readonly out_dir="data/conditional/common/gene_positions/2402/min_mac${min_mac}"
 readonly pheno_dir="data/phenotypes"
 readonly in_prefix="ukb_eur_wes_200k"
 
+readonly phenos_tested="311"
 readonly genes_tested=952
 readonly bonf_p_cutoff="$(python -c "print(0.05/(${genes_tested}*${phenos_tested}))")"
 readonly nom_p_cutoff="$(python -c "print(0.05/(${genes_tested}))")"

@@ -10,17 +10,6 @@
 #SBATCH --partition=short
 #SBATCH --cpus-per-task 3
 #SBATCH --array=1-22
-#
-#
-#$ -N export_regular_markers
-#$ -wd /well/lindgren-ukbb/projects/ukbb-11867/flassen/projects/KO/wes_ko_ukbb
-#$ -o logs/export_regular_markers.log
-#$ -e logs/export_regular_markers.errors.log
-#$ -P lindgren.prjc
-#$ -pe shmem 1
-#$ -q short.qc
-#$ -t 1-22
-#$ -V
 
 set -o errexit
 set -o nounset
